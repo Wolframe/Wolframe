@@ -20,13 +20,13 @@ mkdir -p $PKGBUILD $PKGBUILD/BUILD $PKGBUILD/PKG $PKGBUILD/PKGS/$ARCH
 rm -f wolframe-$VERSION.tar.gz
 
 make distclean
-mkdir /tmp/wolframe-$VERSION
-cp -a * /tmp/wolframe-$VERSION
-cd /tmp
+mkdir /var/tmp/wolframe-$VERSION
+cp -a * /var/tmp/wolframe-$VERSION
+cd /var/tmp
 tar zcf wolframe-$VERSION.tar.gz wolframe-$VERSION
 cd -
-mv /tmp/wolframe-$VERSION.tar.gz .
-rm -rf /tmp/wolframe-$VERSION
+mv /var/tmp/wolframe-$VERSION.tar.gz .
+rm -rf /var/tmp/wolframe-$VERSION
 
 cp wolframe-$VERSION.tar.gz $PKGBUILD/BUILD/.
 cp packaging/archlinux/* $PKGBUILD/BUILD/.

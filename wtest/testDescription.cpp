@@ -54,10 +54,18 @@
 #include <oci.h>
 #include <sstream>
 #endif
+#include <boost/lexical_cast.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
-static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs);
+static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
+{
+	res.clear();
+	std::vector<std::string> imm;
+	boost::split( imm, inp, boost::is_any_of(splitchrs));
+	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
+	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
+}
 
 using namespace _Wolframe;
 using namespace wtest;
@@ -342,15 +350,35 @@ if (boost::starts_with( flag, "DISABLED "))
 	return "";
 }
 
+static void readFileContent( const std::string& filename, std::string& res)
+{
+	unsigned char ch;
+	FILE* fh = fopen( filename.c_str(), "rb");
+	if (!fh)
+	{
+		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
+	}
+	boost::shared_ptr<FILE> fhr( fh, fclose);
+	while (1 == fread( &ch, 1, 1, fh))
+	{
+		res.push_back( ch);
+	}
+	if (!feof( fh))
+	{
+		int ec = ferror( fh);
+		if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
+	}
+}
+
 static void readFile( const std::string& pt, std::vector<std::string>& hdr, std::vector<std::string>& out, std::string& requires, std::vector<std::string>& outputfile)
 {
 	std::string element;
-	char chb;
+	std::string content;
+	readFileContent( pt, content);
+	std::string::const_iterator ci = content.begin(), ce = content.end();
+
 	std::size_t linecnt = 0;
 	std::size_t colcnt = 0;
-	std::fstream infh;
-	infh.exceptions( std::ifstream::failbit | std::ifstream::badbit);
-	infh.open( pt.c_str(), std::ios::in | std::ios::binary);
 	std::string splitstr;
 	std::string::const_iterator splititr;
 	enum
@@ -361,27 +389,25 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 	}
 	type = PARSE_HDR;
 
-	while (infh.read( &chb, sizeof(chb)))
+	for (; ci != ce; ++ci)
 	{
-		if (chb == '\r' || chb == '\n') break;
+		if (*ci == '\r' || *ci == '\n') break;
 		++linecnt;
-		splitstr.push_back( chb);
+		splitstr.push_back( *ci);
 	}
+	if (ci != ce && *ci == '\r') ++ci;
+	if (ci != ce && *ci == '\n') ++ci;
+
 	splititr = splitstr.begin();
 	if (splititr == splitstr.end())
 	{
 		throw std::runtime_error( "illegal test definition file. no split tag defined at file start");
 	}
-	while (infh.read( &chb, sizeof(chb)))
+	for (; ci != ce && splititr != splitstr.end(); ++ci)
 	{
-		if (chb != '\r' && chb != '\n') break;
-	}
-	do
-	{
-		if (chb != *splititr) break;
+		if (*ci != *splititr) break;
 		++splititr;
-	} while (splititr != splitstr.end() && infh.read( &chb, sizeof(chb)));
-
+	};
 	if (splititr != splitstr.end())
 	{
 		throw std::runtime_error( "illegal test definition file. header expected after split tag definition");
@@ -390,9 +416,9 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 
 	try
 	{
-		while (infh.read( &chb, sizeof(chb)))
+		for (; ci != ce; ++ci)
 		{
-			if (chb == '\n')
+			if (*ci == '\n')
 			{
 				++linecnt;
 				colcnt = 0;
@@ -403,13 +429,12 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 			}
 			if (type == PARSE_HDR)
 			{
-				if (chb == '\n')
+				if (*ci == '\n')
 				{
 					std::string tag( std::string( element.c_str(), element.size()));
 					boost::trim( tag);
 					if (boost::iequals( tag, "end"))
 					{
-						infh.close();
 						return;
 					}
 					else if (boost::starts_with( tag, "outputfile:"))
@@ -439,13 +464,13 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 				}
 				else
 				{
-					element.push_back( chb);
+					element.push_back( *ci);
 				}
 			}
 			else if (type == PARSE_OUT)
 			{
-				element.push_back( chb);
-				if (chb == *splititr)
+				element.push_back( *ci);
+				if (*ci == *splititr)
 				{
 					++splititr;
 					if (splititr == splitstr.end())
@@ -464,7 +489,7 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 			}
 			else if (type == PARSE_NOT)
 			{
-				if (chb == *splititr)
+				if (*ci == *splititr)
 				{
 					++splititr;
 					if (splititr == splitstr.end())
@@ -474,7 +499,7 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 						splititr = splitstr.begin();
 					}
 				}
-				else if ((unsigned char)chb > 32)
+				else if ((unsigned char)*ci > 32)
 				{
 					throw std::runtime_error( "illegal test definition file. tag definition expected");
 				}
@@ -559,14 +584,63 @@ TestDescription::TestDescription( const std::string& pt, const char* argv0)
 	}
 }
 
-static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
+std::string TestDescription::normalizeOutputCRLF( const std::string& output, const std::string& expected_)
 {
-	res.clear();
-	std::vector<std::string> imm;
-	boost::split( imm, inp, boost::is_any_of(splitchrs));
-	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
-	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
+	std::string::const_iterator ei = expected_.begin(), ee = expected_.end();
+	std::string::const_iterator oi = output.begin(), oe = output.end();
+	std::string resultstr;
+
+	for (; ei != ee && oi != oe; ++oi,++ei)
+	{
+		if (*ei == *oi)
+		{
+			resultstr.push_back( *ei);
+		}
+		else if (*ei == '\r' && *oi == '\n')
+		{
+			++ei;
+			if (*ei == '\n')
+			{
+				resultstr.push_back( '\r');
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+		else if (*ei == '\n' && *oi == '\r')
+		{
+			++oi;
+			if (*oi == '\n')
+			{
+				resultstr.push_back( '\n');
+			}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
+	if (oi == oe && ei == ee)
+	{
+		return resultstr;
+	}
+	else
+	{
+		return output;
+	}
 }
+
+std::string TestDescription::normalizeOutputCRLF( const std::string& output)
+{
+	return normalizeOutputCRLF( output, expected);
+}
+
 #ifdef _WIN32
 #pragma warning(pop)
 #endif

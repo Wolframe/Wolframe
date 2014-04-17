@@ -26,13 +26,18 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall BEGIN
-	DO run( haus, baum);
+	DO SELECT run( $(haus), $(baum));
 END
 **outputfile:DBOUT
 **output
-run #hier ist ein haus text#hier ist ein baum text
-
-start( 'run' );
+Code:
+[0] RESULT_SET_INIT
+[1] DBSTM_START STM (SELECT run( $1, $2))
+[2] DBSTM_BIND_CONST CONST 'hier ist ein haus text'
+[3] DBSTM_BIND_CONST CONST 'hier ist ein baum text'
+[4] DBSTM_EXEC
+[5] RETURN
+start( 'SELECT run( $1, $2)' );
 bind( 1, 'hier ist ein haus text' );
 bind( 2, 'hier ist ein baum text' );
 execute();

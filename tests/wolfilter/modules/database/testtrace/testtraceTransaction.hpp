@@ -45,13 +45,16 @@ namespace _Wolframe {
 namespace db {
 
 class TesttraceTransaction
-	:public StatemachineBasedTransaction
+	:public Transaction
 {
 public:
 	TesttraceTransaction( const TesttraceDatabase* dbref_, const std::vector<std::string>& result_);
 	virtual ~TesttraceTransaction(){}
 
+	virtual bool execute( const VmTransactionInput& input, VmTransactionOutput& output);
+
 private:
+	
 	std::vector<std::string> m_result;
 };
 

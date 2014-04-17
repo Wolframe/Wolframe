@@ -97,13 +97,6 @@
 						code base.
 					</para>
 				</listitem>
-				<listitem><programlisting>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</programlisting>
-					<para>
-						This optional declaration defines a tag for the
-						result structure relative to the result context
-						of the caller.
-					</para>
-				</listitem>
 				<listitem><programlisting>BEGIN &lt;...instructions...&gt; END</programlisting>
 					<para>
 					The main processing block starts with <code>BEGIN</code> and
@@ -117,12 +110,11 @@
 			<programlisting language='sql'>
 			SUBROUTINE &lt;name&gt; ( &lt;parameter name list&gt; )
 			DATABASE &lt;list of database names&gt;
-			RESULT INTO &lt;result-block-name&gt;
 			BEGIN
 				...&lt;instructions&gt;...
 			END
 			</programlisting>
-			The line with the RESULT INTO declaration and the DATABASE declaration are optional.
+			The DATABASE declaration is optional.
 			</para>
 		</sect3>
 
@@ -153,14 +145,17 @@
 						code base.
 					</para>
 				</listitem>
-				<listitem><programlisting>RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;</programlisting>
+				<listitem><programlisting>RESULT FILTER &lt;post-filter-name&gt;</programlisting>
 					<para>
-						This optional declaration defines a top level tag for the 
-						result structure and optionally a postprocessing step as
-						filter referenced by name.
-						It is similar as the construct in the subroutine description
-						except that one cannot specify a postprocessing filter
-						in a subroutine.
+						This optional declaration defines a function
+						applied as post filter to the transaction function.
+						The idea is that you might want to return a structure
+						as result that cannot be built by TDL. For example a
+						recursive structure like a tree.
+						The result filter function is called with the structure
+						printed by the main processing block (BEGIN .. END)
+						and the result of the filter function is returned to the
+						caller instead.
 					</para>
 				</listitem>
 				<listitem><programlisting>PREPROC &lt;...preprocessing instructions...&gt; ENDPROC</programlisting>
@@ -303,7 +298,7 @@
 			of a transaction function consist similar to the instructions
 			in the main execution block of three parts in the
 			following order terminated by a semicolon ';' (the order of the INTO and FOREACH expression can be
-			switched):
+			switched and has no meaning, e.g. FOREACH..INTO == INTO..FOREACH):
 		<itemizedlist>
 			<listitem><programlisting>INTO &lt;result substructure name&gt;</programlisting>
 				<para>
@@ -602,14 +597,13 @@
 		<sect3>
 			<title>Substructures in the Result</title>
 			<para>We already learned how to define substructures of the 
-			transaction function result with
-			the <code>RESULT INTO</code> directive of an OPERATION or 
-			TRANSACTION. But <code>RESULT INTO</code> blocks can also be
-			defined locally as sub blocks in the main processing block.
-			A sub-block in the result is declared with 
+			transaction function result with the <code>RESULT INTO</code>
+			directive of a TRANSACTION. 
+			But we can also define a scope in the result structure
+			for sub blocks. A sub-block in the result is declared with 
 			<programlisting language='sql'>
 
-				RESULT INTO &lt;resulttag&gt;
+				INTO &lt;resulttag&gt;
 				BEGIN
 					...&lt;instruction list&gt;...
 				END
@@ -659,14 +653,16 @@
 			<title>Subroutine Templates</title>
 			<para>To reuse code with different context, for example for doing the same
 			procedure on different tables, subroutine templates can be defined in TDL.
-			Subroutines become useful when we want to make items instantiable
+			Subroutine templates become useful when we want to make items instantiable
 			that are not allowed to be dependent on variable arguments.
 			Most SQL implementations for example forbid tables to be dependent on
 			variable arguments. To reuse code on different tables you can 
 			define subroutine templates with the involved table names as 
 			template argument. The following example defines a transaction using 
 			the template subroutine insertIntoTree on a table passed as template 
-			argument.
+			argument. The subroutine template arguments are substituting the identifiers
+			in embedded database statements by the passed identifier. Only whole identifiers
+			and not substrings of identifiers and no string contents are substituted.
 			<programlisting language='sql'>
 			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_subroutine_template.tdl" parse="text" />
 			</programlisting>

@@ -43,20 +43,20 @@ extern "C" {
 namespace _Wolframe {
 namespace langbind {
 
-//\brief Dump structure
+///\brief Dump structure
 class LuaDump;
 
-//\brief Create a dump of the lua state
-//\param[in] ls Lua state to dump
-//\return dump or 0 in case of bad_alloc
+///\brief Create a dump of the lua state
+///\param[in] ls Lua state to dump
+///\return dump or 0 in case of bad_alloc
 LuaDump* luaCreateDump( lua_State *ls);
 
-//\brief Load a Lua state dump into a Lua state
-//\param[in] ls Lua state to fill with dump
-//\param[in] source Lua state dump to load
+///\brief Load a Lua state dump into a Lua state
+///\param[in] ls Lua state to fill with dump
+///\param[in] source Lua state dump to load
 void luaLoadDump( lua_State *ls, const LuaDump* source);
 
-//\brief Free a Lua dump structure
+///\brief Free a Lua dump structure
 void freeLuaDump( LuaDump* d);
 
 }}//namespace

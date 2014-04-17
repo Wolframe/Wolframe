@@ -39,6 +39,7 @@
 #include "serialize/struct/structDescription.hpp"
 #include "config/structSerialize.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/parseUtils.hpp"
 #include "utils/stringUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3

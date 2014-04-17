@@ -29,8 +29,9 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION test_transaction
-RESULT INTO doc
+BEGIN INTO doc
 BEGIN
-	INTO task FOREACH //task DO run( title);
+	INTO task FOREACH //task DO SELECT run( title);
+END
 END"
 . ./output_tst_all.sh

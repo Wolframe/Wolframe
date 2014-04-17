@@ -44,8 +44,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-//\class DDLParseState
-//\brief State stack element for an initializer of a DDL structure from an iterator (serialization)
+///\class DDLParseState
+///\brief State stack element for an initializer of a DDL structure from an iterator (serialization)
 class DDLParseState
 {
 public:
@@ -103,7 +103,7 @@ private:
 	std::size_t m_stateidx;
 };
 
-//\brief State stack for an initializer of a DDL structure from an iterator (serialization)
+///\brief State stack for an initializer of a DDL structure from an iterator (serialization)
 typedef std::vector<DDLParseState> DDLParseStateStack;
 
 

@@ -44,8 +44,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-//\class DDLStructParser
-//\brief Initializer of a DDL structure from an iterator (serialization)
+///\class DDLStructParser
+///\brief Initializer of a DDL structure from an iterator (serialization)
 class DDLStructParser
 {
 public:

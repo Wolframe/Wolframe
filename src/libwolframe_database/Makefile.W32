@@ -20,23 +20,37 @@ INCLUDE_LIBS =
 LIBRARIES = \
 	wolframe_database.lib
 
+TDL_CPP_OBJS = \
+	tdl\elementReference.obj \
+	tdl\embeddedStatement.obj \
+	tdl\parseUtils.obj \
+	tdl\preprocCallStatement.obj \
+	tdl\preprocElementReference.obj \
+	tdl\preprocBlock.obj \
+	tdl\subroutineCallStatement.obj \
+	tdl\commandDefinition.obj
+
+VM_CPP_OBJS = \
+	vm\tagTable.obj \
+	vm\inputStructure.obj \
+	vm\selectorPath.obj \
+	vm\selectorPathSet.obj \
+	vm\subroutine.obj \
+	vm\program.obj \
+	vm\programImage.obj \
+	vm\programInstance.obj
+
 CPP_OBJS = \
-	transactionfunction/TagTable.obj \
-	transactionfunction/Path.obj \
-	transactionfunction/PreProcessCommand.obj \
-	transactionfunction/DatabaseCommand.obj \
-	transactionfunction/InputStructure.obj \
-	transactionfunction/ResultStructure.obj \
-	transactionfunction/ResultIterator.obj \
-	transactionfunction/ResultFilter.obj \
+	$(TDL_CPP_OBJS) \
+	$(VM_CPP_OBJS) \
 	transaction.obj \
-	transactionInput.obj \
-	transactionOutput.obj \
-	transactionFunction.obj \
-	transactionFunctionDescription.obj \
+	tdlTransactionPreprocStep.obj \
+	tdlTransactionFunction.obj \
+	vmTransactionInput.obj \
+	vmTransactionOutput.obj \
+	tdl2vmTranslator.obj \
 	loadTransactionProgram.obj \
 	databaseLanguage.obj \
-	transactionExecStatemachine.obj \
 	baseStatement.obj \
 	substitutingStatement.obj
 

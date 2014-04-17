@@ -46,8 +46,8 @@ namespace serialize {
 ///\brief Forward declaration
 class ParseStateStack;
 
-//\class ParseState
-//\brief State stack element for an initializer of a structure
+///\class ParseState
+///\brief State stack element for an initializer of a structure
 class ParseState
 {
 public:
@@ -75,8 +75,8 @@ private:
 	std::size_t m_stateidx;
 };
 
-//\class ParseStateStack
-//\brief State stack for an initializer of a structure
+///\class ParseStateStack
+///\brief State stack for an initializer of a structure
 class ParseStateStack :public std::vector<ParseState>
 {
 public:

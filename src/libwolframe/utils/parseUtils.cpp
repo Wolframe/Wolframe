@@ -51,10 +51,10 @@ CharTable::CharTable( const char* op, bool isInverse)
 	for (ii=33; ii<sizeof(m_ar); ++ii) m_ar[ii] = isInverse;
 	for (ii=0; op[ii]; ++ii)
 	{
-		if (op[ii] == '.' && op[ii+1] == '.' && op[ii+2] && ii > 0)
+		if (op[ii] == '.' && op[ii+1] == '.')
 		{
-			unsigned char hi = (unsigned char)op[ii+2];
-			unsigned char lo = (unsigned char)op[ii-1];
+			unsigned char hi = op[ii+2]?(unsigned char)op[ii+2]:255;
+			unsigned char lo = (ii>0)?(unsigned char)op[ii-1]:1;
 			if (hi < lo)
 			{
 				unsigned char tmp = hi;
@@ -206,30 +206,6 @@ std::pair<std::string,std::string> _Wolframe::utils::parseTokenAssignement( std:
 std::pair<std::string,std::string> utils::parseTokenAssignement( std::string::const_iterator& itr, std::string::const_iterator end)
 {
 	return parseTokenAssignement( itr, end, identifierCharTable());
-}
-
-LineInfo utils::getLineInfoIncrement( const LineInfo& lineinfo, const std::string::const_iterator& lastpos, const std::string::const_iterator& pos)
-{
-	LineInfo rt = lineinfo;
-	std::string::const_iterator ii = lastpos;
-	for (; ii!=pos; ++ii)
-	{
-		if (*ii == '\n')
-		{
-			rt.incrementLine();
-		}
-		else if (*ii != '\r')
-		{
-			rt.incrementColumn();
-		}
-	}
-	return rt;
-}
-
-LineInfo utils::getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
-{
-	LineInfo rt;
-	return utils::getLineInfoIncrement( rt, start, pos);
 }
 
 std::string utils::parseLine( std::string::const_iterator& si, const std::string::const_iterator& se)

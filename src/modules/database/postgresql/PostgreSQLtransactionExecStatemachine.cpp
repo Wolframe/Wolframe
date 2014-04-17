@@ -55,9 +55,8 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( const std::string& name_, PostgreSQLdbUnit* dbunit_)
-	:TransactionExecStatemachine(name_)
-	,m_state(Init)
+TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( PostgreSQLdbUnit* dbunit_)
+	:m_state(Init)
 	,m_lastresult(0)
 	,m_statement( new STATEMENT_CLASS( ) )
 	,m_nof_rows(0)
@@ -155,26 +154,30 @@ void TransactionExecStatemachine_postgres::setDatabaseErrorMessage()
 {
 	const char* errmsg = m_lastresult?PQresultErrorMessage( m_lastresult):"";
 	const char* errtype = m_lastresult?getErrorType( PQresultErrorField( m_lastresult, PG_DIAG_SQLSTATE)):"INTERNAL";
-	const char* severitystr = m_lastresult?PQresultErrorField( m_lastresult, PG_DIAG_SEVERITY):"ERROR";
-	log::LogLevel::Level severity = PostgreSQLdbUnit::getLogLevel( severitystr);
 
 	const char* usermsg = 0;
+	std::string errmsgstr;
+	std::string usermsgstr;
 	if (errmsg)
 	{
-		usermsg = strstr( errmsg, "DETAIL:");
-		if (usermsg) usermsg = usermsg + 7;
-		if (!usermsg)
+		if (std::memcmp( errmsg, "ERROR: ", 7) == 0)
 		{
-			usermsg = strstr( errmsg, "ERROR:");
-			if (usermsg) usermsg = usermsg + 7;
+			errmsgstr.append( errmsg+7);
 		}
-		if (!usermsg)
+		else
 		{
-			usermsg = errmsg;
+			errmsgstr.append( errmsg);
+		}
+		usermsg = std::strstr( errmsgstr.c_str(), "DETAIL:");
+		if (usermsg)
+		{
+			errmsgstr.resize( usermsg - errmsgstr.c_str());
+			usermsg = usermsg + 7;
+			usermsgstr = usermsg;
 		}
 	}
 	int errorcode = 0;
-	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(**m_conn), m_statement->nativeSQL().c_str(), errtype, errmsg, usermsg));
+	m_lasterror.reset( new DatabaseError( errtype, errorcode, errmsgstr, usermsgstr));
 }
 
 bool TransactionExecStatemachine_postgres::status( PGresult* res, State newstate)
@@ -236,6 +239,7 @@ bool TransactionExecStatemachine_postgres::commit()
 	{
 		delete m_conn;
 		m_conn = 0;
+		m_state = Init;
 	}
 	return rt;
 }
@@ -243,6 +247,13 @@ bool TransactionExecStatemachine_postgres::commit()
 bool TransactionExecStatemachine_postgres::rollback()
 {
 	LOG_TRACE << "[postgresql statement] CALL rollback()";
+	if (m_state == Transaction)
+	{
+	}
+	else if (m_state != Executed && m_state != CommandReady)
+	{
+		return errorStatus( std::string( "call of rollback not allowed in state '") + stateName(m_state) + "'");
+	}
 	if (m_conn)
 	{
 		bool rt = status( PQexec( **m_conn, "ROLLBACK;"), Init);
@@ -250,9 +261,11 @@ bool TransactionExecStatemachine_postgres::rollback()
 		{
 			delete m_conn;
 			m_conn = 0;
+			m_state = Init;
 		}
 		return rt;
 	}
+	m_state = Init;
 	return true;
 }
 
@@ -260,8 +273,7 @@ bool TransactionExecStatemachine_postgres::errorStatus( const std::string& messa
 {
 	if (m_state != Error)
 	{
-		const char* dbname = m_conn?PQdb(**m_conn):"POSTGRESQL";
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, dbname, m_statement->nativeSQL().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+		m_lasterror.reset( new DatabaseError( "INTERNAL", 0, message));
 		m_state = Error;
 	}
 	return false;

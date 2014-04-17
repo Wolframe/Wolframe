@@ -37,8 +37,6 @@
 #include "database/transaction.hpp"
 #include "types/keymap.hpp"
 #include <string>
-#include <iostream>
-#include <sstream>
 
 namespace _Wolframe {
 namespace db {

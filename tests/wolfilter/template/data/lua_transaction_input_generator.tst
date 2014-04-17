@@ -35,9 +35,10 @@ Processor
 #name#job4
 **file:DBIN.tdl
 TRANSACTION test_transaction
-RESULT INTO doc
-BEGIN
-	INTO title FOREACH //task DO run( title);
+BEGIN INTO doc
+	BEGIN
+		INTO title FOREACH //task DO SELECT run( title);
+	END
 END"
 . ./output_tst_all.sh
 

@@ -60,11 +60,11 @@ public:
 	virtual const std::string replace( const unsigned int idx ) const;
 
 private:
-	//\brief Implementation of bind(const unsigned int,const types::Variant&) without boundary checking
+	///\brief Implementation of bind(const unsigned int,const types::Variant&) without boundary checking
 	void bindVariant( unsigned int idx, const types::Variant &value);
 
 private:
-	//\remark See implementation of pq_sendint64
+	///\remark See implementation of pq_sendint64
 	void bindUInt64( boost::uint64_t value, const char* type="int8");
 	void bindInt64( boost::int64_t value);
 	void bindUInt32( boost::uint32_t value, const char* type="int4");

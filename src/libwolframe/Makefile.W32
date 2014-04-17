@@ -47,6 +47,8 @@ TYPE_OBJS = \
 	types\form.obj
 
 UTIL_OBJS = \
+	utils\fileLineInfo.obj \
+	utils\sourceLineInfo.obj \
 	utils\typeSignature.obj \
 	utils\allocators.obj \
 	utils\malloc.obj \

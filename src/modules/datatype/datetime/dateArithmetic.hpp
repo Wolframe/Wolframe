@@ -68,11 +68,11 @@ public:
 	///\brief Assignment operator
 	Date& operator=( const Date& o)			{m_date = o.m_date; return *this;}
 
-	//\brief Get the year part of the date (YYYY)
+	///\brief Get the year part of the date (YYYY)
 	int year() const				{return m_date.year();}
-	//\brief Get the month part of the date ( >= 1)
+	///\brief Get the month part of the date ( >= 1)
 	int month() const				{return m_date.month();}
-	//\brief Get the day part of the date ( >= 1)
+	///\brief Get the day part of the date ( >= 1)
 	int day() const					{return m_date.day();}
 
 	///\brief Get the difference in days

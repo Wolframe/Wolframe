@@ -406,7 +406,7 @@ void PostgreSQLdatabase::closeTransaction( Transaction *t )
 
 
 PostgreSQLtransaction::PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_)
-	:StatemachineBasedTransaction( name_, new TransactionExecStatemachine_postgres( name_, &database.dbUnit())){}
+	:Transaction( name_, TransactionExecStatemachineR( new TransactionExecStatemachine_postgres( &database.dbUnit()))){}
 
 }} // _Wolframe::db
 

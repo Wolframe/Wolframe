@@ -29,8 +29,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file comauto/variantToString.hpp
-//\brief Debug helper for mapping VARIANT data types to string
+///\file comauto/variantToString.hpp
+///\brief Debug helper for mapping VARIANT data types to string
 #ifndef _Wolframe_COM_AUTOMATION_VARIANT_TOSTRING_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_VARIANT_TOSTRING_HPP_INCLUDED
 #include "comauto/typelib.hpp"

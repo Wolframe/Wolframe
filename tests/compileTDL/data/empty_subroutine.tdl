@@ -1,0 +1,9 @@
+SUBROUTINE empty
+BEGIN
+END
+
+TRANSACTION main
+BEGIN
+	DO empty( );
+END
+

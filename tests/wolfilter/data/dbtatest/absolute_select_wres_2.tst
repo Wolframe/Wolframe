@@ -27,9 +27,11 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall
-RESULT INTO result
 BEGIN
-	INTO item DO run( /aa, /bb);
+INTO result
+BEGIN
+	INTO item DO SELECT run( $(/aa), $(/bb));
+END
 END
 **file: DBRES
 #id name#1 hugo
@@ -37,9 +39,25 @@ END
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <result><item><id>1</id><name>hugo</name></item></result>
-run #1#2
-
-start( 'run' );
+Code:
+[0] OUTPUT_OPEN TAG result
+[1] RESULT_SET_INIT
+[2] DBSTM_START STM (SELECT run( $1, $2))
+[3] DBSTM_BIND_CONST CONST '1'
+[4] DBSTM_BIND_CONST CONST '2'
+[5] DBSTM_EXEC
+[6] OUTPUT_OPEN_ARRAY TAG item
+[7] OPEN_ITER_LAST_RESULT
+[8] NOT_IF_COND GOTO @14
+[9] OUTPUT_OPEN_ELEM
+[10] OUTPUT_ITR_COLUMN
+[11] OUTPUT_CLOSE_ELEM
+[12] NEXT
+[13] IF_COND GOTO @9
+[14] OUTPUT_CLOSE_ARRAY
+[15] OUTPUT_CLOSE
+[16] RETURN
+start( 'SELECT run( $1, $2)' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();

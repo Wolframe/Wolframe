@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file luaObjectTemplate.hpp
-//\brief Template for Wolframe objects used in the Lua interpreter context
+///\file luaObjectTemplate.hpp
+///\brief Template for Wolframe objects used in the Lua interpreter context
 #ifndef _Wolframe_langbind_LUA_OBJECT_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_OBJECT_TEMPLATE_HPP_INCLUDED
 #include "luaObjects.hpp"
@@ -41,10 +41,16 @@ Project Wolframe.
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
 #include "types/customDataType.hpp"
+#include "types/form.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"
 #include "filter/tostringfilter.hpp"
+#include "filter/redirectFilterClosure.hpp"
+#include "serialize/ddlFormParser.hpp"
+#include "serialize/ddlFormSerializer.hpp"
+#include "serialize/struct/structParser.hpp"
+#include "serialize/struct/structSerializer.hpp"
 #include "utils/fileUtils.hpp"
 #include <limits>
 #include <stdexcept>
@@ -61,7 +67,6 @@ namespace langbind {
 
 template <class ObjectType>
 struct MetaTable {static const char* name()						{return 0;}};
-template <> struct MetaTable<Logger> {static const char* name()				{return "wolframe.Logger";}};
 template <> struct MetaTable<Input> {static const char* name()				{return "wolframe.Input";}};
 template <> struct MetaTable<Output> {static const char* name()				{return "wolframe.Output";}};
 template <> struct MetaTable<Filter> {static const char* name()				{return "wolframe.Filter";}};
@@ -71,16 +76,16 @@ template <> struct MetaTable<types::CustomDataValueR> {static const char* name()
 template <> struct MetaTable<types::CustomDataInitializerR> {static const char* name()	{return "wolframe.CustomInitializer";}};
 template <> struct MetaTable<types::DateTime> {static const char* name()		{return "wolframe.DateTime";}};
 template <> struct MetaTable<types::BigNumber> {static const char* name()		{return "wolframe.BigNumber";}};
-template <> struct MetaTable<DDLFormParser> {static const char* name()			{return "wolframe.DDLFormParser";}};
-template <> struct MetaTable<DDLFormSerializer> {static const char* name()		{return "wolframe.DDLFormSerializer";}};
+template <> struct MetaTable<serialize::DDLFormParser> {static const char* name()	{return "wolframe.DDLFormParser";}};
+template <> struct MetaTable<serialize::DDLFormSerializer> {static const char* name()	{return "wolframe.DDLFormSerializer";}};
 template <> struct MetaTable<InputFilterClosure> {static const char* name()		{return "wolframe.InputFilterClosure";}};
 template <> struct MetaTable<TypedInputFilterR> {static const char* name()		{return "wolframe.TypedInputFilterR";}};
 template <> struct MetaTable<TypedInputFilterClosure> {static const char* name()	{return "wolframe.TypedInputFilterClosure";}};
 template <> struct MetaTable<FormFunctionClosureR> {static const char* name()		{return "wolframe.FormFunctionClosureR";}};
 template <> struct MetaTable<types::NormalizeFunctionR> {static const char* name()	{return "wolframe.NormalizeFunctionR";}};
 template <> struct MetaTable<serialize::StructSerializer> {static const char* name()	{return "wolframe.StructSerializer";}};
-template <> struct MetaTable<proc::ProcessorProviderInterface> {static const char* name()	{return "wolframe.ProcessorProvider";}};
-template <> struct MetaTable<langbind::LuaModuleMap> {static const char* name()		{return "wolframe.LuaModuleMap";}};
+template <> struct MetaTable<proc::ProcessorProviderInterface> {static const char* name(){return "wolframe.ProcessorProvider";}};
+template <> struct MetaTable<LuaModuleMap> {static const char* name()			{return "wolframe.LuaModuleMap";}};
 
 template <class ObjectType>
 struct LuaObject

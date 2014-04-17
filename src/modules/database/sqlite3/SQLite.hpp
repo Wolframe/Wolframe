@@ -188,8 +188,8 @@ private:
 };
 
 
-//\class SQLiteConstructor
-//\brief SQLite database constructor
+///\class SQLiteConstructor
+///\brief SQLite database constructor
 class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
@@ -200,9 +200,9 @@ public:
 };
 
 
-//\class SQLiteTransaction
+///\class SQLiteTransaction
 class SQLiteTransaction
-	:public StatemachineBasedTransaction
+	:public Transaction
 {
 public:
 	SQLiteTransaction( SQLiteDatabase& database, const std::string& name_);

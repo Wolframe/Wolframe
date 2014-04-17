@@ -27,9 +27,11 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall
-RESULT INTO doc
 BEGIN
-	INTO address DO run( /aa, /bb, /cc);
+INTO doc
+BEGIN
+	INTO address DO SELECT run( $(/aa), $(/bb), $(/cc));
+END
 END
 **file: DBRES
 #id name street#1 hugo "bahnhofstrasse 15"#2 miriam "zum gemsweg 3"#3 sara "tannensteig 12"
@@ -37,9 +39,26 @@ END
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <doc><address><id>1</id><name>hugo</name><street>bahnhofstrasse 15</street></address><address><id>2</id><name>miriam</name><street>zum gemsweg 3</street></address><address><id>3</id><name>sara</name><street>tannensteig 12</street></address></doc>
-run #1#2#3
-
-start( 'run' );
+Code:
+[0] OUTPUT_OPEN TAG doc
+[1] RESULT_SET_INIT
+[2] DBSTM_START STM (SELECT run( $1, $2, $3))
+[3] DBSTM_BIND_CONST CONST '1'
+[4] DBSTM_BIND_CONST CONST '2'
+[5] DBSTM_BIND_CONST CONST '3'
+[6] DBSTM_EXEC
+[7] OUTPUT_OPEN_ARRAY TAG address
+[8] OPEN_ITER_LAST_RESULT
+[9] NOT_IF_COND GOTO @15
+[10] OUTPUT_OPEN_ELEM
+[11] OUTPUT_ITR_COLUMN
+[12] OUTPUT_CLOSE_ELEM
+[13] NEXT
+[14] IF_COND GOTO @10
+[15] OUTPUT_CLOSE_ARRAY
+[16] OUTPUT_CLOSE
+[17] RETURN
+start( 'SELECT run( $1, $2, $3)' );
 bind( 1, '1' );
 bind( 2, '2' );
 bind( 3, '3' );

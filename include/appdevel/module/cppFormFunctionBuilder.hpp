@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface template for object builder of built-in functions
 #ifndef _Wolframe_MODULE_CPP_FORM_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_CPP_FORM_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "langbind/cppFormFunction.hpp"
+#include "serialize/cppFormFunction.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include "types/keymap.hpp"
@@ -46,10 +46,10 @@ namespace module {
 struct CppFormFunctionDef
 {
 	const char* name;
-	langbind::CppFormFunction func;
+	serialize::CppFormFunction func;
 };
 
-class CppFormFunctionConstructor :public SimpleObjectConstructor< langbind::CppFormFunction >
+class CppFormFunctionConstructor :public SimpleObjectConstructor< serialize::CppFormFunction >
 {
 public:
 	CppFormFunctionConstructor( const char* name_, const CppFormFunctionDef* functions_)
@@ -78,7 +78,7 @@ public:
 		return m_functionmap.getkeys<std::vector<std::string> >();
 	}
 
-	const langbind::CppFormFunction function( const std::string& name) const
+	const serialize::CppFormFunction function( const std::string& name) const
 	{
 		FunctionTypeMap::const_iterator fi = m_functionmap.find( name);
 		if (fi == m_functionmap.end()) throw std::runtime_error( "function not defined");
@@ -87,7 +87,7 @@ public:
 
 private:
 	const std::string m_name;
-	typedef types::keymap<langbind::CppFormFunction> FunctionTypeMap;
+	typedef types::keymap<serialize::CppFormFunction> FunctionTypeMap;
 	FunctionTypeMap m_functionmap;
 };
 

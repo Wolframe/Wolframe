@@ -42,7 +42,6 @@
 #include "module/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "config/configurationTree.hpp"
-#include "langbind/appObjects.hpp"
 #include "processor/procProvider.hpp"
 #include "wtest/testHandlerTemplates.hpp"
 #include "utils/fileUtils.hpp"

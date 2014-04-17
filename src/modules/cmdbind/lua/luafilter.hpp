@@ -101,6 +101,11 @@ private:
 			static const char* ar[] = {"Init","TopLevel","TableIterOpen","TableIterValue","TableIterValueNoTag","TableIterClose","TableIterNext","VectorIterValue","VectorIterClose","VectorIterReopen","Done"};
 			return ar[ (int)i];
 		}
+		static const char* idShortName( Id i)
+		{
+			static const char* ar[] = {"Init","Top","T_Open","T_Value","T_ValueNoTag","T_Close","T_Next","V_Value","V_Close","V_Reopen","Done"};
+			return ar[ (int)i];
+		}
 
 		FetchState( const FetchState& o)				:id(o.id),tag(o.tag),tagsize(o.tagsize),idx(o.idx){}
 		explicit FetchState( Id id_)					:id(id_),tag(0),tagsize(0),idx(0){}
@@ -113,16 +118,19 @@ private:
 
 		void getTagElement( types::VariantConst& e);
 	};
-	//\brief Fetch the element with index 'idx' as atomic value from lua stack
+	///\brief Fetch the element with index 'idx' as atomic value from lua stack
 	bool getLuaStackValue( int idx, types::VariantConst& e);
-	//\brief Same as getLuaStackValue(int,types::VariantConst&) but does set the filter state
+	///\brief Same as getLuaStackValue(int,types::VariantConst&) but does set the filter state
 	bool tryGetLuaStackValue( int idx, types::VariantConst& element, const char*& errelemtype);
-	//\brief Opens a new table iterator on an array or lua table
+	///\brief Opens a new table iterator on an array or lua table
 	bool firstTableElem( const char* tag);
-	//\brief Fetches the next element of the currently iterated associative (non array) lua table
+	///\brief Fetches the next element of the currently iterated associative (non array) lua table
 	bool nextTableElem();
-	//\brief Fetches the next element of the currently iterated lua array (table with numbers as indices)
+	///\brief Fetches the next element of the currently iterated lua array (table with numbers as indices)
 	bool nextVectorElem();
+
+private:
+	static std::string stackDump( const std::vector<FetchState>& stk);
 
 private:
 	lua_State* m_ls;			//< lua state

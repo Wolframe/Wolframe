@@ -81,13 +81,13 @@ public:
 		return new InputFilterScope(*this);
 	}
 
-	//\brief Implement InputFilter::initcopy()
+	///\brief Implement InputFilter::initcopy()
 	virtual InputFilter* initcopy() const
 	{
 		return new InputFilterScope( m_inputfilter);
 	}
 
-	//\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
+	///\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void*, std::size_t, bool)
 	{
 		throw std::logic_error( "put input to an input filter scope");

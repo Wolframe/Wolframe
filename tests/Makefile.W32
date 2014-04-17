@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules database wolfilter
+SUBDIRS = modules database wolfilter simpleFormCompiler compileTDL
 #SUBDIRS = modules database AAAA wolfilter
 
 
@@ -125,7 +125,6 @@ testString.exe: testString.obj $(TOPDIR)\src\wolframe.lib
 testDateTime.exe: testDateTime.obj $(TOPDIR)\src\wolframe.lib
 testBigNumber.exe: testBigNumber.obj $(TOPDIR)\src\wolframe.lib
 testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
-#stringNormalizationTest.exe: stringNormalizationTest.obj $(TOPDIR)\src\libwolframe_functions\wolframe_functions.lib
 testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj
 testVariantTypes.exe: testVariantTypes.obj $(TOPDIR)\src\wolframe.lib
@@ -190,8 +189,8 @@ local_test:
 	@-testNumberBaseConversion 
 	@-testString 
 	@-testDateTime 
-	@-testBigNumber 
-	@-testVariantTypes 
+	@-testBigNumber
+	@-testVariantTypes
 	@-testIntegers 
 	@-testWolfilter 
 #	@-stringNormalizationTest 

@@ -87,12 +87,12 @@ typedef boost::shared_ptr<OracleColumnDescription> OracleColumnDescriptionPtr;
 struct TransactionExecStatemachine_oracle :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, const std::string& name_, OracleDbUnit *dbUnit_);
+	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDbUnit *dbUnit_);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_oracle();
 
-	//\brief Get the database identifier
+	///\brief Get the database identifier
 	virtual const std::string& databaseID() const;
 
 	///\brief Begin transaction

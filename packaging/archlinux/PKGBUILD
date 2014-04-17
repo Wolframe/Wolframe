@@ -5,7 +5,7 @@ pkgver=0.0.1
 pkgrel=2
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
-arch=('i686' 'x86_64')
+arch=('i686' 'x86_64' 'armv6h')
 url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
          'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'libharu'

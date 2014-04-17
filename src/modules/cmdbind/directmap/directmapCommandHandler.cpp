@@ -35,7 +35,7 @@ Project Wolframe.
 #include "serialize/tostringUtils.hpp"
 #include "types/doctype.hpp"
 #include "types/variant.hpp"
-#include "langbind/appObjects.hpp"
+#include "filter/redirectFilterClosure.hpp"
 #include "filter/typingfilter.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>

@@ -50,16 +50,16 @@ class Statement
 		virtual ~Statement( ) { }
 		
 		///\brief Binds parameter at position idx with variant data
-		///       in the format with Wolframe placeholders
+		//       in the format with Wolframe placeholders
 		virtual void bind( const unsigned int idx, const types::Variant &arg ) = 0;
 
 		///\brief Returns the SQL statement as passed down to the
-		///       database layer
+		//       database layer
 		virtual const std::string originalSQL( ) const = 0;
 		
 		///\brief Returns the SQL statement with the native database
-		///       placeholders or the data filled in (this is up
-		///       to the derived classes).
+		//       placeholders or the data filled in (this is up
+		//       to the derived classes).
 		virtual const std::string nativeSQL( ) const = 0;
 
 		///\brief Set new SQL statement
@@ -69,15 +69,15 @@ class Statement
 		virtual void clear( ) = 0;
 
 		///\brief Trigger substitution (nativeSQL is valid after
-		///       this call and not before!)
+		//       this call and not before!)
 		///\param[in] checkForMissingPlaceholders whether the function should
-		///           already check the validity and cardinality of the placeholders
-		///           in the SQL statement
+		//           already check the validity and cardinality of the placeholders
+		//           in the SQL statement
 		virtual void substitute( bool checkForMissingPlaceholders = true ) = 0;
 
 		///\brief Funtion called when the placeholder should be put
-		///       into the final string (this is either for subsituting
-		///       data or rewrite placeholders to native syntax)
+		//       into the final string (this is either for subsituting
+		//       data or rewrite placeholders to native syntax)
 		virtual const std::string replace( const unsigned int idx ) const = 0;
 };
 

@@ -47,22 +47,88 @@ bool TypingInputFilter::getNext( ElementType& type, types::VariantConst& element
 	if (!rt)
 	{
 		setState( m_inputfilter->state(), m_inputfilter->getError());
+		return false;
 	}
 	else
 	{
 		setState( m_inputfilter->state());
-		element.init( (const char*)charptr, charsize);
+#if 1 /*[-]*/
+		if (flag(FilterBase::SerializeWithIndices))
+		{
+			if (type == FilterBase::OpenTag)
+			{
+				if (charsize == 0)
+				{
+					if (m_stack.size())
+					{
+						m_stack.back().isArrayElem = true;
+						element = ++m_stack.back().cnt;
+						return true;
+					}
+					else
+					{
+						throw std::runtime_error("illegal index element in filter (SerializeWithIndices)");
+					}
+				}
+				else
+				{
+					element.init( (const char*)charptr, charsize);
+					m_stack.push_back( StackElement());
+					return true;
+				}
+			}
+			else if (type == FilterBase::CloseTag)
+			{
+				if (m_stack.size())
+				{
+					if (m_stack.back().isArrayElem)
+					{
+						m_stack.back().isArrayElem = false;
+					}
+					else
+					{
+						m_stack.pop_back();
+					}
+				}
+				else
+				{
+					element.init();
+					return true;
+				}
+				element.init();
+				return true;
+			}
+			else
+			{
+				element.init( (const char*)charptr, charsize);
+				return true;
+			}
+		}
+		else
+#endif/*[-]*/
+		{
+			element.init( (const char*)charptr, charsize);
+			return true;
+		}
 	}
-	return rt;
 }
 
 bool TypingInputFilter::setFlags( Flags f)
 {
 	if (m_inputfilter.get()->setFlags( f))
 	{
+		if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices) && m_stack.empty())
+		{
+			m_stack.push_back( StackElement());
+		}
 		return langbind::TypedInputFilter::setFlags( f);
 	}
 	return false;
+}
+
+bool TypingInputFilter::checkSetFlags( Flags f) const
+{
+	return (m_inputfilter.get()->checkSetFlags( f));
 }
 
 bool TypingOutputFilter::print( ElementType type, const types::VariantConst& element)

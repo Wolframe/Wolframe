@@ -1,0 +1,8 @@
+TRANSACTION testcall
+BEGIN
+INTO result
+BEGIN
+	INTO item DO SELECT run( $(/aa) , $(/bb) );
+	FOREACH RESULT DO SELECT exec ( $1,$2);
+END
+END

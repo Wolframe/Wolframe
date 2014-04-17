@@ -145,7 +145,9 @@ public:
 	///\return true on success, false if the (or one of) flag is not supported
 	virtual bool setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff; return true;}
 	///\brief Reset set all flags
-	void resetFlags()				{m_flags = None;}
+	virtual void resetFlags()			{m_flags = None;}
+	///\brief Test if a flag can be set (allowed)
+	virtual bool checkSetFlags( Flags) const	{return true;}
 
 	const char* name() const			{return m_name;}
 

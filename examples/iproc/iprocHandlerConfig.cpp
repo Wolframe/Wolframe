@@ -36,7 +36,6 @@
 #include "iprocHandlerConfig.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
-#include "langbind/appObjects.hpp"
 #include "config/structSerialize.hpp"
 #include "serialize/struct/structDescription.hpp"
 #include <sstream>

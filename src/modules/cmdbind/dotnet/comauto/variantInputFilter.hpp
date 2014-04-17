@@ -29,8 +29,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file comauto/variantInputFilter.hpp
-//\brief InputFilter implementation for MSDN variant type
+///\file comauto/variantInputFilter.hpp
+///\brief InputFilter implementation for MSDN variant type
 #ifndef _Wolframe_COM_AUTOMATION_VARIANT_INPUT_FILTER_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_VARIANT_INPUT_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -46,7 +46,7 @@ struct tagTYPEATTR;
 namespace _Wolframe {
 namespace comauto {
 
-//\brief Forward declarations
+///\brief Forward declarations
 class TypeLib;
 
 class VariantInputFilter

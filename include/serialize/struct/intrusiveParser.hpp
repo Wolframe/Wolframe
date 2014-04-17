@@ -50,7 +50,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-// forward declaration
+///\brief forward declaration
 template <typename TYPE>
 struct IntrusiveParser
 {

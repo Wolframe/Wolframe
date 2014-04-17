@@ -85,7 +85,7 @@ COMMAND(employee_assignment_print) CALL(test_transaction) RETURN STANDALONE doc;
 **file:DBIN.tdl
 TRANSACTION test_transaction
 BEGIN
-	INTO task FOREACH //task DO run( title);
+	INTO task FOREACH //task DO SELECT run( title);
 END
 **output
 {

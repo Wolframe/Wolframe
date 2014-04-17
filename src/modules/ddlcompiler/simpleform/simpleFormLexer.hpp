@@ -37,19 +37,20 @@ Project Wolframe.
 #include <string>
 #include "types/form.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include "langbind/ddlCompilerInterface.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 namespace simpleform {
 
-//\class Lexem
-//\brief Single token in simpleform source with position information
+///\class Lexem
+///\brief Single token in simpleform source with position information
 class Lexem
 {
 public:
-	//\enum Id
-	//\brief Token identifier enumeration
+	///\enum Id
+	///\brief Token identifier enumeration
 	enum Id
 	{
 		EndOfFile,	//< end of source file
@@ -68,61 +69,61 @@ public:
 		Assign		//< '='
 	};
 public:
-	//\brief Default constructor
+	///\brief Default constructor
 	Lexem()
 		:m_id(EndOfFile){}
-	//\brief Constructor
-	Lexem( utils::LineInfo position_, Id id_, const std::string& value_=std::string())
+	///\brief Constructor
+	Lexem( utils::SourceLineInfo position_, Id id_, const std::string& value_=std::string())
 		:m_id(id_),m_value(value_),m_position(position_){}
-	//\brief Copy constructor
+	///\brief Copy constructor
 	Lexem( const Lexem& o)
 		:m_id(o.m_id),m_value(o.m_value),m_position(o.m_position){}
 
 	Id id() const				{return m_id;}
 	std::string value() const		{return m_value;}
-	utils::LineInfo position() const	{return m_position;}
+	utils::SourceLineInfo position() const	{return m_position;}
 	std::string positionLogtext() const;
 
 private:
 	Id m_id;				//< lexem identifier
 	std::string m_value;			//< lexem value
-	utils::LineInfo m_position;		//< lexem position
+	utils::SourceLineInfo m_position;	//< lexem position
 };
 
-//\brief Structure for lexical analysis of one simple form source file
-//\class Lexer
+///\brief Structure for lexical analysis of one simple form source file
+///\class Lexer
 class Lexer
 {
 public:
-	//\brief Constructor
+	///\brief Constructor
 	Lexer( const std::string::const_iterator& begin, const std::string::const_iterator& end)
 		:m_start(begin),m_itr(begin),m_end(end),m_itr_position(begin),m_tokch(0){}
-	//\brief Copy constructor
+	///\brief Copy constructor
 	Lexer( const Lexer& o)
 		:m_start(o.m_start),m_itr(o.m_itr),m_end(o.m_end),m_position(o.m_position),m_itr_position(o.m_itr_position),m_tokch(o.m_tokch){}
 
-	//\brief Make a lookup and evaluate the type of the lexem that will follow
-	//\return the lexem type
+	///\brief Make a lookup and evaluate the type of the lexem that will follow
+	///\return the lexem type
 	Lexem::Id forwardLookup();
-	//\brief Fetch the next lexem (that is not a comment) in the source
-	//\return the lexem
+	///\brief Fetch the next lexem (that is not a comment) in the source
+	///\return the lexem
 	Lexem next();
-	//\brief Same as 'next' but returns identifier for the keywords 'FORM' and 'STRUCT'
-	//\return the lexem
+	///\brief Same as 'next' but returns identifier for the keywords 'FORM' and 'STRUCT'
+	///\return the lexem
 	Lexem next2();
-	//\brief Get a description of the current token for error messages
-	//\return the token description
+	///\brief Get a description of the current token for error messages
+	///\return the token description
 	std::string curtoken() const;
 
-	//\brief Get the current position
-	//\return the position
-	utils::LineInfo position() const	{return m_position;}
+	///\brief Get the current position
+	///\return the position
+	utils::SourceLineInfo position() const	{return m_position;}
 
 private:
 	std::string::const_iterator m_start;		//< source start
 	std::string::const_iterator m_itr;		//< iterator on source
 	std::string::const_iterator m_end;		//< end of source
-	utils::LineInfo m_position;			//< current position in source
+	utils::SourceLineInfo m_position;		//< current position in source
 	std::string::const_iterator m_itr_position;	//< iterator from what m_position has been calculated the last time
 	char m_tokch;					//< token character of the current token
 };

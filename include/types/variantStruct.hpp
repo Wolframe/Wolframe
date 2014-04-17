@@ -43,7 +43,7 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace utils {
-	//\brief Forward declaration
+	///\brief Forward declaration
 	struct PrintFormat;
 }
 namespace types {
@@ -259,8 +259,8 @@ private:
 };
 
 
-//\class VariantStructIndirection
-//\brief Variant type as indirection: Variant value is only expanded when referenced
+///\class VariantStructIndirection
+///\brief Variant type as indirection: Variant value is only expanded when referenced
 class VariantIndirection :public Variant
 {
 public:

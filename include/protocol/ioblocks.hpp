@@ -51,7 +51,7 @@ namespace protocol {
 class MemBlock
 {
 public:
-	//element typedefs
+	///\brief element typedef
 	typedef char value_type;		//< basic STL vector typedefs
 
 	///\brief Constructor
@@ -340,8 +340,8 @@ public:
 	void release()						{setPos(0);}
 };
 
-//\class CharBuffer
-//\brief Buffer for an arbitrary size string (with array doubling strategy for the allocator) 
+///\class CharBuffer
+///\brief Buffer for an arbitrary size string (with array doubling strategy for the allocator) 
 struct CharBuffer :public utils::ArrayDoublingAllocator
 {
 	CharBuffer(){}

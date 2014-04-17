@@ -29,8 +29,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file comauto/function.hpp
-//\brief Interface to execute form functions written in .NET
+///\file comauto/function.hpp
+///\brief Interface to execute form functions written in .NET
 #ifndef _Wolframe_COM_AUTOMATION_FUNCTION_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_FUNCTION_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -43,7 +43,7 @@ struct ITypeInfo;
 namespace _Wolframe {
 namespace comauto {
 
-//\brief Forward declarations
+///\brief Forward declarations
 class TypeLib;
 class CommonLanguageRuntime;
 class DotnetFunction;

@@ -29,13 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file luaObjects.hpp
-//\brief Interface to handling and executing Lua scripts
+///\file luaObjects.hpp
+///\brief Interface to handling and executing Lua scripts
 #ifndef _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #include "luaDump.hpp"
 #include "filter/filter.hpp"
-#include "langbind/appObjects.hpp"
+#include "langbind/input.hpp"
+#include "langbind/output.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <map>
 #include <list>
@@ -81,8 +82,8 @@ private:
 };
 
 
-//\class LuaModuleMap
-//\brief Map of available Lua functions
+///\class LuaModuleMap
+///\brief Map of available Lua functions
 class LuaModuleMap
 {
 public:
@@ -99,9 +100,9 @@ private:
 class LuaScriptInstance
 {
 public:
-	//\brief Constructor
-	//\param[in] script script executed by this instance
-	//\param[in] modulemap_ map of modules that can be loaded
+	///\brief Constructor
+	///\param[in] script script executed by this instance
+	///\param[in] modulemap_ map of modules that can be loaded
 	LuaScriptInstance( const LuaScript* script, const LuaModuleMap* modulemap_);
 	~LuaScriptInstance();
 
@@ -112,29 +113,29 @@ public:
 	std::string luaErrorMessage( lua_State* ls_, int index=-1);
 	std::string luaUserErrorMessage( lua_State* ls_, int index=-1);
 
-	//\brief Create the context for executing a Lua script with all objects initialized
-	//\param[in] input_ input definition for the input to process
-	//\param[in] output_ output definition for the output to print
-	//\param[in] provider_ processor provider for allocation of objects accessed
+	///\brief Create the context for executing a Lua script with all objects initialized
+	///\param[in] input_ input definition for the input to process
+	///\param[in] output_ output definition for the output to print
+	///\param[in] provider_ processor provider for allocation of objects accessed
 	void init( const Input& input_, const Output& output_, const proc::ProcessorProviderInterface* provider_);
 
-	//\brief Create the context for executing a Lua script without input/output but all other objects initialized
-	//\param[in] provider_ processor provider for allocation of objects accessed
+	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
+	///\param[in] provider_ processor provider for allocation of objects accessed
 	void init( const proc::ProcessorProviderInterface* provider_);
 
-	//\brief Fetch a lua object as typed input filter from the lua stack of the executed lua thread context
-	//\param[in] idx index of the object on the lua stack
-	//\return the lua object
+	///\brief Fetch a lua object as typed input filter from the lua stack of the executed lua thread context
+	///\param[in] idx index of the object on the lua stack
+	///\return the lua object
 	TypedInputFilterR getObject( int idx);
 
-	//\brief Push a lua object as typed input filter on the lua stack of the executed lua thread context
-	//\param[in] obj the object to push
+	///\brief Push a lua object as typed input filter on the lua stack of the executed lua thread context
+	///\param[in] obj the object to push
 	void pushObject( const TypedInputFilterR& obj);
 
 private:
-	//\brief Create the context for executing a Lua script without input/output but all other objects initialized
-	//\param[in] provider_ processor provider for allocation of objects accessed
-	//\param[in] callMain wheter to call the script for initialization of its objects or not
+	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
+	///\param[in] provider_ processor provider for allocation of objects accessed
+	///\param[in] callMain wheter to call the script for initialization of its objects or not
 	void initbase( const proc::ProcessorProviderInterface* provider_, bool callMain);
 
 private:
@@ -153,26 +154,26 @@ private:
 typedef boost::shared_ptr<LuaScriptInstance> LuaScriptInstanceR;
 
 
-//\class LuaFunctionMap
-//\brief Map of available Lua functions
+///\class LuaFunctionMap
+///\brief Map of available Lua functions
 class LuaFunctionMap
 {
 public:
-	//\brief Constructor
+	///\brief Constructor
 	LuaFunctionMap( const LuaModuleMap* modulemap_)
 		:m_modulemap(modulemap_){}
 
-	//\brief Destructor
+	///\brief Destructor
 	virtual ~LuaFunctionMap();
 
-	//\brief Define a lua function
-	//\param[in] procname name of the function
-	//\param[in] script with the function
+	///\brief Define a lua function
+	///\param[in] procname name of the function
+	///\param[in] script with the function
 	void defineLuaFunction( const std::string& procname, const LuaScript& script);
-	//\brief Get an empty the context for a Lua script
+	///\brief Get an empty the context for a Lua script
 	bool getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const;
 
-	//\brief Get the list of commands
+	///\brief Get the list of commands
 	std::list<std::string> commands() const;
 
 private:

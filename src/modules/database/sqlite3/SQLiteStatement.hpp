@@ -59,7 +59,7 @@ class SQLiteStatement : public BaseStatement
 		int getLastStatus( );
 	
 	private:
-		//\brief Implementation of bind(const unsigned int,const types::Variant&) without boundary checking
+		///\brief Implementation of bind(const unsigned int,const types::Variant&) without boundary checking
 		void bindVariant( unsigned int idx, const types::Variant &value);
 
 	private:

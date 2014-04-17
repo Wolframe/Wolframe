@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file outputfilterImpl.hpp
-//\brief Output filter abstraction for the libxml2 library
+///\file outputfilterImpl.hpp
+///\brief Output filter abstraction for the libxml2 library
 
 #ifndef _Wolframe_LIBXML2_OUTPUT_FILTER_HPP_INCLUDED
 #define _Wolframe_LIBXML2_OUTPUT_FILTER_HPP_INCLUDED
@@ -93,22 +93,22 @@ public:
 
 	virtual ~OutputFilterImpl(){}
 
-	//\brief Implementation of OutputFilter::copy()
+	///\brief Implementation of OutputFilter::copy()
 	virtual OutputFilterImpl* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	//\brief Implementation of OutputFilter::setDocType(const types::DocType&)
+	///\brief Implementation of OutputFilter::setDocType(const types::DocType&)
 	virtual void setDocType( const types::DocType& doctype);
 
-	//\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
+	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
 
-	//\brief Implementation of FilterBase::getValue( const char*, std::string&)
+	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
 	virtual bool getValue( const char* name, std::string& val) const;
 
-	//\brief Implementation of FilterBase::setValue( const char*, const std::string&)
+	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
 
 	void setEncoding( const std::string& value)

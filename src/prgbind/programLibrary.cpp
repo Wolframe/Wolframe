@@ -39,10 +39,8 @@
 #include "prgbind/transactionProgram.hpp"
 #include "prgbind/ddlProgram.hpp"
 #include "prgbind/normalizeProgram.hpp"
-#include "database/transactionFunction.hpp"
 #include "types/normalizeFunction.hpp"
 #include "langbind/formFunction.hpp"
-#include "langbind/appObjects.hpp"
 #include "logger-v1.hpp"
 #include "utils/fileUtils.hpp"
 #include <algorithm>
@@ -55,7 +53,7 @@ class CppFormFunctionClosure
 	,public langbind::FormFunctionClosure
 {
 public:
-	CppFormFunctionClosure( const langbind::CppFormFunction& f)
+	CppFormFunctionClosure( const serialize::CppFormFunction& f)
 		:utils::TypeSignature("prgbind::CppFormFunctionClosure", __LINE__)
 		,m_func(f)
 		,m_state(0)
@@ -111,10 +109,10 @@ public:
 	}
 
 private:
-	langbind::CppFormFunction m_func;
+	serialize::CppFormFunction m_func;
 	int m_state;
-	langbind::ApiFormData m_param_data;
-	langbind::ApiFormData m_result_data;
+	serialize::ApiFormData m_param_data;
+	serialize::ApiFormData m_result_data;
 	langbind::TypedInputFilterR m_result;
 	serialize::StructParser m_parser;
 	const proc::ProcessorProviderInterface* m_provider;
@@ -124,7 +122,7 @@ class CppFormFunction
 	:public langbind::FormFunction
 {
 public:
-	CppFormFunction( const langbind::CppFormFunction& f)
+	CppFormFunction( const serialize::CppFormFunction& f)
 		:m_impl(f){}
 
 	virtual langbind::FormFunctionClosure* createClosure() const
@@ -134,7 +132,7 @@ public:
 
 private:
 	const proc::ProcessorProviderInterface* m_provider;
-	langbind::CppFormFunction m_impl;
+	serialize::CppFormFunction m_impl;
 };
 
 class NormalizeFunctionMap
@@ -351,7 +349,7 @@ ProgramLibrary::~ProgramLibrary()
 	delete m_impl;
 }
 
-void ProgramLibrary::defineCppFormFunction( const std::string& name, const langbind::CppFormFunction& f)
+void ProgramLibrary::defineCppFormFunction( const std::string& name, const serialize::CppFormFunction& f)
 {
 	m_impl->defineCppFormFunction( name, f);
 }

@@ -33,39 +33,279 @@
 //\file database/transaction.hpp
 //\brief Implementation database transaction
 #include "database/transaction.hpp"
+#include "database/vm/programInstance.hpp"
+#include "vm/inputStructure.hpp"
+#include "tdl2vmTranslator.hpp"
+#include "logger-v1.hpp"
+#include <iostream>
+#include <sstream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-Transaction::Result Transaction::executeStatement( const std::string& stm, const std::vector<types::Variant>& params)
+static std::string removeCRLF( const std::string& src)
 {
-	Result rt;
-	TransactionInput input;
-	input.startCommand( 1, 0, stm, -1);
+	std::string rt;
+	std::string::const_iterator si = src.begin(), se = src.end();
+	for (; si != se; ++si)
+	{
+		if (*si == '\r' || *si == '\n')
+		{
+			if (rt.size() && rt[ rt.size()-1] != ' ') rt.push_back(' ');
+		}
+		else
+		{
+			rt.push_back( *si);
+		}
+	}
+	return rt;
+}
+
+struct vm::ProgramInstance::LogTraceContext
+{
+	const vm::ProgramImage* program;
+};
+
+static void programInstance_logTraceCallBack_TRACE( const vm::ProgramInstance::LogTraceContext* ctx, unsigned int ip)
+{
+	std::ostringstream str;
+	ctx->program->printInstruction( str, ctx->program->code[ ip]);
+	LOG_TRACE << "[transaction vm] execute [" << ip << "] " << str.str();
+}
+
+bool Transaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
+{
+	vm::ProgramInstance::LogTraceContext context;
+	context.program = &input.program();
+
+	vm::ProgramInstance::LogTraceCallBack logtrace = 0;
+	if (log::LogBackend::instance().minLogLevel() <= log::LogLevel::LOGLEVEL_TRACE)
+	{
+		logtrace = &programInstance_logTraceCallBack_TRACE;
+	}
+	vm::ProgramInstance instance( *context.program, m_stm.get(), logtrace, &context);
+	try
+	{
+		if (!instance.execute())
+		{
+			const DatabaseError* err = instance.lastError();
+			if (err)
+			{
+				m_lastError = *err;
+			}
+			else
+			{
+				m_lastError = DatabaseError( "UNKNOWN", 0, "unknown error");
+			}
+			m_stm->rollback();
+			return false;
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		m_lastError = DatabaseError( "EXCEPTION", 0, e.what());
+		m_lastError.ip = instance.ip();
+		m_stm->rollback();
+		return false;
+	}
+	catch (const std::exception& e)
+	{
+		m_stm->rollback();
+		throw e;
+	}
+	output = VmTransactionOutput( instance.output());
+	if (log::LogBackend::instance().minLogLevel() <= log::LogLevel::LOGLEVEL_DATA)
+	{
+		langbind::TypedInputFilterR resultfilter = output.get();
+		langbind::FilterBase::ElementType elemtype;
+		types::VariantConst elemvalue;
+		while (resultfilter->getNext( elemtype, elemvalue))
+		{
+			if (elemvalue.defined())
+			{
+				LOG_DATA << "[transaction output] element " << langbind::FilterBase::elementTypeName( elemtype) << " '" << elemvalue.tostring() << "' :" << elemvalue.typeName();
+			}
+			else
+			{
+				LOG_DATA << "[transaction output] element " << langbind::FilterBase::elementTypeName( elemtype);
+			}
+		}
+	}
+	return true;
+}
+
+static std::string errorMessageString( const DatabaseError& err)
+{
+	std::string errordetail = removeCRLF( err.errordetail);
+	std::string errormsg = removeCRLF( err.errormsg);
+	
+	std::ostringstream logmsg;
+	logmsg << "error in database '" << err.dbname << "'"
+		<< " error class '" << err.errorclass << "'";
+
+	if (err.errorcode)
+	{
+		logmsg << " database internal error code " << err.errorcode << "'";
+	}
+	if (errormsg.size())
+	{
+		logmsg << " " << errormsg;
+	}
+	if (errordetail.size())
+	{
+		logmsg << " " << errordetail;
+	}
+	return logmsg.str();
+}
+
+static vm::ProgramR singleStatementProgram( const std::string& stm, const std::vector<types::Variant>& params)
+{
+	std::vector<std::string> resultpath;
+	resultpath.push_back( "");
+	types::keymap<vm::Subroutine> sm;
+
+	Tdl2vmTranslator prg( &sm, false);
+	prg.begin_DO_statement( stm);
 	std::vector<types::Variant>::const_iterator pi = params.begin(), pe = params.end();
 	for (; pi != pe; ++pi)
 	{
-		input.bindCommandArgAsValue( *pi);
+		prg.push_ARGUMENT_CONST( *pi);
 	}
-	TransactionOutput output;
-	execute( input, output);
-	TransactionOutput::result_const_iterator ri = output.begin(), re = output.end();
-	if (ri == re) return rt;
-	if (ri +1 != re) throw std::logic_error("internal: more than one result (set of rows) for one command");
-	std::vector<std::string> colnames;
-	std::vector<Transaction::Result::Row> rows;
-
-	std::size_t ci=0, ce = ri->nofColumns();
-	for (; ci != ce; ++ci)
-	{
-		colnames.push_back( ri->columnName( ci));
-	}
-	std::vector<TransactionOutput::CommandResult::Row>::const_iterator wi = ri->begin(), we = ri->end();
-	for (; wi != we; ++wi)
-	{
-		rows.push_back( *wi);
-	}
-	return Result( colnames, rows);
+	prg.end_DO_statement();
+	prg.begin_loop_INTO_block( resultpath);
+	prg.output_statement_result( true);
+	prg.end_loop_INTO_block();
+	return prg.createProgram();
 }
+
+bool Transaction::executeStatement( const std::string& stm, const std::vector<types::Variant>& params)
+{
+	vm::ProgramR program = singleStatementProgram( stm, params);
+
+	VmTransactionInput input( *program, vm::InputStructure( program->pathset.tagtab()));
+	VmTransactionOutput output;
+
+	return execute( input, output);
+}
+
+bool Transaction::executeStatement( Result& result, const std::string& stm, const std::vector<types::Variant>& params)
+{
+	vm::ProgramR program = singleStatementProgram( stm, params);
+
+	VmTransactionInput input( *program, vm::InputStructure( program->pathset.tagtab()));
+	VmTransactionOutput output;
+
+	if (!execute( input, output))
+	{
+		return false;
+	}
+	langbind::TypedInputFilterR of( output.get());
+
+	bool firstRow = true;
+	langbind::FilterBase::ElementType type;
+	types::VariantConst value;
+	int taglevel = 0;
+	std::vector<std::string> colnames;
+	std::vector<Result::Row> rows;
+	Result::Row row;
+	bool done = false;
+
+	while (of->getNext( type, value))
+	{
+		if (done)
+		{
+			m_lastError = DatabaseError( "EXCEPTION", 0, "unexpected element after final CLOSE");
+			return false;
+		}
+		switch (type)
+		{
+			case langbind::FilterBase::OpenTag:
+				taglevel++;
+				if (taglevel == 1)
+				{
+					if (value.type() != types::Variant::String || value.charsize() != 0)
+					{
+						m_lastError = DatabaseError( "EXCEPTION", 0, "unexpected top level tag in result");
+						return false;
+					}
+				}
+				else if (taglevel == 2)
+				{
+					if (firstRow)
+					{
+						colnames.push_back( value.tostring());
+					}
+				}
+				else
+				{
+					m_lastError = DatabaseError( "EXCEPTION", 0, "unexpected structure in result");
+					return false;
+				}
+				break;
+			case langbind::FilterBase::CloseTag:
+				--taglevel;
+				if (taglevel == -1) done = true;
+				if (taglevel == 0)
+				{
+					firstRow = false;
+					if (row.size() != colnames.size())
+					{
+						m_lastError = DatabaseError( "EXCEPTION", 0, "row size does not mach to number of columns");
+						return false;
+					}
+					rows.push_back( row);
+					row.clear();
+				}
+				break;
+			case langbind::FilterBase::Attribute:
+				if (taglevel == 1)
+				{
+					if (firstRow)
+					{
+						colnames.push_back( value.tostring());
+					}
+				}
+				else
+				{
+					m_lastError = DatabaseError( "EXCEPTION", 0, "unexpected attribute in result");
+					return false;
+				}
+				break;
+			case langbind::FilterBase::Value:
+				row.push_back( value);
+				break;
+		}
+	}
+	result = Result( colnames, rows);
+	return true;
+}
+
+void Transaction::begin()
+{
+	if (!m_stm->begin())
+	{
+		const DatabaseError* err = m_stm->getLastError();
+		if (err) throw std::runtime_error( errorMessageString( *err));
+	}
+}
+
+void Transaction::commit()
+{
+	if (!m_stm->commit())
+	{
+		const DatabaseError* err = m_stm->getLastError();
+		if (err) throw std::runtime_error( errorMessageString( *err));
+	}
+}
+
+void Transaction::rollback()
+{
+	if (!m_stm->rollback())
+	{
+		const DatabaseError* err = m_stm->getLastError();
+		if (err) throw std::runtime_error( errorMessageString( *err));
+	}
+}
+
 
 

@@ -34,145 +34,15 @@
 ///\file prgbind_transactionProgram.cpp
 #include "prgbind/transactionProgram.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "processor/procProviderInterface.hpp"
-#include "database/transactionFunction.hpp"
+#include "filter/redirectFilterClosure.hpp"
 #include "database/databaseError.hpp"
 #include "database/database.hpp"
-#include "utils/fileUtils.hpp"
 #include "database/loadTransactionProgram.hpp"
-#include "config/programBase.hpp"
-#include "langbind/appObjects.hpp"
+#include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
-
-class TransactionFunctionClosure
-	:public utils::TypeSignature
-	,public langbind::FormFunctionClosure
-{
-public:
-	TransactionFunctionClosure( const db::TransactionFunction* f)
-		:utils::TypeSignature("prgbind::TransactionFunctionClosure", __LINE__)
-		,m_provider(0)
-		,m_func(f)
-		,m_state(0)
-		,m_inputstructptr(0)
-		,m_flags(serialize::Context::None)
-		{}
-
-	TransactionFunctionClosure( const TransactionFunctionClosure& o)
-		:utils::TypeSignature(o)
-		,m_provider(o.m_provider)
-		,m_func(o.m_func)
-		,m_state(o.m_state)
-		,m_input(o.m_input)
-		,m_inputstructptr(o.m_inputstructptr)
-		,m_inputstruct(o.m_inputstruct)
-		,m_result(o.m_result)
-		,m_flags(o.m_flags)
-		{}
-
-	virtual bool call()
-	{
-		switch (m_state)
-		{
-			case 0:
-				throw std::runtime_error( "input not initialized");
-			case 1:
-				if (!m_input.call()) return false;
-				m_state = 2;
-			case 2:
-			{
-				m_inputstructptr->finalize( m_provider);
-				db::TransactionInput transactionInput( m_inputstructptr->get());
-				db::TransactionOutputR res;
-				{
-					types::CountedReference<db::Transaction> trsr( m_provider->transaction( m_func->name()));
-					if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
-					db::TransactionOutput* outputptr = new db::TransactionOutput();
-					try
-					{
-						trsr->begin();
-						trsr->execute( transactionInput, *outputptr);
-						trsr->commit();
-						res.reset( outputptr);
-					}
-					catch (const db::DatabaseTransactionErrorException& e)
-					{
-						delete outputptr;
-						LOG_ERROR << e.what();
-						const char* hint = m_func->getErrorHint( e.errorclass, e.functionidx);
-						std::string explain;
-						if (hint) explain = explain + " -- " + hint;
-						throw std::runtime_error( std::string( "error in transaction '") + e.transaction + "':" + e.usermsg + explain);
-					}
-					catch (const std::runtime_error& e)
-					{
-						delete outputptr;
-						throw e;
-					}
-				}
-				m_result = m_func->getOutput( m_provider, res);
-				if (!res->isCaseSensitive())
-				{
-					//... If not case sensitive result then propagate this
-					//	to be respected in mapping to structures.
-					m_result->setFlags( langbind::TypedInputFilter::PropagateNoCase);
-				}
-				m_state = 3;
-				return true;
-			}
-			default:
-				return true;
-		}
-	}
-
-	virtual void init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
-	{
-		m_provider = p;
-		m_inputstruct.reset( m_inputstructptr = m_func->getInput());
-		i->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
-		m_input.init( i, m_inputstruct);
-		m_state = 1;
-		m_flags = f;
-	}
-
-	virtual langbind::TypedInputFilterR result() const
-	{
-		return m_result;
-	}
-
-private:
-	const proc::ProcessorProviderInterface* m_provider;	//< processor provider to get transaction object
-	const db::TransactionFunction* m_func;			//< function to execute
-	int m_state;						//< current state of call
-	langbind::RedirectFilterClosure m_input;		//< builder of structure from input
-	db::TransactionFunctionInput* m_inputstructptr;		//< input structure implementation interface
-	langbind::TypedOutputFilterR m_inputstruct;		//< input structure
-	langbind::TypedInputFilterR m_result;			//< function call result
-	serialize::Context::Flags m_flags;			//< flags for input serialization
-};
-
-
-class TransactionFunction
-	:public langbind::FormFunction
-{
-public:
-	TransactionFunction( const db::TransactionFunctionR& f)
-		:m_impl(f){}
-
-	virtual TransactionFunctionClosure* createClosure() const
-	{
-		return new TransactionFunctionClosure( m_impl.get());
-	}
-
-private:
-// unused:
-//	const proc::ProcessorProviderInterface* m_provider;
-	db::TransactionFunctionR m_impl;
-};
-
-
 
 bool TransactionDefinitionProgram::is_mine( const std::string& filename) const
 {
@@ -195,20 +65,15 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 			databaseID = transactionDB->ID();
 			databaseClassName = transactionDB->className();
 		}
-		std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
+		db::TdlTransactionFunctionList funclist
 			= db::loadTransactionProgramFile( filename, databaseID, databaseClassName, languageDescr);
 
-		std::vector<std::pair<std::string,db::TransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
+		db::TdlTransactionFunctionList::const_iterator fi = funclist.begin(), fe = funclist.end();
 		for (; fi != fe; ++fi)
 		{
-			langbind::FormFunctionR func( new TransactionFunction( fi->second));
-			library.defineFormFunction( fi->first, func);
+			library.defineFormFunction( fi->first, fi->second);
 			LOG_DEBUG << "Loaded transaction function '" << fi->first << "'";
 		}
-	}
-	catch (const config::PositionalErrorException& e)
-	{
-		throw config::PositionalFileErrorException( config::PositionalFileError( e, filename));
 	}
 	catch (const std::runtime_error& e)
 	{

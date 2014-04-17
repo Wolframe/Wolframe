@@ -36,7 +36,7 @@
 #include "appdevel/module/filterBuilder.hpp"
 #include "appdevel/module/programTypeBuilder.hpp"
 
-//\brief Defines a Wolframe filter module after the includes section.
+///\brief Defines a Wolframe filter module after the includes section.
 #define FILTER_MODULE( DESCRIPTION, FILTER, CREATE_FILTERTYPE)\
 	static const char* _Wolframe__moduleDescription()\
 	{\
@@ -59,7 +59,7 @@
 	}
 
 
-//\brief HACK for modules implementing 2 filters
+///\brief HACK for modules implementing 2 filters
 #define FILTER_WITH_SOURCE_MODULE( DESCRIPTION, FILTER, CREATE_FILTERTYPE, LANGNAME, CREATE_PRG_FUNC)\
 	static const char* _Wolframe__moduleDescription()\
 	{\

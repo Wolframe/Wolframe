@@ -75,7 +75,12 @@ public:
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
 	virtual bool getNext( ElementType& type, types::VariantConst& element);
+
+	///\brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f);
+
+	///\brief Implements FilterBase::checkSetFlags()const
+	virtual bool checkSetFlags( Flags f) const;
 
 	std::string posLogText() const
 	{

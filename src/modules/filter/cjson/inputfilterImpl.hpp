@@ -112,8 +112,8 @@ struct InputFilterImpl :public InputFilter
 	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize);
 
-	///\brief Implements FilterBase::setFlags()
-	virtual bool setFlags( Flags f);
+	///\remark FilterBase::setFlags() inherited		(always successful)
+	///\remark FilterBase::checkSetFlags()const inherited	(true)
 
 private:
 	boost::shared_ptr<cJSON> parse( const std::string& content);
@@ -134,10 +134,10 @@ private:
 		StackElement( const StackElement& o)
 			:m_state(o.m_state),m_node(o.m_node),m_tag(o.m_tag){}
 
-		enum State {StateOpen,StateAttributeValue,StateContentValue,StateChild,StateValue,StateNext,StateCheckEnd,StateReopen};
+		enum State {StateOpen,StateAttributeValue,StateContentValue,StateChild,StateValue,StateNext,StateCheckEnd,StateReopen,StateCloseNode};
 		static const char* stateName( State i)
 		{
-			static const char* ar[] = {"StateOpen","StateAttributeValue","StateContentValue","StateChild","StateValue","StateNext","StateCheckEnd","StateReopen"};
+			static const char* ar[] = {"StateOpen","StateAttributeValue","StateContentValue","StateChild","StateValue","StateNext","StateCheckEnd","StateReopen","StateCloseNode"};
 			return ar[i];
 		}
 		State m_state;				//< current state

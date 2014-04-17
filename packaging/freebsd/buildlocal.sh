@@ -86,7 +86,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
-	mandir=/usr/local/man
+	mandir=/usr/local/man \
 	help
 
 gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
@@ -97,7 +97,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
-	mandir=/usr/local/man
+	mandir=/usr/local/man \
 	config
 
 gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \

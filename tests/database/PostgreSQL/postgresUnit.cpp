@@ -8,6 +8,7 @@
 
 #include "PostgreSQL.hpp"
 #include "types/variant.hpp"
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -75,7 +76,7 @@ TEST_F( PQmoduleFixture, Transaction )
 				3, 4, 3, 30000, std::vector<std::string>());
 
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	// ok transaction
 	trans->begin( );
@@ -90,11 +91,15 @@ TEST_F( PQmoduleFixture, Transaction )
 
 	// error, rollback without begin
 	EXPECT_THROW( trans->rollback( ), std::runtime_error );
-
-	trans->close( );
 }
 
-static void executeInsertStatements( Transaction* trans)
+static std::string dberror_string( const TransactionR& trans)
+{
+	const DatabaseError* err = trans->getLastError();
+	return std::string("error in database: '") + err->dbname + "' error class '" + err->errorclass + ": " + err->errormsg + " " + err->errordetail;
+}
+
+static void executeInsertStatements( const TransactionR& trans)
 {
 	// some normal values
 	{
@@ -103,7 +108,7 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( "xyz");
 		values.push_back( true);
 		values.push_back( 4.782 );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 	{
 		std::vector<types::Variant> values;
@@ -111,7 +116,7 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( "abc");
 		values.push_back( false);
 		values.push_back( -4.2344 );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 	// some maxima
 	{
@@ -122,7 +127,7 @@ static void executeInsertStatements( Transaction* trans)
 		// temporary: storing max( ) in a double precision returns a value which
 		// is bigger than max() when converting it from a string..
 		values.push_back( std::numeric_limits<double>::max( ) / 2 );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 	// some minima
 	{
@@ -131,7 +136,7 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( "");
 		values.push_back( false);
 		values.push_back( std::numeric_limits<double>::min( ) / 2 );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 	// null values
 	{
@@ -140,7 +145,7 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( types::VariantConst( ));
 		values.push_back( types::VariantConst( ));
 		values.push_back( types::VariantConst( ));
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 }
 
@@ -150,12 +155,12 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	// ok transaction create table statement with commit
 	trans->begin( );
-	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
-	trans->executeStatement( "CREATE TABLE TestTest (id BIGINT, name TEXT, active BOOLEAN, price DOUBLE PRECISION)");
+	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));
+	if (!trans->executeStatement( "CREATE TABLE TestTest (id BIGINT, name TEXT, active BOOLEAN, price DOUBLE PRECISION)")) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 
 	// ok transaction with statements with rollback
@@ -165,7 +170,8 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 
 	// ok select result that must not exist because of the rollback in the previous transaction
 	trans->begin( );
-	Transaction::Result emptyres = trans->executeStatement( "SELECT * FROM TestTest");
+	Transaction::Result emptyres;
+	if (!trans->executeStatement( emptyres, "SELECT * FROM TestTest")) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 	EXPECT_EQ( emptyres.size(), 0U);
 
@@ -176,7 +182,8 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 
 	// ok select result that must contain the elements inserted in the previous transaction
 	trans->begin( );
-	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id IS NULL, id ASC");
+	Transaction::Result res;
+	if (!trans->executeStatement( res, "SELECT * FROM TestTest ORDER BY id IS NULL, id ASC")) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 	EXPECT_EQ( res.size(), 5U);
 	EXPECT_EQ( res.colnames().size(), 4U);
@@ -239,8 +246,6 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 			}
 		}
 	}
-
-	trans->close( );
 }
 
 TEST_F( PQmoduleFixture, ExceptionSyntaxError )
@@ -249,24 +254,22 @@ TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
 
 	// execute an illegal SQL statement, must throw
-	try {
-		trans->executeStatement( "SELCT 1" );
-		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
-	} catch( const DatabaseTransactionErrorException &e ) {
-		std::cout << e.what( ) << std::endl;
-		ASSERT_EQ( e.statement, "SELCT 1" );
-		ASSERT_EQ( e.errorclass, "SYNTAX" );
-	} catch( ... ) {
-		FAIL( ) << "Wrong exception class seen in database error!";
+	if (!trans->executeStatement( "SELCT 1" ))
+	{
+		const DatabaseError* err = trans->getLastError();
+		ASSERT_EQ( err->errorclass, "SYNTAX" );
+		std::cout << dberror_string( trans) << std::endl;
 	}
-
-	// auto rollback?
-	// auto close transaction?
+	else
+	{
+		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
+	}
+	//... auto rollback
 }
 
 TEST_F( PQmoduleFixture, TooFewBindParameter )
@@ -275,7 +278,7 @@ TEST_F( PQmoduleFixture, TooFewBindParameter )
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
@@ -284,24 +287,20 @@ TEST_F( PQmoduleFixture, TooFewBindParameter )
 	values.push_back( 1);
 	values.push_back( "xyz");
 	values.push_back( true);
+
 	// intentionally ommiting values here, must throw an error
-	try {
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values))
+	{
+		std::cout << dberror_string( trans) << std::endl;
+	}
+	else
+	{
 		// should actually not work
-		trans->commit( );
-		trans->close( );
+		trans->rollback();
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( const std::runtime_error &e ) {
-// why is this another excpetion?
-		std::cout << e.what( ) << std::endl;
-//	} catch( DatabaseTransactionErrorException &e ) {
-//		std::cout << e.what( );
-	} catch( ... ) {
-		FAIL( ) << "Wrong exception class seen in database error!";
 	}
 
-	// auto rollback?
-	// auto close transaction?
+	//... auto rollback
 }
 
 TEST_F( PQmoduleFixture, TooManyBindParameter )
@@ -310,7 +309,7 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
@@ -321,33 +320,19 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 	values.push_back( true);
 	values.push_back( 4.782);
 	values.push_back( "too much");
-	// intentionally adding too many values here, must throw an error
-	try {
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
-		// we should not get here, just in case we close the transaction properly
-		trans->commit( );
-		trans->close( );
-		FAIL( ) << "Reached success state, but should fail!";
-	} catch( const DatabaseTransactionErrorException &e ) {
-		std::cout << e.what( ) << std::endl;
-	} catch( const DatabaseErrorException &e ) {
-		std::cout << e.what( ) << std::endl;
-		FAIL( ) << "Wrong std::DatabaseErrorException class seen in database error!";
-	} catch( const std::runtime_error &e ) {
-		std::cout << e.what( ) << std::endl;
-//		FAIL( ) << "Wrong std::runtime_error class seen in database error!";
-	} catch( const std::exception &e ) {
-		std::cout << e.what( ) << std::endl;
-		FAIL( ) << "Wrong std::exception class seen in database error!";
-	} catch( ... ) {
-		// really?
-		trans->commit( );
-		trans->close( );
-		//~ FAIL( ) << "Wrong exception class seen in database error!";
-	}
+	// intentionally adding too many values here, must return an error
 
-	// auto rollback?
-	// auto close transaction?
+	if (trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values))
+	{
+		// we should not get here, just in case we close the transaction properly
+		trans->rollback();
+		FAIL( ) << "Reached success state, but should fail!";
+	}
+	else
+	{
+		std::cout << dberror_string( trans) << std::endl;
+	}
+	//... auto rollback
 }
 
 TEST_F( PQmoduleFixture, IllegalBindParameter )
@@ -356,7 +341,7 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
 	std::vector<types::Variant> values;
@@ -367,25 +352,18 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 	values.push_back( "not used");
 	values.push_back( true);
 	values.push_back( 4.782);
-	try {
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$4,$5)", values);
+
+	if (trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$4,$5)", values))
+	{
 		// should actually not work
-		trans->commit( );
-		trans->close( );
+		trans->rollback( );
 		FAIL( ) << "Reached success state, but should fail!";
-	//~ } catch( const DatabaseTransactionErrorException &e ) {
-		//~ std::cout << e.what( ) << std::endl;
-	} catch( std::runtime_error const &e ) {
-		std::cout << e.what( ) << std::endl;
-		//~ FAIL( ) << "Wrong std::exception class seen in database error!";
-	} catch( ... ) {
-		// really?
-		trans->commit( );
-		trans->close( );
-		FAIL( ) << "Wrong exception class seen in database error!";
 	}
-	// auto rollback?
-	// auto close transaction?
+	else
+	{
+		std::cout << dberror_string( trans) << std::endl;
+	}
+	//... auto rollback
 }
 
 TEST_F( PQmoduleFixture, ReusedBindParameter )
@@ -394,18 +372,19 @@ TEST_F( PQmoduleFixture, ReusedBindParameter )
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
-	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
-	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
+	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));
+	if (!trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)")) throw std::runtime_error( dberror_string( trans));
 	std::vector<types::Variant> values;
 	values.push_back( 47);
-	trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$1,$1)", values);
+	if (!trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$1,$1)", values)) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 
 	trans->begin( );
-	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest");
+	Transaction::Result res;
+	if (!trans->executeStatement( res, "SELECT * FROM TestTest")) throw std::runtime_error( dberror_string( trans));
 	EXPECT_EQ( res.size(), 1U);
 	EXPECT_EQ( res.colnames().size(), 3U);
 	EXPECT_STREQ( "id", res.colnames().at(0).c_str());
@@ -422,7 +401,6 @@ TEST_F( PQmoduleFixture, ReusedBindParameter )
 		EXPECT_EQ( 47, ri->at(2).toint());
 	}
 	trans->commit( );
-	trans->close( );
 }
 
 TEST_F( PQmoduleFixture, ExpressionWithParametersAndTypeCoercion )
@@ -431,20 +409,21 @@ TEST_F( PQmoduleFixture, ExpressionWithParametersAndTypeCoercion )
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
-	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
-	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
+	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));
+	if (!trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)")) throw std::runtime_error( dberror_string( trans));
 	std::vector<types::Variant> values;
 	values.push_back( std::string("47"));
 	values.push_back( 47);
 	values.push_back( 47);
-	trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$2+1,$3+2)", values);
+	if (!trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$2+1,$3+2)", values)) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 
 	trans->begin( );
-	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest");
+	Transaction::Result res;
+	if (!trans->executeStatement( res, "SELECT * FROM TestTest")) throw std::runtime_error( dberror_string( trans));
 	EXPECT_EQ( res.size(), 1U);
 	EXPECT_EQ( res.colnames().size(), 3U);
 	EXPECT_STREQ( "id", res.colnames().at(0).c_str());
@@ -461,7 +440,6 @@ TEST_F( PQmoduleFixture, ExpressionWithParametersAndTypeCoercion )
 		EXPECT_EQ( 49, ri->at(2).toint());
 	}
 	trans->commit( );
-	trans->close( );
 }
 
 int main( int argc, char **argv )

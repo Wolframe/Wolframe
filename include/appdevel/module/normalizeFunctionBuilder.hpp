@@ -91,8 +91,8 @@ struct NormalizeFunctionDef
 class NormalizeFunctionBuilder :public SimpleBuilder
 {
 public:
-	//\brief Constructor
-	//\param[in] functions {0,0} terminated array of function definitions
+	///\brief Constructor
+	///\param[in] functions {0,0} terminated array of function definitions
 	NormalizeFunctionBuilder( const char* classname_, const NormalizeFunctionDef* functions, types::CreateNormalizeResourceHandle createResourceHandle=0)
 		:SimpleBuilder( classname_)
 	{

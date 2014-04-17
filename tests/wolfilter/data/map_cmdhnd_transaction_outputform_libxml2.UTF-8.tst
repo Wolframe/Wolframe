@@ -89,7 +89,7 @@ COMMAND(employee_assignment_print) CALL(test_transaction) RETURN (map_cmdhnd_tra
 **file:DBIN.tdl
 TRANSACTION test_transaction
 BEGIN
-	INTO task FOREACH //task DO run( title);
+	INTO task FOREACH //task DO SELECT run( title);
 END
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>

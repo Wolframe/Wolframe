@@ -79,7 +79,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
-	mandir=/usr/pkg/man \
+	mandir=/usr/pkg/man
 check_for_errors
 
 # testing breaks at least in boost-locale and some xml filters for now

@@ -35,6 +35,7 @@
 
 #ifndef _WOLFRAME_PARSE_UTILS_HPP_INCLUDED
 #define _WOLFRAME_PARSE_UTILS_HPP_INCLUDED
+#include "utils/sourceLineInfo.hpp"
 #include <string>
 #include <vector>
 #include <map>
@@ -44,7 +45,7 @@ namespace utils {
 
 ///\class CharTable
 ///\brief Character table structure for parseNextToken( std::string&,std::string::const_iterator&, std::string::const_iterator, ...);
-//\remark A range of characters is specified with 2 dots between the first and the last character of the range (e.g. "a..z")
+///\remark A range of characters is specified with 2 dots between the first and the last character of the range (e.g. "a..z")
 class CharTable
 {
 public:
@@ -63,16 +64,16 @@ const CharTable& anyCharTable();
 class IdentifierTable
 {
 public:
-	//\brief Constructor
-	//\param[in] casesensitive_ true, if the keywords inserted are case sensitive
-	//\param[in] arg NULL terminated array of identifiers to insert
+	///\brief Constructor
+	///\param[in] casesensitive_ true, if the keywords inserted are case sensitive
+	///\param[in] arg NULL terminated array of identifiers to insert
 	IdentifierTable( bool casesensitive_, const char** arg);
 
-	//\brief Lookup in table
+	///\brief Lookup in table
 	int operator[]( const std::string&) const;
-	//\brief Get the list of keywords defined as string for log messages
+	///\brief Get the list of keywords defined as string for log messages
 	std::string tostring() const;
-	//\brief Get the keyword with index 'id' (starting from 1)
+	///\brief Get the keyword with index 'id' (starting from 1)
 	const char* idstring( int id) const;
 
 private:
@@ -117,7 +118,7 @@ std::string parseLine( std::string::const_iterator& si, const std::string::const
 ///\param[in,out] si scanning iterator passed as start of the source to parse and returned as source position after the token parsed if it matches or start of the token not matching if not
 ///\param[in] se iterator marking the end of the source
 ///\param[in] idtab identifier table
-//\return 0 if not found, else index of identifier in table starting with 1
+///\return 0 if not found, else index of identifier in table starting with 1
 int parseNextIdentifier( std::string::const_iterator& si, const std::string::const_iterator& se, const IdentifierTable& idtab);
 
 ///\brief Parse a token assignement 'identifier = token'
@@ -138,26 +139,6 @@ std::pair<std::string,std::string> parseTokenAssignement( std::string::const_ite
 ///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the expression parsed)
 ///\param[in] end iterator marking the end of the source
 std::string parseNextLine( std::string::const_iterator& itr, std::string::const_iterator end);
-
-///\brief Get the line/column info from a source iterator
-struct LineInfo
-{
-	unsigned int line;
-	unsigned int column;
-
-	LineInfo()
-		:line(1),column(1){}
-	LineInfo( unsigned int line_, unsigned int column_)
-		:line(line_),column(column_){}
-	LineInfo( const LineInfo& o)
-		:line(o.line),column(o.column){}
-
-	void incrementLine()	{column=1; ++line;}
-	void incrementColumn()	{++column;}
-};
-
-LineInfo getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos);
-LineInfo getLineInfoIncrement( const LineInfo& lineinfo, const std::string::const_iterator& lastpos, const std::string::const_iterator& pos);
 
 }} //namespace _Wolframe::utils
 

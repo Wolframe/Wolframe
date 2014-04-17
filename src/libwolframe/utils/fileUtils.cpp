@@ -188,7 +188,7 @@ static void readFileContent( const std::string& filename, std::string& res)
 	}
 #else
 	unsigned char ch;
-	FILE* fh = fopen( filename.c_str(), "r");
+	FILE* fh = fopen( filename.c_str(), "rb");
 	if (!fh)
 	{
 		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
@@ -226,7 +226,7 @@ void utils::writeFile( const std::string& filename, const std::string& content)
 #endif
 	if (!fh)
 	{
-		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
+		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for writing");
 	}
 	boost::shared_ptr<FILE> fhr( fh, fclose);
 	std::string::const_iterator fi = content.begin(), fe = content.end();
@@ -542,12 +542,9 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 	stk.push_back( StackElem( "", types::PropertyTree::Node()));
 	std::string id;
 	std::string tok;
-	LineInfo lineinfo;
+	FileLineInfo posinfo( filename);
 
-	std::string includepath(
-		boost::filesystem::system_complete( filename).parent_path().string());
-	types::PropertyTree::FileName filenameref( 
-		types::PropertyTree::getFileName( resolvePath( filename)));
+	std::string includepath( boost::filesystem::system_complete( filename).parent_path().string());
 
 	// Check circular include references:
 	std::vector<std::string> filenamestack2 = filenamestack;
@@ -566,7 +563,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 		{
 			// update current position info:
 			utils::gotoNextToken( ci, ce);
-			lineinfo = utils::getLineInfoIncrement( lineinfo, ca, ci);
+			posinfo.update( ca, ci);
 			ca = ci;
 
 			// parse next token:
@@ -582,7 +579,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 				ch = utils::parseNextToken( tok, ci, ce, valueOpTab, valueAlphaTab);
 			}
 #ifdef _Wolframe_LOWLEVEL_DEBUG
-			std::cout << "PROPERTY TOKEN " << (char)(ch?ch:'?') << " '" << tok << "' (" << (id.empty()?"key":"value") << " at " << lineinfo.line << ":" << lineinfo.column << ")" << std::endl;
+			std::cout << "PROPERTY TOKEN " << (char)(ch?ch:'?') << " '" << tok << "' (" << (id.empty()?"key":"value") << " at " << posinfo.line() << ":" << posinfo.column() << ")" << std::endl;
 #endif
 			switch (ch)
 			{
@@ -606,8 +603,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 					//... start of structure -> push a new open substructure on the stack to process
 					++ci;
 					if (id.empty()) throw std::runtime_error( "declared substructure {..} without preceeding name");
-					types::PropertyTree::Position stpos( lineinfo.line, lineinfo.column);
-					stk.push_back( StackElem( id,types::PropertyTree::Node( stpos)));
+					stk.push_back( StackElem( id,types::PropertyTree::Node( posinfo)));
 					id.clear();
 					break;
 				}
@@ -616,15 +612,11 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 					//... end of structure -> close it and define it as substructure of the enclosing structure
 					if (stk.size() == 1) throw std::runtime_error( "unexpected '}' (brackets {..} of structures not well balanced)");
 					if (id.size()) throw std::runtime_error( "unexpected '}' (declaration identifier without value followed by close bracket)");
-					id = stk.back().first;	//... save top of stack
+					id = stk.back().first;		//... save top of stack
 					node = stk.back().second;	//... save top of stack
-					stk.pop_back();		//... pop
+					stk.pop_back();			//... pop
 					stk.back().second.add_child( id, node);
-					id.clear();		//... add saved top element and clear state
-					if (stk.size() == 1)
-					{
-						stk.back().second.recursiveSetFileName( filenameref);
-					}
+					id.clear();			//... add saved top element and clear state
 					break;
 				}
 				case '.':
@@ -660,8 +652,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 					if (id.size())
 					{
 						//... 'id' has been defined before so (id,tok) is a new key value pair
-						types::PropertyTree::Position tokpos( lineinfo.line, lineinfo.column);
-						stk.back().second.add_child( id, types::PropertyTree::Node( tok, tokpos));
+						stk.back().second.add_child( id, types::PropertyTree::Node( tok, posinfo));
 						id.clear();
 						std::string::const_iterator cl = ci;
 						std::string restline( utils::parseLine( cl, ce));
@@ -707,7 +698,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 		}
 		else
 		{
-			throw std::runtime_error(std::string("error in file '") + filename + "' at line " + boost::lexical_cast<std::string>(lineinfo.line) + " column " + boost::lexical_cast<std::string>(lineinfo.column) + ": " + e.what());
+			throw std::runtime_error(std::string("error ") + posinfo.logtext() + ": " + e.what());
 		}
 	}
 }

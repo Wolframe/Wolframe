@@ -55,9 +55,8 @@ static int wrap_sqlite3_prepare_v2( sqlite3* c, const char* s, int n, sqlite3_st
 	return sqlite3_prepare_v2( c, s, n, stm, t);
 }
 
-TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( const std::string& name_, SQLiteDBunit* dbunit_)
-	:TransactionExecStatemachine(name_)
-	,m_state(Init)
+TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( SQLiteDBunit* dbunit_)
+	:m_state(Init)
 	,m_hasResult(false)
 	,m_hasRow(false)
 	,m_stm(0)
@@ -70,6 +69,7 @@ TransactionExecStatemachine_sqlite3::~TransactionExecStatemachine_sqlite3()
 {
 	clear();
 	delete m_statement;
+	if (m_conn) delete m_conn;
 }
 
 void TransactionExecStatemachine_sqlite3::clear()
@@ -92,11 +92,6 @@ void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 	// Aba: we cannot map those globally! They depende on
 	// the function which was called before..
 	int errcode = sqlite3_errcode( **m_conn);
-#if SQLITE_VERSION_NUMBER >= 3006005
-	int extcode = sqlite3_extended_errcode( **m_conn);
-#else
-	int extcode = 0;
-#endif
 	const char* errmsg = sqlite3_errmsg( **m_conn);
 	const char* errtype = 0;
 	switch (errcode)
@@ -129,8 +124,7 @@ void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 		case SQLITE_RANGE: errtype = "PARAMETER"; break;
 		case SQLITE_NOTADB: errtype = "SYSTEM"; break;
 	}
-	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
-	m_lasterror.reset( new DatabaseError( severity, extcode?extcode:errcode, databaseID().c_str(), m_curstm.c_str(), errtype, errmsg, errmsg));
+	m_lasterror.reset( new DatabaseError( errtype, errcode, errmsg));
 }
 
 bool TransactionExecStatemachine_sqlite3::executeInstruction( const char* stmstr, State newstate)
@@ -190,14 +184,26 @@ bool TransactionExecStatemachine_sqlite3::commit()
 bool TransactionExecStatemachine_sqlite3::rollback()
 {
 	LOG_TRACE << "[sqlite3 statement] CALL rollback()";
-	bool rt = executeInstruction( "ROLLBACK TRANSACTION;", Init);
-	clear();
-	if (rt)
+	if (m_state == Transaction)
 	{
-		delete m_conn;
-		m_conn = 0;
 	}
-	return rt;
+	else if (m_state != Executed && m_state != CommandReady)
+	{
+		return errorStatus( std::string( "call of rollback not allowed in state '") + stateName(m_state) + "'");
+	}
+	if (m_conn)
+	{
+		bool rt = executeInstruction( "ROLLBACK TRANSACTION;", Init);
+		clear();
+		if (rt)
+		{
+			delete m_conn;
+			m_conn = 0;
+		}
+		return rt;
+	}
+	m_state = Init;
+	return true;
 }
 
 bool TransactionExecStatemachine_sqlite3::status( int rc, State newstate)
@@ -219,7 +225,7 @@ bool TransactionExecStatemachine_sqlite3::errorStatus( const std::string& messag
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, databaseID().c_str(), m_curstm.c_str(), "INTERNAL", message.c_str(), "internal logic error (prepared statement)"));
+		m_lasterror.reset( new DatabaseError( "INTERNAL", 0, message));
 		m_state = Error;
 	}
 	return false;

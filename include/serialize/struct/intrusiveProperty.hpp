@@ -38,8 +38,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-//\class IntrusiveProperty
-//\brief Maps the traits based on structure element type properties to an enumeration value
+///\class IntrusiveProperty
+///\brief Maps the traits based on structure element type properties to an enumeration value
 template <typename T>
 struct IntrusiveProperty
 {

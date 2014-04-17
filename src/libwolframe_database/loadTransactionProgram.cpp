@@ -33,9 +33,19 @@
 ///\brief Loading function for transaction definition programs
 ///\file loadTransactionProgram.cpp
 #include "database/loadTransactionProgram.hpp"
-#include "transactionFunctionDescription.hpp"
+#include "tdl/commandDefinition.hpp"
+#include "tdl/elementReference.hpp"
+#include "tdl/subroutineCallStatement.hpp"
+#include "tdl/embeddedStatement.hpp"
+#include "tdl/preprocElementReference.hpp"
+#include "tdl/preprocCallStatement.hpp"
+#include "tdl/preprocBlock.hpp"
+#include "tdl/parseUtils.hpp"
+#include "tdl2vmTranslator.hpp"
+#include "tdlTransactionFunction.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/fileLineInfo.hpp"
 #include "types/conversions.hpp"
 #include "logger-v1.hpp"
 #include "config/programBase.hpp"
@@ -44,1127 +54,372 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-static std::string::const_iterator lineStart( std::string::const_iterator si, const std::string& src)
+static void programAddCommandDefinition( Tdl2vmTranslator& prg, const tdl::CommandDefinition& cmd)
 {
-	if (si == src.begin()) return si;
-	for (--si; si >= src.begin() && *si <= ' ' && *si > '\0'; --si)
+	prg.init_resultset();
+	if (cmd.nonempty) prg.define_resultset_nonempty();
+	if (cmd.unique) prg.define_resultset_unique();
+
+	if (cmd.embedded)
 	{
-		if (*si == '\n') return si+1;
-	}
-	throw std::logic_error( "internal: Called lineStart without calling isLineStart before");
-}
-
-static const utils::CharTable g_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
-
-static bool isAlpha( char ch)
-{
-	if (ch >= 'A' && ch <= 'Z') return true;
-	if (ch >= 'a' && ch <= 'z') return true;
-	if (ch == '_') return true;
-	return false;
-}
-
-static bool isAlphaNumeric( char ch)
-{
-	if (ch >= '0' && ch <= '9') return true;
-	return isAlpha( ch);
-}
-
-static bool isIdentifier( const std::string& str)
-{
-	std::string::const_iterator si = str.begin(), se = str.end();
-	if (si == se) return false;
-	if (!isAlpha(*si)) return false;
-	for (++si; si != se && isAlphaNumeric(*si); ++si){}
-	return (si == se);
-}
-
-static std::string errorTokenString( char ch, const std::string& tok)
-{
-	if (g_optab[ch])
-	{
-		std::string rt;
-		rt.push_back( ch);
-		return rt;
-	}
-	if (ch == '"' || ch == '\'')
-	{
-		std::string rt( "string ");
-		rt.push_back( ch);
-		rt.append( tok);
-		rt.push_back( ch);
-		return rt;
-	}
-	if (ch == 0)
-	{
-		return "end of file";
-	}
-	return tok;
-}
-
-static char gotoNextToken( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator se)
-{
-	const char* commentopr = langdescr->eoln_commentopr();
-	char ch;
-	while ((ch = utils::gotoNextToken( si, se)) != 0)
-	{
-		if (ch == commentopr[0])
+		if (!cmd.selector.empty())
 		{
-			std::string::const_iterator ti = si+1;
-			std::size_t ci = 1;
-			while (commentopr[ci] && ti != se && commentopr[ci] == *ti)
+			prg.begin_FOREACH( cmd.selector);
+		}
+		prg.begin_DO_statement( cmd.statement.stmstring);
+
+		std::vector<tdl::CommandDefinition::Hint>::const_iterator hi = cmd.hints.begin(), he = cmd.hints.end();
+		for (; hi != he; ++hi)
+		{
+			prg.statement_HINT( hi->errorclass, hi->message);
+		}
+		std::vector<tdl::ElementReference>::const_iterator pi = cmd.statement.params.begin(), pe = cmd.statement.params.end();
+		for (; pi != pe; ++pi)
+		{
+			switch (pi->type)
 			{
-				++ci;
-				++ti;
-			}
-			if (!commentopr[ci])
-			{
-				// skip to end of line
-				while (ti != se && *ti != '\n') ++ti;
-				si = ti;
-				continue;
-			}
-		}
-		break;
-	}
-	return ch;
-}
-
-static char parseNextToken( const LanguageDescription* langdescr, std::string& tok, std::string::const_iterator& si, std::string::const_iterator se)
-{
-	char ch = gotoNextToken( langdescr, si, se);
-	if (!ch) return 0;
-	return utils::parseNextToken( tok, si, se, g_optab);
-}
-
-static std::vector<std::string> parse_INTO_path( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
-{
-	std::vector<std::string> rt;
-	for (;;)
-	{
-		std::string output;
-		char ch = parseNextToken( langdescr, output, si, se);
-		if (!ch) throw std::runtime_error( "unexpected end of description. result tag path expected after INTO");
-		if (ch == '.' && output.empty()) output.push_back(ch);
-
-		if (output.empty())
-		{
-			throw std::runtime_error( "identifier or '.' expected after INTO");
-		}
-		rt.push_back( output);
-		ch = gotoNextToken( langdescr, si, se);
-		if (ch != '/') break;
-		++si;
-	}
-	return rt;
-}
-
-static int getResultNamespaceIdentifier( const std::string& name, const types::keymap<int>& keepResult_map, int fidx)
-{
-	types::keymap<int>::const_iterator ki = keepResult_map.find( name);
-	if (ki == keepResult_map.end())
-	{
-		if (boost::algorithm::iequals( name, "PARAM"))
-		{
-			return 0;
-		}
-		else if (boost::algorithm::iequals( name, "RESULT"))
-		{
-			if (fidx == 0)
-			{
-				throw std::runtime_error( "no command result referenceable here with RESULT");
-			}
-			return fidx;
-		}
-		return -1;
-	}
-	else
-	{
-		return ki->second;
-	}
-}
-
-static std::vector<std::string>
-	parseTemplateArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	std::vector<std::string> rt;
-	std::string tok;
-	if (gotoNextToken( langdescr, si, se) == '<')
-	{
-		++si;
-		for (;;)
-		{
-			char ch = parseNextToken( langdescr, tok, si, se);
-			if (!ch) throw std::runtime_error( "unexpected end of template argument list");
-			if (ch == ',') std::runtime_error( "expected template argument identifier before comma ','");
-			if (ch == '>') break;
-			if (!isAlpha(ch)) throw std::runtime_error( std::string( "template argument is not an identifier: '") + errorTokenString( ch, tok) + "'");
-			rt.push_back( tok);
-			ch = parseNextToken( langdescr, tok, si, se);
-			if (ch == '>') break;
-			if (ch == ',') continue;
-			if (ch == ',') std::runtime_error( "expected comma ',' or end of template identifier list '>'");
-		}
-	}
-	return rt;
-}
-
-static TransactionFunctionDescription::MainProcessingStep::Call::Param
-	parseReferenceParameter( const LanguageDescription* langdescr, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	char ch = utils::gotoNextToken( si, se);
-	if (ch == '(')
-	{
-		char sb,eb;
-		Call::Param::Type type;
-		sb = '('; eb = ')';
-		type = Call::Param::InputSelectorPath;
-		++si;
-		std::string::const_iterator argstart = si;
-		std::string tok;
-		ch = parseNextToken( langdescr, tok, si, se);
-		for (; ch && ch != sb && ch != eb; ch=parseNextToken( langdescr, tok, si, se));
-		if (ch == eb)
-		{
-			Call::Param param( type, boost::algorithm::trim_copy( std::string( argstart, si-1)));
-			return param;
-		}
-		else
-		{
-			throw std::runtime_error( std::string( "missing close bracket for expression") + ((eb==')')?"')'":"']'"));
-		}
-	}
-	else if (ch == '#')
-	{
-		// Internal LOOPCOUNT variable:
-		++si;
-		Call::Param param( Call::Param::InternalVariable, "#");
-		return param;
-	}
-	else if (isAlphaNumeric(ch))
-	{
-		// Parse namespaces and result references:
-		int resultscope_functionidx = -1;
-		if (isAlpha(ch))
-		{
-			std::string::const_iterator argstart = si;
-			for (; si!=se && isAlphaNumeric(*si); ++si);
-			if (*si == '.')
-			{
-				std::string namspace( argstart, si);
-				resultscope_functionidx = getResultNamespaceIdentifier( namspace, keepResult_map, fidx);
-				if (resultscope_functionidx == -1)
-				{
-					throw std::runtime_error( std::string( "result set identifier not found '") + namspace + "'");
-				}
-				++si;
-				ch = (si==se)?0:*si;
-			}
-			else
-			{
-				si = argstart;
-			}
-		}
-		if (ch >= '0' && ch <= '9')
-		{
-			std::string::const_iterator argstart = si;
-			for (; si!=se && *si>= '0' && *si<= '9'; ++si);
-			if (si != se && isAlphaNumeric(*si))
-			{
-				throw std::runtime_error( "operator or space expected after numeric reference");
-			}
-			Call::Param::Type type = Call::Param::NumericResultReference;
-			Call::Param param( type, std::string( argstart, si), resultscope_functionidx);
-			return param;
-		}
-		else if (isAlpha(ch))
-		{
-			std::string::const_iterator argstart = si;
-			for (; si!=se && isAlphaNumeric(*si); ++si);
-			if (resultscope_functionidx == 0)
-			{
-				// ... Parameter reference has to be converted to a numeric reference
-				std::string paramname = std::string( argstart, si);
-				types::keymap<int>::const_iterator pi = param_map.find( paramname);
-				if (pi == param_map.end())
-				{
-					throw std::runtime_error( std::string("unknown parameter '") + paramname + "'");
-				}
-				Call::Param::Type type = Call::Param::NumericResultReference;
-				Call::Param param( type, types::tostring_cast((_WOLFRAME_UINTEGER)pi->second), resultscope_functionidx);
-				return param;
-			}
-			else
-			{
-				Call::Param::Type type = Call::Param::SymbolicResultReference;
-				Call::Param param( type, std::string( argstart, si), resultscope_functionidx);
-				return param;
-			}
-		}
-		else
-		{
-			throw std::runtime_error( "expected open bracket '(' or alphanumeric result reference");
-		}
-	}
-	else
-	{
-		throw std::runtime_error( "expected open bracket '(' or alphanumeric result reference");
-	}
-}
-
-static TransactionFunctionDescription::MainProcessingStep::Call::Param
-	parsePathParameter( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	std::string pp;
-	std::string tok;
-	char ch;
-	for (;;)
-	{
-		ch = gotoNextToken( langdescr, si, se);
-		if (ch == ',' || ch == ')') break;
-		if (!ch) throw std::runtime_error( "unexpected end of function call");
-
-		ch = parseNextToken( langdescr, tok, si, se);
-
-		if (ch == '/' || ch == '*' || ch == '.')
-		{
-			pp.push_back( ch);
-		}
-		else if (isAlphaNumeric( ch))
-		{
-			pp.append( tok);
-		}
-		else
-		{
-			throw std::runtime_error( std::string( "illegal token in path parameter of function call: ") + errorTokenString( ch, tok));
-		}
-	}
-	Call::Param param( Call::Param::InputSelectorPath, pp);
-	return param;
-}
-
-static TransactionFunctionDescription::MainProcessingStep::Call
-	parseEmbeddedStatement( const LanguageDescription* langdescr, std::string::const_iterator& osi, std::string::const_iterator ose, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx)
-{
-	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	std::vector<Call::Param> paramlist;	//< list of arguments
-	std::string stm;
-	std::string dbstm = langdescr->parseEmbeddedStatement( osi, ose);
-	std::string::const_iterator start = dbstm.begin(), si = dbstm.begin(), se = dbstm.end();
-	std::string tok;
-
-	char ch = parseNextToken( langdescr, tok, si, se);
-	for (; si != se && ch; ch = parseNextToken( langdescr, tok, si, se))
-	{
-		if (ch == '$' && si != se)
-		{
-			if (*si == '(' || isAlphaNumeric(*si) || *si == '#')
-			{
-				stm.append( start, si - 1);
-				Call::Param param = parseReferenceParameter( langdescr, param_map, keepResult_map, fidx, si, se);
-				paramlist.push_back( param);
-				start = si;
-				stm.append( langdescr->stm_argument_reference( paramlist.size()));
-			}
-		}
-	}
-	stm.append( start, si);
-	return Call( stm, std::vector<std::string>(), paramlist, true);
-}
-
-static TransactionFunctionDescription::MainProcessingStep::Call
-	parseCallStatement( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce, const types::keymap<int>& param_map, const types::keymap<int>& keepResult_map, int fidx)
-{
-	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	std::string callname;			//< function name
-	std::vector<std::string> templatearg;	//< list of template arguments
-	std::vector<Call::Param> paramlist;	//< list of arguments
-	std::string tok;
-
-	if (!utils::gotoNextToken( ci, ce))
-	{
-		throw std::runtime_error( "unexpected end of transaction description. Function call expected");
-	}
-	while (ci < ce && (isAlphaNumeric( *ci) || *ci == '.'))
-	{
-		callname.push_back( *ci);
-		++ci;
-	}
-	if (callname.empty())
-	{
-		throw std::runtime_error( "identifier expected for name of function");
-	}
-	char ch = utils::gotoNextToken( ci, ce);
-	if (ch == '<')
-	{
-		templatearg = parseTemplateArguments( langdescr, ci, ce);
-		ch = utils::gotoNextToken( ci, ce);
-	}
-	if (ch != '(')
-	{
-		throw std::runtime_error( "'(' expected after function name");
-	}
-	++ci; ch = utils::gotoNextToken( ci, ce);
-
-	// Parse parameter list:
-	if (ch == ')')
-	{
-		// ... empty parameter list
-		++ci;
-	}
-	else
-	{
-		std::string pp;
-		ch = ',';
-		while (ch == ',')
-		{
-			ch = gotoNextToken( langdescr, ci, ce);
-			if (ch == '\'' || ch == '\"')
-			{
-				ch = parseNextToken( langdescr, tok, ci, ce);
-				Call::Param::Type type = Call::Param::Constant;
-				Call::Param param( type, tok);
-				paramlist.push_back( param);
-			}
-			else if (ch == '$')
-			{
-				++ci;
-				Call::Param param = parseReferenceParameter( langdescr, param_map, keepResult_map, fidx, ci, ce);
-				paramlist.push_back( param);
-			}
-			else if (ch == ')' || ch == ',')
-			{
-				throw std::runtime_error( std::string("parameter expected before '") + (char)ch + "'");
-			}
-			else
-			{
-				Call::Param param = parsePathParameter( langdescr, ci, ce);
-				paramlist.push_back( param);
-			}
-			ch = parseNextToken( langdescr, tok, ci, ce);
-		}
-		if (ch != ')')
-		{
-			throw std::runtime_error( "unexpected token in function call parameter. close bracket ')' or comma ',' expected after argument");
-		}
-	}
-	return Call( callname, templatearg, paramlist, false);
-}
-
-static TransactionFunctionDescription::PreProcessingStep::Argument
-	parsePreProcessingStepArgument( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	typedef TransactionFunctionDescription::PreProcessingStep::Argument Argument;
-	Argument rt;
-	std::string tok;
-	char ch;
-	bool nameDefined = false;
-	bool nameLegal = true;
-
-	ch = gotoNextToken( langdescr, si, se);
-	if (isAlphaNumeric( ch) || ch == '.')
-	{
-		parseNextToken( langdescr, tok, si, se);
-		ch = gotoNextToken( langdescr, si, se);
-		if (ch == '=')
-		{
-			nameDefined = true;
-			rt.name = tok;
-			++si;
-			ch = gotoNextToken( langdescr, si, se);
-		}
-		else
-		{
-			rt.value.append( tok);
-			rt.name = tok;
-		}
-	}
-	if (ch == '\'' || ch == '\"')
-	{
-		parseNextToken( langdescr, rt.value, si, se);
-		rt.type = Argument::Constant;
-	}
-	else
-	{
-		rt.type = Argument::Selector;
-		for (;;)
-		{
-			ch = gotoNextToken( langdescr, si, se);
-			if (ch == ',' || ch == ')') break;
-			if (!ch) throw std::runtime_error( "unexpected end of function call");
-
-			ch = parseNextToken( langdescr, tok, si, se);
-
-			if (ch == '/' || ch == '*' || ch == '.')
-			{
-				if (ch == '.' && !nameDefined)
-				{
-					rt.name = ".";
-				}
-				else
-				{
-					nameLegal = false;
-				}
-				rt.value.push_back( ch);
-			}
-			else if (isAlphaNumeric( ch))
-			{
-				nameLegal = true;
-				if (!nameDefined) rt.name = tok;
-				rt.value.append( tok);
-			}
-			else
-			{
-				throw std::runtime_error( "illegal token in path parameter of preprocesing command");
-			}
-		}
-		if (!nameDefined && !nameLegal)
-		{
-			throw std::runtime_error( "illegal token in path parameter of preprocesing command");
-		}
-		if (rt.name == ".")
-		{
-			rt.name.clear();
-		}
-	}
-	return rt;
-}
-
-static std::vector<TransactionFunctionDescription::PreProcessingStep::Argument>
-	parsePreProcessingStepArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
-{
-	typedef TransactionFunctionDescription::PreProcessingStep::Argument Argument;
-	std::vector<Argument> rt;
-
-	for (;;)
-	{
-		char ch = gotoNextToken( langdescr, si, se);
-		if (ch == ')' || ch == '\0') break;
-
-		rt.push_back( parsePreProcessingStepArgument( langdescr, si, se));
-	}
-	return rt;
-}
-
-static void parseSubroutineArguments( types::keymap<int>& param_map, const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)
-{
-	std::string varname;
-	char ch;
-	int column_idx = 0;
-	ch = parseNextToken( langdescr, varname, si, se);
-	if (ch == ')') return;
-
-	if (isAlphaNumeric(ch))
-	{
-		types::keymap<int>::const_iterator vi = param_map.find( varname);
-		if (vi != param_map.end())
-		{
-			throw std::runtime_error( std::string("duplicate definition of subroutine parameter '") + varname + "'");
-		}
-		param_map[ varname] = ++column_idx;
-	}
-	else
-	{
-		throw std::runtime_error( "variable name expected (itentifier in SUBROUTINE argument list)");
-	}
-	while (0!=(ch=gotoNextToken( langdescr, si, se)))
-	{
-		if (ch != ',') break;
-		++si;
-		ch = parseNextToken( langdescr, varname, si, se);
-		if (isAlphaNumeric(ch))
-		{
-			types::keymap<int>::const_iterator vi = param_map.find( varname);
-			if (vi != param_map.end())
-			{
-				throw std::runtime_error( std::string("duplicate definition of subroutine parameter '") + varname + "'");
-			}
-			param_map[ varname] = ++column_idx;
-		}
-		else
-		{
-			throw std::runtime_error( "variable name expected (itentifier in SUBROUTINE argument list)");
-		}
-	}
-	if (ch == ')')
-	{
-		++si;
-	}
-	else
-	{
-		throw std::runtime_error( "syntax error in in SUBROUTINE argument list: expected ')'");
-	}
-}
-
-
-namespace {
-struct Subroutine
-{
-	Subroutine( const std::vector<std::string>& templateArguments_, std::string::const_iterator start_, bool isTransaction_)
-		:templateArguments(templateArguments_),start(start_),isTransaction(isTransaction_),isValidDatabase(true),embstm_index(0){}
-	Subroutine( const Subroutine& o)
-		:templateArguments(o.templateArguments),start(o.start),isTransaction(o.isTransaction),isValidDatabase(o.isValidDatabase),param_map(o.param_map),description(o.description),callstartar(o.callstartar),pprcstartar(o.pprcstartar),result_INTO(o.result_INTO),blockstk(o.blockstk),embstm_index(o.embstm_index){}
-
-	std::vector<std::string> templateArguments;
-	std::string::const_iterator start;
-	bool isTransaction;
-	bool isValidDatabase;
-	types::keymap<int> param_map;
-	TransactionFunctionDescription description;
-	std::vector<std::string::const_iterator> callstartar;
-	std::vector<std::string::const_iterator> pprcstartar;
-	std::vector<std::string> result_INTO;					//< RESULT INTO path
-	std::vector<TransactionFunctionDescription::ResultBlock> blockstk;	//< stack of current RESULT INTO block scope
-	int embstm_index;
-};
-}// anonymous namespace
-
-
-static void checkUniqOccurrence( int id, unsigned int& mask, const utils::IdentifierTable& idtab, config::PositionalErrorMessageBase& ERROR, std::string::const_iterator& si)
-{
-	unsigned int idshft = (1 << (id+1));
-	if (0 != (mask & idshft))
-	{
-		throw ERROR( si, std::string( idtab.idstring(id)) + " specified twice in a command");
-	}
-	mask |= idshft;
-}
-
-static const char* g_preproc_ids[] = {"ENDPROC","FOREACH","INTO","DO",0};
-enum PreProcKeyword{ p_NONE,p_ENDPROC,p_FOREACH,p_INTO,p_DO };
-static const utils::IdentifierTable g_preproc_idtab( false, g_preproc_ids);
-
-static void parsePreProcessingBlock( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	config::PositionalErrorMessageBase::Message MSG;
-	std::string tok;
-	if (!subroutine.isTransaction)
-	{
-		throw ERROR( si, "Cannot define PREPROC in SUBROUTINE. Only allowed in TRANSACTION definition");
-	}
-	char ch = 0;
-	unsigned int mask = 0;
-	TransactionFunctionDescription::PreProcessingStep prcstep;
-
-	while ((ch = gotoNextToken( langdescr, si, se)) != 0)
-	{
-		while (subroutine.pprcstartar.size() <= subroutine.description.preprocs.size())
-		{
-			subroutine.pprcstartar.push_back( si);
-		}
-		switch ((PreProcKeyword)utils::parseNextIdentifier( si, se, g_preproc_idtab))
-		{
-			case p_NONE:
-				ch = parseNextToken( langdescr, tok, si, se);
-				if (ch == ';')
-				{
-					if (mask)
+				case tdl::ElementReference::SelectorPath:
+					prg.push_ARGUMENT_PATH( pi->selector);
+					break;
+				case tdl::ElementReference::LoopCounter:
+					prg.push_ARGUMENT_LOOPCNT();
+				case tdl::ElementReference::Constant:
+					prg.push_ARGUMENT_CONST( pi->selector);
+					break;
+				case tdl::ElementReference::NamedSetElement:
+					if (!cmd.selector.empty() && (boost::iequals( pi->selector, cmd.selector) || pi->selector.empty()))
 					{
-						subroutine.description.preprocs.push_back( prcstep);
-						prcstep.clear();
-						mask = 0;
+						prg.push_ARGUMENT_ITER( pi->name);
 					}
-				}
-				else if (g_optab[ch])
-				{
-					throw ERROR( si, MSG << "keyword (" << g_preproc_idtab.tostring() << ") expected instead of operator '" << ch << "'");
-				}
-				else if (ch == '\'' || ch == '\"')
-				{
-					throw ERROR( si, MSG << "keyword (" << g_preproc_idtab.tostring() << ") expected instead of string");
-				}
-				else
-				{
-					throw ERROR( si, MSG << "keyword (" << g_preproc_idtab.tostring() << ") expected instead of identifier '" << tok << "'");
-				}
-				break;
-
-			case p_ENDPROC:
-				if (mask != 0)
-				{
-					throw std::runtime_error( "preprocessing command not terminated with ';'");
-				}
-				return;
-			case p_FOREACH:
-				checkUniqOccurrence( p_FOREACH, mask, g_preproc_idtab, ERROR, si);
-	
-				ch = utils::parseNextToken( prcstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
-				if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
-				break;
-			case p_INTO:
-				checkUniqOccurrence( p_INTO, mask, g_preproc_idtab, ERROR, si);
-	
-				prcstep.path_INTO = parse_INTO_path( langdescr, si, se);
-				break;
-
-			case p_DO:
-				checkUniqOccurrence( p_DO, mask, g_preproc_idtab, ERROR, si);
-	
-				ch = parseNextToken( langdescr, prcstep.functionname, si, se);
-				if (!isAlphaNumeric( ch))
-				{
-					throw std::runtime_error( "identifier expected for preprocessing function name after DO");
-				}
-				ch = gotoNextToken( langdescr, si, se);
-				if (ch != '(')
-				{
-					throw std::runtime_error( "'(' expected after preprocessing function name");
-				}
-				++si;
-				prcstep.args = parsePreProcessingStepArguments( langdescr, si, se);
-				ch = gotoNextToken( langdescr, si, se);
-				if (ch != ')')
-				{
-					throw std::runtime_error( "')' expected after preprocessing function arguments");
-				}
-				++si;
-				break;
-		}
-	}
-}
-
-static void parseResultDirective( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	config::PositionalErrorMessageBase::Message MSG;
-	std::string tok;
-	char ch;
-	unsigned int mask = 0;
-
-	std::string::const_iterator start = si;
-	subroutine.result_INTO.clear();
-	while (0!=(ch=parseNextToken( langdescr, tok, si, se)))
-	{
-		if (isAlpha(ch) && boost::algorithm::iequals( tok, "INTO"))
-		{
-			if ((mask & 0x2) != 0) throw ERROR( si, "wrong order of definition in RESULT: INTO defined after FILTER");
-			if ((mask & 0x1) != 0) throw ERROR( si, "duplicate INTO definition after RESULT");
-			mask |= 0x1;
-			subroutine.result_INTO = parse_INTO_path( langdescr, si, se);
-		}
-		else if (isAlpha(ch) && boost::algorithm::iequals( tok, "FILTER"))
-		{
-			if (!subroutine.isTransaction)
-			{
-				throw ERROR( si, "Cannot define RESULT FILTER in SUBROUTINE. Only allowed as in TRANSACTION definition");
-			}
-			if ((mask & 0x2) != 0) throw ERROR( si, "duplicate FILTER definition after RESULT");
-			mask |= 0x2;
-			ch = gotoNextToken( langdescr, si, se);
-			if (!isAlpha(ch))
-			{
-				throw ERROR( si, "function name expected after RESULT FILTER");
-			}
-			while (si < se && (isAlphaNumeric( *si) || *si == '.'))
-			{
-				subroutine.description.resultfilter.push_back( *si);
-				++si;
+					else
+					{
+						prg.push_ARGUMENT_TUPLESET( pi->selector, pi->name);
+					}
+					break;
+				case tdl::ElementReference::IndexSetElement:
+					if (!cmd.selector.empty() && (boost::iequals( pi->selector, cmd.selector) || pi->selector.empty()))
+					{
+						prg.push_ARGUMENT_ITER( pi->index);
+					}
+					else
+					{
+						prg.push_ARGUMENT_TUPLESET( pi->selector, pi->index);
+					}
+					break;
 			}
 		}
-		else if (mask)
+		prg.end_DO_statement();
+
+		if (!cmd.selector.empty())
 		{
-			si = start;
-			break;
+			prg.end_FOREACH();
+		}
+
+		//[2] Iterate on result to print (INTO) all tuple sets produced by the FOREACH:
+		if (cmd.resultpath.size() == 0)
+		{
+			//... no INTO path, so we do not print the result
+		}
+		else if (cmd.resultpath.size() == 1 && cmd.resultpath.back() == ".")
+		{
+			//... 'INTO .' expected always a single element as output
+			prg.begin_INTO_block( std::vector<std::string>());
+			prg.output_statement_result( false);
+			prg.end_INTO_block();
 		}
 		else
 		{
-			throw ERROR( si, "INTO or FILTER expected after RESULT");
-		}
-		start = si;
-	}
-}
-
-static void parseAuthorizeDirective( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	config::PositionalErrorMessageBase::Message MSG;
-	std::string tok;
-
-	std::string authfunction;
-	std::string authresource;
-
-	if (!subroutine.isTransaction)
-	{
-		throw ERROR( si, "Cannot define AUTHORIZE in SUBROUTINE. Only allowed as TRANSACTION definition attribute");
-	}
-	char ch = gotoNextToken( langdescr, si, se);
-	if (ch != '(') throw ERROR( si, "Open bracket '(' expected after AUTHORIZE function call");
-	si++;
-	if (!parseNextToken( langdescr, authfunction, si, se))
-	{
-		throw ERROR( si, "unexpected end of description. function name expected after AUTHORIZE");
-	}
-	if (authfunction.empty())
-	{
-		throw ERROR( si, "AUTHORIZE function name must not be empty");
-	}
-	ch = gotoNextToken( langdescr, si, se);
-	if (ch == ',')
-	{
-		++si;
-		if (!parseNextToken( langdescr, authresource, si, se))
-		{
-			throw ERROR( si, "unexpected end of description. resource name expected as argument of AUTHORIZE function call");
-		}
-	}
-	ch = gotoNextToken( langdescr, si, se);
-	if (ch != ')')
-	{
-		throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function defintion");
-	}
-	++si;
-	subroutine.description.auth.init( authfunction, authresource);
-}
-
-static void parsePrintStep( Subroutine& subroutine, const types::keymap<int>& keepResult_map, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const std::vector<std::string>& print_INTO_path)
-{
-	typedef TransactionFunctionDescription::MainProcessingStep::Call Call;
-	config::PositionalErrorMessageBase::Message MSG;
-	std::string tok;
-
-	std::vector<std::string> pt = print_INTO_path;
-	Call::Param printarg;
-
-	char ch = gotoNextToken( langdescr, si, se);
-	if (ch == '\'' || ch == '\"')
-	{
-		ch = parseNextToken( langdescr, tok, si, se);
-		printarg = Call::Param( Call::Param::Constant, tok);
-	}
-	else if (ch == '$')
-	{
-		++si;
-		printarg = parseReferenceParameter( langdescr, subroutine.param_map, keepResult_map, subroutine.description.steps.size(), si, se);
-		if (printarg.type == Call::Param::InputSelectorPath)
-		{
-			throw std::runtime_error( "cannot handle input reference as argument of PRINT");
-		}
-	}
-	else
-	{
-		throw std::runtime_error( "string or result reference expected as argument of PRINT");
-	}
-	
-	ch = gotoNextToken( langdescr, si, se);
-	if (isAlphaNumeric(ch))
-	{
-		if (0!=(parseNextToken( langdescr, tok, si, se))
-		&& isAlpha(ch) && boost::algorithm::iequals( tok, "INTO"))
-		{
-			if (pt.empty())
+			bool isLoop = !cmd.unique || !cmd.selector.empty();
+			if (isLoop)
 			{
-				pt = parse_INTO_path( langdescr, si, se);
-				ch = gotoNextToken( langdescr, si, se);
+				prg.begin_loop_INTO_block( cmd.resultpath);
+				prg.output_statement_result( true);
+				prg.end_loop_INTO_block();
 			}
 			else
 			{
-				throw ERROR( si, "INTO specified twice for 'PRINT'");
+				prg.begin_INTO_block( cmd.resultpath);
+				prg.output_statement_result( false);
+				prg.end_INTO_block();
 			}
 		}
-		else
-		{
-			throw ERROR( si, "unexpected token after 'PRINT' and argument");
-		}
-	}
-	if (ch != ';')
-	{
-		throw ERROR( si, "unexpected token as end of print expression (';' expected)");
-	}
-	subroutine.description.printsteps[ subroutine.description.steps.size()] = TransactionFunctionDescription::PrintStep( pt, printarg);
-}
-
-static void parseErrorHint( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	config::PositionalErrorMessageBase::Message MSG;
-	std::string tok;
-	char ch;
-
-	if (0!=(ch=parseNextToken( langdescr, tok, si, se))
-	&&  isAlpha(ch) && boost::algorithm::iequals( tok, "ERROR"))
-	{
-		if (subroutine.description.steps.empty())
-		{
-			throw ERROR( si, "ON ERROR declaration allowed only after a database call");
-		}
-		std::string errclass;
-		if (!parseNextToken( langdescr, errclass, si, se))
-		{
-			throw ERROR( si, "error class expected after ON ERROR");
-		}
-		if (0==(ch=parseNextToken( langdescr, tok, si, se))
-		||  !isAlpha(ch)
-		||  !boost::algorithm::iequals( tok, "HINT"))
-		{
-			throw ERROR( si, "keyword HINT expected after ON ERROR <errorclass>");
-		}
-		std::string errhint;
-		if (!parseNextToken( langdescr, errhint, si, se))
-		{
-			throw ERROR( si, "hint message string expected after ON ERROR <errorclass> HINT");
-		}
-		if (subroutine.description.steps.back().hints.find( errclass) != subroutine.description.steps.back().hints.end())
-		{
-			throw ERROR( si, std::string( "Duplicate hint for error class '") + errclass + "' for this database call");
-		}
-		subroutine.description.steps.back().hints[ errclass] = errhint;
-
-		if (';' != gotoNextToken( langdescr, si, se))
-		{
-			throw ERROR( si, "';' expected after ON ERROR declaration");
-		}
-		++si;
 	}
 	else
 	{
-		throw ERROR( si, "keyword (ERROR) expected after ON");
+		bool hasIntoBlock = !(cmd.resultpath.size() == 0 || (cmd.resultpath.size() == 1 && cmd.resultpath.back() == "."));
+		bool hasIntoLoop = false;
+		if (hasIntoBlock)
+		{
+			if (cmd.selector.empty())
+			{
+				prg.begin_INTO_block( cmd.resultpath);
+			}
+			else
+			{
+				hasIntoLoop = true;
+				prg.begin_loop_INTO_block( cmd.resultpath);
+			}
+		}
+		if (!cmd.selector.empty())
+		{
+			prg.begin_FOREACH( cmd.selector);
+		}
+		if (hasIntoLoop)
+		{
+			prg.begin_loop_element();
+		}
+		prg.begin_DO_subroutine( cmd.call.name, cmd.call.templateparams, vm::SelectorPath::normalize( cmd.selector));
+		std::vector<tdl::ElementReference>::const_iterator pi = cmd.call.params.begin(), pe = cmd.call.params.end();
+		for (; pi != pe; ++pi)
+		{
+			switch (pi->type)
+			{
+				case tdl::ElementReference::SelectorPath:
+					prg.push_ARGUMENT_PATH( pi->selector);
+					break;
+				case tdl::ElementReference::LoopCounter:
+					prg.push_ARGUMENT_LOOPCNT();
+				case tdl::ElementReference::Constant:
+					prg.push_ARGUMENT_CONST( pi->selector);
+					break;
+				case tdl::ElementReference::NamedSetElement:
+					if (!cmd.selector.empty() && (boost::iequals( pi->selector, cmd.selector) || pi->selector.empty()))
+					{
+						prg.push_ARGUMENT_ITER( pi->name);
+					}
+					else
+					{
+						prg.push_ARGUMENT_TUPLESET( pi->selector, pi->name);
+					}
+					break;
+				case tdl::ElementReference::IndexSetElement:
+					if (!cmd.selector.empty() && (boost::iequals( pi->selector, cmd.selector) || pi->selector.empty()))
+					{
+						prg.push_ARGUMENT_ITER( pi->index);
+					}
+					else
+					{
+						prg.push_ARGUMENT_TUPLESET( pi->selector, pi->index);
+					}
+					break;
+			}
+		}
+		prg.end_DO_subroutine();
+		if (hasIntoLoop)
+		{
+			prg.end_loop_element();
+		}
+		if (!cmd.selector.empty())
+		{
+			prg.end_FOREACH();
+		}
+		if (hasIntoBlock)
+		{
+			if (cmd.selector.empty())
+			{
+				prg.end_INTO_block();
+			}
+			else
+			{
+				prg.end_loop_INTO_block();
+			}
+		}
 	}
 }
 
-static void parseKeepAs( types::keymap<int>& keepResult_map, std::size_t commandlistsize, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+
+static void parsePrgBlock( Tdl2vmTranslator& prg, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, utils::FileLineInfo& posinfo)
 {
-	config::PositionalErrorMessageBase::Message MSG;
+	static const char* g_prgblock_ids[] = {"END","FOREACH","INTO","DO","ON","KEEP","PRINT",0};
+	enum PrgBlockKeyword{ m_NONE, m_END,m_FOREACH,m_INTO,m_DO,m_ON,m_KEEP,m_PRINT};
+	static const utils::IdentifierTable g_prgblock_idtab( false, g_prgblock_ids);
+
+	std::string::const_iterator posinfo_si = si;
 	std::string tok;
-	char ch;
-
-	if (0!=(ch=parseNextToken( langdescr, tok, si, se))
-	&&  isAlpha(ch) && boost::algorithm::iequals( tok, "AS"))
-	{
-		ch = parseNextToken( langdescr, tok, si, se);
-		if (!isAlpha(ch))
-		{
-			throw ERROR( si, "identifier expected after KEEP AS");
-		}
-		ch = gotoNextToken( langdescr, si, se);
-		if (ch != ';')
-		{
-			throw ERROR( si, "semicolon ';' expected after KEEP AS <identifier>");
-		}
-		++si;
-		types::keymap<int>::const_iterator ki = keepResult_map.find( tok);
-		if (ki != keepResult_map.end())
-		{
-			throw ERROR( si, std::string("duplicate definition of result set '") + tok + "'");
-		}
-		if (commandlistsize == 0)
-		{
-			throw ERROR( si, "no result available to reference here (KEEP AS)");
-		}
-		keepResult_map.insert( tok, commandlistsize);
-	}
-}
-
-static const char* g_mainblock_ids[] = {"END","FOREACH","INTO","DO","ON","KEEP","PRINT","RESULT",0};
-enum MainBlockKeyword{ m_NONE, m_END,m_FOREACH,m_INTO,m_DO,m_ON,m_KEEP,m_PRINT,m_RESULT};
-static const utils::IdentifierTable g_mainblock_idtab(false, g_mainblock_ids);
-
-static void parseMainBlock( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	config::PositionalErrorMessageBase::Message MSG;
-	std::string tok;
-	unsigned int mask = 0;
 	char ch = 0;
-	types::keymap<int> keepResult_map;
 
-	TransactionFunctionDescription::MainProcessingStep opstep;
-
-	while ((ch = gotoNextToken( langdescr, si, se)) != 0)
+	while ((ch = tdl::gotoNextToken( langdescr, si, se)) != 0)
 	{
-		while (subroutine.callstartar.size() <= subroutine.description.steps.size())
-		{
-			subroutine.callstartar.push_back( si);
-		}
-		switch ((MainBlockKeyword)utils::parseNextIdentifier( si, se, g_mainblock_idtab))
+		std::string::const_iterator start = si;
+
+		switch ((PrgBlockKeyword)utils::parseNextIdentifier( si, se, g_prgblock_idtab))
 		{
 			case m_NONE:
-				ch = parseNextToken( langdescr, tok, si, se);
+				ch = tdl::parseNextToken( langdescr, tok, si, se);
 				if (ch == ';')
 				{
-					if (mask)
-					{
-						subroutine.description.steps.push_back( opstep);
-						opstep.clear();
-						mask = 0;
-					}
-				}
-				else if (g_optab[ch])
-				{
-					throw ERROR( si, MSG << "keyword (" << g_mainblock_idtab.tostring() << ") expected instead of operator '" << ch << "'");
-				}
-				else if (ch == '\'' || ch == '\"')
-				{
-					throw ERROR( si, MSG << "keyword (" << g_mainblock_idtab.tostring() << ") expected instead of string");
-				}
-				else if (mask == 0x0)
-				{
-					throw ERROR( si, MSG << "keyword (" << g_mainblock_idtab.tostring() << ") expected instead of identifier '" << tok << "'");
+					throw std::runtime_error( "unexpected semicolon without statement");
 				}
 				else
 				{
-					throw ERROR( si, MSG << "keyword (FOREACH,INTO,DO) expected instead of '" << tok << "'");
+					throw std::runtime_error( std::string( "unexpected token in TDL program block. keyword (") + g_prgblock_idtab.tostring() + ") expected instead of " + tdl::errorTokenString( ch, tok));
 				}
 				break;
 			case m_ON:
-				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
-
-				parseErrorHint( subroutine, ERROR, langdescr, si, se);
-				break;
+				throw std::runtime_error( "unexpected keyword ON (for error hint), only valid after database command");
 			case m_KEEP:
-				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
 
-				parseKeepAs( keepResult_map, subroutine.description.steps.size(), ERROR, langdescr, si, se);
+				if (tdl::parseKeyword( langdescr, si, se, "AS"))
+				{
+					std::string resultname = tdl::parseResultName( langdescr, si, se);
+					if (tdl::gotoNextToken( langdescr, si, se) != ';')
+					{
+						throw std::runtime_error( "semicolon ';' expected after KEEP AS <identifier>");
+					}
+					++si;
+					prg.result_KEEP( resultname);
+				}
 				break;
 			case m_END:
-				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
-				try
-				{
-					if (subroutine.blockstk.empty())
-					{
-						if (!subroutine.result_INTO.empty())
-						{
-							subroutine.description.resultblocks.insert( subroutine.description.resultblocks.begin(), TransactionFunctionDescription::ResultBlock( subroutine.result_INTO, 0, subroutine.description.steps.size()));
-						}
-					}
-					else
-					{
-						subroutine.blockstk.back().size = subroutine.description.steps.size() - subroutine.blockstk.back().startidx;
-						subroutine.description.resultblocks.push_back( subroutine.blockstk.back());
-						subroutine.blockstk.pop_back();
-					}
-				}
-				catch (const TransactionFunctionDescription::MainProcessingStep::Error& err)
-				{
-					throw ERROR( subroutine.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
-				}
-				catch (const std::runtime_error& err)
-				{
-					throw ERROR( subroutine.start, MSG << "error in definition of transaction: " << err.what());
-				}
-				catch (const std::exception& e)
-				{
-					LOG_ERROR << "uncaught exception loading transaction program: " << e.what();
-				}
-				catch (...)
-				{
-					LOG_ERROR << "uncaught exception loading transaction program";
-				}
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
 				return;
 			case m_PRINT:
-				{
-					std::vector<std::string> print_INTO_path;
-					if (mask != 0)
-					{
-						unsigned int idshft = (1 << ((unsigned int)m_INTO+1));
-						if (mask == idshft)
-						{
-							print_INTO_path = opstep.path_INTO;
-							opstep.path_INTO.clear();
-							mask = 0;
-						}
-						else
-						{
-							throw std::runtime_error( "unexpected token PRINT in middle of database instruction definition");
-						}
-					}
-					parsePrintStep( subroutine, keepResult_map, ERROR, langdescr, si, se, print_INTO_path);
-				}
-				break;
-			case m_RESULT:
-				if (mask != 0) throw std::runtime_error( "database command not terminated with ';'");
+			{
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
 
-				if (0!=(ch=parseNextToken( langdescr, tok, si, se))
-				&&  isAlpha(ch) && boost::algorithm::iequals( tok, "INTO"))
+				tdl::ElementReference elem = tdl::ElementReference::parsePlainReference( langdescr, si, se);
+				std::vector<std::string> pt;
+				if (tdl::parseKeyword( langdescr, si, se, "INTO"))
 				{
-					std::vector<std::string> path = parse_INTO_path( langdescr, si, se);
-	
-					if (0!=(ch=parseNextToken( langdescr, tok, si, se))
-					&&  isAlpha(ch) && boost::algorithm::iequals( tok, "BEGIN"))
-					{
-						subroutine.blockstk.push_back( TransactionFunctionDescription::ResultBlock( path, subroutine.description.steps.size(), 0));
-					}
-					else
-					{
-						throw ERROR( si, "keyword (BEGIN) expected after RESULT INTO <path>");
-					}
+					pt = tdl::parse_INTO_path( langdescr, si, se);
 				}
-				else
+				bool hasIntoBlock = !(pt.size() == 0 || (pt.size() == 1 && pt.back() == "."));
+				if (hasIntoBlock)
 				{
-					throw ERROR( si, "keyword (INTO) expected after RESULT");
+					prg.begin_INTO_block( pt);
 				}
-				break;
-			case m_FOREACH:
-				checkUniqOccurrence( m_FOREACH, mask, g_mainblock_idtab, ERROR, si);
-
-				ch = utils::parseNextToken( opstep.selector_FOREACH, si, se, utils::emptyCharTable(), utils::anyCharTable());
-				if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
-	
-				if (isIdentifier(opstep.selector_FOREACH))
+				switch (elem.type)
 				{
-					opstep.resultref_FOREACH = getResultNamespaceIdentifier( opstep.selector_FOREACH, keepResult_map, subroutine.description.steps.size());
-					if (opstep.resultref_FOREACH >= 0)
-					{
-						if (opstep.resultref_FOREACH == 0 && boost::algorithm::iequals( opstep.selector_FOREACH, "PARAM"))
-						{
-							throw ERROR( si, "PARAM not allowed as argument of FOREACH");
-						}
-						opstep.selector_FOREACH.clear();
-					}
-				}
-				break;
-			case m_INTO:
-				checkUniqOccurrence( m_INTO, mask, g_mainblock_idtab, ERROR, si);
-	
-				opstep.path_INTO = parse_INTO_path( langdescr, si, se);
-				break;
-			case m_DO:
-				checkUniqOccurrence( m_DO, mask, g_mainblock_idtab, ERROR, si);
-	
-				std::string::const_iterator oi = si;
-				while (0!=(ch=parseNextToken( langdescr, tok, oi, se)))
-				{
-					if (isAlpha(ch) && boost::algorithm::iequals( tok, "NONEMPTY"))
-					{
-						opstep.nonempty = true;
-						si = oi;
-					}
-					else if (isAlpha(ch) && boost::algorithm::iequals( tok, "UNIQUE"))
-					{
-						opstep.unique = true;
-						si = oi;
-					}
-					else
-					{
+					case tdl::ElementReference::SelectorPath:
+						prg.output_ARGUMENT_PATH( elem.selector);
 						break;
+					case tdl::ElementReference::LoopCounter:
+						prg.output_ARGUMENT_LOOPCNT();
+					case tdl::ElementReference::Constant:
+						prg.output_ARGUMENT_CONST( elem.selector);
+						break;
+					case tdl::ElementReference::NamedSetElement:
+						prg.output_ARGUMENT_TUPLESET( elem.selector, elem.name);
+						break;
+					case tdl::ElementReference::IndexSetElement:
+						prg.output_ARGUMENT_TUPLESET( elem.selector, elem.index);
+						break;
+				}
+				if (hasIntoBlock)
+				{
+					prg.end_INTO_block();
+				}
+				ch = tdl::parseNextToken( langdescr, tok, si, se);
+				if (ch != ';')
+				{
+					throw std::runtime_error( "expected ';' terminating PRINT instruction");
+				}
+				break;
+			}
+			case m_DO:
+			case m_FOREACH:
+			{
+				si = start;
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
+
+				tdl::CommandDefinition cmd = tdl::CommandDefinition::parse( langdescr, si, se);
+				programAddCommandDefinition( prg, cmd);
+				break;
+			}
+			case m_INTO:
+			{
+				std::vector<std::string> resultpath = tdl::parse_INTO_path( langdescr, si, se);
+				if (tdl::parseKeyword( langdescr, si, se, "PRINT"))
+				{
+					tdl::ElementReference elem = tdl::ElementReference::parsePlainReference( langdescr, si, se);
+
+					bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
+					if (hasIntoBlock)
+					{
+						prg.begin_INTO_block( resultpath);
+					}
+					switch (elem.type)
+					{
+						case tdl::ElementReference::SelectorPath:
+							prg.output_ARGUMENT_PATH( elem.selector);
+							break;
+						case tdl::ElementReference::LoopCounter:
+							prg.output_ARGUMENT_LOOPCNT();
+						case tdl::ElementReference::Constant:
+							prg.output_ARGUMENT_CONST( elem.selector);
+							break;
+						case tdl::ElementReference::NamedSetElement:
+							prg.output_ARGUMENT_TUPLESET( elem.selector, elem.name);
+							break;
+						case tdl::ElementReference::IndexSetElement:
+							prg.output_ARGUMENT_TUPLESET( elem.selector, elem.index);
+							break;
+					};
+					if (hasIntoBlock)
+					{
+						prg.end_INTO_block();
+					}
+					ch = tdl::parseNextToken( langdescr, tok, si, se);
+					if (ch != ';')
+					{
+						throw std::runtime_error( "expected ';' terminating PRINT instruction");
 					}
 				}
-				if (!gotoNextToken( langdescr, si, se))
+				else if (tdl::parseKeyword( langdescr, si, se, "BEGIN"))
 				{
-					throw ERROR( si, "unexpected end of transaction description after DO");
-				}
-				if (langdescr->isEmbeddedStatement( si, se))
-				{
-					opstep.call = parseEmbeddedStatement( langdescr, si, se, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+					bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
+					if (hasIntoBlock)
+					{
+						prg.begin_INTO_block( resultpath);
+					}
+					parsePrgBlock( prg, langdescr, si, se, posinfo);
+					posinfo_si = si;
+					if (hasIntoBlock)
+					{
+						prg.end_INTO_block();
+					}
 				}
 				else
 				{
-					opstep.call = parseCallStatement( langdescr, si, se, subroutine.param_map, keepResult_map, subroutine.description.steps.size());
+					si = start;
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+					prg.setCurrentSourceReference( posinfo);
+
+					tdl::CommandDefinition cmd = tdl::CommandDefinition::parse( langdescr, si, se);
+					programAddCommandDefinition( prg, cmd);
 				}
 				break;
+			}
 		}
 	}
+	throw std::runtime_error("unexpected end of file (missing END of block)");
 }
 
-static std::vector<std::string> parseDatabaseList( config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+
+static std::vector<std::string> parseDatabaseList( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	std::vector<std::string> rt;
 	std::string dbName;
 	for (;;)
 	{
-		char ch = parseNextToken( langdescr, dbName, si, se);
-		if (!ch) throw ERROR( si, "unexpected end of file in DATABASE declaration");
-		if (isAlpha(ch))
+		char ch = tdl::parseNextToken( langdescr, dbName, si, se);
+		if (!ch) throw std::runtime_error( "unexpected end of file in DATABASE declaration");
+		if (tdl::isAlpha(ch))
 		{
 			rt.push_back( dbName);
-			ch = gotoNextToken( langdescr, si, se);
+			ch = tdl::gotoNextToken( langdescr, si, se);
 			if (ch == ',')
 			{
 				++si;
@@ -1175,13 +430,13 @@ static std::vector<std::string> parseDatabaseList( config::PositionalErrorMessag
 				return rt;
 			}
 		}
-		throw ERROR( si, "unexpected token in DATABASE declaration");
+		throw std::runtime_error( "unexpected token in DATABASE declaration");
 	}
 }
 
-static bool checkDatabaseList( const std::string& databaseID, const std::string& databaseClassName, config::PositionalErrorMessageBase& ERROR, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+static bool checkDatabaseList( const std::string& databaseID, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	std::vector<std::string> dblist = parseDatabaseList( ERROR, langdescr, si, se);
+	std::vector<std::string> dblist = parseDatabaseList( langdescr, si, se);
 	std::vector<std::string>::const_iterator di = dblist.begin(), de = dblist.end();
 	for (; di != de; ++di)
 	{
@@ -1191,289 +446,363 @@ static bool checkDatabaseList( const std::string& databaseID, const std::string&
 	return false;
 }
 
-///\brief Forward declaration
-static std::vector<std::pair<std::string,TransactionFunctionR> >
-	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap);
 
-static std::string getInclude( const std::string& mainfilename, const std::string& incfilename)
+static bool parseSubroutineBody( Tdl2vmTranslator& prg, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, utils::FileLineInfo& posinfo)
 {
-	std::string::const_iterator fi = incfilename.begin(), fe = incfilename.end();
-	for (; fi != fe; ++fi)
+	static const char* g_subroutine_ids[] = {"DATABASE","BEGIN",0};
+	enum SubroutineKeyword{ s_NONE, s_DATABASE, s_BEGIN};
+	static const utils::IdentifierTable g_subroutine_idtab( false, g_subroutine_ids);
+
+	bool isValidDatabase = true;
+	unsigned int mask = 0;
+	std::vector<std::string> resultpath;
+	std::string::const_iterator posinfo_si = si;
+
+	while (tdl::gotoNextToken( langdescr, si, se))
 	{
-		char ch = *fi | 32;
-		if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_' || ch == '/' || ch == '\\' || ch == '.') continue;
-		throw std::runtime_error( "illegal include file: only relative paths allowed for include");
+		switch ((SubroutineKeyword)utils::parseNextIdentifier( si, se, g_subroutine_idtab))
+		{
+			case s_NONE:
+			{
+				std::string tok;
+				char ch = utils::parseNextToken( tok, si, se);
+				throw std::runtime_error( std::string("unexpected token in TDL subroutine header. keyword (") + g_subroutine_idtab.tostring() + ") expected instead of " + tdl::errorTokenString( ch, tok));
+			}
+			case s_DATABASE:
+			{
+				tdl::checkUniqOccurrence( s_DATABASE, mask, g_subroutine_idtab);
+				isValidDatabase = checkDatabaseList( databaseId, databaseClassName, langdescr, si, se);
+				break;
+			}
+			case s_BEGIN:
+			{
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				prg.setCurrentSourceReference( posinfo);
+
+				tdl::checkUniqOccurrence( s_BEGIN, mask, g_subroutine_idtab);
+				bool hasIntoBlock = !(resultpath.size() == 0 || (resultpath.size() == 1 && resultpath.back() == "."));
+				if (hasIntoBlock)
+				{
+					prg.begin_INTO_block( resultpath);
+				}
+				parsePrgBlock( prg, langdescr, si, se, posinfo);
+				posinfo_si = si;
+				if (hasIntoBlock)
+				{
+					prg.end_INTO_block();
+				}
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				return isValidDatabase;
+			}
+		}
 	}
-	std::string ext = utils::getFileExtension( incfilename);
-	if (ext.empty())
-	{
-		return utils::readSourceFileContent( utils::joinPath( utils::getParentPath( mainfilename), incfilename) + utils::getFileExtension( mainfilename));
-	}
-	else
-	{
-		return utils::readSourceFileContent( utils::joinPath( utils::getParentPath( mainfilename), incfilename));
-	}
+	throw std::runtime_error( "unexpected end of file in subroutine declaration");
 }
 
-static const char* g_body_ids[] = {"DATABASE","TRANSACTION","SUBROUTINE","RESULT","AUTHORIZE","PREPROC","BEGIN",0};
-enum BodyKeyword{ b_NONE, b_DATABASE,b_TRANSACTION,b_SUBROUTINE,b_RESULT,b_AUTHORIZE,b_PREPROC,b_BEGIN};
-static const utils::IdentifierTable g_body_idtab( false, g_body_ids);
 
-static bool parseProcedureBody( Subroutine& subroutine, config::PositionalErrorMessageBase& ERROR, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
+typedef types::keymap<vm::Subroutine> SubroutineMap;
+
+static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::string& transactionFunctionName, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const SubroutineMap& subroutineMap, utils::FileLineInfo& posinfo)
 {
-	unsigned int mask = 0;
-	config::PositionalErrorMessageBase::Message MSG;
-	char ch;
-	std::string tok;
+	static const char* g_transaction_ids[] = {"DATABASE","AUTHORIZE","RESULT","PREPROC","BEGIN",0};
+	enum TransactionKeyword{ b_NONE, b_DATABASE,b_AUTHORIZE,b_RESULT,b_PREPROC,b_BEGIN};
+	static const utils::IdentifierTable g_transaction_idtab( false, g_transaction_ids);
 
-	while (0!=(ch=gotoNextToken( langdescr, si, se)))
+	bool isValidDatabase = true;
+	unsigned int mask = 0;
+	std::string resultfilter;
+	std::string authfunction;
+	std::string authresource;
+	tdl::PreProcBlock preproc;
+
+	std::string::const_iterator posinfo_si = si;
+
+	while (tdl::gotoNextToken( langdescr, si, se))
 	{
-		switch ((BodyKeyword)utils::parseNextIdentifier( si, se, g_body_idtab))
+		switch ((TransactionKeyword)utils::parseNextIdentifier( si, se, g_transaction_idtab))
 		{
 			case b_NONE:
-				ch = utils::parseNextToken( tok, si, se);
-				throw ERROR( si, MSG << "keyword (" << g_body_idtab.tostring() << ") expected instead of identifier '" << tok << "'");
+			{
+				std::string tok;
+				char ch = utils::parseNextToken( tok, si, se);
+				throw std::runtime_error( std::string("unexpected token in TDL subroutine header. keyword (") + g_transaction_idtab.tostring() + ") expected instead of " + tdl::errorTokenString( ch, tok));
+			}
 			case b_DATABASE:
-				checkUniqOccurrence( b_DATABASE, mask, g_body_idtab, ERROR, si);
-				subroutine.isValidDatabase &= checkDatabaseList( databaseId, databaseClassName, ERROR, langdescr, si, se);
+				tdl::checkUniqOccurrence( b_DATABASE, mask, g_transaction_idtab);
+				isValidDatabase = checkDatabaseList( databaseId, databaseClassName, langdescr, si, se);
 				break;
 			case b_RESULT:
-				checkUniqOccurrence( b_RESULT, mask, g_body_idtab, ERROR, si);
-				parseResultDirective( subroutine, ERROR, langdescr, si, se);
-				break;
-			case b_AUTHORIZE:
-				checkUniqOccurrence( b_AUTHORIZE, mask, g_body_idtab, ERROR, si);
-				parseAuthorizeDirective( subroutine, ERROR, langdescr, si, se);
-				break;
-			case b_PREPROC:
-				checkUniqOccurrence( b_PREPROC, mask, g_body_idtab, ERROR, si);
-				parsePreProcessingBlock( subroutine, ERROR, langdescr, si, se);
-				break;
-			case b_BEGIN:
-				checkUniqOccurrence( b_BEGIN, mask, g_body_idtab, ERROR, si);
-				parseMainBlock( subroutine, ERROR, langdescr, si, se);
-				if (subroutine.isValidDatabase)
+			{
+				tdl::checkUniqOccurrence( b_RESULT, mask, g_transaction_idtab);
+				if (tdl::parseKeyword( langdescr, si, se, "FILTER"))
 				{
-					return true;
+					resultfilter = tdl::parseFunctionName( langdescr, si, se);
 				}
 				else
 				{
-					LOG_DEBUG << "parsed but ignored " << (subroutine.isTransaction?"TRANSACTION":"OPERATION") << " '" << subroutine.description.name << "' for active transaction database '" << databaseId << "'";
+					throw std::runtime_error( "FILTER expected after RESULT");
 				}
-				return false;
-			case b_TRANSACTION:
-			case b_SUBROUTINE:
 				break;
+			}
+			case b_AUTHORIZE:
+			{
+				if ('(' != tdl::gotoNextToken( langdescr, si, se))
+				{
+					throw std::runtime_error( "Open bracket '(' expected after AUTHORIZE function call");
+				}
+				si++;
+				authfunction = tdl::parseFunctionName( langdescr, si, se);
+				char ch = tdl::gotoNextToken( langdescr, si, se);
+				if (ch == ',')
+				{
+					++si;
+					authresource = tdl::parseResourceName( langdescr, si, se);
+				}
+				if (')' != tdl::gotoNextToken( langdescr, si, se))
+				{
+					throw std::runtime_error( "Close bracket ')' expected after AUTHORIZE function defintion");
+				}
+				++si;
+				break;
+			}
+			case b_PREPROC:
+			{
+				tdl::checkUniqOccurrence( b_PREPROC, mask, g_transaction_idtab);
+				preproc = tdl::PreProcBlock::parse( langdescr, si, se);
+				break;
+			}
+			case b_BEGIN:
+			{
+				tdl::checkUniqOccurrence( b_BEGIN, mask, g_transaction_idtab);
+				Tdl2vmTranslator prg( &subroutineMap, false);
+
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+
+				parsePrgBlock( prg, langdescr, si, se, posinfo);
+				posinfo_si = si;
+
+				if (isValidDatabase)
+				{
+					vm::ProgramR program = prg.createProgram();
+					tfunc.reset( new TdlTransactionFunction( transactionFunctionName, resultfilter, authfunction, authresource, preproc.build(program.get()), program));
+				}
+				return isValidDatabase;
+			}
 		}
 	}
-	if (subroutine.isTransaction)
-	{
-		throw ERROR( si, "missing main block BEGIN..END in TRANSACTION");
-	}
-	else
-	{
-		throw ERROR( si, "missing main block BEGIN..END in SUBROUTINE");
-	}
+	throw std::runtime_error( "unexpected end of file in transaction function declaration");
 }
 
+
+///\brief Forward declaration
+static void includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, SubroutineMap& subroutineMap, TdlTransactionFunctionList& transactionFunctionList);
 
 static const char* g_toplevel_ids[] = {"DATABASE","TRANSACTION","SUBROUTINE","TEMPLATE","INCLUDE",0};
 enum TopLevelKeyword{ t_NONE,t_DATABASE,t_TRANSACTION,t_SUBROUTINE,t_TEMPLATE,t_INCLUDE};
 static const utils::IdentifierTable g_toplevel_idtab( false, g_toplevel_ids);
 
-static std::vector<std::pair<std::string,TransactionFunctionR> >
-	load( const std::string& filename, const std::string& source, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap)
+static void load( const std::string& filename, const std::string& source, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, SubroutineMap& subroutineMap, TdlTransactionFunctionList& transactionFunctionList)
 {
-	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
-	bool firstDef = true;
-	bool isValidDatabase = true;
-	std::vector<std::string> templateArguments;
-	std::string tok;
 	std::string::const_iterator si = source.begin(), se = source.end();
-	std::string::const_iterator tokstart;
 
-	config::PositionalErrorMessageBase ERROR(source);
-	config::PositionalErrorMessageBase::Message MSG;
+	utils::FileLineInfo posinfo( utils::getFileStem( filename) + utils::getFileExtension( filename));
+	std::string::const_iterator posinfo_si = si;
 
 	if (!langdescr) throw std::logic_error( "no database language description defined");
 	try
 	{
-		while ((ch = gotoNextToken( langdescr, si, se)) != 0)
+		if (tdl::parseKeyword( langdescr, si, se, "DATABASE"))
 		{
-			tokstart = si;
-			bool enterDefinition = false;
-			bool isTransaction = false;
-			templateArguments.clear();
-
+			if (!checkDatabaseList( databaseId, databaseClassName, langdescr, si, se))
+			{
+				LOG_INFO << "TDL file parsed but ignored for database '" << databaseId << "'";
+			}
+		}
+		while ((ch = tdl::gotoNextToken( langdescr, si, se)) != 0)
+		{
+			std::string::const_iterator start = si;
 			switch ((TopLevelKeyword)utils::parseNextIdentifier( si, se, g_toplevel_idtab))
 			{
 				case t_NONE:
+				{
+					std::string tok;
 					ch = utils::parseNextToken( tok, si, se);
-					throw ERROR( si, MSG << "keyword (" << g_toplevel_idtab.tostring() << ") expected instead of identifier '" << tok << "'");
+					throw std::runtime_error( std::string("unexpected token in TDL file. keyword (") + g_toplevel_idtab.tostring() + ") expected instead of " + tdl::errorTokenString( ch, tok));
+				}
 				case t_DATABASE:
-					if (!firstDef)
-					{
-						throw ERROR( si, MSG << "DATABASE definition only allowed at the beginning of the TDL source (global) or as part of the transaction declaration (per function)");
-					}
-					isValidDatabase = checkDatabaseList( databaseId, databaseClassName, ERROR, langdescr, si, se);
-					if (!isValidDatabase)
-					{
-						LOG_DEBUG << "TDL file parsed but ignored for database '" << databaseId << "'";
-					}
-					break;
+					throw std::runtime_error( "unexpected top level DATABASE definition (the top level database definition must be unique and is only allowed as the first declaration in the TDL source");
+
 				case t_TRANSACTION:
-					isTransaction = true;
-					enterDefinition = true;
-					break;
-				case t_SUBROUTINE:
-					isTransaction = false;
-					enterDefinition = true;
-					break;
-				case t_TEMPLATE:
-					if (gotoNextToken( langdescr, si, se) != '<')
+				{
+					posinfo.update( posinfo_si, start);
+					posinfo_si = start;
+					utils::FileLineInfo start_posinfo = posinfo;
+
+					std::string transactionName
+						= tdl::parseSubroutineName( langdescr, si, se);
+
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+
+					langbind::FormFunctionR tfunc;
+					if (parseTransactionBody( tfunc, transactionName, databaseId, databaseClassName, langdescr, si, se, subroutineMap, posinfo))
 					{
-						throw ERROR( si, MSG << "template argument list in '<' '>' brackets expected instead of '" << ch << "'");
-					}
-					templateArguments = parseTemplateArguments( langdescr, si, se);
-	
-					ch = parseNextToken( langdescr, tok, si, se);
-					if (isAlpha(ch) && boost::algorithm::iequals( tok, "SUBROUTINE"))
-					{
-						isTransaction = false;
-						enterDefinition = true;
+						std::pair<std::string,langbind::FormFunctionR> tfuncdef( transactionName, tfunc);
+						transactionFunctionList.push_back( tfuncdef);
 					}
 					else
 					{
-						throw ERROR( si, MSG << "SUBROUTINE declaration expected after TEMPLATE declaration instead of '" << errorTokenString( ch, tok) << "'");
+						LOG_DEBUG << "TDL transaction function '" << transactionName << "' defined " << start_posinfo.logtext() << " is ignored because of database exclusion";
 					}
+					posinfo_si = si;
 					break;
-				case t_INCLUDE:
-					enterDefinition = false;
-
-					ch = utils::parseNextToken( tok, si, se, utils::emptyCharTable(), utils::anyCharTable());
-					if (!ch) throw ERROR( si, MSG << "unexpected end of include definition (include file name expected)");
-					std::vector<std::pair<std::string,TransactionFunctionR> > lst
-						= includeFile( filename, tok, databaseId, databaseClassName, langdescr, subroutineMap);
-					rt.insert( rt.begin(), lst.begin(), lst.end());
-					break;
-			}
-			if (enterDefinition)
-			{
-				std::string::const_iterator dbe = lineStart( tokstart, source);
-				std::string transactionName;
-
-				ch = parseNextToken( langdescr, transactionName, si, se);
-				if (!ch) throw ERROR( si, MSG << "unexpected end of transaction definition (transaction name expected)");
-				if (g_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
-
-				Subroutine subroutine( templateArguments, dbe, isTransaction);
-				subroutine.description.name = transactionName;
-				subroutine.description.casesensitive = langdescr->isCaseSensitive();
-				subroutine.isValidDatabase = isValidDatabase;
-
-				if (!subroutine.isTransaction && gotoNextToken( langdescr, si, se) == '(')
-				{
-					// ... subroutine call argument list
-					parseNextToken( langdescr, tok, si, se);
-					parseSubroutineArguments( subroutine.param_map, langdescr, si, se);
 				}
-				try
+				case t_SUBROUTINE:
 				{
-					if (parseProcedureBody( subroutine, ERROR, databaseId, databaseClassName, langdescr, si, se))
+					posinfo.update( posinfo_si, start);
+					posinfo_si = start;
+					utils::FileLineInfo start_posinfo = posinfo;
+
+					std::string subroutineName
+						= tdl::parseSubroutineName( langdescr, si, se);
+					std::vector<std::string> templateArguments;
+					std::vector<std::string> callArguments 
+						= tdl::parseCallArguments( langdescr, si, se);
+
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+
+					Tdl2vmTranslator prg( &subroutineMap, true);
+					if (parseSubroutineBody( prg, databaseId, databaseClassName, langdescr, si, se, posinfo))
 					{
-						if (subroutine.isTransaction)
-						{
-							LOG_TRACE << "Registering transaction definition '" << subroutine.description.name << "'";
-							TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, subroutineMap));
-							rt.push_back( std::pair<std::string,TransactionFunctionR>( subroutine.description.name, func));
-						}
-						else
-						{
-							TransactionFunctionR func( createTransactionFunction( subroutine.description, langdescr, subroutineMap));
-							subroutineMap[ subroutine.description.name] = SubroutineDeclaration( subroutine.templateArguments, func);
-						}
+						subroutineMap.insert( 
+							subroutineName, 
+							vm::Subroutine( subroutineName, templateArguments, callArguments, prg.createProgram()));
 					}
+					else
+					{
+						LOG_DEBUG << "TDL subroutine '" << subroutineName << "' defined " << start_posinfo.logtext() << " is ignored because of database exclusion";
+					}
+					posinfo_si = si;
+					break;
 				}
-				catch (const TransactionFunctionDescription::MainProcessingStep::Error& err)
+				case t_TEMPLATE:
 				{
-					throw ERROR( subroutine.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
-				}
-				catch (const TransactionFunctionDescription::PreProcessingStep::Error& err)
-				{
-					throw ERROR( subroutine.pprcstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
-				}
+					posinfo.update( posinfo_si, start);
+					posinfo_si = start;
+					utils::FileLineInfo start_posinfo = posinfo;
 
+					(void)tdl::gotoNextToken( langdescr, si, se);
+
+					std::vector<std::string> templateArguments
+						= tdl::parseTemplateArguments( langdescr, si, se);
+	
+					if (!tdl::parseKeyword( langdescr, si, se, "SUBROUTINE"))
+					{
+						throw std::runtime_error( "SUBROUTINE declaration expected after TEMPLATE declaration");
+					}
+
+					std::string subroutineName
+						= tdl::parseSubroutineName( langdescr, si, se);
+					std::vector<std::string> callArguments 
+						= tdl::parseCallArguments( langdescr, si, se);
+
+					posinfo.update( posinfo_si, si);
+					posinfo_si = si;
+
+					Tdl2vmTranslator prg( &subroutineMap, true);
+					if (parseSubroutineBody( prg, databaseId, databaseClassName, langdescr, si, se, posinfo))
+					{
+						subroutineMap.insert( 
+							subroutineName, 
+							vm::Subroutine( subroutineName, templateArguments, callArguments, prg.createProgram()));
+					}
+					else
+					{
+						LOG_DEBUG << "TDL subroutine template '" << subroutineName << "' defined " << start_posinfo.logtext() << " is ignored because of database exclusion";
+					}
+					posinfo_si = si;
+					break;
+				}
+				case t_INCLUDE:
+				{
+					std::string incfile = tdl::parseFilename( langdescr, si, se);
+					includeFile( filename, incfile, databaseId, databaseClassName, langdescr, subroutineMap, transactionFunctionList);
+					break;
+				}
 			}
 		}
 	}
-	catch (const config::PositionalErrorException& e)
-	{
-		throw e;
-	}
 	catch (const std::runtime_error& e)
 	{
-		throw ERROR( si, e.what());
+		config::PositionalErrorMessageBase base(source);
+		base.getError( si, e.what());
+		
+		config::PositionalFileError err( base.getError( si, e.what()), filename);
+		throw config::PositionalFileErrorException( err);
 	}
-	return rt;
 }
 
-static std::vector<std::pair<std::string,TransactionFunctionR> >
-	includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, SubroutineDeclarationMap& subroutineMap)
+static void includeFile( const std::string& mainfilename, const std::string& incfilename, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, SubroutineMap& subroutineMap, TdlTransactionFunctionList& transactionFunctionList)
 {
 	try
 	{
-		std::string incsrc = getInclude( mainfilename, incfilename);
-		return load( mainfilename, incsrc, databaseId, databaseClassName, langdescr, subroutineMap);
+		std::string ext = utils::getFileExtension( incfilename);
+		std::string src;
+		if (ext.empty())
+		{
+			src = utils::readSourceFileContent( utils::joinPath( utils::getParentPath( mainfilename), incfilename) + utils::getFileExtension( mainfilename));
+		}
+		else
+		{
+			src = utils::readSourceFileContent( utils::joinPath( utils::getParentPath( mainfilename), incfilename));
+		}
+		load( incfilename, src, databaseId, databaseClassName, langdescr, subroutineMap, transactionFunctionList);
 	}
-	catch (const config::PositionalErrorException& e)
+	catch (const config::PositionalFileErrorException& e)
 	{
-		config::PositionalFileError err( e, incfilename);
-		throw config::PositionalFileErrorException( err);
+		LOG_ERROR << "error loading program from file '" << mainfilename << " when including file '" << incfilename << "'";
+		throw e;
 	}
 	catch (const std::runtime_error& e)
 	{
 		LOG_ERROR << "error loading program from file '" << mainfilename << " when including file '" << incfilename << "'";
 		throw e;
 	}
-	catch (...)
-	{
-		LOG_ERROR << "uncaught exception in TDL include file '" << incfilename << "' included from file '" << mainfilename << "'";
-		throw std::runtime_error( "uncaught exception. see logs");
-	}
 }
 
-std::vector<std::pair<std::string,TransactionFunctionR> >
-	_Wolframe::db::loadTransactionProgramFile(
+TdlTransactionFunctionList
+	db::loadTransactionProgramFile(
 		const std::string& filename,
 		const std::string& databaseId,
 		const std::string& databaseClassName,
 		const LanguageDescription* langdescr)
 {
+	TdlTransactionFunctionList rt;
 	try
 	{
-		SubroutineDeclarationMap subroutineMap;
-		return load( filename, utils::readSourceFileContent( filename), databaseId, databaseClassName, langdescr, subroutineMap);
+		SubroutineMap subroutineMap;
+		load( filename, utils::readSourceFileContent( filename), databaseId, databaseClassName, langdescr, subroutineMap, rt);
 	}
 	catch (const config::PositionalFileErrorException& e)
 	{
 		throw e;
-	}
-	catch (const config::PositionalErrorException& e)
-	{
-		config::PositionalFileError err( e, filename);
-		throw config::PositionalFileErrorException( err);
 	}
 	catch (const std::runtime_error& e)
 	{
 		LOG_ERROR << "error loading program from file '" << filename << "'";
 		throw e;
 	}
-	catch (...)
+	catch (const std::exception& e)
 	{
-		LOG_ERROR << "uncaught exception loading program from file '" << filename << "'";
-		throw std::runtime_error( "uncaught exception. see logs");
+		LOG_FATAL << "uncaught exception loading program from file '" << filename << "':" << e.what();
+		throw e;
 	}
+	return rt;
 }
 
 

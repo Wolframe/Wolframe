@@ -36,18 +36,18 @@
 #ifndef _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
 
-#include "langbind/cppFormFunction.hpp"
+#include "serialize/cppFormFunction.hpp"
 #include "processor/procProviderInterface.hpp"
 
 namespace _Wolframe {
 namespace appdevel {
 
-//\class CppFormFunction
-//\brief Application development template for form functions written in C++
+///\class CppFormFunction
+///\brief Application development template for form functions written in C++
 template <class InputType, class OutputType, int (*Function)( const proc::ProcessorProviderInterface* p, OutputType&, const InputType&)>
 struct CppFormFunction
 {
-	static const langbind::CppFormFunction& declaration()
+	static const serialize::CppFormFunction& declaration()
 	{
 		static const serialize::StructDescriptionBase* param = InputType::getStructDescription();
 		static const serialize::StructDescriptionBase* result = OutputType::getStructDescription();
@@ -58,7 +58,7 @@ struct CppFormFunction
 				return Function( provider, *(OutputType*)res, *(const InputType*) param);
 			}
 		};
-		static langbind::CppFormFunction func( Functor::implementation, param, result);
+		static serialize::CppFormFunction func( Functor::implementation, param, result);
 		return func;
 	}
 };

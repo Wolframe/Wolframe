@@ -26,25 +26,37 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall
-BEGIN FOREACH //aa DO run( xx, yy);
+BEGIN FOREACH //aa DO SELECT run( $(xx), $(yy));
 END
 **outputfile:DBOUT
 **output
-run #1#1
-run #2#NULL
-run #3#3
-
-start( 'run' );
+Code:
+[0] RESULT_SET_INIT
+[1] OPEN_ITER_TUPLESET TUPLESET 0
+[2] NOT_IF_COND GOTO @9
+[3] DBSTM_START STM (SELECT run( $1, $2))
+[4] DBSTM_BIND_ITR_IDX COLIDX 1
+[5] DBSTM_BIND_ITR_IDX COLIDX 2
+[6] DBSTM_EXEC
+[7] NEXT
+[8] IF_COND GOTO @3
+[9] RETURN
+Input Data:
+SET 0: xx, yy
+  '1', '1'
+  '2', NULL
+  '3', '3'
+start( 'SELECT run( $1, $2)' );
 bind( 1, '1' );
 bind( 2, '1' );
 execute();
 nofColumns(); returns 0
-start( 'run' );
+start( 'SELECT run( $1, $2)' );
 bind( 1, '2' );
 bind( 2, NULL );
 execute();
 nofColumns(); returns 0
-start( 'run' );
+start( 'SELECT run( $1, $2)' );
 bind( 1, '3' );
 bind( 2, '3' );
 execute();

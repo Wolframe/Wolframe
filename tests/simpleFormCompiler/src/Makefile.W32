@@ -13,7 +13,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\3rdParty\gtest\include \
-	/I$(TOPDIR)\wtest
+	/I$(TOPDIR)\wtest\include
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
@@ -33,7 +33,7 @@ OBJS = \
 TEST_CPP_BINS = \
 	testSimpleFormCompiler.exe
 
-all: $(TEST_OBJS) $(TEST_CPP_BINS)
+all: $(OBJS) $(TEST_CPP_BINS)
 
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

@@ -138,14 +138,14 @@ public:
 
 	///\brief Get a self copy
 	///\return allocated pointer to copy of this
-	virtual TypedOutputFilter* copy() const=0;
+	virtual TypedOutputFilter* copy() const		{return 0;}
 
 	///\brief Get next element
 	///\param [out] type element type parsed
 	///\param [out] element reference to element returned
 	///\return true, if success, false, if not.
 	///\remark Check the state when false is returned
-	virtual bool print( ElementType type, const types::VariantConst& element)=0;
+	virtual bool print( ElementType /*type*/, const types::VariantConst& /*element*/){return true;}
 
 	///\brief Get the current state
 	///\return the current state

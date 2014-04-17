@@ -35,7 +35,7 @@
 //
 #ifndef _CONFIG_PROGRAM_BASE_HPP_INCLUDED
 #define _CONFIG_PROGRAM_BASE_HPP_INCLUDED
-#include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include "logger/logObject.hpp"
 #include <string>
 #include <cstdlib>
@@ -48,30 +48,37 @@
 namespace _Wolframe {
 namespace config {
 
-//\class LineInfo
-//\brief Info for line/coulumn position
+///\class LineInfo
+///\brief Info for line/coulumn position
 struct LineInfo
-	:public utils::LineInfo
 {
+	unsigned int line;
+	unsigned int column;
+
+	LineInfo( const utils::SourceLineInfo& o)
+		:line(o.line()),column(o.column()){}
 	LineInfo( const LineInfo& o)
-		:utils::LineInfo(o){}
+		:line(o.line),column(o.column){}
 	LineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
-		:utils::LineInfo( utils::getLineInfo( start, pos))
-	{}
+	{
+		utils::SourceLineInfo pp( utils::getSourceLineInfo( start, pos));
+		line = pp.line();
+		column = pp.column();
+	}
 
 	static const log::LogObjectDescriptionBase* getLogObjectDescription()
 	{
-		struct Description :public log::LogObjectDescription<utils::LineInfo>
+		struct Description :public log::LogObjectDescription<LineInfo>
 		{
-			Description():log::LogObjectDescription<utils::LineInfo>( "on line $1 column $2"){(*this)(&utils::LineInfo::line)(&utils::LineInfo::column);}
+			Description():log::LogObjectDescription<LineInfo>( "on line $1 column $2"){(*this)(&LineInfo::line)(&LineInfo::column);}
 		};
 		static Description rt;
 		return &rt;
 	}
 };
 
-//\class PositionalFileError
-//\brief Error class with message and source position info
+///\class PositionalFileError
+///\brief Error class with message and source position info
 struct PositionalError
 {
 	PositionalError( const PositionalError& o)
@@ -94,8 +101,8 @@ struct PositionalError
 	}
 };
 
-//\class PositionalFileError
-//\brief Error class with message and source file and position info
+///\class PositionalFileError
+///\brief Error class with message and source file and position info
 struct PositionalFileError
 {
 	PositionalFileError( const PositionalFileError& o)
@@ -121,8 +128,8 @@ struct PositionalFileError
 	}
 };
 
-//\class PositionalErrorException
-//\brief Base class for an error exception including source position info
+///\class PositionalErrorException
+///\brief Base class for an error exception including source position info
 struct PositionalErrorException
 	:public log::Exception<std::runtime_error,PositionalError>
 {
@@ -130,8 +137,8 @@ struct PositionalErrorException
 		:log::Exception<std::runtime_error,PositionalError>(err_){}
 };
 
-//\class PositionalFileErrorException
-//\brief Base class for an error exception including source file and position info
+///\class PositionalFileErrorException
+///\brief Base class for an error exception including source file and position info
 struct PositionalFileErrorException
 	:public log::Exception<std::runtime_error,PositionalFileError>
 {
@@ -139,8 +146,8 @@ struct PositionalFileErrorException
 		:log::Exception<std::runtime_error,PositionalFileError>(err_){}
 };
 
-//\class PositionalErrorMessageBase
-//\brief Base class to build up a positional error exception with its error message
+///\class PositionalErrorMessageBase
+///\brief Base class to build up a positional error exception with its error message
 class PositionalErrorMessageBase
 {
 public:
@@ -171,6 +178,10 @@ public:
 		return PositionalErrorException( err);
 	}
 
+	PositionalError getError( const std::string::const_iterator& pos_, const std::string& msgobj) const
+	{
+		return PositionalError( LineInfo( m_start, pos_), msgobj);
+	}
 private:
 	std::string::const_iterator m_start;
 };

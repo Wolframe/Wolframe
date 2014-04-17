@@ -713,14 +713,14 @@ public:
 		///\return *this
 		PathElement& selectAttribute( const char* name) throw(exception)		{return doSelect( Attribute, name).defineOutput( ThisAttributeValue);}
 
-		//\brief Find tag with one attribute,value condition
+		///\brief Find tag with one attribute,value condition
 		///\remark same as ifAttribute(const char*,const char*)
 		///\param [in] name name of the attribute
 		///\param [in] value value of the attribute
 		///\return *this
 		PathElement& operator ()( const char* name, const char* value) throw(exception)	{return doSelect( Attribute, name).doSelect( ThisAttributeValue, value);}
 
-		//\brief Find tag with one attribute,value condition
+		///\brief Find tag with one attribute,value condition
 		///\param [in] name name of the attribute
 		///\param [in] value value of the attribute
 		///\return *this

@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of input filter abstraction for the cjson library
 #include "inputfilterImpl.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include "types/string.hpp"
 #include "logger-v1.hpp"
 #include <boost/lexical_cast.hpp>
@@ -152,7 +153,7 @@ boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
 	if (!pp)
 	{
 		if (!ctx.errorptr) throw std::bad_alloc();
-		utils::LineInfo pos = utils::getLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
+		utils::SourceLineInfo pos = utils::getSourceLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
 
 		std::string err( ctx.errorptr);
 		if (err.size() > 80)
@@ -160,7 +161,7 @@ boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
 			err.resize( 80);
 			err.append( "...");
 		}
-		throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line) + " column " + boost::lexical_cast<std::string>(pos.column) + " at '" + err + "'");
+		throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line()) + " column " + boost::lexical_cast<std::string>(pos.column()) + " at '" + err + "'");
 	}
 	return boost::shared_ptr<cJSON>( pp, cJSON_Delete);
 }
@@ -289,7 +290,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 	while (!m_stk.empty())
 	{
 		const cJSON* nd = m_stk.back().m_node;
-		if (!nd && m_stk.back().m_state != StackElement::StateCheckEnd)
+		if (!nd && m_stk.back().m_state != StackElement::StateCloseNode && m_stk.back().m_state != StackElement::StateCheckEnd)
 		{
 			setState( Error, "internal: invalid node in JSON structure");
 			return false;
@@ -337,6 +338,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 							elementsize = std::strlen( nd->string);
 							m_stk.back().m_state = StackElement::StateChild;
 						}
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else
@@ -353,6 +355,15 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						{
 							m_stk.push_back( StackElement( nd->child, nd->string));
 							nd = m_stk.back().m_node;
+
+							if (flag( FilterBase::SerializeWithIndices))
+							{
+								type = InputFilter::OpenTag;
+								element = "";
+								elementsize = 0;
+								LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
+								return true;
+							}
 						}
 						else
 						{
@@ -373,6 +384,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						m_stk.back().m_node = nd->next;
 						m_stk.back().m_state = StackElement::StateCheckEnd;
 						type = InputFilter::Value;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else if (state() == InputFilter::Open)
@@ -390,6 +402,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 					{
 						m_stk.back().m_state = StackElement::StateNext;
 						type = InputFilter::Value;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else if (state() == InputFilter::Open)
@@ -411,6 +424,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						elementsize = 0;
 						m_stk.back().m_node = nd->next;
 						m_stk.back().m_state = StackElement::StateCheckEnd;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else
@@ -429,47 +443,63 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 							element = 0;
 							elementsize = 0;
 							m_stk.back().m_state = StackElement::StateReopen;
+							LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 							return true;
 						}
 						else
 						{
 							m_stk.back().m_state = StackElement::StateOpen;
 						}
+						continue;
 					}
 					else
 					{
-						m_stk.pop_back();
-						if (m_stk.empty())
+						if (m_stk.back().m_tag && flag( FilterBase::SerializeWithIndices))
 						{
-							// final close:
 							type = InputFilter::CloseTag;
 							element = 0;
 							elementsize = 0;
+							m_stk.back().m_state = StackElement::StateCloseNode;
+							LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 							return true;
 						}
-						nd = m_stk.back().m_node;
+						m_stk.back().m_state = StackElement::StateCloseNode;
+						continue;
 					}
+
+				case StackElement::StateCloseNode:
+					m_stk.pop_back();
+					if (m_stk.empty())
+					{
+						// final close:
+						type = InputFilter::CloseTag;
+						element = 0;
+						elementsize = 0;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
+						return true;
+					}
+					nd = m_stk.back().m_node;
 					continue;
 
 				case StackElement::StateReopen:
-					type = InputFilter::OpenTag;
-					element = m_stk.back().m_tag;
-					elementsize = std::strlen( m_stk.back().m_tag);
+					if (flag( FilterBase::SerializeWithIndices))
+					{
+						type = InputFilter::OpenTag;
+						element = 0;
+						elementsize = 0;
+					}
+					else
+					{
+						type = InputFilter::OpenTag;
+						element = m_stk.back().m_tag;
+						elementsize = std::strlen( m_stk.back().m_tag);
+					}
 					m_stk.back().m_state = StackElement::StateOpen;
+					LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 					return true;
 			}
 		}
 	}
 	return false;
 }
-
-bool InputFilterImpl::setFlags( Flags f)
-{
-	if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
-	{
-		return false;
-	}
-	return InputFilter::setFlags( f);
-}
-
 

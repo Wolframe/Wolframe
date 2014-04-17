@@ -50,9 +50,8 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEnvirenment *env_, const std::string& name_, OracleDbUnit *dbUnit_)
-	: TransactionExecStatemachine(name_)
-	,m_state(Init)
+TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDbUnit *dbUnit_)
+	:m_state(Init)
 	,m_env(env_)
 	,m_lastresult(0)
 	,m_nof_cols(0)
@@ -143,11 +142,7 @@ void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status_ 
 	}
 	
 	const char *errtype = getErrorType( errcode );
-	
-	// TODO: map OCI codes to severity levels, so far everything is ERROR
-	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
-	
-	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement->originalSQL().c_str(), errtype, errmsg, errmsg));
+	m_lasterror.reset( new DatabaseError( errtype, errcode, errmsg));
 }
 
 bool TransactionExecStatemachine_oracle::status( sword status_, State newstate )
@@ -203,9 +198,17 @@ bool TransactionExecStatemachine_oracle::commit()
 bool TransactionExecStatemachine_oracle::rollback()
 {
 	LOG_TRACE << "[oracle statement] CALL rollback()";
+	if (m_state == Transaction)
+	{
+	}
+	else if (m_state != Executed && m_state != CommandReady)
+	{
+		return errorStatus( std::string( "call of rollback not allowed in state '") + stateName(m_state) + "'");
+	}
 	if (m_conn)
 	{
 		bool rt = status( OCITransRollback( (*m_conn)->svchp, (*m_conn)->errhp, OCI_DEFAULT ), Init );
+		clear();
 		if (rt)
 		{
 			delete m_conn;
@@ -213,6 +216,7 @@ bool TransactionExecStatemachine_oracle::rollback()
 		}
 		return rt;
 	}
+	m_state = Init;
 	return true;
 }
 
@@ -220,7 +224,7 @@ bool TransactionExecStatemachine_oracle::errorStatus( const std::string& message
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_statement->originalSQL().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+		m_lasterror.reset( new DatabaseError( "INTERNAL", 0, message));
 		m_state = Error;
 	}
 	return false;

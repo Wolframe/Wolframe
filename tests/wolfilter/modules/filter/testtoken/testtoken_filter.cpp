@@ -341,6 +341,11 @@ struct InputFilterImpl :public InputFilter
 		return false;
 	}
 
+	virtual bool checkSetFlags( Flags f) const
+	{
+		return (0==((int)f & (int)langbind::FilterBase::SerializeWithIndices));
+	}
+
 	virtual bool setFlags( Flags f)
 	{
 		if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))

@@ -47,8 +47,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-//\class StructDescriptionBase
-//\brief Base class for structure description used for introspection in serialization/deserialization
+///\class StructDescriptionBase
+///\brief Base class for structure description used for introspection in serialization/deserialization
 class StructDescriptionBase
 {
 public:

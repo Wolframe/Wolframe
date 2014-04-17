@@ -38,7 +38,7 @@
 #include "cmdbind/commandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 
-//\brief Defines a Wolframe command handler module after the includes section.
+///\brief Defines a Wolframe command handler module after the includes section.
 #define COMMAND_HANDLER_MODULE(DESCRIPTION,LANGNAME,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF)\
 	class LANGNAME ##CommandHandlerConstructor\
 		:public _Wolframe::cmdbind::CommandHandlerConstructor\
@@ -104,7 +104,7 @@
 	}
 
 
-//\brief Defines a Wolframe command handler with standalone programs module after the includes section.
+///\brief Defines a Wolframe command handler with standalone programs module after the includes section.
 #define COMMAND_HANDLER_MODULE_WITH_PROGRAMS(DESCRIPTION,LANGNAME,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,CREATEPRGFUNC)\
 	class LANGNAME ##CommandHandlerConstructor\
 		:public _Wolframe::cmdbind::CommandHandlerConstructor\

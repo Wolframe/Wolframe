@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-//\brief Interface for higher data type transformations for libpq
-//\remark The implementation of the data types are taken from libpqtype but with another interface
-//\file PostgreSQLdatatypes.hpp
+///\brief Interface for higher data type transformations for libpq
+///\remark The implementation of the data types are taken from libpqtype but with another interface
+///\file PostgreSQLdatatypes.hpp
 #ifndef _DATABASE_POSTGRES_DATATYPES_HPP_INCLUDED
 #define _DATABASE_POSTGRES_DATATYPES_HPP_INCLUDED
 #include "types/datetime.hpp"

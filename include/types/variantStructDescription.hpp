@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file types/variantStructDescription.hpp
-//\brief Description of structures of variant types
+///\file types/variantStructDescription.hpp
+///\brief Description of structures of variant types
 
 #ifndef _Wolframe_TYPES_VARIANT_STRUCT_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_TYPES_VARIANT_STRUCT_DESCRIPTION_HPP_INCLUDED
@@ -44,29 +44,29 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace utils {
-	//\brief Forward declaration
+	///\brief Forward declaration
 	struct PrintFormat;
 }
 namespace types {
 
-//\brief Forward declaration for VariantStructDescription
+///\brief Forward declaration for VariantStructDescription
 class VariantStruct;
 
-//\class VariantStructDescription
-//\brief Description of a variant structure as array of attributes and content elements
+///\class VariantStructDescription
+///\brief Description of a variant structure as array of attributes and content elements
 class VariantStructDescription
 {
 public:
 	typedef std::map<std::string,const VariantStructDescription*> ResolveMap;
 
-	//\brief Constructor
+	///\brief Constructor
 	VariantStructDescription();
-	//\brief Copy constructor
+	///\brief Copy constructor
 	VariantStructDescription( const VariantStructDescription& o);
-	//\brief Destructor
+	///\brief Destructor
 	~VariantStructDescription();
 
-	//\brief One element of the structure description. Refers to the element with the same index in the corresponding VariantStruct
+	///\brief One element of the structure description. Refers to the element with the same index in the corresponding VariantStruct
 	struct Element
 	{
 		char* name;				//< name of the element in UTF-8
@@ -74,7 +74,7 @@ public:
 		VariantStructDescription* substruct;	//< substructure in case of an element that is itself a structure
 		const NormalizeFunction* normalizer;	//< normalizer function for an atomic element. Can be null also for an atomic element if not defined
 
-		//\brief Flags describing some properties of the element
+		///\brief Flags describing some properties of the element
 		enum Flags
 		{
 			NoFlags=0x0,		//< no flags set
@@ -99,7 +99,7 @@ public:
 		void copy( const Element& o);
 	};
 
-	//\brief Const iterator on the elements of the definition
+	///\brief Const iterator on the elements of the definition
 	class const_iterator
 	{
 	public:
@@ -128,7 +128,7 @@ public:
 		Element const* m_itr;
 	};
 
-	//\brief Iterator on the elements of the definition
+	///\brief Iterator on the elements of the definition
 	class iterator
 	{
 	public:
@@ -158,82 +158,82 @@ public:
 	};
 
 public:
-	//\brief Random access or 0 if no random access defined (throws logic error on ABR/ABW)
+	///\brief Random access or 0 if no random access defined (throws logic error on ABR/ABW)
 	const Element* at( std::size_t idx) const				{if (idx>=m_size) return 0; else return m_ar+idx;}
 	Element* at( std::size_t idx)						{if (idx>=m_size) return 0; else return m_ar+idx;}
 
-	//\brief Get the last element (throws logic error on ABR/ABW)
+	///\brief Get the last element (throws logic error on ABR/ABW)
 	const Element& back() const						{if (m_size==0) throw std::logic_error("array bound read"); return m_ar[ m_size-1];}
 	Element& back()								{if (m_size==0) throw std::logic_error("array bound write"); return m_ar[ m_size-1];}
 
-	//\brief Get the an iterator on the first element (direct child)
+	///\brief Get the an iterator on the first element (direct child)
 	const_iterator begin() const						{return beginptr();}
 	iterator begin()							{return beginptr();}
-	//\brief Get the an iterator on the end of the list of elements
+	///\brief Get the an iterator on the end of the list of elements
 	const_iterator end() const						{return endptr();}
 	iterator end()								{return endptr();}
 
-	//\brief Add an attribute definition to the structure description
-	//\param[in] name name of the element added
-	//\param[in] initvalue initialization value (default) of the element added
-	//\param[in] normalizer normalization function applied before assignment on values assigned
-	//\return the index of the element added
+	///\brief Add an attribute definition to the structure description
+	///\param[in] name name of the element added
+	///\param[in] initvalue initialization value (default) of the element added
+	///\param[in] normalizer normalization function applied before assignment on values assigned
+	///\return the index of the element added
 	int addAttribute( const std::string& name, const Variant& initvalue, const NormalizeFunction* normalizer=0);
-	//\brief Add an atomic element definition to the structure description
-	//\param[in] name name of the element added
-	//\param[in] initvalue initialization value (default) of the element added
-	//\param[in] normalizer normalization function applied before assignment on values assigned
-	//\return the index of the element added
+	///\brief Add an atomic element definition to the structure description
+	///\param[in] name name of the element added
+	///\param[in] initvalue initialization value (default) of the element added
+	///\param[in] normalizer normalization function applied before assignment on values assigned
+	///\return the index of the element added
 	int addAtom( const std::string& name, const Variant& initvalue, const NormalizeFunction* normalizer=0);
-	//\brief Add a substructure definition to the structure description
-	//\param[in] name name of the element added
-	//\param[in] substruct structure of the element added
-	//\return the index of the element added
+	///\brief Add a substructure definition to the structure description
+	///\param[in] name name of the element added
+	///\param[in] substruct structure of the element added
+	///\return the index of the element added
 	int addStructure( const std::string& name, const VariantStructDescription& substruct);
-	//\brief Add an indirection definition to the structure description (an indirection is a element expanded on access, e.g. for defining recursive structures)
-	//\param[in] name name of the element added
-	//\param[in] descr pointer to structure description of the element added
-	//\return the index of the element added
+	///\brief Add an indirection definition to the structure description (an indirection is a element expanded on access, e.g. for defining recursive structures)
+	///\param[in] name name of the element added
+	///\param[in] descr pointer to structure description of the element added
+	///\return the index of the element added
 	int addIndirection( const std::string& name_, const VariantStructDescription* descr);
-	//\brief Add an unresolved indirection definition to the structure description (an indirection is a element expanded on access, e.g. for defining recursive structures)
-	//\param[in] name name of the element added
-	//\param[in] symbol_ symbolic reference to be resolved later
-	//\return the index of the element added
+	///\brief Add an unresolved indirection definition to the structure description (an indirection is a element expanded on access, e.g. for defining recursive structures)
+	///\param[in] name name of the element added
+	///\param[in] symbol_ symbolic reference to be resolved later
+	///\return the index of the element added
 	int addUnresolved( const std::string& name_, const std::string& symbol_);
-	//\brief Add an element copy to the structure description
-	//\param[in] name name of the element added
-	//\param[in] elem element to be added
-	//\return the index of the element added
+	///\brief Add an element copy to the structure description
+	///\param[in] name name of the element added
+	///\param[in] elem element to be added
+	///\return the index of the element added
 	int addElement( const Element& elem);
-	//\brief Inherit the elements from another structure description
-	//\param[in] parent structure to inherit from
+	///\brief Inherit the elements from another structure description
+	///\param[in] parent structure to inherit from
 	void inherit( const VariantStructDescription& parent);
-	//\brief Resolve all unresolved externals in intialzation values according to the given map. Throws, if not all unresolved symbols could be resolved !
-	//\param[in] rmap map with sybols to resolve
+	///\brief Resolve all unresolved externals in intialzation values according to the given map. Throws, if not all unresolved symbols could be resolved !
+	///\param[in] rmap map with sybols to resolve
 	void resolve( const ResolveMap& rmap);
 
-	//\brief Find an element by name in the structure description
+	///\brief Find an element by name in the structure description
 	int findidx( const std::string& name) const;
 	const_iterator find( const std::string& name) const;
 	iterator find( const std::string& name);
 
-	//\brief Find an element by name with case insensitive comparison (of ascii A-Z) in the structure description
+	///\brief Find an element by name with case insensitive comparison (of ascii A-Z) in the structure description
 	int findidx_cis( const std::string& name) const;
 	const_iterator find_cis( const std::string& name) const;
 	iterator find_cis( const std::string& name);
 
-	//\brief Get the number of elements in the structure description
+	///\brief Get the number of elements in the structure description
 	std::size_t size() const						{return m_size;}
 
-	//\brief Compare two structure descriptions element by element (recursively)
+	///\brief Compare two structure descriptions element by element (recursively)
 	int compare( const VariantStructDescription& o) const;
-	//\brief Get the list of names as string with 'sep' as separator for logging
+	///\brief Get the list of names as string with 'sep' as separator for logging
 	std::string names( const std::string& sep) const;
 
-	//\brief Print the contents of a structure description (structures in curly brackets as in the simpleform language)
+	///\brief Print the contents of a structure description (structures in curly brackets as in the simpleform language)
 	void print( std::ostream& out, const utils::PrintFormat* pformat, std::size_t level) const;
 
-	//\brief Return the contents of a structure description as string (format as in print with no indent and newlines)
+	///\brief Return the contents of a structure description as string (format as in print with no indent and newlines)
 	std::string tostring( const utils::PrintFormat* pformat=0) const;
 
 	void check() const;

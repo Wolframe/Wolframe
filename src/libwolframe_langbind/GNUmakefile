@@ -15,12 +15,10 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwfsingleton \
-	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_database \
-	-L$(TOPDIR)/src/libwolframe_serialize
+	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwfsingleton -lwolframe -lwolframe_serialize -lwolframe_database
+	-lwfsingleton -lwolframe
 
 STATIC_LIB = libwolframe_langbind.a
 
@@ -31,7 +29,8 @@ DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
 	protocol_ioblocks.o \
-	appObjects.o \
+	input.o \
+	output.o \
 	null_filter.o \
 	typingfilter.o \
 	typedfilterScope.o \

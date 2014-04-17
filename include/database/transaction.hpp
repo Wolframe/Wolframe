@@ -30,13 +30,15 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file database/transaction.hpp
-//\brief Interface of a database transaction
+///\file database/transaction.hpp
+///\brief Interface of a database transaction
 
 #ifndef _TRANSACTION_HPP_INCLUDED
 #define _TRANSACTION_HPP_INCLUDED
-#include "database/transactionInput.hpp"
-#include "database/transactionOutput.hpp"
+#include "database/vmTransactionInput.hpp"
+#include "database/vmTransactionOutput.hpp"
+#include "database/transactionExecStatemachine.hpp"
+#include "database/databaseError.hpp"
 #include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include <string>
@@ -45,29 +47,38 @@
 namespace _Wolframe {
 namespace db {
 
-//\brief Transaction interface
+///\brief Transaction interface
 class Transaction
 {
 public:
-	//\brief Destructor
-	virtual ~Transaction(){}
-	//\brief Configured ID of the underlaying database
-	virtual const std::string& databaseID() const=0;
+	Transaction( const std::string& name_, const TransactionExecStatemachineR& stm_)
+		:m_name(name_),m_stm(stm_){}
 
-	//\brief Begin of a new transaction
-	virtual void begin()=0;
-	//\brief Commit of the running transaction
-	virtual void commit()=0;
-	//\brief Rollback of the running transaction
-	virtual void rollback()=0;
-	//\brief Close of the committed or rolled back transaction
-	virtual void close()=0;
+	///\brief Destructor
+	virtual ~Transaction()			{close();}
+	///\brief Configured ID of the underlaying database
+	const std::string& databaseID() const	{return m_stm->databaseID();}
 
-	//\brief Execute a transaction
-	virtual void execute( const TransactionInput& input, TransactionOutput& output)=0;
+	///\brief Begin of a new transaction
+	void begin();
+	///\brief Commit of the running transaction
+	void commit();
+	///\brief Rollback of the running transaction
+	void rollback();
+	///\brief Close of the committed or rolled back transaction
+	void close()				{m_stm.reset();}
 
-	//\class Result
-	//\brief Result of a single statement execute call: executeStatement( const std::string&, const std::vector<types::Variant>&);
+	///\brief Execute a transaction
+	///\return true if successful, otherwise false (use getLastError to get details)
+	virtual bool execute( const VmTransactionInput& input, VmTransactionOutput& output);
+
+	const std::string& name() const
+	{
+		return m_name;
+	}
+
+	///\class Result
+	///\brief Result of a single statement execute call: executeStatement( const std::string&, const std::vector<types::Variant>&);
 	class Result
 	{
 	public:
@@ -90,8 +101,23 @@ public:
 		std::vector<Row> m_rows;
 	};
 
-	//\brief Execute a single statement
-	Result executeStatement( const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
+	///\brief Execute a single statement with result
+	///\return true if successful, otherwise false (use getLastError to get details)
+	bool executeStatement( Result& result, const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
+	///\brief Execute a single statement without result
+	///\return true if successful, otherwise false (use getLastError to get details)
+	bool executeStatement( const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
+
+	TransactionExecStatemachine* execStatemachine()			{return m_stm.get();}
+	const DatabaseError* getLastError() const			{return &m_lastError;}
+
+private:
+	Transaction( const Transaction&){}	//... non copyable
+
+private:
+	std::string m_name;
+	TransactionExecStatemachineR m_stm;
+	DatabaseError m_lastError;
 };
 
 
@@ -100,3 +126,4 @@ typedef types::CountedReference<Transaction> TransactionR;
 }} // namespace _Wolframe::db
 
 #endif // _TRANSACTION_HPP_INCLUDED
+

@@ -37,7 +37,7 @@
 #include "processor/procProviderInterface.hpp"
 #include <boost/lexical_cast.hpp>
 
-//\brief Defines a Wolframe module for programs with a runtime environment (e.g. programs with shared resources) after the includes section.
+///\brief Defines a Wolframe module for programs with a runtime environment (e.g. programs with shared resources) after the includes section.
 #define RUNTIME_ENVIRONMENT_MODULE(NAME,DESCRIPTION,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,INITFUNCTION)\
 	static const char* _Wolframe__moduleName()\
 	{\

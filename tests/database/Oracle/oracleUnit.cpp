@@ -71,7 +71,7 @@ TEST_F( OracleFixture, Transaction )
 			     3, 4, 3, 10, std::vector<std::string>());
 
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	// ok transaction
 	trans->begin( );
@@ -86,11 +86,15 @@ TEST_F( OracleFixture, Transaction )
 
 	// error, rollback without begin
 	EXPECT_THROW( trans->rollback( ), std::runtime_error );
-
-	trans->close( );
 }
 
-static void executeInsertStatements( Transaction* trans)
+static std::string dberror_string( const TransactionR& trans)
+{
+	const DatabaseError* err = trans->getLastError();
+	return std::string("error in database: '") + err->dbname + "' error class '" + err->errorclass + ": " + err->errormsg + " " + err->errordetail;
+}
+
+static void executeInsertStatements( const TransactionR& trans)
 {
 	// some normal values
 	{
@@ -99,7 +103,7 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( "xyz");
 		values.push_back( true);
 		values.push_back( 4.782 );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 	{
 		std::vector<types::Variant> values;
@@ -107,7 +111,7 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( "abc");
 		values.push_back( false);
 		values.push_back( -4.2344 );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 	// some maxima
 	{
@@ -118,7 +122,7 @@ static void executeInsertStatements( Transaction* trans)
 		// temporary: something blocks bigger doubles..?
 		values.push_back( 1.0E+126 );
 		// values.push_back( std::numeric_limits<double>::max( ) );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 	// some minima
 	{
@@ -127,7 +131,7 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( "");
 		values.push_back( false);
 		values.push_back( std::numeric_limits<double>::min( ) );
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 	// null values
 	{
@@ -136,7 +140,7 @@ static void executeInsertStatements( Transaction* trans)
 		values.push_back( types::VariantConst( ));
 		values.push_back( types::VariantConst( ));
 		values.push_back( types::VariantConst( ));
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+		if (!trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values)) throw std::runtime_error( dberror_string( trans));
 	}
 }
 
@@ -146,13 +150,13 @@ TEST_F( OracleFixture, ExecuteInstruction )
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	// ok transaction create table statement with commit
 	trans->begin( );
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
 	// Aba: feedback welcome how to represent a BOOLEAN in Oracle :-)
-	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name VARCHAR(64), active NUMBER(1) check(active in  (0,1)), price BINARY_DOUBLE)");
+	if (!trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name VARCHAR(64), active NUMBER(1) check(active in  (0,1)), price BINARY_DOUBLE)")) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 
 	// ok transaction with statements with rollback
@@ -162,7 +166,8 @@ TEST_F( OracleFixture, ExecuteInstruction )
 
 	// ok select result that must not exist because of the rollback in the previous transaction
 	trans->begin( );
-	Transaction::Result emptyres = trans->executeStatement( "SELECT * FROM TestTest");
+	Transaction::Result emptyres;
+	if (!trans->executeStatement( emptyres, "SELECT * FROM TestTest")) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 	EXPECT_EQ( emptyres.size(), (unsigned int)0);
 
@@ -173,7 +178,8 @@ TEST_F( OracleFixture, ExecuteInstruction )
 
 	// ok select result that must contain the elements inserted in the previous transaction
 	trans->begin( );
-	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest ORDER BY id ASC NULLS LAST");
+	Transaction::Result res;
+	if (!trans->executeStatement( res, "SELECT * FROM TestTest ORDER BY id ASC NULLS LAST")) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 	EXPECT_EQ( res.size(), 5U);
 	EXPECT_EQ( res.colnames().size(), 4U);
@@ -246,8 +252,6 @@ TEST_F( OracleFixture, ExecuteInstruction )
 			}
 		}
 	}
-
-	trans->close( );
 }
 
 TEST_F( OracleFixture, ExceptionSyntaxError )
@@ -257,24 +261,24 @@ TEST_F( OracleFixture, ExceptionSyntaxError )
 			     3, 4, 3, 10, std::vector<std::string>());
 
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
 
 	// execute an illegal SQL statement, must throw
-	try {
-		trans->executeStatement( "SELCT 1 FROM DUAL" );
+	if (trans->executeStatement( "SELCT 1 FROM DUAL" ))
+	{
+		trans->rollback( );
 		FAIL( ) << "Statement with illegal syntax should fail but doesn't!";
-	} catch( DatabaseTransactionErrorException &e ) {
-		std::cout << e.what( ) << std::endl;
-		ASSERT_EQ( e.statement, "SELCT 1 FROM DUAL" );
-		ASSERT_EQ( e.errorclass, "SYNTAX" );
-	} catch( ... ) {
-		FAIL( ) << "Wrong exception class seen in database error!";
+	}
+	else
+	{
+		const DatabaseError* err = trans->getLastError();
+		ASSERT_EQ( err->errorclass, "SYNTAX" );
+		std::cout << dberror_string( trans) << std::endl;
 	}
 
-	// auto rollback
-	// auto close transaction
+	//... auto rollback
 }
 
 TEST_F( OracleFixture, TooFewBindParameter )
@@ -283,7 +287,7 @@ TEST_F( OracleFixture, TooFewBindParameter )
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
@@ -293,23 +297,17 @@ TEST_F( OracleFixture, TooFewBindParameter )
 	values.push_back( "xyz");
 	values.push_back( true);
 	// intentionally ommiting values here, must throw an error
-	try {
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	if (trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values))
+	{
 		// should actually not work
-		trans->commit( );
-		trans->close( );
+		trans->rollback( );
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( std::runtime_error &e ) {
-// why is this another excpetion?
-		std::cout << e.what( ) << std::endl;
-//	} catch( DatabaseTransactionErrorException &e ) {
-//		std::cout << e.what( );
-	} catch( ... ) {
-		FAIL( ) << "Wrong exception class seen in database error!";
 	}
-
-	// auto rollback?
-	// auto close transaction?
+	else
+	{
+		std::cout << dberror_string( trans) << std::endl;
+	}
+	//... auto rollback
 }
 
 TEST_F( OracleFixture, TooManyBindParameter )
@@ -318,7 +316,7 @@ TEST_F( OracleFixture, TooManyBindParameter )
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
@@ -330,20 +328,17 @@ TEST_F( OracleFixture, TooManyBindParameter )
 	values.push_back( 4.782);
 	values.push_back( "too much");
 	// intentionally adding too many values here, must throw an error
-	try {
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values);
+	if (trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$3,$4)", values))
+	{
 		// should actually not work
-		trans->commit( );
-		trans->close( );
+		trans->rollback( );
 		FAIL( ) << "Reached success state, but should fail!";
-	} catch( DatabaseTransactionErrorException &e ) {
-		std::cout << e.what( ) << std::endl;
-	} catch( ... ) {
-		FAIL( ) << "Wrong exception class seen in database error!";
 	}
-
-	// auto rollback?
-	// auto close transaction?
+	else
+	{
+		std::cout << dberror_string( trans) << std::endl;
+	}
+	//... auto rollback
 }
 
 TEST_F( OracleFixture, IllegalBindParameter )
@@ -352,32 +347,28 @@ TEST_F( OracleFixture, IllegalBindParameter )
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
 	std::vector<types::Variant> values;
-	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
-	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name VARCHAR(64), active NUMBER(1) check(active in  (0,1)), price FLOAT)");
+	if (!trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;")) throw std::runtime_error( dberror_string( trans));
+	if (!trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, name VARCHAR(64), active NUMBER(1) check(active in  (0,1)), price FLOAT)")) throw std::runtime_error( dberror_string( trans));
 	values.push_back( 1);
 	values.push_back( "xyz");
 	values.push_back( "not used");
 	values.push_back( true);
 	values.push_back( 4.782);
-	try {
-		trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$4,$5)", values);
+	if (trans->executeStatement( "INSERT INTO TestTest (id, name, active, price) VALUES ($1,$2,$4,$5)", values))
+	{
 		// should actually not work
-		trans->commit( );
-		trans->close( );
+		trans->rollback( );
 		FAIL( ) << "Reached success state, but should fail!";
-	//~ } catch( const DatabaseTransactionErrorException &e ) {
-		//~ std::cout << e.what( ) << std::endl;
-	} catch( std::runtime_error const &e ) {
-		std::cout << e.what( ) << std::endl;
-	} catch( ... ) {
-		FAIL( ) << "Wrong exception class seen in database error!";
 	}
-	// auto rollback?
-	// auto close transaction?
+	else
+	{
+		std::cout << dberror_string( trans) << std::endl;
+	}
+	//... auto rollback
 }
 
 TEST_F( OracleFixture, ReusedBindParameter )
@@ -386,18 +377,19 @@ TEST_F( OracleFixture, ReusedBindParameter )
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
-	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
-	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
+	if (!trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;")) throw std::runtime_error( dberror_string( trans));
+	if (!trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)")) throw std::runtime_error( dberror_string( trans));
 	std::vector<types::Variant> values;
 	values.push_back( 47);
-	trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$1,$1)", values);
+	if (!trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$1,$1)", values)) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 
 	trans->begin( );
-	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest");
+	Transaction::Result res;
+	if (!trans->executeStatement( res, "SELECT * FROM TestTest")) throw std::runtime_error( dberror_string( trans));
 	EXPECT_EQ( res.size(), 1U);
 	EXPECT_EQ( res.colnames().size(), 3U);
 	EXPECT_STREQ( "ID", res.colnames().at(0).c_str());
@@ -414,7 +406,6 @@ TEST_F( OracleFixture, ReusedBindParameter )
 		EXPECT_EQ( 47, ri->at(2).toint());
 	}
 	trans->commit( );
-	trans->close( );
 }
 
 TEST_F( OracleFixture, ExpressionWithParametersAndTypeCoercion )
@@ -423,20 +414,21 @@ TEST_F( OracleFixture, ExpressionWithParametersAndTypeCoercion )
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
 			     3, 4, 3, 10, std::vector<std::string>());
 	Database* db = dbUnit.database( );
-	Transaction* trans = db->transaction( "test" );
+	TransactionR trans( db->transaction( "test" ));
 
 	trans->begin( );
-	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
-	trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)");
+	if (!trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;")) throw std::runtime_error( dberror_string( trans));
+	if (!trans->executeStatement( "CREATE TABLE TestTest (id INTEGER, id2 INTEGER, id3 INTEGER)")) throw std::runtime_error( dberror_string( trans));
 	std::vector<types::Variant> values;
 	values.push_back( std::string( "47"));
 	values.push_back( 47);
 	values.push_back( 47);
-	trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$2+1,$3+2)", values);
+	if (!trans->executeStatement( "INSERT INTO TestTest (id, id2, id3) VALUES ($1,$2+1,$3+2)", values)) throw std::runtime_error( dberror_string( trans));
 	trans->commit( );
 
 	trans->begin( );
-	Transaction::Result res = trans->executeStatement( "SELECT * FROM TestTest");
+	Transaction::Result res;
+	if (!trans->executeStatement( res, "SELECT * FROM TestTest")) throw std::runtime_error( dberror_string( trans));
 	EXPECT_EQ( res.size(), 1U);
 	EXPECT_EQ( res.colnames().size(), 3U);
 	EXPECT_STREQ( "ID", res.colnames().at(0).c_str());
@@ -453,7 +445,6 @@ TEST_F( OracleFixture, ExpressionWithParametersAndTypeCoercion )
 		EXPECT_EQ( 49, ri->at(2).toint());
 	}
 	trans->commit( );
-	trans->close( );
 }
 
 int main( int argc, char **argv )
