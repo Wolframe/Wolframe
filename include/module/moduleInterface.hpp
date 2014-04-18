@@ -97,24 +97,24 @@ public:
 
 	virtual const char* objectClassName() const	{ return m_className; }
 
-	/// The type of the object: filter, audit, command handler etc.
+	/// \brief Get the type of the object: filter, audit, command handler etc.
 	/// This is not the same as the objectName
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
 
-	/// the configuration for the object
-	///\param logPrefix	string to print before the log messages generated inside this object.
+	/// \brief Get the configuration for the object
+	/// \param logPrefix	string to print before the log messages generated inside this object.
 	///			Same as for any confiuration object.
 	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
 
-	/// the virtual constructor for the object
+	/// \brief get the virtual constructor for the object
 	virtual ObjectConstructorBase* constructor() = 0;
 
 protected:
 	const char* m_title;		///< used for printing (logging etc.)
 	const char* m_section;		///< configuration section to which the
 					/// configuration parser reacts
-	const char* m_keyword;		///< configuration keyword (element)
-	const char* m_className;	///< class name of the object
+	const char* m_keyword;		//< configuration keyword (element)
+	const char* m_className;	//< class name of the object
 };
 
 
