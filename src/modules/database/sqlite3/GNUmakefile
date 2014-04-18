@@ -8,6 +8,7 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(BOOST_LIB_DIR) \
 	$(SQLITE3_LIB_DIRS)
@@ -19,6 +20,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
+	-lwolframe_serialize \
 	-lwolframe_database \
 	-lboost_filesystem \
 	$(SQLITE3_LIBS)

@@ -65,7 +65,7 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationNode& pt, 
 				}
 				else
 				{
-					throw std::runtime_error( "illegal value for filter declaration. expected two items separated by a '='");
+					throw std::runtime_error( std::string("illegal value for filter declaration. expected two items separated by a '=' ") + pi->second.data().position.logtext());
 				}
 			}
 			// required configuration parameters:
@@ -75,12 +75,12 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationNode& pt, 
 			}
 			else
 			{
-				throw std::runtime_error( std::string("expected 'program' or 'filter' definition instead of '") + pi->first + "'");
+				throw std::runtime_error( std::string("expected 'program' or 'filter' definition instead of '") + pi->first + "' " + pi->second.data().position.logtext());
 			}
 		}
 		if (!filterDefied)
 		{
-			LOG_WARNING << "no filter defined in directmap command handler. cannot process anything";
+			LOG_WARNING << "no filter defined in directmap command handler. cannot process anything (" << pi->second.data().position.logtext() << ")";
 		}
 	}
 	catch (std::runtime_error& e)

@@ -106,6 +106,7 @@ private:
 
 	std::vector<AssemblyDescription> m_assemblylist;
 	const char* m_className;
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 }} //namespace

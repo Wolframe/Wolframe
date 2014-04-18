@@ -64,6 +64,7 @@ public:
 private:
 	bool			m_required;
 	std::string		m_dbConfig;
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 

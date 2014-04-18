@@ -156,6 +156,15 @@ public:
 	///\brief Find out if the element in the structure is optional
 	///\return true, if yes
 	bool optional() const				{return m_requirement == Optional;}
+	///\brief Set element occurrence requirement
+	void requirement( ElementRequirement requirement_){m_requirement = requirement_;}
+
+protected:
+	StructDescriptionBase& last()
+	{
+		if (m_elem.empty()) throw std::logic_error( "access of last element in empty structure");
+		return m_elem.back().second;
+	}
 
 private:
 	Constructor m_constructor;

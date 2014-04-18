@@ -182,7 +182,7 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 				    unsigned short connectTimeout,
 				    size_t connections, unsigned short acquireTimeout,
 				    unsigned statementTimeout,
-				    const std::list<std::string>& programFiles_)
+				    const std::vector<std::string>& programFiles_)
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
 	  m_statementTimeout( statementTimeout ), m_programFiles(programFiles_)
 {
@@ -347,7 +347,7 @@ void PostgreSQLdbUnit::loadProgram( const std::string& filename )
 
 void PostgreSQLdbUnit::loadAllPrograms()
 {
-	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
+	std::vector<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
 	for (; pi != pe; ++pi)
 	{
 		LOG_DEBUG << "Load Program '" << *pi << "' for PostgreSQL database unit '" << m_ID << "'";

@@ -12,12 +12,16 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(BOOST_LIB_DIR) \
 	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lwfsingleton \
 	-lwolframe \
+	-lwolframe_serialize \
+	-lwolframe_database \
 	$(PGSQL_LIBS)
 
 NOINST_STATIC_LIB = mod_db_postgresql_lib.a

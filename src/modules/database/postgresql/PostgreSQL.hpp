@@ -40,11 +40,13 @@
 #include "logger-v1.hpp"
 #include <libpq-fe.h>
 #include <list>
+#include <vector>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "PostgreSQLprogram.hpp"
 #include "PostgreSQLserverSettings.hpp"
 #include "config/configurationBase.hpp"
+#include "config/structSerialize.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
 
@@ -57,11 +59,40 @@ namespace db {
 
 static const char* POSTGRESQL_DB_CLASS_NAME = "PostgreSQL";
 
-static const unsigned int POSTGRESQL_MIN_DB_VERSION = 80400;
-static const unsigned short POSTGRESQL_MIN_PROTOCOL_VERSION = 3;
+enum {
+	POSTGRESQL_MIN_DB_VERSION = 80400,
+	POSTGRESQL_MIN_PROTOCOL_VERSION = 3
+};
 
-/// PostgreSQL server connection configuration
-class PostgreSQLconfig : public config::NamedConfiguration
+struct PostgreSQLconfigStruct
+{
+	PostgreSQLconfigStruct();
+
+	std::string	m_ID;			 //< database identifier
+	std::string	m_host;			 //< server host
+	unsigned short	m_port;			 //< server port
+	std::string	m_dbName;		 //< database name on server
+	std::string	m_user;			 //< database user
+	std::string	m_password;		 //< and password
+	std::string	sslMode;		 //< SSL connection mode
+	std::string	sslCert;		 //< client SSL certificate file
+	std::string	sslKey;			 //< client SSL key file
+	std::string	sslRootCert;		 //< root SSL certificate file
+	std::string	sslCRL;			 //< SSL certificate revocation list
+	unsigned short	connectTimeout;		 //< connection timeout
+	unsigned short	connections;		 //< number of database connection (pool size)
+	unsigned short	acquireTimeout;		 //< timeout when acquiring a connection from the pool
+	unsigned	statementTimeout;	 //< default timeout when executin a statement
+	std::vector< std::string > m_programFiles; //< list of program files
+
+	//\brief Structure description for serialization/parsing
+	static const serialize::StructDescriptionBase* getStructDescription();
+};
+
+//\brief PostgreSQL server connection configuration
+class PostgreSQLconfig
+	:public config::NamedConfiguration
+	,public PostgreSQLconfigStruct
 {
 	friend class PostgreSQLconstructor;
 public:
@@ -81,25 +112,12 @@ public:
 	const std::string& dbName() const	{return m_dbName;}
 	const std::string& user() const		{return m_user;}
 	const std::string& password() const	{return m_password;}
-	const std::list<std::string>& programFiles() const	{return m_programFiles;}
+	const std::vector<std::string>& programFiles() const	{return m_programFiles;}
 
 private:
-	std::string	m_ID;			///< database identifier
-	std::string	m_host;			///< server host
-	unsigned short	m_port;			///< server port
-	std::string	m_dbName;		///< database name on server
-	std::string	m_user;			///< database user
-	std::string	m_password;		///< and password
-	std::string	sslMode;		///< SSL connection mode
-	std::string	sslCert;		///< client SSL certificate file
-	std::string	sslKey;			///< client SSL key file
-	std::string	sslRootCert;		///< root SSL certificate file
-	std::string	sslCRL;			///< SSL certificate revocation list
-	unsigned short	connectTimeout;		///< connection timeout
-	unsigned short	connections;		///< number of database connection (pool size)
-	unsigned short	acquireTimeout;		///< timeout when acquiring a connection from the pool
-	unsigned	statementTimeout;	///< default timeout when executin a statement
-	std::list< std::string > m_programFiles;///< list of program files
+	//\brief Check the domains of the configured values and do some mappings (e.g. instantiating enum values from strings)
+	bool mapValueDomains();
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 
@@ -142,7 +160,7 @@ public:
 	}
 
 private:
-	PostgreSQLdbUnit*	m_unit;		///< parent database unit
+	PostgreSQLdbUnit*	m_unit;		 //< parent database unit
 };
 
 
@@ -157,7 +175,7 @@ public:
 			  unsigned short connectTimeout,
 			  size_t connections, unsigned short acquireTimeout,
 			  unsigned statementTimeout,
-			  const std::list<std::string>& programFiles_);
+			  const std::vector<std::string>& programFiles_);
 	~PostgreSQLdbUnit();
 
 	const std::string& ID() const		{ return m_ID; }
@@ -187,7 +205,7 @@ private:
 	unsigned		m_statementTimeout;	//< default statement execution timeout
 	PostgreSQLdatabase	m_db;			//< real database object
 	PostgreSQLprogram	m_program;		//< (not supported yet) Loader of programs (m_programFiles)
-	std::list<std::string>	m_programFiles;		//< (not supported yet) list of source files with SQL statements to load at startup
+	std::vector<std::string>m_programFiles;		//< (not supported yet) list of source files with SQL statements to load at startup
 };
 
 

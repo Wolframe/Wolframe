@@ -41,10 +41,12 @@
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
 #include "config/configurationBase.hpp"
+#include "config/structSerialize.hpp"
 #include "types/keymap.hpp"
 #include "module/constructor.hpp"
 #include "SQLiteProgram.hpp"
 #include <list>
+#include <vector>
 #include "system/objectPool.hpp"
 #include "sqlite3.h"
 
@@ -57,8 +59,27 @@ namespace db {
 
 static const char* SQLite_DB_CLASS_NAME = "SQLite";
 
-///\brief SQLite database configuration
-class SQLiteConfig : public config::NamedConfiguration
+struct SQLiteConfigStruct
+{
+	SQLiteConfigStruct();
+
+	std::string	m_ID;
+	std::string	m_filename;
+	bool		m_foreignKeys;
+	bool		m_profiling;
+	unsigned short	m_connections;
+	std::vector< std::string > m_programFiles;		//< list of program files
+	std::vector< std::string > m_extensionFiles;		//< list of Sqlite extension modules to load
+
+	//\brief Structure description for serialization/parsing
+	static const serialize::StructDescriptionBase* getStructDescription();
+};
+
+
+//\brief SQLite database configuration
+class SQLiteConfig
+	:public config::NamedConfiguration
+	,public SQLiteConfigStruct
 {
 public:
 	const char* className() const				{ return SQLite_DB_CLASS_NAME; }
@@ -77,17 +98,10 @@ public:
 	bool foreignKeys() const				{ return m_foreignKeys; }
 	bool profiling() const					{ return m_profiling; }
 	unsigned short connections() const			{ return m_connections; }
-	const std::list< std::string > programFiles() const	{ return m_programFiles; }
-	const std::list< std::string > extensionFiles() const	{ return m_extensionFiles; }
-
+	const std::vector< std::string > programFiles() const	{ return m_programFiles; }
+	const std::vector< std::string > extensionFiles() const	{ return m_extensionFiles; }
 private:
-	std::string	m_ID;
-	std::string	m_filename;
-	bool		m_foreignKeys;
-	bool		m_profiling;
-	unsigned short	m_connections;
-	std::list< std::string > m_programFiles;		//< list of program files
-	std::list< std::string > m_extensionFiles;		//< list of Sqlite extension modules to load
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 
@@ -144,8 +158,8 @@ public:
 	SQLiteDBunit( const std::string& id, const std::string& filename,
 		      bool foreignKeys, bool profiling,
 		      unsigned short connections,
-		      const std::list<std::string>& programFiles_,
-		      const std::list<std::string>& extensionFiles_ );
+		      const std::vector<std::string>& programFiles_,
+		      const std::vector<std::string>& extensionFiles_ );
 	~SQLiteDBunit();
 
 	const std::string& ID() const		{ return m_ID; }
@@ -169,8 +183,8 @@ private:
 
 	SQLiteProgram		m_program;		///< database programs
 	SQLiteDatabase		m_db;
-	std::list<std::string>	m_programFiles;
-	std::list<std::string>	m_extensionFiles;
+	std::vector<std::string>m_programFiles;
+	std::vector<std::string>m_extensionFiles;
 };
 
 
