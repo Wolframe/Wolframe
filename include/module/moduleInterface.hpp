@@ -47,10 +47,10 @@
 namespace _Wolframe {
 namespace module {
 
-class BaseBuilder
+class BuilderBase
 {
 public:
-	virtual ~BaseBuilder(){};
+	virtual ~BuilderBase(){};
 
 	virtual const char* objectClassName() const = 0;
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
@@ -59,7 +59,7 @@ public:
 
 ///
 class SimpleBuilder
-	:public BaseBuilder
+	:public BuilderBase
 {
 	friend class ModulesDirectory;
 public:
@@ -78,7 +78,7 @@ protected:
 
 ///
 class ConfiguredBuilder
-	:public BaseBuilder
+	:public BuilderBase
 {
 	friend class ModulesDirectory;
 public:
@@ -147,7 +147,7 @@ private:
 
 ///\brief Function that constructs a builder.
 //	This function is specific for each of the configured builders in the module.
-typedef BaseBuilder* (*createBuilderFunc)();
+typedef BuilderBase* (*createBuilderFunc)();
 
 
 /// The module entry point structure. Only one entry point per module.

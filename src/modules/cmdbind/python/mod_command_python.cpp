@@ -39,12 +39,12 @@
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 
-static BaseBuilder* pythonProgramTypeBuilder()
+static BuilderBase* pythonProgramTypeBuilder()
 {
 	return new ProgramTypeBuilder( "PythonProgramType", "pythonformfunc", langbind::createPythonProgramType);
 }
 
-static BaseBuilder* (*builder[])() =
+static BuilderBase* (*builder[])() =
 {
 	pythonProgramTypeBuilder, NULL
 };

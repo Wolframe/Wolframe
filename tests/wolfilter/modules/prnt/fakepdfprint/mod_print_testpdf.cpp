@@ -49,7 +49,7 @@ struct PdfPrinter
 	{
 		return new prnt::SimplePdfPrintProgram( prnt::createTestTraceDocument);
 	}
-	static BaseBuilder* constructor()
+	static BuilderBase* constructor()
 	{
 		return new ProgramTypeBuilder( "TestPdfPrintFunction", "simplepdf", &PdfPrinter::createProgram);
 	}

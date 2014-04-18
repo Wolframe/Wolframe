@@ -49,7 +49,7 @@ struct PdfPrinter
 	{
 		return new prnt::SimplePdfPrintProgram( prnt::createLibHpdfDocument);
 	}
-	static BaseBuilder* constructor()
+	static BuilderBase* constructor()
 	{
 		return new ProgramTypeBuilder( "HaruPdfPrintFunction", "simplepdf", PdfPrinter::createProgram);
 	}

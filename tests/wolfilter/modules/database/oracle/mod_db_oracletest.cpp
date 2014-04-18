@@ -43,7 +43,7 @@ namespace module {
 
 typedef ConfiguredBuilder* (*CreateBuilderFunc)();
 
-static BaseBuilder* createDatabase()
+static BuilderBase* createDatabase()
 {
 	static module::ConfiguredBuilderDescription< db::OracleTestConstructor,
 		db::OracleTestConfig > mod( "test Oracle database", "database", "OracleTest", db::ORACLE_DB_CLASS_NAME);

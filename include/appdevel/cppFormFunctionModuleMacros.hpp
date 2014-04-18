@@ -56,7 +56,7 @@
 	namespace {\
 	struct ModuleImpl\
 	{\
-	static _Wolframe::module::BaseBuilder* constructor()\
+	static _Wolframe::module::BuilderBase* constructor()\
 	{\
 		return new _Wolframe::module::CppFormFunctionBuilder( _Wolframe__moduleName(), _Wolframe__cppFormFunctions);\
 	}\

@@ -56,51 +56,19 @@
 		{0,0}\
 	};\
 	namespace {\
-	struct CreateBuilderArray\
-	{\
-		_Wolframe::module::createBuilderFunc* ar;\
-		std::size_t size;\
-		CreateBuilderArray() :ar(std::calloc( sizeof( _Wolframe::module::createBuilderFunc), 1)),size(0)\
-		{\
-			if (!ar) throw std::bad_alloc();\
-			ar[0] = 0;\
-		}\
-		CreateBuilderArray operator()( _Wolframe::module::createBuilderFunc func)\
-		{\
-			ar = std::realloc( ar, (++size) * sizeof( _Wolframe::module::createBuilderFunc));\
-			if (!ar) throw std::bad_alloc();\
-			ar[ size-1] = func;\
-		}\
-		~CreateBuilderArray()\
-		{\
-			if (ar) std::free( ar);\
-		}\
-	}\
-	struct CreateBuilderArrayImpl :public CreateBuilderArray\
-	{\
-		CreateBuilderArrayImpl()\
-		{\
-			struct Constructor\
-			{\
-				static _Wolframe::module::BaseBuilder* impl()\
-				{\
-					return new _Wolframe::module::CustomDataTypeBuilder( _Wolframe__moduleName(), _Wolframe__customDataTypes);\
-				}\
-			}\
-			(*this)(&Constructor::impl);\
-		}\
-	}\
 	struct ModuleImpl\
 	{\
-		static _Wolframe::module::createBuilderFunc* objdef()\
+		static _Wolframe::module::BuilderBase* constructor()\
 		{\
-			static CreateBuilderArrayImpl createBuilderArray;\
-			return createBuilderArray.ar;\
+			return new _Wolframe::module::CustomDataTypeBuilder( _Wolframe__moduleName(), _Wolframe__customDataTypes);\
 		}\
 	};\
-	}//namespace\
-	static _Wolframe::module::CreateBuilderArrayImpl createBuilderArray;\
+	}\
+	static _Wolframe::module::createBuilderFunc _Wolframe__objdef[] =\
+	{\
+		ModuleImpl::constructor, NULL\
+	};\
 	extern "C" { \
-		_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), createBuilderArray.ar); \
+		_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), _Wolframe__objdef); \
 	}
 

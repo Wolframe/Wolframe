@@ -86,12 +86,12 @@
 			return new LANGNAME ##CommandHandlerConstructor();\
 		}\
 	};\
-	static _Wolframe::module::BaseBuilder* createCommandHandler()\
+	static _Wolframe::module::BuilderBase* createCommandHandler()\
 	{\
 		static LANGNAME ##CommandHandlerBuilder rt;\
 		return &rt;\
 	}\
-	static _Wolframe::module::BaseBuilder* (*builder[])() =\
+	static _Wolframe::module::BuilderBase* (*builder[])() =\
 	{\
 		createCommandHandler, NULL\
 	};\
@@ -149,16 +149,16 @@
 			return new LANGNAME ##CommandHandlerConstructor();\
 		}\
 	};\
-	static _Wolframe::module::BaseBuilder* createCommandHandler()\
+	static _Wolframe::module::BuilderBase* createCommandHandler()\
 	{\
 		static LANGNAME ##CommandHandlerBuilder rt;\
 		return &rt;\
 	}\
-	static _Wolframe::module::BaseBuilder* createProgramType()\
+	static _Wolframe::module::BuilderBase* createProgramType()\
 	{\
 		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
 	}\
-	static _Wolframe::module::BaseBuilder* (*builder[])() =\
+	static _Wolframe::module::BuilderBase* (*builder[])() =\
 	{\
 		createCommandHandler, createProgramType, NULL \
 	};\

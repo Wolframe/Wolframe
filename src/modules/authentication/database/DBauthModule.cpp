@@ -44,7 +44,7 @@ namespace AAAA {
 
 namespace module {
 
-static BaseBuilder* createModule( void )
+static BuilderBase* createModule( void )
 {
 	static module::ConfiguredBuilderDescription< AAAA::DBauthConstructor,
 			AAAA::DBAuthConfig > mod( "Authentication database", "Authentication",
@@ -52,7 +52,7 @@ static BaseBuilder* createModule( void )
 	return &mod;
 }
 
-static BaseBuilder* (*containers[])() = {
+static BuilderBase* (*containers[])() = {
 	createModule, NULL
 };
 

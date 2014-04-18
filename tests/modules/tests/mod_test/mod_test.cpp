@@ -102,7 +102,7 @@ bool TestUnitImpl::resolveDB( const db::DatabaseProvider& /* db */ )
 	return true;
 }
 
-static BaseBuilder* createModule( void )
+static BuilderBase* createModule( void )
 {
 	static module::ConfiguredBuilderDescription< test::TestModuleConstructor,
 		test::TestModuleConfig > mod( "Test Module", "Test", "test", "TestObject" );
@@ -110,7 +110,7 @@ static BaseBuilder* createModule( void )
 }
 
 
-static BaseBuilder* (*containers[])() = {
+static BuilderBase* (*containers[])() = {
 	createModule, NULL
 };
 

@@ -41,7 +41,7 @@ namespace module {
 
 typedef ConfiguredBuilder* (*CreateBuilderFunc)();
 
-static BaseBuilder* createDatabase()
+static BuilderBase* createDatabase()
 {
 	static module::ConfiguredBuilderDescription< db::SQLiteTestConstructor,
 		db::SQLiteTestConfig > mod( "test sqlite database", "database", "SQLiteTest", db::SQLite_DB_CLASS_NAME);

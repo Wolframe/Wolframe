@@ -41,7 +41,7 @@
 namespace _Wolframe {
 namespace module {
 
-static BaseBuilder* createPGSQLmodule( void )
+static BuilderBase* createPGSQLmodule( void )
 {
 	static ConfiguredBuilderDescription< db::PostgreSQLconstructor,
 			db::PostgreSQLconfig > mod( "PostgreSQL database", "database",
@@ -49,7 +49,7 @@ static BaseBuilder* createPGSQLmodule( void )
 	return &mod;
 }
 
-static BaseBuilder* (*containers[])() = {
+static BuilderBase* (*containers[])() = {
 	createPGSQLmodule, NULL
 };
 

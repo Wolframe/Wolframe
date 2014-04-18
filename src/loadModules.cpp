@@ -172,7 +172,7 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir,
 		}
 
 		for ( unsigned short i = 0; entry->createBuilder[ i ]; i++ )	{
-			BaseBuilder* builder = entry->createBuilder[ i ]();
+			BuilderBase* builder = entry->createBuilder[ i ]();
 			SimpleBuilder* simpleBuilder = dynamic_cast<SimpleBuilder*>(builder);
 			ConfiguredBuilder* configuredBuilder = dynamic_cast<ConfiguredBuilder*>(builder);
 			if (configuredBuilder)

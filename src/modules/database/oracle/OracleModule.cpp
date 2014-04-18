@@ -41,7 +41,7 @@
 namespace _Wolframe {
 namespace module {
 
-static BaseBuilder* createOracleModule( void )
+static BuilderBase* createOracleModule( void )
 {
 	static ConfiguredBuilderDescription< db::OracleConstructor,
 			db::OracleConfig > mod( "Oracle database", "database",
@@ -49,7 +49,7 @@ static BaseBuilder* createOracleModule( void )
 	return &mod;
 }
 
-static BaseBuilder* (*containers[])() = {
+static BuilderBase* (*containers[])() = {
 	createOracleModule, NULL
 };
 

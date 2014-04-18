@@ -43,7 +43,7 @@ namespace module {
 
 typedef ConfiguredBuilder* (*CreateBuilderFunc)();
 
-static BaseBuilder* createDatabase()
+static BuilderBase* createDatabase()
 {
 	static module::ConfiguredBuilderDescription< db::PostgreSQLTestConstructor,
 		db::PostgreSQLTestConfig > mod( "test PostgreSQL database", "database", "PostgreSQLTest", db::POSTGRESQL_DB_CLASS_NAME);

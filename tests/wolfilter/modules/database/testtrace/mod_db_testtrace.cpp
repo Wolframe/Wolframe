@@ -41,7 +41,7 @@ namespace module {
 
 typedef ConfiguredBuilder* (*CreateBuilderFunc)();
 
-static BaseBuilder* createTesttraceDatabaseModule()
+static BuilderBase* createTesttraceDatabaseModule()
 {
 	static module::ConfiguredBuilderDescription< db::TesttraceDatabaseConstructor,
 		db::TesttraceDatabaseConfig > mod( "testtrace database", "database", "test", TESTTRACE_DATABASE_CLASSNAME);

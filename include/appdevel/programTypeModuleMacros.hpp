@@ -37,11 +37,11 @@
 
 ///\brief Defines a Wolframe command handler module after the includes section.
 #define PROGRAM_TYPE_MODULE( DESCRIPTION, LANGNAME, CREATEPRGFUNC)\
-	static _Wolframe::module::BaseBuilder* createProgramType()\
+	static _Wolframe::module::BuilderBase* createProgramType()\
 	{\
 		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
 	}\
-	static _Wolframe::module::BaseBuilder* (*builder[])() =\
+	static _Wolframe::module::BuilderBase* (*builder[])() =\
 	{\
 		createProgramType, NULL\
 	};\

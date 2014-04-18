@@ -42,11 +42,11 @@
 	{\
 		return DESCRIPTION;\
 	}\
-	static _Wolframe::module::BaseBuilder* createFilterType()\
+	static _Wolframe::module::BuilderBase* createFilterType()\
 	{\
 		return new _Wolframe::module::FilterBuilder( #FILTER "Filter", #FILTER, CREATE_FILTERTYPE);\
 	}\
-	static _Wolframe::module::BaseBuilder* (*builder[])() =\
+	static _Wolframe::module::BuilderBase* (*builder[])() =\
 	{\
 		createFilterType, NULL\
 	};\
@@ -62,15 +62,15 @@
 	{\
 		return DESCRIPTION;\
 	}\
-	static _Wolframe::module::BaseBuilder* createFilterType()\
+	static _Wolframe::module::BuilderBase* createFilterType()\
 	{\
 		return new _Wolframe::module::FilterBuilder( #FILTER "Filter", #FILTER, CREATE_FILTERTYPE);\
 	}\
-	static _Wolframe::module::BaseBuilder* createProgramType()\
+	static _Wolframe::module::BuilderBase* createProgramType()\
 	{\
 		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME, CREATE_PRG_FUNC);\
 	}\
-	static _Wolframe::module::BaseBuilder* (*builder[])() =\
+	static _Wolframe::module::BuilderBase* (*builder[])() =\
 	{\
 		createFilterType,\
 		createProgramType,\

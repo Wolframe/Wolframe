@@ -41,11 +41,11 @@
 	{\
 		return DESCRIPTION;\
 	}\
-	static _Wolframe::module::BaseBuilder* createCompiler()\
+	static _Wolframe::module::BuilderBase* createCompiler()\
 	{\
 		return new _Wolframe::module::DDLCompilerBuilder( #LANGUAGE "Compiler", #LANGUAGE, CREATE_COMPILER);\
 	}\
-	static _Wolframe::module::BaseBuilder* (*builder[])() =\
+	static _Wolframe::module::BuilderBase* (*builder[])() =\
 	{\
 		createCompiler, NULL\
 	};\
