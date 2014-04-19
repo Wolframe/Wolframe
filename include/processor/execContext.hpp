@@ -30,56 +30,45 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-///\file user.hpp
-/// Basic user information
-//
-
-#ifndef _USER_HPP_INCLUDED
-#define _USER_HPP_INCLUDED
-
-#include <string>
-#include <ctime>
+/// \file processor/execContext.hpp
+/// \brief Processor Provider
+#ifndef _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
+#define _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
+#include "procProviderInterface.hpp"
+#include "AAAA/user.hpp"
+#include "AAAA/authorization.hpp"
 
 namespace _Wolframe {
-namespace AAAA {
+namespace proc {
 
-class User
+/// \class ExecContext
+/// \brief Execution context passed to functions for referencing resources and to define authorization dependend processing
+class ExecContext
 {
 public:
-	User()
-		:m_loginTime( time( NULL)){}
-	User( const User& o)
-		: m_authenticator( o.m_authenticator ), m_loginTime( o.m_loginTime ),
-		  m_uname( o.m_uname ), m_name( o.m_name )	{}
-	User( const std::string& Authenticator, const std::string& uName, const std::string& Name )
-		: m_authenticator( Authenticator ), m_loginTime( time( NULL )),
-		  m_uname( uName ), m_name( Name )	{}
+	/// \brief Default Constructor
+	ExecContext()
+		:m_provider(0){}
+	/// \brief Constructor
+	ExecContext( const ProcessorProviderInterface* p, const AAAA::User& u, AAAA::Authorizator* a)
+		:m_provider(p),m_user(u),m_authorizator(a){}
+	/// \brief Copy constructor
+	ExecContext( const ExecContext& o)
+		:m_provider(o.m_provider),m_user(o.m_user),m_authorizator(o.m_authorizator){}
 
-	/// Destructor
-	~User();
+	/// \brief Get the processor provider interface
+	const ProcessorProviderInterface* provider() const	{return m_provider;}
+	/// \brief Get the user data
+	const AAAA::User& user() const				{return m_user;}
+	/// \brief Get the authorization instance interface
+	AAAA::Authorizator* authorizator()			{return m_authorizator;}
 
-	const std::string& authenticator() const	{ return m_authenticator; }
-	/// Return the login moment
-	time_t loginTime() const			{ return m_loginTime; }
-	/// Return the username
-	const std::string& uname() const		{ return m_uname; }
-	/// Return the real name of the user
-	const std::string& name() const			{ return m_name; }
-
-private:
-	std::string	m_authenticator;
-	time_t		m_loginTime;
-	std::string	m_uname;
-	std::string	m_name;
-
-#ifdef _WIN32
-// prevent C4512 on Windows, we don't want user data to be assignable
-private:
-	User& operator=( const User &o );
-#endif
+public:
+	const ProcessorProviderInterface* m_provider;		///< processor provider interface
+	AAAA::User m_user;					///< user data
+	AAAA::Authorizator* m_authorizator;			///< instance to query for execution allowance
 };
 
-}} // namespace _Wolframe::AAAA
+}} //namespace
+#endif
 
-#endif // _USER_HPP_INCLUDED
