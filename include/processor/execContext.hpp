@@ -69,6 +69,12 @@ public:
 	/// \brief Set the authorization instance interface
 	void setAuthorizer( const AAAA::Authorizer* a)		{m_authorizer = a;}
 
+	/// \brief Checks if a function tagged with AUTHORIZE( authorizationFunction, authorizationResource) is allowed to be executed
+	bool checkAuthorization( const std::string& /*authorizationFunction*/, const std::string& /*authorizationResource*/)
+	{
+		return true;
+	}
+
 public:
 	const ProcessorProviderInterface* m_provider;		///< processor provider interface
 	AAAA::User m_user;					///< user data

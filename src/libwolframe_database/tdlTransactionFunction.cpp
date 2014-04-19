@@ -253,12 +253,12 @@ void TdlTransactionFunction::print( std::ostream& out) const
 	out << "TRANSACTION " << m_name << std::endl;
 
 	// Print authorization constraints:
-	if (!m_authfunction.empty())
+	if (!m_authorizationFunction.empty())
 	{
-		out << "AUTHORIZE (" << m_authfunction;
-		if (!m_authresource.empty())
+		out << "AUTHORIZE (" << m_authorizationFunction;
+		if (!m_authorizationResource.empty())
 		{
-			out << ", " << m_authresource;
+			out << ", " << m_authorizationResource;
 		}
 		out << ")" << std::endl;
 	}
@@ -322,6 +322,15 @@ bool TdlTransactionFunctionClosure::call()
 		case 0:
 			throw std::runtime_error( "input not initialized");
 		case 1:
+			LOG_DEBUG << "check authorization '" << m_func->name() << "'";
+			if (m_context->checkAuthorization( m_func->authorizationFunction(), m_func->authorizationResource()))
+			{
+				LOG_DEBUG << "authorization allows exection of function '" << m_func->name() << "'";
+			}
+			else
+			{
+				throw std::runtime_error( std::string("execution of transaction function '") + m_func->name() + "' denied in this authorization context");
+			}
 			LOG_DEBUG << "execute transaction '" << m_func->name() << "'";
 
 			if (!m_input.call()) return false;

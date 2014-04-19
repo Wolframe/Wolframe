@@ -58,8 +58,8 @@ typedef boost::shared_ptr<InputStructure> InputStructureR;
 ///\brief Forward declaration
 class TdlTransactionFunction;
 
-///\///\brief 
-///\brief Closure (execution context) of a transaction function based on TDL
+/// \class TdlTransactionFunctionClosure
+/// \brief Closure (execution context) of a transaction function based on TDL
 class TdlTransactionFunctionClosure
 	:public utils::TypeSignature
 	,public langbind::FormFunctionClosure
@@ -86,27 +86,28 @@ private:
 	serialize::Context::Flags m_flags;			//< flags for input serialization
 };
 
-
+/// \class TdlTransactionFunction
+/// \brief Transaction function based on TDL
 class TdlTransactionFunction
 	:public langbind::FormFunction
 {
 public:
 	TdlTransactionFunction(){}
 	TdlTransactionFunction( const TdlTransactionFunction& o)
-		:m_resultfilter(o.m_resultfilter),m_authfunction(o.m_authfunction),m_authresource(o.m_authresource),m_preproc(o.m_preproc),m_program(o.m_program){}
+		:m_resultfilter(o.m_resultfilter),m_authorizationFunction(o.m_authorizationFunction),m_authorizationResource(o.m_authorizationResource),m_preproc(o.m_preproc),m_program(o.m_program){}
 	TdlTransactionFunction( const std::string& name_, const std::string& rf, const std::string& af, const std::string& ar, const std::vector<TdlTransactionPreprocStep>& pp, const vm::ProgramR& prg)
-		:m_name(name_),m_resultfilter(rf),m_authfunction(af),m_authresource(ar),m_preproc(pp),m_program(prg){}
+		:m_name(name_),m_resultfilter(rf),m_authorizationFunction(af),m_authorizationResource(ar),m_preproc(pp),m_program(prg){}
 
 	void print( std::ostream& out) const;
 
 	const std::string& name() const					{return m_name;}
 	const std::string& resultfilter() const				{return m_resultfilter;}
-	const std::string& authfunction() const				{return m_authfunction;}
-	const std::string& authresource() const				{return m_authresource;}
+	const std::string& authorizationFunction() const		{return m_authorizationFunction;}
+	const std::string& authorizationResource() const		{return m_authorizationResource;}
 	const std::vector<TdlTransactionPreprocStep>& preproc() const	{return m_preproc;}
 	const vm::ProgramR& program() const				{return m_program;}
 
-	////\brief Build the function output
+	/// \brief Build the function output
 	langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const;
 
 	virtual TdlTransactionFunctionClosure* createClosure() const;
@@ -114,8 +115,8 @@ public:
 private:
 	std::string m_name;		 			//< function name
 	std::string m_resultfilter;				//< name of result filter function to call with the transaction result
-	std::string m_authfunction;				//< authorization function name
-	std::string m_authresource;				//< authorization resource name
+	std::string m_authorizationFunction;			//< authorization function name
+	std::string m_authorizationResource;			//< authorization resource name
 	std::vector<TdlTransactionPreprocStep> m_preproc;	//< preprocessing steps to perform on input before transaction execution
 	vm::ProgramR m_program;					//< program to execute
 };
