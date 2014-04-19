@@ -35,13 +35,12 @@
 #ifndef _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_exec_HPP_INCLUDED
 #define _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_exec_HPP_INCLUDED
 #include "employee_assignment_convert.hpp"
-#include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
 
 namespace _Wolframe {
 namespace test {
 
-int assignmentListDocConvert( const proc::ProcessorProviderInterface* provider, AssignmentListDoc& res, const AssignmentListDoc& param);
+int assignmentListDocConvert( proc::ExecContext* ctx, AssignmentListDoc& res, const AssignmentListDoc& param);
 
 }} //namespace
 #endif

@@ -53,7 +53,7 @@ public:
 	virtual ~InterpreterInstance(){}
 
 	///\brief Call a function written in 'Mylang'
-	StructureR call( const proc::ProcessorProviderInterface* provider, const StructureR& arg);
+	StructureR call( proc::ExecContext* ctx, const StructureR& arg);
 };
 
 typedef boost::shared_ptr<InterpreterInstance> InterpreterInstanceR;

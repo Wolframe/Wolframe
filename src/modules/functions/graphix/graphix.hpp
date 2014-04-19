@@ -82,9 +82,9 @@ class ImageImpl
 		static std::string encode( const std::string &data );
 		
 	public:
-		static int info( const proc::ProcessorProviderInterface* provider, ImageInfo &res, const Image &param );
-		static int thumb( const proc::ProcessorProviderInterface* provider, Image &res, const ImageThumb &param );
-		static int rescale( const proc::ProcessorProviderInterface* provider, Image &res, const ImageRescale &param );
+		static int info( proc::ExecContext* ctx, ImageInfo &res, const Image &param );
+		static int thumb( proc::ExecContext* ctx, Image &res, const ImageThumb &param );
+		static int rescale( proc::ExecContext* ctx, Image &res, const ImageRescale &param );
 };
 
 }}

@@ -322,7 +322,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			}
 			case 3:
 				m_functionclosure.reset( m_function->createClosure());
-				m_functionclosure->init( execContext()->provider(), m_input);
+				m_functionclosure->init( execContext(), m_input);
 				m_state = 4;
 				/* no break here ! */
 			case 4:

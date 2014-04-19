@@ -59,12 +59,12 @@ public:
 	~Impl();
 	bool call();
 
-	void init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None);
+	void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None);
 
 	langbind::TypedInputFilterR result() const;
 
 private:
-	const proc::ProcessorProviderInterface* m_provider;		//< processor provider reference for function called
+	proc::ExecContext* m_context;					//< execution context reference for function called
 	const DotnetFunction* m_func;					//< function to call
 	langbind::TypedInputFilterR m_input;				//< input parameters
 	serialize::Context::Flags m_flags;				//< flag passed by called to stear validation strictness
@@ -432,7 +432,7 @@ const comauto::DotnetFunction::Impl::Parameter* comauto::DotnetFunction::Impl::g
 }
 
 comauto::DotnetFunctionClosure::Impl::Impl( const DotnetFunction* func_)
-		:m_provider(0)
+		:m_context(0)
 		,m_func(func_)
 		,m_flags(serialize::Context::None)
 		,m_param(0)
@@ -469,9 +469,9 @@ comauto::DotnetFunctionClosure::Impl::~Impl()
 	}
 }
 
-void comauto::DotnetFunctionClosure::Impl::init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+void comauto::DotnetFunctionClosure::Impl::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 {
-	m_provider = p;
+	m_execContext = c;
 	m_input = i;
 	m_flags = f;
 	std::size_t ii = 0,nn = m_func->m_impl->nofParameter();
@@ -665,7 +665,7 @@ AGAIN:
 					case DotnetFunction::Impl::Parameter::ProcProvider:
 						if (!m_providerdispatch)
 						{
-							m_providerdispatch = ProcessorProviderDispatch::create( m_provider, m_func->m_impl->typelib(), m_func->m_impl->typelib()->getProviderInterface());
+							m_providerdispatch = ProcessorProviderDispatch::create( m_context, m_func->m_impl->typelib(), m_func->m_impl->typelib()->getProviderInterface());
 						}
 						m_param[ ii].vt = VT_DISPATCH | VT_BYREF;
 						m_providerdispatch->AddRef();

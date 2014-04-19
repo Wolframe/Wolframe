@@ -209,7 +209,7 @@ class MylangFormFunctionClosure
 {
 public:
 	MylangFormFunctionClosure( const std::string& name_, const mylang::InterpreterInstanceR& instance_)
-		:m_name(name_),m_initialized(false),m_instance(instance_),m_provider(0){}
+		:m_name(name_),m_initialized(false),m_instance(instance_),m_context(0){}
 
 	virtual ~MylangFormFunctionClosure(){}
 
@@ -295,7 +295,7 @@ public:
 		}
 		try
 		{
-			m_output = m_instance->call( m_provider, m_input);
+			m_output = m_instance->call( m_context, m_input);
 			LOG_TRACE << "Calling function '" << m_name << "' with argument: " << m_input->tostring() << "returns " << m_output->tostring();
 			m_result.reset( new MyLangResult( m_output));
 		}
@@ -306,9 +306,9 @@ public:
 		return true;
 	}
 
-	virtual void init( const proc::ProcessorProviderInterface* provider, const TypedInputFilterR& arg, serialize::Context::Flags /*f*/)
+	virtual void init( proc::ExecContext* ctx, const TypedInputFilterR& arg, serialize::Context::Flags /*f*/)
 	{
-		m_provider = provider;
+		m_context = ctx;
 		m_arg = arg;
 		if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
 		{
@@ -334,7 +334,7 @@ private:
 	mylang::StructureR m_input;				//< pointer to input structure
 	mylang::StructureR m_output;				//< pointer to output structure
 	mylang::InterpreterInstanceR m_instance;		//< interpreter instance
-	const proc::ProcessorProviderInterface* m_provider;	//< pointer to processor provider
+	proc::ExecContext* m_context;				//< execution context reference
 };
 
 

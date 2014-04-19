@@ -13,6 +13,7 @@
 using namespace _Wolframe;
 
 static proc::ProcessorProvider g_provider;
+static proc::ExecContext g_context( &g_provider);
 
 static void initProcessorProvider()
 {
@@ -43,7 +44,7 @@ static void test_function_call( const std::map<std::string,comauto::DotnetFuncti
 	if (xi == funcmap.end()) throw std::runtime_error( std::string("function not defined: '") + name + "'");
 
 	langbind::FormFunctionClosureR closure( xi->second->createClosure());
-	closure->init( &g_provider, param.get());
+	closure->init( &g_context, param.get());
 	if (!closure->call()) throw std::runtime_error( std::string("function call failed: '") + name + "'");
 
 	langbind::TypedInputFilterR funcres = closure->result();

@@ -41,7 +41,7 @@ python::InterpreterInstance::InterpreterInstance( )
 {
 }
 
-StructureR python::InterpreterInstance::call( const proc::ProcessorProviderInterface*, const StructureR& arg)
+StructureR python::InterpreterInstance::call( proc::ExecContext*, const StructureR& arg)
 {
 	return arg;
 }

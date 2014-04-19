@@ -58,7 +58,7 @@ void LuaCommandHandler::initcall( const std::string& docformat)
 	{
 		throw std::runtime_error( std::string( "unknown lua script '") + m_name + "'");
 	}
-	m_interp->init( Input(m_inputfilter,docformat), Output(m_outputfilter), provider);
+	m_interp->init( Input(m_inputfilter,docformat), Output(m_outputfilter), execContext());
 	std::string defaultfilter = m_ctx->defaultFilter( docformat);
 
 	if (!defaultfilter.empty())

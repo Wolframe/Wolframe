@@ -45,7 +45,7 @@ namespace appdevel {
 
 ///\class CppFormFunction
 ///\brief Application development template for form functions written in C++
-template <class InputType, class OutputType, int (*Function)( const proc::ProcessorProviderInterface* p, OutputType&, const InputType&)>
+template <class InputType, class OutputType, int (*Function)( proc::ExecContext* ctx, OutputType&, const InputType&)>
 struct CppFormFunction
 {
 	static const serialize::CppFormFunction& declaration()
@@ -54,9 +54,9 @@ struct CppFormFunction
 		static const serialize::StructDescriptionBase* result = OutputType::getStructDescription();
 		struct Functor
 		{
-			static int implementation( const proc::ProcessorProviderInterface* provider, void* res, const void* param)
+			static int implementation( proc::ExecContext* ctx, void* res, const void* param)
 			{
-				return Function( provider, *(OutputType*)res, *(const InputType*) param);
+				return Function( ctx, *(OutputType*)res, *(const InputType*) param);
 			}
 		};
 		static serialize::CppFormFunction func( Functor::implementation, param, result);

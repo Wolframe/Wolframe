@@ -70,13 +70,13 @@ public:
 
 	virtual bool call();
 
-	virtual void init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f);
+	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f);
 
 	virtual langbind::TypedInputFilterR result() const;
 
 private:
 	class InputStructure;
-	const proc::ProcessorProviderInterface* m_provider;	//< processor provider to get transaction object
+	proc::ExecContext* m_context;				//< execution context
 	const TdlTransactionFunction* m_func;			//< function to execute
 	int m_state;						//< current state of call
 	langbind::RedirectFilterClosure m_input;		//< builder of structure from input
