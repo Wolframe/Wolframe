@@ -36,6 +36,7 @@
 #define _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
 #include "types/keymap.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <string>
 
 namespace _Wolframe {

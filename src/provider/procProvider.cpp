@@ -217,7 +217,6 @@ bool ProcessorProvider::loadPrograms()
 cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name ) const
 {
 	cmdbind::CommandHandler* rt = m_impl->cmdhandler( name );
-	if (rt) rt->setProcProvider( this);
 	return rt;
 }
 

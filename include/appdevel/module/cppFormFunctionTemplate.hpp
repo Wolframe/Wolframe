@@ -38,6 +38,7 @@
 
 #include "serialize/cppFormFunction.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 
 namespace _Wolframe {
 namespace appdevel {

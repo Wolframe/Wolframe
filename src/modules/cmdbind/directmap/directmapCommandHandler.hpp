@@ -37,6 +37,7 @@ Project Wolframe.
 #include "langbind/formFunction.hpp"
 #include "filter/redirectFilterClosure.hpp"
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
+#include "processor/execContext.hpp"
 #include <boost/shared_ptr.hpp>
 #include "types/keymap.hpp"
 #include "types/form.hpp"

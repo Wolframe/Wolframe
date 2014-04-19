@@ -84,6 +84,7 @@ int main( int argc, char **argv )
 		prgbind::ProgramLibrary programLibrary;
 
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &programLibrary);
+		proc::ExecContext execContext( &processorProvider);
 
 		if (!processorProvider.resolveDB( databaseProvider))
 		{
@@ -100,11 +101,11 @@ int main( int argc, char **argv )
 			std::ifstream fh;
 			fh.open( cmdline.inputfile().c_str());
 
-			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, fh, std::cout);
+			langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, fh, std::cout);
 		}
 		else
 		{
-			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, std::cin, std::cout);
+			langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, std::cin, std::cout);
 		}
 	}
 	catch (const std::bad_alloc& e)

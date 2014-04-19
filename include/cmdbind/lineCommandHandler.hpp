@@ -35,6 +35,7 @@
 #ifndef _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
+#include "processor/execContext.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
 #include "system/connectionHandler.hpp"

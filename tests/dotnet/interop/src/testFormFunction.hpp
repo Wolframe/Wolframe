@@ -37,6 +37,7 @@
 #define _LANGBIND_TEST_FORM_FUNCTION_HPP_INCLUDED
 #include "ddl_form.hpp"
 #include "langbind/formFunction.hpp"
+#include "processor/execContext.hpp"
 #include <iostream>
 
 namespace _Wolframe {

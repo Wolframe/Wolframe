@@ -40,6 +40,7 @@
 #include "serialize/ddl/ddlStructSerializer.hpp"
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
+#include "processor/execContext.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/null_filter.hpp"
 #include "filter/redirectFilterClosure.hpp"
@@ -118,7 +119,7 @@ static std::string filterargAsString( const std::vector<langbind::FilterArgument
 	return out.str();
 }
 
-static Filter getFilter( proc::ProcessorProvider* provider, const std::string& ifl_, const std::string& ofl_)
+static Filter getFilter( const proc::ProcessorProviderInterface* provider, const std::string& ifl_, const std::string& ofl_)
 {
 	Filter rt;
 	if (ifl_.empty() && ofl_.empty())
@@ -599,10 +600,11 @@ static void processCommandHandler( BufferStruct& buf, int& stateEscIn, int& stat
 }
 
 
-void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
+void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	BufferStruct buf( ib, ob);
-
+	const proc::ProcessorProviderInterface* provider = execContext->provider();
+		
 	if (proc.size() == 0 || proc == "-")
 	{
 		Filter flt = getFilter( provider, ifl, ofl);
@@ -676,6 +678,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
 			if (cmdh)
 			{
+				cmdh->setExecContext( execContext);
 				cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
 
 				if (ifch) 
@@ -740,6 +743,8 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 			//	-> detect document format with the doctype detection
 			//	and initialize the command handler with the docformat
 			//	as first parameter as the main protocol does.
+			cmdh->setExecContext( execContext);
+
 			Filter flt = getFilter( provider, ifl, ofl);
 			bool doEscapeLFdot = false;
 

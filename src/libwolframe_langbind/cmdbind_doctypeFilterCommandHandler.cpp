@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///\file cmdbind_doctypeFilterCommandHandler.cpp
-
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
+#include "processor/execContext.hpp"
 #include "logger-v1.hpp"
 #include "types/doctype.hpp"
 #include "utils/parseUtils.hpp"

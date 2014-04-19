@@ -40,6 +40,7 @@
 #include "types/normalizeFunction.hpp"
 #include "types/variant.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include "serialize/mapContext.hpp"
 #include "logger-v1.hpp"
 #include <string>

@@ -35,6 +35,7 @@
 #define _Wolframe_COM_AUTOMATION_FUNCTION_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "langbind/formFunction.hpp"
+#include "processor/execContext.hpp"
 #include <boost/shared_ptr.hpp>
 #include <vector>
 

@@ -34,7 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_COM_AUTOMATION_PROCESSOR_PROVIDER_DISPATCH_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_PROCESSOR_PROVIDER_DISPATCH_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "processor/procProvider.hpp"
+#include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <objbase.h>
 
 namespace _Wolframe {

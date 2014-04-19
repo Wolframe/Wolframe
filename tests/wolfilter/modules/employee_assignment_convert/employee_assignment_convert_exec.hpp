@@ -36,6 +36,7 @@
 #define _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_exec_HPP_INCLUDED
 #include "employee_assignment_convert.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 
 namespace _Wolframe {
 namespace test {

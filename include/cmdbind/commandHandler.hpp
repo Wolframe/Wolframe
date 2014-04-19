@@ -34,12 +34,19 @@
 ///\brief Interface to a generic command handler
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
-#include "processor/procProviderInterface.hpp"
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
+
+namespace proc {
+/// \brief Forward declaration
+class ExecContext;
+/// \brief Forward declaration
+class ProcessorProviderInterface;
+}//namespace proc
+
 namespace cmdbind {
 
 ///\class CommandHandler
@@ -47,16 +54,16 @@ namespace cmdbind {
 class CommandHandler
 {
 public:
-	///\brief This is a temporary declared instance for FSMoperation::Operation
+	///\brief Operation type
 	enum Operation	{
-		READ,
-		WRITE,
-		CLOSE
+		READ,			/// <request to read data
+		WRITE,			/// <request to write data
+		CLOSE			/// <request to terminate processing
 	};
 
 	///\brief Defaul constructor
 	CommandHandler()
-		:m_provider(0){}
+		:m_execContext(0){}
 
 	///\brief Destructor
 	virtual ~CommandHandler(){}
@@ -102,18 +109,18 @@ public:
 		return m_lastError.empty()?0:m_lastError.c_str();
 	}
 
-	///\brief Pass the reference to the processor provider to the command handler
-	///\param[in] p the reference to the processor provider
-	void setProcProvider( const proc::ProcessorProviderInterface* p)
+	///\brief Pass the reference to the execution context to the command handler
+	///\param[in] c the reference to the execution context owned by the caller (connection)
+	void setExecContext( proc::ExecContext* c)
 	{
-		m_provider = p;
+		m_execContext = c;
 	}
 
 	///\brief Get the reference to the processor provider
 	///\return the reference to the processor provider
-	const proc::ProcessorProviderInterface* procProvider()
+	proc::ExecContext* execContext()
 	{
-		return m_provider;
+		return m_execContext;
 	}
 
 	///\brief Pass the parameters for the next command handler call
@@ -133,7 +140,7 @@ protected:
 	std::string m_lastError;				//< error operation for the client
 	std::string m_name;					//< name of the command to execute
 	std::vector< std::string > m_argBuffer;			//< the command arguments
-	const proc::ProcessorProviderInterface* m_provider;	//< the reference to the global processor provider
+	proc::ExecContext* m_execContext;			//< the reference to the execution context of the connection
 };
 
 typedef boost::shared_ptr<CommandHandler> CommandHandlerR;

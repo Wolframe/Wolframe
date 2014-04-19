@@ -31,6 +31,7 @@
 
 ************************************************************************/
 #include "cmdbind/lineCommandHandler.hpp"
+#include "processor/execContext.hpp"
 #include "protocol/ioblocks.hpp"
 #include "logger-v1.hpp"
 

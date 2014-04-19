@@ -257,9 +257,10 @@ TEST_F( IProcHandlerXMLTest, tests)
 
 			boost::shared_ptr<proc::ProcessorProvider>
 				provider = getProcProvider( config.providerConfig(), &prglib);
+			proc::ExecContext execContext( provider.get());
 
 			iproc::Connection connection( ep, &config);
-			connection.setProcessorProvider( provider.get());
+			connection.setExecContext( &execContext);
 
 			EXPECT_EQ( 0, test::runTestIO( data.input, testoutput, connection));
 			data.check( testoutput);

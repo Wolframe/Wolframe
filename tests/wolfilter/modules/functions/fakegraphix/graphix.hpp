@@ -36,6 +36,7 @@
 #define _Wolframe_TESTS_WOLFILTER_MODULE_FUNCTIONS_FAKE_GRAPHIX_HPP_INCLUDED
 #include "serialize/struct/structDescriptionBase.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <string>
 #include <vector>
 

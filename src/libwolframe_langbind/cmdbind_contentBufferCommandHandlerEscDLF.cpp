@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///\file cmdbind_contentBufferCommandHandlerEscDLF.cpp
-
 #include "cmdbind/contentBufferCommandHandlerEscDLF.hpp"
+#include "processor/execContext.hpp"
 #include "filter/outputfilter.hpp"
 #include "filter/inputfilter.hpp"
 #include "logger-v1.hpp"

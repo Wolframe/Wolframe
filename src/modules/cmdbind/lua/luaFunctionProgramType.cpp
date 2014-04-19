@@ -35,6 +35,7 @@ Project Wolframe.
 #include "langbind/formFunction.hpp"
 #include "luaScriptContext.hpp"
 #include "processor/procProvider.hpp"
+#include "processor/execContext.hpp"
 #include "luaObjects.hpp"
 #include "logger-v1.hpp"
 #define BOOST_FILESYSTEM_VERSION 3

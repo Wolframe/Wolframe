@@ -39,6 +39,7 @@
 #include "handlerConfig.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include "filter/filter.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
@@ -75,9 +76,9 @@ public:
 	virtual void signalOccured( NetworkSignal);
 
 	///\brief Set the reference to the prcessor provider
-	void setProcessorProvider( proc::ProcessorProviderInterface* provider_)
+	void setExecContext( proc::ExecContext* context_)
 	{
-		m_provider = provider_;
+		m_execContext = context_;
 	}
 
 private:
@@ -137,7 +138,7 @@ private:
 	protocol::CmdParser<protocol::Buffer> m_parser;				//< context dependent command parser definition
 	int m_cmdidx;								//< command parsed
 	types::CountedReference<cmdbind::CommandHandler> m_cmdhandler;		//< currently executed command
-	proc::ProcessorProviderInterface* m_provider;				//< processor provider
+	proc::ExecContext* m_execContext;					//< execution context
 
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write

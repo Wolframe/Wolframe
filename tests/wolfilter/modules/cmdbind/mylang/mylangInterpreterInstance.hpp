@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_Mylang_INTERPRETER_INSTANCE_HPP_INCLUDED
 #include "mylangStructure.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {

@@ -73,9 +73,12 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	{
 		throw std::runtime_error( std::string( "command is not defined '") + m_name + "'");
 	}
+	if (!execContext()) throw std::logic_error( "execution context is not defined");
+	const proc::ProcessorProviderInterface* provider = execContext()->provider();
+
 	if (!m_cmd->inputform.empty())
 	{
-		const types::FormDescription* df = m_provider->formDescription( m_cmd->inputform);
+		const types::FormDescription* df = provider->formDescription( m_cmd->inputform);
 		if (!df)
 		{
 			throw std::runtime_error( std::string( "input form is not defined '") + m_cmd->inputform + "'");
@@ -84,7 +87,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	}
 	if (!m_cmd->outputform.empty())
 	{
-		const types::FormDescription* df = m_provider->formDescription( m_cmd->outputform);
+		const types::FormDescription* df = provider->formDescription( m_cmd->outputform);
 		if (!df)
 		{
 			if (m_cmd->outputrootelem.empty())
@@ -135,7 +138,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		output_filtername = m_cmd->outputfilter;
 		output_filterarg = m_cmd->outputfilterarg;
 	}
-	m_function = m_provider->formFunction( m_cmd->call);
+	m_function = provider->formFunction( m_cmd->call);
 	if (!m_function)
 	{
 		throw std::runtime_error( std::string( "function not defined '") + m_cmd->call + "'");
@@ -148,7 +151,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	}
 	else if (input_filtername == output_filtername)
 	{
-		types::CountedReference<langbind::Filter> filter( m_provider->filter( input_filtername, input_filterarg));
+		types::CountedReference<langbind::Filter> filter( provider->filter( input_filtername, input_filterarg));
 		if (!filter.get())
 		{
 			throw std::runtime_error( std::string( "filter not defined '") + input_filtername + "'");
@@ -158,12 +161,12 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	}
 	else
 	{
-		types::CountedReference<langbind::Filter> filter_i( m_provider->filter( input_filtername, input_filterarg));
+		types::CountedReference<langbind::Filter> filter_i( provider->filter( input_filtername, input_filterarg));
 		if (!filter_i.get())
 		{
 			throw std::runtime_error( std::string( "filter not defined '") + input_filtername + "'");
 		}
-		types::CountedReference<langbind::Filter> filter_o( m_provider->filter( output_filtername, output_filterarg));
+		types::CountedReference<langbind::Filter> filter_o( provider->filter( output_filtername, output_filterarg));
 		if (!filter_o.get())
 		{
 			throw std::runtime_error( std::string( "filter not defined '") + output_filtername + "'");
@@ -254,7 +257,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					if (m_inputfilter->getDocType( doctype) && doctype.defined())
 					{
 						// if no input form is defined we check for the input document type and set the form on our own:
-						const types::FormDescription* df = m_provider->formDescription( doctype.id);
+						const types::FormDescription* df = execContext()->provider()->formDescription( doctype.id);
 						if (df)
 						{
 							m_inputform.reset( new types::Form( df));
@@ -319,7 +322,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			}
 			case 3:
 				m_functionclosure.reset( m_function->createClosure());
-				m_functionclosure->init( m_provider, m_input);
+				m_functionclosure->init( execContext()->provider(), m_input);
 				m_state = 4;
 				/* no break here ! */
 			case 4:

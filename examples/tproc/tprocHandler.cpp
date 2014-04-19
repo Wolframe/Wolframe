@@ -208,7 +208,7 @@ int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 		try
 		{
 			CommandHandler* ch = (CommandHandler*)new cmdbind::ExecCommandHandler( cmds(), m_config->commands());
-			ch->setProcProvider( m_provider);
+			ch->setExecContext( execContext());
 			delegateProcessing<&CommandHandler::endRun>( ch);
 		}
 		catch (const std::exception& e)
@@ -243,7 +243,7 @@ int CommandHandler::doHello( int argc, const char**, std::ostream& out)
 	try
 	{
 		CommandHandler* ch = (CommandHandler*)new cmdbind::ExecCommandHandler( cmds(), m_config->commands());
-		ch->setProcProvider( m_provider);
+		ch->setExecContext( execContext());
 		delegateProcessing<&CommandHandler::endRun>( ch);
 	}
 	catch (const std::exception& e)

@@ -36,14 +36,14 @@
 #define _Wolfilter_IOSTREAMFILTER_HPP_INCLUDED
 #include <string>
 #include <iostream>
-#include "processor/procProvider.hpp"
+#include "processor/execContext.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
 ///\brief Maps input to output through a filter and a conversion procedure.
 ///\remark throws exception on error
-///\param[in] provider processor provider for the execution context
+///\param[in] execContext the execution context
 ///\param[in] proc conversion procedure name. emty for no conversion
 ///\param[in] ifl input filter name
 ///\param[in] ib input buffer size
@@ -51,7 +51,7 @@ namespace langbind {
 ///\param[in] ob output buffer size
 ///\param[in,out] is input stream
 ///\param[in,out] os output stream
-void iostreamfilter( proc::ProcessorProvider* provider, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os);
+void iostreamfilter( proc::ExecContext* execContext, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os);
 
 }}//namespace
 #endif

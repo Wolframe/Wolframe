@@ -42,7 +42,9 @@
 
 namespace _Wolframe {
 namespace proc {
-///\brief Forward declaration
+/// \brief Forward declaration
+class ExecContext;
+/// \brief Forward declaration
 class ProcessorProviderInterface;
 }//namespace proc
 

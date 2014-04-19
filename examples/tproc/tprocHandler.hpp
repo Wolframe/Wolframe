@@ -93,10 +93,11 @@ public:
 	///\brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
 	virtual void signalOccured( NetworkSignal);
 
-	///\brief Set the reference to the prcessor provider
-	void setProcessorProvider( proc::ProcessorProviderInterface* provider_)
+	///\brief Set the execution context reference
+	///\param[in] c execution context reference
+	void setExecContext( proc::ExecContext* c)
 	{
-		m_cmdhandler.setProcProvider( provider_);
+		m_cmdhandler.setExecContext( c);
 	}
 
 private:

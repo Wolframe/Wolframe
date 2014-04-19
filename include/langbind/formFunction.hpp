@@ -42,10 +42,15 @@
 
 namespace _Wolframe {
 namespace proc {
-	class ProcessorProviderInterface;
+/// \brief Forward declaration
+class ExecContext;
+/// \brief Forward declaration
+class ProcessorProviderInterface;
 }
 namespace langbind {
 
+/// \class FormFunctionClosure
+/// \brief Form function execution context
 class FormFunctionClosure
 {
 public:

@@ -37,6 +37,7 @@
 #include "database/vmTransactionInput.hpp"
 #include "database/vmTransactionOutput.hpp"
 #include "langbind/formFunction.hpp"
+#include "processor/execContext.hpp"
 #include "filter/redirectFilterClosure.hpp"
 #include "filter/typedfilter.hpp"
 #include "vm/program.hpp"

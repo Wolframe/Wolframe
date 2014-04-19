@@ -34,7 +34,7 @@
 /// \brief Processor Provider
 #ifndef _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
 #define _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
-#include "procProviderInterface.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/authorization.hpp"
 
@@ -50,23 +50,29 @@ public:
 	ExecContext()
 		:m_provider(0){}
 	/// \brief Constructor
-	ExecContext( const ProcessorProviderInterface* p, const AAAA::User& u, AAAA::Authorizator* a)
-		:m_provider(p),m_user(u),m_authorizator(a){}
+	explicit ExecContext( const ProcessorProviderInterface* p)
+		:m_provider(p){}
 	/// \brief Copy constructor
 	ExecContext( const ExecContext& o)
-		:m_provider(o.m_provider),m_user(o.m_user),m_authorizator(o.m_authorizator){}
+		:m_provider(o.m_provider),m_user(o.m_user),m_authorizer(o.m_authorizer){}
 
 	/// \brief Get the processor provider interface
 	const ProcessorProviderInterface* provider() const	{return m_provider;}
+
 	/// \brief Get the user data
 	const AAAA::User& user() const				{return m_user;}
+	/// \brief Set the user data
+	void setUser( const AAAA::User& u)			{m_user = u;}
+
 	/// \brief Get the authorization instance interface
-	AAAA::Authorizator* authorizator()			{return m_authorizator;}
+	const AAAA::Authorizer* authorizer()			{return m_authorizer;}
+	/// \brief Set the authorization instance interface
+	void setAuthorizer( const AAAA::Authorizer* a)		{m_authorizer = a;}
 
 public:
 	const ProcessorProviderInterface* m_provider;		///< processor provider interface
 	AAAA::User m_user;					///< user data
-	AAAA::Authorizator* m_authorizator;			///< instance to query for execution allowance
+	const AAAA::Authorizer* m_authorizer;			///< instance to query for execution permission based on login data
 };
 
 }} //namespace

@@ -38,6 +38,7 @@ Project Wolframe.
 #include "langbind/input.hpp"
 #include "langbind/output.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <map>
 #include <list>
 #include <boost/shared_ptr.hpp>

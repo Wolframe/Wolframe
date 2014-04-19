@@ -36,6 +36,7 @@ Project Wolframe.
 #include "pythonStructure.hpp"
 #include "types/variant.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <utility>
 #include <vector>
 #include <boost/shared_ptr.hpp>

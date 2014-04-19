@@ -51,16 +51,19 @@ using namespace cmdbind;
 
 void LuaCommandHandler::initcall( const std::string& docformat)
 {
+	if (!execContext()) throw std::logic_error( "execution context is not defined");
+	const proc::ProcessorProviderInterface* provider = execContext()->provider();
+
 	if (!m_ctx->funcmap.getLuaScriptInstance( m_name, m_interp))
 	{
 		throw std::runtime_error( std::string( "unknown lua script '") + m_name + "'");
 	}
-	m_interp->init( Input(m_inputfilter,docformat), Output(m_outputfilter), m_provider);
+	m_interp->init( Input(m_inputfilter,docformat), Output(m_outputfilter), provider);
 	std::string defaultfilter = m_ctx->defaultFilter( docformat);
 
 	if (!defaultfilter.empty())
 	{
-		types::CountedReference<langbind::Filter> filter( m_provider->filter( defaultfilter));
+		types::CountedReference<langbind::Filter> filter( provider->filter( defaultfilter));
 		if (!filter.get())
 		{
 			throw std::runtime_error( std::string( "filter not defined '") + defaultfilter + "'");

@@ -37,6 +37,7 @@ Project Wolframe.
 #include "serialize/struct/structSerializer.hpp"
 #include "serialize/struct/structParser.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include "filter/typedfilter.hpp"
 #include <boost/shared_ptr.hpp>
 

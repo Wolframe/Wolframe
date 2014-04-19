@@ -39,6 +39,7 @@
 #include "cmdbind/lineCommandHandler.hpp"
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include "mainConnectionHandler_auth.hpp"
 #include "protocol/ioblocks.hpp"
 #include "types/keymap.hpp"
@@ -115,10 +116,10 @@ public:
 	///\brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
 	virtual void signalOccured( NetworkSignal);
 
-	///\brief Set the reference to the prcessor provider
-	void setProcessorProvider( proc::ProcessorProviderInterface* provider_)
+	///\brief Set the reference to the execution context
+	void setExecContext( proc::ExecContext* context_)
 	{
-		m_cmdhandler.setProcProvider( provider_);
+		m_cmdhandler.setExecContext( context_);
 	}
 
 private:
