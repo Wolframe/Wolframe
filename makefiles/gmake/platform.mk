@@ -122,11 +122,6 @@ PLATFORM_COMPILE_FLAGS += \
 			-DLINUX_REV=$(LINUX_REV)
 endif
 
-
-# extensions for shared libraries
-# (TOOD: HP/Unix has .shlib, Mac/X has .lib, but we can't test it currently)
-SO = .so
-
 # name if the installation program
 # (TODO: use the MIT or openradio install-sh script instead?)
 ifndef INSTALL
