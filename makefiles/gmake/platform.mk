@@ -123,7 +123,6 @@ PLATFORM_COMPILE_FLAGS += \
 endif
 
 # name if the installation program
-# (TODO: use the MIT or openradio install-sh script instead?)
 ifndef INSTALL
 ifeq "$(PLATFORM)" "SUNOS"
 INSTALL = /usr/ucb/install
@@ -136,8 +135,6 @@ endif
 ################
 
 # the linker library for dynamically loadable modules
-# (TODO: check for all platforms, as soon we add loadable modules here from
-# old TextWolf)
 ifeq "$(PLATFORM)" "LINUX"
 LIBS_DL = -ldl
 else
@@ -162,7 +159,7 @@ endif
 
 ifeq "$(ENABLE_NLS)" "1"
 
-# we relly only on the GNU version, other versions (e.g. Solaris) are not
+# we rely only on the GNU version, other versions (e.g. Solaris) are not
 # so nice..
 
 MSGFMT=msgfmt
