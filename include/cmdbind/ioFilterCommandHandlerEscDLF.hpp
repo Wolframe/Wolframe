@@ -56,33 +56,36 @@ public:
 	///\brief Destructor
 	virtual ~IOFilterCommandHandlerEscDLF();
 
-	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
+	///\brief See CommandHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
-	///\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
+	///\brief See CommandHandler::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
 
-	///\brief See Parent::nextOperation()
+	///\brief See CommandHandler::nextOperation()
 	virtual Operation nextOperation();
 
-	///\brief See Parent::putInput(const void*,std::size_t);
+	///\brief See CommandHandler::putInput(const void*,std::size_t);
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief See Parent::getInputBlock(void*&,std::size_t&)
+	///\brief See CommandHandler::getInputBlock(void*&,std::size_t&)
 	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
 
-	///\brief See Parent::getOutput(const void*&,std::size_t&)
+	///\brief See CommandHandler::getOutput(const void*&,std::size_t&)
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
 
-	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
+	///\brief See CommandHandler::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	///\brief See Parent::interruptDataSessionMarker()
+	///\brief See CommandHandler::interruptDataSessionMarker()
 	virtual const char* interruptDataSessionMarker() const;
 
 	///\param[out] err error code in case of error
 	///\return CallResult status of the filter input for the state machine of this command handler
 	virtual CallResult call( const char*& err)=0;
+
+private:
+	void getFilterOutputWriteData();
 
 private:
 	enum State
@@ -110,9 +113,6 @@ private:
 	protocol::OutputBlock m_output;			//< output buffer
 	protocol::InputBlock::iterator m_eoD;		//< input end of data marker
 	std::size_t m_itrpos;				//< read start position in buffer for the command handler
-
-private:
-	void getFilterOutputWriteData();
 };
 }}
 #endif

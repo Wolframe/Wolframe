@@ -73,7 +73,7 @@ public:
 	/// The input data.
 	virtual void receiveData( const void* data, std::size_t size ) = 0;
 
-	/// What oeration the FSM expects next from the outside.
+	/// What operation the FSM expects next from the outside.
 	virtual const Operation nextOperation() = 0;
 
 	/// Signal the FSM.
