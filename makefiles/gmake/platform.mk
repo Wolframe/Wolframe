@@ -88,10 +88,6 @@ ifeq "$(PLATFORM)" "SUNOS"
 LIBDIR=lib
 endif
 
-
-# default location of system libraries per architecture
-SYSTEM_LIBDIR=/usr/$(LIBDIR)
-
 # platform specific flags
 #########################
 
