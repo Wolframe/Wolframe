@@ -122,7 +122,7 @@ int CommandHandler::doAuth( int argc, const char**, std::ostream& out)
 
 int CommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 {
-	cmdbind::AuthCommandHandler* chnd = dynamic_cast<cmdbind::AuthCommandHandler*>( ch);
+	//[+] cmdbind::AuthCommandHandler* chnd = dynamic_cast<cmdbind::AuthCommandHandler*>( ch);
 	cmdbind::CommandHandlerR chr( ch);
 	const char* error = ch->lastError();
 	if (error)
@@ -133,7 +133,7 @@ int CommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 	else
 	{
 		out << "OK authorization" << endl();
-		m_authtickets.push_back( chnd->ticket());
+		//[+] m_execContext.setUser( chnd->user());
 		return Authenticated;
 	}
 }

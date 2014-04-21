@@ -47,6 +47,8 @@ namespace AAAA {
 class User
 {
 public:
+	User()
+		:m_loginTime(0){}
 	User( const std::string& Authenticator, const std::string& uName, const std::string& Name )
 		: m_authenticator( Authenticator ), m_loginTime( time( NULL )),
 		  m_uname( uName ), m_name( Name )	{}

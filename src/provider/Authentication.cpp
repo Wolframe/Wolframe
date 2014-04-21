@@ -112,13 +112,6 @@ void StandardAuthenticator::receiveData( const void* /*data*/, std::size_t /*siz
 {
 }
 
-// What should be done next.
-const FSM::Operation StandardAuthenticator::nextOperation()
-{
-	FSM::Operation	op;
-	return op;
-}
-
 // signal the FSM
 void StandardAuthenticator::signal( FSM::Signal /*event*/ )
 {

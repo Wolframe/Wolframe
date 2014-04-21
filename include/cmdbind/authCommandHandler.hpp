@@ -37,52 +37,9 @@
 #define _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
 
 #include "cmdbind/lineCommandHandler.hpp"
-#include "AAAA/"
+#include "AAAA/authentication.hpp"
 
 namespace _Wolframe {
-namespace AAAA {
-
-/// \class Authenticator
-/// \brief Interface for the authentication global mechanism
-class Authenticator
-{
-public:
-	typedef _Wolframe::FSM::Operation::FSMoperation Operation;
-
-	struct Message
-	{
-		std::size_t size;
-		const char* ptr;
-
-		Message()
-			:size(0),ptr(0){}
-		Message( const Message& o)
-			:size(o.size),ptr(o.ptr){}
-		Message( const char* ptr_, std::size_t size_)
-			:size(size_),ptr(ptr_){}
-	};
-
-public:
-	/// \brief Destructor
-	virtual ~Authenticator(){}
-
-	/// \brief Initialize statemachine before execution
-	virtual void init(){};
-
-	/// \brief Get the next operation
-	virtual Operation nextOperation()=0;
-
-	/// \brief Get the message of a WRITE operation
-	virtual Message getMessage()=0;
-
-	/// \brief Put the answer of a READ request operation
-	virtual void putMessage( const Message& msg)=0;
-
-	/// \brief Close the authenticator and destroy all sensible data
-	virtual void close(){}
-};
-}//namespace AAAA
-
 namespace cmdbind {
 
 /// \class AuthCommandHandler
@@ -127,17 +84,14 @@ public:
 	virtual const char* interruptDataSessionMarker() const;
 
 private:
-	void getOutputWriteData();
-
-private:
 	/// \enum State
 	/// \brief Enumeration of processor states
 	enum State
 	{
 		Init,				///< start state, called first time in this session
 		NextOperation,			///< running a command
-		FlushOutput,			///< flush network output
-		Terminate			///< terminate application processor session
+		ReadConsumed,			///< state set by putInput for guarantee that pusInput message is valid till net call of AAAA::Authenticator::nextOperation()
+		FlushOutput			///< flush network output
 	};
 	/// \brief Returns the state as string for logging etc.
 	/// \param [in] i state to get as string
@@ -146,27 +100,25 @@ private:
 		static const char* ar[] = {
 			"Init",
 			"NextOperation",
+			"ReadConsumed",
 			"FlushOutput"
-			"Terminate"
 		};
 		return ar[i];
 	}
-	protocol::EscapeBuffer m_escapeBuffer;
-
-	State m_state;				///< processing state of the command handler
-	const void* m_writedata;		///< bytes to write next (WRITE)
-	std::size_t m_writedatasize;		///< number of bytes to write next (WRITE)
-	unsigned int m_writedata_chksum;	///< check sum to verify write
-	unsigned int m_writedata_chkpos;	///< check position to verify write
-
-	AAAA:Authenticator* m_authenticator;	///< instance of authenticator owned by this
-	protocol::InputBlock m_input;		///< buffer for network read messages
-	protocol::OutputBlock m_output;		///< buffer for network write messages
+	AAAA::Authenticator* m_authenticator;	///< authenticator object reference owned by this
+	protocol::InputBlock m_input;		///< protocol input buffer
 	protocol::InputBlock::iterator m_eoD;	///< input end of data marker
 	std::size_t m_itrpos;			///< read start position in buffer for the command handler
-	std::string m_readbuffer;		///< buffer for message read
-	std::string m_writebuffer;		///< buffer for message written
-	std::size_t m_writepos;			///< position of cosumption of content of m_writebuffer
+
+	char* m_outputbuf;			///< protocol output buffer
+	std::size_t m_outputbufsize;		///< protocol output buffer allocation size
+	std::size_t m_outputbufpos;		///< protocol output buffer start of data chunk
+
+	State m_state;				///< processing state of the command handler
+	std::string m_readbuffer;		///< buffer for chunkwise network read
+	std::size_t m_readpos;			///< current position in buffer for chunkwise network read
+	std::string m_writebuffer;		///< buffer for chunkwise network write
+	std::size_t m_writepos;			///< current position in buffer for chunkwise network write
 };
 
 }} //namespace

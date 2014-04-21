@@ -47,14 +47,60 @@
 namespace _Wolframe {
 namespace AAAA {
 
-// interface for the authentication global mechanism
-class Authenticator : public _Wolframe::FSM
+/// \class Authenticator
+/// \brief Interface for the authentication global mechanism
+class Authenticator
 {
 public:
-	virtual ~Authenticator()		{}
+	typedef FSM::Operation::FSMoperation Operation;
+	typedef FSM::Signal Signal;
 
-	// close the authenticator and destroy all sensible data
-	virtual void close()			{}
+	struct Message
+	{
+		std::size_t size;
+		const void* ptr;
+
+		Message()
+			:size(0),ptr(0){}
+		Message( const Message& o)
+			:size(o.size),ptr(o.ptr){}
+		Message( const void* ptr_, std::size_t size_)
+			:size(size_),ptr(ptr_){}
+	};
+
+public:
+	/// \brief Destructor
+	virtual ~Authenticator(){}
+
+	/// \brief Initialize statemachine before execution
+	virtual void init(){};
+
+	/// \brief Get the next operation
+	virtual Operation nextOperation()
+	{
+		throw std::logic_error( "not implemented");	
+	}
+
+	/// \brief Get the message of a WRITE operation
+	virtual Message getWriteMessage()
+	{
+		throw std::logic_error( "not implemented");	
+	}
+
+	/// \brief Put the answer of a READ request operation
+	virtual void putReadMessage( const Message&)
+	{
+		throw std::logic_error( "not implemented");	
+	}
+
+	/// \brief Get reference to the user as result of authentication (called before close)
+	virtual User* user()
+	{
+		throw std::logic_error( "not implemented");	
+	}
+
+	/// \brief Close the authenticator and destroy all sensible data
+	virtual void close(){}
 };
 
 

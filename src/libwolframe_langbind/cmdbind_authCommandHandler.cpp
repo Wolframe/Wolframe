@@ -39,52 +39,41 @@ using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
 AuthCommandHandler::AuthCommandHandler( AAAA::Authenticator* authenticator_)
-	:m_state(Init)
-	,m_writedata(0)
-	,m_writedatasize(0)
-	,m_writedata_chksum(0)
-	,m_writedata_chkpos(0)
-	,m_authenticator(authenticator_)
+	:m_authenticator(authenticator_)
 	,m_itrpos(0)
+	,m_outputbuf(0)
+	,m_outputbufsize(0)
+	,m_outputbufpos(0)
+	,m_state(Init)
+	,m_readpos(0)
+	,m_writepos(0)
 {}
 
 AuthCommandHandler::~AuthCommandHandler()
 {
-	if (m_authenticator) delete m_authenticator;
+	if (m_authenticator)
+	{
+		m_authenticator->close();
+		delete m_authenticator;
+	}
 }
 
 const char* AuthCommandHandler::interruptDataSessionMarker() const
 {
-	switch (m_state)
-	{
-		case Processing:
-		case FlushingOutput:
-		case DiscardInput: return "\r\n.\r\n";
-		case Terminated: return "";
-	}
-	return "";
+	return (m_state == FlushOutput)?"\r\n.\r\n":"";
 }
 
 void AuthCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
-	m_input = InputBlock( (char*)buf, allocsize);
+	m_input.set( (char*)buf, allocsize);
 }
 
 void AuthCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
-	m_output = OutputBlock( buf, size, pos);
-}
-
-void AuthCommandHandler::getOutputWriteData()
-{
-	m_writedata = m_output.ptr();
-	m_writedatasize = m_output.pos();
-
-	langbind::OutputFilter::calculateCheckSum( m_writedata_chksum, 0, (const char*)m_writedata, m_writedatasize);
-	m_writedata_chkpos += m_writedatasize;
-
-	m_escapeBuffer.process( m_output.charptr(), m_output.size(), m_writedatasize);
-	m_output.setPos(0);
+	m_outputbuf = (char*)buf;
+	m_outputbufsize = size;
+	m_outputbufpos = pos;
+	if (pos > size) throw std::logic_error("illegal parameter (setOutputBuffer)");
 }
 
 void AuthCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
@@ -106,8 +95,8 @@ void AuthCommandHandler::putInput( const void *begin, std::size_t bytesTransferr
 	m_readbuffer.append( start.ptr(), m_eoD-start);
 	if (m_input.gotEoD())
 	{
-		m_authenticator->putMessage( Message( m_readbuffer.c_str(), m_readbuffer.size()));
-		m_readbuffer.clear();
+		m_authenticator->putReadMessage( AAAA::Authenticator::Message( (const void*)m_readbuffer.c_str(), m_readbuffer.size()));
+		m_state = ReadConsumed;
 	}
 }
 
@@ -122,12 +111,23 @@ void AuthCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 
 void AuthCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
-	begin = m_writedata;
-	bytesToTransfer = m_writedatasize;
+	bytesToTransfer = m_outputbufsize - m_outputbufpos;
+	if (bytesToTransfer > m_writebuffer.size() - m_writepos)
+	{
+		bytesToTransfer = m_writebuffer.size() - m_writepos;
+	}
+	if (bytesToTransfer == 0) throw std::logic_error( "protocol error: empty write in authorization command handler");
+
+	std::memcpy( m_outputbuf + m_outputbufpos, m_writebuffer.c_str() + m_writepos, bytesToTransfer);
+	begin = m_outputbuf + m_outputbufpos;
+	m_outputbufpos = 0;
+	m_writepos += bytesToTransfer;
 }
 
 void AuthCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
+	if (!m_input.gotEoD()) throw std::logic_error("EoD not consumed in authorization commmand handler");
+
 	std::size_t pos = m_eoD - m_input.begin();
 	begin = (const void*)(m_input.charptr() + pos);
 	nofBytes = m_input.pos() - pos;
@@ -141,9 +141,43 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 		switch (m_state)
 		{
 			case Init:
+				m_authenticator->init();
+				m_state = NextOperation;
+				/*no break here!*/
+
 			case NextOperation:
+				switch (m_authenticator->nextOperation())
+				{
+					case READ:
+						return READ;
+
+					case WRITE:
+					{
+						AAAA::Authenticator::Message msg = m_authenticator->getWriteMessage();
+						m_writebuffer = protocol::escapeStringDLF( std::string( (const char*)msg.ptr, msg.size));
+						m_writebuffer.append( "\r\n.\r\n");
+						m_writepos = 0;
+						m_state = FlushOutput;
+						continue;
+					}
+					case CLOSE:
+						return CLOSE;
+				}
+
+			case ReadConsumed:
+				m_readbuffer.clear();
+				m_state = NextOperation;
+				continue;
+
 			case FlushOutput:
-			case Terminate:
+				if (m_writepos == m_writebuffer.size())
+				{
+					m_writepos = 0;
+					m_writebuffer.clear();
+					m_state = NextOperation;
+					continue;
+				}
+				return WRITE;
 		}
 	}//for(;;)
 	return CLOSE;
