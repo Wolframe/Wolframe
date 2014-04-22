@@ -72,7 +72,7 @@ public:
 typedef boost::shared_ptr<NormalizeResourceHandle> NormalizeResourceHandleR;
 
 
-typedef NormalizeResourceHandle* (*CreateNormalizeResourceHandle)();
+typedef const NormalizeResourceHandleR& (*GetNormalizeResourceHandle)();
 typedef NormalizeFunction* (*CreateNormalizeFunction)( NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
 
 ///\class NormalizeFunctionType

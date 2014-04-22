@@ -33,21 +33,23 @@
 ///\file mod_normalize_locale.hpp
 ///\brief Module for normalization functions based on boost locale (ICU)
 #include "appdevel/normalizeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "logger-v1.hpp"
 #include "localeNormalize.hpp"
 
 using namespace _Wolframe::langbind;
 
-NORMALIZER_MODULE_WITH_RESOURCE( "Base64Normalizer", "base 64 encoding/decoding as normalization functions", LocaleResourceHandle)
-NORMALIZER_FUNCTION(	"tolower",	create_tolower_NormalizeFunction)
-NORMALIZER_FUNCTION(	"toupper",	create_toupper_NormalizeFunction)
-NORMALIZER_FUNCTION(	"totitle",	create_totitle_NormalizeFunction)
-NORMALIZER_FUNCTION(	"foldcase",	create_foldcase_NormalizeFunction)
-NORMALIZER_FUNCTION(	"conv_nfd",	create_nfd_NormalizeFunction)
-NORMALIZER_FUNCTION(	"conv_nfc",	create_nfc_NormalizeFunction)
-NORMALIZER_FUNCTION(	"conv_nfkd",	create_nfkd_NormalizeFunction)
-NORMALIZER_FUNCTION(	"conv_nfkc",	create_nfkc_NormalizeFunction)
-NORMALIZER_FUNCTION(	"latinword",	create_latinword_NormalizeFunction)
-NORMALIZER_FUNCTION(	"ascii_de",	create_ascii_de_NormalizeFunction)
-NORMALIZER_FUNCTION(	"ascii_eu",	create_ascii_eu_NormalizeFunction)
-NORMALIZER_MODULE_END
+WF_MODULE_BEGIN( "Base64Normalizer", "base 64 encoding/decoding as normalization functions")
+ WF_NORMALIZER_RESOURCE( LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "tolower", create_tolower_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "toupper", create_toupper_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "totitle", create_totitle_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "foldcase", create_foldcase_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "conv_nfd", create_nfd_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "conv_nfc", create_nfc_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "conv_nfkd", create_nfkd_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "conv_nfkc", create_nfkc_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "latinword", create_latinword_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "ascii_de", create_ascii_de_NormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "ascii_eu", create_ascii_eu_NormalizeFunction, LocaleResourceHandle)
+WF_MODULE_END

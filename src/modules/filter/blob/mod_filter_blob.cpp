@@ -33,7 +33,10 @@
 ///\file modules/filter/char/mod_filter_char.cpp
 ///\brief Module for blob filters that forward the data as binary blob as it is
 #include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "blob_filter.hpp"
 
-FILTER_MODULE( "single blob filter", blob, _Wolframe::langbind::createBlobFilterType)
+WF_MODULE_BEGIN( "blobFilter", "filter module for processing content as single blob value")
+ WF_FILTER_TYPE( "blob", _Wolframe::langbind::createBlobFilterType)
+WF_MODULE_END
 

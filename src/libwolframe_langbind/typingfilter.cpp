@@ -52,7 +52,6 @@ bool TypingInputFilter::getNext( ElementType& type, types::VariantConst& element
 	else
 	{
 		setState( m_inputfilter->state());
-#if 1 /*[-]*/
 		if (flag(FilterBase::SerializeWithIndices))
 		{
 			if (type == FilterBase::OpenTag)
@@ -105,7 +104,6 @@ bool TypingInputFilter::getNext( ElementType& type, types::VariantConst& element
 			}
 		}
 		else
-#endif/*[-]*/
 		{
 			element.init( (const char*)charptr, charsize);
 			return true;

@@ -33,7 +33,10 @@
 ///\file mod_filter_cjson.cpp
 ///\brief Module for JSON filter based on the cJSON library
 #include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "cjson_filter.hpp"
 
-FILTER_MODULE( "JSON filter", cjson, _Wolframe::langbind::createCJsonFilterType)
+WF_MODULE_BEGIN( "jsonFilter", "JSON filter based on cJSON")
+ WF_FILTER_TYPE( "cjson", _Wolframe::langbind::createCJsonFilterType)
+WF_MODULE_END
 

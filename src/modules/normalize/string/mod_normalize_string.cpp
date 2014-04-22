@@ -33,14 +33,15 @@
 ///\file mod_normalize_string.cpp
 ///\brief Module for string normalization and validating functions without using ICU
 #include "appdevel/normalizeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "stringNormalize.hpp"
 
 using namespace _Wolframe::langbind;
 
-NORMALIZER_MODULE( "StringNormalizer", "basic string normalizers not using ICU or another library")
-NORMALIZER_FUNCTION(	"trim",		createTrimNormalizeFunction)
-NORMALIZER_FUNCTION(	"ucname",	createUcnameNormalizeFunction)
-NORMALIZER_FUNCTION(	"lcname",	createLcnameNormalizeFunction)
-NORMALIZER_FUNCTION(	"convdia",	createConvdiaNormalizeFunction)
-NORMALIZER_MODULE_END
+WF_MODULE_BEGIN( "StringNormalizer", "basic string normalizers not using ICU or another library")
+ WF_NORMALIZER( "trim",  createTrimNormalizeFunction)
+ WF_NORMALIZER( "ucname", createUcnameNormalizeFunction)
+ WF_NORMALIZER( "lcname", createLcnameNormalizeFunction)
+ WF_NORMALIZER( "convdia", createConvdiaNormalizeFunction)
+WF_MODULE_END
 

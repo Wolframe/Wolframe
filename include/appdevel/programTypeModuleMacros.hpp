@@ -35,17 +35,16 @@
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/programTypeBuilder.hpp"
 
-///\brief Defines a Wolframe command handler module after the includes section.
-#define PROGRAM_TYPE_MODULE( DESCRIPTION, LANGNAME, CREATEPRGFUNC)\
-	static _Wolframe::module::BuilderBase* createProgramType()\
+///\brief Defines a Wolframe program type
+#define WF_PROGRAM_TYPE( LANGNAME, CREATEPRGFUNC)\
+{\
+	struct Constructor\
 	{\
-		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
-	}\
-	static _Wolframe::module::BuilderBase* (*builder[])() =\
-	{\
-		createProgramType, NULL\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
+		}\
 	};\
-	extern "C" {\
-		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, "form function program type for " #LANGNAME, builder );\
-	}
+	(*this)(&Constructor ::impl);\
+}
+

@@ -33,18 +33,22 @@
 ///\file mod_filter_libxml2.cpp
 ///\brief Module for libxml2 XML filters
 #include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "libxml2_filter.hpp"
+
 #if WITH_LIBXSLT
 #include "xsltProgramType.hpp"
-#endif
+#include "appdevel/programTypeModuleMacros.hpp"
 
-namespace lb = _Wolframe::langbind;
+WF_MODULE_BEGIN( "libxml2Filter", "xml/xslt filter module based on libxml2")
+WF_PROGRAM_TYPE( "xslt", _Wolframe::langbind::createXsltProgramType)
+WF_FILTER_TYPE( "libxml2", _Wolframe::langbind::createLibxml2FilterType)
+WF_MODULE_END
 
-#if WITH_LIBXSLT
-FILTER_WITH_SOURCE_MODULE( "libxml2 filter and xslt program type", 
-				libxml2, _Wolframe::langbind::createLibxml2FilterType,
-				xslt, _Wolframe::langbind::createXsltProgramType)
 #else
-FILTER_MODULE( "libxml2 filter", libxml2, _Wolframe::langbind::createLibxml2FilterType)
+
+WF_MODULE_BEGIN( "libxml2Filter", "xml filter module based on libxml2")
+WF_FILTER_TYPE( "libxml2", _Wolframe::langbind::createLibxml2FilterType)
+WF_MODULE_END
 #endif
 

@@ -38,7 +38,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::module;
 
 namespace {
-static ConfiguredBuilder* createDotnetRuntimeEnvironmentBuilder()
+static BuilderBase* createDotnetRuntimeEnvironmentBuilder()
 {
 	static DotnetRuntimeEnvironmentBuilder
 		mod( "runtime environment for .NET", "runtimeenv", "dotnet", "DotnetRuntimeEnvironment");
@@ -47,16 +47,13 @@ static ConfiguredBuilder* createDotnetRuntimeEnvironmentBuilder()
 
 }//anonymous namespace
 
-enum {NofConfiguredBuilder=1};
-enum {NofSimpleBuilder=0};
-static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
+static BuilderBase* (*builder[])() =
 {
-	createDotnetRuntimeEnvironmentBuilder
+	createDotnetRuntimeEnvironmentBuilder, NULL
 };
 
+
 extern "C" {
-	ModuleEntryPoint entryPoint( 0, "form function handler for .NET interop",
-				NofConfiguredBuilder, configuredBuilder,
-				NofSimpleBuilder, 0);
+ModuleEntryPoint entryPoint( 0, "form function handler for .NET interop", builder);
 }
 

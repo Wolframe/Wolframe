@@ -32,9 +32,10 @@
 ************************************************************************/
 ///\file mod_datatype_datetime.cpp
 ///\brief Module for date and datetime arithmetic
+#include "appdevel/moduleFrameMacros.hpp"
 #include "appdevel/customDatatypeModuleMacros.hpp"
 #include "datatypeDate.hpp"
 
-CUSTOM_DATATYPE_MODULE( "datetime", "custom data types for date and time arithmetics")
-CUSTOM_DATATYPE( "date",	_Wolframe::types::DateDataType::create)
-CUSTOM_DATATYPE_MODULE_END
+WF_MODULE_BEGIN( "datetime", "custom data types for date and time arithmetics")
+ WF_CUSTOM_DATATYPE( "date", _Wolframe::types::DateDataType::create)
+WF_MODULE_END

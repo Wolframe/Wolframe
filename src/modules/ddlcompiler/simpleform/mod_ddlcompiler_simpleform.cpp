@@ -33,7 +33,10 @@
 ///\file modules/ddlcompiler/mod_ddlcompiler_simpleform.cpp
 ///\brief Module for testing form functions
 #include "appdevel/ddlCompilerModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "simpleFormCompiler.hpp"
 
-DDLCOMPILER_MODULE( "simpleform DDL compiler", "simpleform", _Wolframe::langbind::createSimpleFormCompilerFunc)
+WF_MODULE_BEGIN( "SimpleformCompiler", "compiler for the simpleform language (DDL)")
+ WF_DDLCOMPILER( "simpleform", _Wolframe::langbind::createSimpleFormCompilerFunc)
+WF_MODULE_END
 

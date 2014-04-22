@@ -30,12 +30,47 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_filter_textwolf.cpp
-///\brief Module for an XML filter based on textwolf
-#include "appdevel/filterModuleMacros.hpp"
-#include "appdevel/moduleFrameMacros.hpp"
-#include "textwolf_filter.hpp"
+///\file appdevel/customDataTypeModuleMacros.hpp
+///\brief Macros for defining a custom datatype module
+#include "appdevel/module/customDataTypeBuilder.hpp"
 
-WF_MODULE_BEGIN( "textwolfFilter", "xml filter based on textwolf")
- WF_FILTER_TYPE( "textwolf", _Wolframe::langbind::createTextwolfXmlFilterType)
-WF_MODULE_END
+///\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
+#define WF_MODULE_BEGIN(NAME,DESCRIPTION)\
+	static const char* _Wolframe__moduleDescription()\
+	{\
+		return DESCRIPTION;\
+	}\
+	namespace {\
+	struct CreateBuilderArray\
+	{\
+		enum {MaxNofBuilders=64};\
+		_Wolframe::module::createBuilderFunc ar[ MaxNofBuilders];\
+		std::size_t size;\
+		CreateBuilderArray()\
+			:size(0)\
+		{\
+			ar[0] = 0;\
+		}\
+		CreateBuilderArray operator()( _Wolframe::module::createBuilderFunc func)\
+		{\
+			if (size +1 >= MaxNofBuilders) throw std::logic_error("too many builder objects defined in module '" #NAME "' (maximum of 64 objects)");\
+			ar[ size] = func;\
+			ar[ size+1] = 0;\
+			size += 1;\
+			return *this;\
+		}\
+	};\
+	struct CreateBuilderArrayImpl :public CreateBuilderArray\
+	{\
+		CreateBuilderArrayImpl()\
+		{
+
+#define WF_MODULE_END\
+		}\
+	};\
+	}\
+	static CreateBuilderArrayImpl createBuilderArray;\
+	extern "C" { \
+		_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), createBuilderArray.ar); \
+	}
+
