@@ -208,18 +208,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 						  << "' is not a form function";
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
-				else	{
+				else
+				{
 					try
 					{
-						std::string name = ffo->objectClassName();
-
-						std::vector<std::string> funclist = ffo->functions();
-						std::vector<std::string>::const_iterator fi = funclist.begin(), fe = funclist.end();
-						for (; fi != fe; ++fi)
-						{
-							m_programs->defineCppFormFunction( *fi, ffo->function( *fi));
-							LOG_TRACE << "registered '" << *fi << "' C++ form function ";
-						}
+						m_programs->defineCppFormFunction( ffo->identifier(), ffo->function());
+						LOG_TRACE << "registered C++ form function '" << ffo->identifier() << "'";
 					}
 					catch (const std::runtime_error& e)
 					{

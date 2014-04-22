@@ -33,12 +33,14 @@
 ///\file mod_graphix.cpp
 ///\brief Fake implementation of module for graphic functions with FreeImage for testing
 #include "appdevel/cppFormFunctionModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "graphix.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::graphix;
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE("graphic functions with FreeImage")
-CPP_APPLICATION_FORM_FUNCTION("imageInfo", ImageImpl::info, ImageInfo, Image)
-CPP_APPLICATION_FORM_FUNCTION("imageThumb", ImageImpl::thumb, Image, ImageThumb)
-CPP_APPLICATION_FORM_FUNCTION_MODULE_END
+WF_MODULE_BEGIN( "FreeImageFunctions", "graphic functions based on the FreeImage library")
+WF_FORM_FUNCTION( "imageInfo", ImageImpl::info, ImageInfo, Image)
+WF_FORM_FUNCTION( "imageThumb", ImageImpl::thumb, Image, ImageThumb)
+WF_MODULE_END
+

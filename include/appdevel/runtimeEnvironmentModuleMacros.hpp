@@ -37,62 +37,63 @@
 #include "processor/procProviderInterface.hpp"
 #include <boost/lexical_cast.hpp>
 
-///\brief Defines a Wolframe module for programs with a runtime environment (e.g. programs with shared resources) after the includes section.
-#define RUNTIME_ENVIRONMENT_MODULE(NAME,DESCRIPTION,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,INITFUNCTION)\
-	static const char* _Wolframe__moduleName()\
-	{\
-		return #NAME;\
-	}\
-	static const char* _Wolframe__moduleDescription()\
-	{\
-		return DESCRIPTION;\
-	}\
-	class NAME ##Constructor \
+///\brief Defines a program type with a runtime environment (e.g. program with shared resource context)
+#define WF_RUNTIME_ENVIRONMENT(TITLE,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,INITFUNCTION) \
+{\
+	class RuntimeEnvConstructor\
 		:public _Wolframe::module::RuntimeEnvironmentConstructor\
 	{\
 	public:\
-		NAME ##Constructor(){}\
-		virtual ~NAME ##Constructor(){}\
+		RuntimeEnvConstructor(){}\
+		virtual ~RuntimeEnvConstructor(){}\
 		virtual DotnetRuntimeEnvironment* object( const _Wolframe::config::NamedConfiguration& cfgi)\
 		{\
 			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
-			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to runtime environment constructor");\
+			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to runtime environment constructor " CONFIG_TITLE);\
 			DotnetRuntimeEnvironment* rt = new DotnetRuntimeEnvironment( cfg);\
 			return rt;\
 		}\
 		virtual const char* objectClassName() const\
 		{\
-			return #NAME;\
+			return CONFIG_TITLE "RuntimeEnvironment";\
 		}\
 		virtual bool checkReferences( const _Wolframe::config::NamedConfiguration&, const _Wolframe::proc::ProcessorProviderInterface*) const\
 		{\
 			return true;\
 		}\
 	};\
-	class NAME ##Builder\
+	class RuntimeEnvBuilder\
 		:public ConfiguredBuilder\
 	{\
 	public:\
-		NAME ##Builder()\
-			:ConfiguredBuilder( DESCRIPTION, CONFIG_SECTION, CONFIG_TITLE, #NAME)\
+		RuntimeEnvBuilder()\
+			:ConfiguredBuilder( DESCRIPTION, CONFIG_SECTION, CONFIG_TITLE, CONFIG_TITLE "RuntimeEnvironment")\
 		{\
 			int err;\
 			if (0!=(err=INITFUNCTION())) throw std::runtime_error(std::string("failed to initialize runtime environment (error code ") + boost::lexical_cast<std::string>(err) + ")");\
 		}\
-		virtual ~NAME ## Builder(){}\
+		virtual ~RuntimeEnvBuilder(){}\
 		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
 		{\
 			return _Wolframe::ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;\
 		}\
 		virtual _Wolframe::config::NamedConfiguration* configuration( const char* logPrefix)\
 		{\
-			return new CONFIGDEF( #NAME, CONFIG_SECTION, logPrefix, CONFIG_TITLE);\
+			return new CONFIGDEF( CONFIG_TITLE "RuntimeEnvironment", m_title, logPrefix, m_keyword);\
 		}\
 		virtual _Wolframe::ObjectConstructorBase* constructor()\
 		{\
-			return new NAME ## Constructor();\
+			return new Constructor();\
 		}\
-	};
-
+	};\
+	struct Constructor\
+	{\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			return new RuntimeEnvBuilder();\
+		}\
+	};\
+	(*this)(&Constructor ::impl);\
+}
 
 
