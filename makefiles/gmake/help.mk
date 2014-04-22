@@ -1,20 +1,20 @@
 
 Available targets:
 
-make [all]              create all artifacts
-make test               create test binaries and execute fast tests
-make longtest           execute all tests, including long lasting ones
-make clean              clean up build artifacts
-make distclean          clean up all generated artifacts
-make install            install (set 'DESTDIR' and 'prefix' at will)
-make uninstall          uninstall (set 'DESTDIR' and 'prefix' at will)
-make dist[-Z|-gz|-bz2]  create tarball containing all sources
-make help               show this very help page
-make config             show the configuration used during build
-make depend             build dependency files (extension .d)
-make init-po            create initial version of the gettext files
-make merge-po           merge the gettext files after changes
-make check-po           check sanity of gettext files
+make [all]                 create all artifacts
+make test                  create test binaries and execute fast tests
+make longtest              execute all tests, including long lasting ones
+make clean                 clean up build artifacts
+make distclean             clean up all generated artifacts
+make install               install (set 'DESTDIR' and 'prefix' at will)
+make uninstall             uninstall (set 'DESTDIR' and 'prefix' at will)
+make dist[-Z|-gz|-bz2|-xz] create tarball containing all sources
+make help                  show this very help page
+make config                show the configuration used during build
+make depend                build dependency files (extension .d)
+make init-po               create initial version of the gettext files
+make merge-po              merge the gettext files after changes
+make check-po              check sanity of gettext files
 
 Available optional features:
 

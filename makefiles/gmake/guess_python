@@ -21,7 +21,6 @@ else
 
 	PYTHON_CFLAGS=`$PYTHON3_CONFIG --cflags`
 	PYTHON_LDFLAGS=`$PYTHON3_CONFIG --ldflags`
-	PYTHON_LIBS=`$PYTHON3_CONFIG --libs`
 
 	# Do some plaform specific fixes, python3-config is most of the times wrong!
 	UNAME_SYSTEM=`(uname -s) 2>/dev/null`
@@ -51,14 +50,12 @@ else
 	cat >"${MAKEFILE_DIR}/makefiles/gmake/python.mk.vars" <<EOF
 PYTHON_CFLAGS?=$PYTHON_CFLAGS
 PYTHON_LDFLAGS?=$PYTHON_LDFLAGS
-PYTHON_LIBS?=$PYTHON_LIBS
 EOF
 
 	# write the cache file (to protect against constant recomputations!)
 	cat >"${MAKEFILE_DIR}/makefiles/gmake/python.vars" <<EOF
 PYTHON_CFLAGS="$PYTHON_CFLAGS"
 PYTHON_LDFLAGS="$PYTHON_LDFLAGS"
-PYTHON_LIBS="$PYTHON_LIBS"
 EOF
 
 fi
@@ -68,9 +65,6 @@ case "$FLAG" in
 				;;
 
 	--ldflags)		echo $PYTHON_LDFLAGS
-				;;
-
-	--libs)			echo $PYTHON_LIBS
 				;;
 
 	*)			echo "unkown flag '$FLAG' requested!"

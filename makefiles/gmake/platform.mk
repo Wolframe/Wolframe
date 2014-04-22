@@ -3603,7 +3603,6 @@ endif
 PYTHON_DIR ?= /usr
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
-PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
@@ -3612,7 +3611,6 @@ PYTHON3_CONFIG ?= /usr/local/bin/python3.3-config
 PYTHON_DIR ?= /usr/local
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
-PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
@@ -3622,7 +3620,6 @@ PYTHON_DIR ?= /usr/pkg
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS_WRONG ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS := -L/usr/pkg/lib $(PYTHON_LDFLAGS_WRONG)
-PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
@@ -3631,7 +3628,6 @@ PYTHON3_CONFIG ?= /opt/csw/python-3.3.2/bin/python3-config
 PYTHON_DIR ?= /opt/csw/python-3.3.2
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
-PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 

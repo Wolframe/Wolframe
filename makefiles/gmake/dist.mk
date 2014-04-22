@@ -21,13 +21,16 @@ dist:
 		$(MAKE) distclean ; \
 		rm -f makefiles/gmake/platform.mk.vars; \
 		rm -f makefiles/gmake/platform.vars; \
-		find . -name .svn -exec rm -rf {} \; ; \
 		find . -name .git -exec rm -rf {} \; ; \
 		cd .. ; \
 		tar cvf $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar \
 			$(PACKAGE_NAME)-$(PACKAGE_VERSION)
 	-@rm -rf $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
 	@mv $(TMPDIR)/$(PACKAGE_NAME)-$(PACKAGE_VERSION).tar .
+
+dist-xz: dist
+	-@rm -rf $(PACKAGE_NAME)-$(PACKAGE_VERSION).xz
+	@xz -f $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar
 
 dist-bz2: dist
 	-@rm -rf $(PACKAGE_NAME)-$(PACKAGE_VERSION).bz2
