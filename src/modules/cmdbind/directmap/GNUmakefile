@@ -18,9 +18,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_serialize \
-	-lwolframe_langbind \
-	$(LIBS_DL)
-
+	-lwolframe_langbind
 
 DYNAMIC_MODULE = mod_command_directmap.so
 
