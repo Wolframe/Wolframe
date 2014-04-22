@@ -91,6 +91,8 @@ ifeq "$(PLATFORM)" "FREEBSD"
 ifeq ($(WITH_PYTHON),1)
 INCLUDE_LDFLAGS += \
 	$(PYTHON_LDFLAGS)
+INCLUDE_LIBS += \
+	$(PYTHON_LIBS)
 endif
 endif
 

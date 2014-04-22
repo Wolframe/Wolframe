@@ -21,7 +21,8 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwolframe_langbind
+	-lwolframe_langbind \
+	$(PYTHON_LIBS)
 
 DYNAMIC_MODULE = mod_command_python.so
 
