@@ -189,7 +189,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 		}
 		const char* rootelem = 0;
 		const char* doctypeid = 0;
-		
+
 		for (;;)
 		{
 			if (m_firstnode->string && m_firstnode->valuestring)

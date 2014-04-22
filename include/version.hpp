@@ -51,9 +51,9 @@ private:
 	unsigned	m_build;		///< Build number.
 	bool		m_hasBuild;		///< Is build number present ?
 public:
-	///\brief Empty Version constructor.
-	// This will contruct a Version object having major and minor versions set to 0,
-	// no revision number and no build number.
+	/// \brief Empty Version constructor.
+	/// This will contruct a Version object having major and minor versions set to 0,
+	/// no revision number and no build number.
 	Version()
 		: m_major( 0 ), m_minor( 0 ),
 		  m_revision( 0 ), m_hasRevision( false ),
@@ -65,16 +65,21 @@ public:
 		  m_build( o.m_build ), m_hasBuild( o.m_hasBuild )
 	{}
 
-	///\brief Parse a version string
-	///\param[in] version the version string to parse
-	///\param[in] format the format string of the version:
-	//	%M = Major version
-	//	%m = Minor version
-	//	%r = revision
-	//	%b = build number
-	//	%% = %
-	//	%| = Accepted end of version string (if the version string ends here, the input is accepted. If not parsing is continued with the rest of the format string as pattern)
+	/// \brief	Parse a version string
+	/// \param[in]	version the version string to parse
+	/// \param[in]	format the format string of the version:
+	/// \li		%M = Major version
+	/// \li		%m = Minor version
+	/// \li		%r = revision
+	/// \li		%b = build number
+	/// \li		%% = %
+	/// \li		%| = Accepted end of version string (if the version string ends
+	///		here, the input is accepted. If not parsing is continued with
+	///		the rest of the format string as pattern)
 	explicit Version( const char* version, const char* format="%M.%m%|.%r%|.%b");
+
+	/// \brief	Build a version object from an unsigned long
+	///		The format of the number is MMmmrrbbb
 	Version( unsigned long version );
 	Version( unsigned short M, unsigned short m );
 	Version( unsigned short M, unsigned short m, unsigned short r );
@@ -102,16 +107,18 @@ public:
 	/// using the usual OSS versioning schemas
 	bool isCompatible( const Version &other ) const;
 
-	/// \brief Print the version in 'major.minor.revision.build' format.
+	/// \brief	Print the version in 'major.minor.revision.build' format.
 	std::string toString() const;
 
-	/// \brief Print the version using custom format.
+	/// \brief	Print the version using custom format.
 	/// \param	format	the format string
 	std::string toString( const char* format ) const;
 
-	/// \brief Output the version as an unsigned long
-	/// The format of the output is MMmmrrbb
-	/// \note All numbers (major, minor...) will be cut to the 2 most significant decimal digits
+	/// \brief	Output the version as an unsigned long
+	///		The format of the output is MMmmrrbbb
+	/// \note	All numbers (major, minor...) will be cut to the 2 most significant
+	///		decimal digits except for the build number which will be cut
+	///		to 3 decimal digits
 	unsigned long toNumber() const;
 };
 

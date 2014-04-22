@@ -10,8 +10,6 @@
 # - OS_MAJOR_VERSION and OS_MINOR_VERSION
 # - GCC_MAJOR_VERSION and GCC_MINOR_VERSION
 # - PLATFORM_COMPILE_FLAGS
-# - EXE
-# - SO
 # - INSTALL
 # - BOOST_LIBRARY_TAG
 #
@@ -88,10 +86,6 @@ ifeq "$(PLATFORM)" "SUNOS"
 LIBDIR=lib
 endif
 
-
-# default location of system libraries per architecture
-SYSTEM_LIBDIR=/usr/$(LIBDIR)
-
 # platform specific flags
 #########################
 
@@ -126,13 +120,7 @@ PLATFORM_COMPILE_FLAGS += \
 			-DLINUX_REV=$(LINUX_REV)
 endif
 
-
-# extensions for shared libraries
-# (TOOD: HP/Unix has .shlib, Mac/X has .lib, but we can't test it currently)
-SO = .so
-
 # name if the installation program
-# (TODO: use the MIT or openradio install-sh script instead?)
 ifndef INSTALL
 ifeq "$(PLATFORM)" "SUNOS"
 INSTALL = /usr/ucb/install
@@ -145,12 +133,14 @@ endif
 ################
 
 # the linker library for dynamically loadable modules
-# (TODO: check for all platforms, as soon we add loadable modules here from
-# old TextWolf)
 ifeq "$(PLATFORM)" "LINUX"
 LIBS_DL = -ldl
 else
+ifeq "$(PLATFORM)" "SUNOS"
+LIBS_DL = -ldl
+else
 LIBS_DL =
+endif
 endif
 
 # Note for dlopen to work (at least on FreeBSD) with rtti information we have to export all symbols
@@ -171,7 +161,7 @@ endif
 
 ifeq "$(ENABLE_NLS)" "1"
 
-# we relly only on the GNU version, other versions (e.g. Solaris) are not
+# we rely only on the GNU version, other versions (e.g. Solaris) are not
 # so nice..
 
 MSGFMT=msgfmt
@@ -747,24 +737,25 @@ ifeq ($(WITH_LUA),1)
 ifeq "$(PLATFORM)" "LINUX"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
 LUA_PLATFORM_LDFLAGS =
-LUA_PLATFORM_LIBS = -ldl -lm
+LUA_PLATFORM_LIBS = $(LIBS_DL) -lm
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
-LUA_PLATFORM_LDFLAGS = -ldl -lm
+LUA_PLATFORM_LDFLAGS =
+LUA_PLATFORM_LIBS = $(LIBS_DL) -lm
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
 LUA_PLATFORM_LDFLAGS =
-LUA_PLATFORM_LIBS = -lm
+LUA_PLATFORM_LIBS = $(LIBS_DL) -lm
 endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
-LUA_PLATFORM_LDFLAGS =
-LUA_PLATFORM_LIBS = -lm
+LUA_PLATFORM_LDFLAGS = 
+LUA_PLATFORM_LIBS = $(LIBS_DL) -lm
 endif
 
 endif
@@ -3615,7 +3606,6 @@ endif
 PYTHON_DIR ?= /usr
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
-PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
@@ -3624,7 +3614,6 @@ PYTHON3_CONFIG ?= /usr/local/bin/python3.3-config
 PYTHON_DIR ?= /usr/local
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
-PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
@@ -3634,7 +3623,6 @@ PYTHON_DIR ?= /usr/pkg
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS_WRONG ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS := -L/usr/pkg/lib $(PYTHON_LDFLAGS_WRONG)
-PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 
@@ -3643,7 +3631,6 @@ PYTHON3_CONFIG ?= /opt/csw/python-3.3.2/bin/python3-config
 PYTHON_DIR ?= /opt/csw/python-3.3.2
 PYTHON_CFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --cflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LDFLAGS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --ldflags "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
-PYTHON_LIBS ?= $(shell $(SHELL) $(TOPDIR)/makefiles/gmake/guess_python --libs "$(PYTHON3_CONFIG)" "$(CURDIR)" $(TOPDIR))
 PYTHON_LIB_DIR ?= $(PYTHON_DIR)/lib
 endif
 

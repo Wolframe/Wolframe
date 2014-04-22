@@ -60,8 +60,6 @@ BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-libdir=$(execdir)/$(LIBDIR)
-
 # overwrite flags so they fit to how Lua people compile the software.
 # we get too many spurios errors and problems (for instance in abuild
 # checks on openSuSE). This doesn't mean they should not be fixed
