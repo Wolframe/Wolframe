@@ -3,7 +3,6 @@
 VERSION=0.0.1
 PKGBUILD=$HOME/archbuild
 ARCH=`uname -m`
-LIBDIR="/usr/lib"
 rm -rf $PKGBUILD/BUILD $PKGBUILD/PKG
 
 check_for_errors( )

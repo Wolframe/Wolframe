@@ -1847,8 +1847,7 @@ export PATH
 		        <programlisting language='shell'>
 	make WITH_PYTHON=1 \
 		PYTHON_CFLAGS=-I/usr/include/python3.3m -I/usr/include/python3.3m \
-		PYTHON_LDFLAGS=-lpthread -Xlink -export-dynamic \
-		PYTHON_LIBS=-lpython3.3m
+		PYTHON_LDFLAGS=-lpthread -lpython3.3m -Xlink -export-dynamic \
 			</programlisting>				
 			
 			</para>
