@@ -854,7 +854,8 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 	if (typ)
 	{
 		types::CustomDataInitializerR ini;
-		if (!initializerList.empty())
+
+		if (!typ->hasInitializer())
 		{
 			ini.reset( typ->createInitializer( initializerList));
 		}

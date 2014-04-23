@@ -17,6 +17,9 @@
 	<para>
 		A <code>.wnmp</code> file contains assignments of a type name to sequences 
 		of basic normalization function calls where the first takes the initial input.
+		A normalization function call can either be a normalizer function 
+		or a custom data type defined in a module or a method of the predecessing
+		custom data type in the sequence of the normalization function calls.
 		The output of a function in the sequence gets the input of the next one and 
 		the final output for the last one.
 		Each normalization step validates the input as atomic type (arithmetic,string,etc.)

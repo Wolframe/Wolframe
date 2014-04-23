@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/customDataTypeModuleMacros.hpp
-///\brief Macros for defining a custom datatype module
+///\file appdevel/moduleFrameMacros.hpp
+///\brief Macros for defining the frame of a Wolframe application extension module
 #include "appdevel/module/customDataTypeBuilder.hpp"
 
 ///\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
