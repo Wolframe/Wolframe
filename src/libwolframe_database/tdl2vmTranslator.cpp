@@ -220,6 +220,14 @@ void Tdl2vmTranslator::output_statement_result( bool isLoop)
 	;
 }
 
+void Tdl2vmTranslator::begin_INTO_block( const std::string& name)
+{
+	// Code generated:
+	m_main_program.code
+		( Op_OUTPUT_OPEN, m_main_program.tagnametab.get( name))
+	;
+	m_stateStack.push_back( State( State::OpenIntoBlock, 1/*nof path elements*/));
+}
 
 void Tdl2vmTranslator::begin_INTO_block( const std::vector<std::string>& path)
 {
@@ -855,8 +863,22 @@ void Tdl2vmTranslator::setCurrentSourceReference( const utils::FileLineInfo& pos
 	m_main_program.setCurrentSourceReference( posinfo);
 }
 
+void Tdl2vmTranslator::add_auditcall( const vm::Program& auditcallprg)
+{
+	if (!m_stateStack.empty()) throw std::runtime_error( "illegal state: add audit call in bad context");
 
-ProgramR Tdl2vmTranslator::createProgram() const
+	m_main_program.code
+		( Op_OUTPUT_ADD_SINK )		// new output stream for audit function input
+		( Op_SCOPE_OPEN )		// own scope is created that inherits parent (main scope)
+	;
+	m_main_program.add( auditcallprg);
+
+	m_main_program.code
+		( Op_SCOPE_CLOSE )
+	;
+}
+
+ProgramR Tdl2vmTranslator::createProgram( bool withReturn) const
 {
 	ProgramR rt;
 
@@ -897,9 +919,12 @@ ProgramR Tdl2vmTranslator::createProgram() const
 	}
 	//Add final return (to main or successful termination of the program):
 	// Code generated:
-	rt->code
-		( Op_RETURN )
-	;
+	if (withReturn)
+	{
+		rt->code
+			( Op_RETURN )
+		;
+	}
 	return rt;
 }
 

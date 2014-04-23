@@ -30,12 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Definition of a preprocessing statement parsing result
-///\file tdl/preprocCallStatement.hpp
-#ifndef _DATABASE_TDL_PREPROC_CALL_STATEMENT_HPP_INCLUDED
-#define _DATABASE_TDL_PREPROC_CALL_STATEMENT_HPP_INCLUDED
+///\brief Definition of embedded database statement parsing result
+///\file tdl/auditCallStatement.hpp
+#ifndef _DATABASE_TDL_AUDIT_CALL_STATEMENT_HPP_INCLUDED
+#define _DATABASE_TDL_AUDIT_CALL_STATEMENT_HPP_INCLUDED
 #include "database/databaseLanguage.hpp"
-#include "tdl/preprocElementReference.hpp"
+#include "tdl/auditElementReference.hpp"
 #include <string>
 #include <vector>
 
@@ -43,20 +43,20 @@ namespace _Wolframe {
 namespace db {
 namespace tdl {
 
-struct PreProcCallStatement
+struct AuditCallStatement
 {
 	std::string name;				//< function name
-	std::vector<PreProcElementReference> params;	//< list of call arguments
+	std::vector<AuditElementReference> params;	//< list of call arguments
 
-	PreProcCallStatement(){}
-	PreProcCallStatement( const PreProcCallStatement& o)
+	AuditCallStatement(){}
+	AuditCallStatement( const AuditCallStatement& o)
 		:name(o.name),params(o.params){}
-	PreProcCallStatement( const std::string& name_, const std::vector<PreProcElementReference>& params_)
+	AuditCallStatement( const std::string& name_, const std::vector<AuditElementReference>& params_)
 		:name(name_),params(params_){}
 
 	void clear();
 
-	static PreProcCallStatement parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce);
+	static AuditCallStatement parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce);
 };
 
 }}}//namespace

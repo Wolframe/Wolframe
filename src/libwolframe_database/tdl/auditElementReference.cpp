@@ -30,58 +30,30 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of a preprocessing statement parsing
-///\file tdl/preprocCallStatement.cpp
-#include "tdl/preprocCallStatement.hpp"
+///\brief Implementation of the audit function call parameter parsing
+///\file tdl/auditElementReference.cpp
+#include "tdl/auditElementReference.hpp"
+#include "tdl/elementReference.hpp"
 #include "tdl/parseUtils.hpp"
+#include <string>
+#include <vector>
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-void PreProcCallStatement::clear()
+AuditElementReference AuditElementReference::parse( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	name.clear();
-	params.clear();
-}
+	std::string name;
 
-PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
-{
-	PreProcCallStatement rt;
-	rt.name = parseFunctionName( langdescr, ci, ce);
+	bool nameDefined = parseNameAssignment( langdescr, name, si, se);
+	ElementReference elem = ElementReference::parsePlainReference( langdescr, si, se);
 
-	char ch = gotoNextToken( langdescr, ci, ce);
-	if (ch != '(')
+	if (elem.type == ElementReference::SelectorPath && !nameDefined)
 	{
-		throw std::runtime_error( "'(' expected after function name");
+		name = extractImplicitNameFromSelector( elem.selector);
 	}
-	++ci; ch = utils::gotoNextToken( ci, ce);
-	if (!ch) throw std::runtime_error( "unexpected end of transaction description. Function parameter list expected");
-
-	// Parse parameter list:
-	if (')' != utils::gotoNextToken( ci, ce))
-	{
-		for (;;)
-		{
-			rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
-			ch = utils::gotoNextToken( ci, ce);
-			if (ch == ',')
-			{
-				++ci;
-				ch = utils::gotoNextToken( ci, ce);
-				if (ch == ')') throw std::runtime_error( "unexpected token ')' immediately after comma ',' in parameter list");
-			}
-			else if (ch == ')')
-			{
-				break;
-			}
-			else
-			{
-				throw std::runtime_error( "unexpected token (comma or close bracket excepted as separator in parameter list)");
-			}
-		}
-	}
-	++ci;	
-	return rt;
+	return AuditElementReference( name, elem);
 }
 

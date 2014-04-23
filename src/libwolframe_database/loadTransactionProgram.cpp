@@ -37,12 +37,14 @@
 #include "tdl/elementReference.hpp"
 #include "tdl/subroutineCallStatement.hpp"
 #include "tdl/embeddedStatement.hpp"
+#include "tdl/auditCallStatement.hpp"
 #include "tdl/preprocElementReference.hpp"
 #include "tdl/preprocCallStatement.hpp"
 #include "tdl/preprocBlock.hpp"
 #include "tdl/parseUtils.hpp"
 #include "tdl2vmTranslator.hpp"
 #include "tdlTransactionFunction.hpp"
+#include "tdlAuditStep.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/fileLineInfo.hpp"
@@ -503,11 +505,92 @@ static bool parseSubroutineBody( Tdl2vmTranslator& prg, const std::string& datab
 
 
 typedef types::keymap<vm::Subroutine> SubroutineMap;
+struct AuditCallDef
+{
+	TdlAuditStep::AuditLevel level;
+	std::string function;
+	vm::ProgramR program;
+
+	AuditCallDef()
+		:level(TdlAuditStep::Informal){}
+	AuditCallDef( const AuditCallDef& o)
+		:level(o.level),function(o.function),program(o.program){}
+	AuditCallDef( TdlAuditStep::AuditLevel v, const std::string f, vm::ProgramR p)
+		:level(v),function(f),program(p){}
+};
+
+static AuditCallDef parseAuditCallDef( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const SubroutineMap& subroutineMap, utils::FileLineInfo& posinfo)
+{
+	Tdl2vmTranslator prg( &subroutineMap, false/*isSubroutine=false*/);
+	TdlAuditStep::AuditLevel auditlevel = TdlAuditStep::Informal;
+	if (tdl::parseKeyword( langdescr, si, se, "CRITICAL"))
+	{
+		auditlevel = TdlAuditStep::Critical;
+	}
+	std::string::const_iterator si_prev = si;
+	std::string::const_iterator posinfo_si = si;
+
+	std::string auditfunction = tdl::parseFunctionName( langdescr, si, se);
+	if ('(' == tdl::gotoNextToken( langdescr, si, se))
+	{
+		si = si_prev;
+		tdl::AuditCallStatement auditstm = tdl::AuditCallStatement::parse( langdescr, si, se);
+		std::vector<tdl::AuditElementReference>::const_iterator pi = auditstm.params.begin(), pe = auditstm.params.end();
+		for (; pi != pe; ++pi)
+		{
+			bool hasIntoBlock = !(pi->name.size() == 0 || (pi->name.size() == 1 && pi->name[0] == '.'));
+			if (hasIntoBlock)
+			{
+				prg.begin_INTO_block( pi->name);
+			}
+			switch (pi->type)
+			{
+				case tdl::ElementReference::SelectorPath:
+					prg.output_ARGUMENT_PATH( pi->selector);
+					break;
+				case tdl::ElementReference::LoopCounter:
+					prg.output_ARGUMENT_LOOPCNT();
+				case tdl::ElementReference::Constant:
+					prg.output_ARGUMENT_CONST( pi->selector);
+					break;
+				case tdl::ElementReference::NamedSetElement:
+					prg.output_ARGUMENT_TUPLESET( pi->selector, pi->name);
+					break;
+				case tdl::ElementReference::IndexSetElement:
+					prg.output_ARGUMENT_TUPLESET( pi->selector, pi->index);
+					break;
+			}
+			if (hasIntoBlock)
+			{
+				prg.end_INTO_block();
+			}
+		}
+		posinfo.update( posinfo_si, si);
+		posinfo_si = si;
+	}
+	else
+	{
+		if (!tdl::parseKeyword( langdescr, si, se, "WITH"))
+		{
+			throw std::runtime_error( "WITH or open bracket expected after AUDIT <function> or AUDIT CRITICAL <function>");
+		}
+		if (!tdl::parseKeyword( langdescr, si, se, "BEGIN"))
+		{
+			throw std::runtime_error( "BEGIN expected after AUDIT <function> WITH or AUDIT CRITICAL <function> WITH");
+		}
+		posinfo.update( posinfo_si, si);
+		posinfo_si = si;
+
+		parsePrgBlock( prg, langdescr, si, se, posinfo);
+		posinfo_si = si;
+	}
+	return AuditCallDef( auditlevel, auditfunction, prg.createProgram( false));
+}
 
 static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::string& transactionFunctionName, const std::string& databaseId, const std::string& databaseClassName, const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se, const SubroutineMap& subroutineMap, utils::FileLineInfo& posinfo)
 {
-	static const char* g_transaction_ids[] = {"DATABASE","AUTHORIZE","RESULT","PREPROC","BEGIN",0};
-	enum TransactionKeyword{ b_NONE, b_DATABASE,b_AUTHORIZE,b_RESULT,b_PREPROC,b_BEGIN};
+	static const char* g_transaction_ids[] = {"TRANSACTION","SUBROUTINE","TEMPLATE","INCLUDE","DATABASE","AUTHORIZE","RESULT","PREPROC","BEGIN","AUDIT", 0};
+	enum TransactionKeyword{ b_NONE, b_TRANSACTION, b_SUBROUTINE, b_TEMPLATE, b_INCLUDE, b_DATABASE, b_AUTHORIZE, b_RESULT, b_PREPROC, b_BEGIN, b_AUDIT};
 	static const utils::IdentifierTable g_transaction_idtab( false, g_transaction_ids);
 
 	bool isValidDatabase = true;
@@ -516,11 +599,16 @@ static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::str
 	std::string authfunction;
 	std::string authresource;
 	tdl::PreProcBlock preproc;
+	std::vector<AuditCallDef> auditcalls;
+
+	Tdl2vmTranslator prg( &subroutineMap, false/*isSubroutine=false*/);
 
 	std::string::const_iterator posinfo_si = si;
 
 	while (tdl::gotoNextToken( langdescr, si, se))
 	{
+		std::string::const_iterator si_prev = si;
+
 		switch ((TransactionKeyword)utils::parseNextIdentifier( si, se, g_transaction_idtab))
 		{
 			case b_NONE:
@@ -529,10 +617,18 @@ static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::str
 				char ch = utils::parseNextToken( tok, si, se);
 				throw std::runtime_error( std::string("unexpected token in TDL subroutine header. keyword (") + g_transaction_idtab.tostring() + ") expected instead of " + tdl::errorTokenString( ch, tok));
 			}
+			case b_TRANSACTION:
+			case b_SUBROUTINE:
+			case b_TEMPLATE:
+			case b_INCLUDE:
+				si = si_prev;
+				goto EXITLOOP;
+
 			case b_DATABASE:
 				tdl::checkUniqOccurrence( b_DATABASE, mask, g_transaction_idtab);
 				isValidDatabase = checkDatabaseList( databaseId, databaseClassName, langdescr, si, se);
 				break;
+
 			case b_RESULT:
 			{
 				tdl::checkUniqOccurrence( b_RESULT, mask, g_transaction_idtab);
@@ -546,6 +642,7 @@ static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::str
 				}
 				break;
 			}
+
 			case b_AUTHORIZE:
 			{
 				if ('(' != tdl::gotoNextToken( langdescr, si, se))
@@ -567,33 +664,52 @@ static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::str
 				++si;
 				break;
 			}
+
 			case b_PREPROC:
 			{
 				tdl::checkUniqOccurrence( b_PREPROC, mask, g_transaction_idtab);
 				preproc = tdl::PreProcBlock::parse( langdescr, si, se);
 				break;
 			}
+
 			case b_BEGIN:
 			{
 				tdl::checkUniqOccurrence( b_BEGIN, mask, g_transaction_idtab);
-				Tdl2vmTranslator prg( &subroutineMap, false);
 
 				posinfo.update( posinfo_si, si);
 				posinfo_si = si;
 
 				parsePrgBlock( prg, langdescr, si, se, posinfo);
 				posinfo_si = si;
+				break;
+			}
 
-				if (isValidDatabase)
-				{
-					vm::ProgramR program = prg.createProgram();
-					tfunc.reset( new TdlTransactionFunction( transactionFunctionName, resultfilter, authfunction, authresource, preproc.build(program.get()), program));
-				}
-				return isValidDatabase;
+			case b_AUDIT:
+			{
+				posinfo.update( posinfo_si, si);
+				posinfo_si = si;
+				auditcalls.push_back( parseAuditCallDef( langdescr, si, se, subroutineMap, posinfo));
+				posinfo_si = si;
+				break;
 			}
 		}
 	}
-	throw std::runtime_error( "unexpected end of file in transaction function declaration");
+EXITLOOP:
+	if (isValidDatabase)
+	{
+		std::vector<TdlAuditStep> auditsteps;
+		std::vector<AuditCallDef>::const_iterator ai = auditcalls.begin(), ae = auditcalls.end();
+		for (; ai != ae; ++ai)
+		{
+			prg.add_auditcall( *ai->program);
+			auditsteps.push_back( TdlAuditStep( ai->level, ai->function));
+		}
+
+		vm::ProgramR program = prg.createProgram();
+		tfunc.reset( new TdlTransactionFunction( transactionFunctionName, resultfilter, authfunction, authresource, preproc.build(program.get()), auditsteps, program));
+	}
+	posinfo.update( posinfo_si, si);
+	return isValidDatabase;
 }
 
 

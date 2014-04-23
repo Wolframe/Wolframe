@@ -158,7 +158,7 @@
 						caller instead.
 					</para>
 				</listitem>
-				<listitem><programlisting>PREPROC &lt;...preprocessing instructions...&gt; ENDPROC</programlisting>
+				<listitem><programlisting>PREPROC &lt;...instructions...&gt; ENDPROC</programlisting>
 					<para>
 						This optional block contains instructions on the transaction
 						function input. The result of these preprocessing instructions are
@@ -173,6 +173,28 @@
 					The main processing block starts with <code>BEGIN</code> and
 					ends with <code>END</code>. It contains all the database instructions
 					needed for completing this transaction.
+					</para>
+				</listitem>
+				<listitem><programlisting>AUDIT [CRITICAL] &lt;funcname...&gt; WITH BEGIN &lt;...instructions...&gt; END</programlisting>
+					<para>
+						This optional block specifies a function that is executed
+						at the end of a transaction. The input of the function is
+						the structure built from the output of the instructions block.
+						If CRITICAL is specified then the transaction fails (rollback) if the
+						audit function fails. Otherwise there is just the error of
+						the audit function logged, but the transaction is completed (commit).
+						You can specify several audit functions. The variables in the
+						instructions block refer to the scope of the main processing
+						block. So you can reference everything that is referencable
+						after the last instruction of the main processing block.
+					</para>
+				</listitem>
+				<listitem><programlisting>AUDIT [CRITICAL] &lt;funcname...&gt; ( &lt;...parameter...&gt; )</programlisting>
+					<para>
+					If the input structure of the audit function is just one
+					parameter list this alternative syntax for an audit function declaration
+					can be used. You simply specify the audit function call after the
+					AUDIT or optionally after the CRITICAL keyword.
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -190,6 +212,8 @@
 			BEGIN
 				...&lt;instructions&gt;...
 			END
+			AUDIT CRITICAL &lt;funcname&gt; ( ...&lt;parameter&gt;... )
+
 			</programlisting>
 			The lines with AUTHORIZE,DATABASE,RESULT INTO and FILTER are optional.
 			So is the preprocessing block PREPROC..ENDPROC. A simpler

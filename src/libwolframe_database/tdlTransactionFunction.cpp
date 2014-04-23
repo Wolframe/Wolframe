@@ -41,6 +41,7 @@
 #include "logger-v1.hpp"
 #include <string>
 #include <vector>
+#include <boost/scoped_ptr.hpp>
 
 #undef LOWLEVEL_DEBUG
 
@@ -342,15 +343,12 @@ bool TdlTransactionFunctionClosure::call()
 			db::VmTransactionInput inp( *m_func->program(), m_inputstructptr->structure());
 			db::VmTransactionOutput res;
 			{
-				types::CountedReference<db::Transaction> trsr( m_context->provider()->transaction( m_func->name()));
+				boost::scoped_ptr<db::Transaction> trsr( m_context->provider()->transaction( m_func->name()));
 				if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
 				trsr->begin();
 
-				if (trsr->execute( inp, res))
-				{
-					trsr->commit();
-				}
-				else
+				// Execute transaction:
+				if (!trsr->execute( inp, res))
 				{
 					const db::DatabaseError* err = trsr->getLastError();
 					if (err)
@@ -366,6 +364,56 @@ bool TdlTransactionFunctionClosure::call()
 						throw std::runtime_error( databaseError_throwtext( ue, m_func->name()));
 					}
 				}
+
+				// Make audit calls:
+				std::vector<TdlAuditStep>::const_iterator ai = m_func->audit().begin(), ae = m_func->audit().end();
+				std::size_t auditFunctionIdx = 1;
+				for (; ai != ae; ++ai,++auditFunctionIdx)
+				{
+					// ... for each audit function take the transaction output defined as input of the audit function and call it
+					try
+					{
+						LOG_DEBUG << "calling audit function '" << ai->function() << "'";
+
+						langbind::TypedInputFilterR auditParameter = res.get( auditFunctionIdx);
+						const langbind::FormFunction* auditfunc = m_context->provider()->formFunction( ai->function());
+						if (!auditfunc)
+						{
+							throw std::runtime_error( std::string( "transaction audit function '") + ai->function() + "' not found (must be defined as form function)");
+						}
+						langbind::FormFunctionClosureR auditclosure = langbind::FormFunctionClosureR( auditfunc->createClosure());
+						auditclosure->init( m_context, auditParameter);
+					
+						if (!auditclosure->call())
+						{
+							throw std::runtime_error( std::string( "failed to call audit function '") + ai->function() + "' (input not complete)");
+						}
+						langbind::TypedInputFilterR auditresult = auditclosure->result();
+						langbind::FilterBase::ElementType et;
+						types::VariantConst ev;
+
+						if (auditresult->getNext( et, ev) || et != langbind::FilterBase::CloseTag)
+						{
+							LOG_WARNING << "called audit function '" << ai->function() << "' that returned a non empty result";
+						}
+					}
+					catch (const std::runtime_error& e)
+					{
+						if (ai->level() == TdlAuditStep::Critical)
+						{
+							trsr->rollback();
+							throw std::runtime_error( std::string("critical audit function '") + ai->function() + "' failed and so the transaction function '" + m_func->name() + "' (rollback): '" + e.what());
+						}
+						else
+						{
+							LOG_ERROR << "non critical audit function '" << ai->function() << "' failed for the transaction function '" << m_func->name() << "'";
+						}
+					}
+					
+				}
+
+				// Commit:
+				trsr->commit();
 			}
 			// Build output:
 			if (m_func->resultfilter().empty())

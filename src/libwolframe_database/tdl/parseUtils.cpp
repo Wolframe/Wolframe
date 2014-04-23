@@ -50,6 +50,21 @@ bool tdl::isIdentifier( const std::string& str)
 	return (si == se);
 }
 
+std::string tdl::extractImplicitNameFromSelector( const std::string& selector)
+{
+	if (selector == ".")
+	{
+		return std::string();
+	}
+	std::string::const_iterator si = selector.begin(), se = selector.end();
+	std::string::const_iterator lastElemStart = si;
+	for (; si != se; ++si)
+	{
+		if (*si == '/') lastElemStart = si+1;
+	}
+	return std::string( lastElemStart, se);
+}
+
 std::string tdl::errorTokenString( char ch, const std::string& tok)
 {
 	if (g_optab[ch])
@@ -181,7 +196,7 @@ std::string tdl::parseFunctionName( const LanguageDescription* langdescr, std::s
 	char ch = gotoNextToken( langdescr, si, se);
 	if (!ch)
 	{
-		throw std::runtime_error( "unexpected end of transaction. Preprocessing call expected");
+		throw std::runtime_error( "unexpected end of transaction (function name expected)");
 	}
 	if (!isAlphaNumeric( ch))
 	{
@@ -244,4 +259,34 @@ std::string tdl::parseResultName( const LanguageDescription* langdescr, std::str
 	return parseSubroutineName( langdescr, si, se);
 }
 
+bool tdl::parseNameAssignment( const LanguageDescription* langdescr, std::string& name, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	std::string::const_iterator start = si;
+	std::string tok;
+	bool nameDefined = false;
+
+	char ch = gotoNextToken( langdescr, si, se);
+	if (isAlphaNumeric( ch) || ch == '.')
+	{
+		//... try to parse assignment first
+		parseNextToken( langdescr, tok, si, se);
+		ch = gotoNextToken( langdescr, si, se);
+		if (ch == '=')
+		{
+			if (tok != ".")
+			{
+				name = tok;
+			}
+			nameDefined = true;
+			++si;
+			ch = gotoNextToken( langdescr, si, se);
+		}
+		else
+		{
+			//... no assignment found -> fallback
+			si = start;
+		}
+	}
+	return nameDefined;
+}
 

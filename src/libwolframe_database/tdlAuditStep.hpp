@@ -30,35 +30,47 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Definition of a preprocessing statement parsing result
-///\file tdl/preprocCallStatement.hpp
-#ifndef _DATABASE_TDL_PREPROC_CALL_STATEMENT_HPP_INCLUDED
-#define _DATABASE_TDL_PREPROC_CALL_STATEMENT_HPP_INCLUDED
-#include "database/databaseLanguage.hpp"
-#include "tdl/preprocElementReference.hpp"
+///\brief Definition of an auditing function call
+///\file tdlAuditStep.hpp
+#ifndef _DATABASE_TDL_TRANSACTION_AUDIT_STEP_HPP_INCLUDED
+#define _DATABASE_TDL_TRANSACTION_AUDIT_STEP_HPP_INCLUDED
 #include <string>
 #include <vector>
+#include <stdexcept>
+#include <iostream>
 
 namespace _Wolframe {
 namespace db {
-namespace tdl {
 
-struct PreProcCallStatement
+class TdlAuditStep
 {
-	std::string name;				//< function name
-	std::vector<PreProcElementReference> params;	//< list of call arguments
+public:
+	enum AuditLevel
+	{
+		Informal,
+		Critical
+	};
 
-	PreProcCallStatement(){}
-	PreProcCallStatement( const PreProcCallStatement& o)
-		:name(o.name),params(o.params){}
-	PreProcCallStatement( const std::string& name_, const std::vector<PreProcElementReference>& params_)
-		:name(name_),params(params_){}
+public:
+	TdlAuditStep()
+		:m_level(Informal){}
 
-	void clear();
+	TdlAuditStep( AuditLevel level_, const std::string& function_)
+		:m_level(level_),m_function(function_){}
 
-	static PreProcCallStatement parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce);
+	TdlAuditStep( const TdlAuditStep& o)
+		:m_level(o.m_level)
+		,m_function(o.m_function){}
+
+public:
+	AuditLevel level() const		{return m_level;}
+	const std::string& function() const	{return m_function;}
+	
+private:
+	AuditLevel m_level;
+	std::string m_function;
 };
 
-}}}//namespace
+}}//namespace
 #endif
 

@@ -60,6 +60,7 @@ public:
 	void define_resultset_nonempty();
 
 	void begin_INTO_block( const std::vector<std::string>& path);
+	void begin_INTO_block( const std::string& name);
 	void end_INTO_block();
 
 	void begin_loop_INTO_block( const std::vector<std::string>& path);
@@ -96,7 +97,9 @@ public:
 
 	void result_KEEP( const std::string& name);
 
-	vm::ProgramR createProgram() const;
+	void add_auditcall( const vm::Program& auditcallprg);
+	
+	vm::ProgramR createProgram( bool withReturn=true) const;
 
 private:
 	struct State

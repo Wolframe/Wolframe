@@ -72,7 +72,7 @@ public:
 		return false;
 	}
 
-	langbind::TypedInputFilterR get() const;
+	langbind::TypedInputFilterR get( std::size_t index=0) const;
 
 private:
 	vm::OutputR m_impl;

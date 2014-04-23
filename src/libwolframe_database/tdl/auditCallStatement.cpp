@@ -30,24 +30,24 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of a preprocessing statement parsing
-///\file tdl/preprocCallStatement.cpp
-#include "tdl/preprocCallStatement.hpp"
+///\brief Implementation of the audit statement
+///\file tdl/auditCallStatement.cpp
+#include "tdl/auditCallStatement.hpp"
 #include "tdl/parseUtils.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-void PreProcCallStatement::clear()
+void AuditCallStatement::clear()
 {
 	name.clear();
 	params.clear();
 }
 
-PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
+AuditCallStatement AuditCallStatement::parse( const LanguageDescription* langdescr, std::string::const_iterator& ci, std::string::const_iterator ce)
 {
-	PreProcCallStatement rt;
+	AuditCallStatement rt;
 	rt.name = parseFunctionName( langdescr, ci, ce);
 
 	char ch = gotoNextToken( langdescr, ci, ce);
@@ -63,7 +63,7 @@ PreProcCallStatement PreProcCallStatement::parse( const LanguageDescription* lan
 	{
 		for (;;)
 		{
-			rt.params.push_back( PreProcElementReference::parse( langdescr, ci, ce));
+			rt.params.push_back( AuditElementReference::parse( langdescr, ci, ce));
 			ch = utils::gotoNextToken( ci, ce);
 			if (ch == ',')
 			{

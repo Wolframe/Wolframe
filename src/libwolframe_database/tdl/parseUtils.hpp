@@ -73,6 +73,7 @@ std::string errorTokenString( char ch, const std::string& tok);
 char gotoNextToken( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator se);
 char parseNextToken( const LanguageDescription* langdescr, std::string& tok, std::string::const_iterator& si, std::string::const_iterator se);
 bool parseKeyword( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se, const char* keyword);
+std::string extractImplicitNameFromSelector( const std::string& selector);
 
 std::vector<std::string> parse_INTO_path( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 std::vector<std::string> parseTemplateArguments( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se);
@@ -84,6 +85,7 @@ std::string parseSelectorPath( const LanguageDescription* langdescr, std::string
 std::string parseFilename( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 std::string parseSubroutineName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
 std::string parseResultName( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se);
+bool parseNameAssignment( const LanguageDescription* langdescr, std::string& name, std::string::const_iterator& si, std::string::const_iterator se);
 
 void checkUniqOccurrence( int id, unsigned int& mask, const utils::IdentifierTable& idtab);
 

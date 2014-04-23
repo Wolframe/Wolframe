@@ -24,6 +24,8 @@ TDL_CPP_OBJS = \
 	tdl\elementReference.obj \
 	tdl\embeddedStatement.obj \
 	tdl\parseUtils.obj \
+	tdl\auditCallStatement.obj \
+	tdl\auditElementReference.obj \
 	tdl\preprocCallStatement.obj \
 	tdl\preprocElementReference.obj \
 	tdl\preprocBlock.obj \

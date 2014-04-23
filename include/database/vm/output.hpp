@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file database/vm/output.hpp
-///\brief Defines the output of a virtual machine for database transactions
+/// \file database/vm/output.hpp
+/// \brief Defines the output of a virtual machine for database transactions
 #ifndef _DATABASE_VIRTUAL_MACHINE_OUTPUT_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_OUTPUT_HPP_INCLUDED
 #include "types/variant.hpp"
@@ -42,23 +42,26 @@ namespace _Wolframe {
 namespace db {
 namespace vm {
 
-///\class Output
-///\brief Output structure of the VM for transactions
+/// \class Output
+/// \brief Output structure of the VM for transactions
 class Output
 {
 public:
-	///\brief Default constructor
-	Output(){}
-	///\brief Copy constructor
+	/// \brief Default constructor
+	Output()
+	{
+		addOutputSink();
+	}
+	/// \brief Copy constructor
 	Output( const Output& o)
 		:m_ar(o.m_ar){}
 
-	///\class Element
-	///\brief Element of output
+	/// \class Element
+	/// \brief Element of output
 	class Element
 	{
 	public:
-		///\brief Operation of output
+		/// \brief Operation of output
 		enum Operation
 		{
 			Open,			//< open of a single element
@@ -69,22 +72,22 @@ public:
 			CloseArrayElement,	//< close of an array element
 			Value			//< content value
 		};
-		///\brief Default constructor
+		/// \brief Default constructor
 		Element()
 			:m_op(Value){}
-		///\brief Copy constructor
+		/// \brief Copy constructor
 		Element( const Element& o)
 			:m_op(o.m_op),m_arg(o.m_arg){}
-		///\brief Constructor
+		/// \brief Constructor
 		Element( const Operation& op_, const types::Variant& arg_)
 			:m_op(op_),m_arg(arg_){}
-		///\brief Constructor
+		/// \brief Constructor
 		explicit Element( const Operation& op_)
 			:m_op(op_){}
 
-		///\brief Get the operation of output
+		/// \brief Get the operation of output
 		Operation op() const			{return m_op;}
-		///\brief Get the argument of output
+		/// \brief Get the argument of output
 		const types::Variant& arg() const	{return m_arg;}
 
 	private:
@@ -92,30 +95,37 @@ public:
 		types::Variant m_arg;			//< argument of output
 	};
 
-	///\brief Add element to output
-	///\param[in] element to add
+	/// \brief Add element to output
+	/// \param[in] element to add
 	void add( const Element& elem)
 	{
-		m_ar.push_back( elem);
+		m_ar.back().push_back( elem);
 	}
-	///\brief Add a value element to output
-	///\param[in] value value of element to add
+	/// \brief Add a value element to output
+	/// \param[in] value value of element to add
 	void addValue( const types::Variant& value)
 	{
-		m_ar.push_back( Element( Element::Value, value));
+		m_ar.back().push_back( Element( Element::Value, value));
+	}
+
+	/// \brief Add a new output sink and declare it as the current output
+	void addOutputSink()
+	{
+		m_ar.push_back( ElementArray());
 	}
 
 	typedef std::vector<Element>::const_iterator const_iterator;
-	///\brief Get the start iterator on this output
-	const_iterator begin() const				{return m_ar.begin();}
-	///\brief Get the end iterator on this output
-	const_iterator end() const				{return m_ar.end();}
+	/// \brief Get the start iterator on this output
+	const_iterator begin( std::size_t i=0) const			{if (i>=m_ar.size()) throw std::runtime_error("array bound access"); return m_ar[i].begin();}
+	/// \brief Get the end iterator on this output
+	const_iterator end( std::size_t i=0) const			{if (i>=m_ar.size()) throw std::runtime_error("array bound access"); return m_ar[i].end();}
 
-	///\brief Get the array of output elements
-	const std::vector<Element>& elements() const;
+	/// \brief Get the array of output elements
+	const std::vector<Element>& elements( std::size_t i=0) const	{if (i>=m_ar.size()) throw std::runtime_error("array bound access"); return m_ar[i];}
 
 private:
-	std::vector<Element> m_ar;		//< array of output elements
+	typedef std::vector<Element> ElementArray;
+	std::vector<ElementArray> m_ar;			//< array of output element vectors (first element is the transaction output and the following are the auditing function inputs)
 };
 
 typedef boost::shared_ptr<Output> OutputR;

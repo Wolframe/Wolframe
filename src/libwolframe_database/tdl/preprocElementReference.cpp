@@ -44,52 +44,12 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-static std::string extractImplicitNameFromSelector( const std::string& selector)
-{
-	if (selector == ".")
-	{
-		return std::string();
-	}
-	std::string::const_iterator si = selector.begin(), se = selector.end();
-	std::string::const_iterator lastElemStart = si;
-	for (; si != se; ++si)
-	{
-		if (*si == '/') lastElemStart = si+1;
-	}
-	return std::string( lastElemStart, se);
-}
-
 PreProcElementReference PreProcElementReference::parse( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	PreProcElementReference rt;
-	std::string tok;
-	char ch;
-	std::string::const_iterator start = si;
-	bool nameDefined = false;
-
-	ch = gotoNextToken( langdescr, si, se);
-	if (isAlphaNumeric( ch) || ch == '.')
-	{
-		//... try to parse assignment first
-		parseNextToken( langdescr, tok, si, se);
-		ch = gotoNextToken( langdescr, si, se);
-		if (ch == '=')
-		{
-			if (tok != ".")
-			{
-				rt.name = tok;
-			}
-			nameDefined = true;
-			++si;
-			ch = gotoNextToken( langdescr, si, se);
-		}
-		else
-		{
-			//... no assignment found -> fallback
-			si = start;
-		}
-	}
+	bool nameDefined = parseNameAssignment( langdescr, rt.name, si, se);
 	ElementReference elem = ElementReference::parsePlainReference( langdescr, si, se);
+
 	switch (elem.type)
 	{
 		case ElementReference::SelectorPath:

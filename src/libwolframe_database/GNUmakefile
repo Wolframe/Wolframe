@@ -35,6 +35,8 @@ TDL_CPP_OBJS = \
 	tdl/preprocCallStatement.o \
 	tdl/preprocElementReference.o \
 	tdl/preprocBlock.o \
+	tdl/auditCallStatement.o \
+	tdl/auditElementReference.o \
 	tdl/subroutineCallStatement.o \
 	tdl/commandDefinition.o
 
