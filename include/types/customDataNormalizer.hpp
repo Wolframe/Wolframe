@@ -135,7 +135,7 @@ public:
 	{
 		const CustomDataValue* cv = i.customref();
 		const CustomDataType* dt = cv->type();
-		CustomDataValueMethod method = dt->getMethod( m_name);
+		CustomDataType::CustomDataValueMethod method = dt->getMethod( m_name);
 		if (!method) throw std::logic_error( "internal: calling undefined method");
 		return method( *cv, m_arg);
 	}

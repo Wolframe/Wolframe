@@ -854,8 +854,7 @@ LUA_FUNCTION_THROWS( "type()", function_type)
 	if (typ)
 	{
 		types::CustomDataInitializerR ini;
-
-		if (!typ->hasInitializer())
+		if (typ->hasInitializer())
 		{
 			ini.reset( typ->createInitializer( initializerList));
 		}
@@ -2182,7 +2181,7 @@ static int callCompare( lua_State* ls, const types::CustomDataValue* operand)
 struct CustomDataValueMethodDef
 {
 	const char* name;
-	types::CustomDataValueMethod call;
+	types::CustomDataType::CustomDataValueMethod call;
 };
 
 LUA_FUNCTION_THROWS( "<custom>:<method>()", function_customtype_methodcall)
@@ -2226,7 +2225,7 @@ LUA_FUNCTION_THROWS( "custom:__index()", function_customtype_index)
 	types::CustomDataValueR* operand = LuaObject<types::CustomDataValueR>::getSelf( ls, "custom", "__unm");
 	check_parameters( ls, 1, 1, LUA_TSTRING);
 	const char* methodname = lua_tostring( ls, 2);
-	types::CustomDataValueMethod method = (*operand)->type()->getMethod( methodname);
+	types::CustomDataType::CustomDataValueMethod method = (*operand)->type()->getMethod( methodname);
 	if (!method)
 	{
 		return 0; //... return NIL
