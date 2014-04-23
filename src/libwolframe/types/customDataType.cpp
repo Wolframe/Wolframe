@@ -104,7 +104,7 @@ CustomDataType::DimensionOperator CustomDataType::getOperator( CustomDataType::D
 	return m_vmt.opDimension[ (int)type];
 }
 
-CustomDataValueMethod CustomDataType::getMethod( const std::string& methodname) const
+CustomDataType::CustomDataValueMethod CustomDataType::getMethod( const std::string& methodname) const
 {
 	types::keymap<CustomDataValueMethod>::const_iterator fi = m_methodmap.find( methodname);
 	if (fi == m_methodmap.end()) return 0;

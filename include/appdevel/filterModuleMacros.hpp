@@ -37,48 +37,15 @@
 #include "appdevel/module/programTypeBuilder.hpp"
 
 ///\brief Defines a Wolframe filter module after the includes section.
-#define FILTER_MODULE( DESCRIPTION, FILTER, CREATE_FILTERTYPE)\
-	static const char* _Wolframe__moduleDescription()\
+#define WF_FILTER_TYPE( FILTERNAME, CREATE_FILTERTYPE)\
+{\
+	struct Constructor\
 	{\
-		return DESCRIPTION;\
-	}\
-	static _Wolframe::module::BuilderBase* createFilterType()\
-	{\
-		return new _Wolframe::module::FilterBuilder( #FILTER "Filter", #FILTER, CREATE_FILTERTYPE);\
-	}\
-	static _Wolframe::module::BuilderBase* (*builder[])() =\
-	{\
-		createFilterType, NULL\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			return new _Wolframe::module::FilterBuilder( FILTERNAME "Filter", FILTERNAME, CREATE_FILTERTYPE);\
+		}\
 	};\
-	extern "C" {\
-		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, _Wolframe__moduleDescription(), builder);\
-	}
-
-
-///\brief HACK for modules implementing 2 filters
-#define FILTER_WITH_SOURCE_MODULE( DESCRIPTION, FILTER, CREATE_FILTERTYPE, LANGNAME, CREATE_PRG_FUNC)\
-	static const char* _Wolframe__moduleDescription()\
-	{\
-		return DESCRIPTION;\
-	}\
-	static _Wolframe::module::BuilderBase* createFilterType()\
-	{\
-		return new _Wolframe::module::FilterBuilder( #FILTER "Filter", #FILTER, CREATE_FILTERTYPE);\
-	}\
-	static _Wolframe::module::BuilderBase* createProgramType()\
-	{\
-		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME, CREATE_PRG_FUNC);\
-	}\
-	static _Wolframe::module::BuilderBase* (*builder[])() =\
-	{\
-		createFilterType,\
-		createProgramType,\
-		NULL\
-	};\
-	extern "C" {\
-		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, _Wolframe__moduleDescription(), builder);\
-	}
-
+	(*this)(&Constructor ::impl);\
+}
 

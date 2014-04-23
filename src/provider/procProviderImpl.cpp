@@ -208,18 +208,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 						  << "' is not a form function";
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
-				else	{
+				else
+				{
 					try
 					{
-						std::string name = ffo->objectClassName();
-
-						std::vector<std::string> funclist = ffo->functions();
-						std::vector<std::string>::const_iterator fi = funclist.begin(), fe = funclist.end();
-						for (; fi != fe; ++fi)
-						{
-							m_programs->defineCppFormFunction( *fi, ffo->function( *fi));
-							LOG_TRACE << "registered '" << *fi << "' C++ form function ";
-						}
+						m_programs->defineCppFormFunction( ffo->identifier(), ffo->function());
+						LOG_TRACE << "registered C++ form function '" << ffo->identifier() << "'";
 					}
 					catch (const std::runtime_error& e)
 					{
@@ -241,12 +235,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					try {
-						module::NormalizeFunctionConstructor::FunctionTypeMap::const_iterator fi = constructor->functionmap().begin(), fe = constructor->functionmap().end();
-						for (; fi != fe; ++fi)
-						{
-							m_programs->defineNormalizeFunctionType( fi->first, fi->second);
-							LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function '" << fi->first << "'";
-						}
+						m_programs->defineNormalizeFunctionType( constructor->identifier(), constructor->function());
+						LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function '" << constructor->identifier() << "'";
 					}
 					catch (const std::runtime_error& e)
 					{
@@ -268,12 +258,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					try {
-						module::CustomDataTypeConstructor::CustomDataTypeMap::const_iterator ti = constructor->typemap().begin(), te = constructor->typemap().end();
-						for (; ti != te; ++ti)
-						{
-							m_programs->defineCustomDataType( ti->first, ti->second);
-							LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << ti->first << "'";
-						}
+						m_programs->defineCustomDataType( constructor->identifier(), constructor->object());
+						LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << constructor->identifier() << "'";
 					}
 					catch (const std::runtime_error& e)
 					{

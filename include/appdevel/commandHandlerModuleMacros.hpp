@@ -39,130 +39,61 @@
 #include "processor/procProviderInterface.hpp"
 
 ///\brief Defines a Wolframe command handler module after the includes section.
-#define COMMAND_HANDLER_MODULE(DESCRIPTION,LANGNAME,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF)\
-	class LANGNAME ##CommandHandlerConstructor\
+#define WF_COMMAND_HANDLER(TITLE,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF)\
+{\
+	class CommandHandlerConstructor\
 		:public _Wolframe::cmdbind::CommandHandlerConstructor\
 	{\
 	public:\
-		LANGNAME ##CommandHandlerConstructor(){}\
-		virtual ~LANGNAME ##CommandHandlerConstructor(){}\
+		CommandHandlerConstructor(){}\
+		virtual ~CommandHandlerConstructor(){}\
 		virtual _Wolframe::cmdbind::CommandHandler* object( const _Wolframe::config::NamedConfiguration& cfgi)\
 		{\
 			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
-			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to " #LANGNAME " command handler constructor");\
+			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to " CONFIG_TITLE " command handler constructor");\
 			CLASSDEF* rt = new CLASSDEF( cfg->context());\
 			return rt;\
 		}\
 		virtual const char* objectClassName() const\
 		{\
-			return #LANGNAME "CommandHandler";\
+			return CONFIG_TITLE "CommandHandler";\
 		}\
 		virtual std::list<std::string> commands( const _Wolframe::config::NamedConfiguration& cfgi) const\
 		{\
 			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
-			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to " #LANGNAME " command handler method");\
+			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to " CONFIG_TITLE " command handler method");\
 			return cfg->commands();\
 		}\
 		virtual bool checkReferences( const _Wolframe::config::NamedConfiguration&, const _Wolframe::proc::ProcessorProviderInterface*) const	{return true;}\
 	};\
-	class LANGNAME ##CommandHandlerBuilder\
+	class CommandHandlerBuilder\
 		:public _Wolframe::module::ConfiguredBuilder\
 	{\
 	public:\
-		LANGNAME ##CommandHandlerBuilder()\
-			:_Wolframe::module::ConfiguredBuilder( DESCRIPTION, CONFIG_SECTION, CONFIG_TITLE, #LANGNAME)\
+		CommandHandlerBuilder()\
+			:_Wolframe::module::ConfiguredBuilder( TITLE, CONFIG_SECTION, CONFIG_TITLE, CONFIG_TITLE "CommandHandler")\
 		{}\
-		virtual ~LANGNAME ##CommandHandlerBuilder(){}\
+		virtual ~CommandHandlerBuilder(){}\
 		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
 		{\
 			return _Wolframe::ObjectConstructorBase::CMD_HANDLER_OBJECT;\
 		}\
 		virtual _Wolframe::config::NamedConfiguration* configuration( const char* logPrefix)\
 		{\
-			return new CONFIGDEF( #LANGNAME, m_title, logPrefix, m_keyword);\
+			return new CONFIGDEF( CONFIG_TITLE "CommandHandler", m_title, logPrefix, m_keyword);\
 		}\
 		virtual _Wolframe::ObjectConstructorBase* constructor()\
 		{\
-			return new LANGNAME ##CommandHandlerConstructor();\
+			return new CommandHandlerConstructor();\
 		}\
 	};\
-	static _Wolframe::module::BuilderBase* createCommandHandler()\
+	struct Constructor\
 	{\
-		static LANGNAME ##CommandHandlerBuilder rt;\
-		return &rt;\
-	}\
-	static _Wolframe::module::BuilderBase* (*builder[])() =\
-	{\
-		createCommandHandler, NULL\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			return new CommandHandlerBuilder();\
+		}\
 	};\
-	extern "C" {\
-		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, "command handler and form function handler for " #LANGNAME, builder );\
-	}
+	(*this)(&Constructor ::impl);\
+}
 
-
-///\brief Defines a Wolframe command handler with standalone programs module after the includes section.
-#define COMMAND_HANDLER_MODULE_WITH_PROGRAMS(DESCRIPTION,LANGNAME,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,CREATEPRGFUNC)\
-	class LANGNAME ##CommandHandlerConstructor\
-		:public _Wolframe::cmdbind::CommandHandlerConstructor\
-	{\
-	public:\
-		LANGNAME ##CommandHandlerConstructor(){}\
-		virtual ~LANGNAME ##CommandHandlerConstructor(){}\
-		virtual _Wolframe::cmdbind::CommandHandler* object( const _Wolframe::config::NamedConfiguration& cfgi)\
-		{\
-			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
-			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to " #LANGNAME " command handler constructor");\
-			CLASSDEF* rt = new CLASSDEF( cfg->context());\
-			return rt;\
-		}\
-		virtual const char* objectClassName() const\
-		{\
-			return #LANGNAME "CommandHandler";\
-		}\
-		virtual std::list<std::string> commands( const _Wolframe::config::NamedConfiguration& cfgi) const\
-		{\
-			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
-			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to " #LANGNAME " command handler method");\
-			return cfg->commands();\
-		}\
-		virtual bool checkReferences( const _Wolframe::config::NamedConfiguration&, const _Wolframe::proc::ProcessorProviderInterface*) const	{return true;}\
-	};\
-	class LANGNAME ##CommandHandlerBuilder\
-		:public _Wolframe::module::ConfiguredBuilder\
-	{\
-	public:\
-		LANGNAME ##CommandHandlerBuilder()\
-			:_Wolframe::module::ConfiguredBuilder( DESCRIPTION, CONFIG_SECTION, CONFIG_TITLE, #LANGNAME)\
-		{}\
-		virtual ~LANGNAME ##CommandHandlerBuilder(){}\
-		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
-		{\
-			return _Wolframe::ObjectConstructorBase::CMD_HANDLER_OBJECT;\
-		}\
-		virtual _Wolframe::config::NamedConfiguration* configuration( const char* logPrefix)\
-		{\
-			return new CONFIGDEF( #LANGNAME, m_title, logPrefix, m_keyword);\
-		}\
-		virtual _Wolframe::ObjectConstructorBase* constructor()\
-		{\
-			return new LANGNAME ##CommandHandlerConstructor();\
-		}\
-	};\
-	static _Wolframe::module::BuilderBase* createCommandHandler()\
-	{\
-		static LANGNAME ##CommandHandlerBuilder rt;\
-		return &rt;\
-	}\
-	static _Wolframe::module::BuilderBase* createProgramType()\
-	{\
-		return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
-	}\
-	static _Wolframe::module::BuilderBase* (*builder[])() =\
-	{\
-		createCommandHandler, createProgramType, NULL \
-	};\
-	extern "C" {\
-		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, "command handler and form function program type for " #LANGNAME, builder);\
-	}

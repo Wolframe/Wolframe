@@ -120,3 +120,10 @@ int ImageImpl::thumb( proc::ExecContext*, Image &res, const ImageThumb &param )
 	return 0;
 }
 
+int ImageImpl::rescale( proc::ExecContext*, Image &res, const ImageRescale &param )
+{
+	std::size_t hh = (param.image.data.size() < (std::size_t)param.height)?param.image.data.size():param.height;
+	std::size_t ww = (param.image.data.size() < (std::size_t)param.width)?param.image.data.size():param.width;
+	res.data = std::string( param.image.data.c_str(), hh*ww);
+	return 0;
+}

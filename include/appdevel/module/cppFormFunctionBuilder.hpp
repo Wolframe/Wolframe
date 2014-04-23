@@ -52,15 +52,9 @@ struct CppFormFunctionDef
 class CppFormFunctionConstructor :public SimpleObjectConstructor< serialize::CppFormFunction >
 {
 public:
-	CppFormFunctionConstructor( const char* name_, const CppFormFunctionDef* functions_)
-		:m_name(name_)
-	{
-		std::size_t fi = 0;
-		for (; functions_[fi].name != 0; ++fi)
-		{
-			m_functionmap.insert( std::string(functions_[fi].name), functions_[fi].func);
-		}
-	}
+	CppFormFunctionConstructor( const std::string& classname_, const std::string& name_, const serialize::CppFormFunction& function_)
+		:m_classname(classname_),m_name(name_),m_function(function_)
+	{}
 
 	virtual ~CppFormFunctionConstructor(){}
 
@@ -68,27 +62,26 @@ public:
 	{
 		return FORM_FUNCTION_OBJECT;
 	}
+
 	virtual const char* objectClassName() const
 	{
-		return m_name.c_str();
+		return m_classname.c_str();
 	}
 
-	std::vector<std::string> functions() const
+	const std::string& identifier() const
 	{
-		return m_functionmap.getkeys<std::vector<std::string> >();
+		return m_name;
 	}
 
-	const serialize::CppFormFunction function( const std::string& name) const
+	const serialize::CppFormFunction function() const
 	{
-		FunctionTypeMap::const_iterator fi = m_functionmap.find( name);
-		if (fi == m_functionmap.end()) throw std::runtime_error( "function not defined");
-		return fi->second;
+		return m_function;
 	}
 
 private:
-	const std::string m_name;
-	typedef types::keymap<serialize::CppFormFunction> FunctionTypeMap;
-	FunctionTypeMap m_functionmap;
+	std::string m_classname;
+	std::string m_name;
+	serialize::CppFormFunction m_function;
 };
 
 typedef boost::shared_ptr<CppFormFunctionConstructor> CppFormFunctionConstructorR;
@@ -97,9 +90,10 @@ typedef boost::shared_ptr<CppFormFunctionConstructor> CppFormFunctionConstructor
 class CppFormFunctionBuilder :public SimpleBuilder
 {
 public:
-	CppFormFunctionBuilder( const char* name_, const CppFormFunctionDef* functions_)
-		:SimpleBuilder( name_)
-		,m_functions(functions_)
+	CppFormFunctionBuilder( const char* className_, const char* name_, const serialize::CppFormFunction& function_)
+		:SimpleBuilder( className_)
+		,m_name(name_)
+		,m_function(function_)
 		  
 	{}
 
@@ -111,10 +105,11 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new CppFormFunctionConstructor( m_className, m_functions);
+		return new CppFormFunctionConstructor( m_className, m_name, m_function);
 	}
 private:
-	const CppFormFunctionDef* m_functions;
+	std::string m_name;
+	serialize::CppFormFunction m_function;
 };
 
 }}//namespace

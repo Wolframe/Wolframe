@@ -33,16 +33,14 @@
 ///\file mod_command_lua.cpp
 ///\brief Module for command handler executing lua scripts
 #include "appdevel/commandHandlerModuleMacros.hpp"
+#include "appdevel/programTypeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "luaCommandHandler.hpp"
 #include "luaCommandHandlerConfig.hpp"
 #include "luaFunctionProgramType.hpp"
 
-COMMAND_HANDLER_MODULE_WITH_PROGRAMS(
-	/*DESCRIPTION: */	"command handler and form function program interpreter for lua",
-	/*LANGNAME:*/		Lua,
-	/*CONFIG_SECTION:*/	"cmdhandler",
-	/*CONFIG_TITLE*/	"lua",
-	/*CLASSDEF:*/		_Wolframe::cmdbind::LuaCommandHandler,
-	/*CONFIGDEF:*/		_Wolframe::module::LuaCommandHandlerConfig,
-	/*CREATEPRGFUNC:*/	_Wolframe::langbind::createLuaProgramType)
+WF_MODULE_BEGIN( "LuaCommandHandler", "lua program and command handler module")
+ WF_PROGRAM_TYPE( "Lua", _Wolframe::langbind::createLuaProgramType)
+ WF_COMMAND_HANDLER( "lua command handler", "cmdhandler", "lua", _Wolframe::cmdbind::LuaCommandHandler, _Wolframe::module::LuaCommandHandlerConfig)
+WF_MODULE_END
 

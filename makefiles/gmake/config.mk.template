@@ -29,13 +29,13 @@
 #BOOST_LIBRARY_TAG =
 
 # self-compiled
-#BOOST_DIR = /home/abaumann/boost_1_45_0
+#BOOST_DIR = /home/user/boost_1_45_0
 #BOOST_INCLUDE_DIR = $(BOOST_DIR)
 #BOOST_LIB_DIR = $(BOOST_DIR)/stage/lib
 #BOOST_LIBRARY_TAG = -mt
 
-# OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
-##############################################################
+# OpenSSL (http://www.openssl.org)
+##################################
 
 # system version
 #OPENSSL_DIR = /usr

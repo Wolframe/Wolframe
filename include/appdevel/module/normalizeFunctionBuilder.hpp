@@ -42,12 +42,14 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-class NormalizeFunctionConstructor :public SimpleObjectConstructor< types::NormalizeFunction >
+class NormalizeFunctionConstructor
+	:public SimpleObjectConstructor< types::NormalizeFunction >
 {
 public:
-	NormalizeFunctionConstructor( const char* classname_, const types::keymap<types::NormalizeFunctionType>& functionmap_)
+	NormalizeFunctionConstructor( const char* classname_, const std::string& identifier_, const types::NormalizeFunctionType& function_)
 		:m_classname(classname_)
-		,m_functionmap(functionmap_)
+		,m_identifier(identifier_)
+		,m_function(function_)
 	{}
 
 	virtual ~NormalizeFunctionConstructor()
@@ -63,50 +65,41 @@ public:
 		return m_classname;
 	}
 
-	std::vector<std::string> functions() const
+	const std::string& identifier() const
 	{
-		return m_functionmap.getkeys<std::vector<std::string> >();
+		return m_identifier;
 	}
 
-	typedef types::keymap<types::NormalizeFunctionType> FunctionTypeMap;
-	const FunctionTypeMap& functionmap() const
+	const types::NormalizeFunctionType& function() const
 	{
-		return m_functionmap;
+		return m_function;
 	}
 
 private:
 	const char* m_classname;
-	FunctionTypeMap m_functionmap;
+	std::string m_identifier;
+	types::NormalizeFunctionType m_function;
 };
 
 typedef boost::shared_ptr<NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
 
 
-struct NormalizeFunctionDef
-{
-	const char* name;
-	types::CreateNormalizeFunction createFunc;
-};
-
 class NormalizeFunctionBuilder :public SimpleBuilder
 {
 public:
 	///\brief Constructor
-	///\param[in] functions {0,0} terminated array of function definitions
-	NormalizeFunctionBuilder( const char* classname_, const NormalizeFunctionDef* functions, types::CreateNormalizeResourceHandle createResourceHandle=0)
-		:SimpleBuilder( classname_)
-	{
-		if (createResourceHandle)
-		{
-			m_resource.reset( createResourceHandle());
-		}
-		std::size_t fi = 0;
-		for (; functions[fi].name && functions[fi].createFunc; ++fi)
-		{
-			types::NormalizeFunctionType functype( functions[fi].createFunc, m_resource);
-			m_functionmap.insert( std::string(functions[fi].name), functype);
-		}
-	}
+	///\param[in] classname_ unique object name in the system (C++ name base)
+	///\param[in] identifier_ object name to reference the function
+	///\param[in] resource_ resource object (module singleton) shared by all instances using this resource
+	NormalizeFunctionBuilder( const char* classname_, const char* identifier_, types::CreateNormalizeFunction createFunc_, const types::NormalizeResourceHandleR& resource_)
+		:SimpleBuilder( classname_),m_identifier(identifier_),m_function(types::NormalizeFunctionType(createFunc_,resource_))
+	{}
+	///\brief Constructor
+	///\param[in] classname_ unique object name in the system (C++ name base)
+	///\param[in] identifier_ object name to reference the function
+	NormalizeFunctionBuilder( const char* classname_, const char* identifier_, types::CreateNormalizeFunction createFunc_)
+		:SimpleBuilder( classname_),m_identifier(identifier_),m_function(types::NormalizeFunctionType(createFunc_))
+	{}
 
 	virtual ~NormalizeFunctionBuilder()
 	{}
@@ -118,12 +111,12 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new NormalizeFunctionConstructor( m_className, m_functionmap);
+		return new NormalizeFunctionConstructor( m_className, m_identifier, m_function);
 	}
 
 private:
-	types::keymap<types::NormalizeFunctionType> m_functionmap;
-	types::NormalizeResourceHandleR m_resource;
+	std::string m_identifier;
+	types::NormalizeFunctionType m_function;
 };
 
 }}//namespace

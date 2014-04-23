@@ -32,12 +32,13 @@
 ************************************************************************/
 ///\file mod_datatype_datetime.cpp
 ///\brief Extension module for date and time arithmetic
+#include "appdevel/moduleFrameMacros.hpp"
 #include "appdevel/customDatatypeModuleMacros.hpp"
 #include "datatypeBigint.hpp"
 #include "datatypeBigfxp.hpp"
 
-CUSTOM_DATATYPE_MODULE( "bcdnumber", "custom data types for arbitrary length BCD numbers")
-CUSTOM_DATATYPE( "bigint",	_Wolframe::types::BigintDataType::create)
-CUSTOM_DATATYPE( "bigfxp",	_Wolframe::types::BigfxpDataType::create)
-CUSTOM_DATATYPE_MODULE_END
+WF_MODULE_BEGIN( "bcdnumber", "custom data types for arbitrary length BCD numbers")
+ WF_CUSTOM_DATATYPE( "bigint",	_Wolframe::types::BigintDataType::create)
+ WF_CUSTOM_DATATYPE( "bigfxp",	_Wolframe::types::BigfxpDataType::create)
+WF_MODULE_END
 

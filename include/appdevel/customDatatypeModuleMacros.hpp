@@ -34,41 +34,17 @@
 ///\brief Macros for defining a custom datatype module
 #include "appdevel/module/customDataTypeBuilder.hpp"
 
-///\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
-#define CUSTOM_DATATYPE_MODULE(NAME,DESCRIPTION)\
-	static const char* _Wolframe__moduleName()\
-	{\
-		return NAME;\
-	}\
-	static const char* _Wolframe__moduleDescription()\
-	{\
-		return DESCRIPTION;\
-	}\
-	static _Wolframe::module::CustomDataTypeDef _Wolframe__customDataTypes[] =\
-	{
-
 ///\brief Defines a custom datatype in the CUSTOM_DATATYPE_MODULE section
-#define CUSTOM_DATATYPE(NAME,CONSTRUCTOR)\
-		{NAME,&CONSTRUCTOR},\
-
-///\brief Defines the end of the CUSTOM_DATATYPE_MODULE section
-#define CUSTOM_DATATYPE_MODULE_END\
-		{0,0}\
-	};\
-	namespace {\
-	struct ModuleImpl\
+#define WF_CUSTOM_DATATYPE(NAME,CONSTRUCTOR)\
 	{\
-		static _Wolframe::module::BuilderBase* constructor()\
+		struct Constructor\
 		{\
-			return new _Wolframe::module::CustomDataTypeBuilder( _Wolframe__moduleName(), _Wolframe__customDataTypes);\
-		}\
-	};\
-	}\
-	static _Wolframe::module::createBuilderFunc _Wolframe__objdef[] =\
-	{\
-		ModuleImpl::constructor, NULL\
-	};\
-	extern "C" { \
-		_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), _Wolframe__objdef); \
+			static _Wolframe::module::BuilderBase* impl()\
+			{\
+				return new _Wolframe::module::CustomDataTypeBuilder( "CustomDataType_" #NAME, NAME, CONSTRUCTOR);\
+			}\
+		};\
+		(*this)(&Constructor ::impl);\
 	}
+
 

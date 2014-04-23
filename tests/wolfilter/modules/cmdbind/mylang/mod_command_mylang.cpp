@@ -33,7 +33,9 @@
 ///\file mod_command_mylang.cpp
 ///\brief Example module for a new language binding
 #include "appdevel/programTypeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "mylangFunctionProgramType.hpp"
 
-PROGRAM_TYPE_MODULE( "example language binding", mylang, _Wolframe::langbind::createMylangProgramType)
-
+WF_MODULE_BEGIN( "MylangProgramType", "example language binding")
+ WF_PROGRAM_TYPE( "mylang", _Wolframe::langbind::createMylangProgramType)
+WF_MODULE_END

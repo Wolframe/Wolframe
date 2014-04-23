@@ -30,18 +30,47 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_graphix.cpp
-///\brief Fake implementation of module for graphic functions with FreeImage for testing
-#include "appdevel/cppFormFunctionModuleMacros.hpp"
-#include "appdevel/moduleFrameMacros.hpp"
-#include "graphix.hpp"
+///\file appdevel/moduleFrameMacros.hpp
+///\brief Macros for defining the frame of a Wolframe application extension module
+#include "appdevel/module/customDataTypeBuilder.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::graphix;
+///\brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
+#define WF_MODULE_BEGIN(NAME,DESCRIPTION)\
+	static const char* _Wolframe__moduleDescription()\
+	{\
+		return DESCRIPTION;\
+	}\
+	namespace {\
+	struct CreateBuilderArray\
+	{\
+		enum {MaxNofBuilders=64};\
+		_Wolframe::module::createBuilderFunc ar[ MaxNofBuilders];\
+		std::size_t size;\
+		CreateBuilderArray()\
+			:size(0)\
+		{\
+			ar[0] = 0;\
+		}\
+		CreateBuilderArray operator()( _Wolframe::module::createBuilderFunc func)\
+		{\
+			if (size +1 >= MaxNofBuilders) throw std::logic_error("too many builder objects defined in module '" #NAME "' (maximum of 64 objects)");\
+			ar[ size] = func;\
+			ar[ size+1] = 0;\
+			size += 1;\
+			return *this;\
+		}\
+	};\
+	struct CreateBuilderArrayImpl :public CreateBuilderArray\
+	{\
+		CreateBuilderArrayImpl()\
+		{
 
-WF_MODULE_BEGIN( "FreeImageFunctions", "graphic functions based on the FreeImage library")
-WF_FORM_FUNCTION( "imageInfo", ImageImpl::info, ImageInfo, Image)
-WF_FORM_FUNCTION( "imageThumb", ImageImpl::thumb, Image, ImageThumb)
-WF_FORM_FUNCTION( "imageRescale", ImageImpl::rescale, Image, ImageRescale)
-WF_MODULE_END
+#define WF_MODULE_END\
+		}\
+	};\
+	}\
+	static CreateBuilderArrayImpl createBuilderArray;\
+	extern "C" { \
+		_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), createBuilderArray.ar); \
+	}
 

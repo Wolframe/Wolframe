@@ -35,22 +35,16 @@
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/ddlcompilerBuilder.hpp"
 
-///\brief Defines a Wolframe DDL compiler module after the includes section.
-#define DDLCOMPILER_MODULE( DESCRIPTION, LANGUAGE, CREATE_COMPILER)\
-	static const char* _Wolframe__moduleDescription()\
+///\brief Defines a Wolframe DDL compiler
+#define WF_DDLCOMPILER( LANGUAGE, CREATE_COMPILER)\
+{\
+	struct Constructor\
 	{\
-		return DESCRIPTION;\
-	}\
-	static _Wolframe::module::BuilderBase* createCompiler()\
-	{\
-		return new _Wolframe::module::DDLCompilerBuilder( #LANGUAGE "Compiler", #LANGUAGE, CREATE_COMPILER);\
-	}\
-	static _Wolframe::module::BuilderBase* (*builder[])() =\
-	{\
-		createCompiler, NULL\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			return new _Wolframe::module::DDLCompilerBuilder( "DDLCompiler_" #LANGUAGE, #LANGUAGE, CREATE_COMPILER);\
+		}\
 	};\
-	extern "C" {\
-		_Wolframe::module::ModuleEntryPoint \
-		entryPoint( 0, _Wolframe__moduleDescription(), builder );\
-	}
+	(*this)(&Constructor ::impl);\
+}
 

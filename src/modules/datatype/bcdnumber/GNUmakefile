@@ -14,9 +14,7 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwolframe \
-	$(LIBS_DL)
-
+	-lwolframe
 
 DYNAMIC_MODULE = mod_datatype_bcdnumber.so
 

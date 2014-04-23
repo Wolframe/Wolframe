@@ -1,0 +1,81 @@
+<chapter>
+	<title>Module Declaration</title>
+	<para>In this chapter we introduce how modules are declared for extending a <application>Wolframe</application>
+	application with our own functions and objects.
+	</para>
+	<sect1>
+	<title>Module Declaration Frame</title>
+	<para>
+	A module has to include "appdevel/moduleFrameMacros.hpp" or simply "appDevel.hpp" and declare
+	a module header and a module trailer with the macros <code>WF_MODULE_BEGIN</code> and
+	<code>WF_MODULE_END</code>. A single module source file built as <application>Wolframe</application>
+	application extension module must contain only one
+	<code>WF_MODULE_BEGIN</code>  .... <code>WF_MODULE_END</code> declaration. But a module declaration
+	can contain an arbitrary number of objects that not conflicting in anything they define (names, etc.)
+	The following example shows an empty module without any exported objects, thus the simplest module
+	we can declare.
+	</para>
+	<sect2>
+	<title>Empty Module Declaration Example</title>
+	<programlisting language='C++'>
+
+    #include "appDevel.hpp"
+    WF_MODULE_BEGIN( "empty", "an example module not exporting anything")
+    WF_MODULE_END
+
+	</programlisting>
+	</sect2>
+	<sect2>
+	<title>Module Declaration Macros</title>
+	<para>The macro WF_MODULE_BEGIN has two parameters
+	</para>
+	<table frame="all" width="100%">
+		<title>Parameters of WF_MODULE_BEGIN</title>
+		<tgroup cols="2">
+		<colspec colnum="1" colwidth="1*"/>
+		<colspec colnum="2" colwidth="2*"/>
+		<thead>
+		<row>
+			<entry>NAME</entry>
+			<entry>DESCRIPTION</entry>
+		</row>
+		</thead>
+
+		<tbody>
+		<row>
+			<entry>Identifier of the module (*)</entry>
+			<entry>Description sentence of the module for user info when inspecting a module.</entry>
+		</row>
+		</tbody>
+		</tgroup>
+	</table>
+	<para>(*) Currently not used but will be when a namespace concept will be implemented.
+	</para>
+	<para>
+	The end declaration WF_MODULE_END closes the module object and defines the module entry point structure.
+	</para>
+	</sect2>
+	</sect1>
+	
+	<sect1>
+	<title>Building a Module</title>
+	<para>For building a module you need to reference the <application>Wolframe</application> 
+	core library (-lwolframe) and eventually some of the extension libraries
+	(-lwolframe_serialize, -lwolframe_langbind, -lwolframe_database) that's all. 
+	You will find example makefiles in the examples of the project. But you are free to 
+	use your own build mechanism.
+	</para>
+	</sect1>
+
+	<sect1>
+	<title>Exported Objects of a Module</title>
+	<para>In this section we explain how modules are filled with functionality. We can define
+	an arbitrary number of objects in a module as long as they do not conflict (e.g. have 
+	name clashes etc.)</para>
+
+	&ExtNormalizerModules;
+	&ExtCustomDataTypeModules;
+	&ExtFilterModules;
+	</sect1>
+</chapter>
+
