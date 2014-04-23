@@ -1,0 +1,81 @@
+<sect2>
+	<title>Define Custom Data Types</title>
+	<para>In this chapter we introduce how to declare a custom data type in a module.
+	Custom data types can be used in scripting language bindings and as normalizers
+	referenced in a <code>.wnmp</code> file (type normalization declaration file, see section 
+	"Data Types in DDLs" in the chapter "Forms" of the "Application Development Manual")
+	First we introduce the data structures you
+	have to know to implement a custom data type and then we will show the module building
+	block to declare a custom data type in a module.
+	</para>
+
+	<sect3>
+	<title>Custom Data Type Interface</title>
+	<para>
+	A custom data type definition involves 3 classes: CustomDataType,CustomDataValue and CustomDataInitializer.
+	The CustomDataInitializer class is optional and only needed when value construction has to
+	be parametrized. If an initializer is involved then it is created and passed as argument to
+	the method constructing the custom data type value (class CustomDataValue).
+	The class CustomDataType defines the custom data type and all its methods defined.
+	The class CustomDataValue defines a value instance of this type.
+	The class CustomDataInitializer, if specified, defines an object describing the parametrization
+	of the value construction. An example of an initializer could be the format of a date or
+	the precision in a fixed point number. The following listings show these interfaces:
+	</para>
+	<sect4>
+	<title>CustomDataType Structure</title>
+	<para>The class to build the custom data type definition structure composed of methods added 
+	with <code>CustomDataType::define( .. )</code>. From this class we do not derive. We incrementally
+	add method by method by calling <code>CustomDataType::define( .. )</code> in the type constructor
+	function.
+	</para>
+	<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/customDataType.hpp" parse="text" />
+	</programlisting>
+	</sect4>
+
+	<sect4>
+	<title>CustomDataInitializer Interface</title>
+	<para>The custom data inizializer definition. From this class we have to derive our own
+	initializer definions.</para>
+	<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/customDataInitializer.hpp" parse="text" />
+	</programlisting>
+	</sect4>
+
+	<sect4>
+	<title>Class CustomDataValue</title>
+	<para>The custom data type value instance definition. From this class we have to derive our own
+	custom value definions.
+	</para>
+	<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/customDataValue.hpp" parse="text" />
+	</programlisting>
+	</sect4>
+	</sect3>
+
+	<sect3>
+	<title>Building Blocks</title>
+	<para>
+	When you include "appdevel/customDatatypeModuleMacros.hpp" or simply "appDevel.hpp" you get 
+	the building block declared to build a custom data type in a module. 
+	</para>
+
+	<sect4>
+	<title>Declaring a custom data type</title>
+	<para>The following declaration shows a declaration of a simple custom data type.
+	</para>
+	<programlisting language='C++'>
+    WF_CUSTOM_DATATYPE(name,constructor)
+	</programlisting>
+	<para>where name is the identifier string of the function in the system and constructor a
+	function with the following signature:
+
+	<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/customDataTypeConstructor.hpp" parse="text" />
+	</programlisting>
+	</para>
+	</sect4>
+	</sect3>
+</sect2>
+

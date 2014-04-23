@@ -18,6 +18,9 @@ struct VariantConst :public Variant
     VariantConst( const char* o);
     VariantConst( const char* o, std::size_t n);
     VariantConst( const std::string& o);
+    VariantConst( const types::CustomDataValue& o);
+    VariantConst( const types::BigNumber& o);
+    VariantConst( const types::DateTime& o);
 
     //Assignment operators:
     VariantConst& operator=( const Variant& o);
@@ -29,6 +32,11 @@ struct VariantConst :public Variant
     VariantConst& operator=( unsigned int o);
     VariantConst& operator=( Data::Int o);
     VariantConst& operator=( Data::UInt o);
+    VariantConst& operator=( const char* o);
+    VariantConst& operator=( const std::string& o);
+    VariantConst& operator=( const types::CustomDataValue& o);
+    VariantConst& operator=( const types::BigNumber& o);
+    VariantConst& operator=( const types::DateTime& o);
     VariantConst& operator=( const char* o);
     VariantConst& operator=( const std::string& o);
 };

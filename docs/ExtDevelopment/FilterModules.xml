@@ -1,0 +1,121 @@
+<sect2>
+	<title>Define Filters</title>
+	<para>In this chapter we introduce how to declare a filter type in a module.
+	Filters are used to deserialize input and to serialize output. 
+	</para>
+
+	<sect3>
+	<title>Filter element types</title>
+	<para>
+	Filters provide a uniform interface to content as sequence of elements. The elements have
+	one of the following types.
+	</para>
+	<table frame="all" width="100%">
+		<title>Filter element types</title>
+		<tgroup cols="2">
+		<colspec colnum="1" colwidth="1*"/>
+		<colspec colnum="2" colwidth="2*"/>
+		<thead>
+		<row>
+			<entry>Identifier</entry>
+			<entry>Description</entry>
+		</row>
+		</thead>
+
+		<tbody>
+		<row>
+			<entry>OpenTag</entry>
+			<entry>Open a substructure (element value is the name of the structure)
+			as the current scope.</entry>
+		</row>
+		<row>
+			<entry>CloseTag</entry>
+			<entry>Close the current substructure scope or marks the end of the document
+			if there is no substructure scope open left (top level close).</entry>
+		</row>
+		<row>
+			<entry>Attribute</entry>
+			<entry>Declare an attribute (element value is the name of the attribute)</entry>
+		</row>
+		<row>
+			<entry>Value</entry>
+			<entry>Declare a value. If the previous element was an attribute then the
+			value specifies the content value of the attribute. Otherwise the value
+			specifies the content value (only one allowed) of the current
+			substructure scope.
+			</entry>
+		</row>
+		</tbody>
+		</tgroup>
+	</table>
+	</sect3>
+
+	<sect3>
+	<title>Filter element values</title>
+	<para>
+	Filter values are chunks of the input and are interpreted depending on the filter element type.
+	</para>
+	</sect3>
+
+	<sect3>
+	<title>Filter Interface</title>
+	<para>
+	A filter definition is a structure with 2 substructure references: An input filter (InputFilter)
+	and an output filter (OutputFilter). You have to include "filter/filter.hpp" to declare a filter.
+	</para>
+
+	<sect4>
+	<title>Input Filter Structure</title>
+	<para>From this interface you have to derive to get an input filter class.
+	</para>
+	<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/inputfilter.hpp" parse="text" />
+	</programlisting>
+	</sect4>
+
+	<sect4>
+	<title>Output Filter Structure</title>
+	<para>From this interface you have to derive to get an output filter class.
+	</para>
+	<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/outputfilter.hpp" parse="text" />
+	</programlisting>
+	</sect4>
+
+	<sect4>
+	<title>Filter Structure</title>
+	<para>The structure 'filter' you have to create and instantiate with an input filter and an output filter
+	reference. There is a filter type defined with a virtual constructor to instantiate the filter.
+	From this class you have to derive.
+	</para>
+	<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/filter.hpp" parse="text" />
+	</programlisting>
+	</sect4>
+	</sect3>
+
+	<sect3>
+	<title>Building Blocks</title>
+	<para>
+	When you include "appdevel/filterModuleMacros.hpp" or simply "appDevel.hpp" you get 
+	the building block declared to build a filter in a module. 
+	</para>
+
+	<sect4>
+	<title>Declaring a filter</title>
+	<para>The following declaration shows a declaration of a simple custom data type.
+	</para>
+	<programlisting language='C++'>
+    WF_FILTER_TYPE(name,constructor)
+	</programlisting>
+	<para>where name is the identifier string of the function in the system and constructor a
+	function with the following signature:
+
+	<programlisting language='C++'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/filterConstructor.hpp" parse="text" />
+	</programlisting>
+	</para>
+	</sect4>
+	</sect3>
+</sect2>
+

@@ -1,10 +1,12 @@
-<chapter>
-	<title>Normalizer Modules</title>
-	<para>In this chapter we introduce how to write your own normalizer functions and thus define your own 
-	DLL form data types.
+<sect2>
+	<title>Define Normalization Functions (Normalizers)</title>
+	<para>In this chapter we introduce how to declare a normalizer function in a module 
+	for defining your own DLL form data types. First we introduce the data structures you
+	have to know to implement normalizer functions and then we will show the module building
+	blocks to declare a normalizer function in a module.
 	</para>
 
-	<sect1>
+	<sect3>
 	<title>Normalizer Interface</title>
 	<para>
 	A normalize function is defined as interface in order to be able to define it as object with data.
@@ -22,61 +24,69 @@
 	</programlisting>
 	The resource handle parameter (<code>reshnd</code>) is the module singleton object instance that is 
 	declared as class in the module building blocks (see following section). The argument (<code>arg</code>) 
-	is a string that has to be parsed by the normalize function constructor function. What the function 
-	gets as argument is the string declared as argument string in '(' brackets ')' when the function 
+	is a list of variant type arguments that parametrize the function. What the function 
+	gets as arguments are the comma separated list of parameters in '(' brackets ')' when the function 
 	is referenced in a <code>.wnmp</code> file (type normalization declaration file, see section 
-	"Data Types in DDLs" in the chapter "Forms" of the "Application Development Manual").
+	"Data Types in DDLs" in the chapter "Forms" of the "Application Development Manual")
+	or constructed with the provider.type method in a script.
 	</para>
-	</sect1>
+	</sect3>
 
-	<sect1>
-	<title>Module Building Blocks</title>
+	<sect3>
+	<title>Building Blocks</title>
 	<para>
 	When you include "appdevel/normalizeModuleMacros.hpp" or simply "appDevel.hpp" you get the building
-	blocks declared to build a normalization module. These building blocks will be exmplained in this section.
+	blocks declared to build a normalizer function in a module. These building blocks will be exmplained in this section.
 	</para>
-	<para>
-	The module declaration section starts with the macro call
-	<programlisting language='C++'>
-NORMALIZER_MODULE(namespace,description)
-	</programlisting>
-	that has two strings as arguments. The first one is the name of the module as refered to in a 
-	type normalization declaration file (first identifier before the ':'). The second string is
-	a module description without any functional meaning for the application but for identification
-	of the module by humans. Alternatively you can use the macro <code>NORMALIZER_MODULE_WITH_RESOURCE</code>
-	that does the same but has additionally a third parameter, the class name of the resource object
-	shared by all normalization functions of this module.
-	</para>
-	<para>
-	What follows are one or more declarations without any separator (comma ',' or semicolon ';')
-	of the form
-	<programlisting language='C++'>
-NORMALIZER_FUNCTION(name,constructor)
-	</programlisting>
-	where <code>name</code> is the name of the function within the module namespace (declared as
-	first parameter of <code>NORMALIZER_MODULE</code>) as string.
-	The second argument is the normalizeFunction object constructor function (without any indirection
-	address marker '&amp;' !).
-	</para>
-	<para>
-	The module declaration ends with an end marker that closes the module declaration.
-	<programlisting language='C++'>
-NORMALIZER_MODULE_END
-	</programlisting>
-	</para>
-	</sect1>
 
-	<sect1>
-	<title>Building the Module</title>
-	<para>For building the module you need to reference the <application>Wolframe</application> core library (-lwolframe), that's all.
-	You will find example makefiles in the examples of the project. But you are free to use your own build
-	mechanism.
+	<sect4>
+	<title>Declaring a resource singleton object</title>
+	<para>
+	Some normalizer functions share resource object declared only once as a singleton in this module.
+	Such a resource class is defined as a class derived from <code>types::NormalizeResourceHandle</code>
+	with an empty constructor. When we have declared this resource signleton class we can include 
+	it in the module before any normalizer referencing it as
 	</para>
-	</sect1>
+	<programlisting language='C++'>
+    WF_NORMALIZER_RESOURCE( ResourceClass )
+	</programlisting>
+	<para>with <code>ResourceClass</code> identifying the module singleton resource class and object.
+	</para>
+	</sect4>
 
-	<sect1>
+	<sect4>
+	<title>Declaring a normalizer not using any resource</title>
+	<para>The following declaration shows a declaration of a simple normalizer function.
+	</para>
+	<programlisting language='C++'>
+    WF_NORMALIZER_FUNCTION(name,constructor)
+	</programlisting>
+	<para>where name is the identifier string of the function in the system and constructor a
+	function with the signature of the <code>CreateNormalizeFunction</code> shown in the
+	section 'Normalize Interface' above.
+	</para>
+	</sect4>
+
+	<sect4>
+	<title>Declaring a normalizer using a resource</title>
+	<para>The following declaration shows a declaration of a normalizer function using a resource
+	module singleton object defined as class 'ResourceClass' and declared with the
+	<code>WF_NORMALIZER_RESOURCE</code> macro (section 'Declaring a resource singleton object').
+	</para>
+	<programlisting language='C++'>
+    WF_NORMALIZER_WITH_RESOURCE(name,constructor,ResourceClass)
+	</programlisting>
+	<para>
+	The parameter <code>name</code> and <code>constructor</code> are defined as in the
+	<code>WF_NORMALIZER_FUNCTION</code> macro.
+	</para>
+	</sect4>
+	</sect3>
+
+	<sect3>
 	<title>Examples</title>
-		<sect2><title>Example without resources</title>
+		<sect4>
+		<title>Example without resources</title>
 		<para>As first example we show a module that implements 2 normalization functions <code>Int</code> 
 		and <code>Float</code> without a global resource class. <code>Int</code> converts a value to an
 		64 bit integer or throws an exception, if this is not possible. <code>Float</code> converts a value 
@@ -86,9 +96,9 @@ NORMALIZER_MODULE_END
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/normalizeExampleWithoutResources.cpp" parse="text" />
 	</programlisting>
 		</para>
-		</sect2>
+		</sect4>
 
-		<sect2><title>Example with resources</title>
+		<sect4><title>Example with resources</title>
 		<para>The second example show one of the functions in the example above (<code>Int</code>) but 
 		declares to use resources. The resource object is not really used, but you see in the example 
 		how it gets bound to the function that uses it.
@@ -97,7 +107,6 @@ NORMALIZER_MODULE_END
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/ExtDevelopment/normalizeExampleWithResources.cpp" parse="text" />
 	</programlisting>
 		</para>
-		</sect2>
-	</sect1>
-
-</chapter>
+		</sect4>
+	</sect3>
+</sect2>
