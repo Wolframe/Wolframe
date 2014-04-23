@@ -84,12 +84,6 @@ private:
 typedef boost::shared_ptr<NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
 
 
-struct NormalizeFunctionDef
-{
-	const char* name;
-	types::CreateNormalizeFunction createFunc;
-};
-
 class NormalizeFunctionBuilder :public SimpleBuilder
 {
 public:
