@@ -65,6 +65,15 @@ struct ImageThumb
 	static const serialize::StructDescriptionBase *getStructDescription( );
 };
 
+struct ImageRescale
+{
+	Image image;
+	int height;
+	int width;
+	
+	static const serialize::StructDescriptionBase *getStructDescription( );
+};
+
 class ImageImpl
 {
 	private:
@@ -75,6 +84,7 @@ class ImageImpl
 		static const serialize::StructDescriptionBase *getStructDescription( );
 		static int info( const proc::ProcessorProviderInterface* provider, ImageInfo &res, const Image &param );
 		static int thumb( const proc::ProcessorProviderInterface* provider, Image &res, const ImageThumb &param );
+		static int rescale( const proc::ProcessorProviderInterface* provider, Image &res, const ImageRescale &param );
 };
 
 }}

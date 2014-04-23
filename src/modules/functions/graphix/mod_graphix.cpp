@@ -32,15 +32,14 @@
 ************************************************************************/
 ///\file mod_graphix.cpp
 ///\brief Module for graphic functions with FreeImage
-#include "appdevel/cppFormFunctionModuleMacros.hpp"
+#include "appDevel.hpp"
 #include "graphix.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::graphix;
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE("graphic functions with FreeImage")
-CPP_APPLICATION_FORM_FUNCTION("imageInfo", ImageImpl::info, ImageInfo, Image)
-CPP_APPLICATION_FORM_FUNCTION("imageThumb", ImageImpl::thumb, Image, ImageThumb)
-CPP_APPLICATION_FORM_FUNCTION("imageRescale", ImageImpl::rescale, Image, ImageRescale)
-CPP_APPLICATION_FORM_FUNCTION_MODULE_END
-
+WF_MODULE_BEGIN( "FreeImageFunctions", "graphic functions with FreeImage")
+WF_FORM_FUNCTION( "imageInfo", ImageImpl::info, ImageInfo, Image)
+WF_FORM_FUNCTION("imageThumb", ImageImpl::thumb, Image, ImageThumb)
+WF_FORM_FUNCTION("imageRescale", ImageImpl::rescale, Image, ImageRescale)
+WF_MODULE_END
