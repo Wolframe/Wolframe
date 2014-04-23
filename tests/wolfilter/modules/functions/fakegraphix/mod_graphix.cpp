@@ -42,5 +42,6 @@ using namespace _Wolframe::graphix;
 WF_MODULE_BEGIN( "FreeImageFunctions", "graphic functions based on the FreeImage library")
 WF_FORM_FUNCTION( "imageInfo", ImageImpl::info, ImageInfo, Image)
 WF_FORM_FUNCTION( "imageThumb", ImageImpl::thumb, Image, ImageThumb)
+WF_FORM_FUNCTION( "imageRescale", ImageImpl::rescale, Image, ImageRescale)
 WF_MODULE_END
 

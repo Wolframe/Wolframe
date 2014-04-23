@@ -228,6 +228,7 @@ ifeq ($(WITH_PYTHON),1)
 	@echo
 	@echo "PYTHON_CFLAGS: $(PYTHON_CFLAGS)"
 	@echo "PYTHON_LDFLAGS: $(PYTHON_LDFLAGS)"
+	@echo "PYTHON_LIBS: $(PYTHON_LIBS)"
 endif
 ifeq ($(WITH_CJSON),1)
 	@echo
