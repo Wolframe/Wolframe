@@ -93,6 +93,8 @@ endif
 	@echo "Optimization flags: $(OPTFLAGS)"
 	@echo "Full C compilation flags: $(ALL_CFLAGS)"
 	@echo "Full C++ compilation flags: $(ALL_CXXFLAGS)"
+	@echo "Global linker flags: $(ALL_LDFLAGS)"
+	@echo "Global libraries: $(LIBS)"
 	@echo
 	@echo "Required Dependencies:"
 	@echo
