@@ -125,10 +125,10 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir,
 		void* hndl;
 		if ( utils::getFileExtension( *it).empty() )	{
 			std::string path = *it + ".so";
-			hndl = dlopen( path.c_str(), RTLD_LAZY );
+			hndl = dlopen( path.c_str(), RTLD_NOW | RTLD_LOCAL );
 		}
 		else	{
-			hndl = dlopen( it->c_str(), RTLD_LAZY );
+			hndl = dlopen( it->c_str(), RTLD_NOW | RTLD_LOCAL );
 		}
 		if ( !hndl )	{
 			LOG_ERROR << "Module loader: " << dlerror()
