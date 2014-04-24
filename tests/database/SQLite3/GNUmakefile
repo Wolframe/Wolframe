@@ -28,7 +28,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(SQLITE3_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_system -lboost_filesystem
+	-lboost_system -lboost_filesystem \
+	$(LIBS_LT)
 
 CPP_OBJS = \
 	sqliteModuleFiles.o
