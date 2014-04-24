@@ -227,6 +227,53 @@ static std::string databaseError_throwtext( const db::DatabaseError& err, const 
 	return throwmsg.str();
 }
 
+std::string inputfilter_logtext( const langbind::TypedInputFilterR& inp)
+{
+	std::ostringstream out;
+	langbind::FilterBase::ElementType type;
+	types::VariantConst element;
+	int taglevel = 0;
+	while (taglevel >= 0 && inp->getNext( type, element))
+	{
+		switch (type)
+		{
+			case langbind::FilterBase::OpenTag:
+				taglevel++;
+				out << " " << element.tostring() << " {";
+				break;
+			case langbind::FilterBase::CloseTag:
+				taglevel--;
+				if (taglevel >= 0)
+				{
+					out << "}";
+				}
+				break;
+			case langbind::FilterBase::Attribute:
+				taglevel++;
+				out << element.tostring() << "=";
+				break;
+			case langbind::FilterBase::Value:
+				taglevel++;
+				if (element.defined())
+				{
+					std::string value = element.tostring();
+					if (value.size() > 30)
+					{
+						value.resize( 30);
+						value.append("...");
+					}
+					out << "'" << value << "'";
+				}
+				else
+				{
+					out << "NULL";
+				}
+				break;
+		}
+	}
+	return out.str();
+}
+
 void TdlTransactionFunctionClosure::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 {
 	m_context = c;
@@ -282,6 +329,14 @@ void TdlTransactionFunction::print( std::ostream& out) const
 		}
 		out << "ENDPROC" << std::endl;
 	}
+
+	// Print auditing steps:
+	std::vector<TdlAuditStep>::const_iterator ai = m_audit.begin(), ae = m_audit.end();
+	for (; ai != ae; ++ai)
+	{
+		out << "AUDIT " << ((ai->level() == TdlAuditStep::Critical)?"CRITICAL ":"") << ai->function() << std::endl;
+	}
+
 #ifdef LOWLEVEL_DEBUG
 	// Print code without symbols:
 	out << "BEGIN RAW" << std::endl;
@@ -374,6 +429,7 @@ bool TdlTransactionFunctionClosure::call()
 					try
 					{
 						LOG_DEBUG << "calling audit function '" << ai->function() << "'";
+						LOG_DATA << "audit function call: " << ai->function() << "(" << inputfilter_logtext( res.get( auditFunctionIdx)) << ")";
 
 						langbind::TypedInputFilterR auditParameter = res.get( auditFunctionIdx);
 						const langbind::FormFunction* auditfunc = m_context->provider()->formFunction( ai->function());

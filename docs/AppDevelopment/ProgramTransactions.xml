@@ -709,6 +709,32 @@
 			</programlisting>
 			</para>
 		</sect3>
+		<sect3>
+			<title>Auditing</title>
+			<para>TDL defines hooks to add function calls for auditing transactions. An
+			audit call is a form function call with a structure build from transaction input
+			and some database results. An auditing function call can be marked as critical, so
+			that the final commit is dependent not only on the transaction success but also on
+			the success of the auditing function call. The following two examples show equivalent
+			calls of audit. One with the function call syntax for calls with a flat structure
+			(only atomic parameters) as parameter and one with the parameter build from a
+			result structure of a BEGIN..END block executed. The later one can be used for
+			audit function calls with a more complex parameter structure.
+			</para>
+
+			<sect4>
+				<title>Audit example with function call syntax</title>
+				<programlisting language='sql'>
+				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_audit_call.tdl" parse="text" />
+				</programlisting>
+			</sect4>
+			<sect4>
+				<title>Audit example with parameter as structure</title>
+				<programlisting language='sql'>
+				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_audit_with.tdl" parse="text" />
+				</programlisting>
+			</sect4>
+		</sect3>
 	</sect2>
 </sect1>
 

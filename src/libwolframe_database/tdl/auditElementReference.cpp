@@ -50,9 +50,16 @@ AuditElementReference AuditElementReference::parse( const LanguageDescription* l
 	bool nameDefined = parseNameAssignment( langdescr, name, si, se);
 	ElementReference elem = ElementReference::parsePlainReference( langdescr, si, se);
 
-	if (elem.type == ElementReference::SelectorPath && !nameDefined)
+	if (!nameDefined)
 	{
-		name = extractImplicitNameFromSelector( elem.selector);
+		if (elem.type == ElementReference::SelectorPath)
+		{
+			name = extractImplicitNameFromSelector( elem.selector);
+		}
+		else if (elem.type == ElementReference::NamedSetElement)
+		{
+			name = elem.name;
+		}
 	}
 	return AuditElementReference( name, elem);
 }
