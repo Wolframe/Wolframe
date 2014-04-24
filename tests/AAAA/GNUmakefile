@@ -24,8 +24,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/src/libwfsingleton/libwfsingleton.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_filesystem -lboost_system \
-	$(LIBS_DL)
+	-lboost_filesystem -lboost_system
 
 CPP_OBJS = \
 	$(TOPDIR)/src/modules/authentication/textfile/TextFileAuth.o \
