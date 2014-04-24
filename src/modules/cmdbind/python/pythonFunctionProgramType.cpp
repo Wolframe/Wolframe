@@ -31,9 +31,9 @@ Project Wolframe.
 ************************************************************************/
 ///\file pythonFunctionProgramType.cpp
 ///\brief Implementation of the function to create a form function program type object for python scripts
+#include "pythonInterpreter.hpp"
 #include "pythonFunctionProgramType.hpp"
 #include "pythonStructureBuilder.hpp"
-#include "pythonInterpreter.hpp"
 #include "pythonObject.hpp"
 #include "langbind/formFunction.hpp"
 #include "prgbind/programLibrary.hpp"
