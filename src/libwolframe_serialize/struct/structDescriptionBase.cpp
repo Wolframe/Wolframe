@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file struct/structDescriptionBase.cpp
 ///\brief Implements the non intrusive base class of serialization/deserialization
 #include "serialize/struct/structDescriptionBase.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include "filter/typingfilter.hpp"
 #include <cstring>
 #include <stdexcept>
@@ -182,5 +183,11 @@ bool StructDescriptionBase::setAtomicValue( void* obj, std::size_t idx, const st
 	OneElementTypedInputFilter inp( value);
 	stk.push_back( ParseState( itr->first.c_str(), itr->second.parse(), objelemptr));
 	return stk.back().parse()( inp, ctx, stk);
+}
+
+const serialize::StructDescriptionBase* EmptyStruct::getStructDescription( )
+{
+	static serialize::StructDescription<EmptyStruct> rt;
+	return &rt;
 }
 

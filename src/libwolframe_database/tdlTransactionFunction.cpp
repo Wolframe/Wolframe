@@ -448,7 +448,7 @@ bool TdlTransactionFunctionClosure::call()
 						langbind::FilterBase::ElementType et;
 						types::VariantConst ev;
 
-						if (auditresult->getNext( et, ev) || et != langbind::FilterBase::CloseTag)
+						if (auditresult->getNext( et, ev) && et != langbind::FilterBase::CloseTag)
 						{
 							LOG_WARNING << "called audit function '" << ai->function() << "' that returned a non empty result";
 						}

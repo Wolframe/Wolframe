@@ -53,7 +53,7 @@ namespace proc {
 ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
 								   const module::ModulesDirectory* modules,
 								   prgbind::ProgramLibrary* programs_)
-	:m_programs(programs_)
+	:m_programs(programs_),m_referencePath(conf->referencePath())
 {
 	m_db = NULL;
 	if ( !conf->m_dbLabel.empty())
@@ -448,6 +448,11 @@ db::Transaction* ProcessorProvider::ProcessorProvider_Impl::transaction( const s
 		LOG_ALERT << "No database defined for the processor provider";
 		return NULL;
 	}
+}
+
+const std::string& ProcessorProvider::ProcessorProvider_Impl::referencePath() const
+{
+	return m_referencePath;
 }
 
 }} // namespace _Wolframe::proc

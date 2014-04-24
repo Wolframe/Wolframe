@@ -174,6 +174,7 @@ bool ProcProviderConfig::check() const
 
 void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 {
+	m_referencePath = refPath;
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
@@ -263,6 +264,11 @@ const types::CustomDataType* ProcessorProvider::customDataType( const std::strin
 bool ProcessorProvider::guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const
 {
 	return m_impl->guessDocumentFormat( result, content, contentsize);
+}
+
+const std::string& ProcessorProvider::referencePath() const
+{
+	return m_impl->referencePath();
 }
 
 }} // namespace _Wolframe::proc

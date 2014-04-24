@@ -37,7 +37,7 @@
 #include "appdevel/module/cppFormFunctionBuilder.hpp"
 
 ///\brief Defines normalization function
-#define WF_FORM_FUNCTION(NAME,FUNCTION,INPUT,OUTPUT)\
+#define WF_FORM_FUNCTION(NAME,FUNCTION,OUTPUT,INPUT)\
 {\
 	struct Constructor\
 	{\
@@ -50,3 +50,16 @@
 	(*this)(&Constructor ::impl);\
 }
 
+///\brief Defines normalization function without return value (empty result)
+#define WF_FORM_PROCEDURE(NAME,PROCEDURE,INPUT)\
+{\
+	struct Constructor\
+	{\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			serialize::CppFormFunction func = appdevel::CppFormFunction<serialize::EmptyStruct,INPUT,PROCEDURE>::declaration();\
+			return new _Wolframe::module::CppFormFunctionBuilder( "CppFormFunction_" NAME, NAME, func);\
+		}\
+	};\
+	(*this)(&Constructor ::impl);\
+}

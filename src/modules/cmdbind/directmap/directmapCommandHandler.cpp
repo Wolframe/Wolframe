@@ -251,6 +251,11 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					m_state = 2;
 					continue;
 				}
+				else if (m_cmd->skipvalidation_input)
+				{
+					m_state = 11;
+					continue;
+				}
 				else
 				{
 					types::DocType doctype;

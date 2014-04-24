@@ -65,18 +65,20 @@ fi
 if [ x"$testdata" != x ]; then
 	echo "$testdata" | sed "s/#FILTER#/$inputfilter/g" >> $output
 fi
-echo '**output' >> $output
-if [ x"$docout" != x ]; then
-	if [ -f doc/$docout.UTF-8.$docformat ]; then
-		cat doc/$docout.UTF-8.$docformat | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
-		echo "" | recode UTF-8..$cset >> $output
-	elif [ -f doc/$docout.$docformat ]; then
-		cat doc/$docout.$docformat >> $output
-	else
-		echo "OUTPUT FILE doc/$docout.UTF-8.$docformat OR doc/$docout.$docformat NOT FOUND !"
+if [ x"$docout" != x ] || [ x"$dumpout" != "x" ]; then
+	echo '**output' >> $output
+	if [ x"$docout" != x ]; then
+		if [ -f doc/$docout.UTF-8.$docformat ]; then
+			cat doc/$docout.UTF-8.$docformat | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
+			echo "" | recode UTF-8..$cset >> $output
+		elif [ -f doc/$docout.$docformat ]; then
+			cat doc/$docout.$docformat >> $output
+		else
+			echo "OUTPUT FILE doc/$docout.UTF-8.$docformat OR doc/$docout.$docformat NOT FOUND !"
+		fi
 	fi
-fi
-if [ x"$dumpout" != "x" ]; then
-	cat $dumpout >> $output
+	if [ x"$dumpout" != "x" ]; then
+		cat $dumpout >> $output
+	fi
 fi
 echo '**end' >> $output

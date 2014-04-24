@@ -1,0 +1,4 @@
+LIBRARY mod_audit
+
+EXPORTS
+entryPoint	@1

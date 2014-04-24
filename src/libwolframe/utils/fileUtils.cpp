@@ -208,13 +208,6 @@ static void readFileContent( const std::string& filename, std::string& res)
 
 void utils::writeFile( const std::string& filename, const std::string& content)
 {
-//[PF:NOTE] Using Posix functions to write file because I did not find a better solution.
-//	a) If '::CreateFile' and '::WriteFile' are used then '\n' is implicitely converted
-//	to '\r\n'. Sometimes this is not wished. No clue how to write a blob as binary
-//	with these functions based on HANDLE.
-//	b) If '::OpenFile' and '::WriteFile' is used we get to a limitation of the file path
-//	length of 128 bytes: See OFSTRUCT definition (OFS_MAXPATHNAME = 128)
-
 	unsigned char ch;
 #ifdef _WIN32
 	errno_t err;

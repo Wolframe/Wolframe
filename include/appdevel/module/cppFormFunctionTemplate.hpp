@@ -45,7 +45,7 @@ namespace appdevel {
 
 ///\class CppFormFunction
 ///\brief Application development template for form functions written in C++
-template <class InputType, class OutputType, int (*Function)( proc::ExecContext* ctx, OutputType&, const InputType&)>
+template <class OutputType, class InputType, int (*Function)( proc::ExecContext* ctx, OutputType&, const InputType&)>
 struct CppFormFunction
 {
 	static const serialize::CppFormFunction& declaration()

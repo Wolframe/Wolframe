@@ -73,6 +73,7 @@ public:
 	InputFilter( const InputFilter& o)
 		:utils::TypeSignature(o)
 		,FilterBase(o)
+		,ContentFilterAttributes()
 		,m_state(o.m_state){}
 
 	///\brief Destructor

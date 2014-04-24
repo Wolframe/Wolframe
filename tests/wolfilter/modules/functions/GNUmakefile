@@ -1,6 +1,6 @@
 TOPDIR = ../../../..
 
-SUBDIRS = fakegraphix
+SUBDIRS = fakegraphix audit
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
