@@ -1088,8 +1088,8 @@ separately:
 
         make WITH_PYTHON=1 \
                 PYTHON_CFLAGS=-I/usr/include/python3.3m -I/usr/include/python3.3m \
-		PYTHON_LDFLAGS=-lpthread -Xlink -export-dynamic \
-		PYTHON_LIBS=-lpython3.3m
+                PYTHON_LDFLAGS=-lpthread -Xlink -export-dynamic \
+                PYTHON_LIBS=-lpython3.3m
 
 
 Normally you should not change those flags by hand and rely on the results of
