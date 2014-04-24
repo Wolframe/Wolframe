@@ -1109,6 +1109,18 @@ LUA_FUNCTION_THROWS( "provider.formfunction(..)", function_formfunction)
 	throw std::runtime_error( std::string( "form function '") + name + "' not found");
 }
 
+LUA_FUNCTION_THROWS( "provider.authorize(..)", function_authorize)
+{
+	check_parameters( ls, 0, 2, LUA_TSTRING, LUA_TSTRING);
+
+	const char* authorizationFunction = lua_tostring( ls, 1);
+	const char* authorizationResource = lua_tostring( ls, 2);
+
+	proc::ExecContext* ctx = getExecContext( ls);
+	lua_pushboolean( ls, ctx->checkAuthorization( authorizationFunction, authorizationResource));
+	return 1;
+}
+
 LUA_FUNCTION_THROWS( "provider.document(..)", function_document)
 {
 	check_parameters( ls, 0, 1, LUA_TSTRING);
@@ -2551,12 +2563,13 @@ static const luaL_Reg form_methodtable[ 7] =
 	{0,0}
 };
 
-static const luaL_Reg provider_methodtable[ 6] =
+static const luaL_Reg provider_methodtable[ 7] =
 {
 	{"filter",&function_filter},
 	{"form",&function_form},
 	{"type",&function_type},
 	{"formfunction",&function_formfunction},
+	{"authorize",&function_authorize},
 	{"document",&function_document},
 	{0,0}
 };
