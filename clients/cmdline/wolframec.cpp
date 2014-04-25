@@ -34,6 +34,7 @@
 #include "options.hpp"
 #include "utils.hpp"
 #include "session.hpp"
+#include "wolframe.hpp"
 #if WITH_TEXTWOLF
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/charset_utf8.hpp"
@@ -48,12 +49,6 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::client;
-
-///\TODO Not to be defined here
-static const unsigned short APP_MAJOR_VERSION = 0;
-static const unsigned short APP_MINOR_VERSION = 0;
-static const unsigned short APP_REVISION = 6;
-static const unsigned short APP_BUILD = 0;
 
 class CmdlineSession :public Session
 {
@@ -198,7 +193,7 @@ int main( int argc, char **argv )
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolframe client version ";
-			std::cerr << APP_MAJOR_VERSION << "." << APP_MINOR_VERSION << "." << APP_REVISION << "." << APP_BUILD << std::endl;
+			std::cerr << WOLFRAME_MAJOR_VERSION << "." << WOLFRAME_MINOR_VERSION << "." << WOLFRAME_REVISION << "." << WOLFRAME_BUILD << std::endl;
 			doExit = true;
 		}
 		if (cmdline.printhelp())

@@ -31,31 +31,25 @@
 
 ************************************************************************/
 ///\brief Program mapping wolframe elements to output (code generation)
-#include <fstream>
-#include <iostream>
-#include <cstring>
-#include <cstdlib>
-#include <stdexcept>
 #include "prgbind/programLibrary.hpp"
+#include "wolframe.hpp"
 #include "wolfwizardCommandLine.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
+#include <fstream>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <stdexcept>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 
-///\TODO Not to be defined here
-static const unsigned short APP_MAJOR_VERSION = 0;
-static const unsigned short APP_MINOR_VERSION = 0;
-static const unsigned short APP_REVISION = 5;
-static const unsigned short APP_BUILD = 0;
-
 #define DO_STRINGIFY(x)	#x
 #define STRINGIFY(x)	DO_STRINGIFY(x)
-
 
 struct StackElement
 {
@@ -328,7 +322,7 @@ int main( int argc, char **argv )
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfwizard version ";
-			std::cerr << APP_MAJOR_VERSION << "." << APP_MINOR_VERSION << "." << APP_REVISION << "." << APP_BUILD << std::endl;
+			std::cerr << WOLFRAME_MAJOR_VERSION << "." << WOLFRAME_MINOR_VERSION << "." << WOLFRAME_REVISION << "." << WOLFRAME_BUILD << std::endl;
 			doExit = true;
 		}
 		if (cmdline.printhelp() || cmdline.configfile().empty())

@@ -66,10 +66,10 @@ class AuthorizationUnit
 {
 public:
 	enum Result	{
-		RES_DENIED,
-		RES_ALLOWED,
-		RES_IGNORED,
-		RES_ERROR	//[PF:NOTE] identifier ERROR is reserved on MSDN (Visual C++)
+		AUTHZ_DENIED,
+		AUTHZ_ALLOWED,
+		AUTHZ_IGNORED,
+		AUTHZ_ERROR
 	};
 
 	AuthorizationUnit( const std::string& Identifier )

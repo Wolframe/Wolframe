@@ -33,6 +33,7 @@
 //\brief Program using wolframe functions to map stdin to stdout
 #include "wolfilterCommandLine.hpp"
 #include "wolfilterIostreamFilter.hpp"
+#include "wolframe.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
@@ -46,11 +47,6 @@
 
 using namespace _Wolframe;
 
-///\TODO Not to be defined here
-static const unsigned short APP_MAJOR_VERSION = 0;
-static const unsigned short APP_MINOR_VERSION = 0;
-static const unsigned short APP_REVISION = 5;
-static const unsigned short APP_BUILD = 0;
 enum {IOBUFFERSIZE=8192};
 
 int main( int argc, char **argv )
@@ -69,7 +65,7 @@ int main( int argc, char **argv )
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";
-			std::cerr << APP_MAJOR_VERSION << "." << APP_MINOR_VERSION << "." << APP_REVISION << "." << APP_BUILD << std::endl;
+			std::cerr << WOLFRAME_MAJOR_VERSION << "." << WOLFRAME_MINOR_VERSION << "." << WOLFRAME_REVISION << "." << WOLFRAME_BUILD << std::endl;
 			doExit = true;
 		}
 		if (cmdline.printhelp())
