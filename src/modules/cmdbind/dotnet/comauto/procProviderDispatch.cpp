@@ -53,9 +53,9 @@ GUID comauto::ProcessorProviderDispatch::uuid()
 	return g_CLSID_ProcProvider;
 }
 
-static langbind::TypedInputFilterR callProcProvider( const proc::ProcessorProviderInterface* provider_, const std::string& funcname_, const langbind::TypedInputFilterR& input_)
+static langbind::TypedInputFilterR callProcProvider( proc::ExecContext* context_, const std::string& funcname_, const langbind::TypedInputFilterR& input_)
 {
-	const langbind::FormFunction* func = provider_->formFunction( funcname_);
+	const langbind::FormFunction* func = context_->provider()->formFunction( funcname_);
 	if (func == 0)
 	{
 		throw std::runtime_error( std::string( "function '") + funcname_ + "' not found (processor provider function call)");
@@ -66,7 +66,7 @@ static langbind::TypedInputFilterR callProcProvider( const proc::ProcessorProvid
 		throw std::runtime_error( "creation of function execution context failed (processor provider function call)");
 	}
 	serialize::Context::Flags flags = serialize::Context::CaseInsensitiveCompare;
-	funcexec->init( provider_, input_, flags);
+	funcexec->init( context_, input_, flags);
 	if (!funcexec->call())
 	{
 		throw std::runtime_error( std::string( "call of function '") + funcname_ + "' failed (processor provider function call)");
@@ -249,7 +249,7 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 				serialize::Context::Flags flags = (serialize::Context::Flags)fs;
 
 				langbind::TypedInputFilterR input( new VariantInputFilter( m_typelib, inputTypeInfo, *inputarg, flags));
-				langbind::TypedInputFilterR result = callProcProvider( m_provider, funcname, input);
+				langbind::TypedInputFilterR result = callProcProvider( m_context, funcname, input);
 
 				if (resultarg)
 				{
@@ -338,9 +338,9 @@ ULONG comauto::ProcessorProviderDispatch::Release()
 	return ulRefCount;
 }
 
-IDispatch* ProcessorProviderDispatch::create(  const proc::ProcessorProviderInterface* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
+IDispatch* ProcessorProviderDispatch::create( proc::ExecContext* context_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
 {
-	ProcessorProviderDispatch* inst = new ProcessorProviderDispatch( provider_, typelib_, typeinfo_);
+	ProcessorProviderDispatch* inst = new ProcessorProviderDispatch( context_, typelib_, typeinfo_);
 	IDispatch* rt = inst;
 	return rt;
 }

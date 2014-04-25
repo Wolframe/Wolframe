@@ -31,18 +31,21 @@
 
 ************************************************************************/
 /// \file processor/execContext.hpp
-/// \brief Execution context
+/// \brief TEST REPLACEMENT OF execution context
 #ifndef _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
 #define _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
 #include "processor/procProviderInterface.hpp"
-#include "AAAA/user.hpp"
-#include "AAAA/authorization.hpp"
 
 namespace _Wolframe {
+
+namespace AAAA {
+class User {public: User(){} User(const User&){}};
+class Authorizer {public: Authorizer(){} Authorizer(const Authorizer&){}};
+}
 namespace proc {
 
 /// \class ExecContext
-/// \brief Execution context passed to functions for referencing resources and to define authorization dependend processing
+/// \brief See include/processor/execContext.hpp
 class ExecContext
 {
 public:

@@ -66,10 +66,10 @@ class AuthorizationUnit
 {
 public:
 	enum Result	{
-		DENIED,
-		ALLOWED,
-		IGNORED,
-		ERROR
+		RES_DENIED,
+		RES_ALLOWED,
+		RES_IGNORED,
+		RES_ERROR
 	};
 
 	AuthorizationUnit( const std::string& Identifier )
@@ -84,6 +84,9 @@ public:
 	virtual const char* className() const = 0;
 
 	virtual Result allowed( const Information& ) = 0;
+
+private:
+	void operator=( const AuthorizationUnit&){}
 private:
 	const std::string	m_identifier;
 };

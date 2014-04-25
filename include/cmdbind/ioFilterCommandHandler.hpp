@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/ioFilterCommandHandlerBase.hpp
+///\file cmdbind/ioFilterCommandHandler.hpp
 ///\brief Command handler base class for processing content and writing output through filters
 
 #ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
