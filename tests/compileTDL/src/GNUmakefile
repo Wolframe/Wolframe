@@ -28,7 +28,8 @@ INCLUDE_LIBS = \
 	-lwolframe_database \
 	-lwolframe_langbind \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_filesystem -lboost_system -lboost_program_options
+	-lboost_filesystem -lboost_system -lboost_program_options \
+	$(LIBS_LT)
 
 CPP_OBJS =
 
