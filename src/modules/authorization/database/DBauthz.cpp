@@ -85,9 +85,9 @@ AuthorizationUnit::Result DBauthorizer::allowed( const Information& authzObject 
 		case Information::LOGIN:
 		case Information::LOGOUT:
 		case Information::TRANSACTION:
-			return IGNORED;
+			return RES_IGNORED;
 	}
-	return ERROR;
+	return RES_ERROR;
 }
 
 AuthorizationUnit::Result DBauthorizer::connectionAllowed( const net::LocalEndpoint& /*local*/,
@@ -95,8 +95,8 @@ AuthorizationUnit::Result DBauthorizer::connectionAllowed( const net::LocalEndpo
 {
 	// that's just for testing - allow localhost only
 	if ( remote.host() == "127.0.0.1" )
-		return ALLOWED;
-	return DENIED;
+		return RES_ALLOWED;
+	return RES_DENIED;
 }
 
 }} // namespace _Wolframe::AAAA

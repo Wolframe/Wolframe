@@ -69,7 +69,7 @@ public:
 		RES_DENIED,
 		RES_ALLOWED,
 		RES_IGNORED,
-		RES_ERROR
+		RES_ERROR	//[PF:NOTE] identifier ERROR is reserved on MSDN (Visual C++)
 	};
 
 	AuthorizationUnit( const std::string& Identifier )
