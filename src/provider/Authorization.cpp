@@ -114,16 +114,16 @@ bool StandardAuthorizer::allowed( const Information& authzObject )
 							au != m_authorizeUnits.end(); au++ )	{
 		AuthorizationUnit::Result res = (*au)->allowed( authzObject );
 		switch( res )	{
-			case AuthorizationUnit::ALLOWED:
+			case AuthorizationUnit::AUTHZ_ALLOWED:
 				ignored = false;
 				break;
-			case AuthorizationUnit::DENIED:
+			case AuthorizationUnit::AUTHZ_DENIED:
 				ignored = false;
 				retVal = false;
 				break;
-			case AuthorizationUnit::IGNORED:
+			case AuthorizationUnit::AUTHZ_IGNORED:
 				break;
-			case AuthorizationUnit::ERROR:
+			case AuthorizationUnit::AUTHZ_ERROR:
 				return false;
 		}
 	}

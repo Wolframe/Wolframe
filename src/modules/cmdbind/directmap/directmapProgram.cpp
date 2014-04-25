@@ -373,6 +373,7 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 						if (!validate_input) throw std::runtime_error( "SKIP (input) specified twice");
 						validate_input = false;
 						state = ParseAttribute;
+						rt.skipvalidation_input = true;
 						continue;
 					case RETURN:
 						if (return_arg_set || return_standalone) throw std::runtime_error( "RETURN specified twice");

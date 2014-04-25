@@ -30,15 +30,25 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// Header file for the main Wolframe version number
-///
+/// \file wolframe.hpp
+/// \brief Header file for the main Wolframe version number
 
 #ifndef _WOLFRAME_HPP_INCLUDED
 #define _WOLFRAME_HPP_INCLUDED
 
+#define WOLFRAME_MAJOR_VERSION	0
+#define WOLFRAME_MINOR_VERSION	0
+#define WOLFRAME_REVISION	1
+#define WOLFRAME_BUILD		0
+
 // The format of the version is MMmmrrbbb
 // example 1.3.13 -> 01 03 13 000 -> 10313000
-#define WOLFRAME_VERSION_NUMBER 000001000
+#define WOLFRAME_VERSION_NUMBER\
+ +(\
+	(WOLFRAME_MAJOR_VERSION * 100 * 100 * 1000)+\
+	(WOLFRAME_MINOR_VERSION       * 100 * 1000)+\
+	(WOLFRAME_REVISION                  * 1000)+\
+	(WOLFRAME_BUILD)\
+ )
 
 #endif // _WOLFRAME_HPP_INCLUDED

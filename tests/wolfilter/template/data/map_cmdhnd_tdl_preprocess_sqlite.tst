@@ -1,6 +1,5 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
-testcmd="$opt AllDataRequest"				# command to execute by the test
 docin=tdl_preprocess.in					# input document name
 docout=tdl_preprocess_sqlite.out			# output document name
 dumpout="program/tdl_preprocess/sqlite.dbdump.txt"	# resource dump to add to expected test output

@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of embedded database statement parsing
+///\brief Implementation of a preprocessing statement parsing
 ///\file tdl/preprocCallStatement.cpp
 #include "tdl/preprocCallStatement.hpp"
 #include "tdl/parseUtils.hpp"

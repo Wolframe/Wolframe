@@ -180,6 +180,11 @@ private:
 	ElementRequirement m_requirement;
 };
 
+struct EmptyStruct
+{
+	static const serialize::StructDescriptionBase* getStructDescription();
+};
+
 }}//namespace
 #endif
 

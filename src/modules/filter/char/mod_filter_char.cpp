@@ -33,7 +33,10 @@
 ///\file mod_filter_char.cpp
 ///\brief Module for a unicode character by character filter
 #include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "char_filter.hpp"
 
-FILTER_MODULE( "unicode character by character filter", char, _Wolframe::langbind::createCharFilterType)
+WF_MODULE_BEGIN( "charFilter", "unicode character by character filter")
+ WF_FILTER_TYPE( "char", _Wolframe::langbind::createCharFilterType)
+WF_MODULE_END
 

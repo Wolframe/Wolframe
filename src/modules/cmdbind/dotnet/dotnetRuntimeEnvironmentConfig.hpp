@@ -36,6 +36,7 @@ Project Wolframe.
 #include "config/configurationTree.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <string>
 #include <map>
 

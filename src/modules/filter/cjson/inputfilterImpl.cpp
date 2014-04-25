@@ -503,7 +503,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 	return false;
 }
 
-bool InputFilterImpl::checkSetFlags( Flags /*f*/) const
+bool InputFilterImpl::checkSetFlags( Flags) const
 {
 	return true;
 }

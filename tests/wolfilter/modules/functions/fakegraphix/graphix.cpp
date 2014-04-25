@@ -106,17 +106,24 @@ const serialize::StructDescriptionBase *ImageImpl::getStructDescription( )
 	return &rt;
 }
 
-int ImageImpl::info( const proc::ProcessorProviderInterface*, ImageInfo &res, const Image &param )
+int ImageImpl::info( proc::ExecContext*, ImageInfo &res, const Image &param )
 {
 	res.width = param.data.size();
 	res.height = 1000 / param.data.size();
 	return 0;
 }
 
-int ImageImpl::thumb( const proc::ProcessorProviderInterface*, Image &res, const ImageThumb &param )
+int ImageImpl::thumb( proc::ExecContext*, Image &res, const ImageThumb &param )
 {
 	std::size_t nn = (param.image.data.size() < (std::size_t)param.size)?param.image.data.size():param.size;
 	res.data = std::string( param.image.data.c_str(), nn);
 	return 0;
 }
 
+int ImageImpl::rescale( proc::ExecContext*, Image &res, const ImageRescale &param )
+{
+	std::size_t hh = (param.image.data.size() < (std::size_t)param.height)?param.image.data.size():param.height;
+	std::size_t ww = (param.image.data.size() < (std::size_t)param.width)?param.image.data.size():param.width;
+	res.data = std::string( param.image.data.c_str(), hh*ww);
+	return 0;
+}

@@ -33,7 +33,9 @@
 ///\file mod_filter_line.cpp
 ///\brief Module for a unicode line by line filter
 #include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "line_filter.hpp"
 
-FILTER_MODULE( "unicode line by line filter", line, _Wolframe::langbind::createLineFilterType)
-
+WF_MODULE_BEGIN( "lineFilter", "unicode line by line filter")
+ WF_FILTER_TYPE( "line", _Wolframe::langbind::createLineFilterType)
+WF_MODULE_END

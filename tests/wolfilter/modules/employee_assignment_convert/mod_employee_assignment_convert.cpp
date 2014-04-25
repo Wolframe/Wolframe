@@ -38,12 +38,9 @@
 using namespace _Wolframe;
 using namespace _Wolframe::test;
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE("test form function")
-CPP_APPLICATION_FORM_FUNCTION(
-	"employee_assignment_convert",
-	assignmentListDocConvert, AssignmentListDoc, AssignmentListDoc)
-CPP_APPLICATION_FORM_FUNCTION_MODULE_END
-
+WF_MODULE_BEGIN( "testFunction", "test form function employee_assignment_convert")
+WF_FORM_FUNCTION( "employee_assignment_convert", assignmentListDocConvert, AssignmentListDoc, AssignmentListDoc)
+WF_MODULE_END
 
 
 

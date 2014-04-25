@@ -48,15 +48,11 @@ namespace module {
 class CustomDataTypeConstructor :public SimpleObjectConstructor<types::CustomDataType>
 {
 public:
-	CustomDataTypeConstructor( const char* classname_, const types::keymap<types::CreateCustomDataType>& constructormap_)
+	CustomDataTypeConstructor( const char* classname_, const std::string& identifier_, types::CreateCustomDataType createFunc_)
 		:m_classname(classname_)
 	{
-		types::keymap<types::CreateCustomDataType>::const_iterator ci = constructormap_.begin(), ce = constructormap_.end();
-		for (; ci != ce; ++ci)
-		{
-			types::CustomDataTypeR dt( ci->second( ci->first));
-			m_typemap.insert( ci->first, dt);
-		}
+		types::CustomDataType* cdt = (*createFunc_)( identifier_);
+		m_datatype.reset( cdt);
 	}
 
 	virtual ~CustomDataTypeConstructor(){}
@@ -66,57 +62,35 @@ public:
 		return CUSTOM_DATA_TYPE_OBJECT;
 	}
 
-	std::vector<std::string> types() const
+	const std::string& identifier() const
 	{
-		return m_typemap.getkeys<std::vector<std::string> >();
+		return m_datatype->name();
 	}
 
-	typedef types::keymap<types::CustomDataTypeR> CustomDataTypeMap;
-	const CustomDataTypeMap& typemap() const
-	{
-		return m_typemap;
-	}
-
-	void getTypeReferences( std::vector<const types::CustomDataType*>& result) const
-	{
-		CustomDataTypeMap::const_iterator ti = m_typemap.begin(), te = m_typemap.end();
-		for (; ti != te; ++ti)
-		{
-			result.push_back( ti->second.get());
-		}
-	}
-	
 	virtual const char* objectClassName() const
 	{
 		return m_classname;
 	}
 
+	const types::CustomDataTypeR& object()
+	{
+		return m_datatype;
+	}
+
 private:
 	const char* m_classname;
-	CustomDataTypeMap m_typemap;
+	types::CustomDataTypeR m_datatype;
 };
 
 typedef boost::shared_ptr<CustomDataTypeConstructor> CustomDataTypeConstructorR;
 
 
-struct CustomDataTypeDef
-{
-	const char* name;
-	types::CreateCustomDataType createFunc;
-};
-
 class CustomDataTypeBuilder :public SimpleBuilder
 {
 public:
-	CustomDataTypeBuilder( const char* classname_, const CustomDataTypeDef* typedefs)
-		:SimpleBuilder(classname_)
-	{
-		std::size_t ti = 0;
-		for (; typedefs[ti].name && typedefs[ti].createFunc; ++ti)
-		{
-			m_constructormap.insert( std::string(typedefs[ti].name), typedefs[ti].createFunc);
-		}
-	}
+	CustomDataTypeBuilder( const char* classname_, const char* identifier_, types::CreateCustomDataType createFunc_)
+		:SimpleBuilder(classname_),m_identifier(identifier_),m_createFunc(createFunc_)
+	{}
 
 	virtual ~CustomDataTypeBuilder(){}
 
@@ -127,12 +101,12 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new CustomDataTypeConstructor( objectClassName(), m_constructormap);
+		return new CustomDataTypeConstructor( objectClassName(), m_identifier, m_createFunc);
 	}
 
 private:
-	typedef types::keymap<types::CreateCustomDataType> ConstructorMap;
-	ConstructorMap m_constructormap;
+	std::string m_identifier;
+	types::CreateCustomDataType m_createFunc;
 };
 
 }}//namespace

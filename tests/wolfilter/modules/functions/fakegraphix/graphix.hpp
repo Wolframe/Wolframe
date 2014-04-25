@@ -36,6 +36,7 @@
 #define _Wolframe_TESTS_WOLFILTER_MODULE_FUNCTIONS_FAKE_GRAPHIX_HPP_INCLUDED
 #include "serialize/struct/structDescriptionBase.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <string>
 #include <vector>
 
@@ -65,6 +66,15 @@ struct ImageThumb
 	static const serialize::StructDescriptionBase *getStructDescription( );
 };
 
+struct ImageRescale
+{
+	Image image;
+	int height;
+	int width;
+	
+	static const serialize::StructDescriptionBase *getStructDescription( );
+};
+
 class ImageImpl
 {
 	private:
@@ -73,8 +83,10 @@ class ImageImpl
 		
 	public:
 		static const serialize::StructDescriptionBase *getStructDescription( );
-		static int info( const proc::ProcessorProviderInterface* provider, ImageInfo &res, const Image &param );
-		static int thumb( const proc::ProcessorProviderInterface* provider, Image &res, const ImageThumb &param );
+
+		static int info( proc::ExecContext* ctx, ImageInfo &res, const Image &param );
+		static int thumb( proc::ExecContext* ctx, Image &res, const ImageThumb &param );
+		static int rescale( proc::ExecContext* ctx, Image &res, const ImageRescale &param );
 };
 
 }}

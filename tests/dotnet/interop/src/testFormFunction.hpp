@@ -37,6 +37,7 @@
 #define _LANGBIND_TEST_FORM_FUNCTION_HPP_INCLUDED
 #include "ddl_form.hpp"
 #include "langbind/formFunction.hpp"
+#include "processor/execContext.hpp"
 #include <iostream>
 
 namespace _Wolframe {
@@ -57,7 +58,7 @@ public:
 		return true;
 	}
 
-	virtual void init( const proc::ProcessorProviderInterface*, const langbind::TypedInputFilterR&, serialize::Context::Flags)
+	virtual void init( proc::ExecContext*, const langbind::TypedInputFilterR&, serialize::Context::Flags)
 	{
 	}
 

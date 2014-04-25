@@ -70,11 +70,16 @@ public:
 	{
 		return m_programFiles;
 	}
+	const std::string& referencePath() const
+	{
+		return m_referencePath;
+	}
 
 private:
 	std::string					m_dbLabel;
 	std::list< config::NamedConfiguration* >	m_procConfig;
 	std::list< std::string >			m_programFiles;
+	std::string					m_referencePath;
 };
 
 
@@ -107,6 +112,7 @@ public:
 	virtual langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const;
 	virtual const types::CustomDataType* customDataType( const std::string& name) const;
 	virtual bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const;
+	virtual const std::string& referencePath() const;
 
 private:
 	class ProcessorProvider_Impl;

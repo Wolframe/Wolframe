@@ -40,6 +40,7 @@
 #include "types/normalizeFunction.hpp"
 #include "types/variant.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include "serialize/mapContext.hpp"
 #include "logger-v1.hpp"
 #include <string>
@@ -141,7 +142,7 @@ static void mapResult( langbind::TypedInputFilter* in, langbind::TypedOutputFilt
 	}
 }
 
-void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* provider, vm::InputStructure& structure) const
+void TdlTransactionPreprocStep::call( proc::ExecContext* context, vm::InputStructure& structure) const
 {
 	// Select the nodes to execute the command with:
 	std::map<vm::InputNodeIndex, int> selectmap;
@@ -151,8 +152,8 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 	const langbind::FormFunction* ff = 0;
 	try
 	{
-		ff = provider->formFunction( m_function);
-		if (!ff) nf = provider->normalizeFunction( m_function);
+		ff = context->provider()->formFunction( m_function);
+		if (!ff) nf = context->provider()->normalizeFunction( m_function);
 
 		std::vector<vm::InputNodeIndex> nodearray;
 		selector().selectNodes( structure, structure.rootindex(), nodearray);
@@ -297,7 +298,7 @@ void TdlTransactionPreprocStep::call( const proc::ProcessorProviderInterface* pr
 				{
 					f = (serialize::Context::Flags)((int)f | (int)serialize::Context::CaseInsensitiveCompare);
 				}
-				fc->init( provider, argfilter, f);
+				fc->init( context, argfilter, f);
 				if (!fc->call())
 				{
 					const char* err = argfilter->getError();

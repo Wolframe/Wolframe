@@ -82,10 +82,11 @@ class ConfiguredBuilder
 {
 	friend class ModulesDirectory;
 public:
-	/// ConfiguredBuilder (builder for objects with configuration) constructor
-	///\param title		string used for printing purposes, usually logging.
-	///\param section	configuration section (parent node)
-	///\param keyword	keyword in the configuration section. The object configuration
+	/// \class ConfiguredBuilder
+	/// \brief builder for objects with configuration
+	/// \param title	string used for printing purposes, usually logging.
+	/// \param section	configuration section (parent node)
+	/// \param keyword	keyword in the configuration section. The object configuration
 	///			is bind to the section, keyword pair
 	///\param className	the name of the class that the built constructor will build
 	ConfiguredBuilder( const char* title, const char* section, const char* keyword,

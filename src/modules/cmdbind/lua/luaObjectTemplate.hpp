@@ -36,6 +36,7 @@ Project Wolframe.
 #include "luaObjects.hpp"
 #include "luaGetFunctionClosure.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/doctype.hpp"
 #include "types/datetime.hpp"
@@ -84,7 +85,7 @@ template <> struct MetaTable<TypedInputFilterClosure> {static const char* name()
 template <> struct MetaTable<FormFunctionClosureR> {static const char* name()		{return "wolframe.FormFunctionClosureR";}};
 template <> struct MetaTable<types::NormalizeFunctionR> {static const char* name()	{return "wolframe.NormalizeFunctionR";}};
 template <> struct MetaTable<serialize::StructSerializer> {static const char* name()	{return "wolframe.StructSerializer";}};
-template <> struct MetaTable<proc::ProcessorProviderInterface> {static const char* name(){return "wolframe.ProcessorProvider";}};
+template <> struct MetaTable<proc::ExecContext>						{static const char* name(){return "wolframe.ExecContext";}};
 template <> struct MetaTable<LuaModuleMap> {static const char* name()			{return "wolframe.LuaModuleMap";}};
 
 template <class ObjectType>

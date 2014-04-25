@@ -113,11 +113,13 @@ class VmTransactionInputFilter
 	:public langbind::TypedInputFilter
 {
 public:
-	explicit VmTransactionInputFilter( const vm::OutputR& output_)
+	explicit VmTransactionInputFilter( const vm::OutputR& output_, std::size_t index)
 		:utils::TypeSignature("db::VmTransactionInputFilter", __LINE__)
 		,langbind::TypedInputFilter("vmTransactionOutput")
-		,m_done(false),m_output(output_),m_itr(output_->begin()),m_end(output_->end())
-	{}
+		,m_done(false),m_output(output_),m_itr(output_->begin(index)),m_end(output_->end(index))
+	{
+		setFlags( langbind::TypedInputFilter::PropagateNoCase);
+	}
 	VmTransactionInputFilter( const VmTransactionInputFilter& o)
 		:utils::TypeSignature("db::VmTransactionInputFilter", __LINE__)
 		,langbind::TypedInputFilter(o)
@@ -213,9 +215,9 @@ private:
 	std::vector<types::Variant> m_stack;
 };
 
-langbind::TypedInputFilterR VmTransactionOutput::get() const
+langbind::TypedInputFilterR VmTransactionOutput::get( std::size_t index) const
 {
-	return langbind::TypedInputFilterR( new VmTransactionInputFilter( m_impl));
+	return langbind::TypedInputFilterR( new VmTransactionInputFilter( m_impl, index));
 }
 
 

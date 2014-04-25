@@ -35,20 +35,15 @@
 //
 
 #include "appProperties.hpp"
+#include "wolframe.hpp"
 #include "version.hpp"
 
 namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
-//unused:
-//	static const unsigned short APP_BUILD = 0;
 
 	const char*	applicationName()			{ return "Wolframe"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION,
-										  APP_MINOR_VERSION
-										  ,APP_REVISION
-//										  ,APP_BUILD
+	const Version	applicationVersion()			{ return Version( WOLFRAME_MAJOR_VERSION,
+										  WOLFRAME_MINOR_VERSION,
+										  WOLFRAME_REVISION
 										  ); }
 
 	const char*	config::defaultMainConfig()		{ return "/etc/wolframe.conf"; }

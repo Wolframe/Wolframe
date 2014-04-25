@@ -132,7 +132,8 @@ public:
 		m_config->setBuffers( ib + EoDBufferSize, ob + MinOutBufferSize);
 		m_connection = new tproc::Connection( ep, m_config);
 		m_provider = getProcProvider( m_config->providerConfig(), &m_prglib);
-		m_connection->setProcessorProvider( m_provider.get());
+		m_execContext = proc::ExecContext( m_provider.get());
+		m_connection->setExecContext( &m_execContext);
 	}
 
 	~TProcHandlerTestInstance()
@@ -159,6 +160,7 @@ private:
 	std::string m_input;
 	std::string m_output;
 	std::string m_expected;
+	proc::ExecContext m_execContext;
 
 	enum
 	{

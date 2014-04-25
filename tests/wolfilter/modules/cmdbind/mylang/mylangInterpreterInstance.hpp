@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_Mylang_INTERPRETER_INSTANCE_HPP_INCLUDED
 #include "mylangStructure.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -52,7 +53,7 @@ public:
 	virtual ~InterpreterInstance(){}
 
 	///\brief Call a function written in 'Mylang'
-	StructureR call( const proc::ProcessorProviderInterface* provider, const StructureR& arg);
+	StructureR call( proc::ExecContext* ctx, const StructureR& arg);
 };
 
 typedef boost::shared_ptr<InterpreterInstance> InterpreterInstanceR;

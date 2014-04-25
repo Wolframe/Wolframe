@@ -33,16 +33,14 @@
 ///\file mod_normalize_number.hpp
 ///\brief Module for number normalization and validation functions
 #include "appdevel/normalizeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "numberNormalize.hpp"
 
 using namespace _Wolframe::langbind;
 
-NORMALIZER_MODULE("NumberNormalizer", "normalizers and validators for numbers")
-
-NORMALIZER_FUNCTION(	"integer",	createIntegerNormalizeFunction)
-NORMALIZER_FUNCTION(	"unsigned",	createUnsignedNormalizeFunction)
-NORMALIZER_FUNCTION(	"floatingpoint",createFloatNormalizeFunction)
-
-NORMALIZER_MODULE_END
-
+WF_MODULE_BEGIN( "NumberNormalizer", "normalizers and validators for numbers")
+ WF_NORMALIZER( "integer", createIntegerNormalizeFunction)
+ WF_NORMALIZER( "unsigned", createUnsignedNormalizeFunction)
+ WF_NORMALIZER( "floatingpoint", createFloatNormalizeFunction)
+WF_MODULE_END
 

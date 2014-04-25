@@ -1,0 +1,13 @@
+
+TRANSACTION doInsertUser
+BEGIN
+	DO INSERT INTO Users (name) values ($(name));
+	DO SELECT id FROM Users WHERE name = $(name);
+END
+AUDIT CRITICAL auditUserInsert WITH
+BEGIN
+	INTO id PRINT $RESULT.id;
+	INTO name PRINT $(name);
+END
+
+

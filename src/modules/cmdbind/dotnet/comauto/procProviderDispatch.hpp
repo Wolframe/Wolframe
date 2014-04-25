@@ -34,7 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_COM_AUTOMATION_PROCESSOR_PROVIDER_DISPATCH_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_PROCESSOR_PROVIDER_DISPATCH_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "processor/procProvider.hpp"
+#include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <objbase.h>
 
 namespace _Wolframe {
@@ -49,15 +50,15 @@ public:
 	enum DispID {DispID_CALL=1, DispID_CALL_NORES=2};
 
 public:
-	ProcessorProviderDispatch( const proc::ProcessorProviderInterface* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
-		:m_provider(provider_),m_refcount(1),m_typelib(typelib_),m_typeinfo(typeinfo_)
+	ProcessorProviderDispatch( proc::ExecContext* context_, const TypeLib* typelib_, ITypeInfo* typeinfo_)
+		:m_context(context_),m_refcount(1),m_typelib(typelib_),m_typeinfo(typeinfo_)
 	{}
 
 	~ProcessorProviderDispatch()
 	{}
 
 	static GUID uuid();
-	static IDispatch* create( const proc::ProcessorProviderInterface* provider_, const TypeLib* typelib_, ITypeInfo* typeinfo_);
+	static IDispatch* create( proc::ExecContext* context_, const TypeLib* typelib_, ITypeInfo* typeinfo_);
 
 	// Interface IDispatch:
 	HRESULT STDMETHODCALLTYPE GetTypeInfoCount( UINT* pCountTypeInfo);
@@ -71,10 +72,10 @@ public:
 	ULONG STDMETHODCALLTYPE Release();
 
 private:
-	const proc::ProcessorProviderInterface* m_provider;	//< processor provider reference
-	volatile LONG m_refcount;						//< atomic counter
-	const TypeLib* m_typelib;						//< type library reference for introspection of provider call argument types
-	ITypeInfo* m_typeinfo;							//< type info of the IDispatch interface
+	proc::ExecContext* m_context;					///< execution context
+	volatile LONG m_refcount;						///< atomic counter
+	const TypeLib* m_typelib;						///< type library reference for introspection of provider call argument types
+	ITypeInfo* m_typeinfo;							///< type info of the IDispatch interface
 };
 
 }}//namespace

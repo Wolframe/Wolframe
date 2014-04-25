@@ -37,6 +37,7 @@ Project Wolframe.
 #include "serialize/struct/structSerializer.hpp"
 #include "serialize/struct/structParser.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include "filter/typedfilter.hpp"
 #include <boost/shared_ptr.hpp>
 
@@ -48,7 +49,7 @@ namespace serialize {
 class CppFormFunction
 {
 public:
-	typedef int (*Function)( const proc::ProcessorProviderInterface* provider, void* res, const void* param);
+	typedef int (*Function)( proc::ExecContext* ctx, void* res, const void* param);
 
 	///\brief Default constructor
 	CppFormFunction()
@@ -83,11 +84,12 @@ public:
 		{return m_api_result;}
 
 	///\brief Call the form function
+	///\param[in] ctx execution context reference
 	///\param[in] res pointer to structure as defined with 'api_result()' to hold the form function result
 	///\param[in] param pointer to structure as defined with 'api_param()' to hold the form function parameter
 	///\return 0 on success, error code else
-	int call( const proc::ProcessorProviderInterface* provider, void* res, const void* param) const
-		{return (*m_function)( provider, res, param);}
+	int call( proc::ExecContext* ctx, void* res, const void* param) const
+		{return (*m_function)( ctx, res, param);}
 
 private:
 	Function m_function;						//< form function implementation
@@ -132,9 +134,10 @@ public:
 	bool call();
 
 	///\brief Initialization of call context for a new call
+	///\param[in] c execution context reference
 	///\param[in] i call input
 	///\param[in] flags serialization flags depending on context (directmap "strict",lua relaxed)
-	void init( const proc::ProcessorProviderInterface* provider, const langbind::TypedInputFilterR& i, serialize::Context::Flags flags);
+	void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags flags);
 
 	const serialize::StructSerializer& result() const	{return m_result;}
 
@@ -145,7 +148,7 @@ private:
 	ApiFormData m_result_data;
 	serialize::StructSerializer m_result;
 	serialize::StructParser m_parser;
-	const proc::ProcessorProviderInterface* m_provider;
+	proc::ExecContext* m_context;
 };
 
 }}//namespace

@@ -55,7 +55,7 @@ namespace _Wolframe	{
 wolframeConnection::wolframeConnection( const WolframeHandler& context,
 					const net::LocalEndpoint& local )
 	: m_globalCtx( context ),
-	  m_readBuf( 16536 ), m_outputBuf( 4096 )
+	  m_readBuf( 16536 ), m_outputBuf( 4096 ), m_execContext( &context.proc())
 {
 	m_remoteEP = NULL;
 	net::ConnectionEndpoint::ConnectionType type = local.type();
@@ -97,7 +97,7 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 //	m_proc = NULL;
 	m_cmdHandler.setInputBuffer( m_readBuf.charptr(), m_readBuf.size() );
 	m_cmdHandler.setOutputBuffer( m_outputBuf.charptr(), m_outputBuf.size() );
-	m_cmdHandler.setProcProvider( &context.proc());
+	m_cmdHandler.setExecContext( &m_execContext);
 }
 
 
@@ -168,6 +168,7 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		if ( m_authorization->allowed( AAAA::ConnectInfo( *m_localEP, *m_remoteEP )))	{
 			LOG_DEBUG << "Connection from " << m_remoteEP->toString()
 				  << " to " << m_localEP->toString() << " authorized";
+			m_execContext.setAuthorizer( m_authorization);
 		}
 		else	{
 			LOG_DEBUG << "Connection from " << m_remoteEP->toString()

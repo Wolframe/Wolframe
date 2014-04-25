@@ -100,11 +100,6 @@ public:
 
 typedef boost::shared_ptr<CustomDataInitializer> CustomDataInitializerR;
 
-
-typedef CustomDataInitializer* (*CreateCustomDataInitializer)( const std::vector<types::Variant>& arg);
-typedef CustomDataValue* (*CustomDataValueConstructor)( const CustomDataInitializer* initializer);
-typedef types::Variant (*CustomDataValueMethod)( const CustomDataValue& val, const std::vector<types::Variant>& arg);
-
 ///\class CustomDataType
 ///\brief Custom Data Type Definition
 class CustomDataType
@@ -144,6 +139,9 @@ public:
 	typedef types::Variant (*UnaryOperator)( const CustomDataValue& operand);
 	typedef types::Variant (*BinaryOperator)( const CustomDataValue& operand, const Variant& arg);
 	typedef std::size_t (*DimensionOperator)( const CustomDataValue& arg);
+	typedef CustomDataInitializer* (*CreateCustomDataInitializer)( const std::vector<types::Variant>& arg);
+	typedef CustomDataValue* (*CustomDataValueConstructor)( const CustomDataInitializer* initializer);
+	typedef types::Variant (*CustomDataValueMethod)( const CustomDataValue& val, const std::vector<types::Variant>& arg);
 
 public:
 	///\brief Default constructor

@@ -33,10 +33,13 @@
 ///\file mod_command_directmap.cpp
 ///\brief Module for command handler executing direct mappings to transactions or functions
 #include "appdevel/commandHandlerModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "directmapCommandHandlerConfig.hpp"
 #include "directmapCommandHandler.hpp"
 
 using namespace _Wolframe::cmdbind;
 
-COMMAND_HANDLER_MODULE("standard command handler",Directmap,"cmdhandler", "directmap",DirectmapCommandHandler,DirectmapCommandHandlerConfig)
+WF_MODULE_BEGIN( "DirectmapCommandHandler", "standard command handler module")
+ WF_COMMAND_HANDLER( "standard command handler", "cmdhandler", "directmap", DirectmapCommandHandler, DirectmapCommandHandlerConfig)
+WF_MODULE_END
 

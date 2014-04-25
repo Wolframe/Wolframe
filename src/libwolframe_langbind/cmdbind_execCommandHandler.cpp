@@ -31,6 +31,7 @@
 
 ************************************************************************/
 #include "cmdbind/execCommandHandler.hpp"
+#include "processor/execContext.hpp"
 #include "protocol/ioblocks.hpp"
 #include "logger-v1.hpp"
 
@@ -269,7 +270,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					try
 					{
 						const std::string& procname = m_cmds[ m_cmdidx - m_nofParentCmds - 2];
-						if (!m_provider)
+						if (!execContext() || !execContext()->provider())
 						{
 							LOG_ERROR << "Processor provider undefined";
 							m_output.print( "ERR command not defined\r\n");
@@ -278,7 +279,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 							m_argBuffer.clear();
 							return WRITE;
 						}
-						m_cmdhandler.reset( m_provider->cmdhandler( procname));
+						m_cmdhandler.reset( execContext()->provider()->cmdhandler( procname));						
 						if (!m_cmdhandler.get())
 						{
 							LOG_ERROR << "Command handler not found for '" << procname << "'";
@@ -289,6 +290,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 							return WRITE;
 
 						}
+						m_cmdhandler->setExecContext( execContext());
 						m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
 						m_state = Processing;
 						m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size());

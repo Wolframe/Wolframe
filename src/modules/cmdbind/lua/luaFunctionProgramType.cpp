@@ -35,6 +35,7 @@ Project Wolframe.
 #include "langbind/formFunction.hpp"
 #include "luaScriptContext.hpp"
 #include "processor/procProvider.hpp"
+#include "processor/execContext.hpp"
 #include "luaObjects.hpp"
 #include "logger-v1.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
@@ -110,9 +111,9 @@ public:
 	}
 
 	///\remark Flags ignored because lua has no strict typing does not validate input parameter structure on its own
-	virtual void init( const proc::ProcessorProviderInterface* provider, const TypedInputFilterR& arg, serialize::Context::Flags)
+	virtual void init( proc::ExecContext* ctx, const TypedInputFilterR& arg, serialize::Context::Flags)
 	{
-		m_interp->init( provider);
+		m_interp->init( ctx);
 		m_arg = arg;
 		m_arg->setFlags( TypedInputFilter::SerializeWithIndices);
 		//... SerializeWithIndices because lua has no strict typing and needs arrays to be delivered with indices to make single element arrays to appear as arrays too

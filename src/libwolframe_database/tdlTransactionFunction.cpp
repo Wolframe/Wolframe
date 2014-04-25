@@ -41,6 +41,7 @@
 #include "logger-v1.hpp"
 #include <string>
 #include <vector>
+#include <boost/scoped_ptr.hpp>
 
 #undef LOWLEVEL_DEBUG
 
@@ -67,7 +68,7 @@ public:
 
 	virtual bool print( ElementType type, const types::VariantConst& element);
 
-	void finalize( const proc::ProcessorProviderInterface* provider);
+	void finalize( proc::ExecContext* context);
 
 	virtual VmTransactionInputR get() const;
 
@@ -129,13 +130,13 @@ bool TdlTransactionFunctionClosure::InputStructure::print( ElementType type, con
 	return true;
 }
 
-void TdlTransactionFunctionClosure::InputStructure::finalize( const proc::ProcessorProviderInterface* provider)
+void TdlTransactionFunctionClosure::InputStructure::finalize( proc::ExecContext* context)
 {
 	std::vector<TdlTransactionPreprocStep>::const_iterator pi = m_func->preproc().begin(), pe = m_func->preproc().end();
 	for (; pi != pe; ++pi)
 	{
 		LOG_TRACE << "[transaction input] execute preprocessing function " << pi->tostring( m_func->program()->pathset.tagtab());
-		pi->call( provider, *m_structure);
+		pi->call( context, *m_structure);
 	}
 	LOG_DATA << "[transaction input] after preprocess " << m_structure->tostring();
 }
@@ -226,9 +227,56 @@ static std::string databaseError_throwtext( const db::DatabaseError& err, const 
 	return throwmsg.str();
 }
 
-void TdlTransactionFunctionClosure::init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+std::string inputfilter_logtext( const langbind::TypedInputFilterR& inp)
 {
-	m_provider = p;
+	std::ostringstream out;
+	langbind::FilterBase::ElementType type;
+	types::VariantConst element;
+	int taglevel = 0;
+	while (taglevel >= 0 && inp->getNext( type, element))
+	{
+		switch (type)
+		{
+			case langbind::FilterBase::OpenTag:
+				taglevel++;
+				out << " " << element.tostring() << " {";
+				break;
+			case langbind::FilterBase::CloseTag:
+				taglevel--;
+				if (taglevel >= 0)
+				{
+					out << "}";
+				}
+				break;
+			case langbind::FilterBase::Attribute:
+				taglevel++;
+				out << element.tostring() << "=";
+				break;
+			case langbind::FilterBase::Value:
+				taglevel++;
+				if (element.defined())
+				{
+					std::string value = element.tostring();
+					if (value.size() > 30)
+					{
+						value.resize( 30);
+						value.append("...");
+					}
+					out << "'" << value << "'";
+				}
+				else
+				{
+					out << "NULL";
+				}
+				break;
+		}
+	}
+	return out.str();
+}
+
+void TdlTransactionFunctionClosure::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+{
+	m_context = c;
 	m_inputstructptr = new TdlTransactionFunctionClosure::InputStructure( m_func);
 	m_inputstruct.reset( m_inputstructptr);
 	m_input.init( i, m_inputstruct);
@@ -253,12 +301,12 @@ void TdlTransactionFunction::print( std::ostream& out) const
 	out << "TRANSACTION " << m_name << std::endl;
 
 	// Print authorization constraints:
-	if (!m_authfunction.empty())
+	if (!m_authorizationFunction.empty())
 	{
-		out << "AUTHORIZE (" << m_authfunction;
-		if (!m_authresource.empty())
+		out << "AUTHORIZE (" << m_authorizationFunction;
+		if (!m_authorizationResource.empty())
 		{
-			out << ", " << m_authresource;
+			out << ", " << m_authorizationResource;
 		}
 		out << ")" << std::endl;
 	}
@@ -281,6 +329,14 @@ void TdlTransactionFunction::print( std::ostream& out) const
 		}
 		out << "ENDPROC" << std::endl;
 	}
+
+	// Print auditing steps:
+	std::vector<TdlAuditStep>::const_iterator ai = m_audit.begin(), ae = m_audit.end();
+	for (; ai != ae; ++ai)
+	{
+		out << "AUDIT " << ((ai->level() == TdlAuditStep::Critical)?"CRITICAL ":"") << ai->function() << std::endl;
+	}
+
 #ifdef LOWLEVEL_DEBUG
 	// Print code without symbols:
 	out << "BEGIN RAW" << std::endl;
@@ -296,7 +352,7 @@ void TdlTransactionFunction::print( std::ostream& out) const
 
 TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransactionFunction* f)
 	:utils::TypeSignature("prgbind::TransactionFunctionClosure", __LINE__)
-	,m_provider(0)
+	,m_context(0)
 	,m_func(f)
 	,m_state(0)
 	,m_inputstructptr(0)
@@ -305,7 +361,7 @@ TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransacti
 
 TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransactionFunctionClosure& o)
 	:utils::TypeSignature(o)
-	,m_provider(o.m_provider)
+	,m_context(o.m_context)
 	,m_func(o.m_func)
 	,m_state(o.m_state)
 	,m_input(o.m_input)
@@ -322,6 +378,15 @@ bool TdlTransactionFunctionClosure::call()
 		case 0:
 			throw std::runtime_error( "input not initialized");
 		case 1:
+			LOG_DEBUG << "check authorization '" << m_func->name() << "'";
+			if (m_context->checkAuthorization( m_func->authorizationFunction(), m_func->authorizationResource()))
+			{
+				LOG_DEBUG << "authorization allows exection of function '" << m_func->name() << "'";
+			}
+			else
+			{
+				throw std::runtime_error( std::string("execution of transaction function '") + m_func->name() + "' denied in this authorization context");
+			}
 			LOG_DEBUG << "execute transaction '" << m_func->name() << "'";
 
 			if (!m_input.call()) return false;
@@ -329,19 +394,16 @@ bool TdlTransactionFunctionClosure::call()
 		case 2:
 		{
 			// Execute function:
-			m_inputstructptr->finalize( m_provider);
+			m_inputstructptr->finalize( m_context);
 			db::VmTransactionInput inp( *m_func->program(), m_inputstructptr->structure());
 			db::VmTransactionOutput res;
 			{
-				types::CountedReference<db::Transaction> trsr( m_provider->transaction( m_func->name()));
+				boost::scoped_ptr<db::Transaction> trsr( m_context->provider()->transaction( m_func->name()));
 				if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
 				trsr->begin();
 
-				if (trsr->execute( inp, res))
-				{
-					trsr->commit();
-				}
-				else
+				// Execute transaction:
+				if (!trsr->execute( inp, res))
 				{
 					const db::DatabaseError* err = trsr->getLastError();
 					if (err)
@@ -357,6 +419,57 @@ bool TdlTransactionFunctionClosure::call()
 						throw std::runtime_error( databaseError_throwtext( ue, m_func->name()));
 					}
 				}
+
+				// Make audit calls:
+				std::vector<TdlAuditStep>::const_iterator ai = m_func->audit().begin(), ae = m_func->audit().end();
+				std::size_t auditFunctionIdx = 1;
+				for (; ai != ae; ++ai,++auditFunctionIdx)
+				{
+					// ... for each audit function take the transaction output defined as input of the audit function and call it
+					try
+					{
+						LOG_DEBUG << "calling audit function '" << ai->function() << "'";
+						LOG_DATA << "audit function call: " << ai->function() << "(" << inputfilter_logtext( res.get( auditFunctionIdx)) << ")";
+
+						langbind::TypedInputFilterR auditParameter = res.get( auditFunctionIdx);
+						const langbind::FormFunction* auditfunc = m_context->provider()->formFunction( ai->function());
+						if (!auditfunc)
+						{
+							throw std::runtime_error( std::string( "transaction audit function '") + ai->function() + "' not found (must be defined as form function)");
+						}
+						langbind::FormFunctionClosureR auditclosure = langbind::FormFunctionClosureR( auditfunc->createClosure());
+						auditclosure->init( m_context, auditParameter);
+					
+						if (!auditclosure->call())
+						{
+							throw std::runtime_error( std::string( "failed to call audit function '") + ai->function() + "' (input not complete)");
+						}
+						langbind::TypedInputFilterR auditresult = auditclosure->result();
+						langbind::FilterBase::ElementType et;
+						types::VariantConst ev;
+
+						if (auditresult->getNext( et, ev) && et != langbind::FilterBase::CloseTag)
+						{
+							LOG_WARNING << "called audit function '" << ai->function() << "' that returned a non empty result";
+						}
+					}
+					catch (const std::runtime_error& e)
+					{
+						if (ai->level() == TdlAuditStep::Critical)
+						{
+							trsr->rollback();
+							throw std::runtime_error( std::string("critical audit function '") + ai->function() + "' failed and so the transaction function '" + m_func->name() + "' (rollback): '" + e.what());
+						}
+						else
+						{
+							LOG_ERROR << "non critical audit function '" << ai->function() << "' failed for the transaction function '" << m_func->name() << "'";
+						}
+					}
+					
+				}
+
+				// Commit:
+				trsr->commit();
 			}
 			// Build output:
 			if (m_func->resultfilter().empty())
@@ -368,13 +481,13 @@ bool TdlTransactionFunctionClosure::call()
 			{
 				// ... result filter exists, so we pipe the transaction result through it to get the final result
 				langbind::TypedInputFilterR unfilderedResult = res.get();
-				const langbind::FormFunction* func = m_provider->formFunction( m_func->resultfilter());
+				const langbind::FormFunction* func = m_context->provider()->formFunction( m_func->resultfilter());
 				if (!func)
 				{
 					throw std::runtime_error( std::string( "transaction result filter function '") + m_func->resultfilter() + "' not found (must be defined as form function)");
 				}
 				langbind::FormFunctionClosureR filterclosure = langbind::FormFunctionClosureR( func->createClosure());
-				filterclosure->init( m_provider, unfilderedResult);
+				filterclosure->init( m_context, unfilderedResult);
 			
 				if (!filterclosure->call())
 				{

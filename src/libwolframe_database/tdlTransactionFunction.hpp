@@ -30,17 +30,19 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Definition of a transaction function based on TDL
-///\file tdlTransactionFunction.hpp
+/// \brief Definition of a transaction function based on TDL
+/// \file tdlTransactionFunction.hpp
 #ifndef _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
 #define _DATABASE_TDL_TRANSACTION_FUNCTION_HPP_INCLUDED
 #include "database/vmTransactionInput.hpp"
 #include "database/vmTransactionOutput.hpp"
 #include "langbind/formFunction.hpp"
+#include "processor/execContext.hpp"
 #include "filter/redirectFilterClosure.hpp"
 #include "filter/typedfilter.hpp"
 #include "vm/program.hpp"
 #include "tdlTransactionPreprocStep.hpp"
+#include "tdlAuditStep.hpp"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -49,16 +51,16 @@
 namespace _Wolframe {
 namespace db {
 namespace vm {
-///\brief Forward declaration
+/// \brief Forward declaration
 class InputStructure;
 typedef boost::shared_ptr<InputStructure> InputStructureR;
 }
 
-///\brief Forward declaration
+/// \brief Forward declaration
 class TdlTransactionFunction;
 
-///\///\brief 
-///\brief Closure (execution context) of a transaction function based on TDL
+/// \class TdlTransactionFunctionClosure
+/// \brief Closure (execution context) of a transaction function based on TDL
 class TdlTransactionFunctionClosure
 	:public utils::TypeSignature
 	,public langbind::FormFunctionClosure
@@ -69,54 +71,57 @@ public:
 
 	virtual bool call();
 
-	virtual void init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f);
+	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f);
 
 	virtual langbind::TypedInputFilterR result() const;
 
 private:
 	class InputStructure;
-	const proc::ProcessorProviderInterface* m_provider;	//< processor provider to get transaction object
-	const TdlTransactionFunction* m_func;			//< function to execute
-	int m_state;						//< current state of call
-	langbind::RedirectFilterClosure m_input;		//< builder of structure from input
-	InputStructure* m_inputstructptr;			//< input structure implementation interface
-	langbind::TypedOutputFilterR m_inputstruct;		//< input structure
-	langbind::TypedInputFilterR m_result;			//< function call result
-	serialize::Context::Flags m_flags;			//< flags for input serialization
+	proc::ExecContext* m_context;				///< execution context
+	const TdlTransactionFunction* m_func;			///< function to execute
+	int m_state;						///< current state of call
+	langbind::RedirectFilterClosure m_input;		///< builder of structure from input
+	InputStructure* m_inputstructptr;			///< input structure implementation interface
+	langbind::TypedOutputFilterR m_inputstruct;		///< input structure
+	langbind::TypedInputFilterR m_result;			///< function call result
+	serialize::Context::Flags m_flags;			///< flags for input serialization
 };
 
-
+/// \class TdlTransactionFunction
+/// \brief Transaction function based on TDL
 class TdlTransactionFunction
 	:public langbind::FormFunction
 {
 public:
 	TdlTransactionFunction(){}
 	TdlTransactionFunction( const TdlTransactionFunction& o)
-		:m_resultfilter(o.m_resultfilter),m_authfunction(o.m_authfunction),m_authresource(o.m_authresource),m_preproc(o.m_preproc),m_program(o.m_program){}
-	TdlTransactionFunction( const std::string& name_, const std::string& rf, const std::string& af, const std::string& ar, const std::vector<TdlTransactionPreprocStep>& pp, const vm::ProgramR& prg)
-		:m_name(name_),m_resultfilter(rf),m_authfunction(af),m_authresource(ar),m_preproc(pp),m_program(prg){}
+		:m_resultfilter(o.m_resultfilter),m_authorizationFunction(o.m_authorizationFunction),m_authorizationResource(o.m_authorizationResource),m_preproc(o.m_preproc),m_audit(o.m_audit),m_program(o.m_program){}
+	TdlTransactionFunction( const std::string& name_, const std::string& rf, const std::string& af, const std::string& ar, const std::vector<TdlTransactionPreprocStep>& pp, const std::vector<TdlAuditStep>& au, const vm::ProgramR& prg)
+		:m_name(name_),m_resultfilter(rf),m_authorizationFunction(af),m_authorizationResource(ar),m_preproc(pp),m_audit(au),m_program(prg){}
 
 	void print( std::ostream& out) const;
 
 	const std::string& name() const					{return m_name;}
 	const std::string& resultfilter() const				{return m_resultfilter;}
-	const std::string& authfunction() const				{return m_authfunction;}
-	const std::string& authresource() const				{return m_authresource;}
+	const std::string& authorizationFunction() const		{return m_authorizationFunction;}
+	const std::string& authorizationResource() const		{return m_authorizationResource;}
 	const std::vector<TdlTransactionPreprocStep>& preproc() const	{return m_preproc;}
+	const std::vector<TdlAuditStep>& audit() const			{return m_audit;}
 	const vm::ProgramR& program() const				{return m_program;}
 
-	////\brief Build the function output
+	/// \brief Build the function output
 	langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const;
 
 	virtual TdlTransactionFunctionClosure* createClosure() const;
 
 private:
-	std::string m_name;		 			//< function name
-	std::string m_resultfilter;				//< name of result filter function to call with the transaction result
-	std::string m_authfunction;				//< authorization function name
-	std::string m_authresource;				//< authorization resource name
-	std::vector<TdlTransactionPreprocStep> m_preproc;	//< preprocessing steps to perform on input before transaction execution
-	vm::ProgramR m_program;					//< program to execute
+	std::string m_name;		 			///< function name
+	std::string m_resultfilter;				///< name of result filter function to call with the transaction result
+	std::string m_authorizationFunction;			///< authorization function name
+	std::string m_authorizationResource;			///< authorization resource name
+	std::vector<TdlTransactionPreprocStep> m_preproc;	///< preprocessing steps to perform on input before transaction execution
+	std::vector<TdlAuditStep> m_audit;			///< auditing steps to perform before transaction commit
+	vm::ProgramR m_program;					///< program to execute
 };
 
 typedef boost::shared_ptr<TdlTransactionFunction> TdlTransactionFunctionR;

@@ -38,6 +38,7 @@ Project Wolframe.
 #include "langbind/input.hpp"
 #include "langbind/output.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <map>
 #include <list>
 #include <boost/shared_ptr.hpp>
@@ -116,12 +117,12 @@ public:
 	///\brief Create the context for executing a Lua script with all objects initialized
 	///\param[in] input_ input definition for the input to process
 	///\param[in] output_ output definition for the output to print
-	///\param[in] provider_ processor provider for allocation of objects accessed
-	void init( const Input& input_, const Output& output_, const proc::ProcessorProviderInterface* provider_);
+	///\param[in] ctx_ execution context
+	void init( const Input& input_, const Output& output_, proc::ExecContext* ctx_);
 
 	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
-	///\param[in] provider_ processor provider for allocation of objects accessed
-	void init( const proc::ProcessorProviderInterface* provider_);
+	///\param[in] ctx_ execution context
+	void init( proc::ExecContext* ctx_);
 
 	///\brief Fetch a lua object as typed input filter from the lua stack of the executed lua thread context
 	///\param[in] idx index of the object on the lua stack
@@ -134,9 +135,9 @@ public:
 
 private:
 	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
-	///\param[in] provider_ processor provider for allocation of objects accessed
+	///\param[in] ctx_ execution context
 	///\param[in] callMain wheter to call the script for initialization of its objects or not
-	void initbase( const proc::ProcessorProviderInterface* provider_, bool callMain);
+	void initbase( proc::ExecContext* ctx_, bool callMain);
 
 private:
 	friend class LuaScript;

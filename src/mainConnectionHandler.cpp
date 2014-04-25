@@ -34,6 +34,7 @@
 #include "mainConnectionHandler.hpp"
 #include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
 #include "cmdbind/authCommandHandler.hpp"
+#include "processor/execContext.hpp"
 #include "interfaceCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
@@ -162,7 +163,7 @@ int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		out << "ERR no handler defined for authentication mechanism " << argv[0] << "'" << endl();
 		return stateidx();
 	}
-	authch->setProcProvider( m_provider);
+	authch->setExecContext( execContext());
 	delegateProcessing<&CommandHandler::endMech>( authch);
 	return stateidx();
 }
@@ -262,7 +263,8 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 	{
 		m_command.append(doctype);
 	}
-	cmdbind::CommandHandler* execch = m_provider->cmdhandler( m_command);
+	cmdbind::CommandHandler* execch = m_execContext->provider()->cmdhandler( m_command);
+	execch->setExecContext( m_execContext);
 	if (!execch)
 	{
 		std::ostringstream msg;
@@ -297,7 +299,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 	else
 	{
 		execch->passParameters( m_command, 1, &docformatptr);
-		execch->setProcProvider( m_provider);
+		execch->setExecContext( execContext());
 		if (m_commandtag.empty())
 		{
 			out << "ANSWER" << endl();

@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_DIRECTMAP_COMMAND_HANDLER_CONFIG_HPP_INCLUDED
 #include "directmapCommandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/commandHandlerConstructor.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"

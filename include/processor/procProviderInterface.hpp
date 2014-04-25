@@ -113,6 +113,9 @@ public:
 	///\param[out] result document format as string
 	///\return true, if decision was possible, false, if more data is needed
 	virtual bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const=0;
+	///\brief Get the application configuration reference path
+	///\return the reference path
+	virtual const std::string& referencePath() const=0;
 };
 
 }}//namespace

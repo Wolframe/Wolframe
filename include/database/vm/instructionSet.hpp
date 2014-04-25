@@ -74,6 +74,7 @@ public:
 		Op_OUTPUT_CLOSE_ARRAY,		//< print a close tag of an array start to output (no argument)
 		Op_OUTPUT_CLOSE_ELEM,		//< print a close tag of an array element to output (no argument)
 		Op_OUTPUT_CLOSE,		//< print a close tag of a single element to output (no argument)
+		Op_OUTPUT_ADD_SINK,		//< open a new output sink (e.g. for audit function inputs)
 
 		// Assignment Instructions:
 		Op_KEEP_RESULT,			//< keep result
@@ -89,7 +90,7 @@ public:
 		Op_NEXT,			//< fetch the next value in iteration
 
 		// Subroutine Call Instructions:
-		Op_SUB_FRAME_OPEN,		//< start prepare a subroutine call
+		Op_SUB_FRAME_OPEN,		//< start prepare a subroutine call or an own execution scope
 		Op_SUB_ARG_CONST,		//< push argument for subroutine call: constant value
 		Op_SUB_ARG_PATH,		//< push argument for subroutine call: path selection value
 		Op_SUB_ARG_LOOPCNT,		//< push argument for subroutine call: FOREACH loop counter (first element is 0)
@@ -98,6 +99,10 @@ public:
 		Op_SUB_ARG_ITR_IDX,		//< push argument for subroutine call: element in tuple set iterated adressed by column index
 		Op_SUB_ARG_ITR_NAM,		//< push argument for subroutine call: element in tuple set iterated adressed by column name
 		Op_SUB_FRAME_CLOSE,		//< push state with parameters on stack for subroutine call. For the jump to the subroutine GOTO is used.
+
+		// Scoping Instructions:
+		Op_SCOPE_OPEN,			//< create a new scope context without calling a subroutine (inherits data from parent scope)
+		Op_SCOPE_CLOSE,			//< restore the previous scope context
 
 		// Database Instructions:
 		Op_DBSTM_START,			//< open a statement to execute
@@ -140,6 +145,7 @@ public:
 			"OUTPUT_CLOSE_ARRAY",
 			"OUTPUT_CLOSE_ELEM",
 			"OUTPUT_CLOSE",
+			"OUTPUT_ADD_SINK",
 
 			"KEEP_RESULT",
 			"SELECT_PARAMETER",
@@ -161,6 +167,9 @@ public:
 			"SUB_ARG_ITR_IDX",
 			"SUB_ARG_ITR_NAM",
 			"SUB_FRAME_CLOSE",
+
+			"SCOPE_OPEN",
+			"SCOPE_CLOSE",
 	
 			"DBSTM_START",
 			"DBSTM_BIND_CONST",
@@ -245,7 +254,8 @@ public:
 			/*Op_OUTPUT_CLOSE_ARRAY*/	At_None,
 			/*Op_OUTPUT_CLOSE_ELEM*/	At_None,
 			/*Op_OUTPUT_CLOSE*/		At_None,
-	
+			/*Op_OUTPUT_ADD_SINK*/		At_None,
+
 			/*Op_KEEP_RESULT*/		At_ResultName,
 			/*Op_SELECT_PARAMETER*/		At_None,
 			/*Op_SELECT_LAST_RESULT*/	At_None,
@@ -256,7 +266,7 @@ public:
 			/*Op_OPEN_ITER_PATH*/		At_Path,
 			/*Op_OPEN_ITER_TUPLESET*/	At_TupleSet,
 			/*Op_NEXT*/			At_None,
-	
+
 			/*Op_SUB_FRAME_OPEN*/		At_SubroutineSignature,
 			/*Op_SUB_ARG_CONST*/		At_Constant,
 			/*Op_SUB_ARG_PATH*/		At_Path,
@@ -266,7 +276,10 @@ public:
 			/*Op_SUB_ARG_ITR_IDX*/		At_IteratorColumnIdx,
 			/*Op_SUB_ARG_ITR_NAM*/		At_ColumnName,
 			/*Op_SUB_FRAME_CLOSE*/		At_None,
-	
+
+			/*Op_SCOPE_OPEN*/		At_None,
+			/*Op_SCOPE_RESTORE*/		At_None,
+
 			/*Op_DBSTM_START*/		At_Statement,
 			/*Op_DBSTM_BIND_CONST*/		At_Constant,
 			/*Op_DBSTM_BIND_PATH*/		At_Path,
@@ -277,7 +290,7 @@ public:
 			/*Op_DBSTM_BIND_ITR_NAM*/	At_ColumnName,
 			/*Op_DBSTM_HINT*/		At_Hint,
 			/*Op_DBSTM_EXEC*/		At_None,
-	
+
 			/*Op_RESULT_SET_INIT*/		At_None,
 			/*Op_RESULT_CONSTRAINT_UNIQUE*/	At_None,
 			/*Op_RESULT_CONSTRAINT_NONEMPTY*/At_None,

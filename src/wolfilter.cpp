@@ -33,6 +33,7 @@
 //\brief Program using wolframe functions to map stdin to stdout
 #include "wolfilterCommandLine.hpp"
 #include "wolfilterIostreamFilter.hpp"
+#include "wolframe.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
@@ -46,11 +47,6 @@
 
 using namespace _Wolframe;
 
-///\TODO Not to be defined here
-static const unsigned short APP_MAJOR_VERSION = 0;
-static const unsigned short APP_MINOR_VERSION = 0;
-static const unsigned short APP_REVISION = 5;
-static const unsigned short APP_BUILD = 0;
 enum {IOBUFFERSIZE=8192};
 
 int main( int argc, char **argv )
@@ -69,7 +65,7 @@ int main( int argc, char **argv )
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";
-			std::cerr << APP_MAJOR_VERSION << "." << APP_MINOR_VERSION << "." << APP_REVISION << "." << APP_BUILD << std::endl;
+			std::cerr << WOLFRAME_MAJOR_VERSION << "." << WOLFRAME_MINOR_VERSION << "." << WOLFRAME_REVISION << "." << WOLFRAME_BUILD << std::endl;
 			doExit = true;
 		}
 		if (cmdline.printhelp())
@@ -84,6 +80,7 @@ int main( int argc, char **argv )
 		prgbind::ProgramLibrary programLibrary;
 
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &programLibrary);
+		proc::ExecContext execContext( &processorProvider);
 
 		if (!processorProvider.resolveDB( databaseProvider))
 		{
@@ -100,11 +97,11 @@ int main( int argc, char **argv )
 			std::ifstream fh;
 			fh.open( cmdline.inputfile().c_str());
 
-			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, fh, std::cout);
+			langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, fh, std::cout);
 		}
 		else
 		{
-			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, std::cin, std::cout);
+			langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, std::cin, std::cout);
 		}
 	}
 	catch (const std::bad_alloc& e)

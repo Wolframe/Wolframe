@@ -33,6 +33,7 @@
 ///\file cmdbind_ioFilterCommandHandlerEscDLF.cpp
 
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
+#include "processor/execContext.hpp"
 #include "logger-v1.hpp"
 #include "filter/null_filter.hpp"
 #include "filter/filter.hpp"

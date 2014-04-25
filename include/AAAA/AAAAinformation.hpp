@@ -67,6 +67,8 @@ struct ConnectInfo : public Information
 		: local( lcl ), remote( rmt )	{}
 
 	Information::Type type() const		{ return CONNECTION; }
+private:
+	void operator=( const ConnectInfo&){}
 };
 
 }} // namespace _Wolframe::AAAA

@@ -265,6 +265,8 @@ public:
 	boost::shared_ptr<proc::ProcessorProvider> m_provider;
 	boost::shared_ptr<iproc::Connection> m_connection;
 	IProcTestConfiguration m_config;
+	proc::ExecContext m_execContext;
+
 	enum
 	{
 		EoDBufferSize=4,
@@ -288,7 +290,8 @@ protected:
 		TestDescription test;
 		m_provider = getProcProvider( m_config.providerConfig(), m_config.prglib());
 		m_connection.reset( new iproc::Connection( ep, &m_config));
-		m_connection->setProcessorProvider( m_provider.get());
+		m_execContext = proc::ExecContext( m_provider.get());
+		m_connection->setExecContext( &m_execContext);
 
 		m_input.clear();
 		m_expected.clear();

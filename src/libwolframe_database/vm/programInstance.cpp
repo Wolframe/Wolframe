@@ -344,7 +344,10 @@ bool ProgramInstance::execute()
 				m_output->add( Output::Element( Output::Element::Close));
 				++m_ip;
 				break;
-
+			case Op_OUTPUT_ADD_SINK:
+				m_output->addOutputSink();
+				++m_ip;
+				break;
 
 			/*Assignment Instructions:*/
 			case Op_KEEP_RESULT:
@@ -352,6 +355,7 @@ bool ProgramInstance::execute()
 				++m_ip;
 				break;
 			case Op_SELECT_PARAMETER:
+				if (!top.m_parameter.get()) throw std::runtime_error( "selecting parameter but no parameters defined");
 				top.m_selectedSet = top.m_parameter;
 				++m_ip;
 				break;
@@ -448,6 +452,16 @@ bool ProgramInstance::execute()
 				m_stack.push_back( StackElement( m_ip + 1/*skip following GOTO*/, m_subroutine_frame.getParameters()));
 				break;
 
+			/*Scoping Instructions:*/
+			case Op_SCOPE_OPEN:
+				++m_ip;
+				m_stack.push_back( m_stack.back()); //... inherit parent scope data
+				break;
+			case Op_SCOPE_CLOSE:
+				m_stack.pop_back();
+				if (m_stack.empty()) throw std::runtime_error("illegal SCOPE_CLOSE operation: stack got empty");
+				++m_ip;
+				break;
 
 			/*Database Statements:*/
 			case Op_DBSTM_START:

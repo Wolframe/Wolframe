@@ -219,24 +219,31 @@ const net::NetworkOperation Connection::nextOperation()
 						try
 						{
 							const char* procname = m_config->commands()[ m_cmdidx - NofCommands].m_procname.c_str();
-							if (!m_provider)
+							if (!m_execContext)
 							{
-								LOG_ERROR << "No processor provider set";
+								LOG_ERROR << "No execution context set";
 								return net::CloseConnection();
 							}
-							cmdbind::CommandHandler* chnd = m_provider->cmdhandler( procname);
+							const proc::ProcessorProviderInterface* provider = m_execContext->provider();
+							if (!provider)
+							{
+								LOG_ERROR << "No procesor provider defined";
+								return net::CloseConnection();
+							}
+							cmdbind::CommandHandler* chnd = provider->cmdhandler( procname);
 							if (!chnd)
 							{
 								LOG_ERROR << "command handler not found for '" << procname << "'";
 								return net::CloseConnection();
 							}
+							chnd->setExecContext( m_execContext);
 							cmdbind::IOFilterCommandHandler* hnd = dynamic_cast<cmdbind::IOFilterCommandHandler*>( chnd);
 							if (!hnd)
 							{
 								LOG_ERROR << "command handler for '" << procname << "' is not an iofilter command handler";
 								return net::CloseConnection();
 							}
-							langbind::Filter* flt = m_provider->filter( "char");
+							langbind::Filter* flt = provider->filter( "char");
 							if (!flt)
 							{
 								LOG_ERROR << "failed to load filter 'char' (not defined)";
@@ -348,7 +355,7 @@ Connection::Connection( const net::LocalEndpoint& local, const Configuration* co
 	,m_output(config->output_bufsize())
 	,m_config(config)
 	,m_cmdidx( -1)
-	,m_provider(0)
+	,m_execContext(0)
 {
 	m_itr = m_input.begin();
 	m_end = m_input.end();

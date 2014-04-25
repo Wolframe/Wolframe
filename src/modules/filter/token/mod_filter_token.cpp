@@ -33,7 +33,10 @@
 ///\file mod_filter_token.cpp
 ///\brief Module for a token by token filter with element type info as first character (to be used for testing fitler output)
 #include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "token_filter.hpp"
 
-FILTER_MODULE( "token filter", token, _Wolframe::langbind::createTokenFilterType)
+WF_MODULE_BEGIN( "tokenFilter", "unicode token by token filter with element type info as character prefix in every token")
+ WF_FILTER_TYPE( "token", _Wolframe::langbind::createTokenFilterType)
+WF_MODULE_END
 

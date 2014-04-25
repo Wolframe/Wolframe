@@ -33,7 +33,10 @@
 ///\file mod_filter_testtoken.cpp
 ///\brief Module for token filter without characters set encoding (ASCII only)
 #include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "testtoken_filter.hpp"
 
-FILTER_MODULE( "token filter", token, _Wolframe::langbind::createTokenFilterType)
+WF_MODULE_BEGIN( "tokenFilter", "ascii token by token filter for testing with element type info as character prefix in every token")
+ WF_FILTER_TYPE( "token", _Wolframe::langbind::createTokenFilterType)
+WF_MODULE_END
 

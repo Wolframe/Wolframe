@@ -253,6 +253,15 @@
 <!-- OpenSUSE -->
 		<sect2>
 			<title>openSUSE, SLES and similar Linux distributions</title>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: This is currently not working,
+				see issues reported at <ulink url="http://sourceforge.net/p/forge/site-support/6928/">http://sourceforge.net/p/forge/site-support/6928/</ulink>
+				and <ulink url="https://github.com/openSUSE/zypper/issues/46">https://github.com/openSUSE/zypper/issues/46</ulink>.			
+				
+				Download the binary packages manually and install them by hand.
+			</para>
+			
 			<para>
 				First we add the Wolframe repository for the corresponding distribution
 				(as example we choose OpenSUSE 13.1):

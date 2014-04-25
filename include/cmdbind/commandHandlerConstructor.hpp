@@ -37,6 +37,7 @@
 #include "cmdbind/commandHandler.hpp"
 #include "module/constructor.hpp"
 #include "module/moduleInterface.hpp"
+#include "processor/execContext.hpp"
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <list>

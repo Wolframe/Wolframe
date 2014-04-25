@@ -68,7 +68,7 @@ CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunction& f)
 	,m_result_data(f.api_result())
 	,m_result(m_result_data.data(),m_result_data.descr())
 	,m_parser(m_param_data.data(),m_param_data.descr())
-	,m_provider(0){}
+	,m_context(0){}
 
 CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunctionClosure& o)
 	:utils::TypeSignature(o)
@@ -78,12 +78,12 @@ CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunctionClosure& o)
 	,m_result_data(o.m_result_data)
 	,m_result(o.m_result)
 	,m_parser(o.m_parser)
-	,m_provider(o.m_provider)
+	,m_context(o.m_context)
 	{}
 
-void CppFormFunctionClosure::init( const proc::ProcessorProviderInterface* provider, const langbind::TypedInputFilterR& i, serialize::Context::Flags flags)
+void CppFormFunctionClosure::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags flags)
 {
-	m_provider = provider;
+	m_context = c;
 	m_parser.init(i,flags);
 }
 
@@ -97,7 +97,7 @@ bool CppFormFunctionClosure::call()
 			if (!m_parser.call()) return false;
 			m_state = 1;
 		case 1:
-			int rt = m_func.call( m_provider, result_struct, param_struct);
+			int rt = m_func.call( m_context, result_struct, param_struct);
 			if (rt != 0)
 			{
 				std::ostringstream msg;

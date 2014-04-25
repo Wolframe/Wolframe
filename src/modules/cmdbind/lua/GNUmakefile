@@ -22,9 +22,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_langbind \
-	$(TOPDIR)/3rdParty/lua/src/liblua.a \
-	$(LIBS_DL)
-
+	$(TOPDIR)/3rdParty/lua/src/liblua.a
 
 DYNAMIC_MODULE = mod_command_lua.so
 

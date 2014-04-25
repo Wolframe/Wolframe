@@ -38,10 +38,12 @@
 #define _Wolframe_HANDLER_HPP_INCLUDED
 
 #include "system/connectionHandler.hpp"
+#include "processor/execContext.hpp"
 #include "protocol/ioblocks.hpp"
 #include "database/database.hpp"
 #include "AAAA/AAAAprovider.hpp"
 #include "processor/procProvider.hpp"
+#include "processor/execContext.hpp"
 #include "mainConnectionHandler.hpp"
 
 namespace _Wolframe {
@@ -58,6 +60,7 @@ public:
 	const db::DatabaseProvider& db() const		{ return m_db; }
 	const AAAA::AAAAprovider& aaaa() const		{ return m_aaaa; }
 	const proc::ProcessorProvider& proc() const	{ return m_proc; }
+
 private:
 	const std::string		m_banner;
 	db::DatabaseProvider		m_db;
@@ -132,7 +135,6 @@ private:
 	AAAA::Auditor*			m_audit;
 //	AAAA::Accountant*		m_accounting;
 ///*************
-//	proc::Processor*		m_proc;
 
 	const net::LocalEndpoint*	m_localEP;		///< local endpoint
 	const net::RemoteEndpoint*	m_remoteEP;		///< remote endpoint
@@ -140,14 +142,14 @@ private:
 	FSMstate			m_state;		///< top processor FSM state
 
 	protocol::InputBlock		m_readBuf;		///< network read buffer
-	protocol::OutputBlock		m_outputBuf;
+	protocol::OutputBlock		m_outputBuf;		///< network write buffer
 	char*				m_dataStart;
 	std::size_t			m_dataSize;
-	/// Output buffer
-	std::string			m_outMsg;
 
-	// Adding protocol
-	proc::CommandHandler		m_cmdHandler;
+	std::string			m_outMsg;		///< output buffer for initial handshake messages
+
+	proc::ExecContext		m_execContext;		///< execution context of the connection
+	proc::CommandHandler		m_cmdHandler;		///< command handler
 };
 
 /// The server handler container

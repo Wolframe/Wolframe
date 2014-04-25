@@ -137,7 +137,7 @@ std::string ImageImpl::encode( const std::string &data )
 	return o.str( );
 }
 
-int ImageImpl::info( const proc::ProcessorProviderInterface*, ImageInfo &res, const Image &param )
+int ImageImpl::info( proc::ExecContext*, ImageInfo &res, const Image &param )
 {
 // decode
 	std::string raw;
@@ -161,7 +161,7 @@ int ImageImpl::info( const proc::ProcessorProviderInterface*, ImageInfo &res, co
 	return 0;
 }
 
-int ImageImpl::thumb( const proc::ProcessorProviderInterface*, Image &res, const ImageThumb &param )
+int ImageImpl::thumb( proc::ExecContext*, Image &res, const ImageThumb &param )
 {
 // decode
 	std::string raw;
@@ -200,7 +200,7 @@ int ImageImpl::thumb( const proc::ProcessorProviderInterface*, Image &res, const
 	return 0;
 }
 
-int ImageImpl::rescale( const proc::ProcessorProviderInterface*, Image &res, const ImageRescale &param )
+int ImageImpl::rescale( proc::ExecContext*, Image &res, const ImageRescale &param )
 {
 // decode
 	std::string raw;

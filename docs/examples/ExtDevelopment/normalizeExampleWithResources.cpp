@@ -24,10 +24,12 @@ public:
         {return "int";}
     virtual types::Variant execute( const types::Variant& i) const
         {return types::Variant( i.toint());}
-	virtual types::NormalizeFunction* copy() const {return new NormalizeInt(*this);}
+    virtual types::NormalizeFunction* copy() const
+        {return new NormalizeInt(*this);}
 
     static types::NormalizeFunction* create(
-        types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>&)
+        types::NormalizeResourceHandle* reshnd,
+        const std::vector<types::Variant>&)
     {
         ConversionResources* res
             = dynamic_cast<ConversionResources*>(reshnd);
@@ -37,12 +39,14 @@ private:
     const ConversionResources* res;
 };
 
-NORMALIZER_MODULE_WITH_RESOURCE( 
+WF_MODULE_BEGIN(
     "example2",
-    "normalizer module with resources",
-    ConversionResources)
+    "normalizer module with resources")
 
-NORMALIZER_FUNCTION( "Int", NormalizeInt::create)
-NORMALIZER_MODULE_END
+    WF_NORMALIZER_RESOURCE( ConversionResources)
+    WF_NORMALIZER_WITH_RESOURCE(
+        "Int", NormalizeInt::create, ConversionResources)
+WF_MODULE_END
+
 
 

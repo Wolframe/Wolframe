@@ -36,37 +36,30 @@
 #include "appdevel/module/cppFormFunctionTemplate.hpp"
 #include "appdevel/module/cppFormFunctionBuilder.hpp"
 
-///\brief Marks the start if the Wolframe C++ form function module after the includes section.
-#define CPP_APPLICATION_FORM_FUNCTION_MODULE(NAME)\
-	static const char* _Wolframe__moduleName()\
+///\brief Defines normalization function
+#define WF_FORM_FUNCTION(NAME,FUNCTION,OUTPUT,INPUT)\
+{\
+	struct Constructor\
 	{\
-	return NAME;\
-	}\
-	static _Wolframe::module::CppFormFunctionDef _Wolframe__cppFormFunctions[] =\
-	{
-
-///\brief Defines a Wolframe C++ form function
-#define CPP_APPLICATION_FORM_FUNCTION(NAME,FUNCTION,OUTPUT,INPUT)\
-	{NAME,appdevel::CppFormFunction<INPUT,OUTPUT,FUNCTION>::declaration()},
-
-///\brief Marks the end if the Wolframe C++ form function module.
-#define CPP_APPLICATION_FORM_FUNCTION_MODULE_END\
-	{0,serialize::CppFormFunction()}\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			serialize::CppFormFunction func = appdevel::CppFormFunction<OUTPUT,INPUT,FUNCTION>::declaration();\
+			return new _Wolframe::module::CppFormFunctionBuilder( "CppFormFunction_" NAME, NAME, func);\
+		}\
 	};\
-	namespace {\
-	struct ModuleImpl\
-	{\
-	static _Wolframe::module::BuilderBase* constructor()\
-	{\
-		return new _Wolframe::module::CppFormFunctionBuilder( _Wolframe__moduleName(), _Wolframe__cppFormFunctions);\
-	}\
-	};\
-	}\
-	static _Wolframe::module::createBuilderFunc _Wolframe__objdef[] =\
-	{\
-		ModuleImpl::constructor, NULL\
-	};\
-	extern "C" { \
-		 module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), _Wolframe__objdef); \
-	}
+	(*this)(&Constructor ::impl);\
+}
 
+///\brief Defines normalization function without return value (empty result)
+#define WF_FORM_PROCEDURE(NAME,PROCEDURE,INPUT)\
+{\
+	struct Constructor\
+	{\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			serialize::CppFormFunction func = appdevel::CppFormFunction<serialize::EmptyStruct,INPUT,PROCEDURE>::declaration();\
+			return new _Wolframe::module::CppFormFunctionBuilder( "CppFormFunction_" NAME, NAME, func);\
+		}\
+	};\
+	(*this)(&Constructor ::impl);\
+}

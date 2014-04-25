@@ -26,7 +26,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/3rdParty/lua/src/liblua.a \
-	$(LIBS_DL)
+	$(LIBS_DL) $(LIBS_LT)
 
 # openssl
 

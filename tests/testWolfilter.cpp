@@ -165,6 +165,8 @@ TEST_F( WolfilterTest, tests)
 			db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
 			prgbind::ProgramLibrary prglib;
 			proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &prglib);
+			proc::ExecContext execContext( &processorProvider);
+
 			if (!processorProvider.resolveDB( databaseProvider))
 			{
 				throw std::runtime_error( "Transaction database could not be resolved. See log." );
@@ -178,7 +180,7 @@ TEST_F( WolfilterTest, tests)
 
 			try
 			{
-				langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
+				langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
 			}
 			catch (const std::runtime_error& e)
 			{

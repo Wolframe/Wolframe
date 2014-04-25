@@ -115,6 +115,7 @@
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantInputFilter.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantToString.hpp" />
     <ClInclude Include="..\..\src\ddl_form.hpp" />
+    <ClInclude Include="..\..\src\processor\execContext.hpp" />
     <ClInclude Include="..\..\src\processor\procProvider.hpp" />
     <ClInclude Include="..\..\src\testFormFunction.hpp" />
     <ClInclude Include="stdafx.h" />

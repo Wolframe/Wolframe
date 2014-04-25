@@ -110,7 +110,7 @@
 		&ExtPreface;
 		&ExtIntroduction;
 		&ExtBasicDataTypes;
-		&ExtNormalizerModules;
+		&ExtModuleDeclaration;
 		&ExtGlossary;
 
 		<index>

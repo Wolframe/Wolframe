@@ -1,0 +1,8 @@
+TRANSACTION doInsertUser
+BEGIN
+	DO INSERT INTO Users (name) values ($(name));
+	DO SELECT id FROM Users WHERE name = $(name);
+END
+AUDIT auditUserInsert( $RESULT.id, $(name) )
+
+

@@ -15,8 +15,7 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_serialize
 
 INCLUDE_LIBS = \
-	-lwolframe_serialize \
-	$(LIBS_DL)
+	-lwolframe_serialize
 
 DYNAMIC_MODULE = mod_employee_assignment_convert.so
 

@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Definition of embedded database statement parsing result
+///\brief Definition of a preprocessing statement parsing result
 ///\file tdl/preprocCallStatement.hpp
 #ifndef _DATABASE_TDL_PREPROC_CALL_STATEMENT_HPP_INCLUDED
 #define _DATABASE_TDL_PREPROC_CALL_STATEMENT_HPP_INCLUDED

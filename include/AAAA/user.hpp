@@ -48,7 +48,10 @@ class User
 {
 public:
 	User()
-		:m_loginTime(0){}
+		:m_loginTime( time( NULL)){}
+	User( const User& o)
+		: m_authenticator( o.m_authenticator ), m_loginTime( o.m_loginTime ),
+		  m_uname( o.m_uname ), m_name( o.m_name )	{}
 	User( const std::string& Authenticator, const std::string& uName, const std::string& Name )
 		: m_authenticator( Authenticator ), m_loginTime( time( NULL )),
 		  m_uname( uName ), m_name( Name )	{}
@@ -69,12 +72,6 @@ private:
 	time_t		m_loginTime;
 	std::string	m_uname;
 	std::string	m_name;
-
-#ifdef _WIN32
-// prevent C4512 on Windows, we don't want user data to be assignable
-private:
-	User& operator=( const User &o );
-#endif
 };
 
 }} // namespace _Wolframe::AAAA

@@ -42,8 +42,8 @@
 
 namespace _Wolframe {
 namespace proc {
-///\brief Forward declaration
-class ProcessorProviderInterface;
+/// \brief Forward declaration
+class ExecContext;
 }//namespace proc
 
 namespace db {
@@ -171,7 +171,7 @@ public:
 	void print( std::ostream& out, const vm::TagTable* tagmap) const;
 	std::string tostring( const vm::TagTable* tagmap) const;
 
-	void call( const proc::ProcessorProviderInterface* provider, vm::InputStructure& structure) const;
+	void call( proc::ExecContext* context, vm::InputStructure& structure) const;
 
 private:
 	std::size_t getStringIdx( const std::string& value)

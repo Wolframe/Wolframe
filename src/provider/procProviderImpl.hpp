@@ -74,6 +74,8 @@ public:
 	bool loadPrograms();
 	bool checkReferences( const ProcessorProvider* provider) const;
 
+	const std::string& referencePath() const;
+
 private:
 	std::string					m_dbLabel;
 	db::Database*					m_db;
@@ -98,6 +100,7 @@ private:
 
 	std::list<std::string> m_programfiles;
 	prgbind::ProgramLibrary* m_programs;
+	std::string m_referencePath;
 };
 
 }} // namespace _Wolframe::proc
