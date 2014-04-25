@@ -73,7 +73,7 @@ const serialize::StructDescriptionBase* Mutation::getStructDescription( )
 static std::string g_auditfilename = "audit.log";
 static int g_auditcnt = 0;
 
-int audit::Audit::mutation( proc::ExecContext* ctx, serialize::EmptyStruct& res, const Mutation& param)
+int audit::Audit::mutation( proc::ExecContext* ctx, serialize::EmptyStruct& /*res*/, const Mutation& param)
 {
 	std::string filename = utils::getCanonicalPath( g_auditfilename, ctx->provider()->referencePath());
 
@@ -98,7 +98,7 @@ int audit::Audit::mutation( proc::ExecContext* ctx, serialize::EmptyStruct& res,
 	return 0;
 }
 
-int audit::Audit::mutation1( proc::ExecContext* ctx, serialize::EmptyStruct& res, const Mutation& param)
+int audit::Audit::mutation1( proc::ExecContext* ctx, serialize::EmptyStruct& /*res*/, const Mutation& param)
 {
 	std::string filename = utils::getCanonicalPath( g_auditfilename, ctx->provider()->referencePath());
 
