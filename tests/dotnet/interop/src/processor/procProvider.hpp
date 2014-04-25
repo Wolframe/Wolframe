@@ -60,11 +60,6 @@ public:
 		throw std::logic_error( "Assertion failed: Called undefined function");
 	}
 
-	virtual cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& ) const
-	{
-		throw std::logic_error( "Assertion failed: Called undefined function");
-	}
-
 	virtual db::Database* transactionDatabase() const
 	{
 		throw std::logic_error( "Assertion failed: Called undefined function");
@@ -115,6 +110,17 @@ public:
 	virtual langbind::Filter* filter( const std::string&) const
 	{
 		return 0;
+	}
+
+	virtual bool guessDocumentFormat( std::string&, const char*, std::size_t) const
+	{
+		return false;
+	}
+
+	virtual const std::string& referencePath() const
+	{
+		static const std::string nopath;
+		return nopath;
 	}
 
 private:

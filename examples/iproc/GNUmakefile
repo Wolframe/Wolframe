@@ -33,7 +33,7 @@ INCLUDE_LIBS = \
 	-lwolframe_langbind \
 	-lwolftest \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(LIBS_DL)
+	$(LIBS_DL) $(LIBS_LT)
 
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/wtest"
 

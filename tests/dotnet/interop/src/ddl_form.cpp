@@ -102,6 +102,7 @@ FormInputFilter::FormInputFilter( const FormInputFilter& o)
 
 FormInputFilter::FormInputFilter( const Form* form)
 	:utils::TypeSignature("langbind::FormInputFilter", __LINE__)
+	,TypedInputFilter("dotNetTestFormInputFilter")
 {
 	if (form->isArray())
 	{

@@ -77,8 +77,10 @@ public:
 	}
 
 private:
-	const std::string	m_host;
-	const unsigned short	m_port;
+	void operator=( const ConnectionEndpoint&){}
+private:
+	std::string	m_host;
+	unsigned short m_port;
 };
 
 

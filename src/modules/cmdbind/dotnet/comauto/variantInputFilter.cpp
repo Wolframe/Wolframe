@@ -41,6 +41,7 @@ using namespace _Wolframe::comauto;
 
 VariantInputFilter::VariantInputFilter( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Context::Flags flags_)
 	:utils::TypeSignature( "comauto::VariantInputFilter", __LINE__)
+	,TypedInputFilter("dotNetVariantInputFilter")
 	,m_typelib(typelib_)
 	,m_flags(flags_)
 	,m_done(false)
@@ -50,6 +51,7 @@ VariantInputFilter::VariantInputFilter( const comauto::TypeLib* typelib_, const 
 
 VariantInputFilter::VariantInputFilter( const VariantInputFilter& o)
 	:utils::TypeSignature( "comauto::VariantInputFilter", __LINE__)
+	,TypedInputFilter(o)
 	,m_stk(o.m_stk)
 	,m_elembuf(o.m_elembuf)
 	,m_typelib(o.m_typelib)

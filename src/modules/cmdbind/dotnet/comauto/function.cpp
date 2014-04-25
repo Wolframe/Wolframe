@@ -471,7 +471,7 @@ comauto::DotnetFunctionClosure::Impl::~Impl()
 
 void comauto::DotnetFunctionClosure::Impl::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 {
-	m_execContext = c;
+	m_context = c;
 	m_input = i;
 	m_flags = f;
 	std::size_t ii = 0,nn = m_func->m_impl->nofParameter();
@@ -713,9 +713,9 @@ bool DotnetFunctionClosure::call()
 	return m_impl->call();
 }
 
-void DotnetFunctionClosure::init( const proc::ProcessorProviderInterface* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+void DotnetFunctionClosure::init( proc::ExecContext* e, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
 {
-	m_impl->init( p, i, f);
+	m_impl->init( e, i, f);
 }
 
 langbind::TypedInputFilterR DotnetFunctionClosure::result() const
