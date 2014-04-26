@@ -145,15 +145,17 @@ endif
 
 # Note for dlopen to work (at least on FreeBSD) with rtti information we have to export all symbols
 # in the binary and in the modules (see http://stackoverflow.com/questions/2351786/dynamic-cast-fails-when-used-with-dlopen-dlsym)
-LDFLAGS_DL =
 ifeq "$(PLATFORM)" "LINUX"
-LDFLAGS_DL = -Wl,-E
+LDFLAGS_EXPORT_ALL_SYMBOLS = -Wl,-E
 endif
 ifeq "$(PLATFORM)" "FREEBSD"
-LDFLAGS_DL = -Wl,-E
+LDFLAGS_EXPORT_ALL_SYMBOLS = -Wl,-E
 endif
 ifeq "$(PLATFORM)" "NETBSD"
-LDFLAGS_DL = -Wl,-E
+LDFLAGS_EXPORT_ALL_SYMBOLS = -Wl,-E
+endif
+ifeq "$(PLATFORM)" "SUNOS"
+LDFLAGS_EXPORT_ALL_SYMBOLS =
 endif
 
 # i18n, gettext/libintl
@@ -196,8 +198,6 @@ LDFLAGS_LT = -L$(LIBLT_DIR)/lib
 LIBS_LT = -lintl
 endif
 
-PLATFORM_COMPILE_FLAGS +=  $(INCLUDE_FLAGS_LT)
-
 endif
 
 PLATFORM_COMPILE_FLAGS += \
@@ -207,30 +207,20 @@ PLATFORM_COMPILE_FLAGS += \
 #############
 
 ifeq "$(PLATFORM)" "LINUX"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
 LIBS_NET =
 endif
 
-ifeq "$(PLATFORM)" "SUNOS"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
-LIBS_NET = -lsocket -lnsl
-endif
-
 ifeq "$(PLATFORM)" "FREEBSD"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
 LIBS_NET =
 endif
 
 ifeq "$(PLATFORM)" "NETBSD"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
 LIBS_NET =
 endif
 
-PLATFORM_COMPILE_FLAGS +=  $(INCLUDE_FLAGS_NET)
+ifeq "$(PLATFORM)" "SUNOS"
+LIBS_NET = -lsocket -lnsl
+endif
 
 # XSLT processor
 ################

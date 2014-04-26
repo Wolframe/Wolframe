@@ -46,9 +46,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/usr/csw/etc libdir=/usr/csw/lib \
-	libdir=/usr/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
-	mandir=/usr/csw/man \
+	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	mandir=/opt/csw/man \
 	help
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
@@ -61,9 +61,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/usr/csw/etc libdir=/usr/csw/lib \
-	libdir=/usr/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
-	mandir=/usr/csw/man \
+	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	mandir=/opt/csw/man \
 	config
 	
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
@@ -76,9 +76,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/usr/csw/etc libdir=/usr/csw/lib \
-	libdir=/usr/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
-	mandir=/usr/csw/man \
+	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	mandir=/opt/csw/man \
 	config
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
@@ -91,9 +91,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/usr/csw/etc libdir=/usr/csw/lib \
-	libdir=/usr/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
-	mandir=/usr/csw/man
+	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	mandir=/opt/csw/man
 check_for_errors
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
@@ -106,9 +106,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/usr/csw/etc libdir=/usr/csw/lib \
-	libdir=/usr/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
-	mandir=/usr/csw/man \
+	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	mandir=/opt/csw/man \
 	test
 check_for_errors
 
@@ -122,9 +122,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/usr/csw/etc libdir=/usr/csw/lib \
-	libdir=/usr/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
-	mandir=/usr/csw/man \
+	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	mandir=/opt/csw/man \
 	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION \
 	install
 check_for_errors
