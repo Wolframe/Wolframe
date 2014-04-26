@@ -327,7 +327,7 @@ working example invocation of make:
 
         LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
         OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql \
-        LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
+        LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.55.0 \
                 WITH_EXPECT=1 WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
                 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 WITH_LOCAL_LIBHPDF=1 \
                 WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
@@ -362,7 +362,7 @@ the 'locale' boost libraries too:
 
 The location of the Boost library can be set when building Wolframe as follows:
 
-        make BOOST_DIR=/usr/local/boost-1.48.0
+        make BOOST_DIR=/usr/local/boost-1.55.0
 
 
 RedHat, Fedora, CentOS, Scientific Linux and similar Linux distributions
@@ -505,46 +505,31 @@ We don't use the CSW boost packages.
 
 As long you don't need ICU support you can build Boost as follows:
 
-Apply the following patch to boost/cstdint.ppp for boost (https://svn.boost.org
-/trac/boost/ticket/6158, see also packaging/patches/Solaris/boost-1.48.0 for
-patch files):
-
-        ...
-        namespace boost
-        {
-
-        #if defined(sun) || defined(__sun)
-                typedef signed char int8_t;
-        #else
-                using ::int8_t;
-        #endif
-        ..
-
-
 Patch the correct architecture (V8 is not really supported, but V8 is also very
-old) in tools/build/v2/user-config.jam:
+old) and gcc version in tools/build/v2/user-config.jam:
 
-        using gcc : 4.6.3 : g++ : <compileflags>-mcpu=v9 ;
+        using gcc : 4.8.2 : g++ : <compileflags>-mcpu=v9 ;
 
 
 Then build boost with:
 
-        ./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
+        ./bootstrap.sh --prefix=/opt/csw/boost-1.55.0 \
                 --with-libraries=thread,filesystem,system,program_options,date_time
         ./b2 -a -d2 install
 
 
-Note: The only tested version for now is version 1.48.0! Other versions of
+Note: The only tested version for now is version 1.55.0! Other versions of
 Boost may work or not:
+
+Do not use boost 1.48.0, it breaks in the threading header files with newer gcc
+versions (4.8.x) and runs only with old gcc versions (4.6.x).
 
 Do not use boost 1.49.0, it has a missing function fchmodat, see http://
 lists.boost.org/boost-build/2012/02/25680.php causing building of
 libboost_filesystem to fail!
 
-Boost 1.50.0 and 1.51.0 have never been tested with Wolframe, so don't use
+Boost 1.50.0 thru 1.54.0 have never been tested with Wolframe, so don't use
 those!
-
-Support for 1.52.0 and later is not guaranteed.
 
 1.9. Secure Socket Layer (SSL)
 
@@ -676,9 +661,13 @@ OpenIndiana 151a8
 
 You need the 'CSWlibsqlite3-0' and the 'CSWlibsqlite3-dev' packages.
 
+For running the Sqlite3 database tests you also need the 'CSWsqlite3' package.
+
 Solaris 10
 
 You need the 'CSWlibsqlite3-0' and the 'CSWlibsqlite3-dev' packages.
+
+For running the Sqlite3 database tests you also need the 'CSWsqlite3' package.
 
 1.11. PostgreSQL database support
 
@@ -1521,7 +1510,7 @@ compiled with the gcc compiler from CSW:
 apply the solaris XOPEN patch (packaging/patches/Solaris/icu4c-1.51.2/
 icu_source_common_uposixdefs_h.patch), then build ICU with:
 
-        cd source/icu
+        cd icu/source
         ./runConfigureICU Solaris/GCC --prefix=/opt/csw/icu4c-51.2
         gmake
         gmake install
@@ -1556,56 +1545,41 @@ compiled with the gcc compiler from CSW:
 apply the solaris icu_source_configure patch (packaging/patches/Solaris/
 icu4c-1.49.2/icu_source_configure.patch), then build ICU with:
 
-        cd source/icu
+        cd icu/source
         ./runConfigureICU Solaris/GCC --prefix=/opt/csw/icu4c-49.1.2
         gmake
         gmake install
 
 
-Apply the following patch to boost/cstdint.ppp for boost (https://svn.boost.org
-/trac/boost/ticket/6158, see also packaging/patches/Solaris/boost-1.48.0 for
-patch files):
-
-        ...
-        namespace boost
-        {
-
-        #if defined(sun) || defined(__sun)
-                typedef signed char int8_t;
-        #else
-                using ::int8_t;
-        #endif
-        ..
-
-
 Patch the correct architecture (V8 is not really supported, but V8 is also very
-old) in tools/build/v2/user-config.jam:
+old) and gcc version in tools/build/v2/user-config.jam:
 
-        using gcc : 4.6.3 : g++ : <compileflags>-mcpu=v9 ;
+        using gcc : 4.8.2 : g++ : <compileflags>-mcpu=v9 ;
 
 
 Apply all Boost compilation patches from 'packaging/patches/Solaris/
-boost-1.48.0' now.
+boost-1.55.0' now.
 
 Then build boost with:
 
-        ./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
+        ./bootstrap.sh --prefix=/opt/csw/boost-1.55.0 \
                 --with-libraries=thread,filesystem,system,program_options,date_time,regex,locale \
                 --with-icu=/opt/csw/icu4c-49.1.2
         ./b2 -a -sICU_PATH=/opt/csw/icu4c-49.1.2 -d2 install
 
 
-Note: The only tested version for now is version 1.48.0! Other versions of
+Note: The only tested version for now is version 1.55.0! Other versions of
 Boost may work or not:
+
+Do not use boost 1.48.0, it breaks in the threading header files with newer gcc
+versions (4.8.x) and runs only with old gcc versions (4.6.x).
 
 Do not use boost 1.49.0, it has a missing function fchmodat, see http://
 lists.boost.org/boost-build/2012/02/25680.php causing building of
 libboost_filesystem to fail!
 
-Boost 1.50.0 and 1.51.0 have never been tested with Wolframe, so don't use
+Boost 1.50.0 thru 1.54.0 have never been tested with Wolframe, so don't use
 those!
-
-Support for 1.52.0 and later is not guaranteed.
 
 1.22. Authentication support with PAM
 
@@ -1973,6 +1947,9 @@ You can run the unit tests of the client with:
 Note:For the tests to run you need an installed X server and have to set the
 DISPLAY variable correctly.
 
+You can disable the building of SSL-enabled code if you remove the 'WITH_SSL=1'
+definition in the 'DEFINES' directive in libqtwolfclient/libqtwolfclient.pro.
+
 You need the Qt libarary of the Unix system you are building on. The following
 list gives Linux distribution respectively Unix specific instructions and lists
 the required packages.
@@ -2061,15 +2038,44 @@ For Qt 5 you need the following packages: 'qt5-gui', 'qt5-network',
 
 NetBSD
 
-You need the 'sqlite3' package.
+For Qt 4 you need the 'qt4' package.
+
+Make sure /usr/pkg/qt4/bin and /usr/pkg/bin are part of the path.
+
+Also set 'QTDIR' to /usr/pkg/qt4.
+
+Build the wolfclient with:
+
+        qmake -config debug -recursive
+
+
+respectively
+
+        qmake -config release -recursive
+
+
+Before compiling apply the following patch command to the generated makefiles:
+
+        find . -name Makefile -exec sh -c \
+                "sed 's/libtool --silent/libtool --silent --tag=CXX/g' {} > x && mv x {}" \;
+
+
+Now build normally with:
+
+        gmake
+        gmake install
+
+
+To run the wolfclient you have currently to set 'LD_LIBRARY_PATH' to /usr/X11R7
+/lib.
+
+For Qt 5 compile your own version of the library.
 
 OpenIndiana 151a8
 
-You need the 'CSWlibsqlite3-0' and the 'CSWlibsqlite3-dev' packages.
+Currently there is no wolfclient for OpenIndiana.
 
 Solaris 10
 
-You need the 'CSWlibsqlite3-0' and the 'CSWlibsqlite3-dev' packages.
-
-For running the Sqlite3 unit tests you also need the 'CSWsqlite3' package.
+Currently there is no wolfclient for Solaris.
 

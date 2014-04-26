@@ -522,7 +522,7 @@ export PATH
 					<programlisting language='shell'>
 	LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql \
-	LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.48.0 \
+	LIBLT_DIR=/usr BOOST_DIR=/opt/csw/boost-1.55.0 \
 		WITH_EXPECT=1 WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
 		WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 WITH_LOCAL_LIBHPDF=1 \
 		WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
@@ -577,7 +577,7 @@ export PATH
 				building <application>Wolframe</application> as follows:
 				
 		        <programlisting language='shell'>
-	make BOOST_DIR=/usr/local/boost-1.48.0
+	make BOOST_DIR=/usr/local/boost-1.55.0
 			</programlisting>				
 
 			</para>
@@ -840,39 +840,20 @@ export PATH
 					As long you don't need ICU support you can
 					build Boost as follows:
 				</para>
-								
-				<para>
-					Apply the following patch to <filename>boost/cstdint.ppp</filename> for boost
-					(<ulink url="https://svn.boost.org/trac/boost/ticket/6158">https://svn.boost.org/trac/boost/ticket/6158</ulink>, see also
-					<filename>packaging/patches/Solaris/boost-1.48.0</filename> for patch files):
-
-					<programlisting language='shell'>
-	...
-	namespace boost
-	{
-
-	#if defined(sun) || defined(__sun) 
-		typedef signed char int8_t;
-	#else
-		using ::int8_t;             
-	#endif  
-	..
-					</programlisting>
-				</para>
-				
+												
 				<para>
 					Patch the correct architecture (V8 is not really supported, but V8
-					is also very old) in <filename>tools/build/v2/user-config.jam</filename>:
+					is also very old) and gcc version in <filename>tools/build/v2/user-config.jam</filename>:
 
 					<programlisting language='shell'>
-	using gcc : 4.6.3 : g++ : &lt;compileflags>-mcpu=v9 ; 
+	using gcc : 4.8.2 : g++ : &lt;compileflags>-mcpu=v9 ; 
 					</programlisting>
 				</para>
 				
 				<para>
 					Then build boost with:
 					<programlisting language='shell'>
-	./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
+	./bootstrap.sh --prefix=/opt/csw/boost-1.55.0 \
 		--with-libraries=thread,filesystem,system,program_options,date_time
 	./b2 -a -d2 install
 					</programlisting>
@@ -880,8 +861,14 @@ export PATH
 				
 				<para>
 					<emphasis role="bold">Note</emphasis>: The only
-					tested version for now is version 1.48.0! Other
+					tested version for now is version 1.55.0! Other
 					versions of Boost may work or not:
+				</para>
+
+				<para>
+					Do not use boost 1.48.0, it breaks in the threading header files with newer
+					gcc versions (4.8.x) and runs only with old gcc
+					versions (4.6.x).
 				</para>
 
 				<para>
@@ -891,13 +878,9 @@ export PATH
 				</para>
 				
 				<para>
-					Boost 1.50.0 and 1.51.0 have never been tested with Wolframe, so don't
+					Boost 1.50.0 thru 1.54.0 have never been tested with Wolframe, so don't
 					use those!
-				</para>
-				
-				<para>
-					Support for 1.52.0 and later is not guaranteed.
-				</para>
+				</para>				
 			</sect3>
 			
 		</sect2>
@@ -1138,6 +1121,11 @@ export PATH
 				<para>
 					You need the 'CSWlibsqlite3-0' and the 'CSWlibsqlite3-dev' packages.
 				</para>
+
+				<para>
+					For running the Sqlite3 database tests you also 
+					need the 'CSWsqlite3' package.
+				</para>
 			</sect3>			
 
 			<sect3>
@@ -1145,6 +1133,11 @@ export PATH
 				
 				<para>
 					You need the 'CSWlibsqlite3-0' and the 'CSWlibsqlite3-dev' packages.
+				</para>
+
+				<para>
+					For running the Sqlite3 database tests you also 
+					need the 'CSWsqlite3' package.
 				</para>
 			</sect3>
 	
@@ -2598,7 +2591,7 @@ export PATH
 					then build ICU with:
 
 					<programlisting language='shell'>
-	cd source/icu
+	cd icu/source
 	./runConfigureICU Solaris/GCC --prefix=/opt/csw/icu4c-51.2
 	gmake
 	gmake install
@@ -2653,7 +2646,7 @@ export PATH
 					then build ICU with:
 
 					<programlisting language='shell'>
-	cd source/icu
+	cd icu/source
 	./runConfigureICU Solaris/GCC --prefix=/opt/csw/icu4c-49.1.2
 	gmake
 	gmake install
@@ -2661,35 +2654,16 @@ export PATH
 				</para>
 												
 				<para>
-					Apply the following patch to <filename>boost/cstdint.ppp</filename> for boost
-					(<ulink url="https://svn.boost.org/trac/boost/ticket/6158">https://svn.boost.org/trac/boost/ticket/6158</ulink>, see also
-					<filename>packaging/patches/Solaris/boost-1.48.0</filename> for patch files):
-
-					<programlisting language='shell'>
-	...
-	namespace boost
-	{
-
-	#if defined(sun) || defined(__sun) 
-		typedef signed char int8_t;
-	#else
-		using ::int8_t;             
-	#endif  
-	..
-					</programlisting>
-				</para>
-				
-				<para>
 					Patch the correct architecture (V8 is not really supported, but V8
-					is also very old) in <filename>tools/build/v2/user-config.jam</filename>:
+					is also very old) and gcc version in <filename>tools/build/v2/user-config.jam</filename>:
 
 					<programlisting language='shell'>
-	using gcc : 4.6.3 : g++ : &lt;compileflags>-mcpu=v9 ; 
+	using gcc : 4.8.2 : g++ : &lt;compileflags>-mcpu=v9 ; 
 					</programlisting>
 				</para>
 				
 				<para>
-					Apply all Boost compilation patches from 'packaging/patches/Solaris/boost-1.48.0' now.
+					Apply all Boost compilation patches from 'packaging/patches/Solaris/boost-1.55.0' now.
 				</para>
 
 
@@ -2697,7 +2671,7 @@ export PATH
 				<para>
 					Then build boost with:
 					<programlisting language='shell'>
-	./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
+	./bootstrap.sh --prefix=/opt/csw/boost-1.55.0 \
 		--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale \
 		--with-icu=/opt/csw/icu4c-49.1.2
 	./b2 -a -sICU_PATH=/opt/csw/icu4c-49.1.2 -d2 install
@@ -2706,8 +2680,14 @@ export PATH
 				
 				<para>
 					<emphasis role="bold">Note</emphasis>: The only
-					tested version for now is version 1.48.0! Other
+					tested version for now is version 1.55.0! Other
 					versions of Boost may work or not:
+				</para>
+
+				<para>
+					Do not use boost 1.48.0, it breaks in the threading header files with newer
+					gcc versions (4.8.x) and runs only with old gcc
+					versions (4.6.x).
 				</para>
 
 				<para>
@@ -2717,12 +2697,8 @@ export PATH
 				</para>
 				
 				<para>
-					Boost 1.50.0 and 1.51.0 have never been tested with Wolframe, so don't
+					Boost 1.50.0 thru 1.54.0 have never been tested with Wolframe, so don't
 					use those!
-				</para>
-				
-				<para>
-					Support for 1.52.0 and later is not guaranteed.
 				</para>
 			</sect3>
 			

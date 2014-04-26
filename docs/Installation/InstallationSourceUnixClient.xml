@@ -48,6 +48,12 @@
 </para>
 
 <para>
+	You can disable the building of SSL-enabled code if you remove the
+	'WITH_SSL=1' definition in the 'DEFINES' directive in
+	<filename>libqtwolfclient/libqtwolfclient.pro</filename>.
+</para>
+
+<para>
 	You need the Qt libarary of the Unix system you are building on.
 	The following list gives Linux distribution respectively Unix
 	specific instructions and lists the required packages.
