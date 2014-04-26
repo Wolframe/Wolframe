@@ -178,14 +178,7 @@
 
 			<sect3>
 				<title>Use prebuild version of Qt</title>
-			
-				<para>
-					
-					You can get a prebuilt version of OpenSSL from
-					<ulink url="http://www.slproweb.com/products/Win32OpenSSL.html">http://www.slproweb.com/products/Win32OpenSSL.html</ulink>.
-					Despite the name you get also 64-bit versions there.
-				</para>
-	
+				
 				<para>
 					Make sure you download the correct Qt package fitting your
 					architecture and Microsoft Visual Studio version.
