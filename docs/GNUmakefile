@@ -121,7 +121,9 @@ INSTALLATION_FILES = \
 	Installation/Preface.xml \
 	Installation/InstallationSource.xml \
 	Installation/InstallationSourceUnix.xml \
+	Installation/InstallationSourceUnixClient.xml \
 	Installation/InstallationSourceWindows.xml \
+	Installation/InstallationSourceWindowsClient.xml \
 	Installation/InstallationBinary.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
@@ -141,12 +143,31 @@ INSTALLATION_WINDOWS_FILES = \
 	Installation/InstallationSourceWindows.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
+
+INSTALLATION_UNIX_CLIENT_FILES = \
+	InstallationUnixClient.xml \
+	InstallationVersion.txt \
+	InstallationDate.txt \
+	Installation/InstallationSourceUnixClient.xml \
+	WolframeVersion.txt \
+	WolfclientVersion.txt
+
+INSTALLATION_WINDOWS_CLIENT_FILES = \
+	InstallationWindowsClient.xml \
+	InstallationVersion.txt \
+	InstallationDate.txt \
+	Installation/InstallationSourceWindowsClient.xml \
+	WolframeVersion.txt \
+	WolfclientVersion.txt
 	
 Installation.html: $(INSTALLATION_FILES)
 Installation.pdf: $(INSTALLATION_FILES)
 
 InstallationUnix.html: $(INSTALLATION_UNIX_FILES)
 InstallationWindows.html: $(INSTALLATION_WINDOWS_FILES)
+
+InstallationUnixClient.html: $(INSTALLATION_UNIX_CLIENT_FILES)
+InstallationWindowsClient.html: $(INSTALLATION_WINDOWS_CLIENT_FILES)
 
 html-installation/index.html: $(INSTALLATION_FILES)
 	$(XSLT_HTML_CHUNKED) $<

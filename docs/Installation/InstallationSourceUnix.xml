@@ -173,6 +173,8 @@
 				</para>
 			</listitem>
 		</itemizedlist>
+
+		&InstallationSourceUnixClientPrereq;
 		
 		</sect2>
 
@@ -3339,6 +3341,11 @@ make check-po           check sanity of gettext files
 				'dist-bz2' to create a tarball containg all the
 				necessary sources.
 			</para>
+		</sect2>
+
+<!-- Wolfclient -->
+		<sect2>
+			&InstallationSourceUnixClient;
 		</sect2>
 
 	</sect1>

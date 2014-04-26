@@ -1,7 +1,11 @@
 <!-- Wolframe Getting Started Guide -->
 
-<!ENTITY InstallationPreface		SYSTEM "Preface.xml">
-<!ENTITY InstallationBinary		SYSTEM "InstallationBinary.xml">
-<!ENTITY InstallationSource		SYSTEM "InstallationSource.xml">
-<!ENTITY InstallationSourceUnix		SYSTEM "InstallationSourceUnix.xml">
-<!ENTITY InstallationSourceWindows	SYSTEM "InstallationSourceWindows.xml">
+<!ENTITY InstallationPreface			SYSTEM "Preface.xml">
+<!ENTITY InstallationBinary			SYSTEM "InstallationBinary.xml">
+<!ENTITY InstallationSource			SYSTEM "InstallationSource.xml">
+<!ENTITY InstallationSourceUnix			SYSTEM "InstallationSourceUnix.xml">
+<!ENTITY InstallationSourceUnixClientPrereq	SYSTEM "InstallationSourceUnixClientPrereq.xml">
+<!ENTITY InstallationSourceUnixClient		SYSTEM "InstallationSourceUnixClient.xml">
+<!ENTITY InstallationSourceWindows		SYSTEM "InstallationSourceWindows.xml">
+<!ENTITY InstallationSourceWindowsClient	SYSTEM "InstallationSourceWindowsClient.xml">
+<!ENTITY InstallationSourceWindowsClientPrereq	SYSTEM "InstallationSourceWindowsClientPrereq.xml">
