@@ -38,7 +38,7 @@ cd wolframe-$VERSION
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBLT_DIR=/usr \
-	BOOST_DIR=/opt/csw/boost-1.48.0 \
+	BOOST_DIR=/opt/csw/boost-1.55.0 \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_LOCAL_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
 	WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
@@ -53,7 +53,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBLT_DIR=/usr \
-	BOOST_DIR=/opt/csw/boost-1.48.0 \
+	BOOST_DIR=/opt/csw/boost-1.55.0 \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_LOCAL_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
 	WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
@@ -68,7 +68,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBLT_DIR=/usr \
-	BOOST_DIR=/opt/csw/boost-1.48.0 \
+	BOOST_DIR=/opt/csw/boost-1.55.0 \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_LOCAL_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
 	WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
@@ -83,7 +83,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBLT_DIR=/usr \
-	BOOST_DIR=/opt/csw/boost-1.48.0 \
+	BOOST_DIR=/opt/csw/boost-1.55.0 \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_LOCAL_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
 	WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
@@ -98,7 +98,7 @@ check_for_errors
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBLT_DIR=/usr \
-	BOOST_DIR=/opt/csw/boost-1.48.0 \
+	BOOST_DIR=/opt/csw/boost-1.55.0 \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_LOCAL_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
 	WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
@@ -114,7 +114,7 @@ check_for_errors
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBLT_DIR=/usr \
-	BOOST_DIR=/opt/csw/boost-1.48.0 \
+	BOOST_DIR=/opt/csw/boost-1.55.0 \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_LOCAL_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 \
 	WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_PAM=1 WITH_SASL=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \

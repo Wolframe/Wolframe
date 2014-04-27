@@ -1579,7 +1579,40 @@ of libboost_filesystem to fail!
 Boost 1.50.0 thru 1.54.0 have never been tested with Wolframe, so don't use
 those!
 
-1.22. Authentication support with PAM
+1.22. Internationalization support with gettext
+
+Wolframe has internationalization support with the help of the gettext
+mechanism.
+
+You can disable NLS support completly with:
+
+        make ENABLE_NLS=0
+
+
+Per default it is enabled.
+
+Linux distributions
+
+'gettext' and 'libintl' are nowadays part of the GNU C library on Linux. No
+special provisions are necessary.
+
+FreeBSD
+
+You need the 'gettext' package.
+
+NetBSD
+
+'gettext' and 'libintl' are installed by default.
+
+OpenIndiana 151a8
+
+You need the 'CSWggettext-dev' package.
+
+Solaris 10
+
+You need the 'CSWggettext-dev' package.
+
+1.23. Authentication support with PAM
 
 Wolframe can authenticate users with PAM.
 
@@ -1640,7 +1673,7 @@ Solaris 10
 
 PAM support is available out of the box just specify 'WITH_PAM=1'.
 
-1.23. Authentication support with SASL
+1.24. Authentication support with SASL
 
 Wolframe can authenticate users with the Cyrus SASL library (http://
 cyrusimap.org/).
@@ -1706,7 +1739,7 @@ Solaris 10
 
 You need the 'CSWsasl' and 'CSWsasl-dev' packages.
 
-1.24. Testing Wolframe
+1.25. Testing Wolframe
 
 Wolframe has tests written in Google gtest (https://code.google.com/p/
 googletest/).
@@ -1729,7 +1762,7 @@ follows:
         make test RUN_TESTS=0
 
 
-1.25. Testing with Expect
+1.26. Testing with Expect
 
 Some more complex tests are written with Expect (http://expect.sourceforge.net/
 ).
@@ -1782,7 +1815,7 @@ Solaris 10
 
 You need the 'CSWexpect' package.
 
-1.26. Building the documentation
+1.27. Building the documentation
 
 The documentation including the man pages is written using DocBook (http://
 www.docbook.org).
@@ -1869,7 +1902,7 @@ NetBSD
 
 We never tried to build the documentation on NetBSD so far.
 
-1.27. Installation
+1.28. Installation
 
 The makefiles provide a 'install' and an 'uninstall' target to install and
 uninstall the software.
@@ -1896,7 +1929,7 @@ contain a line like:
         make DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules
 
 
-1.28. Manual dependency generation
+1.29. Manual dependency generation
 
 Usually dependencies are automatically recomputed and stored in files with
 extension '.d'.
@@ -1909,12 +1942,12 @@ can force the computation of depencies in a special make step as follows:
         make -j 4
 
 
-1.29. Creating source tarballs
+1.30. Creating source tarballs
 
 Wolframe supports the standard targets 'dist', 'dist-Z', 'dist-gz' and
 'dist-bz2' to create a tarball containg all the necessary sources.
 
-1.30. Building the wolfclient
+1.31. Building the wolfclient
 
 The wolfclient is a Qt-based client for the Wolframe server.
 

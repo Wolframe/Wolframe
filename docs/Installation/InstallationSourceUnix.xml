@@ -2700,6 +2700,68 @@ export PATH
 			
 		</sect2>
 
+<!-- gettext, libintl, i18n -->
+		<sect2>
+			<title>Internationalization support with gettext</title>
+			
+			<para>
+				<application>Wolframe</application> has internationalization
+				support with the help of the gettext mechanism.
+			</para>
+						
+			<para>
+				You can disable NLS support completly with:
+
+		        <programlisting language='shell'>
+	make ENABLE_NLS=0
+			</programlisting>
+			
+				Per default it is enabled.				
+			</para>
+						
+			<sect3>
+				<title>Linux distributions</title>
+				
+				<para>
+					'gettext' and 'libintl' are nowadays part of the GNU
+					C library on Linux. No special provisions are
+					necessary.
+				</para>				
+			</sect3>
+
+			<sect3>
+				<title>FreeBSD</title>
+				
+				<para>
+					You need the 'gettext' package.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>NetBSD</title>
+				<para>
+					'gettext' and 'libintl' are installed by default.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>OpenIndiana 151a8</title>
+				
+				<para>
+					You need the 'CSWggettext-dev' package.
+				</para>
+			</sect3>			
+
+			<sect3>
+				<title>Solaris 10</title>
+				
+				<para>
+					You need the 'CSWggettext-dev' package.
+				</para>
+			</sect3>
+			
+		</sect2>
+
 <!-- PAM -->
 		<sect2>
 			<title>Authentication support with PAM</title>

@@ -196,12 +196,43 @@
 				<title>Build your own version of Qt</title>
 
 				<para>
+					Set the following environment variables in order for Qt to
+					find the OpenSSL header files and libraries:\
+					
+					<programlisting language='shell'>
+	set OPENSSL_DIR=C:\openssl-1.0.1g-win32-debug
+	set INCLUDE=%INCLUDE%;%OPENSSL_DIR%\include
+	set LIB=%LIB%;%OPENSSL_DIR%\lib
+					</programlisting>
+					
+					or for the release version:
+					
+					<programlisting language='shell'>
+	set OPENSSL_DIR=C:\openssl-1.0.1g-win32-release
+	set INCLUDE=%INCLUDE%;%OPENSSL_DIR%\include
+	set LIB=%LIB%;%OPENSSL_DIR%\lib
+					</programlisting>
+					
+				</para>
+				
+				<para>
 					Compile Qt with OpenSSL enabled:
 					
 					<programlisting language='shell'>
-	configure -platform win32-msvc -openssl
+	configure -platform win32-msvc2010 -debug -openssl
+	nmake
 					</programlisting>
 				</para>
+				
+				<para>
+					For a release version use:
+
+					<programlisting language='shell'>
+	configure -platform win32-msvc2010 -release -openssl
+	nmake
+					</programlisting>
+				</para>
+				
 			</sect3>
 		</sect2>
 		
