@@ -6,7 +6,8 @@ SUBDIRS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	$(INCLUDE_FLAGS_LT)
 
 INCLUDE_CXXFLAGS =
 
@@ -30,6 +31,9 @@ CPP_OBJS = \
 	TextFileAuthModule.o \
 	$(PASSWD_OBJS)
 
+PASSWD_LDFLAGS = \
+	$(LDFLAGS_LT)
+	
 PASSWD_LIBS = \
 	$(TOPDIR)/src/libwfsingleton/libwfsingleton.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
@@ -40,7 +44,7 @@ CPP_BINS = \
 	wolfpasswd$(EXE)
 
 wolfpasswd$(EXE): wolfpasswd.o $(PASSWD_OBJS)
-	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(PASSWD_OBJS) $< $(PASSWD_LIBS) $(LIBS_LT)
+	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(PASSWD_LDFLAGS) $(PASSWD_OBJS) $< $(PASSWD_LIBS) $(LIBS_LT)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

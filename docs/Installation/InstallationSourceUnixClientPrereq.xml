@@ -1,0 +1,19 @@
+<para>
+	For building the wolfclient you need:
+</para>
+
+<itemizedlist>
+	<listitem>
+		<para>
+			Qt 4.6.x or later, or Qt 5,
+			<ulink url="http://qt-project.org/">http://qt-project.org/</ulink>
+		</para>
+	</listitem>
+	<listitem>
+		<para>
+			For secure communication between the wolfclient and the Wolframe
+			server you need the OpenSSL library 0.9.7 or newer,
+			<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>
+		</para>
+	</listitem>
+</itemizedlist>

@@ -1,5 +1,5 @@
---- boost/locale/date_time_facet.hpp.orig	2012-11-02 13:16:50.000000000 +0100
-+++ boost/locale/date_time_facet.hpp	2012-11-02 13:16:57.000000000 +0100
+--- boost_1_55_0-orig/boost/locale/date_time_facet.hpp	2012-12-29 15:18:45.000000000 +0100
++++ boost_1_55_0/boost/locale/date_time_facet.hpp	2014-04-26 20:49:10.027406000 +0200
 @@ -51,7 +51,7 @@
                      second,                     ///< second [0..59]
                      week_of_year,               ///< The week number in the year
@@ -16,14 +16,5 @@
 -                absolute_maximum,   ///< Maximal value, for Gregorian day it would be 31.
 +                absolute_maximum    ///< Maximal value, for Gregorian day it would be 31.
              } value_type;
- 
-             ///
-@@ -141,7 +141,7 @@
-             ///
-             typedef enum {
-                 move,   ///< Change the value up or down effecting others for example 1990-12-31 + 1 day = 1991-01-01
--                roll,   ///< Change the value up or down not effecting others for example 1990-12-31 + 1 day = 1990-12-01
-+                roll    ///< Change the value up or down not effecting others for example 1990-12-31 + 1 day = 1990-12-01
-             } update_type;
  
              ///
