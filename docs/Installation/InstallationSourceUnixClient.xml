@@ -294,6 +294,11 @@
 	<para>
 		For Qt 4 you need the 'CSWqt4-dev' package (at least version '4.8.5,REV=2013.11.26').
 	</para>
+	
+	<para>
+		There are quite some problems with the generated makefiles, remove -rpath,/lib directrives
+		where the build fails.
+	</para>
 
 	<para>
 		Using Qt 5 for <application>wolfclient</application> is untested.

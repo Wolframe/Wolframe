@@ -471,6 +471,16 @@
 				<para>
 					Install packages with 'pkgutil --install'.
 				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: If running tests or programs
+					fails with "locale::facet::_S_create_c_locale name not valid" then
+					set
+					<programlisting language='shell'>
+	LC_ALL=C
+	export LC_ALL
+					</programlisting>
+				</para>					
 			</sect3>
 
 			<sect3>
