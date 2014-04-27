@@ -272,7 +272,7 @@
 	</para>
 
 	<para>
-		For Qt 5 compile your own version of the library.
+		Using Qt 5 for <application>wolfclient</application> is untested.
 	</para>
 </sect3>
 
@@ -280,9 +280,12 @@
 	<title>OpenIndiana 151a8</title>
 	
 	<para>
-		Currently there is no <application>wolfclient</application> for OpenIndiana.
+		For Qt 4 you need the 'CSWqt4-dev' package (at least version '4.8.5,REV=2013.11.26').
 	</para>
-	
+
+	<para>
+		Using Qt 5 for <application>wolfclient</application> is untested.
+	</para>
 </sect3>			
 
 <sect3>
