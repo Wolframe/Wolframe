@@ -1,0 +1,2 @@
+MECHS NONE
+BYE

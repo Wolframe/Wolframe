@@ -48,12 +48,13 @@
 namespace _Wolframe {
 namespace proc {
 
-class CommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
+class MainCommandHandler
+	:public cmdbind::LineCommandHandlerTemplate<MainCommandHandler>
 {
 public:
-	typedef cmdbind::LineCommandHandlerTemplate<CommandHandler> Parent;
-	CommandHandler();
-	virtual ~CommandHandler(){}
+	typedef cmdbind::LineCommandHandlerTemplate<MainCommandHandler> Parent;
+	MainCommandHandler();
+	virtual ~MainCommandHandler(){}
 
 public:
 	int doAuth( int argc, const char** argv, std::ostream& out);
@@ -75,18 +76,11 @@ public:
 
 private:
 	bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out);
-	std::list<std::string> roles() const
-	{
-		std::list<std::string> rt;
-		rt.push_back( "std");		//TODO: To be extracted from m_authtickets
-		return rt;
-	}
 
 private:
 	AuthMechanisms m_authMechanisms;
 	std::string m_command;
 	std::string m_commandtag;
-	std::vector<std::string> m_authtickets;
 };
 
 
@@ -123,7 +117,7 @@ public:
 	}
 
 private:
-	CommandHandler m_cmdhandler;			//< top level instance executing commands
+	MainCommandHandler m_cmdhandler;		//< top level instance executing commands
 	protocol::InputBlock m_input;			//< buffer for network read messages
 	protocol::OutputBlock m_output;			//< buffer for network write messages
 	bool m_terminated;				//< true, if a termination signal came from the network

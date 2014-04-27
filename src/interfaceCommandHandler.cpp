@@ -41,16 +41,16 @@
 using namespace _Wolframe;
 using namespace _Wolframe::proc;
 
-enum State
+struct IchSTM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandler>
 {
-	User,
-	Admin,
-	AdminPush
-};
+	enum State
+	{
+		User,
+		Admin,
+		AdminPush
+	};
 
-struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandler>
-{
-	STM()
+	IchSTM()
 	{
 		(*this)
 			[User]
@@ -60,11 +60,10 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandle
 		;
 	}
 };
-static STM stm;
+static IchSTM ichstm;
 
-InterfaceCommandHandler::InterfaceCommandHandler( const std::list<std::string>& roles_, bool adminInterface_)
-	:cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>( &stm, (std::size_t)(adminInterface_?User:Admin))
-	,m_roles(roles_)
+InterfaceCommandHandler::InterfaceCommandHandler( bool adminInterface_)
+	:cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>( &ichstm, (std::size_t)(adminInterface_?IchSTM::User:IchSTM::Admin))
 {}
 
 int InterfaceCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)

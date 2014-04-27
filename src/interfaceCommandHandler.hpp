@@ -46,14 +46,13 @@ class InterfaceCommandHandler :public cmdbind::LineCommandHandlerTemplate<Interf
 {
 public:
 	typedef cmdbind::LineCommandHandlerTemplate<CommandHandler> Parent;
-	explicit InterfaceCommandHandler( const std::list<std::string>& roles_, bool adminInterface_=false);
+	explicit InterfaceCommandHandler( bool adminInterface_=false);
 	virtual ~InterfaceCommandHandler(){}
 
 public:
 	int doCapabilities( int argc, const char** argv, std::ostream& out);
 
 private:
-	std::list<std::string> m_roles;
 	std::vector<std::string> m_argbuf;
 	std::vector<std::pair< std::string, std::string> > m_attributes;
 };

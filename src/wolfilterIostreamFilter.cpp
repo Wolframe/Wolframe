@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilterIostreamFilter.hpp
+///\file wolfilterIostreamFilter.cpp
 ///\brief Implementation of a kind of pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 #include "wolfilterIostreamFilter.hpp"
 #include "serialize/ddlFormSerializer.hpp"
@@ -187,11 +187,11 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbin
 		is.read( buf+pp, sizeof(char));
 		if (!is.eof()) ++pp;
 	}
-	cmdh->putInput( buf, pp);
 	if (pp == 0 && is.eof())
 	{
 		throw std::runtime_error("unexpected end of file");
 	}
+	cmdh->putInput( buf, pp);
 }
 
 static bool readInputEscLFdot( int& state, char* buf, unsigned int bufsize, std::istream& is, cmdbind::CommandHandler* cmdh)
@@ -592,7 +592,7 @@ static void processCommandHandler( BufferStruct& buf, int& stateEscIn, int& stat
 			if (error)
 			{ 
 				std::ostringstream msg;
-				msg << "error redirect input: " << error;
+				msg << "error process command handler: " << error;
 				throw std::runtime_error( msg.str());
 			}
 			return;
@@ -762,7 +762,6 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 				}
 				doEscapeLFdot = true;
 			}
-			
 			cmdbind::DoctypeFilterCommandHandler* dtfh = new cmdbind::DoctypeFilterCommandHandler();
 			cmdbind::CommandHandlerR dtfh_scoped( dtfh);
 			dtfh->setOutputBuffer( buf.outbuf, buf.outsize, 0);

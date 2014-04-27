@@ -45,41 +45,41 @@
 using namespace _Wolframe;
 using namespace _Wolframe::proc;
 
-enum State
+struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler>
 {
-	Unauthenticated,
-	Authentication,
-	Authenticated
-};
+	enum State
+	{
+		Unauthenticated,
+		Authentication,
+		Authenticated
+	};
 
-struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
-{
-	STM()
+	MainSTM()
 	{
 		(*this)
 			[Unauthenticated]
-				.cmd< &CommandHandler::doAuth >( "AUTH")
-				.cmd< &CommandHandler::doQuit >( "QUIT")
-				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
+				.cmd< &MainCommandHandler::doAuth >( "AUTH")
+				.cmd< &MainCommandHandler::doQuit >( "QUIT")
+				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
 			[Authentication]
-				.cmd< &CommandHandler::doMech >( "MECH")
-				.cmd< &CommandHandler::doQuit >( "QUIT")
-				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
+				.cmd< &MainCommandHandler::doMech >( "MECH")
+				.cmd< &MainCommandHandler::doQuit >( "QUIT")
+				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
 			[Authenticated]
-				.cmd< &CommandHandler::doRequest >( "REQUEST")
-				.cmd< &CommandHandler::doInterface >( "INTERFACE")
-				.cmd< &CommandHandler::doAuth >( "AUTH")
-				.cmd< &CommandHandler::doQuit >( "QUIT")
-				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
+				.cmd< &MainCommandHandler::doRequest >( "REQUEST")
+				.cmd< &MainCommandHandler::doInterface >( "INTERFACE")
+				.cmd< &MainCommandHandler::doAuth >( "AUTH")
+				.cmd< &MainCommandHandler::doQuit >( "QUIT")
+				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
 		;
 	}
 };
-static STM stm;
+static MainSTM mainstm;
 
-CommandHandler::CommandHandler()
-	:cmdbind::LineCommandHandlerTemplate<CommandHandler>( &stm ){}
+MainCommandHandler::MainCommandHandler()
+	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>( &mainstm ){}
 
-int CommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
+int MainCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
@@ -93,7 +93,7 @@ int CommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
 	}
 }
 
-int CommandHandler::doQuit( int argc, const char**, std::ostream& out)
+int MainCommandHandler::doQuit( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
@@ -107,7 +107,7 @@ int CommandHandler::doQuit( int argc, const char**, std::ostream& out)
 	}
 }
 
-int CommandHandler::doAuth( int argc, const char**, std::ostream& out)
+int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
@@ -117,11 +117,11 @@ int CommandHandler::doAuth( int argc, const char**, std::ostream& out)
 	else
 	{
 		out << "MECHS " << boost::algorithm::join( m_authMechanisms.list(), " ") << "NONE" << endl();
-		return Authentication;
+		return MainSTM::Authentication;
 	}
 }
 
-int CommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
+int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 {
 	//[+] cmdbind::AuthCommandHandler* chnd = dynamic_cast<cmdbind::AuthCommandHandler*>( ch);
 	cmdbind::CommandHandlerR chr( ch);
@@ -135,11 +135,11 @@ int CommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 	{
 		out << "OK authorization" << endl();
 		//[+] m_execContext.setUser( chnd->user());
-		return Authenticated;
+		return MainSTM::Authenticated;
 	}
 }
 
-int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
+int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 {
 	if (argc == 0)
 	{
@@ -154,8 +154,7 @@ int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 	if (boost::iequals( std::string(argv[0]), "NONE"))
 	{
 		out << "OK authentication" << endl();
-		m_authtickets.push_back( "none");
-		return Authenticated;
+		return MainSTM::Authenticated;
 	}
 	cmdbind::AuthCommandHandler* authch = m_authMechanisms.get( argv[0]);
 	if (!authch)
@@ -164,33 +163,33 @@ int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		return stateidx();
 	}
 	authch->setExecContext( execContext());
-	delegateProcessing<&CommandHandler::endMech>( authch);
+	delegateProcessing<&MainCommandHandler::endMech>( authch);
 	return stateidx();
 }
 
-int CommandHandler::endInterface( cmdbind::CommandHandler* ch, std::ostream&)
+int MainCommandHandler::endInterface( cmdbind::CommandHandler* ch, std::ostream&)
 {
 	delete ch;
 	int rt = stateidx();
 	return rt;
 }
 
-int CommandHandler::doInterface( int argc, const char**, std::ostream& out)
+int MainCommandHandler::doInterface( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
 		out << "ERR INTERFACE unexpected arguments" << endl();
 		return stateidx();
 	}
-	cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new InterfaceCommandHandler( roles());
+	cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new InterfaceCommandHandler();
 	out << "OK INTERFACE enter commands" << endl();
-	delegateProcessing<&CommandHandler::endInterface>( delegate_ch);
+	delegateProcessing<&MainCommandHandler::endInterface>( delegate_ch);
 	return stateidx();
 }
 
 static bool IsCntrl( char ch) {return ch>0 && ch <=32;}
 
-int CommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out)
+int MainCommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out)
 {
 	cmdbind::CommandHandlerR chr( chnd);
 	int rt = stateidx();
@@ -209,7 +208,7 @@ int CommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out
 	return rt;
 }
 
-bool CommandHandler::redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out)
+bool MainCommandHandler::redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out)
 {
 	void* buf;
 	std::size_t bufsize;
@@ -217,7 +216,7 @@ bool CommandHandler::redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler
 	return Parent::redirectInput( buf, bufsize, toh, out);
 }
 
-int CommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out)
+int MainCommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out)
 {
 	cmdbind::CommandHandlerR chr( ch);
 	const char* err = ch->lastError();
@@ -225,7 +224,7 @@ int CommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostrea
 	return stateidx();
 }
 
-int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out)
+int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out)
 {
 	cmdbind::DoctypeFilterCommandHandler* chnd = dynamic_cast<cmdbind::DoctypeFilterCommandHandler*>( ch);
 	cmdbind::CommandHandlerR chr( ch);
@@ -249,7 +248,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		}
 		if (redirectConsumedInput( chnd, delegate_ch, out))
 		{
-			delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
+			delegateProcessing<&MainCommandHandler::endErrDocumentType>( delegate_ch);
 		}
 		else
 		{
@@ -287,7 +286,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		}
 		if (redirectConsumedInput( chnd, execch, out))
 		{
-			delegateProcessing<&CommandHandler::endErrDocumentType>( execch);
+			delegateProcessing<&MainCommandHandler::endErrDocumentType>( execch);
 		}
 		else
 		{
@@ -310,7 +309,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		}
 		if (redirectConsumedInput( chnd, execch, out))
 		{
-			delegateProcessing<&CommandHandler::endRequest>( execch);
+			delegateProcessing<&MainCommandHandler::endRequest>( execch);
 		}
 		else
 		{
@@ -330,7 +329,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 	}
 }
 
-int CommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
+int MainCommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
 {
 	m_command.clear();
 	m_commandtag.clear();
@@ -363,7 +362,7 @@ int CommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
 		}
 	}
 	CommandHandler* ch = (CommandHandler*)new cmdbind::DoctypeFilterCommandHandler();
-	delegateProcessing<&CommandHandler::endDoctypeDetection>( ch);
+	delegateProcessing<&MainCommandHandler::endDoctypeDetection>( ch);
 	return stateidx();
 }
 

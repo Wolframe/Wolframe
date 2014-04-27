@@ -82,26 +82,9 @@ static std::string configurationTree_tostring( const types::PropertyTree::Node& 
 	return res->content();
 }
 
-static types::PropertyTree::Node getTreeNode( const types::PropertyTree::Node& tree, const std::string& name)
-{
-	bool found = false;
-	types::PropertyTree::Node rt;
-	types::PropertyTree::Node::const_iterator gi = tree.begin(), ge = tree.end();
-	for (; gi != ge; ++gi)
-	{
-		if (boost::algorithm::iequals( gi->first, name))
-		{
-			if (found) throw std::runtime_error( std::string("duplicate '") + name + "' node in configuration");
-			rt = gi->second;
-			found = true;
-		}
-	}
-	return rt;
-}
-
 config::ConfigurationNode WolfilterCommandLine::getConfigNode( const std::string& name) const
 {
-	return getTreeNode( m_config.root(), name);
+	return m_config.root().getChild( name);
 }
 
 std::vector<std::string> WolfilterCommandLine::configModules( const std::string& refpath) const

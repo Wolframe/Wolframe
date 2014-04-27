@@ -77,9 +77,13 @@ std::string joinPath( const std::string& path, const std::string& item);
 ///\brief Returns true, if the file with path 'path' exists
 bool fileExists( const std::string& path);
 
-///\brief Reading the content of a source file as one string
+///\brief Reading the content of a source file as one string in UTF-8 (with implicit conversion of other known unicode character encodings to UTF-8)
 ///\remark Throws on error
 std::string readSourceFileContent( const std::string& filename);
+
+///\brief Reading the content of a file as one string without any conversions applied
+///\remark Throws on error
+std::string readBinaryFileContent( const std::string& filename);
 
 ///\brief Reading the content of a source file as property tree (with property tree syntax)
 ///\remark Throws on error

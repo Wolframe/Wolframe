@@ -1,7 +1,7 @@
 TOPDIR = ..
 
-SUBDIRS = modules database wolfilter simpleFormCompiler compileTDL
-#SUBDIRS = modules database AAAA wolfilter
+SUBDIRS = modules database wolfilter simpleFormCompiler compileTDL wolfilter protocol
+#SUBDIRS = modules database AAAA
 
 
 # all broken on windows due to working telnet

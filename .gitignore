@@ -85,6 +85,7 @@ tests/testIntegers
 tests/testVariantStruct
 tests/3rdParty/libhpdf/testlibhpdf
 tests/3rdParty/libhpdf/*.pdf
+tests/protocol/src/testProtocol
 examples/echo/echod
 examples/lua/luad
 examples/pecho/pechod

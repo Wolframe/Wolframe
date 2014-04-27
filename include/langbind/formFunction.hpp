@@ -77,7 +77,7 @@ struct FormFunction
 	virtual FormFunctionClosure* createClosure() const=0;
 };
 
-typedef types::CountedReference<FormFunction> FormFunctionR;
+typedef boost::shared_ptr<FormFunction> FormFunctionR;
 
 }}//namespace
 #endif

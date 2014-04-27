@@ -98,4 +98,20 @@ void PropertyTree::Node::print( std::ostringstream& out, const Node& nd, int ind
 	}
 }
 
+PropertyTree::Node PropertyTree::Node::getChild( const std::string& nodename) const
+{
+	bool found = false;
+	types::PropertyTree::Node rt;
+	types::PropertyTree::Node::const_iterator gi = begin(), ge = end();
+	for (; gi != ge; ++gi)
+	{
+		if (boost::algorithm::iequals( gi->first, nodename))
+		{
+			if (found) throw std::runtime_error( std::string("duplicate '") + nodename + "' node in configuration");
+			rt = gi->second;
+			found = true;
+		}
+	}
+	return rt;
+}
 

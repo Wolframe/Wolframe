@@ -48,92 +48,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-class CppFormFunctionClosure
-	:public virtual utils::TypeSignature
-	,public langbind::FormFunctionClosure
-{
-public:
-	CppFormFunctionClosure( const serialize::CppFormFunction& f)
-		:utils::TypeSignature("prgbind::CppFormFunctionClosure", __LINE__)
-		,m_func(f)
-		,m_state(0)
-		,m_param_data(f.api_param())
-		,m_result_data(f.api_result())
-		,m_result(langbind::TypedInputFilterR( new serialize::StructSerializer( m_result_data.data(),m_result_data.descr())))
-		,m_parser(m_param_data.data(),m_param_data.descr())
-		,m_context(0)
-		{}
-
-	CppFormFunctionClosure( const CppFormFunctionClosure& o)
-		:utils::TypeSignature(o)
-		,m_func(o.m_func)
-		,m_state(0)
-		,m_param_data(o.m_param_data)
-		,m_result_data(o.m_result_data)
-		,m_result(o.m_result)
-		,m_parser(o.m_parser)
-		,m_context(o.m_context)
-		{}
-
-	virtual bool call()
-	{
-		void* param_struct = m_param_data.get();
-		void* result_struct = m_result_data.get();
-		switch (m_state)
-		{
-			case 0:
-				if (!m_parser.call()) return false;
-				m_state = 1;
-			case 1:
-				int rt = m_func.call( m_context, result_struct, param_struct);
-				if (rt != 0)
-				{
-					std::ostringstream msg;
-					msg << "error in call of form function (return code " << rt << ")";
-					throw std::runtime_error( msg.str());
-				}
-				m_state = 2;
-		}
-		return true;
-	}
-
-	virtual void init( proc::ExecContext* ctx, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
-	{
-		m_context = ctx;
-		m_parser.init( i, f);
-	}
-
-	virtual langbind::TypedInputFilterR result() const
-	{
-		return m_result;
-	}
-
-private:
-	serialize::CppFormFunction m_func;
-	int m_state;
-	serialize::ApiFormData m_param_data;
-	serialize::ApiFormData m_result_data;
-	langbind::TypedInputFilterR m_result;
-	serialize::StructParser m_parser;
-	proc::ExecContext* m_context;
-};
-
-class CppFormFunction
-	:public langbind::FormFunction
-{
-public:
-	CppFormFunction( const serialize::CppFormFunction& f)
-		:m_impl(f){}
-
-	virtual langbind::FormFunctionClosure* createClosure() const
-	{
-		return new CppFormFunctionClosure( m_impl);
-	}
-
-private:
-	serialize::CppFormFunction m_impl;
-};
-
 class NormalizeFunctionMap
 	:public types::NormalizeFunctionMap
 {
@@ -177,9 +91,9 @@ public:
 	Impl( const Impl& o)
 		:m_programTypes(o.m_programTypes){}
 
-	void defineCppFormFunction( const std::string& name, const CppFormFunction& f)
+	void defineCppFormFunction( const std::string& name, const serialize::CppFormFunction& f)
 	{
-		m_formFunctionMap.insert( name, langbind::FormFunctionR( new CppFormFunction( f)));
+		m_formFunctionMap.insert( name, langbind::FormFunctionR( new serialize::CppFormFunction( f)));
 	}
 
 	void defineFormFunction( const std::string& name, const langbind::FormFunctionR f)

@@ -56,7 +56,7 @@ static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
 static LanguageDescription g_dblang;
-static std::string selectedTestName;
+static std::string g_selectedTestName;
 
 class CompileTDLTest
 	:public ::testing::Test
@@ -154,9 +154,9 @@ TEST_F( CompileTDLTest, tests)
 	boost::filesystem::path outputdir( g_testdir / ".." / "output");
 
 	// [1] Selecting tests to execute:
-	if (selectedTestName.size())
+	if (g_selectedTestName.size())
 	{
-		std::cerr << "executing tests matching '" << selectedTestName << "'" << std::endl;
+		std::cerr << "executing tests matching '" << g_selectedTestName << "'" << std::endl;
 	}
 	boost::filesystem::recursive_directory_iterator ditr( g_testdir / ".." / "data" ), dend;
 	for (; ditr != dend; ++ditr)
@@ -165,9 +165,9 @@ TEST_F( CompileTDLTest, tests)
 		if (boost::iequals( boost::filesystem::extension( *ditr), ".tdl"))
 		{
 			std::string testname = utils::getFileStem( filename);
-			if (selectedTestName.size())
+			if (g_selectedTestName.size())
 			{
-				if (std::strstr( testname.c_str(), selectedTestName.c_str()))
+				if (std::strstr( testname.c_str(), g_selectedTestName.c_str()))
 				{
 					std::cerr << "selected test '" << testname << "'" << std::endl;
 					tests.push_back( filename);
@@ -235,7 +235,7 @@ TEST_F( CompileTDLTest, tests)
 		std::string expect;
 		try
 		{
-			expect = utils::readSourceFileContent( expectfile);
+			expect = utils::readBinaryFileContent( expectfile);
 		}
 		catch (const std::runtime_error& e)
 		{
@@ -269,7 +269,7 @@ int main( int argc, char **argv)
 		}
 		else if (argc == 2)
 		{
-			selectedTestName = argv[ 1];
+			g_selectedTestName = argv[ 1];
 		}
 		else
 		{
