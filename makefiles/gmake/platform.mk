@@ -178,7 +178,7 @@ LIBS_LT =
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
-LIBLT_DIR ?= /usr/local
+LIBLT_DIR ?= /opt/csw
 INCLUDE_FLAGS_LT = -I$(LIBLT_DIR)/include
 LDFLAGS_LT = -L$(LIBLT_DIR)/lib
 LIBS_LT = -lintl
