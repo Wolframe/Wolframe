@@ -872,8 +872,7 @@ export PATH
 				</para>
 
 				<para>
-					Do not use boost 1.49.0, it has a missing function fchmodat, see
-					<ulink url="http://lists.boost.org/boost-build/2012/02/25680.php">http://lists.boost.org/boost-build/2012/02/25680.php</ulink>
+					Do not use boost 1.49.0, it has a missing function 'fchmodat'
 					causing building of libboost_filesystem to fail!
 				</para>
 				
@@ -2654,7 +2653,7 @@ export PATH
 				</para>
 												
 				<para>
-					Patch the correct architecture (V8 is not really supported, but V8
+					In Boost patch the correct architecture (V8 is not really supported, but V8
 					is also very old) and gcc version in <filename>tools/build/v2/user-config.jam</filename>:
 
 					<programlisting language='shell'>
@@ -2665,8 +2664,6 @@ export PATH
 				<para>
 					Apply all Boost compilation patches from 'packaging/patches/Solaris/boost-1.55.0' now.
 				</para>
-
-
 					
 				<para>
 					Then build boost with:
@@ -2691,8 +2688,7 @@ export PATH
 				</para>
 
 				<para>
-					Do not use boost 1.49.0, it has a missing function fchmodat, see
-					<ulink url="http://lists.boost.org/boost-build/2012/02/25680.php">http://lists.boost.org/boost-build/2012/02/25680.php</ulink>
+					Do not use boost 1.49.0, it has a missing function 'fchmodat'
 					causing building of libboost_filesystem to fail!
 				</para>
 				

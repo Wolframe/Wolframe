@@ -524,9 +524,8 @@ Boost may work or not:
 Do not use boost 1.48.0, it breaks in the threading header files with newer gcc
 versions (4.8.x) and runs only with old gcc versions (4.6.x).
 
-Do not use boost 1.49.0, it has a missing function fchmodat, see http://
-lists.boost.org/boost-build/2012/02/25680.php causing building of
-libboost_filesystem to fail!
+Do not use boost 1.49.0, it has a missing function 'fchmodat' causing building
+of libboost_filesystem to fail!
 
 Boost 1.50.0 thru 1.54.0 have never been tested with Wolframe, so don't use
 those!
@@ -1551,8 +1550,8 @@ icu4c-1.49.2/icu_source_configure.patch), then build ICU with:
         gmake install
 
 
-Patch the correct architecture (V8 is not really supported, but V8 is also very
-old) and gcc version in tools/build/v2/user-config.jam:
+In Boost patch the correct architecture (V8 is not really supported, but V8 is
+also very old) and gcc version in tools/build/v2/user-config.jam:
 
         using gcc : 4.8.2 : g++ : <compileflags>-mcpu=v9 ;
 
@@ -1574,9 +1573,8 @@ Boost may work or not:
 Do not use boost 1.48.0, it breaks in the threading header files with newer gcc
 versions (4.8.x) and runs only with old gcc versions (4.6.x).
 
-Do not use boost 1.49.0, it has a missing function fchmodat, see http://
-lists.boost.org/boost-build/2012/02/25680.php causing building of
-libboost_filesystem to fail!
+Do not use boost 1.49.0, it has a missing function 'fchmodat' causing building
+of libboost_filesystem to fail!
 
 Boost 1.50.0 thru 1.54.0 have never been tested with Wolframe, so don't use
 those!
