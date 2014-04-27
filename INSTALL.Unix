@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-April 12, 2014 version 0.0.1
+April 27, 2014 version 0.0.1
 
 -------------------------------------------------------------------------------
 
@@ -294,13 +294,6 @@ You also need some system files:
 Make sure /opt/csw/bin is part of your PATH.
 
 Install packages with 'pkgutil --install'.
-
-Note: If running tests or programs fails with
-"locale::facet::_S_create_c_locale name not valid" then set
-
-        LC_ALL=C
-        export LC_ALL
-
 
 Solaris 10
 
