@@ -811,13 +811,13 @@ export PATH
 				
 				<para>
 					First apply all patches found in
-					<filename>packaging/patches/Solaris/1.54.0</filename>.
+					<filename>packaging/patches/Solaris/1.55.0</filename>.
 				</para>
 				
 				<para>
 					Then build boost with:
 					<programlisting language='shell'>
-	./bootstrap.sh --prefix=/opt/csw/boost-1.54.0 \
+	./bootstrap.sh --prefix=/opt/csw/boost-1.55.0 \
 		--with-libraries=thread,filesystem,system,program_options,date_time
 	./b2 -a -d2 install
 					</programlisting>
@@ -825,8 +825,8 @@ export PATH
 				
 				<para>
 					<emphasis role="bold">Note</emphasis>: The only
-					tested version for now is version 1.54.0! Other
-					versions of Boost may work or not..
+					tested version for now is version 1.55.0! Other
+					versions of Boost may work or not work..
 				</para>
 			</sect3>
 
@@ -2603,13 +2603,13 @@ export PATH
 				
 				<para>
 					First apply all patches found in
-					<filename>packaging/patches/Solaris/1.54.0</filename>.
+					<filename>packaging/patches/Solaris/1.55.0</filename>.
 				</para>
 				
 				<para>
 					Then build boost with:
 					<programlisting language='shell'>
-	./bootstrap.sh --prefix=/opt/csw/boost-1.54.0 \
+	./bootstrap.sh --prefix=/opt/csw/boost-1.55.0 \
 		--with-icu=/opt/csw/icu4c-51.2 \
 		--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
 	./b2 -a -sICU_PATH=/opt/csw/icu4c-51.2 -d2 install
@@ -2618,8 +2618,8 @@ export PATH
 				
 				<para>
 					<emphasis role="bold">Note</emphasis>: The only
-					tested version for now is version 1.54.0! Other
-					versions of Boost may work or not..
+					tested version for now is version 1.55.0! Other
+					versions of Boost may work or not work..
 				</para>
 
 			</sect3>

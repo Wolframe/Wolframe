@@ -487,17 +487,17 @@ We don't use the CSW boost packages.
 
 As long you don't need ICU support you can build Boost as follows:
 
-First apply all patches found in packaging/patches/Solaris/1.54.0.
+First apply all patches found in packaging/patches/Solaris/1.55.0.
 
 Then build boost with:
 
-        ./bootstrap.sh --prefix=/opt/csw/boost-1.54.0 \
+        ./bootstrap.sh --prefix=/opt/csw/boost-1.55.0 \
                 --with-libraries=thread,filesystem,system,program_options,date_time
         ./b2 -a -d2 install
 
 
-Note: The only tested version for now is version 1.54.0! Other versions of
-Boost may work or not..
+Note: The only tested version for now is version 1.55.0! Other versions of
+Boost may work or not work..
 
 Solaris 10
 
@@ -1517,18 +1517,18 @@ icu_source_common_uposixdefs_h.patch), then build ICU with:
 
 Then build Boost as follows:
 
-First apply all patches found in packaging/patches/Solaris/1.54.0.
+First apply all patches found in packaging/patches/Solaris/1.55.0.
 
 Then build boost with:
 
-        ./bootstrap.sh --prefix=/opt/csw/boost-1.54.0 \
+        ./bootstrap.sh --prefix=/opt/csw/boost-1.55.0 \
                 --with-icu=/opt/csw/icu4c-51.2 \
                 --with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
         ./b2 -a -sICU_PATH=/opt/csw/icu4c-51.2 -d2 install
 
 
-Note: The only tested version for now is version 1.54.0! Other versions of
-Boost may work or not..
+Note: The only tested version for now is version 1.55.0! Other versions of
+Boost may work or not work..
 
 Solaris 10
 
