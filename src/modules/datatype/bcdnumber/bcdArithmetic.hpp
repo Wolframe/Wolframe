@@ -65,6 +65,7 @@ public:
 	BigBCD( const BigBCD& o);
 	~BigBCD();
 
+	BigBCD& operator=( const BigBCD& o)		{copy( o, 0); return *this;}
 	void init( const BigBCD& o)			{copy( o, 0);}
 	void init( const std::string& str);
 	void init( const char* str, std::size_t strsize);

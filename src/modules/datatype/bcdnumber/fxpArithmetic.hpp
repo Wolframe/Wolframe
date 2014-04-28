@@ -54,7 +54,7 @@ public:
 	BigFxpBCD( const BigNumber& num);
 	BigFxpBCD( const std::string& numstr);
 
-	std::string format( unsigned int scale_);
+	BigFxpBCD format( unsigned int scale_);
 
 	BigFxpBCD round( const BigFxpBCD& gran);
 
@@ -88,6 +88,9 @@ public:
 
 	bool sign() const					{return m_bcd.sign();}
 	void invert_sign()					{m_bcd.invert_sign();}
+	unsigned int nof_digits() const				{return (unsigned int)m_bcd.nof_digits();}
+	unsigned int scale() const				{return m_scale;}
+	void setScale( unsigned int scale_);
 
 private:
 	void initFromString( const std::string& numstr);

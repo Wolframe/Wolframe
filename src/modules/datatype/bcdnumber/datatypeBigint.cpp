@@ -36,6 +36,17 @@
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
+BigintDataInitializer::BigintDataInitializer( const std::vector<types::Variant>& arg)
+	:m_max_digits(std::numeric_limits<unsigned int>::max())
+{
+	if (arg.size() > 1) throw std::runtime_error("too many arguments for big bcd number initializer");
+	if (arg.size() == 0) return;
+
+	types::Variant::Data::Int a1 = arg.at(0).touint();
+	if (a1 >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("max digits argument out of range for big bcd number initializer");
+	m_max_digits = (unsigned int)a1;
+}
+
 types::Variant BigintDataType::add( const CustomDataValue& operand_, const Variant& arg)
 {
 	const BigintDataValue* op = reinterpret_cast<const BigintDataValue*>(&operand_);
@@ -192,4 +203,10 @@ void BigintDataValue::assign( const Variant& o)
 			types::BigBCD::init( o.charptr(), o.charsize());
 			break;
 	}
+	unsigned int nn = (unsigned int)types::BigBCD::nof_digits();
+	if (nn > m_max_digits)
+	{
+		throw std::runtime_error( "to many digits in big bcd integer number");
+	}
 }
+

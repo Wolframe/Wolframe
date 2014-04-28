@@ -37,6 +37,30 @@
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
+BigfxpDataInitializer::BigfxpDataInitializer( const std::vector<types::Variant>& arg)
+	:m_max_integer_digits(std::numeric_limits<unsigned int>::max())
+	,m_max_fractional_digits(std::numeric_limits<unsigned int>::max())
+{
+	if (arg.size() > 2) throw std::runtime_error("too many arguments for big fixed point number initializer");
+	if (arg.size() == 0) return;
+	if (arg.size() == 1)
+	{
+		types::Variant::Data::Int a1 = arg.at(0).touint();
+		if (a1 >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("max fractional digits argument out of range for big fixed point number initializer");
+		m_max_fractional_digits = (unsigned int)a1;
+	}
+	else
+	{
+		types::Variant::Data::Int a1 = arg.at(0).touint();
+		if (a1 >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("max integer digits argument out of range for big fixed point number initializer");
+		m_max_integer_digits = (unsigned int)a1;
+
+		types::Variant::Data::Int a2 = arg.at(1).touint();
+		if (a2 >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("max fractional digits argument out of range for big fixed point number initializer");
+		m_max_fractional_digits = (unsigned int)a2;
+	}
+}
+
 types::Variant BigfxpDataType::add( const CustomDataValue& operand, const Variant& arg)
 {
 	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
@@ -215,6 +239,20 @@ void BigfxpDataValue::assign( const Variant& o)
 		case Variant::String:
 			types::BigFxpBCD::operator=( o.tostring());
 			break;
+	}
+	unsigned int prec = (unsigned int)types::BigFxpBCD::nof_digits();
+	unsigned int scal = (unsigned int)types::BigFxpBCD::scale();
+	if (prec - scal > m_max_integer_digits)
+	{
+		throw std::runtime_error( "to many integer digits in bcd fixed point number");
+	}
+	if (scal > m_max_fractional_digits)
+	{
+		throw std::runtime_error( "to many fractional digits in bcd fixed point number");
+	}
+	if (m_max_fractional_digits != std::numeric_limits<unsigned int>::max())
+	{
+		BigFxpBCD::setScale( m_max_fractional_digits);
 	}
 }
 

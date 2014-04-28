@@ -200,6 +200,15 @@ double BigFxpBCD::todouble() const
 	return boost::lexical_cast<double>( tostring());
 }
 
+void BigFxpBCD::setScale( unsigned int scale_)
+{
+	if (scale_ != m_scale)
+	{
+		m_bcd = m_bcd.shift( (int)scale_ - (int)m_scale);
+		m_scale = scale_;
+	}
+}
+
 int BigFxpBCD::compare( const BigFxpBCD& o) const
 {
 	if (o.m_scale == m_scale)
@@ -237,7 +246,6 @@ BigFxpBCD BigFxpBCD::operator *( const BigFxpBCD& o) const
 {
 	BigBCD val( m_bcd.operator*( o.m_bcd));
 	BigFxpBCD rt( val, m_scale + o.m_scale);
-	/*[-]*/std::cout << tostring() << " * " << o.tostring() << " = " << rt.tostring() << std::endl;
 	return rt;
 }
 
@@ -309,23 +317,18 @@ BigFxpBCD BigFxpBCD::operator -() const
 	return rt;
 }
 
-std::string BigFxpBCD::format( unsigned int scale_)
+BigFxpBCD BigFxpBCD::format( unsigned int scale_)
 {
-	if (scale_ > m_scale)
+	if (scale_ != m_scale)
 	{
-		return tostring() + std::string( scale_ - m_scale, '0');
-	}
-	else if (scale_ < m_scale)
-	{
-		std::string rt = tostring();
-		std::size_t sizeredu = (m_scale - scale_);
-		if (sizeredu > rt.size()) throw std::runtime_error("internal: format error in BigFxpBCD");
-		rt.resize( rt.size() - sizeredu);
+		BigFxpBCD rt;
+		rt.m_bcd = m_bcd.shift( (int)scale_ - (int)m_scale);
+		rt.m_scale = scale_;
 		return rt;
 	}
 	else
 	{
-		return tostring();
+		return *this;
 	}
 }
 

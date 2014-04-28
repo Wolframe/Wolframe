@@ -42,6 +42,27 @@
 namespace _Wolframe {
 namespace types {
 
+class BigfxpDataInitializer
+	:public CustomDataInitializer
+{
+public:
+	explicit BigfxpDataInitializer( const std::vector<types::Variant>& arg);
+	virtual ~BigfxpDataInitializer(){}
+
+	unsigned int max_integer_digits() const		{return m_max_integer_digits;}
+	unsigned int max_fractional_digits() const	{return m_max_fractional_digits;}
+
+	static CustomDataInitializer* create( const std::vector<types::Variant>& arg)
+	{
+		if (arg.size() == 0) return 0;
+		return new BigfxpDataInitializer( arg);
+	}
+
+private:
+	unsigned int m_max_integer_digits;
+	unsigned int m_max_fractional_digits;
+};
+
 class BigfxpDataValue
 	:public CustomDataValue
 	,public types::BigFxpBCD
@@ -49,10 +70,15 @@ class BigfxpDataValue
 public:
 	///\brief Copy constructor
 	BigfxpDataValue( const BigfxpDataValue& o)
-		:CustomDataValue(o),types::BigFxpBCD(o){}
+		:CustomDataValue(o)
+		,types::BigFxpBCD(o)
+		,m_max_integer_digits(o.m_max_integer_digits)
+		,m_max_fractional_digits(o.m_max_fractional_digits){}
 
-	BigfxpDataValue()
-		:types::BigFxpBCD(){}
+	BigfxpDataValue( const BigfxpDataInitializer* ini)
+		:types::BigFxpBCD()
+		,m_max_integer_digits(ini?ini->max_integer_digits():std::numeric_limits<unsigned int>::max())
+		,m_max_fractional_digits(ini?ini->max_fractional_digits():std::numeric_limits<unsigned int>::max()){}
 
 	virtual ~BigfxpDataValue(){};
 
@@ -71,10 +97,15 @@ public:
 		return new BigfxpDataValue( *this);
 	}
 
-	static CustomDataValue* create( const CustomDataInitializer*)
+	static CustomDataValue* create( const CustomDataInitializer* ini_)
 	{
-		return new BigfxpDataValue();
+		const BigfxpDataInitializer* ini = reinterpret_cast<const BigfxpDataInitializer*>(ini_);
+		return new BigfxpDataValue( ini);
 	}
+
+private:
+	unsigned int m_max_integer_digits;
+	unsigned int m_max_fractional_digits;
 };
 
 
@@ -83,7 +114,7 @@ class BigfxpDataType
 {
 public:
 	BigfxpDataType( const std::string& name_)
-		:CustomDataType(name_,&BigfxpDataValue::create)
+		:CustomDataType(name_,&BigfxpDataValue::create,&BigfxpDataInitializer::create)
 	{
 		define( Add, &add);
 		define( Subtract, &subtract);

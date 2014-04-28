@@ -68,5 +68,4 @@ function run()
 	inp_ = input:table()
 	output:print( inp)
 end
-**output
 **end
