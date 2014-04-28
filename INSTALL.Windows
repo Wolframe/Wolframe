@@ -106,6 +106,13 @@ For building the documentation and manpages you need:
   * hhc.exe, help compiler from the 'HTML Help Workshop', http://
     msdn.microsoft.com/en-us/library/windows/desktop/ms670169%28v=vs.85%29.aspx
 
+For building the wolfclient you need:
+
+  * Qt 4.6.x or later, or Qt 5, http://qt-project.org/
+
+  * For secure communication between the wolfclient and the Wolframe server you
+    need the OpenSSL library 0.9.7 or newer, http://www.openssl.org
+
 1.2. Basic build instructions
 
 Wolframe can be build in a Visual Studio command line (or better a Platform SDK
@@ -869,4 +876,6 @@ config.mk:
 
         DOXYGEN = C:\Doxygen\bin\doxygen.exe
 
+
+1.21. Building the wolfclient
 

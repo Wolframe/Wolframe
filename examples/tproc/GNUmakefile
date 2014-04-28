@@ -33,8 +33,7 @@ INCLUDE_LIBS = \
 	-lwolframe_langbind \
 	-lwolftest \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(LIBS_DL) $(LIBS_LT)
-
+	$(LIBS_DL) $(LIBS_LT) $(LIBS_NET)
 
 # openssl
 ifeq ($(WITH_SSL),1)

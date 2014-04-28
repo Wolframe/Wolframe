@@ -178,6 +178,8 @@
 				</para>
 			</listitem>
 		</itemizedlist>
+
+		&InstallationSourceWindowsClientPrereq;
 		
 		</sect2>
 	
@@ -1514,6 +1516,11 @@
 				</programlisting>
 			</para>
 		</sect2>			
+
+<!-- Wolfclient -->
+		<sect2>
+			&InstallationSourceWindowsClient;
+		</sect2>
 
 	</sect1>
 

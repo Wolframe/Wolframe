@@ -1,0 +1,238 @@
+<title>Building the wolfclient</title>
+		
+<para>
+	The <application>wolfclient</application> is a Qt-based client
+	for the <application>Wolframe</application> server.
+</para>	
+
+<para>
+	You build it for Qt 4 with:
+	
+	<programlisting language='shell'>
+	C:\Qt\4.8.1\bin\qmake.exe -config debug -recursive
+	nmake
+	</programlisting>
+
+	respectively for a release version:
+	
+	<programlisting language='shell'>
+	C:\Qt\4.8.1\bin\qmake.exe -config release -recursive
+	nmake
+	</programlisting>
+</para>
+
+<para>
+	You build it for Qt 5 with:
+	
+	<programlisting language='shell'>
+	C:\Qt\Qt5.2.1\5.2.1\msvc2010\bin\qmake.exe -config debug -recursive
+	nmake
+	</programlisting>
+
+	respectively for a release version:
+	
+	<programlisting language='shell'>
+	C:\Qt\Qt5.2.1\5.2.1\msvc2010\bin\qmake.exe -config release -recursive
+	nmake
+	</programlisting>
+</para>
+
+<para>
+	If you want SSL support you have to download or build OpenSSL
+	and rebuild Qt 4 or Qt 5 with SSL support:
+</para>
+
+<!-- SSL -->
+		<sect2>
+			<title>Secure Socket Layer (SSL)</title>
+
+			<para>
+				The <application>Wolframe</application> protocol can
+				be secured with SSL. Currently only OpenSSL
+				(<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>)
+				is supported.
+			
+			</para>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: No matter whether you
+				use the precompiled version or if you build OpenSSL on your own
+				use the 0.9.8, 1.0.0 or 1.0.1g versions, but not  the version
+				1.0.1 through 1.0.1f (Heartbleed bug)!
+			</para>
+
+			<sect3>
+				<title>Use prebuild version of OpenSSL</title>
+			
+				<para>
+					
+					You can get a prebuilt version of OpenSSL from
+					<ulink url="http://www.slproweb.com/products/Win32OpenSSL.html">http://www.slproweb.com/products/Win32OpenSSL.html</ulink>.
+					Despite the name you get also 64-bit versions there.
+				</para>
+				
+				<para>
+					Install the developer version (for instance <filename>Win32OpenSSL-1_0_1g.exe</filename>)
+					for instance to <filename>C:\OpenSSL-Win32</filename>.
+				</para>
+				
+				<para>
+					Do not copy the OpenSSL binaries to the Windows system directory, copy
+					them to the Bin subdirectory of the OpenSSL installation directory!
+				</para>
+
+				<para>
+					Set the "BOOST_XXX" variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	OPENSSL_DIR = C:\OpenSSL-Win32
+					</programlisting>
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Build your own version of OpenSSL</title>
+				
+				<para>
+					You need the community edition of ActivePerl from
+					<ulink url="http://www.activestate.com/activeperl/">http://www.activestate.com/activeperl/</ulink>.
+					Install it for instance to <filename>C:\Perl</filename>.
+				</para>
+
+				<para>
+					You will also need NASM to assemble certain
+					parts of OpenSSL. You can get a Windows NASM from
+					<ulink url="http://www.nasm.us/">http://www.nasm.us/</ulink>.
+					Install it for instance to <filename>C:\nasm</filename>.
+				</para>
+
+				<para>
+					Make sure the Perl interpreter and the NASM assembler are part of the path in
+					the shell you want to build OpenSSL:
+					
+					<programlisting language='shell'>
+	Set PATH=%PATH%;C:\Perl\bin;C:\nasm
+					</programlisting>
+				</para>
+								
+				<para>
+					Get the source package <filename>openssl-1.0.1g.tar.gz</filename> of OpenSSL from
+					<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>.
+				</para>
+				
+				<para>
+					Configure the package with:
+					
+					<programlisting language='shell'>
+	perl Configure debug-VC-WIN32 \
+		--prefix="C:\openssl-1.0.1g-win32-debug"
+					</programlisting>
+					
+					for a debug version, respectively with:
+					
+					<programlisting language='shell'>
+	perl Configure VC-WIN32 \
+		--prefix="C:\openssl-1.0.1g-win32-release"
+					</programlisting>
+					
+					for a release version.
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					Make sure there prefix you choose has no spaces in it!
+				</para>
+				
+				<para>
+					Prepare OpenSSL for NASM support with:
+					
+					<programlisting language='shell'>
+	ms\do_nasm.bat
+					</programlisting>
+				</para>
+				
+				<para>
+					Build and install OpenSSL now with:
+					<programlisting language='shell'>
+	nmake /f ms\ntdll.mak
+	nmake /f ms\ntdll.mak install
+					</programlisting>
+				</para>
+				
+				<para>
+					More build information is available
+					in <filename>INSTALL.W32</filename> and
+					<filename>INSTALL.W64</filename> of the 
+					OpenSSL package itself.
+				</para>
+				
+			</sect3>
+
+		</sect2>
+
+<!-- Qt -->
+
+		<sect2>
+			<title>Qt libraries</title>
+
+			<sect3>
+				<title>Use prebuild version of Qt</title>
+				
+				<para>
+					Make sure you download the correct Qt package fitting your
+					architecture and Microsoft Visual Studio version.
+				</para>
+
+				<para>
+					If you take the prebuild Qt libraries you have to disable the
+					building of SSL-enabled code by removing the
+					'WITH_SSL=1' definition in the 'DEFINES' directive in
+					<filename>libqtwolfclient/libqtwolfclient.pro</filename>.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Build your own version of Qt</title>
+
+				<para>
+					Set the following environment variables in order for Qt to
+					find the OpenSSL header files and libraries:\
+					
+					<programlisting language='shell'>
+	set OPENSSL_DIR=C:\openssl-1.0.1g-win32-debug
+	set INCLUDE=%INCLUDE%;%OPENSSL_DIR%\include
+	set LIB=%LIB%;%OPENSSL_DIR%\lib
+					</programlisting>
+					
+					or for the release version:
+					
+					<programlisting language='shell'>
+	set OPENSSL_DIR=C:\openssl-1.0.1g-win32-release
+	set INCLUDE=%INCLUDE%;%OPENSSL_DIR%\include
+	set LIB=%LIB%;%OPENSSL_DIR%\lib
+					</programlisting>
+					
+				</para>
+				
+				<para>
+					Compile Qt with OpenSSL enabled:
+					
+					<programlisting language='shell'>
+	configure -platform win32-msvc2010 -debug -openssl
+	nmake
+					</programlisting>
+				</para>
+				
+				<para>
+					For a release version use:
+
+					<programlisting language='shell'>
+	configure -platform win32-msvc2010 -release -openssl
+	nmake
+					</programlisting>
+				</para>
+				
+			</sect3>
+		</sect2>
+		

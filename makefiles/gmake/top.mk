@@ -95,6 +95,11 @@ endif
 	@echo "Full C++ compilation flags: $(ALL_CXXFLAGS)"
 	@echo "Global linker flags: $(ALL_LDFLAGS)"
 	@echo "Global libraries: $(LIBS)"
+	@echo "Libraries for module loading via dlopen: $(LIBS_DL)"
+	@echo "Libraries for networking: $(LIBS_NET)"
+	@echo "Compilation flags for i18n support: $(INCLUDE_FLAGS_LT)"
+	@echo "Linking flags for i18n support: $(LDFLAGS_LT)"
+	@echo "Libraries for i18n support: $(LIBS_LT)"
 	@echo
 	@echo "Required Dependencies:"
 	@echo
