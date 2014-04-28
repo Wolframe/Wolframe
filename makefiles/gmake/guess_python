@@ -46,6 +46,10 @@ else
 			# /usr/local/lib is not in the compiler search path
 			PYTHON_LDFLAGS="$PYTHON_LDFLAGS -L/usr/local/lib"
 			;;
+		FreeBSD*10*)
+			# /usr/local/lib is not in the compiler search path
+			PYTHON_LDFLAGS="$PYTHON_LDFLAGS -L/usr/local/lib"
+			;;
 	esac
 
 	# generate the makefile snippet with conditional variables
