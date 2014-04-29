@@ -434,7 +434,7 @@ Ubuntu 13.04
 Currently libboost breaks in enable_if template, compile your own Boost version
 here.
 
-Ubuntu 13.10
+Ubuntu 13.10 and 14.04
 
 You need the following packages: 'libboost-dev',
 'libboost-program-options-dev', 'libboost-filesystem-dev',
@@ -700,9 +700,9 @@ For Centos/RHEL/SciLi 5 you can choose between the 'postgresql-devel'package
 (which is version 8.1) or the 'postgresql84-devel' package. The 8.4 version is
 recommended over 8.1.
 
-For running the Postgresql tests you need a fully function 'postgresql-server'
-with a db user 'wolfusr' (password: 'wolfpwd') owning a database called
-'wolframe'.
+For running the Postgresql tests you need a fully functional
+'postgresql-server' with a db user 'wolfusr' (password: 'wolfpwd') owning a
+database called 'wolframe'.
 
 Setting up a test user in PostgreSQL is done with:
 
@@ -719,6 +719,8 @@ You need the 'libpq-dev' package.
 
 For running the PostgreSQL database tests you also need the 'postgresql-client'
 package.
+
+You also need a fully functional PostgreSQL server, package 'postgresql'.
 
 openSUSE, SLES and similar Linux distributions
 
@@ -1201,7 +1203,7 @@ Debian, Ubuntu and similar Linux distributions
 
 You need the 'zlib1g-dev' and 'libpng12-dev' packages to build libhpdf.
 
-You can also try to use the 'libhpdf-devel' package.
+You can also try to use the 'libhpdf-dev' package.
 
 openSUSE, SLES and similar Linux distributions
 
@@ -1452,7 +1454,7 @@ Ubuntu 13.04
 The official Boost packages have problems. Build your own Boost version with
 ICU support here.
 
-Ubuntu 13.10
+Ubuntu 13.10 and 14.04
 
 You need 'libboost-locale-dev' package.
 
