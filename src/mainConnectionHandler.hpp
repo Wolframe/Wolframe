@@ -35,54 +35,13 @@
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #include "system/connectionHandler.hpp"
-#include "cmdbind/commandHandler.hpp"
-#include "cmdbind/lineCommandHandler.hpp"
-#include "cmdbind/doctypeFilterCommandHandler.hpp"
-#include "processor/procProviderInterface.hpp"
-#include "processor/execContext.hpp"
-#include "mainConnectionHandler_auth.hpp"
+#include "mainCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "types/keymap.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace proc {
-
-class MainCommandHandler
-	:public cmdbind::LineCommandHandlerTemplate<MainCommandHandler>
-{
-public:
-	typedef cmdbind::LineCommandHandlerTemplate<MainCommandHandler> Parent;
-	MainCommandHandler();
-	virtual ~MainCommandHandler(){}
-
-public:
-	int doAuth( int argc, const char** argv, std::ostream& out);
-
-	int doMech( int argc, const char** argv, std::ostream& out);
-	int endMech( cmdbind::CommandHandler* ch, std::ostream& out);
-
-	int doRequest( int argc, const char** argv, std::ostream& out);
-	int endRequest( cmdbind::CommandHandler* ch, std::ostream& out);
-
-	int doInterface( int argc, const char** argv, std::ostream& out);
-	int endInterface( cmdbind::CommandHandler* ch, std::ostream& out);
-
-	int doCapabilities( int argc, const char** argv, std::ostream& out);
-	int doQuit( int argc, const char** argv, std::ostream& out);
-
-	int endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out);
-	int endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out);
-
-private:
-	bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out);
-
-private:
-	AuthMechanisms m_authMechanisms;
-	std::string m_command;
-	std::string m_commandtag;
-};
-
 
 /// The connection handler
 class Connection : public net::ConnectionHandler

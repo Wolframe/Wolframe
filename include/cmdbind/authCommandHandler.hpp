@@ -38,6 +38,7 @@
 
 #include "cmdbind/lineCommandHandler.hpp"
 #include "AAAA/authentication.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -48,7 +49,7 @@ class AuthCommandHandler
 	:public cmdbind::CommandHandler
 {
 public:
-	explicit AuthCommandHandler( AAAA::Authenticator* authenticator_);
+	explicit AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_);
 	virtual ~AuthCommandHandler();
 
 	const AAAA::User& user() const
@@ -105,20 +106,20 @@ private:
 		};
 		return ar[i];
 	}
-	AAAA::Authenticator* m_authenticator;	///< authenticator object reference owned by this
-	protocol::InputBlock m_input;		///< protocol input buffer
-	protocol::InputBlock::iterator m_eoD;	///< input end of data marker
-	std::size_t m_itrpos;			///< read start position in buffer for the command handler
+	boost::shared_ptr<AAAA::Authenticator> m_authenticator;	///< authenticator object reference
+	protocol::InputBlock m_input;				///< protocol input buffer
+	protocol::InputBlock::iterator m_eoD;			///< input end of data marker
+	std::size_t m_itrpos;					///< read start position in buffer for the command handler
 
-	char* m_outputbuf;			///< protocol output buffer
-	std::size_t m_outputbufsize;		///< protocol output buffer allocation size
-	std::size_t m_outputbufpos;		///< protocol output buffer start of data chunk
+	char* m_outputbuf;					///< protocol output buffer
+	std::size_t m_outputbufsize;				///< protocol output buffer allocation size
+	std::size_t m_outputbufpos;				///< protocol output buffer start of data chunk
 
-	State m_state;				///< processing state of the command handler
-	std::string m_readbuffer;		///< buffer for chunkwise network read
-	std::size_t m_readpos;			///< current position in buffer for chunkwise network read
-	std::string m_writebuffer;		///< buffer for chunkwise network write
-	std::size_t m_writepos;			///< current position in buffer for chunkwise network write
+	State m_state;						///< processing state of the command handler
+	std::string m_readbuffer;				///< buffer for chunkwise network read
+	std::size_t m_readpos;					///< current position in buffer for chunkwise network read
+	std::string m_writebuffer;				///< buffer for chunkwise network write
+	std::size_t m_writepos;					///< current position in buffer for chunkwise network write
 };
 
 }} //namespace

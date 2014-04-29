@@ -38,7 +38,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
-AuthCommandHandler::AuthCommandHandler( AAAA::Authenticator* authenticator_)
+AuthCommandHandler::AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_)
 	:m_authenticator(authenticator_)
 	,m_itrpos(0)
 	,m_outputbuf(0)
@@ -51,10 +51,9 @@ AuthCommandHandler::AuthCommandHandler( AAAA::Authenticator* authenticator_)
 
 AuthCommandHandler::~AuthCommandHandler()
 {
-	if (m_authenticator)
+	if (m_authenticator.get())
 	{
 		m_authenticator->close();
-		delete m_authenticator;
 	}
 }
 

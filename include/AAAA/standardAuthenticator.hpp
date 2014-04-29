@@ -49,7 +49,7 @@ public:
 	void close();
 
 	virtual std::vector<std::string> mechs() const;
-	virtual void chooseMech( const std::string& mech) const;
+	virtual bool chooseMech( const std::string& mech) const;
 
 	// From the FSM interface
 	void receiveData( const void* data, std::size_t size );

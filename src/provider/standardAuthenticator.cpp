@@ -54,8 +54,16 @@ std::vector<std::string> StandardAuthenticator::mechs() const
 	return rt;
 }
 
-void StandardAuthenticator::chooseMech( const std::string& /*mech*/) const
+bool StandardAuthenticator::chooseMech( const std::string& mech) const
 {
+	if (boost::algorithm::iequals( mech, "NONE" ))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void StandardAuthenticator::close()

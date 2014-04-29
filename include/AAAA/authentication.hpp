@@ -78,7 +78,7 @@ public:
 	/// \brief Get the next operation
 	virtual Operation nextOperation()
 	{
-		throw std::logic_error( "not implemented");
+		return FSM::Operation::CLOSE;
 	}
 
 	/// \brief Get the message of a WRITE operation
@@ -107,9 +107,9 @@ public:
 		throw std::logic_error( "not implemented");
 	}
 
-	virtual void chooseMech( const std::string& /*mech*/) const
+	virtual bool chooseMech( const std::string& /*mech*/) const
 	{
-		throw std::logic_error( "not implemented");
+		return false;
 	}
 };
 

@@ -68,6 +68,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	wolfilterCommandLine.o \
 	wolfilterIostreamFilter.o \
 	wolfwizardCommandLine.o \
+	mainCommandHandler.o \
 	mainConnectionHandler.o \
 	interfaceCommandHandler.o \
 	loadModules.o \

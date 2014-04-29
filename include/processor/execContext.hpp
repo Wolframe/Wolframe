@@ -72,7 +72,7 @@ public:
 	void setAuthorizer( const AAAA::Authorizer* a)		{m_authorizer = a;}
 
 	/// \brief Get an authenticator
-	const AAAA::Authenticator* authenticator() const	{return m_aaaaProvider?m_aaaaProvider->authenticator():0;}
+	AAAA::Authenticator* authenticator() const		{return m_aaaaProvider?m_aaaaProvider->authenticator():0;}
 
 	/// \brief Checks if a function tagged with AUTHORIZE( authorizationFunction, authorizationResource) is allowed to be executed
 	bool checkAuthorization( const std::string& /*authorizationFunction*/, const std::string& /*authorizationResource*/)
