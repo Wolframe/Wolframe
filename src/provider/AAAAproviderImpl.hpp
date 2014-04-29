@@ -134,11 +134,11 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator()		{ return m_authenticator.authenticator(); }
-	Authorizer* authorizer()		{ return m_authorizer.authorizer(); }
+	Authorizer* authorizer()		{ return m_authorizationProvider.authorizer(); }
 	Auditor* auditor()			{ return m_auditor.auditor(); }
 private:
 	AuthenticationFactory	m_authenticator;
-	AuthorizationProvider	m_authorizer;
+	AuthorizationProvider	m_authorizationProvider;
 	AuditProvider		m_auditor;
 };
 

@@ -125,11 +125,22 @@ void AuthCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTran
 
 void AuthCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	if (!m_input.gotEoD()) throw std::logic_error("EoD not consumed in authorization commmand handler");
-
-	std::size_t pos = m_eoD - m_input.begin();
-	begin = (const void*)(m_input.charptr() + pos);
-	nofBytes = m_input.pos() - pos;
+	if (m_input.gotEoD())
+	{
+		std::size_t pos = m_eoD - m_input.begin();
+		begin = (const void*)(m_input.charptr() + pos);
+		nofBytes = m_input.pos() - pos;
+	}
+	else
+	{
+		if (m_readbuffer.size() > m_input.size())
+		{
+			throw std::logic_error("data requested but EoD not consumed in authorization commmand handler");
+		}
+		std::memcpy( m_input.charptr(), m_readbuffer.c_str(), m_readbuffer.size());
+		m_input.setPos( nofBytes = m_readbuffer.size());		
+		begin = (const void*)m_input.charptr();
+	}
 }
 
 CommandHandler::Operation AuthCommandHandler::nextOperation()

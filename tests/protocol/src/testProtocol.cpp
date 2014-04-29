@@ -459,25 +459,58 @@ int main( int argc, char **argv)
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
 	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+	int argi = 1;
+	int tracelevel = 0;
 
 	if (argc >= 2)
 	{
-		if (std::strcmp( argv[1], "-h") == 0 || std::strcmp( argv[1], "--help") == 0)
+		if (argv[argi][0] == '-')
 		{
-			std::cerr << argv[0] << " (no arguments)" << std::endl;
-			return 0;
+			if (std::strcmp( argv[argi], "-h") == 0 || std::strcmp( argv[argi], "--help") == 0)
+			{
+				std::cerr << argv[0] << " [options]" << std::endl;
+				std::cerr << "\toption -t :(repeated) increment debug log level" << std::endl;
+				std::cerr << "\toption -h :print (this) help message and exit" << std::endl;
+				return 0;
+			}
+			else if (argv[argi][1] == 't')
+			{
+				tracelevel++;
+				unsigned int ii=1;
+				for (; argv[argi][ii+1] == 't'; ++ii)
+				{
+					tracelevel++;
+				}
+				if (argv[argi][ii+1] != '\0')
+				{
+					throw std::runtime_error( std::string("unknown option '") + argv[argi] + "' (use -h for getting the usage)");
+				}
+			}
+			else
+			{
+				throw std::runtime_error( std::string("unknown option '") + argv[argi] + "' (use -h for getting the usage)");
+			}
 		}
-		else if (argc == 2)
+		else if (argc == argi+1)
 		{
-			g_selectedTestName = argv[ 1];
+			g_selectedTestName = argv[ argi];
 		}
 		else
 		{
-			std::cerr << "Too many arguments (expected no arguments)" << std::endl;
+			std::cerr << "Too many arguments  " << std::endl;
 			return 1;
 		}
 	}
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV);
+
+	_Wolframe::log::LogLevel::Level loglevel = _Wolframe::log::LogLevel::LOGLEVEL_WARNING;
+	if (tracelevel >= 1) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_INFO;
+	if (tracelevel >= 2) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG;
+	if (tracelevel >= 3) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_TRACE;
+	if (tracelevel >= 4) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA;
+	if (tracelevel >= 5) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA2;
+	_Wolframe::log::LogBackend::instance().setConsoleLevel( loglevel);
+
 	return RUN_ALL_TESTS();
 }
 

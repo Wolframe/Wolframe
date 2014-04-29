@@ -68,7 +68,6 @@ bool StandardAuthenticator::chooseMech( const std::string& mech) const
 
 void StandardAuthenticator::close()
 {
-	delete this;
 }
 
 // The FSM interface functions

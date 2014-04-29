@@ -96,7 +96,7 @@ public:
 	/// \brief Get reference to the user as result of authentication (called before close)
 	virtual User* user()
 	{
-		throw std::logic_error( "not implemented");
+		return 0;
 	}
 
 	/// \brief Close the authenticator and destroy all sensible data

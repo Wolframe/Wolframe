@@ -79,7 +79,7 @@ Auditor* AAAAprovider::auditor() const
 AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* conf,
 						    const module::ModulesDirectory* modules )
 	: m_authenticator( conf->m_authConfig, modules ),
-	  m_authorizer( conf->m_authzConfig, conf->m_authzDefault, modules ),
+	  m_authorizationProvider( conf->m_authzConfig, conf->m_authzDefault, modules ),
 	  m_auditor( conf->m_auditConfig, modules )
 {
 	// initialize the global rnd generator
@@ -92,7 +92,7 @@ bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db 
 	if ( !m_authenticator.resolveDB( db ))
 		return false;
 	LOG_DATA << "Resolving authorization databases";
-	if ( !m_authorizer.resolveDB( db ))
+	if ( !m_authorizationProvider.resolveDB( db ))
 		return false;
 	LOG_DATA << "Resolving audit databases";
 	if ( !m_auditor.resolveDB( db ))
