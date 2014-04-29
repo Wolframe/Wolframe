@@ -305,7 +305,7 @@ struct GlobalContext
 	void resetExecContext()
 	{
 		if (m_execContext) delete m_execContext;
-		m_execContext = new proc::ExecContext( m_processorProvider);
+		m_execContext = new proc::ExecContext( m_processorProvider, m_aaaaProvider);
 	}
 
 	proc::ExecContext* execContext()
