@@ -110,7 +110,7 @@ doc-towordml: WolfBook.docx
 	$(XSLT_TOWORDML) $< > $@
 
 %.txt: %.html
-	w3m -dump $< > $@
+	w3m -O ASCII -dump $< > $@
 
 # Installation Guide
 
