@@ -71,6 +71,7 @@
 			<member>FILTER</member>
 			<member>INPUT</member>
 			<member>OUTPUT</member>
+			<member>AUTHORIZE</member>
 			</simplelist>
 			</para>
 		</sect3>
@@ -181,6 +182,21 @@
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_filter_call_return.directmap" parse="text" />
 				</programlisting>
+			</para>
+		</sect3>
+		<sect3>
+			<title>Authorization checks</title>
+			<para>
+				We can tag a command to be allowed only after an authorization check.
+				The check denies command execution with an error if the login of the
+				user does not allow the execution of the command. The call is the same
+				as in TDL for example.
+				Authorization checks are triggered by the AUTHORIZE attribute with
+				one or two arguments as follows:
+				<itemizedlist>
+				<listitem><para><code>AUTHORIZE &lt;authfunc&gt;</code> or</para></listitem>
+				<listitem><para><code>AUTHORIZE &lt;authfunc&gt; &lt;resource&gt;</code></para></listitem>
+				</itemizedlist>
 			</para>
 		</sect3>
 		<sect3>

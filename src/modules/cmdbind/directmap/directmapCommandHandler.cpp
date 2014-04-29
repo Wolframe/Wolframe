@@ -76,6 +76,15 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	if (!execContext()) throw std::logic_error( "execution context is not defined");
 	const proc::ProcessorProviderInterface* provider = execContext()->provider();
 
+	// Check if we are allowed to execute the command:
+	if (!m_cmd->authfunction.empty())
+	{
+		if (!execContext()->checkAuthorization( m_cmd->authfunction, m_cmd->authresource))
+		{
+			throw std::runtime_error( std::string( "not authorized to execute command '") + m_name + "'");
+		}
+	}
+	// Initialize input form for validation if defined:
 	if (!m_cmd->inputform.empty())
 	{
 		const types::FormDescription* df = provider->formDescription( m_cmd->inputform);
@@ -85,6 +94,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		}
 		m_inputform.reset( new types::Form( df));
 	}
+	// Initialize output form for validation if defined:
 	if (!m_cmd->outputform.empty())
 	{
 		const types::FormDescription* df = provider->formDescription( m_cmd->outputform);
@@ -116,6 +126,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 			}
 		}
 	}
+	// Initialize input filter name as configured for this command:
 	std::string input_filtername;
 	std::vector<langbind::FilterArgument> input_filterarg;
 	if (m_cmd->inputfilter.empty())
@@ -127,6 +138,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		input_filtername = m_cmd->inputfilter;
 		input_filterarg = m_cmd->inputfilterarg;
 	}
+	// Initialize output filter name as configured for this command:
 	std::string output_filtername;
 	std::vector<langbind::FilterArgument> output_filterarg;
 	if (m_cmd->outputfilter.empty())
@@ -138,11 +150,13 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		output_filtername = m_cmd->outputfilter;
 		output_filterarg = m_cmd->outputfilterarg;
 	}
+	// Get the function to execute:
 	m_function = provider->formFunction( m_cmd->call);
 	if (!m_function)
 	{
 		throw std::runtime_error( std::string( "function not defined '") + m_cmd->call + "'");
 	}
+	// Initialize filter:
 	langbind::InputFilterR l_inputfilter;
 	langbind::OutputFilterR l_outputfilter;
 
@@ -225,7 +239,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		}
 		m_output_rootelement = m_cmd->outputrootelem;
 	}
-	// synchronize attributes:
+	// Synchronize attributes of filters:
 	m_outputfilter->setAttributes( m_inputfilter.get());
 
 	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));

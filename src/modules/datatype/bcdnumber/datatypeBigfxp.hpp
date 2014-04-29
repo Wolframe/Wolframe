@@ -36,7 +36,8 @@
 #define _CUSTOM_DATA_TYPE_BCD_BIGFXP_HPP_INCLUDED
 #include "types/customDataType.hpp"
 #include "types/variant.hpp"
-#include "bcdArithmetic.hpp"
+#include "fxpArithmetic.hpp"
+#include <limits>
 
 namespace _Wolframe {
 namespace types {
@@ -48,17 +49,18 @@ public:
 	explicit BigfxpDataInitializer( const std::vector<types::Variant>& arg);
 	virtual ~BigfxpDataInitializer(){}
 
-	unsigned int show_precision() const	{return m_show_precision;}
-	unsigned int calc_precision() const	{return m_calc_precision;}
+	unsigned int max_integer_digits() const		{return m_max_integer_digits;}
+	unsigned int max_fractional_digits() const	{return m_max_fractional_digits;}
 
 	static CustomDataInitializer* create( const std::vector<types::Variant>& arg)
 	{
+		if (arg.size() == 0) return 0;
 		return new BigfxpDataInitializer( arg);
 	}
 
 private:
-	unsigned int m_show_precision;
-	unsigned int m_calc_precision;
+	unsigned int m_max_integer_digits;
+	unsigned int m_max_fractional_digits;
 };
 
 class BigfxpDataValue
@@ -68,10 +70,15 @@ class BigfxpDataValue
 public:
 	///\brief Copy constructor
 	BigfxpDataValue( const BigfxpDataValue& o)
-		:CustomDataValue(o),types::BigFxpBCD(o){}
+		:CustomDataValue(o)
+		,types::BigFxpBCD(o)
+		,m_max_integer_digits(o.m_max_integer_digits)
+		,m_max_fractional_digits(o.m_max_fractional_digits){}
 
 	BigfxpDataValue( const BigfxpDataInitializer* ini)
-		:types::BigFxpBCD(ini->show_precision(),ini->calc_precision()){}
+		:types::BigFxpBCD()
+		,m_max_integer_digits(ini?ini->max_integer_digits():std::numeric_limits<unsigned int>::max())
+		,m_max_fractional_digits(ini?ini->max_fractional_digits():std::numeric_limits<unsigned int>::max()){}
 
 	virtual ~BigfxpDataValue(){};
 
@@ -95,6 +102,10 @@ public:
 		const BigfxpDataInitializer* ini = reinterpret_cast<const BigfxpDataInitializer*>(ini_);
 		return new BigfxpDataValue( ini);
 	}
+
+private:
+	unsigned int m_max_integer_digits;
+	unsigned int m_max_fractional_digits;
 };
 
 
@@ -108,9 +119,11 @@ public:
 		define( Add, &add);
 		define( Subtract, &subtract);
 		define( Multiply, &multiply);
-		define( Divide, &divide);
 		define( Negation, &negation);
 		define( ToDouble, &toDouble);
+		define( "round", &round);
+		define( "format", &format);
+		define( "divide", &divide);
 	}
 
 	static CustomDataType* create( const std::string& name)
@@ -122,9 +135,11 @@ private:
 	static types::Variant add( const CustomDataValue& operand, const Variant& arg);
 	static types::Variant subtract( const CustomDataValue& operand, const Variant& arg);
 	static types::Variant multiply( const CustomDataValue& operand, const Variant& arg);
-	static types::Variant divide( const CustomDataValue& operand, const Variant& arg);
 	static types::Variant negation( const CustomDataValue& operand);
 	static types::Variant toDouble( const CustomDataValue& operand);
+	static types::Variant format( const CustomDataValue& operand, const std::vector<types::Variant>& arg);
+	static types::Variant round( const CustomDataValue& operand, const std::vector<types::Variant>& arg);
+	static types::Variant divide( const CustomDataValue& operand, const std::vector<types::Variant>& arg);
 };
 
 }}//namespace

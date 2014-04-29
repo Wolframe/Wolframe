@@ -60,6 +60,8 @@ struct DirectmapCommandDescription
 		,inputform(o.inputform)
 		,outputform(o.outputform)
 		,outputrootelem(o.outputrootelem)
+		,authfunction(o.authfunction)
+		,authresource(o.authresource)
 		,skipvalidation_input(o.skipvalidation_input)
 		,skipvalidation_output(o.skipvalidation_output)
 		,output_doctype_standalone(o.output_doctype_standalone)
@@ -75,6 +77,8 @@ struct DirectmapCommandDescription
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
 	std::string outputrootelem;					//< name of the output root element (in case of SKIP and no form defined)
+	std::string authfunction;					//< authorization function name
+	std::string authresource;					//< authorization resource name
 	bool skipvalidation_input;					//< input is not validated
 	bool skipvalidation_output;					//< output is not validated but document is not standalone and is with doctype returned
 	bool output_doctype_standalone;					//< no document type defined (only root element). document is standalone

@@ -1,13 +1,11 @@
 OPEN SOURCE PRODUCT MUSTS:
 Core:
-	- Context for processors in provider (MBa & PF)
 	- AAAA stuff to a certain level (MBa, support for protocol PF)
 	- Client UI files from server with protocol support as ordinary wolframe function call - eliminate process specific stuff from core (PF & MBa)
 	- For different type of transactions (get UI files, process request, etc..) chose DB in context
 
 Processors:
 	- Python (ABa, with support PF)
-	- Custom data type documentation and BigFxp tests (PF)
 
 Fixes:
 	- Start SDK and splitting of graphix module and others

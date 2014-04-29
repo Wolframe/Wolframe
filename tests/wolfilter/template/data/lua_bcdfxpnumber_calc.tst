@@ -2,8 +2,8 @@ testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//'`.lua
 testscripts=$luascript					# list of scripts of the test
 testcmd="-c wolframe.conf run"				# command to execute by the test
-docin=doc/rand_bcdnumber_calc_input.txt			# input document name
-docout=doc/rand_bcdnumber_calc_output.txt		# output document name
+docin=doc/rand_bcdfxpnumber_calc_input.txt		# input document name
+docout=doc/rand_bcdfxpnumber_calc_output.txt		# output document name
 output="../data/$testname.tst"
 
 echo '**' > $output
@@ -23,7 +23,7 @@ Processor
 	{
 		lua
 		{
-			program bcdnumber_calc.lua
+			program bcdfxpnumber_calc.lua
 		}
 	}
 }

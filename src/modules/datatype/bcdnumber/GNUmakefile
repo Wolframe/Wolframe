@@ -20,6 +20,7 @@ DYNAMIC_MODULE = mod_datatype_bcdnumber.so
 
 CPP_OBJS = \
 	bcdArithmetic.o \
+	fxpArithmetic.o \
 	datatypeBigint.o \
 	datatypeBigfxp.o \
 	mod_datatype_bcdnumber.o

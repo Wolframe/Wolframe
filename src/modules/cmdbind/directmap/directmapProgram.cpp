@@ -218,11 +218,11 @@ static std::vector<langbind::FilterArgument> parseFilterArguments( std::string::
 
 enum Lexem
 {
-	IDENTIFIER,SKIP,STANDALONE,RETURN,CALL,FILTER,INPUT,OUTPUT,ILLEGAL
+	IDENTIFIER,SKIP,STANDALONE,RETURN,CALL,FILTER,INPUT,OUTPUT,AUTHORIZE
 };
 static const char* lexemName( Lexem i)
 {
-	static const char* ar[] = {"IDENTIFIER","SKIP","STANDALONE","RETURN","CALL","FILTER","INPUT","OUTPUT",0};
+	static const char* ar[] = {"IDENTIFIER","SKIP","STANDALONE","RETURN","CALL","FILTER","INPUT","OUTPUT","AUTHORIZE",0};
 	return ar[ (int)i];
 }
 Lexem lexemId( const std::string& id)
@@ -301,10 +301,12 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 	bool return_standalone = false;
 	bool input_filter_set = false;
 	bool output_filter_set = false;
-	enum State {ParseCommand,ParseInputDoctype,ParseAttribute,ParseAttributeFilter,ParseReturnArg,ParseFilter,ParseInputFilter,ParseOutputFilter};
+	bool authorize_set = false;
+	enum State {ParseCommand,ParseInputDoctype,ParseAttribute,ParseAttributeFilter,ParseReturnArg,ParseFilter,ParseInputFilter,ParseOutputFilter,ParseAuthorize};
+
 	State state = ParseCommand;
 	char ch;
-	Lexem lexem = ILLEGAL;
+	Lexem lexem = IDENTIFIER;
 
 	while (parseNextLexem( lexem, toklist, si, se))
 	{
@@ -408,11 +410,38 @@ static DirectmapCommandDescription parseCommandDescription( std::string::const_i
 					case FILTER:
 						if (input_filter_set || output_filter_set) throw std::runtime_error( "FILTER specified twice");
 						state = ParseFilter;
-						continue;			
-					case ILLEGAL:
-						throw std::logic_error( "Lexem has state ILLEGAL. Should not happen!");
+						continue;
+					case AUTHORIZE:
+						if (authorize_set) throw std::runtime_error( "AUTHORIZE specified twice");
+						state = ParseAuthorize;
+						continue;
 				}
-				throw std::runtime_error("SKIP,FILTER,CALL or RETURN expected instead of token");
+				throw std::runtime_error("SKIP,FILTER,CALL,AUTHORIZE or RETURN expected instead of token");
+
+			case ParseAuthorize:
+				if (lexem != IDENTIFIER) throw std::runtime_error( std::string("expected identifier after command and got keyword '") + lexemName(lexem) + "'");
+				if (toklist.size() > 2) throw std::runtime_error( "to many arguments for COMMAND");
+				if (toklist.size() == 2)
+				{
+					rt.authfunction = toklist.at(0);
+					rt.authresource = toklist.at(1);
+					state = ParseAttribute;
+					break;
+				}
+				else if (toklist.empty())
+				{
+					throw std::runtime_error( "expected nonempty argument for AUTHORIZE if specified");
+				}
+				else
+				{
+					rt.authfunction = toklist.at(0);
+					state = ParseAttribute;
+				}
+				if (rt.authfunction.empty())
+				{
+					throw std::runtime_error( "expected nonempty authorization function name after AUTHORIZE");
+				}
+				break;
 
 			case ParseReturnArg:
 				if (lexem == SKIP)
