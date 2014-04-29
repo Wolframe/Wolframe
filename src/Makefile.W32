@@ -54,6 +54,7 @@ LOCAL_STATIC_LIB = \
 PROVIDER_OBJS = \
 	provider\Authentication.obj \
 	provider\Authorization.obj \
+	provider\standardAuthenticator.obj \
 	provider\Audit.obj \
 	provider\AAAAproviderImpl.obj \
 	provider\AAAAproviderConfig.obj \

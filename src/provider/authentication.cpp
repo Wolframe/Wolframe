@@ -40,6 +40,7 @@
 #include "logger-v1.hpp"
 #include "boost/algorithm/string.hpp"
 #include "module/moduleDirectory.hpp"
+#include "AAAA/standardAuthenticator.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -90,37 +91,5 @@ Authenticator* AuthenticationFactory::authenticator()
 	return new StandardAuthenticator();
 }
 
-
-//*********************************************************************************
-// Standard authenticator
-StandardAuthenticator::StandardAuthenticator()
-{
-}
-
-StandardAuthenticator::~StandardAuthenticator()
-{
-}
-
-void StandardAuthenticator::close()
-{
-	delete this;
-}
-
-// The FSM interface functions
-// The input data.
-void StandardAuthenticator::receiveData( const void* /*data*/, std::size_t /*size*/ )
-{
-}
-
-// signal the FSM
-void StandardAuthenticator::signal( FSM::Signal /*event*/ )
-{
-}
-
-// Data not consumed.
-std::size_t StandardAuthenticator::dataLeft( const void*& /*begin*/ )
-{
-	return 0;
-}
-
 }} // namespace _Wolframe::AAAA
+

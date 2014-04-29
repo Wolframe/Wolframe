@@ -44,8 +44,9 @@ LOCAL_STATIC_LIB = \
 	libwolframed.a
 
 PROVIDER_OBJS = \
-	provider/Authentication.o \
+	provider/authentication.o \
 	provider/Authorization.o \
+	provider/standardAuthenticator.o \
 	provider/Audit.o \
 	provider/AAAAproviderImpl.o \
 	provider/AAAAproviderConfig.o \

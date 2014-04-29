@@ -51,21 +51,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-// Standard authentication class and authentication provider
-class StandardAuthenticator : public Authenticator
-{
-public:
-	StandardAuthenticator();
-	~StandardAuthenticator();
-	void close();
-
-	// From the FSM interface
-	void receiveData( const void* data, std::size_t size );
-	void signal( Signal event );
-	std::size_t dataLeft( const void*& begin );
-private:
-};
-
 class AuthenticationFactory
 {
 public:

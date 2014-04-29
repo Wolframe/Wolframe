@@ -30,62 +30,34 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// AAAA provider interface
-//
+/// \file standardAuthenticator.hpp
 
-#ifndef _AAAA_PROVIDER_HPP_INCLUDED
-#define _AAAA_PROVIDER_HPP_INCLUDED
-
-#include "authentication.hpp"
-#include "authorization.hpp"
-#include "audit.hpp"
-#include "config/configurationBase.hpp"
-#include <boost/noncopyable.hpp>
+#ifndef _WOLFRAME_STANDARD_AUTHENTICATOR_HPP_INCLUDED
+#define _WOLFRAME_STANDARD_AUTHENTICATOR_HPP_INCLUDED
+#include <string>
+#include "AAAA/authentication.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-class AAAAconfiguration : public config::ConfigurationBase
-{
-	friend class AAAAprovider;
-public:
-	/// x-structor
-	AAAAconfiguration();
-	~AAAAconfiguration();
-
-	/// methods
-	bool parse( const config::ConfigurationNode& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string					m_randomDevice;
-	std::list< config::NamedConfiguration* >	m_authConfig;
-	bool						m_authzDefault;
-	std::list< config::NamedConfiguration* >	m_authzConfig;
-	bool						m_mandatoryAudit;
-	std::list< config::NamedConfiguration* >	m_auditConfig;
-};
-
-class AAAAprovider : public boost::noncopyable
+// Standard authentication class and authentication provider
+class StandardAuthenticator : public Authenticator
 {
 public:
-	AAAAprovider( const AAAAconfiguration* conf,
-		      const module::ModulesDirectory* modules );
-	~AAAAprovider();
+	StandardAuthenticator();
+	~StandardAuthenticator();
+	void close();
 
-	bool resolveDB( const db::DatabaseProvider& db );
+	virtual std::vector<std::string> mechs() const;
+	virtual void chooseMech( const std::string& mech) const;
 
-	Authenticator* authenticator() const;
-	Authorizer* authorizer() const;
-	Auditor* auditor() const;
+	// From the FSM interface
+	void receiveData( const void* data, std::size_t size );
+	void signal( Signal event );
+	std::size_t dataLeft( const void*& begin );
 private:
-	class AAAAprovider_Impl;
-	AAAAprovider_Impl*	m_impl;
 };
 
-}} // namespace _Wolframe::AAAA
+}}//namespace
+#endif
 
-#endif // _AAAA_PROVIDER_HPP_INCLUDED

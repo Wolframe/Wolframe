@@ -164,8 +164,11 @@ TEST_F( WolfilterTest, tests)
 
 			db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
 			prgbind::ProgramLibrary prglib;
+
+			AAAA::AAAAprovider aaaaProvider( &cmdline.aaaaProviderConfig(), &cmdline.modulesDirectory());
 			proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &prglib);
-			proc::ExecContext execContext( &processorProvider);
+
+			proc::ExecContext execContext( &processorProvider, &aaaaProvider);
 
 			if (!processorProvider.resolveDB( databaseProvider))
 			{

@@ -35,6 +35,7 @@
 
 #include "utils/fileUtils.hpp"
 #include "processor/procProvider.hpp"
+#include "AAAA/AAAAprovider.hpp"
 #include "module/moduleDirectory.hpp"
 #include "mainConnectionHandler.hpp"
 #include "logger-v1.hpp"
@@ -256,37 +257,49 @@ struct GlobalContext
 			throw std::runtime_error( "Modules could not be loaded");
 		}
 
+		if (!m_aaaaProviderConfig.parse( m_config.root().getChild( "AAAA"), "", &m_modulesDirectory))
+		{
+			throw std::runtime_error( "AAAA provider configuration could not be parsed");
+		}
+		m_aaaaProviderConfig.setCanonicalPathes( m_referencePath);
+		if (!m_aaaaProviderConfig.check())
+		{
+			throw std::runtime_error( "error in AAAA provider configuration");
+		}
+
 		if (!m_dbProviderConfig.parse( m_config.root().getChild( "database"), "", &m_modulesDirectory))
 		{
-			throw std::runtime_error( "Database provider configuration could not be created from command line");
+			throw std::runtime_error( "database provider configuration could not be parsed");
 		}
 		m_dbProviderConfig.setCanonicalPathes( m_referencePath);
 		if (!m_dbProviderConfig.check())
 		{
-			throw std::runtime_error( "error in command line. failed to setup a valid database provider configuration");
+			throw std::runtime_error( "error in database provider configuration");
 		}
 
 		if (!m_procProviderConfig.parse( m_config.root().getChild( "Processor"), "", &m_modulesDirectory))
 		{
-			throw std::runtime_error( "Error in processor provider configuration");
+			throw std::runtime_error( "processor provider configuration could not be parsed");
 		}
 		m_procProviderConfig.setCanonicalPathes( m_referencePath);
 		if (!m_procProviderConfig.check())
 		{
-			throw std::runtime_error( "Invalid processor provider configuration");
+			throw std::runtime_error( "error in processor provider configuration");
 		}
 
 		// Load the modules, scripts, etc. defined in the command line into the global context:
+		m_aaaaProvider = new AAAA::AAAAprovider( &m_aaaaProviderConfig, &m_modulesDirectory);
 		m_databaseProvider = new db::DatabaseProvider( &m_dbProviderConfig, &m_modulesDirectory);
 		m_processorProvider = new proc::ProcessorProvider( &m_procProviderConfig, &m_modulesDirectory, &m_programLibrary);
-		m_execContext = new proc::ExecContext( m_processorProvider);
+		m_execContext = new proc::ExecContext( m_processorProvider, m_aaaaProvider);
 	}
 
 	~GlobalContext()
 	{
+		if (m_execContext) delete m_execContext;
 		if (m_databaseProvider) delete m_databaseProvider;
 		if (m_processorProvider) delete m_processorProvider;
-		if (m_execContext) delete m_execContext;
+		if (m_aaaaProvider) delete m_aaaaProvider;
 	}
 
 	void resetExecContext()
@@ -302,6 +315,7 @@ struct GlobalContext
 
 private:
 	types::PropertyTree m_config;
+	AAAA::AAAAconfiguration m_aaaaProviderConfig;
 	proc::ProcProviderConfig m_procProviderConfig;
 	db::DBproviderConfig m_dbProviderConfig;
 
@@ -310,6 +324,7 @@ private:
 	module::ModulesDirectory m_modulesDirectory;
 
 	prgbind::ProgramLibrary m_programLibrary;
+	AAAA::AAAAprovider* m_aaaaProvider;
 	db::DatabaseProvider* m_databaseProvider;
 	proc::ProcessorProvider* m_processorProvider;
 	proc::ExecContext* m_execContext;

@@ -78,29 +78,39 @@ public:
 	/// \brief Get the next operation
 	virtual Operation nextOperation()
 	{
-		throw std::logic_error( "not implemented");	
+		throw std::logic_error( "not implemented");
 	}
 
 	/// \brief Get the message of a WRITE operation
 	virtual Message getWriteMessage()
 	{
-		throw std::logic_error( "not implemented");	
+		throw std::logic_error( "not implemented");
 	}
 
 	/// \brief Put the answer of a READ request operation
 	virtual void putReadMessage( const Message&)
 	{
-		throw std::logic_error( "not implemented");	
+		throw std::logic_error( "not implemented");
 	}
 
 	/// \brief Get reference to the user as result of authentication (called before close)
 	virtual User* user()
 	{
-		throw std::logic_error( "not implemented");	
+		throw std::logic_error( "not implemented");
 	}
 
 	/// \brief Close the authenticator and destroy all sensible data
 	virtual void close(){}
+
+	virtual std::vector<std::string> mechs() const
+	{
+		throw std::logic_error( "not implemented");
+	}
+
+	virtual void chooseMech( const std::string& /*mech*/) const
+	{
+		throw std::logic_error( "not implemented");
+	}
 };
 
 
