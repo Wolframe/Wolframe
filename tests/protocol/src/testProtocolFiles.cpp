@@ -1,4 +1,4 @@
-#include "mainConnectionHandler.cpp"
+#include "mainCommandHandler.cpp"
 #include "interfaceCommandHandler.cpp"
 #include "moduleDirectory.cpp"
 #include "loadModules.cpp"
