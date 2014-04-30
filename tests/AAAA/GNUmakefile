@@ -31,15 +31,6 @@ CPP_OBJS = \
 	$(TOPDIR)/src/modules/authentication/database/DBauth.o \
 	$(TOPDIR)/src/modules/authentication/textfile/passwdFile.o
 
-# openssl
-
-ifeq ($(WITH_SSL),1)
-
-INCLUDE_LIBS += \
-	$(OPENSSL_LIBS)
-
-endif
-
 # PAM
 
 ifeq ($(WITH_PAM),1)
