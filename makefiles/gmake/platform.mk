@@ -338,7 +338,7 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 else
-$(error no recent enough boost package on Slackware before version 14.0, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on Slackware before version 14.0, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 endif
@@ -383,7 +383,7 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on Ubuntu 12.04, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on Ubuntu 12.04, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -394,7 +394,7 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on Ubuntu 10.04, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on Ubuntu 10.04, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -408,7 +408,7 @@ BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on Debian 6, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on Debian 6, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -448,7 +448,7 @@ BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on SLES, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on SLES, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -483,7 +483,7 @@ BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on RHEL 5, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on RHEL 5, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 endif
@@ -535,7 +535,7 @@ endif
 # SunOS
 
 ifeq "$(PLATFORM)" "SUNOS"
-$(error no recent enough boost package on Solaris, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on Solaris, compile your own version and set BOOST_DIR accordingly)
 endif
 
 # OpenSSL
@@ -2277,19 +2277,19 @@ LIBHPDF_LIBS ?= -lhpdf
 endif
 
 ifeq "$(LINUX_REV)" "13.04"
-$(error no recent enough libhpdf package on Ubuntu 13.04, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Ubuntu 13.04, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "12.10"
-$(error no recent enough libhpdf package on Ubuntu 12.10, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Ubuntu 12.10, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "12.04"
-$(error no recent enough libhpdf package on Ubuntu 12.04, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Ubuntu 12.04, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "10.04"
-$(error no recent enough libhpdf package on Ubuntu 10.04, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Ubuntu 10.04, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 endif
@@ -2298,12 +2298,12 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-$(error no recent enough libhpdf package on RHEL5, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on RHEL5, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-$(error no recent enough libhpdf package on RHEL6, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on RHEL6, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 # Fedora 19
@@ -2329,11 +2329,11 @@ endif
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
-$(error no recent enough libhpdf package on SLES, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on SLES, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
-$(error no recent enough libhpdf package on OpenSuSE, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on OpenSuSE, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 endif
@@ -2342,7 +2342,7 @@ endif
 
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
-$(error no recent enough libhpdf package on Solaris, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Solaris, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 endif
 
@@ -2350,10 +2350,10 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
-$(error no recent enough libhpdf package on FreeBSD 8, use WITH_LOCAL_LIBHPDF=1 instead)endif
+$(warning no recent enough libhpdf package on FreeBSD 8, use WITH_LOCAL_LIBHPDF=1 instead)endif
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
-$(error no recent enough libhpdf package on FreeBSD 9, use WITH_LOCAL_LIBHPDF=1 instead)endif
+$(warning no recent enough libhpdf package on FreeBSD 9, use WITH_LOCAL_LIBHPDF=1 instead)endif
 endif
 ifeq "$(OS_MAJOR_VERSION)" "10"
 LIBHPDF_DIR ?= /usr/local
@@ -2369,7 +2369,7 @@ endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 ifeq "$(OS_MAJOR_VERSION)" "6"
-$(error no recent enough libhpdf package on NetBSD 6, use WITH_LOCAL_LIBHPDF=1 instead)endif
+$(warning no recent enough libhpdf package on NetBSD 6, use WITH_LOCAL_LIBHPDF=1 instead)endif
 endif
 endif
 
@@ -3086,7 +3086,7 @@ ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
 ICU_LIBS ?= -licuuc -licudata -licui18n
 endif
 ifndef ICU_DIR
-$(error no usable ICU package for SPARC Solaris, compile your own version and set ICU_DIR accordingly)
+$(warning no usable ICU package for SPARC Solaris, compile your own version and set ICU_DIR accordingly)
 endif
 endif
 ifeq "$(OS_MINOR_VERSION)" "11"
@@ -3279,11 +3279,11 @@ endif
 ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "6"
-$(error no recent enough FreeImage package on Debian 6, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Debian 6, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "7"
-$(error no recent enough FreeImage package on Debian 7, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Debian 7, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 endif
@@ -3292,32 +3292,32 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-$(error no recent enough FreeImage package on RHEL5, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on RHEL5, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-$(error no recent enough FreeImage package on RHEL6, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on RHEL6, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
-$(error no recent enough FreeImage package on Fedora 19, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Fedora 19, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # Fedora 20
 ifeq "$(LINUX_REV)" "20"
-$(error no recent enough FreeImage package on Fedora 20, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Fedora 20, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
-$(error no recent enough FreeImage package on SLES, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on SLES, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
-$(error no recent enough FreeImage package on OpenSUSE, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on OpenSUSE, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 endif
@@ -3327,10 +3327,10 @@ endif
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
-$(error no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 ifeq "$(OS_MINOR_VERSION)" "11"
-$(error no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 endif
 endif
@@ -3339,10 +3339,10 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
-$(error no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
-$(error no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 ifeq "$(OS_MAJOR_VERSION)" "10"
 FREEIMAGE_DIR ?= /usr/local
@@ -3363,7 +3363,7 @@ endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 ifeq "$(OS_MAJOR_VERSION)" "6"
-$(error no recent enough official FreeImage package on NetBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough official FreeImage package on NetBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 endif
 
