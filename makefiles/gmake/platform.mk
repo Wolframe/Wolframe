@@ -15,7 +15,6 @@
 #
 # author: Andreas Baumann, abaumann at yahoo dot com
 
--include $(HOME)/config.mk
 -include $(TOPDIR)/makefiles/gmake/platform.mk.vars
 
 # set up defaults for the build switches
