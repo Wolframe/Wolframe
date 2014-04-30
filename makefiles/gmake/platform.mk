@@ -535,7 +535,14 @@ endif
 # SunOS
 
 ifeq "$(PLATFORM)" "SUNOS"
+ifdef BOOST_DIR
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+ifndef BOOST_DIR
 $(warning no recent enough boost package on Solaris, compile your own version and set BOOST_DIR accordingly)
+endif
 endif
 
 # OpenSSL
