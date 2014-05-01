@@ -29,7 +29,9 @@ doxygen\html\index.chm: doxygen\html\index.hhp
 	@-"$(HHC_LOCATION)" $@
 
 local_clean:
+	@-erase *.dll >NUL 2>NUL
 	@-erase /S /Q doxygen\* >NUL 2>NUL
+	@-rmdir doxygen >NUL 2>NUL
 	@-erase /S /Q output\htmlhelp\* >NUL 2>NUL
 	@-rmdir output\htmlhelp >NUL 2>NUL
 	@-rmdir output >NUL 2>NUL

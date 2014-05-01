@@ -27,7 +27,7 @@ testlibhpdf.exe: testlibhpdf.obj
 local_all:
 
 local_clean:
-	@-erase *.pdf 2>NUL
+	@-erase *.pdf test2.raw 2>NUL
 
 local_distclean:
 
