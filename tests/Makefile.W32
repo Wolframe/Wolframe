@@ -1,8 +1,7 @@
 TOPDIR = ..
 
-SUBDIRS = modules database wolfilter simpleFormCompiler compileTDL wolfilter protocol
+SUBDIRS = 3rdParty modules database wolfilter simpleFormCompiler compileTDL wolfilter protocol
 #SUBDIRS = modules database AAAA
-
 
 # all broken on windows due to working telnet
 #!IFDEF WITH_EXPECT
@@ -194,7 +193,6 @@ local_test:
 	@-testIntegers 
 	@-testWolfilter 
 #	@-stringNormalizationTest 
-#DISABLED (moved to .Attic) 	@-unitLibraryTest 
 
 local_longtest:
 	@-poolTest 

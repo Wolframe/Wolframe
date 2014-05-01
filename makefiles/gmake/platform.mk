@@ -15,7 +15,6 @@
 #
 # author: Andreas Baumann, abaumann at yahoo dot com
 
--include $(HOME)/config.mk
 -include $(TOPDIR)/makefiles/gmake/platform.mk.vars
 
 # set up defaults for the build switches
@@ -338,7 +337,7 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 else
-$(error no recent enough boost package on Slackware before version 14.0, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on Slackware before version 14.0, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 endif
@@ -383,7 +382,7 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on Ubuntu 12.04, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on Ubuntu 12.04, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -394,7 +393,7 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on Ubuntu 10.04, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on Ubuntu 10.04, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -408,7 +407,7 @@ BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on Debian 6, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on Debian 6, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -448,7 +447,7 @@ BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on SLES, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on SLES, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -483,7 +482,7 @@ BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 endif
 ifndef BOOST_DIR
-$(error no recent enough boost package on RHEL 5, compile your own version and set BOOST_DIR accordingly)
+$(warning no recent enough boost package on RHEL 5, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 endif
@@ -535,7 +534,14 @@ endif
 # SunOS
 
 ifeq "$(PLATFORM)" "SUNOS"
-$(error no recent enough boost package on Solaris, compile your own version and set BOOST_DIR accordingly)
+ifdef BOOST_DIR
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+ifndef BOOST_DIR
+$(warning no recent enough boost package on Solaris, compile your own version and set BOOST_DIR accordingly)
+endif
 endif
 
 # OpenSSL
@@ -546,10 +552,20 @@ ifeq ($(WITH_SSL),1)
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto -lz
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -558,26 +574,56 @@ endif
 ifeq "$(LINUX_DIST)" "ubuntu"
 
 ifeq "$(LINUX_REV)" "14.04"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "13.10"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "13.04"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "12.10"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "12.04"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "10.04"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -588,10 +634,20 @@ endif
 ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "6"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "7"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -601,31 +657,61 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 # Fedora 20
 ifeq "$(LINUX_REV)" "20"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -635,12 +721,27 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 ifeq "$(OS_MAJOR_VERSION)" "10"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
@@ -649,6 +750,11 @@ endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 ifeq "$(OS_MAJOR_VERSION)" "6"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
@@ -658,11 +764,19 @@ endif
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
-OPENSSL_DIR ?= /usr/local/ssl
+OPENSSL_DIR ?= /opt/csw
+OPENSSL_INCLUDE_DIR ?= $(OPENSSL_DIR)/include
+OPENSSL_INCLUDE_DIRS ?= -I$(OPENSSL_INCLUDE_DIR)
+OPENSSL_LIB_DIR ?= $(OPENSSL_DIR)/lib
+OPENSSL_LIB_DIRS ?= -L$(OPENSSL_LIB_DIR)
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 ifeq "$(OS_MINOR_VERSION)" "11"
-OPENSSL_DIR =
+OPENSSL_DIR ?= /opt/csw
+OPENSSL_INCLUDE_DIR ?= $(OPENSSL_DIR)/include
+OPENSSL_INCLUDE_DIRS ?= -I$(OPENSSL_INCLUDE_DIR)
+OPENSSL_LIB_DIR ?= $(OPENSSL_DIR)/lib
+OPENSSL_LIB_DIRS ?= -L$(OPENSSL_LIB_DIR)
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
@@ -1304,6 +1418,21 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "14.04"
+ORACLE_VERSION ?= 12.1
+ifeq "$(ARCH)" "x86_64"
+ORACLE_CLIENT_ARCH=client64
+else
+ORACLE_CLIENT_ARCH=client
+endif
+ORACLE_DIR ?= /usr/lib/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIR ?= /usr/include/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
+ORACLE_LIB_DIR ?= $(ORACLE_DIR)/lib
+ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
+ORACLE_LIBS ?= -lclntsh
+endif
+
 ifeq "$(LINUX_REV)" "13.10"
 ORACLE_VERSION ?= 12.1
 ifeq "$(ARCH)" "x86_64"
@@ -1929,7 +2058,7 @@ ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 LIBXML2_DIR ?= /usr/local
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR) -I/usr/local/include
 LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
 LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
 LIBXML2_LIBS ?= -lxml2
@@ -1937,7 +2066,7 @@ endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 LIBXML2_DIR ?= /usr/local
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR) -I/usr/local/include
 LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
 LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
 LIBXML2_LIBS ?= -lxml2
@@ -2262,19 +2391,19 @@ LIBHPDF_LIBS ?= -lhpdf
 endif
 
 ifeq "$(LINUX_REV)" "13.04"
-$(error no recent enough libhpdf package on Ubuntu 13.04, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Ubuntu 13.04, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "12.10"
-$(error no recent enough libhpdf package on Ubuntu 12.10, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Ubuntu 12.10, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "12.04"
-$(error no recent enough libhpdf package on Ubuntu 12.04, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Ubuntu 12.04, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "10.04"
-$(error no recent enough libhpdf package on Ubuntu 10.04, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Ubuntu 10.04, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 endif
@@ -2283,12 +2412,12 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-$(error no recent enough libhpdf package on RHEL5, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on RHEL5, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-$(error no recent enough libhpdf package on RHEL6, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on RHEL6, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 # Fedora 19
@@ -2314,11 +2443,11 @@ endif
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
-$(error no recent enough libhpdf package on SLES, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on SLES, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
-$(error no recent enough libhpdf package on OpenSuSE, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on OpenSuSE, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 endif
@@ -2327,7 +2456,7 @@ endif
 
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
-$(error no recent enough libhpdf package on Solaris, use WITH_LOCAL_LIBHPDF=1 instead)
+$(warning no recent enough libhpdf package on Solaris, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 endif
 
@@ -2335,10 +2464,10 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
-$(error no recent enough libhpdf package on FreeBSD 8, use WITH_LOCAL_LIBHPDF=1 instead)endif
+$(warning no recent enough libhpdf package on FreeBSD 8, use WITH_LOCAL_LIBHPDF=1 instead)endif
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
-$(error no recent enough libhpdf package on FreeBSD 9, use WITH_LOCAL_LIBHPDF=1 instead)endif
+$(warning no recent enough libhpdf package on FreeBSD 9, use WITH_LOCAL_LIBHPDF=1 instead)endif
 endif
 ifeq "$(OS_MAJOR_VERSION)" "10"
 LIBHPDF_DIR ?= /usr/local
@@ -2354,7 +2483,7 @@ endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 ifeq "$(OS_MAJOR_VERSION)" "6"
-$(error no recent enough libhpdf package on NetBSD 6, use WITH_LOCAL_LIBHPDF=1 instead)endif
+$(warning no recent enough libhpdf package on NetBSD 6, use WITH_LOCAL_LIBHPDF=1 instead)endif
 endif
 endif
 
@@ -3071,7 +3200,7 @@ ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
 ICU_LIBS ?= -licuuc -licudata -licui18n
 endif
 ifndef ICU_DIR
-$(error no usable ICU package for SPARC Solaris, compile your own version and set ICU_DIR accordingly)
+$(warning no usable ICU package for SPARC Solaris, compile your own version and set ICU_DIR accordingly)
 endif
 endif
 ifeq "$(OS_MINOR_VERSION)" "11"
@@ -3264,11 +3393,11 @@ endif
 ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "6"
-$(error no recent enough FreeImage package on Debian 6, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Debian 6, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "7"
-$(error no recent enough FreeImage package on Debian 7, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Debian 7, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 endif
@@ -3277,32 +3406,32 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-$(error no recent enough FreeImage package on RHEL5, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on RHEL5, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-$(error no recent enough FreeImage package on RHEL6, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on RHEL6, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
-$(error no recent enough FreeImage package on Fedora 19, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Fedora 19, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # Fedora 20
 ifeq "$(LINUX_REV)" "20"
-$(error no recent enough FreeImage package on Fedora 20, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Fedora 20, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
-$(error no recent enough FreeImage package on SLES, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on SLES, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
-$(error no recent enough FreeImage package on OpenSUSE, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on OpenSUSE, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 endif
@@ -3312,10 +3441,10 @@ endif
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
-$(error no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 ifeq "$(OS_MINOR_VERSION)" "11"
-$(error no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 endif
 endif
@@ -3324,10 +3453,10 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
-$(error no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
-$(error no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 ifeq "$(OS_MAJOR_VERSION)" "10"
 FREEIMAGE_DIR ?= /usr/local
@@ -3348,7 +3477,7 @@ endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 ifeq "$(OS_MAJOR_VERSION)" "6"
-$(error no recent enough official FreeImage package on NetBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
+$(warning no recent enough official FreeImage package on NetBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 endif
 

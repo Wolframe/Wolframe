@@ -112,6 +112,8 @@ endif
 ifeq ($(WITH_SSL),1)
 	@echo
 	@echo "OPENSSL_DIR: $(OPENSSL_DIR)"
+	@echo "OPENSSL_INCLUDE_DIR: $(OPENSSL_INCLUDE_DIR)"
+	@echo "OPENSSL_LIB_DIR: $(OPENSSL_LIB_DIR)"
 	@echo "OPENSSL_LIBS: $(OPENSSL_LIBS)"
 endif
 ifeq ($(WITH_LUA),1)

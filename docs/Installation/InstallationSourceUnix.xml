@@ -712,7 +712,7 @@ export PATH
 				</sect4>
 				
 				<sect4>
-					<title>Ubuntu 13.10</title>
+					<title>Ubuntu 13.10 and 14.04</title>
 					<para>
 						You need the following packages:
 						'libboost-dev', 'libboost-program-options-dev',
@@ -1196,7 +1196,7 @@ export PATH
 				</para>
 				
 				<para>
-					For running the Postgresql tests you need a fully function 'postgresql-server'
+					For running the Postgresql tests you need a fully functional 'postgresql-server'
 					with a db user 'wolfusr' (password: 'wolfpwd') owning a database called
 					'wolframe'.
 				</para>
@@ -1224,6 +1224,11 @@ export PATH
 				<para>
 					For running the PostgreSQL database tests you also
 					need the 'postgresql-client' package.
+				</para>
+
+				<para>
+					You also need a fully functional
+					PostgreSQL server, package 'postgresql'.
 				</para>
 			</sect3>
 
@@ -2047,7 +2052,7 @@ export PATH
 				</para>				
 
 				<para>
-					You can also try to use the 'libhpdf-devel' package.
+					You can also try to use the 'libhpdf-dev' package.
 				</para>
 			</sect3>
 
@@ -2488,7 +2493,7 @@ export PATH
 				</sect4>
 				
 				<sect4>
-					<title>Ubuntu 13.10</title>
+					<title>Ubuntu 13.10 and 14.04</title>
 
 					<para>
 						You need 'libboost-locale-dev' package.

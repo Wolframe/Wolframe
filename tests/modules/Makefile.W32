@@ -37,6 +37,7 @@ moduleTest.exe: moduleTest.obj $(TOPDIR)\src\wolframe.lib
 local_all:
 
 local_clean:
+	@-erase test.bat >NUL 2>NUL
 
 local_distclean:
 
