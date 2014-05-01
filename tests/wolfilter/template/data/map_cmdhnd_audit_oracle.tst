@@ -13,11 +13,14 @@ LoadModules
 }
 Database
 {
-	SQliteTest
+	OracleTest
 	{
 		identifier testdb
-		file test.db
-		connections 3
+		host andreasbaumann.dyndns.org
+		database orcl
+		port 1521
+		user wolfusr
+		password wolfpwd
 		dumpfile DBDUMP
 		inputfile DBDATA
 	}
