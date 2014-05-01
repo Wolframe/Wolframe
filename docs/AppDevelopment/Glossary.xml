@@ -33,21 +33,9 @@
 			</para>
 		</glossdef>
 	</glossentry>
-	<glossentry><glossterm>Network Input</glossterm>
-		<glossdef>
-			<para>Data passed from the networking framework to the connection handler through its channel for processing.
-			</para>
-		</glossdef>
-	</glossentry>
-	<glossentry><glossterm>Network Output</glossterm>
-		<glossdef>
-			<para>Data passed back through the channel to the networking framework from the connection handler as output of processing.
-			</para>
-		</glossdef>
-	</glossentry>
 	<glossentry><glossterm>Program</glossterm>
 		<glossdef>
-			<para>A set of named units of description of processing or data in a source file. The source file is loaded and interpreted at server startup. It exports some unique symbols to address single units in a program library. All units in this library are usable in any context of the logic tier.
+			<para>A set of named units of description of processing or data in a source file. The source file is loaded at server startup.
 			</para>
 		</glossdef>
 	</glossentry>
@@ -55,12 +43,6 @@
 		<glossdef>
 			<para>A transaction is a call of a database defined in a transaction program. A transaction either fails completely or succeeds as whole. Auditing is seen as part of the transaction. Transactions have an object as input and return an object or an error as result.
 				Authorization tags that are checked against the user privileges of the connection can be attached to transactions.
-			</para>
-		</glossdef>
-	</glossentry>
-	<glossentry><glossterm>Processor program</glossterm>
-		<glossdef>
-			<para>A program that is executed by a command handler. It works with data input, data output and transaction execution as the only interfaces to the system. Exceptions, signals and events are handled by the processor in the background without showing them to the program. A program in this context is sequential.
 			</para>
 		</glossdef>
 	</glossentry>
@@ -79,17 +61,6 @@
 	<glossentry><glossterm>Form</glossterm>
 		<glossdef>
 			<para>A form is a hierarchical description of typed data. Forms are used to create objects from a serialization and to validate input. Forms are defined in programs written in a DDL (Data Definition Language) or as declared as part of a build-in function API.
-			</para>
-		</glossdef>
-	</glossentry>
-	<glossentry><glossterm>Direct Map Command Handler</glossterm>
-		<glossdef>
-			<para>The direct map command handler, also refered to as the standard comand handle
-			is a command handler describing how server requsts are executed.
-			It describes requests by a form for the input, a form for the output, and a function called. 
-			The input of a direct map function is the object deserialization of the input 
-			defined in the input form. The result of the function is returned as serialization of 
-			the transaction result defined in the output form. 
 			</para>
 		</glossdef>
 	</glossentry>
@@ -114,38 +85,25 @@
 	</glossentry>
 	<glossentry><glossterm>Provider</glossterm>
 		<glossdef>
-			<para>An entity providing objects of a kind. Some providers are factories, 
-			but not all of them (e.g. the database provider)
+			<para>An entity providing objects of a kind. Some providers are factories, but not all of them.
 			</para>
 		</glossdef>
 	</glossentry>
 	<glossentry id="EoD"><glossterm>End Of Data (EoD)</glossterm>
 		<abbrev>EoD</abbrev>
 		<glossdef>
-			<para>Marks the end of the data to be processed by a processor. End of data is 
-			marked with CR LF dot ('.') CR LF or LF dot LF. For passing lines with a dot ('.') at 
-			the start of a content line, the client has to escape an LF dot in the content with 
-			LF dot dot. This escaping applies also to the result returned to the client. 
+			<para>Marks the end of a complete data unit to be processed by a processor. 
+			End of data is marked with CR LF dot ('.') CR LF or LF dot LF. For passing 
+			lines with a dot ('.') at the start of a content line, the client has to 
+			escape an LF dot in the content with LF dot dot. This escaping applies 
+			also to the result returned to the client. 
 			So client has to unescape LF dot sequences by replacing them by a LF.
-			</para>
-		</glossdef>
-	</glossentry>
-	<glossentry id="EoM"><glossterm>End Of Message (EoM)</glossterm>
-		<abbrev>EoM</abbrev>
-		<glossdef>
-			<para>Marks the end of a network input message. End of message is handled by the processor without showing up to the processor program (yield execution).
 			</para>
 		</glossdef>
 	</glossentry>
 	<glossentry><glossterm>Application Reference Path</glossterm>
 		<glossdef>
 			<para>The application server defines this file path where all relative paths defined in the configuration refer to.
-			</para>
-		</glossdef>
-	</glossentry>
-	<glossentry><glossterm>Yield execution</glossterm>
-		<glossdef>
-			<para>The processor yields execution and gives control back to the connection handler, when it cannot continue execution. The connection handler has to resume with an action returned to the networking framework, that fetches the resources needed by the processor to continue. (see also [http://en.wikipedia.org/wiki/Coroutine Wikipedia yield in coroutine]). Lua is able to yield execution.
 			</para>
 		</glossdef>
 	</glossentry>
@@ -165,29 +123,33 @@
 
 	<glossentry id="Authentication"><glossterm>Authentication</glossterm>
 		<glossdef>
-			<para>Some reasonable definition here. BTW, this just an example.</para>
-			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+			<para>Authentication is a process that creates a login for the user,
+			granting him access to parts of the system.</para>
 		</glossdef>
 	</glossentry>
 
 	<glossentry id="Authorization"><glossterm>Authorization</glossterm>
 		<glossdef>
-			<para>Some reasonable definition here. BTW, this just an example.</para>
-			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+			<para>Authorization grant or deny the execution of functions or
+			database transactions based on rules on the client login of the session
+			(Authentication).
+			You can specify such access rules on different levels of processing.</para>
 		</glossdef>
 	</glossentry>
 
 	<glossentry id="Accounting"><glossterm>Accounting</glossterm>
 		<glossdef>
-			<para>Some reasonable definition here. BTW, this just an example.</para>
-			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+			<para></para>
 		</glossdef>
 	</glossentry>
 
 	<glossentry id="Auditing"><glossterm>Auditing</glossterm>
 		<glossdef>
-			<para>Some reasonable definition here. BTW, this just an example.</para>
-			<glossseealso otherterm="AAAA">AAAA</glossseealso>
+			<para>Auditing describes a special kind of logging of transactions.
+			Audit operations are represented as function calls.
+			Audit operations specified as critical are handled as a critical part 
+			of the transaction. If a critical audit operation fails then the 
+			transaction fails (rollback).</para>
 		</glossdef>
 	</glossentry>
 </glossdiv>
@@ -211,7 +173,7 @@
 			are cryptographic protocols that provide communication security over the Internet.
 			TLS and SSL encrypt the segments of network connections above the Transport Layer,
 			using asymmetric cryptography for key exchange, symmetric encryption for privacy,
-			and message authentication codes for message integrity. <citation>Wikipedia</citation></para>
+			and message authentication codes for message integrity.</para>
 			<glossseealso otherterm="SSL">SSL</glossseealso>
 		</glossdef>
 	</glossentry>
