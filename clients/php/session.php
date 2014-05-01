@@ -4,11 +4,16 @@ namespace Wolframe
 require 'connection.php';
 use Wolframe\Connection as Connection;
 
+/*
+* Session
+* Object based on Connection with higher level commands hiding protocol details from the caller.
+*/
 class Session extends Connection
 {
 	private $banner;
 	private $requesterror = FALSE;
 
+	/* Get a line from socket and check if it starts as expected (success case) */
 	function getline( $expect)
 	{
 		$ln = explode( " ", $this->readline(), 2);
@@ -23,11 +28,13 @@ class Session extends Connection
 		throw new Exception( "illegal state in protocol. expected " . $expect . " but got " . $ln[0]);
 	}
 
+	/* Choose authentication mechanism NONE */
 	function auth_NONE()
 	{
 		$this->getline( "OK");
 	}
 
+	/* Constructor */
 	function __construct( $address, $port, $sslopt, $authmethod)
 	{
 		parent::__construct( $address, $port, $sslopt);
@@ -50,17 +57,20 @@ class Session extends Connection
 		}
 	}
 
+	/* Destructor */
 	public function __destruct()
 	{
 		if ($this->isalive()) $this->writeline( "QUIT");
 		parent::__destruct();
 	}
 
+	/* Get the last error of the connection or session (protocol) */
 	public function lasterror()
 	{
 		return $this->requesterror;
 	}
 
+	/* Send a request to the server */
 	public function request( $query)
 	{
 		$requesterror = FALSE;
