@@ -102,7 +102,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		{
 			if (m_cmd->outputrootelem.empty())
 			{
-				throw std::runtime_error( std::string( "output form is not defined '") + m_cmd->outputform + "'");
+				throw std::runtime_error( std::string( "root element is not defined for RETURN SKIP ") + m_cmd->outputform);
 			}
 		}
 		else

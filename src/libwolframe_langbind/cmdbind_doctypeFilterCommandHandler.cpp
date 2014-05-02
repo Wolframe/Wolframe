@@ -415,7 +415,21 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					}
 					else if ((unsigned char)ch == ':')
 					{
-						setState( ParseJSONHeaderAssign);
+						if (boost::algorithm::iequals( m_keybuf, "doctype"))
+						{
+							m_keytype = KeyDoctype;
+							setState( ParseJSONHeaderAssign);
+						}
+						else if (boost::algorithm::iequals( m_keybuf, "encoding"))
+						{
+							m_keytype = KeyEncoding;
+							setState( ParseJSONHeaderAssign);
+						}
+						else
+						{
+							m_keytype = KeyNone;
+							setState( Done);
+						}
 					}
 					else
 					{
@@ -460,7 +474,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					}
 					else if (isAlphaNum(ch))
 					{
-						m_keybuf.push_back( ch|32);
+						m_itembuf.push_back( ch|32);
 						setState( ParseJSONHeaderIdentValue);
 					}
 					else
@@ -482,14 +496,14 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 						switch (m_keytype)
 						{
 							case KeyNone:
-								throw std::logic_error("illegal state in JSON document type recognition");
+								throw std::runtime_error("syntax error in JSON document (document type recognition)");
 							case KeyDoctype:
 								m_doctypeid = m_itembuf;
 								m_keytype = KeyNone;
 								setState( Done);
 								break;
 							case KeyEncoding:
-								setState( ParseJSONHeaderStart);
+								setState( ParseJSONHeaderSeekDelim);
 								break;
 						}
 						m_itembuf.clear();
@@ -508,19 +522,30 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					break;
 
 				case ParseJSONHeaderIdentValue:
-					if (isSpace( ch))
+					if (isSpace( ch) || ch == ',' || ch == '}')
 					{
 						switch (m_keytype)
 						{
 							case KeyNone:
-								throw std::logic_error("illegal state in JSON document type recognition");
+								throw std::runtime_error("syntax error in JSON document (document type recognition)");
 							case KeyDoctype:
 								m_doctypeid = m_itembuf;
 								m_keytype = KeyNone;
 								setState( Done);
 								break;
 							case KeyEncoding:
-								setState( ParseJSONHeaderStart);
+								if (ch == '}')
+								{
+									setState( Done);
+								}
+								else if (ch == ',')
+								{
+									setState( ParseJSONHeaderStart);
+								}
+								else
+								{
+									setState( ParseJSONHeaderSeekDelim);
+								}
 								break;
 						}
 						m_itembuf.clear();
@@ -529,6 +554,20 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					else
 					{
 						m_itembuf.push_back( ch|32);
+					}
+					break;
+
+				case ParseJSONHeaderSeekDelim:
+					if (!isSpace( ch))
+					{
+						if (ch == ',')
+						{
+							setState( ParseJSONHeaderStart);
+						}
+						else
+						{
+							setState( Done);
+						}
 					}
 					break;
 

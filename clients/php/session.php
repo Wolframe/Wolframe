@@ -71,10 +71,17 @@ class Session extends Connection
 	}
 
 	/* Send a request to the server */
-	public function request( $query)
+	public function request( $command, $query)
 	{
 		$requesterror = FALSE;
-		$this->writeline( "REQUEST");
+		if ($command == "")
+		{
+			$this->writeline( "REQUEST");
+		}
+		else
+		{
+			$this->writeline( "REQUEST $command");
+		}
 		$this->writedata( $query); 
 		$ln = explode( " ", $this->readline(), 2);
 		if ($ln[0] == "OK") return "";
@@ -93,5 +100,6 @@ class Session extends Connection
 		if ($ln[0] == "ERR") throw $this->protocol_exception( "server error: " . $ln[1]);
 		throw $this->protocol_exception( "protocol error: 'OK' or 'ERR' or 'ANSWER' expected instead of '" . $ln[0] . "'");
 	}
+
 } // class Session
 } // namespace Wolframe
