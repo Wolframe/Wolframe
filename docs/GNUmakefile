@@ -322,6 +322,8 @@ local_clean:
 	-rm -rf html-installation-webpage/*.html
 	-rm -rf html-installation-webpage-chunked/*.html
 	-rm -rf doxygen/html-webpage/*
+	-rm -rf InstallationUnixClient.html InstallationUnixClient.txt
+	-rm -rf InstallationWindowsClient.html InstallationWindowsClient.txt
 	
 local_distclean:
 

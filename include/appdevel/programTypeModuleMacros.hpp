@@ -42,7 +42,7 @@
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			return new _Wolframe::module::ProgramTypeBuilder( #LANGNAME "ProgramType", #LANGNAME "FormFunc", CREATEPRGFUNC);\
+			return new _Wolframe::module::ProgramTypeBuilder( LANGNAME "ProgramType", LANGNAME "FormFunc", CREATEPRGFUNC);\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\
