@@ -17,7 +17,7 @@ source=(
   'wolframe.conf'
   'wolframed.service'
 )
-md5sums=('49ac64b1957318385c53afffffbdf912'
+md5sums=('faa0c7a37d5d6156fe3d8e9f16093a06'
          'cc146a28908aad55f156860340934095')
 _gitroot=git://github.com/mbarbos/Wolframe.git
 _gitname=Wolframe
