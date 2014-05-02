@@ -268,7 +268,6 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 		m_command.append(doctype);
 	}
 	cmdbind::CommandHandler* execch = m_execContext->provider()->cmdhandler( m_command);
-	execch->setExecContext( m_execContext);
 	if (!execch)
 	{
 		std::ostringstream msg;
@@ -281,6 +280,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 			msg << "no command handler for '" << m_command << "'";
 		}
 		execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
+		execch->setExecContext( m_execContext);
 		if (m_commandtag.empty())
 		{
 			out << "ANSWER" << endl();
@@ -302,8 +302,8 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	}
 	else
 	{
+		execch->setExecContext( m_execContext);
 		execch->passParameters( m_command, 1, &docformatptr);
-		execch->setExecContext( execContext());
 		if (m_commandtag.empty())
 		{
 			out << "ANSWER" << endl();
