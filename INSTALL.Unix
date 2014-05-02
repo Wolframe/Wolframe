@@ -2116,8 +2116,19 @@ Solaris 10
 For Qt 4 you need the 'CSWqt4-dev' package (at least version '4.8.5,REV=
 2013.11.26').
 
-There are quite some problems with the generated makefiles, remove -rpath,/lib
-directrives where the build fails.
+Before compiling apply the following patch command to the generated makefiles:
+
+        for i in `find . -name Makefile`; do \
+                sed 's|-Wl,-rpath,/lib||g' $i > /tmp/x; mv -f /tmp/x $i; \
+                sed 's|-Wl,-rpath,/opt/csw/lib/qt4/plugins/designer||g' $i > /tmp/x; mv -f /tmp/x $i; \
+        done
+
+
+Now build normally with:
+
+        gmake
+        gmake install
+
 
 Using Qt 5 for wolfclient is untested.
 
