@@ -301,10 +301,12 @@
 		
 		<programlisting language='shell'>
 	for i in `find . -name Makefile`; do \
-		sed 's|-Wl,-rpath,/lib||g' $i > /tmp/x; mv -f /tmp/x $i; \
-		sed 's|-Wl,-rpath,/opt/csw/lib/qt4/plugins/designer||g' $i > /tmp/x; mv -f /tmp/x $i; \
+		sed 's|-Wl,-rpath|-Wl,-R|g' $i > /tmp/x; mv -f /tmp/x $i; \
 	done
 		</programlisting>
+		
+		This is because we should use <application>/usr/css/bin/ld</application>
+		as linker and this one unterstands only '-R' and not '-rpath'.
 	</para>
 	
 	<para>
