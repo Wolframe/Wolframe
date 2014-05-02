@@ -296,8 +296,26 @@
 	</para>
 	
 	<para>
-		There are quite some problems with the generated makefiles, remove -rpath,/lib directrives
-		where the build fails.
+		Before compiling apply the following patch command to
+		the generated makefiles:
+		
+		<programlisting language='shell'>
+	for i in `find . -name Makefile`; do \
+		sed 's|-Wl,-rpath|-Wl,-R|g' $i > /tmp/x; mv -f /tmp/x $i; \
+	done
+		</programlisting>
+		
+		This is because we should use <application>/usr/css/bin/ld</application>
+		as linker and this one unterstands only '-R' and not '-rpath'.
+	</para>
+	
+	<para>
+		Now build normally with:
+
+		<programlisting language='shell'>
+	gmake
+	gmake install
+		</programlisting>
 	</para>
 
 	<para>
