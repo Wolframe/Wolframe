@@ -68,10 +68,6 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::NamedConf
 		}
 	}
 	m_authorizer = new StandardAuthorizer( m_authorizeUnits, authzDefault );
-	if (m_authorizeUnits.empty())
-	{
-		LOG_ERROR << "No authorization units defined in AAAA configuration section. Every request will be ignored";
-	}
 }
 
 AuthorizationProvider::~AuthorizationProvider()
