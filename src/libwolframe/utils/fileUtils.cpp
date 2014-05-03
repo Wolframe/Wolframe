@@ -257,6 +257,13 @@ std::string utils::readSourceFileContent( const std::string& filename)
 	return src;
 }
 
+std::string utils::readBinaryFileContent( const std::string& filename)
+{
+	std::string rt;
+	readFileContent( filename, rt);
+	return rt;
+}
+
 
 namespace {
 struct FileTypeDetection

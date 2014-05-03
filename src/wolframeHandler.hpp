@@ -149,7 +149,7 @@ private:
 	std::string			m_outMsg;		///< output buffer for initial handshake messages
 
 	proc::ExecContext		m_execContext;		///< execution context of the connection
-	proc::CommandHandler		m_cmdHandler;		///< command handler
+	proc::MainCommandHandler	m_cmdHandler;		///< command handler
 };
 
 /// The server handler container

@@ -111,6 +111,8 @@ public:
 
 		std::string tostring( const utils::PrintFormat* pformat=0) const;
 
+		Node getChild( const std::string& nodename) const;
+
 	private:
 		static void print( std::ostringstream& out, const Node& nd, int indent, const utils::PrintFormat* pformat=0);
 

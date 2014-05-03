@@ -290,7 +290,7 @@ protected:
 		TestDescription test;
 		m_provider = getProcProvider( m_config.providerConfig(), m_config.prglib());
 		m_connection.reset( new iproc::Connection( ep, &m_config));
-		m_execContext = proc::ExecContext( m_provider.get());
+		m_execContext = proc::ExecContext( m_provider.get(), 0);
 		m_connection->setExecContext( &m_execContext);
 
 		m_input.clear();

@@ -30,29 +30,97 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file authCommandHandler.hpp
-///\brief Interface to AUTH command handler
+/// \file authCommandHandler.hpp
+/// \brief Interface of the authentication command handler
 
 #ifndef _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
 
 #include "cmdbind/lineCommandHandler.hpp"
+#include "AAAA/authentication.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class AuthCommandHandler
-///\brief Command handler for the sub protocol for authentication
-class AuthCommandHandler :public cmdbind::LineCommandHandlerTemplate<AuthCommandHandler>
+/// \class AuthCommandHandler
+/// \brief Command handler for the sub protocol for authentication
+class AuthCommandHandler
+	:public cmdbind::CommandHandler
 {
 public:
-	AuthCommandHandler();
-	virtual ~AuthCommandHandler(){}
+	explicit AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_);
+	virtual ~AuthCommandHandler();
 
-	const std::string& ticket() const	{return m_ticket;}
+	const AAAA::User& user() const
+	{
+		static const AAAA::User undefined;
+		return undefined;
+		//[+] if (!m_authenticator) return undefined;
+		//[+] AAAA::User* usr = m_authenticator->user();
+		//[+] return usr?*usr:undefined;
+	}
+
+	///\brief See CommandHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
+	virtual void setInputBuffer( void* buf, std::size_t allocsize);
+
+	///\brief See CommandHandler::setOutputBuffer(void*,std::size_t,std::size_t)
+	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
+
+	///\brief See CommandHandler::nextOperation()
+	virtual Operation nextOperation();
+
+	///\brief See CommandHandler::putInput(const void*,std::size_t);
+	virtual void putInput( const void *begin, std::size_t bytesTransferred);
+
+	///\brief See CommandHandler::getInputBlock(void*&,std::size_t&)
+	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
+
+	///\brief See CommandHandler::getOutput(const void*&,std::size_t&)
+	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
+
+	///\brief See CommandHandler::getDataLeft(const void*&,std::size_t&)
+	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
+
+	///\brief See CommandHandler::interruptDataSessionMarker()
+	virtual const char* interruptDataSessionMarker() const;
 
 private:
-	std::string m_ticket;
+	/// \enum State
+	/// \brief Enumeration of processor states
+	enum State
+	{
+		Init,				///< start state, called first time in this session
+		NextOperation,			///< running a command
+		ReadConsumed,			///< state set by putInput for guarantee that pusInput message is valid till net call of AAAA::Authenticator::nextOperation()
+		FlushOutput			///< flush network output
+	};
+	/// \brief Returns the state as string for logging etc.
+	/// \param [in] i state to get as string
+	static const char* stateName( State i)
+	{
+		static const char* ar[] = {
+			"Init",
+			"NextOperation",
+			"ReadConsumed",
+			"FlushOutput"
+		};
+		return ar[i];
+	}
+	boost::shared_ptr<AAAA::Authenticator> m_authenticator;	///< authenticator object reference
+	protocol::InputBlock m_input;				///< protocol input buffer
+	protocol::InputBlock::iterator m_eoD;			///< input end of data marker
+	std::size_t m_itrpos;					///< read start position in buffer for the command handler
+
+	char* m_outputbuf;					///< protocol output buffer
+	std::size_t m_outputbufsize;				///< protocol output buffer allocation size
+	std::size_t m_outputbufpos;				///< protocol output buffer start of data chunk
+
+	State m_state;						///< processing state of the command handler
+	std::string m_readbuffer;				///< buffer for chunkwise network read
+	std::size_t m_readpos;					///< current position in buffer for chunkwise network read
+	std::string m_writebuffer;				///< buffer for chunkwise network write
+	std::size_t m_writepos;					///< current position in buffer for chunkwise network write
 };
 
 }} //namespace

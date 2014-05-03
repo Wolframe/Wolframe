@@ -59,7 +59,7 @@ bool AAAAprovider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-Authenticator* AAAAprovider::authenticator()
+Authenticator* AAAAprovider::authenticator() const
 {
 	return m_impl->authenticator();
 }

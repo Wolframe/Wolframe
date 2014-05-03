@@ -62,9 +62,8 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandle
 };
 static STM stm;
 
-InterfaceCommandHandler::InterfaceCommandHandler( const std::list<std::string>& roles_, bool adminInterface_)
+InterfaceCommandHandler::InterfaceCommandHandler( bool adminInterface_)
 	:cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>( &stm, (std::size_t)(adminInterface_?User:Admin))
-	,m_roles(roles_)
 {}
 
 int InterfaceCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)

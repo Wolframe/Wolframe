@@ -34,11 +34,8 @@
 ///
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
+#include "mainCommandHandler.hpp"
 #include "system/connectionHandler.hpp"
-#include "cmdbind/commandHandler.hpp"
-#include "cmdbind/lineCommandHandler.hpp"
-#include "cmdbind/doctypeFilterCommandHandler.hpp"
-#include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
 #include "mainConnectionHandler_auth.hpp"
 #include "protocol/ioblocks.hpp"
@@ -47,48 +44,6 @@
 
 namespace _Wolframe {
 namespace proc {
-
-class CommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
-{
-public:
-	typedef cmdbind::LineCommandHandlerTemplate<CommandHandler> Parent;
-	CommandHandler();
-	virtual ~CommandHandler(){}
-
-public:
-	int doAuth( int argc, const char** argv, std::ostream& out);
-
-	int doMech( int argc, const char** argv, std::ostream& out);
-	int endMech( cmdbind::CommandHandler* ch, std::ostream& out);
-
-	int doRequest( int argc, const char** argv, std::ostream& out);
-	int endRequest( cmdbind::CommandHandler* ch, std::ostream& out);
-
-	int doInterface( int argc, const char** argv, std::ostream& out);
-	int endInterface( cmdbind::CommandHandler* ch, std::ostream& out);
-
-	int doCapabilities( int argc, const char** argv, std::ostream& out);
-	int doQuit( int argc, const char** argv, std::ostream& out);
-
-	int endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out);
-	int endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out);
-
-private:
-	bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out);
-	std::list<std::string> roles() const
-	{
-		std::list<std::string> rt;
-		rt.push_back( "std");		//TODO: To be extracted from m_authtickets
-		return rt;
-	}
-
-private:
-	AuthMechanisms m_authMechanisms;
-	std::string m_command;
-	std::string m_commandtag;
-	std::vector<std::string> m_authtickets;
-};
-
 
 /// The connection handler
 class Connection : public net::ConnectionHandler
@@ -123,7 +78,7 @@ public:
 	}
 
 private:
-	CommandHandler m_cmdhandler;			//< top level instance executing commands
+	MainCommandHandler m_cmdhandler;		//< top level instance executing commands
 	protocol::InputBlock m_input;			//< buffer for network read messages
 	protocol::OutputBlock m_output;			//< buffer for network write messages
 	bool m_terminated;				//< true, if a termination signal came from the network

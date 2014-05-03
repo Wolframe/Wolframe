@@ -55,7 +55,7 @@ namespace _Wolframe	{
 wolframeConnection::wolframeConnection( const WolframeHandler& context,
 					const net::LocalEndpoint& local )
 	: m_globalCtx( context ),
-	  m_readBuf( 16536 ), m_outputBuf( 4096 ), m_execContext( &context.proc())
+	  m_readBuf( 16536 ), m_outputBuf( 4096 ), m_execContext( &context.proc(), &context.aaaa())
 {
 	m_remoteEP = NULL;
 	net::ConnectionEndpoint::ConnectionType type = local.type();

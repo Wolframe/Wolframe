@@ -61,7 +61,10 @@ StructSerializer::StructSerializer( const void* obj, const StructDescriptionBase
 	,m_descr(descr_)
 	,m_ctx()
 {
-	m_stk.push_back( SerializeState( 0, m_descr->fetch(), m_ptr));
+	if (m_descr)
+	{
+		m_stk.push_back( SerializeState( 0, m_descr->fetch(), m_ptr));
+	}
 }
 
 StructSerializer::StructSerializer( const StructSerializer& o)

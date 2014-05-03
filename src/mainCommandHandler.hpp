@@ -30,34 +30,55 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file interfaceCommandHandler.hpp
-///\brief Interface to INTERFACE command handler (sub statemachine)
-#ifndef _Wolframe_INTERFACE_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_INTERFACE_COMMAND_HANDLER_HPP_INCLUDED
+///\file mainCommandHandler.hpp
+
+#ifndef _Wolframe_MAIN_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_MAIN_COMMAND_HANDLER_HPP_INCLUDED
+#include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
+#include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
-#include <list>
-#include <string>
+#include "processor/execContext.hpp"
+#include "AAAA/authentication.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace proc {
 
-class InterfaceCommandHandler :public cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>
+class MainCommandHandler
+	:public cmdbind::LineCommandHandlerTemplate<MainCommandHandler>
 {
 public:
-	typedef cmdbind::LineCommandHandlerTemplate<CommandHandler> Parent;
-	explicit InterfaceCommandHandler( bool adminInterface_=false);
-	virtual ~InterfaceCommandHandler(){}
+	typedef cmdbind::LineCommandHandlerTemplate<MainCommandHandler> Parent;
+	MainCommandHandler();
+	virtual ~MainCommandHandler(){}
 
 public:
+	int doAuth( int argc, const char** argv, std::ostream& out);
+
+	int doMech( int argc, const char** argv, std::ostream& out);
+	int endMech( cmdbind::CommandHandler* ch, std::ostream& out);
+
+	int doRequest( int argc, const char** argv, std::ostream& out);
+	int endRequest( cmdbind::CommandHandler* ch, std::ostream& out);
+
+	int doInterface( int argc, const char** argv, std::ostream& out);
+	int endInterface( cmdbind::CommandHandler* ch, std::ostream& out);
+
 	int doCapabilities( int argc, const char** argv, std::ostream& out);
+	int doQuit( int argc, const char** argv, std::ostream& out);
+
+	int endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out);
+	int endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out);
 
 private:
-	std::list<std::string> m_roles;
-	std::vector<std::string> m_argbuf;
-	std::vector<std::pair< std::string, std::string> > m_attributes;
+	bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out);
+
+private:
+	boost::shared_ptr<AAAA::Authenticator> m_authenticator;
+	std::string m_command;
+	std::string m_commandtag;
 };
 
 }}//namespace
 #endif
-

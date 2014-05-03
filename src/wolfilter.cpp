@@ -37,6 +37,7 @@
 #include "prgbind/programLibrary.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
+#include "AAAA/AAAAprovider.hpp"
 #include <fstream>
 #include <iostream>
 #include <cstring>
@@ -79,8 +80,9 @@ int main( int argc, char **argv )
 		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
 		prgbind::ProgramLibrary programLibrary;
 
+		AAAA::AAAAprovider aaaaProvider( &cmdline.aaaaProviderConfig(), &cmdline.modulesDirectory());
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &programLibrary);
-		proc::ExecContext execContext( &processorProvider);
+		proc::ExecContext execContext( &processorProvider, &aaaaProvider);
 
 		if (!processorProvider.resolveDB( databaseProvider))
 		{

@@ -82,26 +82,9 @@ static std::string configurationTree_tostring( const types::PropertyTree::Node& 
 	return res->content();
 }
 
-static types::PropertyTree::Node getTreeNode( const types::PropertyTree::Node& tree, const std::string& name)
-{
-	bool found = false;
-	types::PropertyTree::Node rt;
-	types::PropertyTree::Node::const_iterator gi = tree.begin(), ge = tree.end();
-	for (; gi != ge; ++gi)
-	{
-		if (boost::algorithm::iequals( gi->first, name))
-		{
-			if (found) throw std::runtime_error( std::string("duplicate '") + name + "' node in configuration");
-			rt = gi->second;
-			found = true;
-		}
-	}
-	return rt;
-}
-
 config::ConfigurationNode WolfilterCommandLine::getConfigNode( const std::string& name) const
 {
-	return getTreeNode( m_config.root(), name);
+	return m_config.root().getChild( name);
 }
 
 std::vector<std::string> WolfilterCommandLine::configModules( const std::string& refpath) const
@@ -306,12 +289,12 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 
 	if (!m_dbProviderConfig->parse( m_dbconfig, "", &m_modulesDirectory))
 	{
-		throw std::runtime_error( "Database provider configuration could not be created from command line");
+		throw std::runtime_error( "database provider configuration could not be parsed");
 	}
 	m_dbProviderConfig->setCanonicalPathes( m_referencePath);
 	if (!m_dbProviderConfig->check())
 	{
-		throw std::runtime_error( "error in command line. failed to setup a valid database provider configuration");
+		throw std::runtime_error( "error in database provider configuration");
 	}
 
 	m_procProviderConfig.reset( new proc::ProcProviderConfig());
@@ -322,12 +305,28 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	}
 	if (!m_procProviderConfig->parse( ppcfg, "", &m_modulesDirectory))
 	{
-		throw std::runtime_error( "Error in processor provider configuration");
+		throw std::runtime_error( "processor provider configuration could not be parsed");
 	}
 	m_procProviderConfig->setCanonicalPathes( m_referencePath);
 	if (!m_procProviderConfig->check())
 	{
-		throw std::runtime_error( "Invalid processor provider configuration");
+		throw std::runtime_error( "error in processor provider configuration");
+	}
+
+	m_aaaaProviderConfig.reset( new AAAA::AAAAconfiguration());
+	types::PropertyTree::Node aacfg;
+	if (hasConfig)
+	{
+		aacfg = getConfigNode( "AAAA");
+	}
+	if (!m_aaaaProviderConfig->parse( aacfg, "", &m_modulesDirectory))
+	{
+		throw std::runtime_error( "AAAA provider configuration could not be parsed");
+	}
+	m_aaaaProviderConfig->setCanonicalPathes( m_referencePath);
+	if (!m_aaaaProviderConfig->check())
+	{
+		throw std::runtime_error( "error in AAAA provider configuration");
 	}
 }
 
