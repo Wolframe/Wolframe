@@ -34,6 +34,7 @@
 ///
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
+#include "mainCommandHandler.hpp"
 #include "system/connectionHandler.hpp"
 #include "mainCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"

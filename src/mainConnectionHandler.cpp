@@ -32,6 +32,11 @@
 ************************************************************************/
 ///\file mainConnectionHandler.cpp
 #include "mainConnectionHandler.hpp"
+#include "mainCommandHandler.hpp"
+#include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
+#include "cmdbind/authCommandHandler.hpp"
+#include "processor/execContext.hpp"
+#include "interfaceCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
