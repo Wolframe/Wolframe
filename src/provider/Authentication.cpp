@@ -103,7 +103,7 @@ StandardAuthenticator::~StandardAuthenticator()
 
 void StandardAuthenticator::close()
 {
-	delete this;
+	//[PF:REMARK 'delete this' prevents use in different context] delete this;
 }
 
 // The FSM interface functions

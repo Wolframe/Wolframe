@@ -243,8 +243,8 @@ void IOFilterCommandHandlerEscDLF::putInput( const void *begin, std::size_t byte
 	InputFilter* flt = m_inputfilter.get();
 	if (flt)
 	{
-		flt->putInput( start.ptr(), m_eoD-start, m_input.gotEoD());
 		flt->setState( InputFilter::Open);
+		flt->putInput( start.ptr(), m_eoD-start, m_input.gotEoD());
 	}
 }
 

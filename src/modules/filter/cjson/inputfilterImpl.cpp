@@ -176,8 +176,20 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 		m_encattr.encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
 		m_encattr.codepage = 0;
 		m_encattr_defined = true;
-		m_root = parse( origcontent);
-
+		try
+		{
+			m_root = parse( origcontent);
+		}
+		catch (const std::runtime_error& err)
+		{
+			setState( InputFilter::Error, err.what());
+			return;
+		}
+		catch (const std::bad_alloc& err)
+		{
+			setState( InputFilter::Error, "out of memory");
+			return;
+		}
 		m_firstnode = m_root.get();
 		int nof_docattributes = 0;
 		bool encodingParsed = false;
@@ -284,7 +296,10 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 {
 	if (!m_root.get())
 	{
-		setState( EndOfMessage);
+		if (state() == Open)
+		{
+			setState( EndOfMessage);
+		}
 		return false;
 	}
 	while (!m_stk.empty())
