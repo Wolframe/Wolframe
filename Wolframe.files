@@ -14,7 +14,7 @@ makefiles/gmake/sub.mk
 makefiles/gmake/top.mk
 makefiles/nmake/clean.mk
 makefiles/nmake/compiler.mk
-makefiles/nmake/config_aba_vc2010_32bit_new.mk
+makefiles/nmake/config_aba_vc2010_32bit_debug.mk
 makefiles/nmake/config_mba_32bit.mk
 makefiles/nmake/config_mba_64bit.mk
 makefiles/nmake/config_pfr_32bit.mk
@@ -1177,6 +1177,7 @@ clients/cmdline/utils.cpp
 clients/cmdline/utils.hpp
 clients/cmdline/wolframec.cpp
 clients/cmdline/wolframe.conf
+clients/cmdline/wolframe.hpp
 clients/GNUmakefile
 clients/lib/connection.cpp
 clients/lib/connection.hpp
@@ -1229,6 +1230,7 @@ docs/AppDevelopment/Testing.xml
 docs/Client/Client.ent
 docs/Client/CLI.xml
 docs/Client/Introduction.xml
+docs/Client/PhpClient.xml
 docs/Client/Preface.xml
 docs/Client/WolfclientArchitecture.xml
 docs/Client/WolfclientArtifacts.xml
@@ -1353,12 +1355,18 @@ docs/images/GNUmakefile
 docs/InstallationDate.txt
 docs/Installation/InstallationBinary.xml
 docs/Installation/Installation.ent
+docs/Installation/InstallationSourceUnixClientPrereq.xml
+docs/Installation/InstallationSourceUnixClient.xml
 docs/Installation/InstallationSourceUnix.xml
+docs/Installation/InstallationSourceWindowsClientPrereq.xml
+docs/Installation/InstallationSourceWindowsClient.xml
 docs/Installation/InstallationSourceWindows.xml
 docs/Installation/InstallationSource.xml
 docs/Installation/Preface.xml
+docs/InstallationUnixClient.xml
 docs/InstallationUnix.xml
 docs/InstallationVersion.txt
+docs/InstallationWindowsClient.xml
 docs/InstallationWindows.xml
 docs/Installation.xml
 docs/Makefile.W32
@@ -1765,9 +1773,11 @@ packaging/obs/boost1.49/debian-xUbuntu_12.10/README.source
 packaging/obs/boost1.49/debian-xUbuntu_13.04/README.Debian
 packaging/obs/boost1.49/debian-xUbuntu_13.04/README.source
 packaging/obs/boost1.53/debian-xUbuntu_13.10/README.Debian
+packaging/obs/boost1.54/debian-xUbuntu_14.04/README.Debian
 packaging/obs/deploy_boost1.48_to_obs.sh
 packaging/obs/deploy_boost1.49_to_obs.sh
 packaging/obs/deploy_boost1.53_to_obs.sh
+packaging/obs/deploy_boost1.54_to_obs.sh
 packaging/obs/deploy_libhpdf221_to_obs.sh
 packaging/obs/deploy_to_obs.sh
 packaging/obs/README
@@ -1894,6 +1904,7 @@ src/libwolframe/GNUmakefile
 src/libwolframe/HMAC.cpp
 src/libwolframe/hmac_sha1.c
 src/libwolframe/hmac_sha256.c
+src/libwolframe_langbind/cmdbind_authCommandHandler.cpp
 src/libwolframe_langbind/cmdbind_contentBufferCommandHandlerEscDLF.cpp
 src/libwolframe_langbind/cmdbind_doctypeFilterCommandHandler.cpp
 src/libwolframe_langbind/cmdbind_execCommandHandler.cpp
@@ -1961,6 +1972,8 @@ src/libwolframe/utils/typeSignature.cpp
 src/libwolframe/version.cpp
 src/loadModules.cpp
 src/loggerConfig.cpp
+src/mainCommandHandler.cpp
+src/mainCommandHandler.hpp
 src/mainConnectionHandler_auth.hpp
 src/mainConnectionHandler.cpp
 src/mainConnectionHandler.hpp
@@ -2167,6 +2180,8 @@ src/modules/datatype/bcdnumber/datatypeBigfxp.cpp
 src/modules/datatype/bcdnumber/datatypeBigfxp.hpp
 src/modules/datatype/bcdnumber/datatypeBigint.cpp
 src/modules/datatype/bcdnumber/datatypeBigint.hpp
+src/modules/datatype/bcdnumber/fxpArithmetic.cpp
+src/modules/datatype/bcdnumber/fxpArithmetic.hpp
 src/modules/datatype/bcdnumber/GNUmakefile
 src/modules/datatype/bcdnumber/Makefile.W32
 src/modules/datatype/bcdnumber/ModBcdNumber.def
@@ -2484,6 +2499,7 @@ tests/dotnet/csharp/Functions/data/wolframe.conf
 tests/dotnet/csharp/Functions/README.txt
 tests/dotnet/interop/src/ddl_form.cpp
 tests/dotnet/interop/src/ddl_form.hpp
+tests/dotnet/interop/src/processor/execContext.hpp
 tests/dotnet/interop/src/processor/procProvider.hpp
 tests/dotnet/interop/src/testFormFunction.cpp
 tests/dotnet/interop/src/testFormFunction.hpp
@@ -2608,6 +2624,7 @@ tests/wolfilter/data/filter_multilingual_libxml2.UTF-8.tst
 tests/wolfilter/data/filter_multilingual.UCS-4LE.tst
 tests/wolfilter/data/filter_multilingual.UTF-16LE.tst
 tests/wolfilter/data/filter_multilingual.UTF-8.tst
+tests/wolfilter/data/lua_bcdfxpnumber_calc.tst
 tests/wolfilter/data/lua_bcdnumber_calc.tst
 tests/wolfilter/data/lua_ddlform_input_generator_cjson.UCS-4LE.tst
 tests/wolfilter/data/lua_ddlform_input_generator_cjson.UTF-16LE.tst
@@ -3065,6 +3082,7 @@ tests/wolfilter/modules/prnt/fakepdfprint/pdfPrinterDocumentImpl.hpp
 tests/wolfilter/modules/prnt/fakepdfprint/pdfPrinterFiles.cpp
 tests/wolfilter/modules/prnt/GNUmakefile
 tests/wolfilter/modules/prnt/Makefile.W32
+tests/wolfilter/scripts/bcdfxpnumber_calc.lua
 tests/wolfilter/scripts/bcdnumber_calc.lua
 tests/wolfilter/scripts/ddlform_input_generator.lua
 tests/wolfilter/scripts/ddlform_iterator.lua
@@ -3096,10 +3114,12 @@ tests/wolfilter/scripts/transaction_input_generator.lua
 tests/wolfilter/scripts/transaction_iterator.lua
 tests/wolfilter/scripts/transaction_table.lua
 tests/wolfilter/template/create_rand_bcd_doc.sh
+tests/wolfilter/template/create_rand_bcdfxp_doc.sh
 tests/wolfilter/template/data/filter_employee_assignment_print.tst
 tests/wolfilter/template/data/filter_employee_assignment_print_xslt_out.tst
 tests/wolfilter/template/data/filter_employee_assignment_print_xslt.tst
 tests/wolfilter/template/data/filter_multilingual.tst
+tests/wolfilter/template/data/lua_bcdfxpnumber_calc.tst
 tests/wolfilter/template/data/lua_bcdnumber_calc.tst
 tests/wolfilter/template/data/lua_ddlform_input_generator.tst
 tests/wolfilter/template/data/lua_ddlform_iterator_scope.tst
