@@ -9,7 +9,6 @@ Serialization:
 	[SE03] http://bytes.com/topic/net/answers/178923-doctype-xml-serialization
 		How to set "<!DOCTYPE root PUBLIC pub SYSTEM sys>" in xml serialization
 
-
 Deserialization:
 	[DS01] MSDN (XmlReader.Create Method (TextReader)): http://msdn.microsoft.com/en-us/library/z042k543%28v=vs.110%29.aspx
 		How to create an XMLReader from string (TextReader)
@@ -22,9 +21,10 @@ Deserialization:
 	[DS05] MSDN (XmlReader.GetAttribute Method): http://msdn.microsoft.com/en-us/library/sxy2cd1w%28v=vs.110%29.aspx
 		Read document type elements for an XMLReader on a DocumentType Node xmlreader::GetAttribute( "DOCTYPE" );
 
-
 TCP/SSL Connection:
 	[TS01] https://www.simple-talk.com/dotnet/.net-framework/tlsssl-and-.net-framework-4.0/
 		Talk about SSL/TLS with protocol explanation and examples
+	[TS02] http://blogs.msdn.com/b/joncole/archive/2007/06/13/sample-asynchronous-sslstream-client-server-implementation.aspx
+		Sample asynchronous sslstream client/server implementation
 
 
