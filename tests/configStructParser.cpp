@@ -156,8 +156,9 @@ struct DatabaseConfig
 	std::string password;
 	unsigned short connections;
 	unsigned short acquireTimeout;
+	bool foreignKeys;
 
-	DatabaseConfig() :port(0),connections(0),acquireTimeout(0) {}
+	DatabaseConfig() :port(0),connections(0),acquireTimeout(0),foreignKeys(false) {}
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
@@ -357,7 +358,9 @@ const serialize::StructDescriptionBase* DatabaseConfig::getStructDescription()
 			( "user",		&DatabaseConfig::user)
 			( "password",		&DatabaseConfig::password)
 			( "connections",	&DatabaseConfig::connections)
-			( "acquireTimeout",	&DatabaseConfig::acquireTimeout);
+			( "acquireTimeout",	&DatabaseConfig::acquireTimeout)
+			( "foreignKeys",	&DatabaseConfig::foreignKeys)
+			;
 		}
 	};
 	static const ThisDescription rt;
@@ -406,7 +409,9 @@ const serialize::StructDescriptionBase* Configuration::getStructDescription()
 			( "service",		&Configuration::service)
 			( "daemon",		&Configuration::daemon)
 			( "logging",		&Configuration::logger)
-			( "net",		&Configuration::net);
+			( "net",		&Configuration::net)
+			( "database",		&Configuration::database)
+			;
 		}
 	};
 	static const ThisDescription rt;
