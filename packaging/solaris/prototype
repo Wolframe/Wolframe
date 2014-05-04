@@ -329,16 +329,16 @@ f none opt/csw/lib/wolframe/libboost_system.so.1.55.0 0755 root root
 f none opt/csw/lib/wolframe/libboost_thread.so.1.55.0 0755 root root
 f none opt/csw/lib/wolframe/libpython3.3m.so.1.0 0755 root root
 f none opt/csw/lib/wolframe/libicudata.so.49.1.2 0755 root root
-s none opt/csw/lib/wolframe/libicudata.so.49=opt/csw/lib/wolframe/libicudata.so.49.1.2
+s none opt/csw/lib/wolframe/libicudata.so.49=libicudata.so.49.1.2
 f none opt/csw/lib/wolframe/libicui18n.so.49.1.2 0755 root root
-s none opt/csw/lib/wolframe/libicui18n.so.49=opt/csw/lib/wolframe/libicui18n.so.49.1.2
+s none opt/csw/lib/wolframe/libicui18n.so.49=libicui18n.so.49.1.2
 f none opt/csw/lib/wolframe/libicuio.so.49.1.2 0755 root root
-s none opt/csw/lib/wolframe/libicuio.so.49=opt/csw/lib/wolframe/libicuio.so.49.1.2
+s none opt/csw/lib/wolframe/libicuio.so.49=libicuio.so.49.1.2
 f none opt/csw/lib/wolframe/libicule.so.49.1.2 0755 root root
-s none opt/csw/lib/wolframe/libicule.so.49=opt/csw/lib/wolframe/libicule.so.49.1.2
+s none opt/csw/lib/wolframe/libicule.so.49=libicule.so.49.1.2
 f none opt/csw/lib/wolframe/libiculx.so.49.1.2 0755 root root
-s none opt/csw/lib/wolframe/libiculx.so.49=opt/csw/lib/wolframe/libiculx.so.49.1.2
+s none opt/csw/lib/wolframe/libiculx.so.49=libiculx.so.49.1.2
 f none opt/csw/lib/wolframe/libicutu.so.49.1.2 0755 root root
-s none opt/csw/lib/wolframe/libicutu.so.49=opt/csw/lib/wolframe/libicutu.so.49.1.2
+s none opt/csw/lib/wolframe/libicutu.so.49=libicutu.so.49.1.2
 f none opt/csw/lib/wolframe/libicuuc.so.49.1.2 0755 root root
-s none opt/csw/lib/wolframe/libicuuc.so.49=opt/csw/lib/wolframe/libicuuc.so.49.1.2
+s none opt/csw/lib/wolframe/libicuuc.so.49=libicuuc.so.49.1.2
