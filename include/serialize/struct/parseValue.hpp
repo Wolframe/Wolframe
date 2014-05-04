@@ -154,22 +154,22 @@ struct ValueParser
 					const char* cc = element.charptr();
 					std::size_t ccsize = element.charsize();
 				
-					if (ccsize == 4 && boost::algorithm::iequals( cc, "true") == 0)
+					if (ccsize == 4 && boost::algorithm::iequals( cc, "true"))
 					{
 						val = true;
 						return true;
 					}
-					if (ccsize == 5 && boost::algorithm::iequals( cc, "false") == 0)
+					if (ccsize == 5 && boost::algorithm::iequals( cc, "false"))
 					{
 						val = false;
 						return true;
 					}
-					if (ccsize == 3 && boost::algorithm::iequals( cc, "yes") == 0)
+					if (ccsize == 3 && boost::algorithm::iequals( cc, "yes"))
 					{
 						val = true;
 						return true;
 					}
-					if (ccsize == 2 && boost::algorithm::iequals( cc, "no") == 0)
+					if (ccsize == 2 && boost::algorithm::iequals( cc, "no"))
 					{
 						val = false;
 						return true;
