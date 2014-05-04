@@ -1,0 +1,30 @@
+
+Serialization:
+	[SE01] MSDN (XmlWriter.WriteDocType Method): http://msdn.microsoft.com/en-us/library/system.xml.xmlwriter.writedoctype%28v=vs.110%29.aspx
+		How to inject document type that determines the processing of Wolframe request
+
+	[SE02] Stackoverflow: http://stackoverflow.com/questions/10718831/how-to-serialize-a-class-to-an-xml-structure
+		How to serialize a class to an xml structure
+
+	[SE03] http://bytes.com/topic/net/answers/178923-doctype-xml-serialization
+		How to set "<!DOCTYPE root PUBLIC pub SYSTEM sys>" in xml serialization
+
+
+Deserialization:
+	[DS01] MSDN (XmlReader.Create Method (TextReader)): http://msdn.microsoft.com/en-us/library/z042k543%28v=vs.110%29.aspx
+		How to create an XMLReader from string (TextReader)
+	[DS02] MSDN (XmlSerializer.Deserialize Method (XmlReader)): http://msdn.microsoft.com/en-us/library/tz8csy73%28v=vs.110%29.aspx
+		How to deserialize an object from an XMLReader
+	[DS03] MSDN (XmlTextReader.NodeType Property): http://msdn.microsoft.com/en-us/library/system.xml.xmltextreader.nodetype.aspx
+		How do get to the DOCTYPE node with an XMLReader
+	[DS04] Tutorial Xamarin (Reading XML with the XmlReader class): http://csharp.net-tutorials.com/xml/reading-xml-with-the-xmlreader-class/
+		Reading XML with the XmlReader class
+	[DS05] MSDN (XmlReader.GetAttribute Method): http://msdn.microsoft.com/en-us/library/sxy2cd1w%28v=vs.110%29.aspx
+		Read document type elements for an XMLReader on a DocumentType Node xmlreader::GetAttribute( "DOCTYPE" );
+
+
+TCP/SSL Connection:
+	[TS01] https://www.simple-talk.com/dotnet/.net-framework/tlsssl-and-.net-framework-4.0/
+		Talk about SSL/TLS with protocol explanation and examples
+
+
