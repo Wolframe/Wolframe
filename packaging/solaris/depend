@@ -1,0 +1,10 @@
+P CSWlibstdc++6     The GNU Compiler Collection, libstdc++.so.6
+P CSWlibssl1-0-0    Openssl 1.0 runtime libraries
+P CSWlibsqlite3-0   SQLite library providing libsqlite3.so.0
+P CSWlibpq5         PostgreSQL 9.3.4, libpq
+P CSWlibxml2-2      XML Parser Library
+P CSWlibxslt        XSLT engine runtime package
+P CSWlibz1          Zlib data compression library, libz.so.1
+P CSWlibiconv2      GNU iconv library, libiconv.so.2
+P CSWsasl           Cyrus Simple Authentication and Security Layer
+P SUNWpng           Portable Network Graphics library
