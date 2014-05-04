@@ -334,25 +334,33 @@ local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man8
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -m 0644 wolframe.conf.5 $(DESTDIR)$(mandir)/man5
+ifneq "$(PLATFORM)" "SUNOS"
 	gzip -f $(DESTDIR)$(mandir)/man5/wolframe.conf.5
+endif
 	$(INSTALL) -m 0644 wolframe-mod_db_sqlite3.5 $(DESTDIR)$(mandir)/man5
+ifneq "$(PLATFORM)" "SUNOS"
 	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5
+endif
 	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(mandir)/man8
+ifneq "$(PLATFORM)" "SUNOS"
 	gzip -f $(DESTDIR)$(mandir)/man8/wolframed.8
+endif
 	$(INSTALL) -m 0644 wolfpasswd.1 $(DESTDIR)$(mandir)/man1
+ifneq "$(PLATFORM)" "SUNOS"
 	gzip -f $(DESTDIR)$(mandir)/man1/wolfpasswd.1
+endif
 
 local_uninstall:
 	@-rm -rf $(DESTDIR)$(datadir)/doc/wolframe/html
 	@-rmdir $(DESTDIR)$(datadir)/doc/wolframe
 	@-rmdir $(DESTDIR)$(datadir)/doc
 	@-rmdir $(DESTDIR)$(datadir)
-	@-rm $(DESTDIR)$(mandir)/man1/wolfpasswd.1.gz
+	@-rm $(DESTDIR)$(mandir)/man1/wolfpasswd.1*
 	@-rmdir $(DESTDIR)$(mandir)/man1
-	@-rm $(DESTDIR)$(mandir)/man8/wolframed.8.gz
+	@-rm $(DESTDIR)$(mandir)/man8/wolframed.8*
 	@-rmdir $(DESTDIR)$(mandir)/man8
-	@-rm $(DESTDIR)$(mandir)/man5/wolframe.conf.5.gz
-	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5.gz
+	@-rm $(DESTDIR)$(mandir)/man5/wolframe.conf.5*
+	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5*
 	@-rmdir $(DESTDIR)$(mandir)/man5
 	@-rmdir $(DESTDIR)$(mandir)
 

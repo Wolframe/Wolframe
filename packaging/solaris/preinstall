@@ -1,0 +1,6 @@
+#!/bin/sh
+
+getent group wolframe >/dev/null || /usr/sbin/groupadd wolframe
+getent passwd wolframe >/dev/null || /usr/sbin/useradd -g wolframe -c "Wolframe user" -d /dev/null -s /usr/bin/false wolframe
+
+exit 0

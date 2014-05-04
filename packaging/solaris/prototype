@@ -1,0 +1,344 @@
+i pkginfo
+i copyright
+i preinstall
+i postinstall
+i preremove
+i postremove
+i depend
+d none opt ? ? ?
+d none opt/csw ? ? ?
+d none opt/csw/lib ? ? ?
+d none opt/csw/lib/wolframe 0755 root root
+f none opt/csw/lib/wolframe/libhpdf.a 0644 root staff
+f none opt/csw/lib/wolframe/libhpdf.so.2.2.1 0755 root staff
+s none opt/csw/lib/wolframe/libhpdf.so.2=libhpdf.so.2.2.1
+s none opt/csw/lib/wolframe/libhpdf.so=libhpdf.so.2.2.1
+f none opt/csw/lib/wolframe/libfreeimageplus.a 0644 root staff
+f none opt/csw/lib/wolframe/libfreeimageplus.so.3.15.4 0755 root staff
+s none opt/csw/lib/wolframe/libfreeimageplus.so.3=libfreeimageplus.so.3.15.4
+s none opt/csw/lib/wolframe/libfreeimageplus.so=libfreeimageplus.so.3.15.4
+f none opt/csw/lib/wolframe/libfreeimage.a 0644 root staff
+f none opt/csw/lib/wolframe/libfreeimage.so.3.15.4 0755 root staff
+s none opt/csw/lib/wolframe/libfreeimage.so.3=libfreeimage.so.3.15.4
+s none opt/csw/lib/wolframe/libfreeimage.so=libfreeimage.so.3.15.4
+f none opt/csw/lib/wolframe/libcjson.a 0644 root staff
+f none opt/csw/lib/wolframe/liblua.a 0644 root staff
+f none opt/csw/lib/wolframe/liblua.so.5.2.0 0755 root staff
+s none opt/csw/lib/wolframe/liblua.so.5=liblua.so.5.2.0
+s none opt/csw/lib/wolframe/liblua.so=liblua.so.5.2.0
+f none opt/csw/lib/wolframe/libwolframe.a 0644 root staff
+f none opt/csw/lib/wolframe/libwolframe.so.0.0.0 0755 root staff
+s none opt/csw/lib/wolframe/libwolframe.so.0=libwolframe.so.0.0.0
+s none opt/csw/lib/wolframe/libwolframe.so=libwolframe.so.0.0.0
+f none opt/csw/lib/wolframe/libwfsingleton.a 0644 root staff
+f none opt/csw/lib/wolframe/libwfsingleton.so.0.0.0 0755 root staff
+s none opt/csw/lib/wolframe/libwfsingleton.so.0=libwfsingleton.so.0.0.0
+s none opt/csw/lib/wolframe/libwfsingleton.so=libwfsingleton.so.0.0.0
+f none opt/csw/lib/wolframe/libwolframe_serialize.a 0644 root staff
+f none opt/csw/lib/wolframe/libwolframe_serialize.so.0.0.0 0755 root staff
+s none opt/csw/lib/wolframe/libwolframe_serialize.so.0=libwolframe_serialize.so.0.0.0
+s none opt/csw/lib/wolframe/libwolframe_serialize.so=libwolframe_serialize.so.0.0.0
+f none opt/csw/lib/wolframe/libwolframe_database.a 0644 root staff
+f none opt/csw/lib/wolframe/libwolframe_database.so.0.0.0 0755 root staff
+s none opt/csw/lib/wolframe/libwolframe_database.so.0=libwolframe_database.so.0.0.0
+s none opt/csw/lib/wolframe/libwolframe_database.so=libwolframe_database.so.0.0.0
+f none opt/csw/lib/wolframe/libwolframe_langbind.a 0644 root staff
+d none opt/csw/lib/wolframe/modules 0775 root root
+f none opt/csw/lib/wolframe/modules/mod_audit_database.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_audit_textfile.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_auth_database.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_auth_textfile.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_auth_pam.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_auth_sasl.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_authz_database.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_db_postgresql.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_db_sqlite3.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_datatype_datetime.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_datatype_bcdnumber.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_filter_blob.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_filter_textwolf.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_filter_token.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_filter_char.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_filter_line.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_filter_libxml2.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_filter_cjson.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_ddlcompiler_simpleform.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_normalize_number.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_normalize_base64.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_normalize_string.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_normalize_locale.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_print_harupdf.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_command_directmap.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_command_lua.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_command_python.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_graphix.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_job_schedule_db.so 0775 root staff
+f none opt/csw/lib/wolframe/libwolframe_langbind.so.0.0.0 0755 root staff
+s none opt/csw/lib/wolframe/libwolframe_langbind.so.0=libwolframe_langbind.so.0.0.0
+s none opt/csw/lib/wolframe/libwolframe_langbind.so=libwolframe_langbind.so.0.0.0
+f none opt/csw/lib/wolframe/libwolframe_client.a 0644 root staff
+f none opt/csw/lib/wolframe/libwolframe_client.so.0.0.0 0755 root staff
+s none opt/csw/lib/wolframe/libwolframe_client.so.0=libwolframe_client.so.0.0.0
+s none opt/csw/lib/wolframe/libwolframe_client.so=libwolframe_client.so.0.0.0
+d none opt/csw/include ? ? ?
+d none opt/csw/include/wolframe 0755 root root
+d none opt/csw/include/wolframe/libhpdf 0755 root root
+f none opt/csw/include/wolframe/libhpdf/hpdf_3dmeasure.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_annotation.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_catalog.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_conf.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_config.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_consts.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_destination.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_doc.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_encoder.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_encryptdict.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_encrypt.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_error.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_exdata.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_ext_gstate.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_fontdef.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_font.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_gstate.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_image.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_info.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_list.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_mmgr.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_namedict.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_objects.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_outline.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_page_label.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_pages.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_pdfa.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_streams.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_types.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_u3d.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_utils.h 0644 root staff
+f none opt/csw/include/wolframe/libhpdf/hpdf_version.h 0644 root staff
+d none opt/csw/include/wolframe/cjson 0755 root root
+f none opt/csw/include/wolframe/cjson/cJSON.h 0644 root staff
+d none opt/csw/include/wolframe/lua 0755 root root
+f none opt/csw/include/wolframe/lua/lauxlib.h 0644 root staff
+f none opt/csw/include/wolframe/lua/lua.h 0644 root staff
+f none opt/csw/include/wolframe/lua/lua.hpp 0644 root staff
+f none opt/csw/include/wolframe/lua/luaconf.h 0644 root staff
+f none opt/csw/include/wolframe/lua/lualib.h 0644 root staff
+d none opt/csw/include/wolframe/libclient 0755 root root
+f none opt/csw/include/wolframe/libclient/connection.hpp 0644 root staff
+f none opt/csw/include/wolframe/libclient/exportable.hpp 0644 root staff
+f none opt/csw/include/wolframe/libclient/protocol.hpp 0644 root staff
+f none opt/csw/include/wolframe/libclient/session.hpp 0644 root staff
+f none opt/csw/include/wolframe/appConfig.hpp 0644 root staff
+f none opt/csw/include/wolframe/appDevel.hpp 0644 root staff
+f none opt/csw/include/wolframe/appInfo.hpp 0644 root staff
+f none opt/csw/include/wolframe/appProperties.hpp 0644 root staff
+f none opt/csw/include/wolframe/logger-v1.hpp 0644 root staff
+f none opt/csw/include/wolframe/standardConfigs.hpp 0644 root staff
+f none opt/csw/include/wolframe/version.hpp 0644 root staff
+f none opt/csw/include/wolframe/wolframe.hpp 0644 root staff
+d none opt/csw/include/wolframe/langbind 0755 root root
+f none opt/csw/include/wolframe/langbind/authorization.hpp 0644 root staff
+f none opt/csw/include/wolframe/langbind/ddlCompilerInterface.hpp 0644 root staff
+f none opt/csw/include/wolframe/langbind/formFunction.hpp 0644 root staff
+f none opt/csw/include/wolframe/langbind/input.hpp 0644 root staff
+f none opt/csw/include/wolframe/langbind/output.hpp 0644 root staff
+f none opt/csw/include/wolframe/langbind/runtimeEnvironment.hpp 0644 root staff
+d none opt/csw/include/wolframe/protocol 0755 root root
+f none opt/csw/include/wolframe/protocol/buffers.hpp 0644 root staff
+f none opt/csw/include/wolframe/protocol/ioblocks.hpp 0644 root staff
+f none opt/csw/include/wolframe/protocol/iterators.hpp 0644 root staff
+f none opt/csw/include/wolframe/protocol/parser.hpp 0644 root staff
+d none opt/csw/include/wolframe/cmdbind 0755 root root
+f none opt/csw/include/wolframe/cmdbind/authCommandHandler.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/commandHandler.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/commandHandlerConstructor.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/execCommandHandler.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/ioFilterCommandHandler.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/lineCommandHandler.hpp 0644 root staff
+d none opt/csw/include/wolframe/database 0755 root root
+f none opt/csw/include/wolframe/database/DBprovider.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/baseStatement.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/database.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/databaseError.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/databaseLanguage.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/loadTransactionProgram.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/statement.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/substitutingStatement.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/transaction.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/transactionExecStatemachine.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/vmTransactionInput.hpp 0644 root staff
+f none opt/csw/include/wolframe/database/vmTransactionOutput.hpp 0644 root staff
+d none opt/csw/include/wolframe/config 0755 root root
+f none opt/csw/include/wolframe/config/configurationBase.hpp 0644 root staff
+f none opt/csw/include/wolframe/config/configurationTree.hpp 0644 root staff
+f none opt/csw/include/wolframe/config/programBase.hpp 0644 root staff
+f none opt/csw/include/wolframe/config/structSerialize.hpp 0644 root staff
+f none opt/csw/include/wolframe/config/valueParser.hpp 0644 root staff
+d none opt/csw/include/wolframe/logger 0755 root root
+f none opt/csw/include/wolframe/logger/logBackend.hpp 0644 root staff
+f none opt/csw/include/wolframe/logger/logError.hpp 0644 root staff
+f none opt/csw/include/wolframe/logger/logLevel.hpp 0644 root staff
+f none opt/csw/include/wolframe/logger/logObject.hpp 0644 root staff
+f none opt/csw/include/wolframe/logger/logSyslogFacility.hpp 0644 root staff
+d none opt/csw/include/wolframe/utils 0755 root root
+f none opt/csw/include/wolframe/utils/allocators.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/fileLineInfo.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/fileUtils.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/getPassword.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/malloc.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/parseUtils.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/printFormats.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/resolvePath.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/sourceLineInfo.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/stringUtils.hpp 0644 root staff
+f none opt/csw/include/wolframe/utils/typeSignature.hpp 0644 root staff
+d none opt/csw/include/wolframe/serialize 0755 root root
+f none opt/csw/include/wolframe/serialize/cppFormFunction.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/ddlFormParser.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/ddlFormSerializer.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/mapContext.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/serializationErrorException.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/structOptionParser.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/tostringUtils.hpp 0644 root staff
+d none opt/csw/include/wolframe/serialize/struct 0755 root root
+f none opt/csw/include/wolframe/serialize/struct/intrusiveParser.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/intrusiveProperty.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/intrusiveSerializer.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/parseStack.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/parseValue.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/printValue.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/serializeStack.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/structDescription.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/structDescriptionBase.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/structParser.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/structSerializer.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/struct/traits_getCategory.hpp 0644 root staff
+d none opt/csw/include/wolframe/serialize/ddl 0755 root root
+f none opt/csw/include/wolframe/serialize/ddl/ddlParseStack.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/ddl/ddlSerializeStack.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/ddl/ddlStructParser.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/ddl/ddlStructSerializer.hpp 0644 root staff
+d none opt/csw/include/wolframe/processor 0755 root root
+f none opt/csw/include/wolframe/processor/execContext.hpp 0644 root staff
+f none opt/csw/include/wolframe/processor/jobSchedule.hpp 0644 root staff
+f none opt/csw/include/wolframe/processor/procProvider.hpp 0644 root staff
+f none opt/csw/include/wolframe/processor/procProviderInterface.hpp 0644 root staff
+d none opt/csw/include/wolframe/filter 0755 root root
+f none opt/csw/include/wolframe/filter/bufferingfilter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/contentfilterAttributes.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/filter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/filterbase.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/inputfilter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/inputfilterScope.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/null_filter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/outputfilter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/ptreefilter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/redirectFilterClosure.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/singlefilter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/tostringfilter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/typedfilter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/typedfilterScope.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/typingfilter.hpp 0644 root staff
+d none opt/csw/include/wolframe/types 0755 root root
+f none opt/csw/include/wolframe/types/base64.h 0644 root staff
+f none opt/csw/include/wolframe/types/base64.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/bignumber.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/byte2hex.h 0644 root staff
+f none opt/csw/include/wolframe/types/conversions.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/countedReference.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/customDataNormalizer.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/customDataType.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/datetime.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/doctype.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/form.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/integer.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/keymap.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/normalizeFunction.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/numberBaseConversion.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/propertyTree.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/string.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/traits.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/variant.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/variantStruct.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/variantStructDescription.hpp 0644 root staff
+d none opt/csw/include/wolframe/AAAA 0755 root root
+f none opt/csw/include/wolframe/AAAA/AAAAinformation.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/AAAAprovider.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/CRAM.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/audit.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/authentication.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/authorization.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/password.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/user.hpp 0644 root staff
+d none opt/csw/include/wolframe/module 0755 root root
+f none opt/csw/include/wolframe/module/constructor.hpp 0644 root staff
+f none opt/csw/include/wolframe/module/moduleDirectory.hpp 0644 root staff
+f none opt/csw/include/wolframe/module/moduleInterface.hpp 0644 root staff
+d none opt/csw/include/wolframe/prgbind 0755 root root
+f none opt/csw/include/wolframe/prgbind/ddlProgram.hpp 0644 root staff
+f none opt/csw/include/wolframe/prgbind/normalizeProgram.hpp 0644 root staff
+f none opt/csw/include/wolframe/prgbind/program.hpp 0644 root staff
+f none opt/csw/include/wolframe/prgbind/programLibrary.hpp 0644 root staff
+f none opt/csw/include/wolframe/prgbind/transactionProgram.hpp 0644 root staff
+d none opt/csw/include/wolframe/crypto 0755 root root
+f none opt/csw/include/wolframe/crypto/HMAC.h 0644 root staff
+f none opt/csw/include/wolframe/crypto/HMAC.hpp 0644 root staff
+f none opt/csw/include/wolframe/crypto/PBKDF2.h 0644 root staff
+f none opt/csw/include/wolframe/crypto/PBKDF2.hpp 0644 root staff
+f none opt/csw/include/wolframe/crypto/md5.h 0644 root staff
+f none opt/csw/include/wolframe/crypto/sha1.h 0644 root staff
+f none opt/csw/include/wolframe/crypto/sha2.h 0644 root staff
+d none opt/csw/bin ? ? ?
+f none opt/csw/bin/wolfpasswd 0775 root staff
+f none opt/csw/bin/wolfilter 0775 root staff
+f none opt/csw/bin/wolfwizard 0775 root staff
+f none opt/csw/bin/wolframec 0755 root staff
+d none opt/csw/sbin ? ? ?
+f none opt/csw/sbin/wolframed 0775 root staff
+d none opt/csw/etc ? ? ?
+d none opt/csw/etc/wolframe 0755 root root
+f none opt/csw/etc/wolframe/wolframe.conf 0755 root staff
+d none opt/csw/share ? ? ?
+d none opt/csw/share/doc ? ? ?
+d none opt/csw/share/doc/wolframe 0755 root root
+d none opt/csw/share/man ? ? ?
+d none opt/csw/share/man/man5 ? ? ?
+f none opt/csw/share/man/man5/wolframe.conf.5 0644 root staff
+f none opt/csw/share/man/man5/wolframe-mod_db_sqlite3.5 0644 root staff
+d none opt/csw/share/man/man8 ? ? ?
+f none opt/csw/share/man/man8/wolframed.8 0644 root staff
+d none opt/csw/share/man/man1 ? ? ?
+f none opt/csw/share/man/man1/wolfpasswd.1 0644 root staff
+d none etc ? ? ?
+d none etc/opt ? ? ?
+d none etc/opt/csw ? ? ?
+d none etc/opt/csw/wolframe 0755 root root
+f none etc/opt/csw/wolframe/wolframe.conf 0644 root staff
+f none opt/csw/lib/wolframe/libboost_chrono.so.1.55.0 0755 root root
+f none opt/csw/lib/wolframe/libboost_date_time.so.1.55.0 0755 root root
+f none opt/csw/lib/wolframe/libboost_filesystem.so.1.55.0 0755 root root
+f none opt/csw/lib/wolframe/libboost_locale.so.1.55.0 0755 root root
+f none opt/csw/lib/wolframe/libboost_program_options.so.1.55.0 0755 root root
+f none opt/csw/lib/wolframe/libboost_regex.so.1.55.0 0755 root root
+f none opt/csw/lib/wolframe/libboost_system.so.1.55.0 0755 root root
+f none opt/csw/lib/wolframe/libboost_thread.so.1.55.0 0755 root root
+f none opt/csw/lib/wolframe/libpython3.3m.so.1.0 0755 root root
+f none opt/csw/lib/wolframe/libicudata.so.49.1.2 0755 root root
+s none opt/csw/lib/wolframe/libicudata.so.49=opt/csw/lib/wolframe/libicudata.so.49.1.2
+f none opt/csw/lib/wolframe/libicui18n.so.49.1.2 0755 root root
+s none opt/csw/lib/wolframe/libicui18n.so.49=opt/csw/lib/wolframe/libicui18n.so.49.1.2
+f none opt/csw/lib/wolframe/libicuio.so.49.1.2 0755 root root
+s none opt/csw/lib/wolframe/libicuio.so.49=opt/csw/lib/wolframe/libicuio.so.49.1.2
+f none opt/csw/lib/wolframe/libicule.so.49.1.2 0755 root root
+s none opt/csw/lib/wolframe/libicule.so.49=opt/csw/lib/wolframe/libicule.so.49.1.2
+f none opt/csw/lib/wolframe/libiculx.so.49.1.2 0755 root root
+s none opt/csw/lib/wolframe/libiculx.so.49=opt/csw/lib/wolframe/libiculx.so.49.1.2
+f none opt/csw/lib/wolframe/libicutu.so.49.1.2 0755 root root
+s none opt/csw/lib/wolframe/libicutu.so.49=opt/csw/lib/wolframe/libicutu.so.49.1.2
+f none opt/csw/lib/wolframe/libicuuc.so.49.1.2 0755 root root
+s none opt/csw/lib/wolframe/libicuuc.so.49=opt/csw/lib/wolframe/libicuuc.so.49.1.2
