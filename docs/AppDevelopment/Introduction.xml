@@ -12,9 +12,12 @@
 		<figure>
 			<title>Overview</title>
 			<mediaobject>
-				<imageobject>
+				<imageobject role="fo">
 					<imagedata fileref="images/3-tier.svg" format="SVG"
 						scalefit="1" width="100%" contentdepth="100%"/>
+				</imageobject>
+				<imageobject role="html">
+					<imagedata fileref="images/3-tier.png" format="PNG"/>
 				</imageobject>
 				<caption><para></para></caption>
 			</mediaobject>
@@ -70,9 +73,12 @@
 		<figure>
 			<title>Overview</title>
 			<mediaobject>
-				<imageobject>
+				<imageobject role="fo">
 					<imagedata fileref="images/LogicTier.svg" format="SVG"
 						scale="300"/>
+				</imageobject>
+				<imageobject role="html">
+					<imagedata fileref="images/LogicTier.png" format="PNG"/>
 				</imageobject>
 				<caption><para></para></caption>
 			</mediaobject>

@@ -48,6 +48,7 @@
 		<programlisting language='shell'>
 	NOTICE: Starting server
 	INFO: Undefined ServerTokens, using ProductOnly
+	INFO: Empty random generator device. Using default device.
 	DEBUG: Random generator initialized. Using device '/dev/urandom'
 	DEBUG: AAAA database references resolved
 	DEBUG: Loading programs
