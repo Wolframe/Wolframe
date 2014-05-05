@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using System.Text.RegularExpressions;
 
 public class Link
 {
@@ -58,6 +59,18 @@ namespace WolframeClient
             return sw.ToString();
         }
 
+        static object getAnswer( string content, Type type)
+        {
+             Regex doctypeDeclaration = new Regex( "<!DOCTYPE[ ]*[^>]*[>]");
+             string saveContent = doctypeDeclaration.Replace( content, "");
+             // ... !DOCTYPE is prohibited for security reasons by .NET, if not 
+             //      explicitely enabled. We cut it out, because we do not need it.
+             StringReader sr = new StringReader( saveContent);
+             XmlReader xr = XmlReader.Create( sr);
+             XmlSerializer xs = new XmlSerializer( type);
+             return xs.Deserialize( xr); 
+        }
+
         static void Main(string[] args)
         {
             ProfileSite obj = new ProfileSite();
@@ -71,7 +84,17 @@ namespace WolframeClient
             obj.Links = lnk1;
 
             var res = getRequestString("profileSite", "profileSite", typeof(ProfileSite), obj);
-            Console.WriteLine("\nDocument:\n\n{0}", res);
+            Console.WriteLine("\nDocument:\n{0}", res);
+            ProfileSite inv = (ProfileSite)getAnswer(res, typeof(ProfileSite));
+            Console.WriteLine("Object ProfileId: {0}", inv.ProfileId);
+            Console.WriteLine("Object SiteId: {0}", inv.SiteId);
+            foreach (Link lnk in inv.Links)
+            {
+                Console.WriteLine("Object Link: {0}", lnk.OriginalUrl);
+            }
+
+            TcpClient client = new TcpClient( "127.0.0.1", 7661);
+            
         }
     }
 }

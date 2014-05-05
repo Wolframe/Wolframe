@@ -27,4 +27,9 @@ TCP/SSL Connection:
 	[TS02] http://blogs.msdn.com/b/joncole/archive/2007/06/13/sample-asynchronous-sslstream-client-server-implementation.aspx
 		Sample asynchronous sslstream client/server implementation
 
+ Security Issues:
+    [SI01] http://msdn.microsoft.com/en-us/library/ms754611%28v=vs.85%29.aspx
+	    To use !DOCTYPE is prohibited if not explicitely enabled
+
+
 
