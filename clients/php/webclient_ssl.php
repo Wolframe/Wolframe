@@ -15,21 +15,18 @@ try
 	{
 		$command = $_REQUEST['COMMAND'];
 	}
-
-	if( array_key_exists( "CONTENT", $_REQUEST ) )
+	$body = string http_get_request_body();
+	if ($body == NULL/*or empty*/)
 	{
-		$conn = new Session( "127.0.0.1", 7962, $sslopt, "NONE");
-		if (($result = $conn->request( $command, $_REQUEST['CONTENT'])) === FALSE)
-		{
-			throw new Exception( $conn->lasterror());
-		}
-		echo "<html><head><title>RESULT</title></head><body><p>" . $result . "</p></body></html>";
-		unset( $conn);
+		$body = $_REQUEST['CONTENT'];
 	}
-	else
+	$conn = new Session( "127.0.0.1", 7962, $sslopt, "NONE");
+	if (($result = $conn->request( $command, $body)) === FALSE)
 	{
-		var_dump( $_REQUEST);
+		throw new Exception( $conn->lasterror());
 	}
+	echo "<html><head><title>RESULT</title></head><body><p>" . $result . "</p></body></html>";
+	unset( $conn);
 }
 catch ( \Exception $e)
 {
