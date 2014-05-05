@@ -42,6 +42,7 @@
 #include "system/serverEndpoint.hpp"
 #include "logger/logLevel.hpp"
 #include "logger/logSyslogFacility.hpp"
+#include "appProperties.hpp"
 
 #include <string>
 #include <list>
@@ -63,7 +64,7 @@ public:
 #endif // WITH_SSL
 
 	/// constructor
-	Configuration();
+	Configuration( const AppProperties* appProperties_);
 
 	/// methods
 	bool parse( const config::ConfigurationNode& pt, const std::string& node,
@@ -75,6 +76,9 @@ public:
 
 //	Not implemented yet, inherited from base for the time being
 //	bool test() const;
+
+private:
+	const AppProperties* m_appProperties;
 };
 
 } // namespace net
@@ -143,7 +147,7 @@ public:
 #endif // !defined( _WIN32 )
 
 	/// constructor
-	ServiceConfiguration();
+	ServiceConfiguration( const AppProperties* appProperties_);
 
 	/// methods
 	bool parse( const config::ConfigurationNode& pt, const std::string& node,
@@ -158,6 +162,9 @@ public:
 	void setCanonicalPathes( const std::string& referencePath );
 	void override( const std::string& user, const std::string& group, const std::string& pidFile );
 #endif // !defined( _WIN32 )
+
+private:
+	 const AppProperties* m_appProperties;
 };
 
 

@@ -38,6 +38,7 @@
 #define _APP_CONFIG_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
+#include "appProperties.hpp"
 #include <cstddef>
 #include <string>
 #include <map>
@@ -79,7 +80,7 @@ public:
 		CONFIG_UNDEFINED
 	};
 
-	ApplicationConfiguration();
+	explicit ApplicationConfiguration( const AppProperties* appProperties_);
 	~ApplicationConfiguration();
 
 	static ConfigFileType fileType( const char *filename, ConfigFileType type );
@@ -112,6 +113,7 @@ private:
 	std::list< std::string >		m_modFiles;
 
 	const module::ModulesDirectory*		m_modDir;
+	const AppProperties*			m_appProperties;
 public:
 	bool addConfig( const std::string& nodeName, ConfigurationBase* conf );
 };

@@ -101,7 +101,7 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 			}
 		}
 		if ( serviceName.empty() )
-			serviceName = defaultServiceName();
+			serviceName = m_appProperties->defaultServiceName();
 	}
 #endif
 #if !defined(_WIN32)
@@ -141,11 +141,11 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 			}
 		}
 		if ( serviceName.empty() )
-			serviceName = defaultServiceName();
+			serviceName = m_appProperties->defaultServiceName();
 		if ( serviceDisplayName.empty() )
-			serviceDisplayName = defaultServiceDisplayName();
+			serviceDisplayName = m_appProperties->defaultServiceDisplayName();
 		if ( serviceDescription.empty() )
-			serviceDescription = defaultServiceDescription();
+			serviceDescription = m_appProperties->defaultServiceDescription();
 	}
 #endif
 	else	{
@@ -157,9 +157,9 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 
 // Constructor
 #if !defined(_WIN32)	// Unix daemon
-ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Daemon", NULL, "Daemon configuration" )	{}
+ServiceConfiguration::ServiceConfiguration( const AppProperties* appProperties_) : ConfigurationBase( "Daemon", NULL, "Daemon configuration" ), m_appProperties(appProperties_)	{}
 #else
-ServiceConfiguration::ServiceConfiguration() : ConfigurationBase( "Service", NULL, "Service configuration" )	{}
+ServiceConfiguration::ServiceConfiguration( const AppProperties* appProperties_) : ConfigurationBase( "Service", NULL, "Service configuration" ), m_appProperties(appProperties_){}
 #endif
 
 

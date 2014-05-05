@@ -113,7 +113,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 						    << L2it->first << "'";
 			}
 			if ( port == 0 )
-				port = net::defaultTCPport();
+				port = m_appProperties->defaultTCPport();
 
 			net::ServerTCPendpoint lep( host, port, identifier, maxConn );
 			address.push_back( lep );
@@ -190,7 +190,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			}
 #ifdef WITH_SSL
 			if ( port == 0 )
-				port = net::defaultSSLport();
+				port = m_appProperties->defaultSSLport();
 
 			net::ServerSSLendpoint lep( host, port, identifier, maxConn,
 						    certFile, keyFile,
@@ -211,8 +211,8 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 
 
 // Constructor
-Configuration::Configuration()
-	: ConfigurationBase( "Network Server", NULL, "Network server configuration" )
+Configuration::Configuration( const AppProperties* appProperties_)
+	: ConfigurationBase( "Network Server", NULL, "Network server configuration" ), m_appProperties( appProperties_ )
 {
 	threads = 0;
 	maxConnections = 0;

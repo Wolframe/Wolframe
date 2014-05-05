@@ -98,7 +98,6 @@ endif
 
 
 CPP_OBJS = \
-	appProperties.o \
 	appConfigDefinition.o \
 	$(LOCAL_STATIC_LIB_OBJS) \
 	wolframeHandler.o \

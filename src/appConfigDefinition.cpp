@@ -42,13 +42,13 @@
 namespace _Wolframe {
 namespace config {
 
-ApplicationConfiguration::ApplicationConfiguration()
-	: m_modDir( NULL )
+ApplicationConfiguration::ApplicationConfiguration( const AppProperties* appProperties_)
+	: m_modDir( NULL ), m_appProperties( appProperties_ )
 {
 	// daemon / service configuration
-	serviceCfg = new _Wolframe::config::ServiceConfiguration();
+	serviceCfg = new _Wolframe::config::ServiceConfiguration( appProperties_);
 	// network server
-	serverCfg = new _Wolframe::net::Configuration();
+	serverCfg = new _Wolframe::net::Configuration( appProperties_);
 	// job scheduler configuration
 //	jobSchedulerCfg = new _Wolframe::JobSchedulerConfiguration();
 	// logging

@@ -34,30 +34,5 @@
 // application properties - implementation
 //
 
-#include "appProperties.hpp"
-#include "wolframe.hpp"
-#include "version.hpp"
 
-namespace _Wolframe	{
-
-	const char*	applicationName()			{ return "Wolframe"; }
-	const Version	applicationVersion()			{ return Version( WOLFRAME_MAJOR_VERSION,
-										  WOLFRAME_MINOR_VERSION,
-										  WOLFRAME_REVISION
-										  ); }
-
-	const char*	config::defaultMainConfig()		{ return "/etc/wolframe.conf"; }
-	const char*	config::defaultUserConfig()		{ return "~/wolframe.conf"; }
-	const char*	config::defaultLocalConfig()		{ return "./wolframe.conf"; }
-
-	unsigned short	net::defaultTCPport()			{ return 7660; }
-	unsigned short	net::defaultSSLport()			{ return 7960; }
-
-	const char*	config::defaultServiceName()		{ return "wolframe"; }
-#if defined( _WIN32 )
-	const char*	config::defaultServiceDisplayName()	{ return "Wolframe Daemon"; }
-	const char*	config::defaultServiceDescription()	{ return "a daemon for wolframeing"; }
-#endif // defined( _WIN32 )
-
-} // namespace _Wolframe
 

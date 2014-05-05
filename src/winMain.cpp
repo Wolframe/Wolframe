@@ -393,14 +393,14 @@ WAIT_FOR_STOP_EVENT:
 }
 
 
-int _Wolframe_winMain( int argc, char* argv[] )
+int _Wolframe_winMain( int argc, char* argv[], const AppProperties* appProperties)
 {
 	try	{
 		// create initial console logger, so we see things going wrong
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
 
 		_Wolframe::ApplicationInfo& appInfo = _Wolframe::ApplicationInfo::instance();
-		appInfo.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
+		appInfo.version( _Wolframe::Version( appProperties->applicationVersion() ));
 
 		_Wolframe::config::CmdLineConfig	cmdLineCfg;
 		const char		*configFile = NULL;
@@ -427,7 +427,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
-			std::cout << _Wolframe::applicationName() << " version "
+			std::cout << appProperties->applicationName() << " version "
 				  << appInfo.version().toString() << std::endl << std::endl;
 			return _Wolframe::ErrorCode::OK;
 		}

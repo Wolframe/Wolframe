@@ -112,7 +112,7 @@ int daemon( int nochdir, int noclose )
 }
 #endif
 
-int _Wolframe_posixMain( int argc, char* argv[] )
+int _Wolframe_posixMain( int argc, char* argv[], const _Wolframe::AppProperties* appProperties )
 {
 // default logger (to console, warning level)
 	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
@@ -135,7 +135,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 	try	{
 		_Wolframe::ApplicationInfo& appInfo = _Wolframe::ApplicationInfo::instance();
-		appInfo.version( _Wolframe::Version( _Wolframe::applicationVersion() ));
+		appInfo.version( _Wolframe::Version( appProperties->applicationVersion() ));
 
 		_Wolframe::config::CmdLineConfig   cmdLineCfg;
 		const char *configFile;
@@ -159,12 +159,12 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 // if we have to print the version or the help do it and exit
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
-			std::cout << std::endl << _Wolframe::applicationName() << gettext( " version " )
+			std::cout << std::endl << appProperties->applicationName() << gettext( " version " )
 				  << appInfo.version().toString() << std::endl << std::endl;
 			return _Wolframe::ErrorCode::OK;
 		}
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_HELP )	{
-			std::cout << std::endl << _Wolframe::applicationName() << gettext( " version " )
+			std::cout << std::endl << appProperties->applicationName() << gettext( " version " )
 				  << appInfo.version().toString() << std::endl;
 			cmdLineCfg.usage( std::cout );
 			std::cout << std::endl;
@@ -175,9 +175,9 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
 			configFile = cmdLineCfg.cfgFile.c_str();
 		else
-			configFile = _Wolframe::config::ApplicationConfiguration::chooseFile( _Wolframe::config::defaultMainConfig(),
-											      _Wolframe::config::defaultUserConfig(),
-											      _Wolframe::config::defaultLocalConfig() );
+			configFile = _Wolframe::config::ApplicationConfiguration::chooseFile( appProperties->defaultMainConfig(),
+											      appProperties->defaultUserConfig(),
+											      appProperties->defaultLocalConfig() );
 		if ( configFile == NULL )	{	// there is no configuration file
 			LOG_FATAL << gettext ( "no configuration file found !" );
 			return _Wolframe::ErrorCode::FAILURE;
@@ -188,7 +188,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		}
 
 		_Wolframe::module::ModulesDirectory modDir;
-		_Wolframe::config::ApplicationConfiguration conf;
+		_Wolframe::config::ApplicationConfiguration conf( appProperties);
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
 				_Wolframe::config::ApplicationConfiguration::fileType( configFile, cmdLineCfg.cfgType );
@@ -211,7 +211,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 // Check the configuration
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::CHECK_CONFIG )	{
-			std::cout << _Wolframe::applicationName() << gettext( " version " )
+			std::cout << appProperties->applicationName() << gettext( " version " )
 				  << appInfo.version().toString() << std::endl;
 			if ( conf.check() )	{
 				std::cout << "Configuration OK" << std::endl << std::endl;
@@ -223,7 +223,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		}
 
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_CONFIG )	{
-			std::cout << std::endl << _Wolframe::applicationName() << gettext( " version " )
+			std::cout << std::endl << appProperties->applicationName() << gettext( " version " )
 				  << appInfo.version().toString() << std::endl;
 			conf.print( std::cout );
 			std::cout << std::endl;
