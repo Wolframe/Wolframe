@@ -1,0 +1,14 @@
+#!/bin/sh
+
+getent passwd wolframe >/dev/null && /usr/sbin/userdel wolframe
+getent group wolframe >/dev/null && /usr/sbin/groupdel wolframe
+
+if test -d /var/log/wolframe; then
+	rm -rf /var/log/wolframe
+fi
+
+if test -d /var/run/wolframe; then
+	rm -rf /var/run/wolframe
+fi
+
+exit 0

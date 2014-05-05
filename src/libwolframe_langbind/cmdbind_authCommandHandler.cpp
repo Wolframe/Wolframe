@@ -45,7 +45,7 @@ AuthCommandHandler::AuthCommandHandler( const boost::shared_ptr<AAAA::Authentica
 	,m_outputbufsize(0)
 	,m_outputbufpos(0)
 	,m_state(Init)
-	,m_readpos(0)
+//	,m_readpos(0)	-> see authCommandHandler.hpp
 	,m_writepos(0)
 {}
 
@@ -138,7 +138,7 @@ void AuthCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 			throw std::logic_error("data requested but EoD not consumed in authorization commmand handler");
 		}
 		std::memcpy( m_input.charptr(), m_readbuffer.c_str(), m_readbuffer.size());
-		m_input.setPos( nofBytes = m_readbuffer.size());		
+		m_input.setPos( nofBytes = m_readbuffer.size());
 		begin = (const void*)m_input.charptr();
 	}
 }
@@ -161,7 +161,7 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 				//[+] {
 				//[+] 	case READ:
 				//[+] 		return READ;
-				//[+] 
+				//[+]
 				//[+] 	case WRITE:
 				//[+] 	{
 				//[+] 		AAAA::Authenticator::Message msg = m_authenticator->getWriteMessage();

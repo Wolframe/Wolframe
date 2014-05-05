@@ -1,0 +1,102 @@
+#!/bin/sh
+
+VERSION=0.0.1
+PKGBUILD=$HOME/solarisbuild
+ORIG_ARCH=`uname -m`
+OS_ARCH=`uname -p`
+OS_VERSION=`uname -r`
+ORIG_OS_VER=`uname -r | cut -f 1 -d -`
+
+if test "x$OS_ARCH" = "xsparc"; then
+	ARCH="x86_64"
+else if test "x$OS_ARCH" = "xi386"; then
+	ARCH="i686"
+else
+	echo "ERROR: Unknown Solaris architecture '$OS_ARCH'"
+	exit 1
+fi
+fi
+
+check_for_errors( )
+{
+	RET=$?
+	if test $RET -gt 0; then
+		echo "Packaging failed."
+		exit 1
+	fi
+}
+
+cp packaging/solaris/pkginfo $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/solaris/copyright $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/solaris/prototype $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/solaris/depend $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/solaris/preinstall $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/solaris/postinstall $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/solaris/preremove $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/solaris/postremove $PKGBUILD/PKG/wolframe-$VERSION/.
+
+ARCH=`uname -m`
+OSARCH=`uname -p`
+OSVER=`uname -r`
+cat <<EOF >> $PKGBUILD/PKG/wolframe-$VERSION/pkginfo
+ARCH="$OSARCH"
+EOF
+
+mkdir -p $PKGBUILD/PKG/wolframe-$VERSION/etc/opt/csw/wolframe
+cp packaging/solaris/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/etc/opt/csw/wolframe/.
+#rm -rf $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
+#mkdir $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
+#cp packaging/freebsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/.
+#chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/wolframed
+
+BOOST_VERSION=1.55.0
+for i in \
+	libboost_chrono.so.$BOOST_VERSION \
+	libboost_date_time.so.$BOOST_VERSION \
+	libboost_filesystem.so.$BOOST_VERSION \
+	libboost_locale.so.$BOOST_VERSION \
+	libboost_program_options.so.$BOOST_VERSION \
+	libboost_regex.so.$BOOST_VERSION \
+	libboost_system.so.$BOOST_VERSION \
+	libboost_thread.so.$BOOST_VERSION; do
+	cp /opt/csw/boost-$BOOST_VERSION/lib/$i $PKGBUILD/PKG/wolframe-$VERSION/opt/csw/lib/wolframe/.
+done
+
+cp /opt/csw/python-3.3.2/lib/libpython3.3m.so.1.0 $PKGBUILD/PKG/wolframe-$VERSION/opt/csw/lib/wolframe/.
+
+ICU_VERSION=49.1.2
+for i in \
+	libicudata.so.$ICU_VERSION \
+	libicui18n.so.$ICU_VERSION \
+	libicuio.so.$ICU_VERSION \
+	libicule.so.$ICU_VERSION \
+	libiculx.so.$ICU_VERSION \
+	libicutu.so.$ICU_VERSION \
+	libicuuc.so.$ICU_VERSION; do
+	cp /opt/csw/icu4c-49.1.2/lib/$i $PKGBUILD/PKG/wolframe-$VERSION/opt/csw/lib/wolframe/.
+	j=`echo $i | cut -f 1 -d .`
+	ln -fs $i $PKGBUILD/PKG/wolframe-$VERSION/opt/csw/lib/wolframe/$j.so.49
+done
+
+cd $PKGBUILD/PKG/wolframe-$VERSION
+
+pkgmk -o -r .
+pkgtrans -s /var/spool/pkg $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$OSARCH-$OSVER.pkg WFRGwolfrm
+
+compress -f $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$OSARCH-$OSVER.pkg
+
+echo "Packaging succeeded."
+
+cp -f $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$OSARCH-$OSVER.pkg.Z /tmp
+uncompress -f /tmp/wolframe-$VERSION-$OSARCH-$OSVER.pkg.Z
+
+pkgchk -l -d /tmp/wolframe-$VERSION-$OSARCH-$OSVER.pkg all | grep 'Pathname:' | cut -f 2- -d ' ' | sort > $PKGBUILD/in
+
+cd $PKGBUILD/PKG/wolframe-$VERSION
+find . | sort | sed 's|^\./||g' > ../../now
+
+echo "Differences in package and in installation root:"
+cd $PKGBUILD
+diff now in
+
+exit 0
