@@ -15,10 +15,10 @@ try
 	{
 		$command = $_REQUEST['COMMAND'];
 	}
-	$body = string http_get_request_body();
-	if ($body == NULL/*or empty*/)
+	$body = $_REQUEST['CONTENT'];
+	if ($body == NULL/*or empty*/ && $_SERVER['REQUEST_METHOD'] == 'POST')
 	{
-		$body = $_REQUEST['CONTENT'];
+		$body = http_get_request_body();
 	}
 	$conn = new Session( "127.0.0.1", 7962, $sslopt, "NONE");
 	if (($result = $conn->request( $command, $body)) === FALSE)
