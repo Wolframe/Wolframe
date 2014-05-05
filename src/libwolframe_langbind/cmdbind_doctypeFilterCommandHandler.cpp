@@ -627,7 +627,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					}
 					else
 					{
-						throw_error( "expected '<!'");
+						setState( SearchXMLRootName);
 					}
 					break;
 
@@ -687,6 +687,134 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					else
 					{
 						m_doctype.push_back( ch);
+					}
+					break;
+
+				case SearchXMLRootName:
+					if (ch == '>')
+					{
+						throw_error( "invalid XML root element");
+					}
+					if (ch > ' ' || ch < 0)
+					{
+						setState( ParseXMLRootName);
+						m_itembuf.clear();
+					}
+					break;
+
+				case ParseXMLRootName:
+					if (ch != '>' && (ch > ' ' || ch < 0))
+					{
+						m_itembuf.push_back( ch);
+						if (m_itembuf.size() > 128)
+						{
+							throw_error( "XML root element name too big");
+						}
+					}
+					else
+					{
+						m_rootelemname = m_itembuf;
+						if (ch == '>')
+						{
+							throw_error( "No document type or schema definition found and document is not standalone");
+						}
+						setState( SearchXMLRootAttrib);
+					}
+					break;
+
+				case SearchXMLRootAttrib:
+					if (ch == '>')
+					{
+						throw_error( "No document type or schema definition found and document is not standalone");
+					}
+					if (ch > ' ' || ch < 0)
+					{
+						setState( ParseXMLRootAttrib);
+						m_itembuf.clear();
+					}
+					break;
+
+				case ParseXMLRootAttrib:
+					if (ch != '>' && (ch > ' ' || ch < 0))
+					{
+						m_itembuf.push_back( ch);
+						if (m_itembuf.size() > 128)
+						{
+							throw_error( "XML root attribute name too big");
+						}
+					}
+					else
+					{
+						if (m_itembuf == "xmlns:xsi")
+						{
+							setState( SearchXMLRootAttribAssign);
+						}
+						else if (ch == '>')
+						{
+							throw_error( "No document type or schema definition found and document is not standalone");
+						}
+						else
+						{
+							setState( SearchXMLRootAttrib);
+						}
+					}
+					break;
+
+				case SearchXMLRootAttribAssign:
+					if (ch == '=')
+					{
+						setState( SearchXMLRootAttribQuote);
+					}
+					else if (ch > ' ' || ch < 0)
+					{
+						throw_error( "invalid XML root attribute definition (missing value assingment)");
+					}
+					break;
+
+				case SearchXMLRootAttribQuote:
+					if (ch == '\'')
+					{
+						setState( ParseXMLRootAttribValueSQ);
+					}
+					else if (ch == '\"')
+					{
+						setState( ParseXMLRootAttribValueDQ);
+					}
+					else if (ch > ' ' || ch < 0)
+					{
+						throw_error( "invalid XML root attribute definition (missing value assingment)");
+					}
+					break;
+
+				case ParseXMLRootAttribValueSQ:
+					if (ch == '\'')
+					{
+						m_doctypeid = utils::getFileStem( m_itembuf);
+						setState( Done);
+					}
+					else
+					{
+						m_itembuf.push_back( ch);
+						if (m_itembuf.size() > 256)
+						{
+							throw_error( "XML xmlns:xsi attribute (schema definition) is too big");
+						}
+					}
+					break;
+
+				case ParseXMLRootAttribValueDQ:
+					if (ch == '\"')
+					{
+						m_doctypeid = utils::getFileStem( m_itembuf);
+						setState( Done);
+					}
+					else
+					{
+						m_itembuf.push_back( ch);
+						if (m_itembuf.size() > 256)
+						{
+							throw_error( "XML xmlns:xsi attribute (schema definition) is too big");
+						}
 					}
 					break;
 
