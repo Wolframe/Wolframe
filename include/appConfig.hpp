@@ -59,7 +59,8 @@ struct LoggerConfiguration;
 struct CmdLineConfig;		// forward declaration for the command line structure
 
 /// application configuration structure
-struct ApplicationConfiguration	{
+class ApplicationConfiguration	{
+public:
 	std::string			configFile;
 	// from command line
 	bool				foreground;
