@@ -33,18 +33,6 @@ public class ProfileSite
 
 namespace WolframeClient
 {
-    class EoD
-    {
-        public int EndIdx;
-        public int NextIdx;
-    };
-
-    class Chunk
-    {
-        public Byte[] data;
-        public int size;
-    };
-
     class Connection
     {
         private IPAddress m_address;
@@ -53,6 +41,8 @@ namespace WolframeClient
         private NetworkStream m_stream;
         public enum Error { NoError = 0, ConnectionFailed, WriteFailed, ReadFailed, ConnectionClosed };
         private Error m_error;
+        public enum State { Init = 0, Connecting, Connected };
+        private State m_state;
         private byte[] m_buffer;
 
         public delegate void ProcessErrorDelegate( Error err);
@@ -71,6 +61,7 @@ namespace WolframeClient
             m_buffer = null;
             m_processError = processError;
             m_processMessage = processMessage;
+            m_state = State.Init;
         }
 
         public void ConnectCallback( IAsyncResult result)
@@ -79,6 +70,8 @@ namespace WolframeClient
             {
                 m_client.EndConnect( result);
                 m_stream = m_client.GetStream();
+                m_processMessage( null);
+                m_state = State.Connected;
             }
             catch
             {
@@ -314,10 +307,23 @@ namespace WolframeClient
         public void Connect()
         {
             m_client.BeginConnect( m_address, m_port, ConnectCallback, null);
+            m_state = State.Connecting;
         }
 
         public void Close()
         {
+            switch (m_state)
+            {
+                case State.Connected:
+                    m_stream.Close();
+                    m_client.Close();
+                    break;
+                case State.Connecting:
+                    m_client.Close();
+                    break;
+                case State.Init:
+                    break;
+            }
         }
 
         public void WriteBytes( byte[] bytes)
@@ -354,53 +360,120 @@ namespace WolframeClient
         private string m_banner;
         private Connection m_connection;
         private string m_authmethod;
-        private enum State { Init, Connecting };
+        private enum State { Init, Connecting, Handshake, Idle, WaitAnswer, WaitQuit };
         private State m_state;
 
-        class Request
+        public class Request
         {
+            public int id { get; set; }
+            public object content { get; set; }
+            public Type answertype { get; set; }
+        };
+
+        public class Answer
+        {
+            public enum MsgType { Error, Result };
+            public MsgType msgtype { get; set; }
             public int id { get; set; }
             public object content { get; set; }
         };
 
-        class Answer
+        public delegate void ProcessSessionErrorDelegate( string err);
+        public delegate void ProcessAnswerDelegate( Answer obj);
+
+        private ProcessSessionErrorDelegate m_processError;
+        private ProcessAnswerDelegate m_processAnswer;
+
+        private Queue<Request> m_requestqueue;
+        private Request m_request;
+
+        private void ClearRequestQueue( string errstr)
         {
-            public enum Type { Error, Result };
-            public Type type { get; set; }
-            public int id { get; set; }
-            public object content { get; set; }
-        };
+            while (m_requestqueue.Count() > 0)
+            {
+                Request request = m_requestqueue.Dequeue();
+                Answer answer = new Answer { msgtype = Answer.MsgType.Error, id = m_request.id, content = errstr };
+                m_processAnswer(answer);
+            }
+        }
 
-        private Queue m_requestqueue;
-        private Queue m_answerqueue;
-
-        public void ProcessErrorDelegate( Error err)
+        public void ProcessConnectionErrorDelegate( Connection.Error err)
         {
             string errstr = null;
             switch (err)
             {
-                case NoError: errstr = "unknown error"; break;
-                case ConnectionFailed: errstr = "connection failed"; break;
-                case WriteFailed: errstr = "write failed"; break;
-                case ReadFailed: errstr = "read failed"; break;
-                case ConnectionClosed: errstr = "server closed connection"; break;
+                case Connection.Error.NoError: m_processError( "unknown error"); return;
+                case Connection.Error.ConnectionFailed: m_processError( "connection failed"); return;
+                case Connection.Error.WriteFailed: errstr = "write failed"; break;
+                case Connection.Error.ReadFailed: errstr = "read failed"; break;
+                case Connection.Error.ConnectionClosed: errstr = "server closed connection"; break;
+            }
+            switch (m_state)
+            {
+                case State.Init: m_processError(errstr); break;
+                case State.Connecting: m_processError(errstr); break;
+                case State.Handshake: m_processError(errstr); break;
+                case State.Idle: m_processError(errstr); break;
+                case State.WaitAnswer:
+                {
+                    Answer answer = new Answer{msgtype=Answer.MsgType.Error, id=m_request.id, content=errstr};
+                    m_processAnswer( answer);
+                    break;
+                }
             }
         }
 
-        public void ProcessMessageDelegate( byte[] msg)
+        public void ProcessConnectionMessageDelegate(byte[] msg)
         {
+
         }
 
-        Session(string ip, int port, string authmethod)
+        Session( string ip, int port, string authmethod, ProcessSessionErrorDelegate processError_, ProcessAnswerDelegate processAnswer_)
         {
             m_banner = null;
-            m_lasterror = null;
-            m_connection = new Connection( ip, port);
+            m_connection = new Connection( ip, port, ProcessConnectionErrorDelegate, ProcessConnectionMessageDelegate);
             m_authmethod = authmethod;
-            m_state = Init;
+            m_state = State.Init;
+
+            m_processError = processError_;
+            m_processAnswer = processAnswer_;
+
+            m_requestqueue = new Queue<Request>();
+            m_request = null;
         }
 
-        
+        void Close()
+        {
+            string msgstr = "client closed connection";
+            switch (m_state)
+            {
+                case State.WaitAnswer:
+                {
+                    Answer answer = new Answer{msgtype=Answer.MsgType.Error, id=m_request.id, content=msgstr};
+                    m_processAnswer( answer);
+                    ClearRequestQueue( msgstr);
+                    break;
+                }
+                /*no break here!*/
+                case State.Init:
+                case State.Connecting:
+                case State.Handshake:
+                    m_processError(msgstr);
+                    break;
+                case State.Idle:
+                    m_connection.WriteLn("QUIT");
+                    ClearRequestQueue(msgstr);
+                    break;
+            }
+        }
+
+        void Connect()
+        {
+            if (m_state == State.Init)
+            {
+                m_connection.Connect();
+            }
+        }
     }
 
     class Program
