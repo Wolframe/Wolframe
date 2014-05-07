@@ -34,6 +34,7 @@ cp packaging/solaris/preinstall $PKGBUILD/PKG/wolframe-$VERSION/.
 cp packaging/solaris/postinstall $PKGBUILD/PKG/wolframe-$VERSION/.
 cp packaging/solaris/preremove $PKGBUILD/PKG/wolframe-$VERSION/.
 cp packaging/solaris/postremove $PKGBUILD/PKG/wolframe-$VERSION/.
+cp packaging/solaris/wolframed.init $PKGBUILD/PKG/wolframe-$VERSION/.
 
 ARCH=`uname -m`
 OSARCH=`uname -p`
