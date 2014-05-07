@@ -1,0 +1,43 @@
+#!/sbin/sh
+
+#RC_KNUM 52         # Number used for kill script symlink, e.g. K20cswfoo
+#RC_SNUM 52         # Number used for start script symlink, e.g. S80cswfoo
+#RC_KLEV 0,1,2,S    # Run levels that should have a kill script symlink
+#RC_SLEV 3          # Run levels that should have a start script symlink
+#FMRI system        # FMRI path for service (S10+), default is /network.
+
+if [ -f /lib/svc/share/smf_include.sh ]; then
+	. /lib/svc/share/smf_include.sh
+fi
+
+CONFIGFILE=/etc/opt/csw/wolframe/wolframe.conf
+PIDFILE=/var/run/wolframe/wolframed.pid
+WOLFRAMED=/opt/csw/sbin/wolframed
+
+case $1 in
+	'start')
+		if [ -f $PIDFILE ]; then
+			echo "wolframed already running (pid file exists)"
+			exit 1
+		fi
+		$WOLFRAMED -c $CONFIGFILE
+		err=$?
+		if [ $err -ne 0 ]; then
+			echo "wolframe daemon failed to start: error $err"
+			exit 1
+		fi
+		;;
+	
+	'stop')
+		if [ -f $PIDFILE ]; then
+			kill `cat $PIDFILE`
+		fi
+		;;
+
+	*)
+		echo "Usage: $0 { start }"
+		exit 1
+		;;
+esac    
+
+exit 0

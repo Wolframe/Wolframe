@@ -300,9 +300,6 @@ f none opt/csw/bin/wolfwizard 0775 root staff
 f none opt/csw/bin/wolframec 0755 root staff
 d none opt/csw/sbin ? ? ?
 f none opt/csw/sbin/wolframed 0775 root staff
-d none opt/csw/etc ? ? ?
-d none opt/csw/etc/wolframe 0755 root root
-f none opt/csw/etc/wolframe/wolframe.conf 0755 root staff
 d none opt/csw/share ? ? ?
 d none opt/csw/share/doc ? ? ?
 d none opt/csw/share/doc/wolframe 0755 root root
@@ -319,6 +316,8 @@ d none etc/opt ? ? ?
 d none etc/opt/csw ? ? ?
 d none etc/opt/csw/wolframe 0755 root root
 f none etc/opt/csw/wolframe/wolframe.conf 0644 root staff
+d none etc/opt/csw/init.d ? ? ?
+f none etc/opt/csw/init.d/wolframed=wolframed.init 0755 root root
 f none opt/csw/lib/wolframe/libboost_chrono.so.1.55.0 0755 root root
 f none opt/csw/lib/wolframe/libboost_date_time.so.1.55.0 0755 root root
 f none opt/csw/lib/wolframe/libboost_filesystem.so.1.55.0 0755 root root
