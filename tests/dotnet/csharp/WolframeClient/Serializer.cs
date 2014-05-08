@@ -22,7 +22,7 @@ namespace WolframeClient
             StringWriter sw = new StringWriter();
             XmlWriterSettings wsettings = new XmlWriterSettings();
             wsettings.OmitXmlDeclaration = false;
-            wsettings.Encoding = new UTF8Encoding();
+            wsettings.Encoding = new UTF8Encoding(false/*no BOM*/, true/*throw if input illegal*/);
             XmlWriter xw = XmlWriter.Create(sw, wsettings);
             xw.WriteProcessingInstruction("xml", "version='1.0' standalone='no'");
             //... have to write header by hand (OmitXmlDeclaration=false has no effect)
@@ -33,7 +33,7 @@ namespace WolframeClient
             //... trick to avoid printing of xmlns:xsi xmlns:xsd attributes of the root element
 
             serializer.Serialize(xw, obj, ns);
-            return sw.ToArray();
+            return wsettings.Encoding.GetBytes( sw.ToString());
         }
 
         public static object getResult(byte[] content, Type type)

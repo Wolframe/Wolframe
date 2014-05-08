@@ -87,13 +87,27 @@ namespace WolframeClient
             return rt;
         }
 
+        public static bool IsCommand(string cmd, byte[] msg)
+        {
+            if (cmd.Length > msg.Length) return false;
+            if (msg.Length > cmd.Length && msg[cmd.Length] != (byte)' ') return false;
+            int ii = 0;
+            for (; ii < cmd.Length; ++ii) if (msg[ii] != (byte)cmd[ii]) return false;
+            return true;
+        }
+
+        public static string CommandArg(string cmd, byte[] msg)
+        {
+            return Encoding.UTF8.GetString(msg, cmd.Length + 1, msg.Length - cmd.Length -1);
+        }
+
         public class Buffer
         {
             public int pos { get; set; }
             public int size { get; set; }
             public byte[] ar { get; set; }
 
-            Buffer( int initsize)
+            public Buffer( int initsize)
             {
                 pos = 0;
                 size = 0;
@@ -102,7 +116,7 @@ namespace WolframeClient
 
             private void Grow()
             {
-                if (ar == null || ar.Length == null)
+                if (ar == null || ar.Length == 0)
                 {
                     ar = new byte[4096];
                     size = 0;
@@ -142,7 +156,7 @@ namespace WolframeClient
                     idx = searchpos;
                 }
                 int nof_bytes_read = src.Read(ar, size, ar.Length - size);
-                if (nof_bytes_read <= 0) return null;
+                if (nof_bytes_read <= 0) return -1;
                 size = size + nof_bytes_read;
                 return idx;
             }
@@ -150,9 +164,11 @@ namespace WolframeClient
             public byte[] FetchLine(Stream src)
             {
                 int idx = Array.IndexOf(ar, '\n',pos,size-pos);
-                while (idx < pos)
+                while (idx == -1)
                 {
-                    idx = FetchData(src, idx);
+                    int newidx = FetchData(src, idx);
+                    if (newidx == -1) return null;
+                    idx = newidx;
                     idx = Array.IndexOf(ar, '\n', idx, size - idx);
                 }
                 if (idx > pos && ar[idx - 1] == '\r')
@@ -168,7 +184,7 @@ namespace WolframeClient
             public byte[] FetchContent(Stream src)
             {
                 int idx = Array.IndexOf(ar, '\n', pos, size - pos);
-                while (idx < pos)
+                while (idx >= pos)
                 {
                     int nextidx = -1;
                     if (size >= idx + 2)
@@ -190,21 +206,31 @@ namespace WolframeClient
                                 }
                                 else
                                 {
-                                    idx = FetchData(src, idx);
+                                    int newidx = FetchData(src, idx);
+                                    if (newidx == -1) return null;
+                                    idx = newidx;
                                 }
                             }
                         }
                     }
                     else
                     {
-                        idx = FetchData(src, idx);
+                        int newidx = FetchData(src, idx);
+                        if (newidx == -1) return null;
+                        idx = newidx;
                     }
                     if (nextidx > 0)
                     {
                         return Protocol.UnescapeLFdot(GetMessageFromBuffer(idx, nextidx));
                     }
-                    idx = Array.IndexOf(ar, '\n', idx, size - idx);
+                    idx = Array.IndexOf(ar, '\n', idx+1, size - idx-1);
                 }
+                return null;
+            }
+
+            public bool HasData()
+            {
+                return (pos < size);
             }
         };
     }

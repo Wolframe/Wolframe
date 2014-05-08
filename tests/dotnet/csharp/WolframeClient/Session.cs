@@ -2,6 +2,8 @@
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Net.Sockets;
 using WolframeClient;
 
 namespace WolframeClient
@@ -11,22 +13,11 @@ namespace WolframeClient
         private string m_banner;
         private Connection m_connection;
         private string m_authmethod;
-        private enum State
-        {
-            Init, 
-            Connecting,
-            HandshakeReadBanner,
-            HandshakeGrantConnect,
-            HandshakeMechs,
-            HandshakeGrantMechNONE,
-            Idle,
-            WaitAnswer,
-            WaitAnswerResult,
-            WaitAnswerSuccess,
-            WaitQuit,
-            Terminated
-        };
+        private AutoResetEvent m_signal;
+        private string m_lasterror;
+        private enum State { Init, Running, Shutdown, Terminated };
         private State m_state;
+        private object m_stateLock;
 
         public class Request
         {
@@ -34,7 +25,14 @@ namespace WolframeClient
             public string command { get; set; }
             public string doctype { get; set; }
             public string root { get; set; }
-            public object content { get; set; }
+            public object obj { get; set; }
+            public Type objtype { get; set; }
+            public Type answertype { get; set; }
+        };
+
+        private class PendingRequest
+        {
+            public int id { get; set; }
             public Type answertype { get; set; }
         };
 
@@ -43,71 +41,240 @@ namespace WolframeClient
             public enum MsgType { Error, Failure, Result };
             public MsgType msgtype { get; set; }
             public int id { get; set; }
-            public object content { get; set; }
+            public object obj { get; set; }
         };
-
-        public delegate void ProcessSessionErrorDelegate(string err);
-        public delegate void ProcessAnswerDelegate(Answer obj);
-
-        private ProcessSessionErrorDelegate m_processError;
-        private ProcessAnswerDelegate m_processAnswer;
+        public delegate void AnswerDelegate( Answer msg);
 
         private Queue<Request> m_requestqueue;
-        private Request m_request;
-        private byte[] m_answerbuf;
+        private Queue<PendingRequest> m_pendingqueue;
+        private AnswerDelegate m_answerDelegate;
+        private Thread m_thread;
 
-        Session(string ip, int port, string authmethod, ProcessSessionErrorDelegate processError_, ProcessAnswerDelegate processAnswer_)
+        Session(string ip, int port, string authmethod, AnswerDelegate answerDelegate)
         {
             m_banner = null;
-            m_connection = new Connection(ip, port, ProcessConnectionErrorDelegate, ProcessConnectionMessageDelegate);
+            m_connection = new Connection(ip, port, m_signal);
             m_authmethod = authmethod;
-            m_state = State.Init;
 
-            m_processError = processError_;
-            m_processAnswer = processAnswer_;
+            m_signal = new AutoResetEvent(false);
+            m_lasterror = null;
+            m_state = State.Init;
+            m_stateLock = new object();
+            m_answerDelegate = answerDelegate;
 
             m_requestqueue = new Queue<Request>();
-            m_request = null;
-            m_answerbuf = null;
+            m_pendingqueue = new Queue<PendingRequest>();
+            m_thread = null;
         }
 
-        private void HandleNextRequest()
+        private void setState(State state)
+        {
+            lock (m_stateLock)
+            {
+                if (m_state != State.Terminated)
+                {
+                    if (m_state == State.Shutdown && state != State.Terminated)
+                    {
+                    }
+                    else
+                    {
+                        m_state = state;
+                    }
+                }
+            }
+        }
+
+        public string getLastError()
+        {
+            return m_lasterror;
+        }
+
+        private void HandleAnswer(PendingRequest rq)
+        {
+            byte[] ln = m_connection.ReadLine();
+            if (ln == null)
+            {
+                m_lasterror = "server closed connection";
+                setState( State.Terminated);
+                return;
+            }
+            else if (Protocol.IsCommand("OK", ln))
+            {
+                m_answerDelegate(new Answer { msgtype = Answer.MsgType.Result, id = rq.id, obj = null });
+            }
+            else if (Protocol.IsCommand("ERR", ln))
+            {
+                m_answerDelegate(new Answer { msgtype = Answer.MsgType.Failure, id = rq.id, obj = Protocol.CommandArg("ERR", ln) });
+            }
+            else if (Protocol.IsCommand("BAD", ln))
+            {
+                m_lasterror = "protocol error";
+                setState(State.Terminated);
+                return;
+            }
+            else if (Protocol.IsCommand("ANSWER", ln))
+            {
+                byte[] msg = m_connection.ReadContent();
+                if (msg == null)
+                {
+                    m_lasterror = "server closed connection";
+                    setState(State.Terminated);
+                    return;
+                }
+                ln = m_connection.ReadLine();
+                if (msg == null)
+                {
+                    m_lasterror = "server closed connection";
+                    setState(State.Terminated);
+                    return;
+                }
+                else if (Protocol.IsCommand("OK", ln))
+                {
+                    object answerobj = Serializer.getResult(msg, rq.answertype);
+                    m_answerDelegate(new Answer { msgtype = Answer.MsgType.Result, id = rq.id, obj = answerobj });
+                }
+                else if (Protocol.IsCommand("ERR", ln))
+                {
+                    m_answerDelegate(new Answer { msgtype = Answer.MsgType.Failure, id = rq.id, obj = Protocol.CommandArg("ERR", ln) });
+                }
+                else if (Protocol.IsCommand("BAD", ln))
+                {
+                    m_lasterror = "protocol error";
+                    setState(State.Terminated);
+                    return;
+                }
+            }
+        }
+
+        private void Run()
+        {
+            setState( State.Running);
+            while (m_state == State.Running)
+            {
+                m_signal.WaitOne();
+                bool hasRequests = true;
+
+                while (m_state == State.Running && (hasRequests || m_connection.HasReadData()))
+                {
+                    if (m_connection.HasReadData())
+                    {
+                        try
+                        {
+                            HandleAnswer( m_pendingqueue.Dequeue());
+                        }
+                        catch (InvalidOperationException)
+                        {}
+                        if (m_state != State.Running) break;
+                    }
+                    try
+                    {
+                        Request rq = m_requestqueue.Dequeue();
+                        byte[] rqdata = Serializer.getRequestContent(rq.doctype, rq.root, rq.objtype, rq.obj);
+                        m_connection.WriteRequest( rq.command, rqdata);
+                        m_pendingqueue.Enqueue( new PendingRequest{ id=rq.id, answertype=rq.answertype});
+                        m_connection.IssueReadRequest();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        hasRequests = false;
+                    }
+                }
+            }
+            ClearRequestQueue();
+            if (m_state == State.Shutdown)
+            {
+                ProcessPendingRequests();
+            }
+        }
+
+        public bool Connect()
         {
             try
             {
-                m_request = m_requestqueue.Dequeue();
-                if (m_request.command != null)
+                m_connection.Connect();
+                byte[] ln = m_connection.ReadLine();
+                if (ln == null) 
                 {
-                    m_connection.WriteLine("REQUEST " + m_request.command);
+                    m_lasterror = "server closed connection";
+                    return false;
                 }
-                else
+                m_banner = Encoding.UTF8.GetString(m_connection.ReadLine());
+                ln = m_connection.ReadLine();
+                if (ln == null) 
                 {
-                    m_connection.WriteLine("REQUEST");
+                    m_lasterror = "server closed connection";
+                    return false;
                 }
-                byte[] requestcontent = Serializer.getRequestContent(m_request.doctype, m_request.root, m_request.answertype, m_request.content);
-                m_connection.WriteContent(requestcontent);
-                m_answerbuf = null;
-                m_state = State.WaitAnswer;
+                else if (Protocol.IsCommand("OK", ln))
+                {
+                    m_connection.WriteLine("AUTH");
+                    ln = m_connection.ReadLine();
+                    if (ln == null) 
+                    {
+                        m_lasterror = "server closed connection";
+                        return false;
+                    }
+                    else if (Protocol.IsCommand("MECHS", ln))
+                    {
+                        m_connection.WriteLine("MECH " + m_authmethod);
+                        ln = m_connection.ReadLine();
+                        if (ln == null) 
+                        {
+                            m_lasterror = "server closed connection";
+                            return false;
+                        }
+                        else if (Protocol.IsCommand("OK", ln))
+                        {
+                            ///... authorized (MECHS NONE)
+                            m_thread = new Thread( new ThreadStart(this.Run));
+                            return true;
+                        }
+                        else if (Protocol.IsCommand("ERR", ln))
+                        {
+                            m_lasterror = "authorization denied: " + Protocol.CommandArg( "ERR", ln);
+                            return false;
+                        }
+                        else
+                        {
+                            m_lasterror = "authorization denied";
+                            return false;
+                        }
+                    }
+                    else if (Protocol.IsCommand("ERR", ln))
+                    {
+                        m_lasterror = Protocol.CommandArg( "ERR", ln);
+                        return false;
+                    }
+                    else
+                    {
+                        m_lasterror = "authorization process refused";
+                        return false;
+                    }
+                }
+                m_lasterror = "protocol error";
+                return false;
             }
-            catch (InvalidOperationException)
+            catch (Exception soe)
             {
-                //... no more requests in the queue
-                m_state = State.Idle;
-                m_request = null;
-                m_answerbuf = null;
+                m_lasterror = soe.Message;
+                return false;
             }
         }
 
-        private void ClearRequestQueue(string errstr)
+        public void IssueRequest( Request request)
+        {
+            m_requestqueue.Enqueue( request);
+            m_signal.Set();
+        }
+
+        private void ProcessPendingRequests()
         {
             bool empty = false;
-            while (!empty)
+            while (!empty && m_state != State.Terminated)
             {
                 try
                 {
-                    Request request = m_requestqueue.Dequeue();
-                    Answer answer = new Answer { msgtype = Answer.MsgType.Error, id = m_request.id, content = errstr };
-                    m_processAnswer(answer);
+                    HandleAnswer(m_pendingqueue.Dequeue());
                 }
                 catch (InvalidOperationException)
                 {
@@ -117,239 +284,22 @@ namespace WolframeClient
             }
         }
 
-        public void HandleUnrecoverableError(string errstr)
+        private void ClearRequestQueue()
         {
-            if (m_request != null)
+            bool empty = false;
+            while (!empty)
             {
-                m_processAnswer(new Answer { msgtype = Answer.MsgType.Error, id = m_request.id, content = errstr });
-                m_request = null;
-            }
-            m_processError(errstr);
-            ClearRequestQueue(errstr);
-            m_connection.Close();
-            m_state = State.Terminated;
-        }
-
-        public void ProcessConnectionErrorDelegate(Connection.Error err)
-        {
-            string errstr = null;
-            switch (err)
-            {
-                case Connection.Error.NoError: m_processError("unknown error"); return;
-                case Connection.Error.ConnectionFailed: m_processError("connection failed"); return;
-                case Connection.Error.WriteFailed: errstr = "write failed"; break;
-                case Connection.Error.ReadFailed: errstr = "read failed"; break;
-                case Connection.Error.ConnectionClosed: errstr = "server closed connection"; break;
-            }
-            HandleUnrecoverableError(errstr);
-        }
-
-        public bool IsCommand(string cmd,byte[] msg)
-        {
-            if (cmd.Length > msg.Length) return false;
-            if (msg.Length > cmd.Length && msg[cmd.Length] != (byte)' ') return false;
-            int ii = 0;
-            for (; ii<cmd.Length; ++ii) if (msg[ii] != (byte)cmd[ii]) return false;
-            return true;
-        }
-
-        public void ProcessConnectionMessageDelegate(byte[] msg)
-        {
-            switch (m_state)
-            {
-                case State.Init:
-                    HandleUnrecoverableError("protocol error in init");
-                    break;
-
-                case State.Connecting:
-                    //... get empty message here when connection succeded
-                    m_state = State.HandshakeReadBanner;
-                    m_connection.IssueReadLine();
-                    break;
-
-                case State.HandshakeReadBanner:
-                    m_banner = Encoding.UTF8.GetString(msg);
-                    m_state = State.HandshakeGrantConnect;
-                    m_connection.IssueReadLine();
-                    break;
-
-                case State.HandshakeGrantConnect:
-                    if (IsCommand("OK", msg))
-                    {
-                        m_connection.WriteLine("AUTH");
-                        m_state = State.HandshakeMechs;
-                        m_connection.IssueReadLine();
-                    }
-                    else
-                    {
-                        HandleUnrecoverableError("connection refused");
-                    }
-                    break;
-
-                case State.HandshakeMechs:
-                    if (IsCommand("MECHS", msg))
-                    {
-                        m_connection.WriteLine("MECH NONE");
-                        m_state = State.HandshakeGrantMechNONE;
-                        m_connection.IssueReadLine();
-                    }
-                    else
-                    {
-                        HandleUnrecoverableError("authorization process refused");
-                    }
-                    break;
-
-                case State.HandshakeGrantMechNONE:
-                    if (IsCommand("OK", msg))
-                    {
-                        m_state = State.Idle; //... authorized now
-                        HandleNextRequest();
-                    }
-                    else
-                    {
-                        HandleUnrecoverableError("authorization refused");
-                    }
-                    break;
-
-                case State.Idle:
-                    HandleUnrecoverableError("got unexpected message in idle state");
-                    break;
-
-                case State.WaitAnswer:
-                    if (IsCommand("ANSWER", msg))
-                    {
-                        m_state = State.WaitAnswerResult;
-                        m_connection.IssueReadContent();
-                    }
-                    else if (IsCommand("OK", msg))
-                    {
-                        m_processAnswer(new Answer { msgtype = Answer.MsgType.Result, id = m_request.id, content = null });
-                        HandleNextRequest();
-                    }
-                    else if (IsCommand("BAD", msg))
-                    {
-                        string arg = Encoding.UTF8.GetString(msg, 3, msg.Length - 3);
-                        m_processAnswer(new Answer { msgtype = Answer.MsgType.Error, id = m_request.id, content = arg });
-                        ClearRequestQueue(arg);
-                        m_connection.WriteLine("QUIT");
-                        m_state = State.WaitQuit;
-                        //... we do not try to recover from protocol errors
-                    }
-                    else if (IsCommand("ERR", msg))
-                    {
-                        string arg = Encoding.UTF8.GetString(msg, 3, msg.Length - 3);
-                        m_processAnswer(new Answer { msgtype = Answer.MsgType.Failure, id = m_request.id, content = arg });
-                        HandleNextRequest();
-                    }
-                    else
-                    {
-                        HandleUnrecoverableError("protocol error in wait answer");
-                    }
-                    break;
-
-                case State.WaitAnswerResult:
-                    m_answerbuf = msg;
-                    m_state = State.WaitAnswerSuccess;
-                    m_connection.IssueReadLine();
-                    break;
-
-                case State.WaitAnswerSuccess:
-                    if (IsCommand("OK", msg))
-                    {
-                        object result = Serializer.getResult(m_answerbuf, m_request.answertype);
-                        m_processAnswer(new Answer { msgtype = Answer.MsgType.Result, id = m_request.id, content = result });
-                        HandleNextRequest();
-                    }
-                    else if (IsCommand("ERR", msg))
-                    {
-                        string arg = Encoding.UTF8.GetString(msg, 3, msg.Length - 3);
-                        m_processAnswer(new Answer { msgtype = Answer.MsgType.Failure, id = m_request.id, content = arg });
-                        HandleNextRequest();
-                    }
-                    else
-                    {
-                        HandleUnrecoverableError("protocol error after answer result");
-                    }
-                    break;
-
-                case State.WaitQuit:
-                    if (IsCommand("BYE", msg))
-                    {
-                        m_connection.Close();
-                        m_state = State.Terminated;
-                    }
-                    else
-                    {
-                        // ... Ignore message (already handled in .Close())
-                    }
-                    break;
-
-                case State.Terminated:
-                    HandleUnrecoverableError("got unexpected message after termination");
-                    break;
-            }
-        }
-
-        void HandleCloseInWaitAnswer()
-        {
-            m_processAnswer(new Answer { msgtype = Answer.MsgType.Error, id = m_request.id, content = msgstr });
-            m_connection.WriteLine("QUIT");
-            ClearRequestQueue("client closed connection");
-            m_state = State.WaitQuit;
-            m_connection.IssueReadLine();
-        }
-
-        void Close()
-        {
-            string msgstr = "client closed connection";
-            switch (m_state)
-            {
-                case State.Init:
-                    m_connection.Close();
-                    break;
-                case State.Connecting:
-                    HandleUnrecoverableError("client closed connection");
-                    break;
-                case State.HandshakeReadBanner:
-                    HandleUnrecoverableError("client closed connection");
-                    break;
-                case State.HandshakeGrantConnect:
-                    HandleUnrecoverableError("client closed connection");
-                    break;
-                case State.HandshakeMechs:
-                    HandleUnrecoverableError("client closed connection");
-                    break;
-                case State.HandshakeGrantMechNONE:
-                    HandleUnrecoverableError("client closed connection");
-                    break;
-                case State.Idle:
-                    m_connection.WriteLine("QUIT");
-                    ClearRequestQueue(msgstr);
-                    m_state = State.WaitQuit;
-                    m_connection.IssueReadLine();
-                    break;
-                case State.WaitAnswer:
-                    HandleCloseInWaitAnswer();
-                    break;
-                case State.WaitAnswerResult:
-                    HandleCloseInWaitAnswer();
-                    break;
-                case State.WaitAnswerSuccess:
-                    HandleCloseInWaitAnswer();
-                    break;
-                case State.WaitQuit:
-                    m_connection.Close();
-                    break;
-                case State.Terminated:
-                    break;
-            }
-        }
-
-        void Connect()
-        {
-            if (m_state == State.Init)
-            {
-                m_connection.Connect();
+                try
+                {
+                    Request rq = m_requestqueue.Dequeue();
+                    Answer answer = new Answer { msgtype = Answer.MsgType.Error, id = rq.id, obj = "connection closed" };
+                    m_answerDelegate( answer);
+                }
+                catch (InvalidOperationException)
+                {
+                    //... done
+                    empty = true;
+                }
             }
         }
     };
