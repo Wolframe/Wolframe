@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace WolframeClient
 {
     class Protocol
     {
-        public static byte[] escapeLFdot(byte[] msg)
+        public static byte[] EscapeLFdot(byte[] msg)
         {
             byte[] rt = null;
             int rtidx = 0;
@@ -47,7 +48,7 @@ namespace WolframeClient
             return rt;
         }
 
-        public static byte[] unescapeLFdot(byte[] msg)
+        public static byte[] UnescapeLFdot(byte[] msg)
         {
             byte[] rt = null;
             int rtidx = 0;
@@ -85,5 +86,126 @@ namespace WolframeClient
             Array.Copy(msg, idx, rt, rtidx, msg.Length - idx);
             return rt;
         }
+
+        public class Buffer
+        {
+            public int pos { get; set; }
+            public int size { get; set; }
+            public byte[] ar { get; set; }
+
+            Buffer( int initsize)
+            {
+                pos = 0;
+                size = 0;
+                ar = new byte[initsize];
+            }
+
+            private void Grow()
+            {
+                if (ar == null || ar.Length == null)
+                {
+                    ar = new byte[4096];
+                    size = 0;
+                    pos = 0;
+                }
+                else
+                {
+                    byte[] new_ar = null;
+                    if (pos > ar.Length / 2)
+                    {
+                        new_ar = new byte[ar.Length];
+                    }
+                    else
+                    {
+                        new_ar = new byte[ar.Length * 2];
+                    }
+                    Array.Copy(ar, pos, new_ar, 0, size - pos);
+                    size = size - pos;
+                    pos = 0;
+                }
+            }
+
+            private byte[] GetMessageFromBuffer(int idx, int nextidx)
+            {
+                byte[] msg = new byte[idx-pos];
+                Array.Copy(ar, pos, msg, 0, idx-pos);
+                pos = nextidx;
+                return msg;
+            }
+
+            private int FetchData(Stream src, int idx)
+            {
+                if (size >= ar.Length)
+                {
+                    int searchpos = idx - pos;
+                    Grow();
+                    idx = searchpos;
+                }
+                int nof_bytes_read = src.Read(ar, size, ar.Length - size);
+                if (nof_bytes_read <= 0) return null;
+                size = size + nof_bytes_read;
+                return idx;
+            }
+
+            public byte[] FetchLine(Stream src)
+            {
+                int idx = Array.IndexOf(ar, '\n',pos,size-pos);
+                while (idx < pos)
+                {
+                    idx = FetchData(src, idx);
+                    idx = Array.IndexOf(ar, '\n', idx, size - idx);
+                }
+                if (idx > pos && ar[idx - 1] == '\r')
+                {
+                    return GetMessageFromBuffer(idx - 1, idx + 1);
+                }
+                else
+                {
+                    return GetMessageFromBuffer(idx, idx + 1);
+                }
+            }
+
+            public byte[] FetchContent(Stream src)
+            {
+                int idx = Array.IndexOf(ar, '\n', pos, size - pos);
+                while (idx < pos)
+                {
+                    int nextidx = -1;
+                    if (size >= idx + 2)
+                    {
+                        if (ar[idx + 1] == '.')
+                        {
+                            if (ar[idx + 2] == '\n')
+                            {
+                                nextidx = idx + 3;
+                            }
+                            else if (ar[idx + 2] == '\r')
+                            {
+                                if (size >= idx + 3)
+                                {
+                                    if (ar[idx + 3] == '\n')
+                                    {
+                                        nextidx = idx + 4;
+                                    }
+                                }
+                                else
+                                {
+                                    idx = FetchData(src, idx);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        idx = FetchData(src, idx);
+                    }
+                    if (nextidx > 0)
+                    {
+                        return Protocol.UnescapeLFdot(GetMessageFromBuffer(idx, nextidx));
+                    }
+                    idx = Array.IndexOf(ar, '\n', idx, size - idx);
+                }
+            }
+        };
     }
 }
