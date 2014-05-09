@@ -14,13 +14,19 @@ use Wolframe\Session as Session;
 try
 {
 	$cmd = NULL;			/* _REQUEST['CMD'] -> command to execute */
-	$body = array();		/* request parameters without 'CMD' */
+	$content = array();		/* request parameters without 'CMD' */
+	$doctype = NULL;
+	$root = NULL;
 
 	foreach ($_REQUEST as $key => $value)
 	{
 		if ($key == "DOCTYPE")
 		{
-			$body[ 'doctype'] = $value;
+			list($doctype, $root) = preg_split( "/[\s,;:]+/", $value, 2);
+			if ($root == NULL)
+			{
+				$root = $doctype;
+			}
 		}
 	}
 
@@ -35,11 +41,15 @@ try
 		}
 		else
 		{
-			$body[ $key] = $value;
+			$content[ $key] = $value;
 		}
 	}
 
-	$body = json_encode( $body);
+	$doc = array();
+	$doc[ 'doctype'] = $doctype;
+	$doc[ $root] = $content;
+
+	$body = json_encode( $doc);
 
 	$conn = new Session( "127.0.0.1", 7661, NULL, "NONE");
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
