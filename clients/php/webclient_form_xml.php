@@ -3,9 +3,11 @@ require 'session.php';
 use Wolframe\Session as Session;
 
 /*
- Forwards HTTP GET request as JSON to a wolframe server via TCP/IP plain and returns the result
- as the HTTP request answer. The HTTP REQUEST parameters without 'CMD' are transformed into 
- a JSON request set sent to the server. The command prefix is specified with the parameter
+ Forwards HTTP GET request as XML to a wolframe server via TCP/IP plain and rendes the result
+ as XML with a reference to a CSS associated to the document type identifier of the result
+ to render it properly by the HTML client.
+ The HTTP REQUEST parameters without 'CMD' are transformed into 
+ an XML request set sent to the server. The command prefix is specified with the parameter
  'CMD' and 'DOCTYPE'. If the parameter 'CMD' is not specified then the document type only
  determines what is executed on the server. The document type of the content is defined 
  with the parameter 'DOCTYPE'.
@@ -30,6 +32,10 @@ try
 		}
 	}
 
+	$body = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' . "\n";
+	$body .= '<!DOCTYPE ' . $root . " SYSTEM '$doctype.sfrm'>\n";
+	$body .= "<$root>";
+
 	foreach ($_REQUEST as $key => $value)
 	{
 		if ($key == "CMD")
@@ -41,15 +47,10 @@ try
 		}
 		else
 		{
-			$content[ $key] = $value;
+			$body .= "<$key>" . $value . "</$key>";
 		}
 	}
-
-	$doc = array();
-	$doc[ 'doctype'] = $doctype;
-	$doc[ $root] = $content;
-
-	$body = json_encode( $doc);
+	$body .= "</$root>\n";
 
 	$conn = new Session( "127.0.0.1", 7661, NULL, "NONE");
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
@@ -58,7 +59,18 @@ try
 	}
 	else
 	{
-		echo "<html><head><title>RESULT</title></head><body><p>" . $result . "</p></body></html>";
+		$random = uniqid( md5( rand( ) ) );
+		$resnsp = str_replace( "\n", '', $result);
+		preg_match('.*(\S+)', $resnsp, $matches);
+		$rr = explode( '?>', $result, 2);
+		$output = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+			. "\n"
+			. '<?xml-stylesheet type="text/css" href="css/'
+			. var_dump( $matches)
+			. ".css?random=$random\"?>"
+			. "\n"
+			. $rr[1];
+		echo $output;
 	}
 	unset( $conn);
 }

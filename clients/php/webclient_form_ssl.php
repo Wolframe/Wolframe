@@ -4,8 +4,8 @@ use Wolframe\Session as Session;
 
 /*
  Same as webclient.php but using SSL to communicate with the Wolframe server.
- Forwards HTTP GET request to a wolframe server via TCP/IP with SSL and returns the result
- as the HTTP request answer. The HTTP GET parameters without 'CMD' are transformed into 
+ Forwards HTTP GET request as JSON to a wolframe server via TCP/IP with SSL and returns the result
+ as the HTTP request answer. The HTTP REQUEST parameters without 'CMD' are transformed into 
  a JSON request set sent to the server. The command prefix is specified with the parameter
  'CMD'. If the parameter 'CMD' is not specified then the document type only determines what is executed
  on the server. The document type of the content is defined in JSON as an attribute named 'doctype'
@@ -22,7 +22,21 @@ try
 	);
 
 	$cmd = NULL;			/* _REQUEST['CMD'] -> command to execute */
-	$body = array();		/* request parameters without 'CMD' */
+	$content = array();		/* request parameters without 'CMD' */
+	$doctype = NULL;
+	$root = NULL;
+
+	foreach ($_REQUEST as $key => $value)
+	{
+		if ($key == "DOCTYPE")
+		{
+			list($doctype, $root) = preg_split( "/[\s,;:]+/", $value, 2);
+			if ($root == NULL)
+			{
+				$root = $doctype;
+			}
+		}
+	}
 
 	foreach ($_REQUEST as $key => $value)
 	{
@@ -30,12 +44,20 @@ try
 		{
 			$cmd = $value;
 		}
+		else if ($key == "DOCTYPE")
+		{
+		}
 		else
 		{
-			$body[ $key] = $value;
+			$content[ $key] = $value;
 		}
 	}
-	$body = json_encode( $body);
+
+	$doc = array();
+	$doc[ 'doctype'] = $doctype;
+	$doc[ $root] = $content;
+
+	$body = json_encode( $doc);
 
 	$conn = new Session( "127.0.0.1", 7962, $sslopt, "NONE");
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
