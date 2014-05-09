@@ -11,6 +11,7 @@
 #include <string>
 
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 std::string	outStr;
 
@@ -50,5 +51,6 @@ TEST( NamedRetVal, test )	{
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }

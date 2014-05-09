@@ -30,42 +30,37 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file testArrayDoublingAllocator.cpp
-///\brief test program for Array Doubling Allocator (utils/allocators.hpp)
 
+//
+// string normalization unit tests
+//
+
+#include "utils/strNormalization.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testReport.hpp"
-#include "utils/allocators.hpp"
 
-using namespace _Wolframe;
 using namespace _Wolframe::utils;
 
-TEST( ArrayDoublingAllocator, tests )
-{
-	static int size[] = {12,45,4566,2324,12343513,1234,234,6,7,98435,43543549,329847932,12345,32432424,0};
-	int pp[32];
-	ArrayDoublingAllocator mem;
-	std::size_t ii;
-	for (ii=0; size[ii]; ++ii)
-	{
-		pp[ii] = mem.alloc( size[ii]);
-		char* ptr = (char*)mem.base() + pp[ii];
-		memset( ptr, 'A' + ii, size[ii]);
-	}
-	for (ii=0; size[ii]; ++ii)
-	{
-		char* ptr = (char*)mem.base() + pp[ii];
-		for (int kk=0; kk<size[ii]; ++kk)
-		{
-			ASSERT_EQ ((std::size_t)ptr[kk], ('A' + ii));
-		}
-	}
-	SUCCEED();
+static const char* testStr = " ? This is ,  a nOt \n \tnormalized string\nwith\tüöä$éàè˝àč :\t. \"characters\'\n";
+static const char* expectedStr = "THIS IS A NOT NORMALIZED STRING WITH üöä éàè˝àč CHARACTERS";
+
+TEST( StringNormalizationFixture, InPlaceNormalization )	{
+	std::string str = testStr;
+	normalizeString( str );
+	ASSERT_STREQ( expectedStr, str.c_str());
 }
+
+TEST( StringNormalizationFixture, CopyNormalization )	{
+	std::string str = testStr;
+	std::string ret = normalizeString_copy( str );
+	ASSERT_STREQ( testStr, str.c_str());
+	ASSERT_STREQ( expectedStr, ret.c_str());
+}
+
 
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
 	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
-	return RUN_ALL_TESTS( );
+	return RUN_ALL_TESTS();
 }

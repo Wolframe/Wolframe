@@ -355,11 +355,7 @@ int main( int argc, char **argv)
 	{
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( loglevel);
 	}
-#undef _WOLFRAME_USE_GTEST_REPORT
-#ifdef _WOLFRAME_USE_GTEST_REPORT
-	boost::filesystem::path refpath( g_testdir / "gtestReport.txt");
 	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
-#endif
 	return RUN_ALL_TESTS();
 }
 

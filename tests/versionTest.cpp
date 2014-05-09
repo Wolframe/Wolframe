@@ -41,6 +41,7 @@
 
 #include "version.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 using namespace _Wolframe;
 
@@ -150,5 +151,6 @@ TEST_F( VersionFixture, Compatibility )	{
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }

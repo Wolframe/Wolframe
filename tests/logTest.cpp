@@ -4,6 +4,7 @@
 
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <stdexcept>
 
 #if !defined( _WIN32 )
@@ -467,5 +468,6 @@ TEST_F( LoggingFixture, LogLevelUndefined )
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS( );
 }

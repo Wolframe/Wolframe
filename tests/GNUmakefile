@@ -175,6 +175,7 @@ local_clean:
 	-rm -f *.o
 	-rm -f logTest.log
 	-rm -rf temp
+	-rm -f gtestReport.txt
 
 local_distclean:
 
