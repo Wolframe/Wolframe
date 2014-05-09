@@ -68,12 +68,13 @@ static std::string getFileTypeString( const std::string& filename)
 
 TEST_P( FiletypeRecognitionTest, test)
 {
-	std::string testname = GetParam();
+	std::string filename = GetParam();
+	std::string testname = boost::filesystem::basename( filename);
 		
 	std::cerr << "processing test '" << testname << "'" << std::endl;
 
-	std::string tp = getFileTypeString( testname);
-	std::string expect( std::string( boost::filesystem::extension(boost::filesystem::basename(testname)).c_str() +1) + boost::filesystem::extension(testname));
+	std::string tp = getFileTypeString( filename);
+	std::string expect( std::string( boost::filesystem::extension(boost::filesystem::basename(filename)).c_str() +1) + boost::filesystem::extension(filename));
 
 	EXPECT_EQ( expect, tp);
 }
