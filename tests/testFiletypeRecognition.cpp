@@ -81,7 +81,7 @@ TEST_P( FiletypeRecognitionTest, test)
 
 static std::vector<std::string> tests;
 
-INSTANTIATE_TEST_CASE_P(AllFiletypeRecognitionTest,
+INSTANTIATE_TEST_CASE_P(AllFiletypeRecognitionTests,
                         FiletypeRecognitionTest,
                         ::testing::ValuesIn(tests));
 
