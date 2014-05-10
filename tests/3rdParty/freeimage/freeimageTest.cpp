@@ -3,6 +3,7 @@
 //
 
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -108,5 +109,6 @@ TEST_F( FreeImageFixture, ImageInfo )
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS( );
 }

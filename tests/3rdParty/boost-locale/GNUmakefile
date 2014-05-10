@@ -9,16 +9,19 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	-I. \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/3rdParty/gtest/include
+	-I$(TOPDIR)/3rdParty/gtest/include \
+	-I$(TOPDIR)/wtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/wtest \
 	$(ICU_LIB_DIRS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
+	-lwolftest \
 	-lboost_locale$(BOOST_LIBRARY_TAG) \
-	-lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_filesystem -lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
 	$(ICU_LIBS)
 
 TEST_OBJS =
@@ -31,6 +34,7 @@ TEST_CPP_BINS = \
 local_all:
 
 local_clean:
+	@-rm -f gtestReport.txt
 
 local_distclean:
 

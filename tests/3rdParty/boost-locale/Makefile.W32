@@ -10,7 +10,8 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I$(TOPDIR)\3rdParty\gtest\include
+	/I$(TOPDIR)\3rdParty\gtest\include \
+	/I$(TOPDIR)\wtest\include
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
@@ -22,6 +23,7 @@ INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(ICU_LIBS) \
+	$(TOPDIR)\wtest\wtest.lib \
 	libboost_system$(BOOST_LIBRARY_TAG).lib \
 	libboost_thread$(BOOST_LIBRARY_TAG).lib
 	
@@ -37,6 +39,7 @@ boostLocaleTest.exe: boostLocaleTest.obj
 local_all:
 
 local_clean:
+	@-erase gtestReport.txt 2>NUL
 
 local_distclean:
 
