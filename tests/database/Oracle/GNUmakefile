@@ -10,10 +10,12 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR) \
 	$(ORACLE_INCLUDE_DIRS) \
 	-I$(TOPDIR)/src/modules/database/oracle \
-	-I$(TOPDIR)/3rdParty/gtest/include
+	-I$(TOPDIR)/3rdParty/gtest/include \
+	-I$(TOPDIR)/wtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/wtest \
 	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
@@ -23,6 +25,7 @@ INCLUDE_LIBS = \
 	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_database \
+	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(ORACLE_LIBS) \
@@ -46,6 +49,7 @@ LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(ORACLE_LIB_DIR):$(TOPD
 local_all:
 
 local_clean:
+	@-rm -f gtestReport.txt
 
 local_distclean:
 

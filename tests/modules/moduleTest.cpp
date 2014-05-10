@@ -5,6 +5,7 @@
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 #include "tests/mod_test/common.hpp"
 #include "tests/mod_test_containers/common.hpp"
@@ -149,5 +150,6 @@ TEST_F( ModuleFixture, ModuleLogging )
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS( );
 }

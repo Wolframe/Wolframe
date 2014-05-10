@@ -7,6 +7,7 @@
 #include "types/variant.hpp"
 #include "types/integer.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 #include "SQLite.hpp"
 #include <vector>
@@ -433,5 +434,6 @@ TEST_F( SQLiteModuleFixture, ExpressionWithParametersAndTypeCoercion )
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS( );
 }
