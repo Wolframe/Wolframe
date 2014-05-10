@@ -34,6 +34,7 @@
 ///\brief Test the recognition of configuration file types
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include "utils/fileUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -44,12 +45,10 @@
 
 using namespace _Wolframe;
 
-static int g_gtest_ARGC = 0;
-static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
 
 class FiletypeRecognitionTest
-	:public ::testing::Test
+	:public ::testing::TestWithParam<std::string>
 {
 protected:
 	FiletypeRecognitionTest() {}
@@ -67,11 +66,28 @@ static std::string getFileTypeString( const std::string& filename)
 	return std::string(encodingName[ (int)filetype.encoding]) + ext[(int)filetype.format];
 }
 
-
-TEST_F( FiletypeRecognitionTest, tests)
+TEST_P( FiletypeRecognitionTest, test)
 {
-	std::vector<std::string> tests;
-	std::size_t testno;
+	std::string filename = GetParam();
+	std::string testname = boost::filesystem::basename( filename);
+		
+	std::cerr << "processing test '" << testname << "'" << std::endl;
+
+	std::string tp = getFileTypeString( filename);
+	std::string expect( std::string( boost::filesystem::extension(boost::filesystem::basename(filename)).c_str() +1) + boost::filesystem::extension(filename));
+
+	EXPECT_EQ( expect, tp);
+}
+
+static std::vector<std::string> tests;
+
+INSTANTIATE_TEST_CASE_P(AllFiletypeRecognitionTests,
+                        FiletypeRecognitionTest,
+                        ::testing::ValuesIn(tests));
+
+int main( int argc, char **argv)
+{
+	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
 
 	// [1] Selecting tests to execute:
 	boost::filesystem::recursive_directory_iterator ditr( g_testdir / "doc" / "filetype"), dend;
@@ -90,42 +106,12 @@ TEST_F( FiletypeRecognitionTest, tests)
 		}
 	}
 	std::sort( tests.begin(), tests.end());
+	
+	// [2] Instantiate test cases with INSTANTIATE_TEST_CASE_P (see above)
 
-	// [2] Execute tests:
-	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
-	for (testno=1; itr != end; ++itr,++testno)
-	{
-		std::string testname = boost::filesystem::basename(*itr) + boost::filesystem::extension(*itr);
-		
-		std::cerr << "processing test '" << testname << "'" << std::endl;
-
-		std::string tp = getFileTypeString( *itr);
-		std::string expect( std::string( boost::filesystem::extension(boost::filesystem::basename(*itr)).c_str() +1) + boost::filesystem::extension(*itr));
-
-		EXPECT_EQ( expect, tp);
-	}
-}
-
-int main( int argc, char **argv)
-{
-	g_gtest_ARGC = 1;
-	g_gtest_ARGV[0] = argv[0];
-	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
-
-	if (argc >= 2)
-	{
-		if (std::strcmp( argv[1], "-h") == 0 || std::strcmp( argv[1], "--help") == 0)
-		{
-			std::cerr << argv[0] << " (no arguments)" << std::endl;
-			return 0;
-		}
-		else
-		{
-			std::cerr << "Too many arguments (expected no arguments)" << std::endl;
-			return 1;
-		}
-	}
-	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV);
+	// [3] Execute tests:
+	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }
 

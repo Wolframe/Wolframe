@@ -7,6 +7,7 @@
 #include <string>
 
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 static std::string outStr;
 
@@ -42,13 +43,13 @@ struct C2
 
 static C1 c1;
 static C2 c2;
-int (*f1)( void* this_, char arg) = &Wrapper<C1,&C1::a>::function;
-int (*f2)( void* this_, char arg) = &Wrapper<C2,&C2::b>::function;
+int (*func1)( void*, char ) = &Wrapper<C1,&C1::a>::function;
+int (*func2)( void*, char ) = &Wrapper<C2,&C2::b>::function;
 
 
 TEST( MethodMemberPointerTemplate, test )	{
-	f1( &c1, '1');
-	f2( &c2, '2');
+	func1( &c1, '1');
+	func2( &c2, '2');
 	ASSERT_STREQ( outStr.c_str(), " C1:1 C2:2");
 }
 
@@ -56,6 +57,7 @@ TEST( MethodMemberPointerTemplate, test )	{
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }
 

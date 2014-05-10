@@ -105,6 +105,14 @@ private:
 		ParseXMLDoctype2,
 		ParseXMLDoctype,
 		SkipXMLComment,
+		SearchXMLRootName,
+		ParseXMLRootName,
+		SearchXMLRootAttrib,
+		ParseXMLRootAttrib,
+		SearchXMLRootAttribAssign,
+		SearchXMLRootAttribQuote,
+		ParseXMLRootAttribValueSQ,
+		ParseXMLRootAttribValueDQ,
 		Done
 	};
 	static const char* stateName( State st)
@@ -128,6 +136,14 @@ private:
 			"ParseXMLDoctype2",
 			"ParseXMLDoctype",
 			"SkipXMLComment",
+			"SearchXMLRootName",
+			"ParseXMLRootName",
+			"SearchXMLRootAttrib",
+			"ParseXMLRootAttrib",
+			"SearchXMLRootAttribAssign",
+			"SearchXMLRootAttribQuote",
+			"ParseXMLRootAttribValueSQ",
+			"ParseXMLRootAttribValueDQ",
 			"Done"};
 		return ar[ (int)st];
 	}
@@ -163,6 +179,7 @@ private:
 	std::string m_doctype;				//< document type extracted
 	std::string m_doctypeid;			//< document type identifier extracted
 	std::string m_docformatid;			//< document format type identifier
+	std::string m_rootelemname;			//< document root element name
 };
 }}
 #endif

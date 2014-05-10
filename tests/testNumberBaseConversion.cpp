@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Test for types/numberBaseConversion.hpp
 #include "types/numberBaseConversion.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -164,6 +165,7 @@ TEST_F( NumberBaseConversions, tests)
 int main( int argc, char **argv)
 {
 	::testing::InitGoogleTest( &argc, argv);
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }
 

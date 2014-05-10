@@ -10,16 +10,22 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	-I. \
+	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/gtest/include \
+	-I$(TOPDIR)/wtest/include \
 	$(FREEIMAGE_INCLUDE_DIRS) \
 	$(FREEIMAGEPLUS_INCLUDE_DIRS)
 
 INCLUDE_LDFLAGS = \
+	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/wtest \
 	$(FREEIMAGE_LIB_DIRS) \
 	$(FREEIMAGEPLUS_LIB_DIRS)
 	
 INCLUDE_LIBS = \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
+	-lwolftest \
+	-lboost_filesystem -lboost_system \
 	$(FREEIMAGEPLUS_LIBS) \
 	$(FREEIMAGE_LIBS)
 
@@ -35,6 +41,7 @@ local_all:
 
 local_clean:
 	@-rm -f thumb.png thumbcpp.png testmem.png
+	@-rm -f gtestReport.txt
 
 local_distclean:
 

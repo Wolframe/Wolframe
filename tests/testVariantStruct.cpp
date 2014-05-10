@@ -2,6 +2,7 @@
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <iostream>
 
 using namespace _Wolframe;
@@ -40,6 +41,7 @@ TEST_F( VariantStructDescriptionStableTest, tests)
 int main( int argc, char **argv)
 {
 	::testing::InitGoogleTest( &argc, argv);
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }
 

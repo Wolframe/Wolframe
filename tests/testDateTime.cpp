@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Test for types/datetime.hpp
 #include "types/datetime.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <iostream>
 #include <string>
 #include <limits>
@@ -148,6 +149,7 @@ TEST_F( DateTimeDescriptionTest, tests)
 int main( int argc, char **argv)
 {
 	::testing::InitGoogleTest( &argc, argv);
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }
 

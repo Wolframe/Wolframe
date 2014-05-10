@@ -12,6 +12,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\wtest\include \
 	/I$(TOPDIR)\3rdParty\gtest\include
 
 # Note: libraries are picked automatically on Windows!
@@ -22,6 +23,7 @@ INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\src\loadModules.obj \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
+	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
@@ -38,6 +40,7 @@ local_all:
 
 local_clean:
 	@-erase test.bat >NUL 2>NUL
+	@-erase gtestReport.txt 2>NUL
 
 local_distclean:
 

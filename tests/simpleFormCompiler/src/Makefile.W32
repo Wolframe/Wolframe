@@ -43,6 +43,7 @@ testSimpleFormCompiler.exe: testSimpleFormCompiler.obj $(TOPDIR)\src\wolframe.li
 local_all:
 
 local_clean:
+	@-erase gtestReport.txt 2>NUL
 
 local_distclean:
 

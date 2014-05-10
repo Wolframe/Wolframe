@@ -95,7 +95,8 @@ public:
 		:m_ctx(ctx_)
 		,m_cmd(0)
 		,m_state(0)
-		,m_function(0){}
+		,m_function(0)
+		,m_checkIfInputLeft(false){}
 
 	///\brief Destructor
 	virtual ~DirectmapCommandHandler(){}
@@ -123,6 +124,7 @@ private:
 	langbind::RedirectFilterClosure m_outputprinter;			//< processor for redirection of the transaction call result or if defined the output form content to output
 	std::string m_errormsg;							//< buffer for error message returned
 	std::string m_output_rootelement;					//< root element of non validated output
+	bool m_checkIfInputLeft;						//< true, if we need to check, if there is input left (SKIP)
 };
 
 }}//namespace

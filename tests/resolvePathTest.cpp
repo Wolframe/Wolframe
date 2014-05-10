@@ -4,6 +4,7 @@
 
 #include "utils/fileUtils.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 using namespace _Wolframe::utils;
 
@@ -21,5 +22,6 @@ TEST( ResolvePathFixture, tests )	{
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }

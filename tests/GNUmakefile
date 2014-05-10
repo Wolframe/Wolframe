@@ -1,7 +1,7 @@
 TOPDIR = ..
 
 SUBDIRS = 3rdParty modules database simpleFormCompiler wolfilter compileTDL
-#SUBDIRS = 3rdParty modules database AAAA simpleFormCompiler wolfilter
+#SUBDIRS = 3rdParty modules database AAAA simpleFormCompiler wolfilter compileTDL
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -56,7 +56,7 @@ INCLUDE_CXXFLAGS += \
 
 INCLUDE_DIRS += \
 	$(OPENSSL_INCLUDE_DIRS)
-	
+
 INCLUDE_LDFLAGS += \
 	$(OPENSSL_LIB_DIRS)
 
@@ -175,6 +175,7 @@ local_clean:
 	-rm -f *.o
 	-rm -f logTest.log
 	-rm -rf temp
+	-rm -f gtestReport.txt
 
 local_distclean:
 

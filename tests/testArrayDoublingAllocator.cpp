@@ -34,6 +34,7 @@
 ///\brief test program for Array Doubling Allocator (utils/allocators.hpp)
 
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include "utils/allocators.hpp"
 
 using namespace _Wolframe;
@@ -65,5 +66,6 @@ TEST( ArrayDoublingAllocator, tests )
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS( );
 }

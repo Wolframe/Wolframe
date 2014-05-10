@@ -312,11 +312,26 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				// ... treat document as standalone: swallow root element
 				langbind::InputFilter::ElementType typ;
 				types::VariantConst element;
-				if (!m_input->getNext( typ, element))
+				if (m_input->getNext( typ, element))
+				{
+					if (typ == langbind::FilterBase::CloseTag)
+					{
+						// ... input document is empty
+					}
+					else if (typ == langbind::FilterBase::OpenTag)
+					{
+						m_checkIfInputLeft = true;
+					}
+					else
+					{
+						throw std::runtime_error( "input has not one unique root element");
+					}
+				}
+				else
 				{
 					switch (m_inputfilter->state())
 					{
-						case InputFilter::Open: throw std::runtime_error( "unexpected end of standalone document. no root element defined");
+						case InputFilter::Open: break;
 						case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
 						case InputFilter::Error: throw std::runtime_error( std::string( "error in input: ") + m_inputfilter->getError());
 					}
@@ -361,7 +376,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						}
 					}
 					m_state = 6;
-					return IOFilterCommandHandler::Ok;
+					continue;
 				}
 				if (m_outputform.get() && !m_cmd->skipvalidation_output)
 				{
@@ -400,7 +415,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			{
 				if (!m_outputprinter.call()) return IOFilterCommandHandler::Yield;
 				m_state = 6;
-				return IOFilterCommandHandler::Ok;
+				continue;
 			}
 			case 51:
 			{
@@ -447,8 +462,33 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					}
 				}
 				m_state = 6;
-				return IOFilterCommandHandler::Ok;
+				continue;
 			}
+			case 6:
+				if (m_checkIfInputLeft)
+				{
+					// Check, if there is input left:
+					langbind::InputFilter::ElementType typ;
+					types::VariantConst element;
+
+					if (m_input->getNext( typ, element))
+					{
+						if (typ != langbind::FilterBase::CloseTag)
+						{
+							throw std::runtime_error( "input has not one unique root element");
+						}
+					}
+					else
+					{
+						switch (m_inputfilter->state())
+						{
+							case InputFilter::Open: break;
+							case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
+							case InputFilter::Error: throw std::runtime_error( std::string( "error in input: ") + m_inputfilter->getError());
+						}
+					}
+				}
+				/*no break here!*/
 			default:
 				return IOFilterCommandHandler::Ok;
 		}

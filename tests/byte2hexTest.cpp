@@ -34,6 +34,7 @@
 // byte <-> ASCII hex conversion tests
 
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include "types/byte2hex.h"
 
 
@@ -145,6 +146,7 @@ TEST( byte2hex, HEX_to_bytes )
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }
 

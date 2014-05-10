@@ -1,7 +1,7 @@
 TOPDIR = ..
 
 SUBDIRS = 3rdParty modules database wolfilter simpleFormCompiler compileTDL
-#SUBDIRS = 3rdParty modules database AAAA wolfilter
+#SUBDIRS = 3rdParty modules database AAAA wolfilter simpleFormCompiler compileTDL
 
 
 # all broken on windows due to working telnet
@@ -137,6 +137,7 @@ local_clean:
 	@-erase logTest.log 2>NUL
 	@-erase /s /q temp >NUL 2>NUL
 	@-rmdir temp 2>NUL
+	@-erase gtestReport.txt 2>NUL
 
 local_distclean:
 
