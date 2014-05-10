@@ -35,6 +35,7 @@ local_all:
 
 local_clean:
 	@-rm -f gtestReport.txt
+	@-rm -f boostLocaleTest*.xml
 
 local_distclean:
 

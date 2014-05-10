@@ -42,6 +42,7 @@ local_all:
 local_clean:
 	@-rm -f thumb.png thumbcpp.png testmem.png
 	@-rm -f gtestReport.txt
+	@-rm -f *.xml
 
 local_distclean:
 
