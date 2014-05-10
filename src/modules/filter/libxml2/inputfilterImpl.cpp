@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of input filter abstraction for the libxml2 library
 #include "inputfilterImpl.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -96,6 +97,12 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	catch (const std::bad_alloc& err)
 	{
 		setState( InputFilter::Error, "out of memory");
+		return;
+	}
+	catch (const std::logic_error& err)
+	{
+		LOG_FATAL << "logic error in libxml2 filer: " << err.what();
+		setState( InputFilter::Error, "logic error in libxml2 filer. See logs");
 		return;
 	}
 	if (!m_doc.get())

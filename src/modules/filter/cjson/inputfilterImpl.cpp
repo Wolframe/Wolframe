@@ -168,91 +168,97 @@ boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
 
 void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
 {
-	m_content.append( (const char*)content, contentsize);
-	if (end)
+	try
 	{
-		std::string origcontent( m_content);
-		if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
-		m_encattr.encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
-		m_encattr.codepage = 0;
-		m_encattr_defined = true;
-		try
+		m_content.append( (const char*)content, contentsize);
+		if (end)
 		{
+			std::string origcontent( m_content);
+			if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
+			m_encattr.encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
+			m_encattr.codepage = 0;
+			m_encattr_defined = true;
 			m_root = parse( origcontent);
-		}
-		catch (const std::runtime_error& err)
-		{
-			setState( InputFilter::Error, err.what());
-			return;
-		}
-		catch (const std::bad_alloc& err)
-		{
-			setState( InputFilter::Error, "out of memory");
-			return;
-		}
-		m_firstnode = m_root.get();
-		int nof_docattributes = 0;
-		bool encodingParsed = false;
-
-		if (!m_firstnode->string && !m_firstnode->valuestring && !m_firstnode->next && m_firstnode->type == cJSON_Object)
-		{
-			//CJSON creates a toplevel object for multiple root nodes:
-			m_firstnode = m_firstnode->child;
-		}
-		const char* rootelem = 0;
-		const char* doctypeid = 0;
-
-		for (;;)
-		{
-			if (m_firstnode->string && m_firstnode->valuestring)
+			m_firstnode = m_root.get();
+			int nof_docattributes = 0;
+			bool encodingParsed = false;
+	
+			if (!m_firstnode->string && !m_firstnode->valuestring && !m_firstnode->next && m_firstnode->type == cJSON_Object)
 			{
-				if (boost::iequals("doctype",m_firstnode->string))
+				//CJSON creates a toplevel object for multiple root nodes:
+				m_firstnode = m_firstnode->child;
+			}
+			const char* rootelem = 0;
+			const char* doctypeid = 0;
+	
+			for (;;)
+			{
+				if (m_firstnode->string && m_firstnode->valuestring)
 				{
-					++nof_docattributes;
-					if (doctypeid) throw std::runtime_error("duplicate 'doctype' definition");
-					doctypeid = m_firstnode->valuestring;
-					m_firstnode = m_firstnode->next;
-					continue;
-				}
-				else if (boost::iequals("encoding", m_firstnode->string))
-				{
-					++nof_docattributes;
-					types::String::EncodingAttrib ea = types::String::getEncodingFromName( m_firstnode->valuestring);
-					if (m_encattr.encoding != ea.encoding || ea.codepage != 0)
+					if (boost::iequals("doctype",m_firstnode->string))
 					{
-						// ... encoding different than guessed. Parse again
-						if (encodingParsed) throw std::runtime_error( "duplicate 'encoding' definition");
-						encodingParsed = true;
-						m_encattr = ea;
-						m_root = parse( origcontent);
-						m_firstnode = m_root.get();
-						while (m_firstnode && nof_docattributes--) m_firstnode = m_firstnode->next;
-					}
-					else
-					{
+						++nof_docattributes;
+						if (doctypeid) throw std::runtime_error("duplicate 'doctype' definition");
+						doctypeid = m_firstnode->valuestring;
 						m_firstnode = m_firstnode->next;
+						continue;
 					}
-					continue;
+					else if (boost::iequals("encoding", m_firstnode->string))
+					{
+						++nof_docattributes;
+						types::String::EncodingAttrib ea = types::String::getEncodingFromName( m_firstnode->valuestring);
+						if (m_encattr.encoding != ea.encoding || ea.codepage != 0)
+						{
+							// ... encoding different than guessed. Parse again
+							if (encodingParsed) throw std::runtime_error( "duplicate 'encoding' definition");
+							encodingParsed = true;
+							m_encattr = ea;
+							m_root = parse( origcontent);
+							m_firstnode = m_root.get();
+							while (m_firstnode && nof_docattributes--) m_firstnode = m_firstnode->next;
+						}
+						else
+						{
+							m_firstnode = m_firstnode->next;
+						}
+						continue;
+					}
+				}
+				break;
+			}
+			if (m_firstnode->string && !m_firstnode->next)
+			{
+				rootelem = m_firstnode->string;
+			}
+			if (doctypeid)
+			{
+				if (rootelem)
+				{
+					m_doctype = types::DocType( doctypeid, rootelem, types::DocType::SchemaPath());
+				}
+				else
+				{
+					setState( InputFilter::Error, "document type defined, but no singular root element");
 				}
 			}
-			break;
+			m_stk.push_back( StackElement( m_firstnode));
 		}
-		if (m_firstnode->string && !m_firstnode->next)
-		{
-			rootelem = m_firstnode->string;
-		}
-		if (doctypeid)
-		{
-			if (rootelem)
-			{
-				m_doctype = types::DocType( doctypeid, rootelem, types::DocType::SchemaPath());
-			}
-			else
-			{
-				throw std::runtime_error( "document type defined, but no singular root element");
-			}
-		}
-		m_stk.push_back( StackElement( m_firstnode));
+	}
+	catch (const std::runtime_error& err)
+	{
+		setState( InputFilter::Error, err.what());
+		return;
+	}
+	catch (const std::bad_alloc& err)
+	{
+		setState( InputFilter::Error, "out of memory");
+		return;
+	}
+	catch (const std::logic_error& err)
+	{
+		LOG_FATAL << "logic error in JSON filer: " << err.what();
+		setState( InputFilter::Error, "logic error in libxml2 filer. See logs");
+		return;
 	}
 }
 

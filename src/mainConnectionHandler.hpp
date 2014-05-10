@@ -78,10 +78,15 @@ public:
 	}
 
 private:
+	void initSessionExceptionBYE();
+
+private:
 	MainCommandHandler m_cmdhandler;		//< top level instance executing commands
 	protocol::InputBlock m_input;			//< buffer for network read messages
 	protocol::OutputBlock m_output;			//< buffer for network write messages
 	bool m_terminated;				//< true, if a termination signal came from the network
+	std::string m_exceptionByeMessage;		//< message to terminate connection on exception
+	const char* m_exceptionByeMessagePtr;		//< reference to message to terminate connection on exception
 };
 } // namespace proc
 } // namespace _Wolframe
