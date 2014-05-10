@@ -1119,6 +1119,7 @@ makefiles/nmake/top.mk
 .Attic/filter/tests/msxslt/testmsxslt.cpp
 .Attic/filter/tests/msxslt/test.xml
 .Attic/functions/README
+.Attic/functions/stringNormalizationTest.cpp
 .Attic/functions/strNormalization.cpp
 .Attic/functions/strNormalization.hpp
 .Attic/functions/strSimilarity.cpp
@@ -1796,6 +1797,7 @@ packaging/slackware/buildlocal.sh
 packaging/slackware/doinst.sh
 packaging/slackware/wolframe.conf
 packaging/solaris/buildlocal.sh
+packaging/solaris/wolframe.conf
 packaging/windows/Makefile.W32
 packaging/windows/Readme.txt
 packaging/windows/wolframe.xml
@@ -2544,7 +2546,6 @@ tests/simpleFormCompiler/src/normalizeFunctions.cpp
 tests/simpleFormCompiler/src/simpleFormCompiler.cpp
 tests/simpleFormCompiler/src/testSimpleFormCompiler.cpp
 tests/SSL/README.txt
-tests/stringNormalizationTest.cpp
 tests/testArrayDoublingAllocator.cpp
 tests/testBigNumber.cpp
 tests/testBoostPath.cpp

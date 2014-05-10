@@ -695,7 +695,9 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					{
 						throw_error( "invalid XML root element");
 					}
-					if (ch > ' ' || ch < 0)
+//					if (ch > ' ' || ch < 0)		// ch is an unsigned char
+					if (ch > ' ')
+
 					{
 						setState( ParseXMLRootName);
 						m_itembuf.clear();
@@ -703,7 +705,9 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					break;
 
 				case ParseXMLRootName:
-					if (ch != '>' && (ch > ' ' || ch < 0))
+//					if (ch != '>' && (ch > ' ' || ch < 0)) // ch is an unsigned char
+					if (ch != '>' && ch > ' ')
+
 					{
 						m_itembuf.push_back( ch);
 						if (m_itembuf.size() > 128)
@@ -727,7 +731,9 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					{
 						throw_error( "No document type or schema definition found and document is not standalone");
 					}
-					if (ch > ' ' || ch < 0)
+// unsigned char			if (ch > ' ' || ch < 0)
+					if (ch > ' ')
+
 					{
 						setState( ParseXMLRootAttrib);
 						m_itembuf.clear();
@@ -735,7 +741,8 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					break;
 
 				case ParseXMLRootAttrib:
-					if (ch != '>' && (ch > ' ' || ch < 0))
+// unsigned char again			if (ch != '>' && (ch > ' ' || ch < 0))
+					if (ch != '>' && ch > ' ')
 					{
 						m_itembuf.push_back( ch);
 						if (m_itembuf.size() > 128)
@@ -765,7 +772,8 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					{
 						setState( SearchXMLRootAttribQuote);
 					}
-					else if (ch > ' ' || ch < 0)
+// ç%&ç%&&ç*ç*+""/(			else if (ch > ' ' || ch < 0)
+					else if (ch > ' ')
 					{
 						throw_error( "invalid XML root attribute definition (missing value assingment)");
 					}
@@ -780,7 +788,8 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					{
 						setState( ParseXMLRootAttribValueDQ);
 					}
-					else if (ch > ' ' || ch < 0)
+// no comment				else if (ch > ' ' || ch < 0)
+					else if (ch > ' ')
 					{
 						throw_error( "invalid XML root attribute definition (missing value assingment)");
 					}
