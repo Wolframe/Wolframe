@@ -11,12 +11,15 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
+	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\wtest\include \
 	/I$(TOPDIR)\3rdParty\gtest\include \
 	/I$(TOPDIR)\3rdParty\freeimage\Source \
 	/I$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus
 
+# Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
 
 # TODO: static linking for now, something is fishy with the DLL
 INCLUDE_LIBS = \
