@@ -89,6 +89,8 @@ tests/pechoHandlerTest$(EXE): tests/pechoHandlerTest.o $(OBJS) $(TOPDIR)/src/lib
 local_all: $(CPP_BINS)
 
 local_clean:
+	-rm -f tests/gtestReport.txt
+	-rm -f pechoHandlerTest*.xml
 
 local_distclean:
 
