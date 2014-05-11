@@ -29,6 +29,7 @@ echo "Test results"
 echo "------------"
 echo ""
 find . -name gtestReport.txt -exec cat {} \; | sort
+echo ""
 
 echo "Test result details"
 echo "-------------------"
