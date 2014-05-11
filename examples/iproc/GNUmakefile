@@ -103,8 +103,11 @@ tests/iprocHandlerXMLTest$(EXE): tests/iprocHandlerXMLTest.o $(OBJS) $(TOPDIR)/s
 local_all: $(CPP_BINS)
 
 local_clean:
-	rm -Rf tests/result
-	rm -Rf tests/temp
+	-rm -rf tests/result
+	-rm -rf tests/temp
+	-rm -f tests/gtestReport.txt
+	-rm -f iprocHandlerTest*.xml
+	-rm -f iprocHandlerXMLTest*.xml
 
 local_distclean:
 

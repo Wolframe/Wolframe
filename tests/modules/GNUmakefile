@@ -43,6 +43,7 @@ local_all:
 
 local_clean:
 	-rm -f gtestReport.txt
+	-rm -f moduleTest*.xml
 
 local_distclean:
 

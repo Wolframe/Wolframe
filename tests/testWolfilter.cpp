@@ -347,6 +347,7 @@ int main( int argc, char **argv)
 	// [2] Instantiate test cases with INSTANTIATE_TEST_CASE_P (see above)
 	
 	// [3] Run the tests
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	_Wolframe::log::LogLevel::Level loglevel = _Wolframe::log::LogLevel::LOGLEVEL_WARNING;
 	if (tracelevel >= 1) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_INFO;
@@ -363,7 +364,6 @@ int main( int argc, char **argv)
 	{
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( loglevel);
 	}
-	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	return RUN_ALL_TESTS();
 }
 

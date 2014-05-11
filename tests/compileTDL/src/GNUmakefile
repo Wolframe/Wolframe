@@ -47,6 +47,7 @@ local_all:
 
 local_clean:
 	@-rm -f gtestReport.txt
+	@-rm -f testCompileTDL*.xml
 
 local_distclean:
 
