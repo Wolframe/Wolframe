@@ -30,68 +30,45 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// wolframedCommandLine.hpp
-//
+#ifndef _WOLFRAME_SERVICE_INTERFACE_HPP_INCLUDED
+#define _WOLFRAME_SERVICE_INTERFACE_HPP_INCLUDED
 
-#ifndef _WOLFRAMED_COMMANDLINE_HPP_INCLUDED
-#define _WOLFRAMED_COMMANDLINE_HPP_INCLUDED
+#include "appProperties.hpp"
+#include "standardConfigs.hpp"
+#include <iostream>
 
-#include "logger/logLevel.hpp"
-#include "appConfig.hpp"
-
-#include <string>
-#include <boost/program_options.hpp>
-
-namespace _Wolframe	{
-namespace config	{
-
-struct CmdLineConfig	{
-	enum Command_t	{
-		PRINT_HELP,
-		PRINT_VERSION,
-		CHECK_CONFIG,
-		TEST_CONFIG,
-		PRINT_CONFIG,
-#if defined(_WIN32)
-		INSTALL_SERVICE,
-		REMOVE_SERVICE,
-		RUN_SERVICE,
-#endif
-		DEFAULT
-	};
-	static const char* commandName( Command_t c)
-	{
-		static const char* ar[] = {"help","version","configcheck","configtest","printconfig",
-#if defined(_WIN32)
-					"install","remove","run",
-#endif
-					"default"};
-		return ar[c];
-	}
-
-	Command_t	command;
-#if !defined(_WIN32)
-	bool		foreground;
-	std::string	user;
-	std::string	group;
-	std::string	pidFile;
-#endif
-	log::LogLevel::Level				debugLevel;
-	std::string					cfgFile;
-	ApplicationConfiguration::ConfigFileType	cfgType;
-	bool						useLogConfig;
-private:
-	std::string					errMsg_;
-	boost::program_options::options_description	options_;
-
+namespace _Wolframe
+{
+class ServiceInterface
+{
 public:
-	CmdLineConfig();
-	bool parse( int argc, char* argv[] );
-	std::string errMsg( void )		{ return errMsg_; }
-	void usage( std::ostream& os ) const	{ options_.print( os ); }
+	virtual ~ServiceInterface(){}
+
+	virtual bool loadConfig( int argc, char* argv[])=0;
+
+	virtual const _Wolframe::AppProperties* appProperties() const=0;
+
+	virtual log::LoggerConfiguration& loggerConfig()=0;
+
+	virtual bool start()=0;
+	virtual void stop()=0;
+
+	virtual bool configcheck() const=0;
+	virtual bool configtest() const=0;
+	virtual void printconfig( std::ostream& os ) const=0;
+
+	virtual bool foreground() const=0;
+	virtual const char* pidfile() const=0;
+
+	virtual const char* user() const=0;
+	virtual const char* group() const=0;
+	
+	virtual const char* command() const=0;
 };
 
-}} // namespace _Wolframe::config
 
-#endif // _COMMANDLINE_HPP_INCLUDED
+int serviceMain( ServiceInterface* service, int argc, char* argv[]);
+
+}//namespace
+#endif
+

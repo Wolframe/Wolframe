@@ -281,13 +281,13 @@ void WINAPI serviceCtrlFunction( DWORD control )
 }
 
 // for passing the location of the configuration
-static std::string serviceConfig;
-static _Wolframe::log::LogLevel::Level winDbgLevel;
+static std::string g_serviceConfig;
+static _Wolframe::ServiceInterface* g_service = 0;
 
 static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 	try {
 // set an emergency logger (debug view), is set in 'ImagePath' in the registry of the service description
-		_Wolframe::log::LogBackend::instance().setWinDebugLevel( winDbgLevel );
+		_Wolframe::log::LogBackend::instance().setWinDebugLevel( g_service->debugLevel() );
 
 // read configuration (from the location passed in the command line arguments of the main, not the service_main)
 		_Wolframe::config::CmdLineConfig cmdLineCfg; // empty for a service with --service
@@ -393,98 +393,12 @@ WAIT_FOR_STOP_EVENT:
 }
 
 
-int _Wolframe_winMain( int argc, char* argv[], const AppProperties* appProperties)
+int _Wolframe_winMain( _Wolframe::ServiceInterface* service, int argc, char* argv[])
 {
+	const _Wolframe::AppProperties* appProperties = service->appProperties();
+	g_service = service_;
+
 	try	{
-		// create initial console logger, so we see things going wrong
-		_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
-
-		_Wolframe::ApplicationInfo& appInfo = _Wolframe::ApplicationInfo::instance();
-		appInfo.version( _Wolframe::Version( appProperties->applicationVersion() ));
-
-		_Wolframe::config::CmdLineConfig	cmdLineCfg;
-		const char		*configFile = NULL;
-
-		if ( !cmdLineCfg.parse( argc, argv ))	{	// there was an error parsing the command line
-			LOG_ERROR << cmdLineCfg.errMsg();
-			cmdLineCfg.usage( std::cerr );
-			std::cerr << std::endl;
-			return _Wolframe::ErrorCode::FAILURE;
-		}
-// command line has been parsed successfully
-// reset log level to the command line one, if specified
-		if ( cmdLineCfg.debugLevel != _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED ) {
-			_Wolframe::log::LogBackend::instance().setConsoleLevel( cmdLineCfg.debugLevel );
-// if in a service the -d flag can be specified in the 'ImagePath' of the service description in order
-// to debug lowlevel via 'OutputDebugString'
-			winDbgLevel = cmdLineCfg.debugLevel;
-		} else {
-			winDbgLevel = _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED;
-		}
-// if cmdLineCfg.errMsg() is not empty than we have a warning
-		if ( !cmdLineCfg.errMsg().empty() )	// there was a warning parsing the command line
-			LOG_WARNING << cmdLineCfg.errMsg();
-
-// if we have to print the version or the help do it and exit
-		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_VERSION )	{
-			std::cout << appProperties->applicationName() << " version "
-				  << appInfo.version().toString() << std::endl << std::endl;
-			return _Wolframe::ErrorCode::OK;
-		}
-		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_HELP )	{
-			cmdLineCfg.usage( std::cout );
-			std::cout << std::endl;
-			return _Wolframe::ErrorCode::OK;
-		}
-
-// decide what configuration file to use
-		if ( !cmdLineCfg.cfgFile.empty() )	// if it has been specified than that's The One ! (and only)
-			configFile = cmdLineCfg.cfgFile.c_str();
-		if ( configFile == NULL )	{	// there is no configuration file
-			LOG_FATAL << "no configuration file found !";
-			return _Wolframe::ErrorCode::FAILURE;
-		}
-
-		_Wolframe::module::ModulesDirectory modDir;
-		_Wolframe::config::ApplicationConfiguration conf;
-
-		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
-				_Wolframe::config::ApplicationConfiguration::fileType( configFile, cmdLineCfg.cfgType );
-		if ( cfgType == _Wolframe::config::ApplicationConfiguration::CONFIG_UNDEFINED )
-			return _Wolframe::ErrorCode::FAILURE;
-		if ( !conf.parseModules( configFile, cfgType ))
-			return _Wolframe::ErrorCode::FAILURE;
-		if ( ! _Wolframe::module::LoadModules( modDir, conf.moduleList() ))
-			return _Wolframe::ErrorCode::FAILURE;
-		conf.addModules( &modDir );
-		if ( !conf.parse( configFile, cfgType ))
-			return _Wolframe::ErrorCode::FAILURE;
-
-// configuration file has been parsed successfully
-// build the final configuration
-		conf.finalize( cmdLineCfg );
-
-// Check the configuration
-		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::CHECK_CONFIG )	{
-			if ( conf.check() )	{
-				std::cout << "Configuration OK" << std::endl << std::endl;
-				return _Wolframe::ErrorCode::OK;
-			}
-			else	{
-				return _Wolframe::ErrorCode::OK;
-			}
-		}
-
-		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::PRINT_CONFIG )	{
-			conf.print( std::cout );
-			std::cout << std::endl;
-			return _Wolframe::ErrorCode::OK;
-		}
-
-		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::TEST_CONFIG )	{
-			std::cout << "Not implemented yet" << std::endl << std::endl;
-			return _Wolframe::ErrorCode::OK;
-		}
 
 		if ( cmdLineCfg.command == _Wolframe::config::CmdLineConfig::INSTALL_SERVICE ) {
 			if( !registerEventlog( conf ) ) return _Wolframe::ErrorCode::FAILURE;
@@ -507,7 +421,7 @@ int _Wolframe_winMain( int argc, char* argv[], const AppProperties* appPropertie
 				{ NULL, NULL } };
 
 			// pass configuration to service main
-			serviceConfig = conf.configFile;
+			g_serviceConfig = conf.configFile;
 
 			if( !StartServiceCtrlDispatcher( dispatch_table ) ) {
 				if( GetLastError( ) == ERROR_FAILED_SERVICE_CONTROLLER_CONNECT ) {

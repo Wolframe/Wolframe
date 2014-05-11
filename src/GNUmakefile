@@ -82,12 +82,15 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceConfig.o \
 	serviceBanner.o \
 	appConfig.o \
+	appConfigDefinition.o \
 	jobScheduler.o \
 	acceptor.o \
 	serverEndpoint.o \
 	connection.o \
 	serverConfig.o \
 	loggerConfig.o \
+	service.o \
+	posixMain.o \
 	server.o
 
 #SSL
@@ -98,10 +101,10 @@ endif
 
 
 CPP_OBJS = \
-	appConfigDefinition.o \
+	wolframeService.o \
+	wolframeServicePosix.o \
 	$(LOCAL_STATIC_LIB_OBJS) \
-	wolframeHandler.o \
-	posixMain.o
+	wolframeHandler.o
 
 CPP_BINS = \
 	wolframed$(EXE) \

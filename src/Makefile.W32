@@ -96,6 +96,9 @@ LOCAL_STATIC_LIB_OBJS = \
 !ENDIF
 
 CPP_OBJS = \
+	service.obj \
+	wolframeService.obj \
+	wolframeServiceWin.obj \
 	appProperties.obj \
 	appConfigDefinition.obj \
 	$(LOCAL_STATIC_LIB_OBJS) \

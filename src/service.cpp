@@ -30,68 +30,24 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// wolframedCommandLine.hpp
-//
+#include "wolframeService.hpp"
 
-#ifndef _WOLFRAMED_COMMANDLINE_HPP_INCLUDED
-#define _WOLFRAMED_COMMANDLINE_HPP_INCLUDED
+#if defined(_WIN32)		// we are on Windows
+	extern int _Wolframe_winMain( _Wolframe::ServiceInterface* service, int argc, char* argv[]);
+#else				// we are on a POSIX system
+	extern int _Wolframe_posixMain( _Wolframe::ServiceInterface* service, int argc, char* argv[]);
+#endif // !defined(_WIN32)
 
-#include "logger/logLevel.hpp"
-#include "appConfig.hpp"
 
-#include <string>
-#include <boost/program_options.hpp>
+int _Wolframe::serviceMain( _Wolframe::ServiceInterface* service, int argc, char* argv[])
+{
+#if defined(_WIN32)		// we are on Windows
 
-namespace _Wolframe	{
-namespace config	{
+	return ( ::_Wolframe_winMain( service, argc, argv));
 
-struct CmdLineConfig	{
-	enum Command_t	{
-		PRINT_HELP,
-		PRINT_VERSION,
-		CHECK_CONFIG,
-		TEST_CONFIG,
-		PRINT_CONFIG,
-#if defined(_WIN32)
-		INSTALL_SERVICE,
-		REMOVE_SERVICE,
-		RUN_SERVICE,
-#endif
-		DEFAULT
-	};
-	static const char* commandName( Command_t c)
-	{
-		static const char* ar[] = {"help","version","configcheck","configtest","printconfig",
-#if defined(_WIN32)
-					"install","remove","run",
-#endif
-					"default"};
-		return ar[c];
-	}
+#else				// we are on a POSIX system
+	return( ::_Wolframe_posixMain( service, argc, argv));
+#endif // !defined(_WIN32)
+}
 
-	Command_t	command;
-#if !defined(_WIN32)
-	bool		foreground;
-	std::string	user;
-	std::string	group;
-	std::string	pidFile;
-#endif
-	log::LogLevel::Level				debugLevel;
-	std::string					cfgFile;
-	ApplicationConfiguration::ConfigFileType	cfgType;
-	bool						useLogConfig;
-private:
-	std::string					errMsg_;
-	boost::program_options::options_description	options_;
 
-public:
-	CmdLineConfig();
-	bool parse( int argc, char* argv[] );
-	std::string errMsg( void )		{ return errMsg_; }
-	void usage( std::ostream& os ) const	{ options_.print( os ); }
-};
-
-}} // namespace _Wolframe::config
-
-#endif // _COMMANDLINE_HPP_INCLUDED

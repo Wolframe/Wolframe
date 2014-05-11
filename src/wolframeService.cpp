@@ -30,68 +30,53 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// wolframedCommandLine.hpp
-//
+#include "wolframeService.hpp"
+#include "logger-v1.hpp"
 
-#ifndef _WOLFRAMED_COMMANDLINE_HPP_INCLUDED
-#define _WOLFRAMED_COMMANDLINE_HPP_INCLUDED
+using namespace _Wolframe;
 
-#include "logger/logLevel.hpp"
-#include "appConfig.hpp"
-
-#include <string>
-#include <boost/program_options.hpp>
-
-namespace _Wolframe	{
-namespace config	{
-
-struct CmdLineConfig	{
-	enum Command_t	{
-		PRINT_HELP,
-		PRINT_VERSION,
-		CHECK_CONFIG,
-		TEST_CONFIG,
-		PRINT_CONFIG,
-#if defined(_WIN32)
-		INSTALL_SERVICE,
-		REMOVE_SERVICE,
-		RUN_SERVICE,
-#endif
-		DEFAULT
-	};
-	static const char* commandName( Command_t c)
+bool WolframeService::start()
+{
+	// Run server in background thread(s).
+	try
 	{
-		static const char* ar[] = {"help","version","configcheck","configtest","printconfig",
-#if defined(_WIN32)
-					"install","remove","run",
-#endif
-					"default"};
-		return ar[c];
+		m_handler = new _Wolframe::ServerHandler( m_appConfig.handlerCfg, &m_modDir);
+		m_server = new _Wolframe::net::server( m_appConfig.serverCfg, *m_handler );
+		m_thread = new boost::thread( boost::bind( &_Wolframe::net::server::run, m_server));
 	}
+	catch (const std::bad_alloc&)
+	{
+		LOG_FATAL << "out of memory starting service";
+		return false;
+	}
+	catch (const std::exception& e)
+	{
+		LOG_FATAL << "failed to start service: " << e.what();
+		return false;
+	}
+	return true;
+}
 
-	Command_t	command;
-#if !defined(_WIN32)
-	bool		foreground;
-	std::string	user;
-	std::string	group;
-	std::string	pidFile;
-#endif
-	log::LogLevel::Level				debugLevel;
-	std::string					cfgFile;
-	ApplicationConfiguration::ConfigFileType	cfgType;
-	bool						useLogConfig;
-private:
-	std::string					errMsg_;
-	boost::program_options::options_description	options_;
+void WolframeService::stop()
+{
+	if (m_server)
+	{
+		m_server->stop();
+	}
+	if (m_thread)
+	{
+		m_thread->join();
+		delete m_thread;
+	}
+	if (m_handler)
+	{
+		delete m_handler;
+		m_handler = 0;
+	}
+	if (m_server)
+	{
+		delete m_server;
+		m_server = 0;
+	}
+}
 
-public:
-	CmdLineConfig();
-	bool parse( int argc, char* argv[] );
-	std::string errMsg( void )		{ return errMsg_; }
-	void usage( std::ostream& os ) const	{ options_.print( os ); }
-};
-
-}} // namespace _Wolframe::config
-
-#endif // _COMMANDLINE_HPP_INCLUDED
