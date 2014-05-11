@@ -1,5 +1,6 @@
 #!/bin/sh
 
+echo ""
 echo "Test report"
 echo "-----------"
 echo ""
@@ -41,4 +42,5 @@ while read test status nof_tests nof_errors; do
 	find . -name "$test*.xml" -exec cat {} \;
 done
 echo "</testresults>"
+echo ""
 
