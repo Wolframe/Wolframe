@@ -111,6 +111,8 @@ doc-towordml: WolfBook.docx
 
 %.txt: %.html
 	w3m -O ASCII -dump $< > $@
+	@sed 's/Copyright ?/Copyright (C)/g' $@ > _tmp
+	@mv -f _tmp $@ 
 
 # Installation Guide
 
