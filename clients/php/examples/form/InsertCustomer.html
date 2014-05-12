@@ -7,35 +7,73 @@
 <script>
 window.addEventListener("DOMContentLoaded", function ()
 {
-	var form = document.getElementById("user");
+	try {
+		form = document.getElementById("user");
 
-	document.getElementById("doinsert").addEventListener("click", function () {
-		event.preventDefault();
-		alert ("HALELUJA!");
+		var insertCall = function (eventObject) {
+			if (eventObject.preventDefault) {
+				eventObject.preventDefault();
+			} else if (window.event) /* for ie */ {
+				window.event.returnValue = false;
+			}
 
-		if (window.XMLHttpRequest)
-		{// code for IE7+, Firefox, Chrome, Opera, Safari
-			xmlhttp=new XMLHttpRequest();
+			try {
+				if (window.XMLHttpRequest)
+				{// code for IE7+, Firefox, Chrome, Opera, Safari
+					xmlhttp=new XMLHttpRequest();
+				}
+				else
+				{// code for IE6, IE5
+					xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				xmlhttp.open("POST", "http://127.0.0.1:8080/webclient_form_xml.php", false);
+				try
+				{
+					formdata = new FormData( form);
+					xmlhttp.send( formdata);
+				}
+				catch (e)
+				{
+					alert( "FG: " + e.name + ": " + e.message);
+				}
+				return true;
+
+				try
+				{
+					var xmlDoc=xmlhttp.responseXML;
+			
+					document.write("<html><head><title></title></head><body>\n");
+					document.write("<p>Username: ");
+					document.write( xmlDoc.getElementsByTagName("usrname")[0].childNodes[0].nodeValue);
+					document.write("</p><br>");
+					document.write("<p>Prename: ");
+					document.write( xmlDoc.getElementsByTagName("prename")[0].childNodes[0].nodeValue);
+					document.write("</p><br>");
+					document.write("</body></html>\n");
+				}
+				catch (e)
+				{
+					alert( "XMHHJ: " + e.name + ": " + e.message);
+				}
+				return true;
+			}
+			catch (e)
+			{
+				alert( e.name + ": " + e.message);
+			}
+			return true;
+		};
+
+		if (form.addEventListener) {
+			form.addEventListener("submit", insertCall, false);
+		} else if (form.attachEvent) {
+			form.attachEvent("onsubmit", insertCall);
 		}
-		else
-		{// code for IE6, IE5
-			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-		}
-		xmlhttp.open("GET", form.action, false);
-		xmlhttp.send();
-
-		var xmlDoc=xmlhttp.responseXML;
-		var root = xmlDoc.getElementsByTagName("test");
-
-		document.write("<html><head><title></title></head><body>\n");
-		document.write("<p>Username: ");
-		document.write( root.getElementsByTagName("usrname")[0].childNodes[0].nodeValue);
-		document.write("</p><br>");
-		document.write("<p>Prename: ");
-		document.write( root.getElementsByTagName("prename")[0].childNodes[0].nodeValue);
-		document.write("</p><br>");
-		document.write("</body></html>\n");
-	});
+	}
+	catch (e)
+	{
+		alert( e.name + ": " + e.message);
+	}
 });
 </script>
 
@@ -49,7 +87,8 @@ Gender: <input type="radio" id="gender" name="gender" checked value="female">Fem
 	<input type="radio" id="gender" name="gender" value="male">Male</input>
 	</br>
 <input type="hidden" id="doctype" name="DOCTYPE" value="Customer customer">
-<input id='doinsert' type="submit" name="CMD" value="Insert">
+<input type="hidden" id="cmd" name="CMD" value="Insert">
+<input id='doinsert' type="submit" name="cmdcall" value="Insert">
 </form>
 </body>
 
