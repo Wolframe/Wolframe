@@ -44,6 +44,7 @@
 #include "testUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "wtest/testModules.hpp"
+#include "wtest/testReport.hpp"
 #include <iostream>
 #include <list>
 #include <fstream>
@@ -290,6 +291,7 @@ int main( int argc, char **argv )
 	}
 	wtest::Data::createDataDir( "temp", g_gtest_ARGV[0]);
 	wtest::Data::createDataDir( "result", g_gtest_ARGV[0]);
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	return RUN_ALL_TESTS();
 	delete g_modulesDirectory;

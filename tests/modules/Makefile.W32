@@ -41,6 +41,7 @@ local_all:
 local_clean:
 	@-erase test.bat >NUL 2>NUL
 	@-erase gtestReport.txt 2>NUL
+	@-erase moduleTest*.xml 2>NUL
 
 local_distclean:
 

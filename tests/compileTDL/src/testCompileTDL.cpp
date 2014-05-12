@@ -282,8 +282,8 @@ int main( int argc, char **argv)
 	// [2] Instantiate test cases with INSTANTIATE_TEST_CASE_P (see above)
 
 	// [3] Execute tests:	
-	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV);
 	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
+	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV);
 	return RUN_ALL_TESTS();
 }
 

@@ -140,7 +140,8 @@ private:
 	boost::filesystem::path refpath( testdir / "gtestReport.txt");\
 	::testing::UnitTest& unit_test = *::testing::UnitTest::GetInstance();\
 	::testing::TestEventListeners& listeners = unit_test.listeners();\
-	listeners.Append( new _Wolframe::wtest::TestReportListener(prgfilename,reportfilename));
+	listeners.Append( new _Wolframe::wtest::TestReportListener(prgfilename,reportfilename));\
+	::testing::GTEST_FLAG(output) = "xml:./";
 
 #endif
 

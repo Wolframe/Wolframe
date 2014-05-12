@@ -35,13 +35,37 @@ local_all:
 
 local_clean:
 	@-rm -f gtestReport.txt
+	@-rm -f boostLocaleTest*.xml
 
 local_distclean:
 
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(ICU_LIB_DIR)"
 
+# for now we test whether the locale is installed, if not we don't
+# execute the test. In the future we should make sure the test environment
+# has the necessary locales installed (not necessarily OBS, as this is 
+# a build and not a system test environment)
+ifeq "$(PLATFORM)" "LINUX"
+TEST_LOCALE=$(shell locale -a | grep en_US.utf8)
+endif
+ifeq "$(PLATFORM)" "FREEBSD"
+TEST_LOCALE=$(shell locale -a | grep en_US.UTF-8)
+endif
+ifeq "$(PLATFORM)" "NETBSD"
+# disabled, breaks, see #59 and #127
+TEST_LOCALE=
+#TEST_LOCALE=$(shell locale -a | grep en_US.UTF-8)
+endif
+ifeq "$(PLATFORM)" "SUNOS"
+# disabled, breaks, see #127
+TEST_LOCALE=
+#TEST_LOCALE=$(shell locale -a | grep en_US.UTF-8)
+endif
+
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) LANG=en_US.UTF8 ./boostLocaleTest
+ifneq ($(TEST_LOCALE),)
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) LANG=$(TEST_LOCALE) ./boostLocaleTest
 	@echo
+endif
 endif

@@ -50,6 +50,7 @@ local_all:
 
 local_clean:
 	@-rm -f gtestReport.txt
+	@-rm -f oracleUnit*.xml
 
 local_distclean:
 

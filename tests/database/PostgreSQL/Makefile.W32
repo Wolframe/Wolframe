@@ -50,6 +50,7 @@ local_all:
 local_clean:
 	@-erase test.bat 2>NUL
 	@-erase gtestReport.txt 2>NUL
+	@-erase postgresUnit*.xml 2>NUL
 
 local_distclean:
 

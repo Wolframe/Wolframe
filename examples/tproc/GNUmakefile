@@ -113,7 +113,9 @@ tprocd$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframed.a $(TOPDIR)/s
 local_all: $(CPP_BINS)
 
 local_clean:
-	rm -Rf tests/temp
+	-rm -rf tests/temp
+	-rm -f tests/gtestReport.txt
+	-rm -f tprocHandlerTest*.xml
 
 local_distclean:
 

@@ -109,9 +109,9 @@ TEST_F( SimpleFormCompilerTest, tests)
 
 int main( int argc, char **argv )
 {
-	::testing::InitGoogleTest( &argc, argv );
 	g_testdir = boost::filesystem::path( utils::getParentPath( argv[0], 2));
 	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
+	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }
 

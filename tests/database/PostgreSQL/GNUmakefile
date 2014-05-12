@@ -49,6 +49,7 @@ local_all:
 
 local_clean:
 	@-rm -f gtestReport.txt
+	@-rm -f postgresUnit*.xml
 
 local_distclean:
 
