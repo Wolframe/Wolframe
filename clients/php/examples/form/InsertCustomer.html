@@ -34,7 +34,7 @@ window.addEventListener("DOMContentLoaded", function ()
 				}
 				catch (e)
 				{
-					alert( "FG: " + e.name + ": " + e.message);
+					alert( "XMLHttpRequest.send failed: " + e.name + ": " + e.message);
 				}
 				return true;
 
@@ -53,7 +53,7 @@ window.addEventListener("DOMContentLoaded", function ()
 				}
 				catch (e)
 				{
-					alert( "XMHHJ: " + e.name + ": " + e.message);
+					alert( "Writing response failed: " + e.name + ": " + e.message);
 				}
 				return true;
 			}
