@@ -59,18 +59,13 @@ try
 	}
 	else
 	{
-		$random = uniqid( md5( rand( ) ) );
-		$resnsp = str_replace( "\n", '', $result);
-		preg_match('.*(\S+)', $resnsp, $matches);
-		$rr = explode( '?>', $result, 2);
-		$output = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
-			. "\n"
-			. '<?xml-stylesheet type="text/css" href="css/'
-			. var_dump( $matches)
-			. ".css?random=$random\"?>"
-			. "\n"
-			. $rr[1];
-		echo $output;
+		$ar = explode( "\n", $result);
+		$hdr = preg_replace( "([ ]standalone[=][\"]no[\"])", "", $ar[0]);
+		$ar[0] = preg_replace("([<][!]DOCTYPE[ ][^>]+[>])", "", $hdr);
+		$ar[1] = preg_replace("([<][!]DOCTYPE[ ][^>]+[>])", "", $ar[1]);
+		$result = implode( "\n", $ar);
+		error_log( "RESULT $result");
+		echo $result;
 	}
 	unset( $conn);
 }
