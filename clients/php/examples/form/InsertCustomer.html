@@ -5,70 +5,136 @@
 <body>
 
 <script>
+function doOutputErrorHTML( typ, msg)
+{
+	document.open();
+	document.write("<!DOCTYPE html>\n");
+	document.write("<html><head><title>Error</title></head><body>\n");
+	document.write("<p><font size=12>" + typ + ": <font color=red>" + msg + "</font></font></p>");
+	document.write("</body></html>\n");
+	document.close();
+	return true;
+}
+
+function doOutputResultHTML( xmlDoc)
+{
+	/*
+	* Function that creates an HTML response out of the XML of the Wolframe request answer:
+	*/
+	document.open();
+	document.write("<!DOCTYPE html>\n");
+
+	var xmlRoot = xmlDoc.childNodes[0];
+	if (xmlRoot.nodeName == "error")
+	{
+		// The server returned an error or an exception was thrown:
+
+		var msg = xmlRoot.getElementsByTagName("message")[0].childNodes[0].data;
+		var typ = xmlRoot.getElementsByTagName("class")[0].childNodes[0].data;
+		document.write("<html><head><title>Error</title></head><body>\n");
+		document.write("<p><font size=12>" + typ + ": <font color=red>" + msg + "</font></font></p>");
+		document.write("</body></html>\n");
+	}
+	else
+	{
+		// The request succeded and returned an object to show:
+
+		document.write("<html><head><title>Customer</title></head><body>\n");
+		document.write("<h1>Customer</h1>\n");
+		document.write("<table width=\"40%\" border=\"1\">\n");
+		var chld = xmlDoc.documentElement.childNodes;
+		for (i=0;i<chld.length;i++)
+		{
+			var name = chld[i].nodeName;
+			var value = chld[i].firstChild.data;
+		
+			document.write("<tr><td>" + name + "</td><td>" + value + "</tr>\n");
+		}
+		document.write("</table>\n");
+		document.write("</body></html>\n");
+	}
+	document.close();
+	return true;
+}
+
+function submitRequest( eventObject)
+{
+	/*
+	* Function that issues a Wolframe service request created out of the form data and uses 
+	* 'doOutputResultHTML' to build the returned HTML result or 'doOutputErrorHTML' for 
+	* returning an error message.
+	*/
+	if (eventObject.preventDefault) {
+		eventObject.preventDefault();
+	} else if (window.event) /* for ie */ {
+		window.event.returnValue = false;
+	}
+	try {
+		// [1] Build the request:
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.open("POST", "http://127.0.0.1/wolframe/webclient_form_xml.php", false);
+		var formdata = new FormData();
+		for(i=0; i<form.elements.length; i++)
+		{
+			var name = form.elements[i].name;
+			if (name != "cmdcall")
+			{
+				/*... some browsers (Chrome) add this value, some not (Firefox). It is not part of the request*/
+				formdata.append( name, form.elements[i].value);
+			}
+		}
+		// [2] Send the request:
+		xmlhttp.send( formdata);
+		if (xmlhttp.status != 200)
+		{
+			doOutputErrorHTML( "HTTP ERROR", "Status: " + xmlhttp.status + " " + xmlhttp.statusText);
+			return true;
+		}
+		// [3] Get the answer:
+		var xmlDoc=xmlhttp.responseXML;
+		if (xmlDoc == null) {
+			xmlDoc = (new DOMParser()).parseFromString( xmlhttp.responseText, 'text/xml');
+		}
+		// [4] Display the answer:
+		var xmlRoot = xmlDoc.childNodes[0];
+		if (xmlRoot.nodeName == "error")
+		{
+			// The server returned an error or an exception was thrown:
+			var typ = xmlRoot.getElementsByTagName("class")[0].childNodes[0].data;
+			var msg = xmlRoot.getElementsByTagName("message")[0].childNodes[0].data;
+			doOutputErrorHTML( typ, msg);
+		}
+		else
+		{
+			doOutputResultHTML( xmlDoc);
+		}
+		return true;
+	}
+	catch (e)
+	{
+		doOutputErrorHTML( "EXCEPTION", e.name + ": " + e.message);
+	}
+};
+
 window.addEventListener("DOMContentLoaded", function ()
 {
+	/*
+	* Listener for installing the submit action of the form with id 'user':
+	*/
 	try {
 		form = document.getElementById("user");
 
-		var insertCall = function (eventObject) {
-			if (eventObject.preventDefault) {
-				eventObject.preventDefault();
-			} else if (window.event) /* for ie */ {
-				window.event.returnValue = false;
-			}
-
-			try {
-				if (window.XMLHttpRequest)
-				{// code for IE7+, Firefox, Chrome, Opera, Safari
-					xmlhttp=new XMLHttpRequest();
-				}
-				else
-				{// code for IE6, IE5
-					xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-				}
-				xmlhttp.open("POST", "http://127.0.0.1/wolframe/webclient_form_xml.php", false);
-				try
-				{
-					formdata = new FormData( form);
-					xmlhttp.send( formdata);
-				}
-				catch (e)
-				{
-					alert( "XMLHttpRequest.send failed: " + e.name + ": " + e.message);
-				}
-				return true;
-
-				try
-				{
-					var xmlDoc=xmlhttp.responseXML;
-			
-					document.write("<html><head><title></title></head><body>\n");
-					document.write("<p>Username: ");
-					document.write( xmlDoc.getElementsByTagName("usrname")[0].childNodes[0].nodeValue);
-					document.write("</p><br>");
-					document.write("<p>Prename: ");
-					document.write( xmlDoc.getElementsByTagName("prename")[0].childNodes[0].nodeValue);
-					document.write("</p><br>");
-					document.write("</body></html>\n");
-					alert( "Got result");
-				}
-				catch (e)
-				{
-					alert( "Writing response failed: " + e.name + ": " + e.message);
-				}
-				return true;
-			}
-			catch (e)
-			{
-				alert( e.name + ": " + e.message);
-			}
-			return true;
-		};
-
 		if (form.addEventListener) {
-			form.addEventListener("submit", insertCall, false);
+			form.addEventListener("submit", submitRequest, false);
 		} else if (form.attachEvent) {
-			form.attachEvent("onsubmit", insertCall);
+			form.attachEvent("onsubmit", submitRequest);
 		}
 	}
 	catch (e)
@@ -78,6 +144,11 @@ window.addEventListener("DOMContentLoaded", function ()
 });
 </script>
 
+<!--
+- HTML Form 'user' for user input. 
+- The contents of the form are sent as XML request to the Wolframe server
+- on submit. Needs Javascript because this example cannot show the result as HTML without.
+-->
 <form id='user' name='user' action="http://127.0.0.1/wolframe/webclient_form_xml.php" method="post">
 Username: <input type="text" id="usrname" name="usrname" value="" placeholder="enter your public user name here"></br>
 Prename: <input type="text" id="prename" name="prename" value=""></br>

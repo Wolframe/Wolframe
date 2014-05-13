@@ -226,14 +226,14 @@ static void logNetwork( const char* title, const void* ptr, std::size_t size)
 				}
 				hexblk.push_back( hex[ ch / 16]);
 				hexblk.push_back( hex[ ch % 16]);
-				if ((eidx & 3) == 0) hexblk.push_back( ' ');
+				if ((eidx & 1) == 0) hexblk.push_back( ' ');
 			}
 			for (eidx=1; ci < 16; ++ci,++eidx)
 			{
 				chrblk.push_back( ' ');
 				hexblk.push_back( ' ');
 				hexblk.push_back( ' ');
-				if ((eidx & 3) == 0) hexblk.push_back( ' ');
+				if ((eidx & 1) == 0) hexblk.push_back( ' ');
 			}
 			std::string idxstr;
 			idxstr.push_back( hex[ (blkidx % 256) / 16]);
