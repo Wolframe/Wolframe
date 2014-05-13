@@ -38,6 +38,8 @@
 #include "filter/null_filter.hpp"
 #include "filter/filter.hpp"
 
+#undef _Wolframe_LOWLEVEL_DEBUG
+
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::langbind;
@@ -102,8 +104,10 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 
 	for (;;)
 	{
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 		LOG_TRACE << "STATE IOFilterCommandHandlerEscDLF " << stateName( m_state);
-
+		// to blurry log message. Helped in the beginning, but got now useless
+#endif
 		switch (m_state)
 		{
 			case Terminated:

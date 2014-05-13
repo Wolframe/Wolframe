@@ -308,7 +308,7 @@ bool DoctypeFilterCommandHandler::getEncoding()
 CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 {
 	if (m_state == Done) return CLOSE;
-	LOG_TRACE << "STATE DoctypeCommandHandler " << stateName( m_state) << " (put input)";
+	LOG_DATA << "STATE DoctypeCommandHandler " << stateName( m_state) << " (put input)";
 	try
 	{
 		if (m_state == Init)
@@ -745,7 +745,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					}
 					else
 					{
-						if (m_itembuf == "xmlns:xsi")
+						if (m_itembuf == "xmlns:schemaLocation")
 						{
 							setState( SearchXMLRootAttribAssign);
 						}
@@ -764,6 +764,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					if (ch == '=')
 					{
 						setState( SearchXMLRootAttribQuote);
+						m_itembuf.clear();
 					}
 					else if (ch > ' ')
 					{
@@ -794,10 +795,17 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					}
 					else
 					{
-						m_itembuf.push_back( ch);
-						if (m_itembuf.size() > 256)
+						if (ch <= ' ')
 						{
-							throw_error( "XML xmlns:xsi attribute (schema definition) is too big");
+							m_itembuf.clear();
+						}
+						else
+						{
+							m_itembuf.push_back( ch);
+							if (m_itembuf.size() > 256)
+							{
+								throw_error( "XML xmlns:xsi attribute (schema definition) is too big");
+							}
 						}
 					}
 					break;
@@ -810,10 +818,17 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					}
 					else
 					{
-						m_itembuf.push_back( ch);
-						if (m_itembuf.size() > 256)
+						if (ch <= ' ')
 						{
-							throw_error( "XML xmlns:xsi attribute (schema definition) is too big");
+							m_itembuf.clear();
+						}
+						else
+						{
+							m_itembuf.push_back( ch);
+							if (m_itembuf.size() > 256)
+							{
+								throw_error( "XML xmlns:xsi attribute (schema definition) is too big");
+							}
 						}
 					}
 					break;

@@ -54,6 +54,8 @@
 
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
+static unsigned int g_input_buffer_size = 0;
+static unsigned int g_output_buffer_size = 0;
 static boost::filesystem::path g_testdir;
 
 using namespace _Wolframe;
@@ -72,9 +74,9 @@ static std::size_t testno = 0;
 TEST_P( WolfilterTest, tests)
 {
 	std::string filename = GetParam();
-	enum {ibarsize=11,obarsize=7,EoDBufferSize=4};
-	std::size_t ibar[ibarsize] = {127,4,5,7,11,13,17,19,23,41,43};
-	std::size_t obar[obarsize] = {127,4,5,7,11,13,17};
+	enum {ibarsize=12,obarsize=8,EoDBufferSize=4};
+	std::size_t ibar[ibarsize] = {4096,127,4,5,7,11,13,17,19,23,41,43};
+	std::size_t obar[obarsize] = {4096,127,4,5,7,11,13,17};
 	
 	testno++;
 
@@ -87,8 +89,8 @@ TEST_P( WolfilterTest, tests)
 		return;
 	}
 	// [2.3] Define I/O buffer sizes
-	std::size_t ib = ibar[ testno % ibarsize];
-	std::size_t ob = obar[ testno % obarsize];
+	std::size_t ib = g_input_buffer_size?g_input_buffer_size:ibar[ testno % ibarsize];
+	std::size_t ob = g_output_buffer_size?g_output_buffer_size:obar[ testno % obarsize];
 
 	// [2.4] Parse command line in config section of the test description
 	std::vector<std::string> cmd;
@@ -97,7 +99,7 @@ TEST_P( WolfilterTest, tests)
 	utils::CharTable argop( ""), argtk( "", true);
 	for (; ai != ae && utils::parseNextToken( arg, ai, ae, argop, argtk); ++ai) cmd.push_back( arg);
 
-	std::cerr << "processing test '" << testname << "'" << std::endl;
+	std::cerr << "processing test '" << testname << "' [-b " << ib << ":" << ob << "]" << std::endl;
 	enum {MaxNofArgs=63};
 	std::string cmdargstr;
 	int cmdargc = cmd.size()+1;
@@ -240,6 +242,7 @@ static void printUsage( const char *prgname)
 	std::cout << "\t-f <logfile>:" << " Specify filename for logger output" << std::endl;
 	std::cout << "\t-h:" << " Print usage" << std::endl;
 	std::cout << "\t-t:" << " Raise verbosity level (-t,-tt,-ttt,..)" << std::endl;
+	std::cout << "\t-b:" << " Specify buffer sizes as <input>:<output>, e.g. -b1024:128" << std::endl;
 }
 
 int main( int argc, char **argv)
@@ -290,17 +293,59 @@ int main( int argc, char **argv)
 				return 2;
 			}
 		}
+		else if (optionname == 'b')
+		{
+			const char* is;
+			if (argv[argstart][2])
+			{
+				is = argv[argstart]+2;
+			}
+			else
+			{
+				argstart++;
+				is = argv[argstart];
+			}
+			argstart += 1;
+			if (!is)
+			{
+				std::cerr << "missing argument for option b (buffer sizes), expected two unsigned ints separated by ':'" << std::endl;
+				return 3;
+			}
+			const char* os = std::strchr( is, ':');
+			try
+			{
+				if (!os)
+				{
+					g_input_buffer_size = g_output_buffer_size = boost::lexical_cast<unsigned int>( std::string(is));
+				}
+				else
+				{
+					g_input_buffer_size = boost::lexical_cast<unsigned int>( std::string( is, os-is));
+					g_output_buffer_size = boost::lexical_cast<unsigned int>( std::string( os +1));
+				}
+				if (g_input_buffer_size < 4 || g_output_buffer_size < 4)
+				{
+					std::cerr << "illegal argument for option b (buffer sizes): sizes too small (minimum 4)" << std::endl;
+					return 3;
+				}
+			}
+			catch (const boost::bad_lexical_cast& e)
+			{
+				std::cerr << "illegal argument for option b (buffer sizes), expected two unsigned ints separated by ':', error: " << e.what() << std::endl;
+				return 3;
+			}
+		}
 		else if (optionname == '-')
 		{
 			std::cerr << "unknown option -" << argv[argstart] << std::endl;
 			printUsage( argv[0]);
-			return 2;
+			return 4;
 		}
 		else
 		{
 			std::cerr << "unknown option -" << optionname << std::endl;
 			printUsage( argv[0]);
-			return 2;
+			return 5;
 		}
 	}
 	if (argc == argstart+1)
@@ -310,7 +355,7 @@ int main( int argc, char **argv)
 	else if (argc > argstart+1)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
-		return 3;
+		return 6;
 	}
 
 	// [1] Selecting tests to execute:
