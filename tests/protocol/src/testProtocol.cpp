@@ -38,6 +38,7 @@
 #include "AAAA/AAAAprovider.hpp"
 #include "module/moduleDirectory.hpp"
 #include "mainConnectionHandler.hpp"
+#include "wtest/pseudoRandomGenForTests.hpp"
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
 #define BOOST_FILESYSTEM_VERSION 3
@@ -52,43 +53,11 @@
 
 using namespace _Wolframe;
 
-/// \brief Pseudo random number generator depending on current day (for reproducability)
-class Random
-{
-public:
-	Random()
-	{
-		time_t nowtime;
-		struct tm* now;
-
-		::time ( &nowtime);	//init time now
-		now = ::localtime( &nowtime);
-
-		m_cur = ((now->tm_year+1) * (now->tm_mon+100) * (now->tm_mday+1)) * KnuthIntegerHashFactor;
-	}
-
-	unsigned int get( unsigned int min_, unsigned int max_)
-	{
-		m_cur = (m_cur+123) * KnuthIntegerHashFactor;
-		unsigned int iv = max_ - min_;
-		return iv?((m_cur % iv) + min_):min_;
-	}
-
-	unsigned int seed() const
-	{
-		return m_cur;
-	}
-
-private:
-	enum {KnuthIntegerHashFactor=2654435761U};
-	unsigned int m_cur;
-};
-
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
 static std::string g_selectedTestName;
-static Random g_random;
+static wtest::Random g_random;
 
 struct BufferStruct
 {
