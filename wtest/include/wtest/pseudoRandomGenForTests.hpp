@@ -65,6 +65,11 @@ public:
 		return m_cur;
 	}
 
+	void setSeed( unsigned int v)
+	{
+		m_cur = v;
+	}
+
 private:
 	enum {KnuthIntegerHashFactor=2654435761U};
 	unsigned int m_cur;
