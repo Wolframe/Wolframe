@@ -30,6 +30,8 @@ rm -rf /var/tmp/wolframe-$VERSION
 cp wolframe-$VERSION.tar.gz $PKGBUILD/BUILD/.
 cp packaging/archlinux/* $PKGBUILD/BUILD/.
 
+sed -i "s/make test/make testreport/g" $PKGBUILD/BUILD/PKGBUILD
+
 cd $PKGBUILD/BUILD
 sed -i 's|"http://sourceforge.net/projects/wolframe/files/.*"|"${pkgname}-${pkgver}.tar.gz"|g' PKGBUILD
 makepkg --asroot -g >> PKGBUILD

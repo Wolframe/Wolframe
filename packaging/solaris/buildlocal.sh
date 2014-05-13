@@ -119,7 +119,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
 	mandir=/opt/csw/share/man \
-	test
+	testreport
 check_for_errors
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
