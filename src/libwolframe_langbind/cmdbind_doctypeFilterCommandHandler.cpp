@@ -804,7 +804,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 							m_itembuf.push_back( ch);
 							if (m_itembuf.size() > 256)
 							{
-								throw_error( "XML xmlns:xsi attribute (schema definition) is too big");
+								throw_error( "XML xmlns:schemaLocation attribute (schema definition) is too big");
 							}
 						}
 					}
@@ -827,7 +827,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 							m_itembuf.push_back( ch);
 							if (m_itembuf.size() > 256)
 							{
-								throw_error( "XML xmlns:xsi attribute (schema definition) is too big");
+								throw_error( "XML xmlns:schemaLocation attribute (schema definition) is too big");
 							}
 						}
 					}
