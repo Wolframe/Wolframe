@@ -120,7 +120,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
 	mandir=/usr/local/man \
-	test 
+	testreport 
 check_for_errors
 
 gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \

@@ -4,6 +4,7 @@ Available targets:
 make [all]                 create all artifacts
 make test                  create test binaries and execute fast tests
 make longtest              execute all tests, including long lasting ones
+make testreport            execute tests as with 'test', then create a report
 make clean                 clean up build artifacts
 make distclean             clean up all generated artifacts
 make install               install (set 'DESTDIR' and 'prefix' at will)

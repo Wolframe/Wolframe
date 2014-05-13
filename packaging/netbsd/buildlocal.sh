@@ -93,7 +93,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
 	mandir=/usr/pkg/man \
-	test 
+	testreport 
 check_for_errors
 
 gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
