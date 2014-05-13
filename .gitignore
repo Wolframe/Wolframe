@@ -214,3 +214,9 @@ qtcreator.xml
 3rdParty/textwolf/tests/tests/test_XMLPathSelect
 3rdParty/textwolf/tests/tests/test_XMLScanner
 tests/3rdParty/libhpdf/test2.raw
+gtestReport.txt
+*test*.xml
+*Test*.xml
+tests/protocolArgumentParsing*.xml
+tests/configValueParser*.xml
+tests/database/*/*.xml

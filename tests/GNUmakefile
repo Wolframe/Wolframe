@@ -56,7 +56,7 @@ INCLUDE_CXXFLAGS += \
 
 INCLUDE_DIRS += \
 	$(OPENSSL_INCLUDE_DIRS)
-	
+
 INCLUDE_LDFLAGS += \
 	$(OPENSSL_LIB_DIRS)
 
@@ -175,6 +175,8 @@ local_clean:
 	-rm -f *.o
 	-rm -f logTest.log
 	-rm -rf temp
+	-rm -f gtestReport.txt
+	-rm -f *.xml
 
 local_distclean:
 
@@ -202,6 +204,7 @@ endif
 
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
+	@-rm -f gtestReport.txt
 	@mkdir -p temp
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testMethodMemberPointerTemplate
 	@echo

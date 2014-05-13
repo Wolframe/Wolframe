@@ -64,7 +64,7 @@ class Session extends Connection
 		parent::__destruct();
 	}
 
-	/* Get the last error of the connection or session (protocol) */
+	/* Get the error of the last request (non exceptional processing error) */
 	public function lasterror()
 	{
 		return $this->requesterror;

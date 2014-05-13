@@ -10,10 +10,12 @@ INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
+	-I$(TOPDIR)/wtest/include \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/gtest/include
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/wtest \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe
@@ -22,6 +24,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/loadModules.o \
 	$(TOPDIR)/src/libwolframed.a \
+	-lwolftest \
 	-lwolframe -lwfsingleton \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system \
@@ -39,6 +42,8 @@ LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingl
 local_all:
 
 local_clean:
+	-rm -f gtestReport.txt
+	-rm -f moduleTest*.xml
 
 local_distclean:
 

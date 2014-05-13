@@ -40,6 +40,7 @@
 
 #include "system/objectPool.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 class testObject	{
 public:
@@ -270,6 +271,7 @@ TEST_F( ObjectPoolFixture, TestTimeout )	{
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

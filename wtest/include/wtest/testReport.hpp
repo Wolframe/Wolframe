@@ -38,8 +38,12 @@
 #include <cstring>
 #include <vector>
 #include <errno.h>
+#include <cstdio>
 #include "gtest/gtest.h"
 #include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
 namespace _Wolframe {
 namespace wtest {
@@ -51,7 +55,7 @@ class TestReportListener
 {
 public:
 	TestReportListener( const std::string& testprg, const std::string& report_filename)
-		:m_count_failure(0),m_count_success(0),m_state(Init)
+		:m_count_failure(0),m_count_success(0),m_count_total(0),m_state(Init)
 	{
 		const char* nam = testprg.c_str();
 		while (std::strchr( nam, '/') != 0) nam = std::strchr( nam, '/')+1;
@@ -77,7 +81,7 @@ public:
 	~TestReportListener()
 	{
 		const char* status = (m_state == Terminated && m_count_failure==0)?"OK":"ERROR";
-		fprintf( m_outfile.get(), "%s %s\n", m_testprg.c_str(), status);
+		fprintf( m_outfile.get(), "%s %s %d %d\n", m_testprg.c_str(), status, m_count_total, m_count_failure);
 		fflush( m_outfile.get());
 	}
 
@@ -98,6 +102,7 @@ private:
 	virtual void OnTestStart( const ::testing::TestInfo& /*test_info*/)
 	{
 		m_state = Start;
+		m_count_total += 1;
 	}
 
 	// Called after a failed assertion or a SUCCEED() invocation.
@@ -123,6 +128,7 @@ private:
 	boost::shared_ptr<FILE> m_outfile;
 	unsigned int m_count_failure;
 	unsigned int m_count_success;
+	unsigned int m_count_total;
 	enum State {Init,Start,End,Terminated};
 	State m_state;
 	std::string m_testprg;
@@ -130,9 +136,12 @@ private:
 }}//namespace
 
 #define WOLFRAME_GTEST_REPORT(prgfilename,reportfilename)\
+	boost::filesystem::path testdir = boost::filesystem::system_complete( argv[0]).parent_path();\
+	boost::filesystem::path refpath( testdir / "gtestReport.txt");\
 	::testing::UnitTest& unit_test = *::testing::UnitTest::GetInstance();\
 	::testing::TestEventListeners& listeners = unit_test.listeners();\
-	listeners.Append( new wtest::TestReportListener(prgfilename,reportfilename));
+	listeners.Append( new _Wolframe::wtest::TestReportListener(prgfilename,reportfilename));\
+	::testing::GTEST_FLAG(output) = "xml:./";
 
 #endif
 

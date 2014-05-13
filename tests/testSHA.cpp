@@ -35,6 +35,7 @@
 //
 
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <cstring>
 #include "crypto/sha2.h"
 #include "crypto/sha1.h"
@@ -296,6 +297,7 @@ TEST( SHA2fixture, SHA512 )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

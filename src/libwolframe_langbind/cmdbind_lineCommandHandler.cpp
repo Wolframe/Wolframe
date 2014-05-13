@@ -35,6 +35,8 @@
 #include "protocol/ioblocks.hpp"
 #include "logger-v1.hpp"
 
+#undef _Wolframe_LOWLEVEL_DEBUG
+
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::protocol;
@@ -174,7 +176,10 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 {
 	for (;;)
 	{
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 		LOG_TRACE << "STATE LineCommandHandler " << commandStateName( m_cmdstateidx);
+		// to blurry log message. Helped in the beginning, but got now useless
+#endif
 		switch( m_cmdstateidx)
 		{
 			case Init:

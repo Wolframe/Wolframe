@@ -5,6 +5,7 @@
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 #include "Oracle.hpp"
 #include "types/variant.hpp"
@@ -449,6 +450,7 @@ TEST_F( OracleFixture, ExpressionWithParametersAndTypeCoercion )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS( );
 }

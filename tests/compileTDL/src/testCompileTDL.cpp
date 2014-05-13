@@ -42,6 +42,7 @@
 #include "filter/ptreefilter.hpp"
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -59,7 +60,7 @@ static LanguageDescription g_dblang;
 static std::string g_selectedTestName;
 
 class CompileTDLTest
-	:public ::testing::Test
+	:public ::testing::TestWithParam<std::string>
 {
 protected:
 	CompileTDLTest() {}
@@ -147,12 +148,104 @@ static std::string normalizeOutputCRLF( const std::string& output, const std::st
 	}
 }
 
-TEST_F( CompileTDLTest, tests)
-{
-	std::vector<std::string> tests;
-	std::size_t testno;
-	boost::filesystem::path outputdir( g_testdir / ".." / "output");
+static boost::filesystem::path outputdir( g_testdir / ".." / "output");
 
+TEST_P( CompileTDLTest, tests)
+{
+	std::string filename = GetParam();
+
+	std::string testname = utils::getFileStem( filename);
+	std::string testdir = utils::getParentPath( filename);
+	std::string tdlfile = testdir + "/" + testname + ".tdl";
+	std::string expectfile = testdir + "/" + testname + ".res";
+	std::string inputfile = testdir + "/" + testname + ".inp";
+
+	// [2.1] Process test:
+	std::cerr << "processing test '" << testname << "'" << std::endl;
+
+	TdlTransactionFunctionList tl = loadTransactionProgramFile( tdlfile, "testdb", "test", &g_dblang);
+	TdlTransactionFunctionList::const_iterator ti = tl.begin(), te = tl.end();
+
+	// [2.2] Print test output to string:
+	std::ostringstream out;
+	for (; ti != te; ++ti)
+	{
+		const TdlTransactionFunction* tfunc = dynamic_cast<TdlTransactionFunction*>( ti->second.get());
+		tfunc->print( out);
+		out << std::endl;
+	}
+
+	// [2.3] Create transaction function from program with input and
+	//	print it, if there is an input file defined:
+	if (utils::fileExists( inputfile))
+	{
+		types::PropertyTree input_ptree = utils::readPropertyTreeFile( inputfile);
+		for (ti = tl.begin(); ti != te; ++ti)
+		{
+			const TdlTransactionFunction* tfunc = dynamic_cast<TdlTransactionFunction*>( ti->second.get());
+			vm::InputStructure input( tfunc->program()->pathset.tagtab());
+			fillInputStructure( input_ptree, input);
+
+			VmTransactionInput trsinput( *tfunc->program(), input);
+			out << "TRANSACTION INPUT:" << std::endl;
+			trsinput.print( out);
+			out << std::endl;
+		}
+	}
+
+	// [2.4] Compare result and write dump to the output directory
+	//	if not equal to expected:
+	bool file_read_exception = false;
+	std::string expect;
+	try
+	{
+		expect = utils::readBinaryFileContent( expectfile);
+	}
+	catch (const std::runtime_error& e)
+	{
+		file_read_exception = true;
+		std::cerr << "failed to read file with expected content: " << e.what() << std::endl;
+	}
+	std::string output = normalizeOutputCRLF( out.str(), expect);
+
+	if (file_read_exception || expect != output)
+	{
+		boost::filesystem::path outputdumpfile( outputdir / (testname + ".res"));
+		utils::writeFile( outputdumpfile.string(), output);
+	}
+	EXPECT_EQ( expect, output);
+}
+
+static std::vector<std::string> tests;
+
+INSTANTIATE_TEST_CASE_P(AllCompileTDLTests,
+                        CompileTDLTest,
+                        ::testing::ValuesIn(tests));
+
+int main( int argc, char **argv)
+{
+	g_gtest_ARGC = 1;
+	g_gtest_ARGV[0] = argv[0];
+	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+
+	if (argc >= 2)
+	{
+		if (std::strcmp( argv[1], "-h") == 0 || std::strcmp( argv[1], "--help") == 0)
+		{
+			std::cerr << argv[0] << " (no arguments)" << std::endl;
+			return 0;
+		}
+		else if (argc == 2)
+		{
+			g_selectedTestName = argv[ 1];
+		}
+		else
+		{
+			std::cerr << "Too many arguments (expected no arguments)" << std::endl;
+			return 1;
+		}
+	}
+	
 	// [1] Selecting tests to execute:
 	if (g_selectedTestName.size())
 	{
@@ -186,97 +279,10 @@ TEST_F( CompileTDLTest, tests)
 	std::sort( tests.begin(), tests.end());
 	std::cerr << "Outputs of failed tests are written to '" << outputdir.string() << "'" << std::endl;
 
-	// [2] Execute tests:
-	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
-	for (testno=1; itr != end; ++itr,++testno)
-	{
-		std::string testname = utils::getFileStem( *itr);
-		std::string testdir = utils::getParentPath( *itr);
-		std::string tdlfile = testdir + "/" + testname + ".tdl";
-		std::string expectfile = testdir + "/" + testname + ".res";
-		std::string inputfile = testdir + "/" + testname + ".inp";
+	// [2] Instantiate test cases with INSTANTIATE_TEST_CASE_P (see above)
 
-		// [2.1] Process test:
-		std::cerr << "processing test '" << testname << "'" << std::endl;
-
-		TdlTransactionFunctionList tl = loadTransactionProgramFile( tdlfile, "testdb", "test", &g_dblang);
-		TdlTransactionFunctionList::const_iterator ti = tl.begin(), te = tl.end();
-
-		// [2.2] Print test output to string:
-		std::ostringstream out;
-		for (; ti != te; ++ti)
-		{
-			const TdlTransactionFunction* tfunc = dynamic_cast<TdlTransactionFunction*>( ti->second.get());
-			tfunc->print( out);
-			out << std::endl;
-		}
-
-		// [2.3] Create transaction function from program with input and
-		//	print it, if there is an input file defined:
-		if (utils::fileExists( inputfile))
-		{
-			types::PropertyTree input_ptree = utils::readPropertyTreeFile( inputfile);
-			for (ti = tl.begin(); ti != te; ++ti)
-			{
-				const TdlTransactionFunction* tfunc = dynamic_cast<TdlTransactionFunction*>( ti->second.get());
-				vm::InputStructure input( tfunc->program()->pathset.tagtab());
-				fillInputStructure( input_ptree, input);
-
-				VmTransactionInput trsinput( *tfunc->program(), input);
-				out << "TRANSACTION INPUT:" << std::endl;
-				trsinput.print( out);
-				out << std::endl;
-			}
-		}
-
-		// [2.4] Compare result and write dump to the output directory
-		//	if not equal to expected:
-		bool file_read_exception = false;
-		std::string expect;
-		try
-		{
-			expect = utils::readBinaryFileContent( expectfile);
-		}
-		catch (const std::runtime_error& e)
-		{
-			file_read_exception = true;
-			std::cerr << "failed to read file with expected content: " << e.what() << std::endl;
-		}
-		std::string output = normalizeOutputCRLF( out.str(), expect);
-
-		if (file_read_exception || expect != output)
-		{
-			boost::filesystem::path outputdumpfile( outputdir / (testname + ".res"));
-			utils::writeFile( outputdumpfile.string(), output);
-		}
-		EXPECT_EQ( expect, output);
-	}
-}
-
-
-int main( int argc, char **argv)
-{
-	g_gtest_ARGC = 1;
-	g_gtest_ARGV[0] = argv[0];
-	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
-
-	if (argc >= 2)
-	{
-		if (std::strcmp( argv[1], "-h") == 0 || std::strcmp( argv[1], "--help") == 0)
-		{
-			std::cerr << argv[0] << " (no arguments)" << std::endl;
-			return 0;
-		}
-		else if (argc == 2)
-		{
-			g_selectedTestName = argv[ 1];
-		}
-		else
-		{
-			std::cerr << "Too many arguments (expected no arguments)" << std::endl;
-			return 1;
-		}
-	}
+	// [3] Execute tests:	
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV);
 	return RUN_ALL_TESTS();
 }

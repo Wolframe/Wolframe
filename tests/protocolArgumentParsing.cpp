@@ -1,6 +1,7 @@
 #include "protocol/parser.hpp"
 #include "protocol/buffers.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <stdlib.h>
 
 using namespace _Wolframe;
@@ -95,7 +96,8 @@ TEST_F( ProtocolArgumentParsingFixture, Members )
 
 int main( int argc, char **argv )
 {
+      WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
    ::testing::InitGoogleTest( &argc, argv );
-   return RUN_ALL_TESTS();
+  return RUN_ALL_TESTS();
 }
 

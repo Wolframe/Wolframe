@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Test for types/string.hpp
 #include "types/string.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -76,6 +77,7 @@ TEST_F( StringDescriptionTest, tests)
 
 int main( int argc, char **argv)
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv);
 	return RUN_ALL_TESTS();
 }

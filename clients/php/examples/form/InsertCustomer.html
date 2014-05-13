@@ -1,0 +1,95 @@
+<html>
+<head>
+<title>Insert Customer (Test that echoes your input)</title>
+</head>
+<body>
+
+<script>
+window.addEventListener("DOMContentLoaded", function ()
+{
+	try {
+		form = document.getElementById("user");
+
+		var insertCall = function (eventObject) {
+			if (eventObject.preventDefault) {
+				eventObject.preventDefault();
+			} else if (window.event) /* for ie */ {
+				window.event.returnValue = false;
+			}
+
+			try {
+				if (window.XMLHttpRequest)
+				{// code for IE7+, Firefox, Chrome, Opera, Safari
+					xmlhttp=new XMLHttpRequest();
+				}
+				else
+				{// code for IE6, IE5
+					xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				xmlhttp.open("POST", "http://127.0.0.1/wolframe/webclient_form_xml.php", false);
+				try
+				{
+					formdata = new FormData( form);
+					xmlhttp.send( formdata);
+				}
+				catch (e)
+				{
+					alert( "XMLHttpRequest.send failed: " + e.name + ": " + e.message);
+				}
+				return true;
+
+				try
+				{
+					var xmlDoc=xmlhttp.responseXML;
+			
+					document.write("<html><head><title></title></head><body>\n");
+					document.write("<p>Username: ");
+					document.write( xmlDoc.getElementsByTagName("usrname")[0].childNodes[0].nodeValue);
+					document.write("</p><br>");
+					document.write("<p>Prename: ");
+					document.write( xmlDoc.getElementsByTagName("prename")[0].childNodes[0].nodeValue);
+					document.write("</p><br>");
+					document.write("</body></html>\n");
+					alert( "Got result");
+				}
+				catch (e)
+				{
+					alert( "Writing response failed: " + e.name + ": " + e.message);
+				}
+				return true;
+			}
+			catch (e)
+			{
+				alert( e.name + ": " + e.message);
+			}
+			return true;
+		};
+
+		if (form.addEventListener) {
+			form.addEventListener("submit", insertCall, false);
+		} else if (form.attachEvent) {
+			form.attachEvent("onsubmit", insertCall);
+		}
+	}
+	catch (e)
+	{
+		alert( e.name + ": " + e.message);
+	}
+});
+</script>
+
+<form id='user' name='user' action="http://127.0.0.1/wolframe/webclient_form_xml.php" method="post">
+Username: <input type="text" id="usrname" name="usrname" value="" placeholder="enter your public user name here"></br>
+Prename: <input type="text" id="prename" name="prename" value=""></br>
+Surname: <input type="text" id="surname" name="surname" value=""></br>
+E-mail: <input type="text" id="email" name="email" value="" placeholder="enter your valid contact email here"></br>
+Comment: <textarea id="comment" name="comment" rows="5" cols="40"></textarea></br>
+Gender: <input type="radio" id="gender" name="gender" checked value="female">Female</input>
+	<input type="radio" id="gender" name="gender" value="male">Male</input>
+	</br>
+<input type="hidden" id="doctype" name="DOCTYPE" value="Customer customer">
+<input type="hidden" id="cmd" name="CMD" value="Insert">
+<input id='doinsert' type="submit" name="cmdcall" value="Insert">
+</form>
+</body>
+

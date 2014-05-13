@@ -9,15 +9,18 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR)/3rdParty/gtest/include \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/wtest/include
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/wtest \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
+	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/src/libwolframe_serialize/libwolframe_serialize.a \
@@ -38,6 +41,8 @@ testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolf
 local_all:
 
 local_clean:
+	@-rm -f gtestReport.txt
+	@-rm -f testSimpleFormCompiler*.xml
 
 local_distclean:
 

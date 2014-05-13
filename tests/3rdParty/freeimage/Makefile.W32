@@ -11,17 +11,22 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\wtest\include \
 	/I$(TOPDIR)\3rdParty\gtest\include \
 	/I$(TOPDIR)\3rdParty\freeimage\Source \
 	/I$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus
 
+# Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
 
 # TODO: static linking for now, something is fishy with the DLL
 INCLUDE_LIBS = \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\3rdParty\freeimage\freeimage3.lib \
-	$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus\freeimageplus3.lib
+	$(TOPDIR)\3rdParty\freeimage\Wrapper\FreeImagePlus\freeimageplus3.lib \
+	$(TOPDIR)\wtest\wtest.lib
 	
 TEST_CPP_BINS = \
 	freeimageTest.exe \
@@ -38,6 +43,8 @@ local_all:
 
 local_clean:
 	@-erase thumb.png thumbcpp.png testmem.png 2>NUL
+	@-erase gtestReport.txt 2>NUL
+	@-erase *.xml 2>NUL
 
 local_distclean:
 

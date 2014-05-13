@@ -65,6 +65,10 @@ test: all
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d test || exit 1); done)
 
+.PHONY: testreport
+testreport: test
+	@tests/tools/generateTestReport.sh
+
 .PHONY: longtest
 longtest: test
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \

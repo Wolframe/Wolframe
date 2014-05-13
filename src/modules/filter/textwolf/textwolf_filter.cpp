@@ -98,16 +98,15 @@ struct InputFilterImpl
 	{
 		try
 		{
-			const char* err;
 			if (m_parser.state() != XMLParser::ParseSource)
 			{
-				if (!m_parser.parseHeader( err))
+				if (!getMetadata())
 				{
-					setState( Error, err);
 					return false;
 				}
 				if (m_parser.isStandalone())
 				{
+					doctype.clear();
 					return true;
 				}
 			}
@@ -265,14 +264,18 @@ struct InputFilterImpl
 	{
 		try
 		{
-			const char* ee;
-			std::size_t eesize;
 			for (;;) switch (m_parser.state())
 			{
 				case XMLParser::ParseHeader:
-					m_parser.getNext( ee, eesize);
+				{
+					const char* err = 0;
+					if (!m_parser.parseHeader( err) || !m_parser.hasMetadataParsed())
+					{
+						setState( Error, err);
+					}
 					continue;
-
+				}
+				case XMLParser::ParsedRoot:
 				case XMLParser::ParseSource:
 				case XMLParser::ParseDoctype:
 					return true;

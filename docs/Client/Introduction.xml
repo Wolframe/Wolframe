@@ -2,7 +2,7 @@
 <chapter>
 	<title>Introduction</title>
 
-	<para>This part of the manual describes how the user interface part (presentation tier, also called client) of
+	<para>This part of the manual describes how the user interface part (presentation tier or client) of
 	<application>Wolframe</application> applications can be built.
 	</para>
 	<para>A <application>Wolframe</application> client can be of various kinds. They all communicate with the server over

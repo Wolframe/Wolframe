@@ -2,7 +2,7 @@ Wolframe Installation Windows
 
 Installation and Configuration Guide for Windows
 
-Copyright ? 2010 - 2014 Project Wolframe
+Copyright (C) 2010 - 2014 Project Wolframe
 
 Commercial Usage.  Licensees holding valid Project Wolframe Commercial licenses
 may use this file in accordance with the Project Wolframe Commercial License
@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-April 12, 2014 version 0.0.1
+May 25, 2014 version 0.0.1
 
 -------------------------------------------------------------------------------
 
@@ -878,4 +878,145 @@ config.mk:
 
 
 1.21. Building the wolfclient
+
+The wolfclient is a Qt-based client for the Wolframe server.
+
+You build it for Qt 4 with:
+
+        C:\Qt\4.8.1\bin\qmake.exe -config debug -recursive
+        nmake
+
+
+respectively for a release version:
+
+        C:\Qt\4.8.1\bin\qmake.exe -config release -recursive
+        nmake
+
+
+You build it for Qt 5 with:
+
+        C:\Qt\Qt5.2.1\5.2.1\msvc2010\bin\qmake.exe -config debug -recursive
+        nmake
+
+
+respectively for a release version:
+
+        C:\Qt\Qt5.2.1\5.2.1\msvc2010\bin\qmake.exe -config release -recursive
+        nmake
+
+
+If you want SSL support you have to download or build OpenSSL and rebuild Qt 4
+or Qt 5 with SSL support:
+
+1.21.1. Secure Socket Layer (SSL)
+
+The Wolframe protocol can be secured with SSL. Currently only OpenSSL (http://
+www.openssl.org) is supported.
+
+Note: No matter whether you use the precompiled version or if you build OpenSSL
+on your own use the 0.9.8, 1.0.0 or 1.0.1g versions, but not the version 1.0.1
+through 1.0.1f (Heartbleed bug)!
+
+Use prebuild version of OpenSSL
+
+You can get a prebuilt version of OpenSSL from http://www.slproweb.com/products
+/Win32OpenSSL.html. Despite the name you get also 64-bit versions there.
+
+Install the developer version (for instance Win32OpenSSL-1_0_1g.exe) for
+instance to C:\OpenSSL-Win32.
+
+Do not copy the OpenSSL binaries to the Windows system directory, copy them to
+the Bin subdirectory of the OpenSSL installation directory!
+
+Set the "BOOST_XXX" variables in makefiles\nmake\config.mk as follows:
+
+        OPENSSL_DIR = C:\OpenSSL-Win32
+
+
+Build your own version of OpenSSL
+
+You need the community edition of ActivePerl from http://www.activestate.com/
+activeperl/. Install it for instance to C:\Perl.
+
+You will also need NASM to assemble certain parts of OpenSSL. You can get a
+Windows NASM from http://www.nasm.us/. Install it for instance to C:\nasm.
+
+Make sure the Perl interpreter and the NASM assembler are part of the path in
+the shell you want to build OpenSSL:
+
+        Set PATH=%PATH%;C:\Perl\bin;C:\nasm
+
+
+Get the source package openssl-1.0.1g.tar.gz of OpenSSL from http://
+www.openssl.org.
+
+Configure the package with:
+
+        perl Configure debug-VC-WIN32 \
+                --prefix="C:\openssl-1.0.1g-win32-debug"
+
+
+for a debug version, respectively with:
+
+        perl Configure VC-WIN32 \
+                --prefix="C:\openssl-1.0.1g-win32-release"
+
+
+for a release version.
+
+Note: Make sure there prefix you choose has no spaces in it!
+
+Prepare OpenSSL for NASM support with:
+
+        ms\do_nasm.bat
+
+
+Build and install OpenSSL now with:
+
+        nmake /f ms\ntdll.mak
+        nmake /f ms\ntdll.mak install
+
+
+More build information is available in INSTALL.W32 and INSTALL.W64 of the
+OpenSSL package itself.
+
+1.21.2. Qt libraries
+
+Use prebuild version of Qt
+
+Make sure you download the correct Qt package fitting your architecture and
+Microsoft Visual Studio version.
+
+If you take the prebuild Qt libraries you have to disable the building of
+SSL-enabled code by removing the 'WITH_SSL=1' definition in the 'DEFINES'
+directive in libqtwolfclient/libqtwolfclient.pro.
+
+Build your own version of Qt
+
+Set the following environment variables in order for Qt to find the OpenSSL
+header files and libraries:\
+
+        set OPENSSL_DIR=C:\openssl-1.0.1g-win32-debug
+        set INCLUDE=%INCLUDE%;%OPENSSL_DIR%\include
+        set LIB=%LIB%;%OPENSSL_DIR%\lib
+
+
+or for the release version:
+
+        set OPENSSL_DIR=C:\openssl-1.0.1g-win32-release
+        set INCLUDE=%INCLUDE%;%OPENSSL_DIR%\include
+        set LIB=%LIB%;%OPENSSL_DIR%\lib
+
+
+Compile Qt with OpenSSL enabled:
+
+        configure -platform win32-msvc2010 -debug -openssl
+        nmake
+
+
+For a release version use:
+
+        configure -platform win32-msvc2010 -release -openssl
+        nmake
+
 

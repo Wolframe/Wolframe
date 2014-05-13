@@ -177,6 +177,9 @@ public:
 		,m_doTokenize(false)
 		,m_standalone(true)
 		,m_doctype_state(0)
+		,m_lastelem(0)
+		,m_lastelemsize(0)
+		,m_lastelemtype(XMLScannerBase::ErrorOccurred)
 	{
 		m_obj = XMLParserObject<XmlHdrSrcIterator,BufferType,charset::UTF8,charset::UTF8>::create( m_mt, charset::UTF8());
 	}
@@ -197,6 +200,9 @@ public:
 		,m_doctype_root(o.m_doctype_root)
 		,m_doctype_public(o.m_doctype_public)
 		,m_doctype_system(o.m_doctype_system)
+		,m_lastelem(o.m_lastelem)
+		,m_lastelemsize(o.m_lastelemsize)
+		,m_lastelemtype(o.m_lastelemtype)
 	{
 		if (o.m_obj)
 		{
@@ -253,6 +259,7 @@ public:
 	{
 		ParseHeader,			//< parsing the XML header section
 		ParseDoctype,			//< parsing DOCTYPE definition if available
+		ParsedRoot,			//< parsed XML root element
 		ParseSource			//< parsing the XML content section
 	};
 	static const char* stateName( State i)
@@ -457,12 +464,25 @@ public:
 						m_doctype_state = 0;
 						return true;
 					}
+					else if (elemtype == XMLScannerBase::OpenTag)
+					{
+						m_lastelem = elemptr;
+						m_lastelemsize = elemsize;
+						m_lastelemtype = elemtype;
+						m_state = ParsedRoot;
+						m_doctype_state = 0;
+						return true;
+					}
 					else
 					{
+						m_lastelem = 0;
+						m_lastelemsize = 0;
+						m_lastelemtype = XMLScannerBase::ErrorOccurred;
 						m_state = ParseSource;
 						m_doctype_state = 0;
 						return true;
 					}
+				case ParsedRoot:
 				case ParseSource:
 					err = "illegal state in xml header parser";
 					return false;
@@ -470,17 +490,37 @@ public:
 		}
 	}
 
+	bool hasMetadataParsed() const
+	{
+		return m_state == ParseSource || m_state == ParsedRoot;
+	}
+
 	XMLScannerBase::ElementType getNext( const char*& elemptr, std::size_t& elemsize)
 	{
 		if (!m_obj) return XMLScannerBase::ErrorOccurred;
 		if (m_state != ParseSource)
 		{
-			const char* err = 0;
-			if (!parseHeader( err) || m_state != ParseSource)
+			if (m_state != ParsedRoot)
 			{
-				elemptr = err?err:"unknown error";
-				elemsize = std::strlen( elemptr);
-				return XMLScannerBase::ErrorOccurred;
+				const char* err = 0;
+				if (!parseHeader( err) || !hasMetadataParsed())
+				{
+					elemptr = err?err:"unknown error";
+					elemsize = std::strlen( elemptr);
+					return XMLScannerBase::ErrorOccurred;
+				}
+			}
+			if (m_state == ParsedRoot)
+			{
+				//... "unget" last element and return it
+				elemptr = m_lastelem;
+				elemsize = m_lastelemsize;
+				XMLScannerBase::ElementType elemtype = m_lastelemtype;
+				m_lastelem = 0;
+				m_lastelemsize = 0;
+				m_lastelemtype = XMLScannerBase::ErrorOccurred;
+				m_state = ParseSource;
+				return elemtype;
 			}
 		}
 		for (;;)
@@ -581,6 +621,9 @@ private:
 	std::string m_doctype_root;		//< document type definition root element
 	std::string m_doctype_public;		//< document type public identifier
 	std::string m_doctype_system;		//< document type system URI of validation schema
+	const char* m_lastelem;			//< last element parsed (for a kind of unget implementation)
+	std::size_t m_lastelemsize;		//< size of last element parsed (for a kind of unget implementation)
+	XMLScannerBase::ElementType m_lastelemtype;//< type of last element
 };
 
 } //namespace

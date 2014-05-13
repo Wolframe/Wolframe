@@ -54,11 +54,13 @@
 
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
+static unsigned int g_input_buffer_size = 0;
+static unsigned int g_output_buffer_size = 0;
 static boost::filesystem::path g_testdir;
 
 using namespace _Wolframe;
 
-class WolfilterTest : public ::testing::Test
+class WolfilterTest :public ::testing::TestWithParam<std::string>
 {
 protected:
 	WolfilterTest() {}
@@ -67,197 +69,170 @@ protected:
 	virtual void TearDown() {}
 };
 
-static std::string selectedTestName;
+static std::size_t testno = 0;
 
-TEST_F( WolfilterTest, tests)
+TEST_P( WolfilterTest, tests)
 {
-	enum {ibarsize=11,obarsize=7,EoDBufferSize=4};
-	std::size_t ibar[ibarsize] = {127,4,5,7,11,13,17,19,23,41,43};
-	std::size_t obar[obarsize] = {127,4,5,7,11,13,17};
-	std::vector<std::string> tests;
-	std::size_t testno;
+	std::string filename = GetParam();
+	enum {ibarsize=12,obarsize=8,EoDBufferSize=4};
+	std::size_t ibar[ibarsize] = {4096,127,4,5,7,11,13,17,19,23,41,43};
+	std::size_t obar[obarsize] = {4096,127,4,5,7,11,13,17};
+	
+	testno++;
 
-	// [1] Selecting tests to execute:
-	boost::filesystem::recursive_directory_iterator ditr( g_testdir / "wolfilter" / "data"), dend;
-	if (selectedTestName.size())
+	std::string testname = boost::filesystem::basename( filename);
+	wtest::TestDescription td( filename, g_gtest_ARGV[0]);
+	if (td.requires.size())
 	{
-		std::cerr << "executing tests matching '" << selectedTestName << "'" << std::endl;
+		// [2.2] Skip tests when disabled
+		std::cerr << "skipping test '" << testname << "' ( is " << td.requires << ")" << std::endl;
+		return;
 	}
-	for (; ditr != dend; ++ditr)
+	// [2.3] Define I/O buffer sizes
+	std::size_t ib = g_input_buffer_size?g_input_buffer_size:ibar[ testno % ibarsize];
+	std::size_t ob = g_output_buffer_size?g_output_buffer_size:obar[ testno % obarsize];
+
+	// [2.4] Parse command line in config section of the test description
+	std::vector<std::string> cmd;
+	std::string arg;
+	std::string::const_iterator ai = td.config.begin(), ae = td.config.end();
+	utils::CharTable argop( ""), argtk( "", true);
+	for (; ai != ae && utils::parseNextToken( arg, ai, ae, argop, argtk); ++ai) cmd.push_back( arg);
+
+	std::cerr << "processing test '" << testname << "' [-b " << ib << ":" << ob << "]" << std::endl;
+	enum {MaxNofArgs=63};
+	std::string cmdargstr;
+	int cmdargc = cmd.size()+1;
+	char* cmdargv[MaxNofArgs+1];
+	std::size_t cmdargi[MaxNofArgs+1];
+	if (cmdargc > MaxNofArgs) throw std::runtime_error( "too many arguments in test");
+	cmdargi[0] = 0;
+	cmdargstr.append( g_gtest_ARGV[0]);
+	cmdargstr.push_back( 0);
+	for (int ci=1; ci<cmdargc; ++ci)
 	{
-		if (boost::iequals( boost::filesystem::extension( *ditr), ".tst"))
+		cmdargi[ci] = cmdargstr.size();
+		cmdargstr.append( cmd[ci-1]);
+		cmdargstr.push_back( 0);
+	}
+	for (int ci=0; ci<cmdargc; ++ci)
+	{
+		cmdargv[ ci] = const_cast<char*>( cmdargstr.c_str() + cmdargi[ ci]);
+	}
+
+	boost::filesystem::path refpath( g_testdir / "temp");
+	std::string outstr;
+	{
+		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), false);
+
+		// [2.5] Call iostreamfilter
+		if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;
+		if (cmdline.printversion()) std::cerr << "ignored option --version" << std::endl;
+		if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
+
+		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
+		prgbind::ProgramLibrary prglib;
+
+		AAAA::AAAAprovider aaaaProvider( &cmdline.aaaaProviderConfig(), &cmdline.modulesDirectory());
+		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &prglib);
+
+		proc::ExecContext execContext( &processorProvider, &aaaaProvider);
+
+		if (!processorProvider.resolveDB( databaseProvider))
 		{
-			std::string testname = boost::filesystem::basename(*ditr);
-			if (selectedTestName.size())
+			throw std::runtime_error( "Transaction database could not be resolved. See log." );
+		}
+		if (!processorProvider.loadPrograms())
+		{
+			throw std::runtime_error( "Not all programs could be loaded. See log." );
+		}
+		std::istringstream in( td.input, std::ios::in | std::ios::binary);
+		std::ostringstream out( std::ios::out | std::ios::binary);
+
+		try
+		{
+			langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
+		}
+		catch (const std::runtime_error& e)
+		{
+			if (!td.exception.empty())
 			{
-				if (std::strstr( ditr->path().string().c_str(), selectedTestName.c_str()))
+				std::vector<std::string> pattern;
+				utils::splitString( pattern, td.exception, "*");
+
+				const char* ap = e.what();
+				std::vector<std::string>::const_iterator pi = pattern.begin(), pe = pattern.end();
+				for (; pi != pe; ++pi)
 				{
-					std::cerr << "selected test '" << testname << "'" << std::endl;
-					tests.push_back( ditr->path().string());
+					ap = std::strstr( ap, pi->c_str());
+					if (ap == 0) break;
+					ap = ap + pi->size();
+				}
+				if (pi != pe)
+				{
+					// [2.6] Dump exception message to file in case of expected exception
+					boost::filesystem::path EXCEPTION( g_testdir / "temp" / "EXCEPTION");
+					std::fstream oo( EXCEPTION.string().c_str(), std::ios::out | std::ios::binary);
+					oo.write( e.what(), std::strlen(e.what()));
+					if (oo.bad()) std::cerr << "error writing file '" << EXCEPTION.string() << "'" << std::endl;
+					oo.close();
+
+					boost::filesystem::path EXPECT_EXCEPTION( g_testdir / "temp" / "EXPECT_EXCEPTION");
+					std::fstream ee( EXPECT_EXCEPTION.string().c_str(), std::ios::out | std::ios::binary);
+					ee.write( td.exception.c_str(), td.exception.size());
+					if (ee.bad()) std::cerr << "error writing file '" << EXPECT_EXCEPTION.string() << "'" << std::endl;
+					ee.close();
+
+					boost::this_thread::sleep( boost::posix_time::seconds( 3));
+					std::cerr << "exception part '" << *pi << "' not found in '" << e.what() << "'" << std::endl;
+					throw std::runtime_error( "exception caught does not match as expected");
 				}
 			}
 			else
 			{
-				tests.push_back( ditr->path().string());
+				throw e;
 			}
 		}
-		else if (!boost::filesystem::is_directory( *ditr))
-		{
-			std::cerr << "ignoring file '" << *ditr << "'" << std::endl;
-		}
+		outstr.append( out.str());
 	}
-	std::sort( tests.begin(), tests.end());
-
-	// [2] Execute tests:
-	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
-	for (testno=1; itr != end; ++itr,++testno)
+	std::vector<std::string>::const_iterator oi = td.outputfile.begin(), oe = td.outputfile.end();
+	for (; oi != oe; ++oi)
 	{
-		std::string testname = boost::filesystem::basename(*itr);
-		wtest::TestDescription td( *itr, g_gtest_ARGV[0]);
-		if (td.requires.size())
-		{
-			// [2.2] Skip tests when disabled
-			std::cerr << "skipping test '" << testname << "' ( is " << td.requires << ")" << std::endl;
-			continue;
-		}
-		// [2.3] Define I/O buffer sizes
-		std::size_t ib = ibar[ testno % ibarsize];
-		std::size_t ob = obar[ testno % obarsize];
-
-		// [2.4] Parse command line in config section of the test description
-		std::vector<std::string> cmd;
-		std::string arg;
-		std::string::const_iterator ai = td.config.begin(), ae = td.config.end();
-		utils::CharTable argop( ""), argtk( "", true);
-		for (; ai != ae && utils::parseNextToken( arg, ai, ae, argop, argtk); ++ai) cmd.push_back( arg);
-
-		std::cerr << "processing test '" << testname << "'" << std::endl;
-		enum {MaxNofArgs=63};
-		std::string cmdargstr;
-		int cmdargc = cmd.size()+1;
-		char* cmdargv[MaxNofArgs+1];
-		std::size_t cmdargi[MaxNofArgs+1];
-		if (cmdargc > MaxNofArgs) throw std::runtime_error( "too many arguments in test");
-		cmdargi[0] = 0;
-		cmdargstr.append( g_gtest_ARGV[0]);
-		cmdargstr.push_back( 0);
-		for (int ci=1; ci<cmdargc; ++ci)
-		{
-			cmdargi[ci] = cmdargstr.size();
-			cmdargstr.append( cmd[ci-1]);
-			cmdargstr.push_back( 0);
-		}
-		for (int ci=0; ci<cmdargc; ++ci)
-		{
-			cmdargv[ ci] = const_cast<char*>( cmdargstr.c_str() + cmdargi[ ci]);
-		}
-
-		boost::filesystem::path refpath( g_testdir / "temp");
-		std::string outstr;
-		{
-			config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), false);
-
-			// [2.5] Call iostreamfilter
-			if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;
-			if (cmdline.printversion()) std::cerr << "ignored option --version" << std::endl;
-			if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
-
-			db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
-			prgbind::ProgramLibrary prglib;
-
-			AAAA::AAAAprovider aaaaProvider( &cmdline.aaaaProviderConfig(), &cmdline.modulesDirectory());
-			proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &prglib);
-
-			proc::ExecContext execContext( &processorProvider, &aaaaProvider);
-
-			if (!processorProvider.resolveDB( databaseProvider))
-			{
-				throw std::runtime_error( "Transaction database could not be resolved. See log." );
-			}
-			if (!processorProvider.loadPrograms())
-			{
-				throw std::runtime_error( "Not all programs could be loaded. See log." );
-			}
-			std::istringstream in( td.input, std::ios::in | std::ios::binary);
-			std::ostringstream out( std::ios::out | std::ios::binary);
-
-			try
-			{
-				langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
-			}
-			catch (const std::runtime_error& e)
-			{
-				if (!td.exception.empty())
-				{
-					std::vector<std::string> pattern;
-					utils::splitString( pattern, td.exception, "*");
-
-					const char* ap = e.what();
-					std::vector<std::string>::const_iterator pi = pattern.begin(), pe = pattern.end();
-					for (; pi != pe; ++pi)
-					{
-						ap = std::strstr( ap, pi->c_str());
-						if (ap == 0) break;
-						ap = ap + pi->size();
-					}
-					if (pi != pe)
-					{
-						// [2.6] Dump exception message to file in case of expected exception
-						boost::filesystem::path EXCEPTION( g_testdir / "temp" / "EXCEPTION");
-						std::fstream oo( EXCEPTION.string().c_str(), std::ios::out | std::ios::binary);
-						oo.write( e.what(), std::strlen(e.what()));
-						if (oo.bad()) std::cerr << "error writing file '" << EXCEPTION.string() << "'" << std::endl;
-						oo.close();
-
-						boost::filesystem::path EXPECT_EXCEPTION( g_testdir / "temp" / "EXPECT_EXCEPTION");
-						std::fstream ee( EXPECT_EXCEPTION.string().c_str(), std::ios::out | std::ios::binary);
-						ee.write( td.exception.c_str(), td.exception.size());
-						if (ee.bad()) std::cerr << "error writing file '" << EXPECT_EXCEPTION.string() << "'" << std::endl;
-						ee.close();
-
-						boost::this_thread::sleep( boost::posix_time::seconds( 3));
-						std::cerr << "exception part '" << *pi << "' not found in '" << e.what() << "'" << std::endl;
-						throw std::runtime_error( "exception caught does not match as expected");
-					}
-				}
-				else
-				{
-					throw e;
-				}
-			}
-			outstr.append( out.str());
-		}
-		std::vector<std::string>::const_iterator oi = td.outputfile.begin(), oe = td.outputfile.end();
-		for (; oi != oe; ++oi)
-		{
-			std::string outfile = utils::getCanonicalPath( *oi, refpath.string());
-			outstr.append( utils::readSourceFileContent( outfile));
-		}
-
-		//... On Windows std::endl used in stream output differs from Unix
-		outstr = td.normalizeOutputCRLF( outstr);
-		if (td.expected != outstr)
-		{
-			// [2.6] Dump test contents to files in case of error
-			boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
-			utils::writeFile( OUTPUT.string(), outstr);
-
-			boost::filesystem::path EXPECT( g_testdir / "temp" / "EXPECT");
-			utils::writeFile( EXPECT.string(), td.expected);
-
-			boost::filesystem::path INPUT( g_testdir / "temp" / "INPUT");
-			utils::writeFile( INPUT.string(), td.input);
-
-			std::cerr << "test output does not match for '" << *itr << "'" << std::endl;
-			std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
-			std::cerr << "OUTPUT written to file '" << OUTPUT.string() << "'" << std::endl;
-			std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
-
-			boost::this_thread::sleep( boost::posix_time::seconds( 3));
-		}
-		EXPECT_EQ( td.expected, outstr);
+		std::string outfile = utils::getCanonicalPath( *oi, refpath.string());
+		outstr.append( utils::readSourceFileContent( outfile));
 	}
+
+	//... On Windows std::endl used in stream output differs from Unix
+	outstr = td.normalizeOutputCRLF( outstr);
+	if (td.expected != outstr)
+	{
+		// [2.6] Dump test contents to files in case of error
+		boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
+		utils::writeFile( OUTPUT.string(), outstr);
+
+		boost::filesystem::path EXPECT( g_testdir / "temp" / "EXPECT");
+		utils::writeFile( EXPECT.string(), td.expected);
+
+		boost::filesystem::path INPUT( g_testdir / "temp" / "INPUT");
+		utils::writeFile( INPUT.string(), td.input);
+
+		std::cerr << "test output does not match for '" << testname << "'" << std::endl;
+		std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
+		std::cerr << "OUTPUT written to file '" << OUTPUT.string() << "'" << std::endl;
+		std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
+
+		boost::this_thread::sleep( boost::posix_time::seconds( 3));
+	}
+	EXPECT_EQ( td.expected, outstr);
 }
+
+static std::string selectedTestName;
+
+static std::vector<std::string> tests;
+
+INSTANTIATE_TEST_CASE_P(AllWolfilterTests,
+                        WolfilterTest,
+                        ::testing::ValuesIn(tests));
 
 static void printUsage( const char *prgname)
 {
@@ -267,6 +242,7 @@ static void printUsage( const char *prgname)
 	std::cout << "\t-f <logfile>:" << " Specify filename for logger output" << std::endl;
 	std::cout << "\t-h:" << " Print usage" << std::endl;
 	std::cout << "\t-t:" << " Raise verbosity level (-t,-tt,-ttt,..)" << std::endl;
+	std::cout << "\t-b:" << " Specify buffer sizes as <input>:<output>, e.g. -b1024:128" << std::endl;
 }
 
 int main( int argc, char **argv)
@@ -317,17 +293,59 @@ int main( int argc, char **argv)
 				return 2;
 			}
 		}
+		else if (optionname == 'b')
+		{
+			const char* is;
+			if (argv[argstart][2])
+			{
+				is = argv[argstart]+2;
+			}
+			else
+			{
+				argstart++;
+				is = argv[argstart];
+			}
+			argstart += 1;
+			if (!is)
+			{
+				std::cerr << "missing argument for option b (buffer sizes), expected two unsigned ints separated by ':'" << std::endl;
+				return 3;
+			}
+			const char* os = std::strchr( is, ':');
+			try
+			{
+				if (!os)
+				{
+					g_input_buffer_size = g_output_buffer_size = boost::lexical_cast<unsigned int>( std::string(is));
+				}
+				else
+				{
+					g_input_buffer_size = boost::lexical_cast<unsigned int>( std::string( is, os-is));
+					g_output_buffer_size = boost::lexical_cast<unsigned int>( std::string( os +1));
+				}
+				if (g_input_buffer_size < 4 || g_output_buffer_size < 4)
+				{
+					std::cerr << "illegal argument for option b (buffer sizes): sizes too small (minimum 4)" << std::endl;
+					return 3;
+				}
+			}
+			catch (const boost::bad_lexical_cast& e)
+			{
+				std::cerr << "illegal argument for option b (buffer sizes), expected two unsigned ints separated by ':', error: " << e.what() << std::endl;
+				return 3;
+			}
+		}
 		else if (optionname == '-')
 		{
 			std::cerr << "unknown option -" << argv[argstart] << std::endl;
 			printUsage( argv[0]);
-			return 2;
+			return 4;
 		}
 		else
 		{
 			std::cerr << "unknown option -" << optionname << std::endl;
 			printUsage( argv[0]);
-			return 2;
+			return 5;
 		}
 	}
 	if (argc == argstart+1)
@@ -337,8 +355,44 @@ int main( int argc, char **argv)
 	else if (argc > argstart+1)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
-		return 3;
+		return 6;
 	}
+
+	// [1] Selecting tests to execute:
+	boost::filesystem::recursive_directory_iterator ditr( g_testdir / "wolfilter" / "data"), dend;
+	if (selectedTestName.size())
+	{
+		std::cerr << "executing tests matching '" << selectedTestName << "'" << std::endl;
+	}
+	for (; ditr != dend; ++ditr)
+	{
+		if (boost::iequals( boost::filesystem::extension( *ditr), ".tst"))
+		{
+			std::string testname = boost::filesystem::basename(*ditr);
+			if (selectedTestName.size())
+			{
+				if (std::strstr( ditr->path().string().c_str(), selectedTestName.c_str()))
+				{
+					std::cerr << "selected test '" << testname << "'" << std::endl;
+					tests.push_back( ditr->path().string());
+				}
+			}
+			else
+			{
+				tests.push_back( ditr->path().string());
+			}
+		}
+		else if (!boost::filesystem::is_directory( *ditr))
+		{
+			std::cerr << "ignoring file '" << *ditr << "'" << std::endl;
+		}
+	}
+	std::sort( tests.begin(), tests.end());
+
+	// [2] Instantiate test cases with INSTANTIATE_TEST_CASE_P (see above)
+	
+	// [3] Run the tests
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	_Wolframe::log::LogLevel::Level loglevel = _Wolframe::log::LogLevel::LOGLEVEL_WARNING;
 	if (tracelevel >= 1) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_INFO;
@@ -355,11 +409,6 @@ int main( int argc, char **argv)
 	{
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( loglevel);
 	}
-#undef _WOLFRAME_USE_GTEST_REPORT
-#ifdef _WOLFRAME_USE_GTEST_REPORT
-	boost::filesystem::path refpath( g_testdir / "gtestReport.txt");
-	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
-#endif
 	return RUN_ALL_TESTS();
 }
 

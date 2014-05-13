@@ -11,10 +11,12 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR) \
 	$(SQLITE3_INCLUDE_DIRS) \
 	-I$(TOPDIR)/src/modules/database/sqlite3 \
-	-I$(TOPDIR)/3rdParty/gtest/include
+	-I$(TOPDIR)/3rdParty/gtest/include \
+	-I$(TOPDIR)/wtest/include
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/wtest \
 	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
@@ -24,6 +26,7 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwfsingleton \
 	-lwolframe_database \
+	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(SQLITE3_LIBS) \
@@ -49,7 +52,9 @@ LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingl
 local_all:
 
 local_clean:
-	@rm -f test.db garbage.db
+	@-rm -f test.db garbage.db
+	@-rm -f gtestReport.txt
+	@-rm -f sqliteUnit*.xml
 
 local_distclean:
 

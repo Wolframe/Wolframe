@@ -308,7 +308,7 @@ bool DoctypeFilterCommandHandler::getEncoding()
 CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 {
 	if (m_state == Done) return CLOSE;
-	LOG_TRACE << "STATE DoctypeCommandHandler " << stateName( m_state) << " (put input)";
+	LOG_DATA << "STATE DoctypeCommandHandler " << stateName( m_state) << " (put input)";
 	try
 	{
 		if (m_state == Init)
@@ -627,7 +627,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					}
 					else
 					{
-						throw_error( "expected '<!'");
+						setState( SearchXMLRootName);
 					}
 					break;
 
@@ -687,6 +687,149 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					else
 					{
 						m_doctype.push_back( ch);
+					}
+					break;
+
+				case SearchXMLRootName:
+					if (ch == '>')
+					{
+						throw_error( "invalid XML root element");
+					}
+					if (ch > ' ')
+					{
+						setState( ParseXMLRootName);
+						m_itembuf.clear();
+					}
+					break;
+
+				case ParseXMLRootName:
+					if (ch != '>' && ch > ' ')
+					{
+						m_itembuf.push_back( ch);
+						if (m_itembuf.size() > 128)
+						{
+							throw_error( "XML root element name too big");
+						}
+					}
+					else
+					{
+						m_rootelemname = m_itembuf;
+						if (ch == '>')
+						{
+							throw_error( "No document type or schema definition found and document is not standalone");
+						}
+						setState( SearchXMLRootAttrib);
+					}
+					break;
+
+				case SearchXMLRootAttrib:
+					if (ch == '>')
+					{
+						throw_error( "No document type or schema definition found and document is not standalone");
+					}
+					if (ch > ' ')
+					{
+						setState( ParseXMLRootAttrib);
+						m_itembuf.clear();
+					}
+					break;
+
+				case ParseXMLRootAttrib:
+					if (ch != '>' && ch > ' ')
+					{
+						m_itembuf.push_back( ch);
+						if (m_itembuf.size() > 128)
+						{
+							throw_error( "XML root attribute name too big");
+						}
+					}
+					else
+					{
+						if (m_itembuf == "xmlns:schemaLocation")
+						{
+							setState( SearchXMLRootAttribAssign);
+						}
+						else if (ch == '>')
+						{
+							throw_error( "No document type or schema definition found and document is not standalone");
+						}
+						else
+						{
+							setState( SearchXMLRootAttrib);
+						}
+					}
+					break;
+
+				case SearchXMLRootAttribAssign:
+					if (ch == '=')
+					{
+						setState( SearchXMLRootAttribQuote);
+						m_itembuf.clear();
+					}
+					else if (ch > ' ')
+					{
+						throw_error( "invalid XML root attribute definition (missing value assingment)");
+					}
+					break;
+
+				case SearchXMLRootAttribQuote:
+					if (ch == '\'')
+					{
+						setState( ParseXMLRootAttribValueSQ);
+					}
+					else if (ch == '\"')
+					{
+						setState( ParseXMLRootAttribValueDQ);
+					}
+					else if (ch > ' ')
+					{
+						throw_error( "invalid XML root attribute definition (missing value assingment)");
+					}
+					break;
+
+				case ParseXMLRootAttribValueSQ:
+					if (ch == '\'')
+					{
+						m_doctypeid = utils::getFileStem( m_itembuf);
+						setState( Done);
+					}
+					else
+					{
+						if (ch <= ' ')
+						{
+							m_itembuf.clear();
+						}
+						else
+						{
+							m_itembuf.push_back( ch);
+							if (m_itembuf.size() > 256)
+							{
+								throw_error( "XML xmlns:schemaLocation attribute (schema definition) is too big");
+							}
+						}
+					}
+					break;
+
+				case ParseXMLRootAttribValueDQ:
+					if (ch == '\"')
+					{
+						m_doctypeid = utils::getFileStem( m_itembuf);
+						setState( Done);
+					}
+					else
+					{
+						if (ch <= ' ')
+						{
+							m_itembuf.clear();
+						}
+						else
+						{
+							m_itembuf.push_back( ch);
+							if (m_itembuf.size() > 256)
+							{
+								throw_error( "XML xmlns:schemaLocation attribute (schema definition) is too big");
+							}
+						}
 					}
 					break;
 

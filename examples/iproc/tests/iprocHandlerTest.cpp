@@ -46,6 +46,7 @@
 #include "utils/fileUtils.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testModules.hpp"
+#include "wtest/testReport.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>
@@ -414,6 +415,7 @@ int main( int argc, char **argv )
 	boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
 
 	wtest::Data::createDataDir( "temp", g_gtest_ARGV[0]);
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
 	return RUN_ALL_TESTS();

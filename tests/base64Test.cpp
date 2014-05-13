@@ -34,6 +34,7 @@
 // base64 tests
 //
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include "types/base64.hpp"
 
 #ifdef _WIN32
@@ -417,6 +418,7 @@ TEST( Base64, RandomData )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

@@ -13,6 +13,7 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\src\modules\database\sqlite3 \
 	/I$(TOPDIR)\3rdParty\gtest\include \
+	/I$(TOPDIR)\wtest\include \
 	/I"$(TOPDIR)\3rdParty\sqlite3"
 
 INCLUDE_LDFLAGS = \
@@ -22,6 +23,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
+	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\3rdParty\sqlite3\sqlite3.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
@@ -44,6 +46,8 @@ local_all:
 
 local_clean:
 	@-erase test.db garbage.db 2>NUL
+	@-erase gtestReport.txt 2>NUL
+	@-erase sqliteUnit*.xml 2>NUL
 
 local_distclean:
 
