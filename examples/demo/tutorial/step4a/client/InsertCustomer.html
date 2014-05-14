@@ -116,7 +116,7 @@ window.addEventListener("DOMContentLoaded", function ()
 	* Listener for installing the submit action of the form with id 'user':
 	*/
 	try {
-		form = document.getElementById("user");
+		form = document.getElementById("customer");
 
 		if (form.addEventListener) {
 			form.addEventListener("submit", submitRequest, false);
@@ -132,19 +132,13 @@ window.addEventListener("DOMContentLoaded", function ()
 </script>
 
 <!--
-- HTML Form 'user' for user input. 
+- HTML Form 'customer' for input a new customer. 
 - The contents of the form are sent as XML request to the Wolframe server
 - on submit. Needs Javascript because this example cannot show the result as HTML without.
 -->
-<form id='user' name='user' action="http://127.0.0.1/wolframe/webclient_form_xml.php" method="post">
-Username: <input type="text" id="usrname" name="usrname" value="" placeholder="enter your public user name here"></br>
-Prename: <input type="text" id="prename" name="prename" value=""></br>
-Surname: <input type="text" id="surname" name="surname" value=""></br>
-E-mail: <input type="text" id="email" name="email" value="" placeholder="enter your valid contact email here"></br>
-Comment: <textarea id="comment" name="comment" rows="5" cols="40"></textarea></br>
-Gender: <input type="radio" id="gender" name="gender" checked value="female">Female</input>
-	<input type="radio" id="gender" name="gender" value="male">Male</input>
-	</br>
+<form id='customer' name='customer' action="http://127.0.0.1/wolframe/webclient_form_xml.php" method="post">
+Name: <input type="text" id="name" name="name" value=""></br>
+Address: <textarea id="address" name="address" rows="3" cols="40"></textarea></br>
 <input type="hidden" id="doctype" name="DOCTYPE" value="Customer customer">
 <input type="hidden" id="cmd" name="CMD" value="Insert">
 <input id='doinsert' type="submit" name="cmdcall" value="Insert">
