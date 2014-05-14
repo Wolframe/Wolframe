@@ -57,33 +57,43 @@ namespace WolframeClient
             int nextidx = 0;
             int size = msg.Length;
 
+            // Count number of LFdot to map to LF:
             while (0 < (idx = Array.IndexOf(msg, (byte)'\n', idx)))
             {
-                if (msg.Length > idx && msg[idx + 1] == '.')
+                idx = idx + 1;
+                if (msg.Length > idx && msg[ idx] == '.')
                 {
+                    //... for each LF dot sequence we need one byte less in the result
                     size = size - 1;
                 }
             }
             if (size == msg.Length)
             {
+                //... nothing to do because no LFdot sequences found
                 return msg;
             }
+            // Allocate result message with fitting size:
             rt = new byte[size];
 
+            // Map all LFdot to LF:
+            idx = 0;
             while (0 < (nextidx = Array.IndexOf(msg, (byte)'\n', idx)))
             {
-                Array.Copy(msg, idx, rt, rtidx, nextidx - idx + 1);
-                rtidx = rtidx + nextidx - idx + 1;
+                int linesize = nextidx - idx + 1/*incl LF*/;
+                Array.Copy(msg, idx, rt, rtidx, linesize);
+                rtidx = rtidx + linesize;
                 idx = nextidx + 1;
 
                 if (msg.Length >= idx)
                 {
                     if (msg[idx] == '.')
                     {
+                        //... ignore first dot after LF
                         idx = idx + 1;
                     }
                 }
             }
+            // Copy rest chunk without terminating LF:
             Array.Copy(msg, idx, rt, rtidx, msg.Length - idx);
             return rt;
         }
@@ -156,7 +166,7 @@ namespace WolframeClient
                 return msg;
             }
 
-            private void EndRead(IAsyncResult ev)
+            private void EndReadCallback(IAsyncResult ev)
             {
                 m_lasterror = null;
                 try
@@ -187,7 +197,7 @@ namespace WolframeClient
                     Grow();
                     idx = searchpos;
                 }
-                var ev = m_src.BeginRead(m_ar, m_size, m_ar.Length - m_size, EndRead, null);
+                var ev = m_src.BeginRead(m_ar, m_size, m_ar.Length - m_size, EndReadCallback, null);
                 if (!ev.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(2)))
                 {
                     throw new Exception("Timeout in socket stream read");
@@ -208,25 +218,33 @@ namespace WolframeClient
 
             public void IssueRead(AutoResetEvent signal_)
             {
-                var ev = m_src.BeginRead(m_ar, m_size, m_ar.Length - m_size,
-                                        delegate(IAsyncResult r)
-                                        {
-                                            m_size = m_size + m_src.EndRead(r);
-                                            AutoResetEvent sg = r.AsyncState as AutoResetEvent;
-                                            sg.Set();
-                                        }, signal_);
+                m_src.BeginRead(
+                    m_ar, m_size, m_ar.Length - m_size,
+                    delegate(IAsyncResult r)
+                    {
+                        m_size = m_size + m_src.EndRead(r);
+                        AutoResetEvent sg = r.AsyncState as AutoResetEvent;
+                        sg.Set();
+                    }, signal_);
+            }
+
+            private int findEndOfLine( int idx)
+            {
+                idx = Array.IndexOf(m_ar, (byte)'\n', idx, m_size - idx);
+                int newidx = m_size;
+                while (idx == -1)
+                {
+                    newidx = FetchData(newidx);
+                    if (newidx == -1) return -1;
+                    idx = Array.IndexOf(m_ar, (byte)'\n', newidx, m_size - newidx);
+                }
+                return idx;
             }
 
             public byte[] FetchLine()
             {
-                int idx = Array.IndexOf(m_ar, (byte)'\n',m_pos,m_size-m_pos);
-                int newidx = m_size;
-                while (idx == -1)
-                {
-                    newidx = FetchData( newidx);
-                    if (newidx == -1) return null;
-                    idx = Array.IndexOf(m_ar, (byte)'\n', newidx, m_size - newidx);
-                }
+                int idx = findEndOfLine( m_pos);
+                if (idx == -1) return null;
                 if (idx > m_pos && m_ar[idx - 1] == '\r')
                 {
                     return GetMessageFromBuffer(idx - 1, idx + 1);
@@ -239,8 +257,8 @@ namespace WolframeClient
 
             public byte[] FetchContent()
             {
-                int idx = Array.IndexOf(m_ar, (byte)'\n', m_pos, m_size - m_pos);
-                while (idx >= m_pos)
+                int idx = findEndOfLine( m_pos);
+                while (idx > 0)
                 {
                     int nextidx = -1;
                     if (m_size >= idx + 2)
@@ -277,9 +295,13 @@ namespace WolframeClient
                     }
                     if (nextidx > 0)
                     {
-                        return Protocol.UnescapeLFdot(GetMessageFromBuffer(idx, nextidx));
+                        if (idx > m_pos && m_ar[idx - 1] == '\r')
+                        {
+                            idx = idx - 1;
+                        }
+                        return Protocol.UnescapeLFdot( GetMessageFromBuffer(idx, nextidx));
                     }
-                    idx = Array.IndexOf(m_ar, (byte)'\n', idx+1, m_size - idx-1);
+                    idx = findEndOfLine( idx +1);
                 }
                 return null;
             }

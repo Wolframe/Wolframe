@@ -35,7 +35,7 @@ namespace WolframeClient
     {
         static void ProcessAnswer(Session.Answer answer)
         {
-            Console.WriteLine("Answer id {0}", answer.id);
+            //[+]Console.WriteLine("Answer id {0}", answer.id);
             switch (answer.msgtype)
             {
                 case Session.Answer.MsgType.Error:
@@ -49,10 +49,17 @@ namespace WolframeClient
                     {
                         case AnswerId.CustomerInsertedObj:
                             {
-                                CustomerInserted customer = (CustomerInserted)answer.obj;
-                                Console.WriteLine("Id {0}", customer.Id);
-                                Console.WriteLine("Name {0}", customer.Name);
-                                Console.WriteLine("Address {0}", customer.Address);
+                                if (answer.obj == null)
+                                {
+                                    Console.WriteLine("Got unexpected empty answer. Expected InsertedCustomer object not null");
+                                }
+                                else
+                                {
+                                    CustomerInserted customer = (CustomerInserted)answer.obj;
+                                    Console.WriteLine("Id {0}", customer.Id);
+                                    Console.WriteLine("Name {0}", customer.Name);
+                                    Console.WriteLine("Address {0}", customer.Address);
+                                }
                             }
                             break;
                         default:
@@ -78,7 +85,11 @@ namespace WolframeClient
                     int answerid = (int)AnswerId.CustomerInsertedObj;
                     Session.Request request = new Session.Request { id = answerid, command = "Insert", doctype = "Customer", root = "customer", obj = customer, objtype = typeof(Customer), answertype = typeof(CustomerInserted) };
 
-                    session.IssueRequest(request);
+                    int ii = 0;
+                    for (ii = 0; ii < 1000; ++ii)
+                    {
+                        session.IssueRequest(request);
+                    }
                     Thread.Sleep( 20000);
                     session.Shutdown();
                 }

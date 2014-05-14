@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections;
 using System.Threading;
+using System.Collections.Generic;
 using WolframeClient;
 
 namespace WolframeClient
@@ -18,6 +19,9 @@ namespace WolframeClient
         private Protocol.Buffer m_buffer;
         private bool m_readRequestIssued;
         private AutoResetEvent m_signal;
+        private Queue<byte[]> m_writequeue;
+        private bool m_waitwrite;
+        private object m_waitwriteLock;
 
         public Connection(string ipadr, int port, AutoResetEvent signal)
         {
@@ -28,6 +32,9 @@ namespace WolframeClient
             m_buffer = null;
             m_readRequestIssued = false;
             m_signal = signal;
+            m_writequeue = new Queue<byte[]>();
+            m_waitwrite = false;
+            m_waitwriteLock = new object();
         }
 
         public void Connect()
@@ -56,14 +63,46 @@ namespace WolframeClient
         {
             if (m_buffer == null) throw new Exception("read line failed");
             m_readRequestIssued = false;
-            return m_buffer.FetchLine();
+            byte[] ln = m_buffer.FetchLine();
+            /*[-]*/Console.WriteLine("+++ LINE {0}", Encoding.UTF8.GetString(ln));
+            return ln;
         }
 
         public byte[] ReadContent()
         {
             if (m_buffer == null) throw new Exception("read content failed");
             m_readRequestIssued = false;
-            return m_buffer.FetchContent();
+            byte[] msg = m_buffer.FetchContent();
+            Console.WriteLine("+++ MSG");
+            return msg;
+        }
+
+        public void EndWriteCallback(IAsyncResult ev)
+        {
+            m_stream.EndWrite(ev);
+            lock (m_waitwriteLock)
+            {
+                m_waitwrite = false;
+            }
+            FlushWriteQueue();
+        }
+
+        public void FlushWriteQueue()
+        {
+            lock (m_waitwriteLock)
+            {
+                if (!m_waitwrite)
+                {
+                    try
+                    {
+                        byte[] msg = m_writequeue.Dequeue();
+                        m_stream.BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
+                        m_waitwrite = true;
+                    }
+                    catch (InvalidOperationException)
+                    {}
+                }
+            }
         }
 
         public void IssueReadRequest()
@@ -85,7 +124,8 @@ namespace WolframeClient
             Array.Copy( msg, msg_with_EoLn, msg.Length);
             msg_with_EoLn[msg.Length + 0] = (byte)'\r';
             msg_with_EoLn[msg.Length + 1] = (byte)'\n';
-            m_stream.Write(msg_with_EoLn, 0, msg_with_EoLn.Length);
+            m_writequeue.Enqueue(msg_with_EoLn);
+            FlushWriteQueue();
         }
 
         public void WriteRequest(string command, byte[] content)
@@ -111,7 +151,8 @@ namespace WolframeClient
             msg[EoDidx + 2] = (byte)'.';
             msg[EoDidx + 3] = (byte)'\r';
             msg[EoDidx + 4] = (byte)'\n';
-            m_stream.Write( msg, 0, msg.Length);
+            m_writequeue.Enqueue(msg);
+            FlushWriteQueue();
         }
     };
 }

@@ -110,6 +110,7 @@ namespace WolframeClient
             {
                 m_lasterror = "protocol error";
                 setState(State.Terminated);
+                m_answerDelegate(new Answer { msgtype = Answer.MsgType.Error, id = rq.id, obj = m_lasterror });
                 return;
             }
             else if (Protocol.IsCommand("ANSWER", ln))
@@ -119,6 +120,7 @@ namespace WolframeClient
                 {
                     m_lasterror = "server closed connection";
                     setState(State.Terminated);
+                    m_answerDelegate(new Answer { msgtype = Answer.MsgType.Error, id = rq.id, obj = m_lasterror });
                     return;
                 }
                 ln = m_connection.ReadLine();
@@ -126,6 +128,7 @@ namespace WolframeClient
                 {
                     m_lasterror = "server closed connection";
                     setState(State.Terminated);
+                    m_answerDelegate(new Answer { msgtype = Answer.MsgType.Error, id = rq.id, obj = m_lasterror });
                     return;
                 }
                 else if (Protocol.IsCommand("OK", ln))
@@ -141,6 +144,7 @@ namespace WolframeClient
                 {
                     m_lasterror = "protocol error";
                     setState(State.Terminated);
+                    m_answerDelegate(new Answer { msgtype = Answer.MsgType.Error, id = rq.id, obj = m_lasterror });
                     return;
                 }
             }
@@ -152,31 +156,39 @@ namespace WolframeClient
             setState( State.Running);
             while (m_state == State.Running)
             {
+                /*[-]*/Console.WriteLine("Wait signal");
                 m_signal.WaitOne();
+                /*[-]*/Console.WriteLine("Got signal");
                 bool hasRequests = true;
 
                 while (m_state == State.Running && (hasRequests || m_connection.HasReadData()))
                 {
-                    if (m_connection.HasReadData())
+                    while (m_connection.HasReadData())
                     {
                         try
                         {
+                            /*[-]*/Console.WriteLine("Start handle answer");
                             HandleAnswer( m_pendingqueue.Dequeue());
+                            /*[-]*/Console.WriteLine("Done handle answer");
                         }
                         catch (InvalidOperationException)
                         {}
                         if (m_state != State.Running) break;
                     }
+                    m_connection.IssueReadRequest();
                     try
                     {
+                        /*[-]*/Console.WriteLine("Start send request");
                         Request rq = m_requestqueue.Dequeue();
                         byte[] rqdata = Serializer.getRequestContent(rq.doctype, rq.root, rq.objtype, rq.obj);
-                        m_connection.WriteRequest( rq.command, rqdata);
+                        /*[-]*/Console.WriteLine("Write request");
+                        m_connection.WriteRequest(rq.command, rqdata);
                         m_pendingqueue.Enqueue( new PendingRequest{ id=rq.id, answertype=rq.answertype});
-                        m_connection.IssueReadRequest();
+                        /*[-]*/Console.WriteLine("Done send request");
                     }
                     catch (InvalidOperationException)
                     {
+                        /*[-]*/Console.WriteLine("Request queue empty");
                         hasRequests = false;
                     }
                 }
@@ -192,7 +204,7 @@ namespace WolframeClient
         {
             if (m_thread != null)
             {
-                m_state = State.Shutdown;
+                setState( State.Shutdown);
                 m_signal.Set();
                 m_thread.Join();
             }
@@ -304,8 +316,16 @@ namespace WolframeClient
                 try
                 {
                     Request rq = m_requestqueue.Dequeue();
-                    Answer answer = new Answer { msgtype = Answer.MsgType.Error, id = rq.id, obj = "connection closed" };
-                    m_answerDelegate( answer);
+                    if (m_lasterror != null)
+                    {
+                        string msg = "session terminated: " + m_lasterror;
+                        m_answerDelegate( new Answer { msgtype = Answer.MsgType.Error, id = rq.id, obj = msg });
+                    }
+                    else
+                    {
+                        string msg = "session terminated";
+                        m_answerDelegate( new Answer { msgtype = Answer.MsgType.Error, id = rq.id, obj = msg});
+                    }
                 }
                 catch (InvalidOperationException)
                 {
