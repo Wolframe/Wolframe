@@ -104,8 +104,6 @@ local_clean:
 	@-erase tests\*.exp 2>NUL
 	@-erase tests\*.lib 2>NUL
 	@-erase /q tests\temp 2>NUL
-	@-erase tests\gtestReport.txt 2>NUL
-	@-erase tprocHandlerTest*.xml 2>NUL
 
 local_distclean:
 

@@ -136,12 +136,13 @@ private:
 }}//namespace
 
 #define WOLFRAME_GTEST_REPORT(prgfilename,reportfilename)\
-	boost::filesystem::path testdir = boost::filesystem::system_complete( argv[0]).parent_path();\
-	boost::filesystem::path refpath( testdir / "gtestReport.txt");\
-	::testing::UnitTest& unit_test = *::testing::UnitTest::GetInstance();\
-	::testing::TestEventListeners& listeners = unit_test.listeners();\
-	listeners.Append( new _Wolframe::wtest::TestReportListener(prgfilename,reportfilename));\
-	::testing::GTEST_FLAG(output) = "xml:./";
+	if( getenv( "WOLFRAME_TESTREPORT_DIR" ) != NULL ) {\
+		boost::filesystem::path testdir = boost::filesystem::system_complete( getenv( "WOLFRAME_TESTREPORT_DIR" ));\
+		boost::filesystem::path refpath( testdir / "gtestReport.txt");\
+		::testing::UnitTest& unit_test = *::testing::UnitTest::GetInstance();\
+		::testing::TestEventListeners& listeners = unit_test.listeners();\
+		listeners.Append( new _Wolframe::wtest::TestReportListener(prgfilename,reportfilename));\
+	}
 
 #endif
 

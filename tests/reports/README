@@ -1,0 +1,12 @@
+Used by automatic build enironment, target 'testreport'.
+
+Also set
+
+GTEST_OUTPUT=xml:this_directory
+
+and 
+
+WOLFRAME_TESTREPORT_DIR=xml:this_directory
+
+in order to produce the overall test reports and the defailed gtest XML
+test reports.

@@ -114,8 +114,6 @@ local_all: $(CPP_BINS)
 
 local_clean:
 	-rm -rf tests/temp
-	-rm -f tests/gtestReport.txt
-	-rm -f tprocHandlerTest*.xml
 
 local_distclean:
 
