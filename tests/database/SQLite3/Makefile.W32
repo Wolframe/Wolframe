@@ -46,8 +46,6 @@ local_all:
 
 local_clean:
 	@-erase test.db garbage.db 2>NUL
-	@-erase gtestReport.txt 2>NUL
-	@-erase sqliteUnit*.xml 2>NUL
 
 local_distclean:
 

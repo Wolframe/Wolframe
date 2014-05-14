@@ -39,8 +39,6 @@ boostLocaleTest.exe: boostLocaleTest.obj
 local_all:
 
 local_clean:
-	@-erase gtestReport.txt 2>NUL
-	@-erase boostLocaleTest*.xml 2>NUL
 
 local_distclean:
 

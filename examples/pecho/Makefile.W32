@@ -77,8 +77,6 @@ local_clean:
 	@-erase tests\*.pdb 2>NUL
 	@-erase tests\*.exp 2>NUL
 	@-erase tests\*.lib 2>NUL
-	@-erase tests\gtestReport.txt 2>NUL
-	@-erase pechoHandlerTest*.xml 2>NUL
 
 local_distclean:
 

@@ -45,8 +45,6 @@ local_all:
 
 local_clean:
 	@-erase *.dll >NUL 2>NUL
-	@-erase gtestReport.txt 2>NUL
-	@-erase testCompileTDL*.xml 2>NUL
 
 local_distclean:
 
