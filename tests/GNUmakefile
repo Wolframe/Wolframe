@@ -175,7 +175,8 @@ local_clean:
 	-rm -f *.o
 	-rm -f logTest.log
 	-rm -rf temp
-
+	-rm -f reports/gtestReport.txt reports/*.xml
+	
 local_distclean:
 
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/wtest"

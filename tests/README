@@ -1,6 +1,6 @@
 3rdParty           - simple tests testing the 3rdparty software alone
 expect             - expect tests
-tools              - reporting tools
+reporting          - reporting tools, gtest report XMLs and gtestReport.txt
 database           - database unit tests, only testing the database
                     module code
 compileTDL         - TDL compiler tests

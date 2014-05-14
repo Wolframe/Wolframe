@@ -66,8 +66,11 @@ test: all
 	  (set -e; $(MAKE) -C $$d test || exit 1); done)
 
 .PHONY: testreport
-testreport: test
-	@tests/tools/generateTestReport.sh
+testreport:
+	WOLFRAME_TESTREPORT_DIR=$(PWD)/tests/reports/ \
+	GTEST_OUTPUT=xml:$(PWD)/tests/reports/ \
+		$(MAKE) test
+	@tests/reports/generateTestReport.sh
 
 .PHONY: longtest
 longtest: test

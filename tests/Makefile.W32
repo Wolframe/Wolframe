@@ -137,6 +137,7 @@ local_clean:
 	@-erase logTest.log 2>NUL
 	@-erase /s /q temp >NUL 2>NUL
 	@-rmdir temp 2>NUL
+	@-erase reports\gtestReport.txt reports\*.xml 2>NUL
 
 local_distclean:
 

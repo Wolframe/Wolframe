@@ -9,7 +9,7 @@ echo ""
 
 echo "0" > _nof_total_tests
 echo "0" > _nof_total_errors
-find . -name gtestReport.txt -exec cat {} \; | sort | \
+cat tests/reports/gtestReport.txt | \
 while read test status nof_tests nof_errors; do
 	nof_total_tests=`cat _nof_total_tests`
 	nof_total_errors=`cat _nof_total_errors`
@@ -32,16 +32,17 @@ echo ""
 echo "Test results"
 echo "------------"
 echo ""
-find . -name gtestReport.txt -exec cat {} \; | sort
+cat tests/reports/gtestReport.txt | sort
+echo ""
 
 echo "Test result details"
 echo "-------------------"
 echo ""
 
 echo "<testresults>"
-find . -name gtestReport.txt -exec cat {} \; | sort | \
+cat tests/reports/gtestReport.txt | sort | \
 while read test status nof_tests nof_errors; do
-	find . -name "$test*.xml" -exec cat {} \;
+	cat tests/reports/$test.xml | grep -v '<?xml '
 done
 echo "</testresults>"
 
