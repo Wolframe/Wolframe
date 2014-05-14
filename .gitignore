@@ -106,6 +106,12 @@ docs/WolfBook.html
 docs/WolfBook.pdf
 docs/doxygen/
 docs/html-webpage/
+docs/Installation.html
+docs/Installation.pdf
+docs/InstallationUnix.html
+docs/InstallationUnix.txt
+docs/html-installation/*.html
+docs/html/
 src/primary.db
 tests/3rdParty/libxslt/testlibxslt1
 tests/testMethodMemberPointerTemplate
