@@ -331,7 +331,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 /// Parse incoming data..
 void wolframeConnection::networkInput( const void* begin, std::size_t bytesTransferred )
 {
-	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
+	LOG_DATA << "network input got " << bytesTransferred << " bytes";
 	if ( _Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA)
 	{
 		logNetwork( "read", begin, bytesTransferred);

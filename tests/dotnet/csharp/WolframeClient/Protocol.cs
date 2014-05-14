@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Threading;
 
 namespace WolframeClient
 {
@@ -16,7 +17,7 @@ namespace WolframeClient
             int nextidx = 0;
             int size = msg.Length;
 
-            while (0 < (idx = Array.IndexOf(msg, '\n', idx)))
+            while (0 < (idx = Array.IndexOf(msg, (byte)'\n', idx)))
             {
                 if (msg.Length > idx && msg[idx + 1] == '.')
                 {
@@ -29,7 +30,7 @@ namespace WolframeClient
             }
             rt = new byte[size];
 
-            while (0 < (nextidx = Array.IndexOf(msg, '\n', idx)))
+            while (0 < (nextidx = Array.IndexOf(msg, (byte)'\n', idx)))
             {
                 Array.Copy(msg, idx, rt, rtidx, nextidx - idx + 1);
                 rtidx = rtidx + nextidx - idx + 1;
@@ -56,7 +57,7 @@ namespace WolframeClient
             int nextidx = 0;
             int size = msg.Length;
 
-            while (0 < (idx = Array.IndexOf(msg, '\n', idx)))
+            while (0 < (idx = Array.IndexOf(msg, (byte)'\n', idx)))
             {
                 if (msg.Length > idx && msg[idx + 1] == '.')
                 {
@@ -69,7 +70,7 @@ namespace WolframeClient
             }
             rt = new byte[size];
 
-            while (0 < (nextidx = Array.IndexOf(msg, '\n', idx)))
+            while (0 < (nextidx = Array.IndexOf(msg, (byte)'\n', idx)))
             {
                 Array.Copy(msg, idx, rt, rtidx, nextidx - idx + 1);
                 rtidx = rtidx + nextidx - idx + 1;
@@ -103,75 +104,130 @@ namespace WolframeClient
 
         public class Buffer
         {
-            public int pos { get; set; }
-            public int size { get; set; }
-            public byte[] ar { get; set; }
+            private int m_pos;
+            private int m_size;
+            private byte[] m_ar;
+            private string m_lasterror;
+            private bool m_eod;
+            private Stream m_src;
+            AutoResetEvent m_dataready;
 
-            public Buffer( int initsize)
+            public Buffer( Stream src_, int initsize)
             {
-                pos = 0;
-                size = 0;
-                ar = new byte[initsize];
+                m_pos = 0;
+                m_size = 0;
+                m_ar = new byte[initsize];
+                m_lasterror = null;
+                m_eod = false;
+                m_src = src_;
+                m_dataready = new AutoResetEvent(false); ;
             }
 
             private void Grow()
             {
-                if (ar == null || ar.Length == 0)
+                if (m_ar == null || m_ar.Length == 0)
                 {
-                    ar = new byte[4096];
-                    size = 0;
-                    pos = 0;
+                    m_ar = new byte[4096];
+                    m_size = 0;
+                    m_pos = 0;
                 }
                 else
                 {
                     byte[] new_ar = null;
-                    if (pos > ar.Length / 2)
+                    if (m_pos > m_ar.Length / 2)
                     {
-                        new_ar = new byte[ar.Length];
+                        new_ar = new byte[m_ar.Length];
                     }
                     else
                     {
-                        new_ar = new byte[ar.Length * 2];
+                        new_ar = new byte[m_ar.Length * 2];
                     }
-                    Array.Copy(ar, pos, new_ar, 0, size - pos);
-                    size = size - pos;
-                    pos = 0;
+                    Array.Copy(m_ar, m_pos, new_ar, 0, m_size - m_pos);
+                    m_size = m_size - m_pos;
+                    m_pos = 0;
                 }
             }
 
             private byte[] GetMessageFromBuffer(int idx, int nextidx)
             {
-                byte[] msg = new byte[idx-pos];
-                Array.Copy(ar, pos, msg, 0, idx-pos);
-                pos = nextidx;
+                byte[] msg = new byte[idx-m_pos];
+                Array.Copy(m_ar, m_pos, msg, 0, idx-m_pos);
+                m_pos = nextidx;
                 return msg;
             }
 
-            private int FetchData(Stream src, int idx)
+            private void EndRead(IAsyncResult ev)
             {
-                if (size >= ar.Length)
+                m_lasterror = null;
+                try
                 {
-                    int searchpos = idx - pos;
+                    int nof_bytes_read = m_src.EndRead(ev);
+                    if (nof_bytes_read > 0)
+                    {
+                        m_size = m_size + nof_bytes_read;
+                    }
+                    else if (nof_bytes_read == 0)
+                    {
+                        m_eod = true;
+                    }
+                }
+                catch (IOException e)
+                {
+                    m_lasterror = e.Message;
+                }
+                m_dataready.Set();
+            }
+
+            private int FetchData( int idx)
+            {
+                m_lasterror = null;
+                if (m_size >= m_ar.Length)
+                {
+                    int searchpos = idx - m_pos;
                     Grow();
                     idx = searchpos;
                 }
-                int nof_bytes_read = src.Read(ar, size, ar.Length - size);
-                if (nof_bytes_read <= 0) return -1;
-                size = size + nof_bytes_read;
+                var ev = m_src.BeginRead(m_ar, m_size, m_ar.Length - m_size, EndRead, null);
+                if (!ev.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(2)))
+                {
+                    throw new Exception("Timeout in socket stream read");
+                }
+                m_dataready.WaitOne();
+                if (m_lasterror != null)
+                {
+                    string err = m_lasterror;
+                    m_lasterror = null;
+                    throw new Exception("Read failed: " + m_lasterror);
+                }
+                if (m_eod)
+                {
+                    return -1;
+                }
                 return idx;
             }
 
-            public byte[] FetchLine(Stream src)
+            public void IssueRead(AutoResetEvent signal_)
             {
-                int idx = Array.IndexOf(ar, '\n',pos,size-pos);
+                var ev = m_src.BeginRead(m_ar, m_size, m_ar.Length - m_size,
+                                        delegate(IAsyncResult r)
+                                        {
+                                            m_size = m_size + m_src.EndRead(r);
+                                            AutoResetEvent sg = r.AsyncState as AutoResetEvent;
+                                            sg.Set();
+                                        }, signal_);
+            }
+
+            public byte[] FetchLine()
+            {
+                int idx = Array.IndexOf(m_ar, (byte)'\n',m_pos,m_size-m_pos);
+                int newidx = m_size;
                 while (idx == -1)
                 {
-                    int newidx = FetchData(src, idx);
+                    newidx = FetchData( newidx);
                     if (newidx == -1) return null;
-                    idx = newidx;
-                    idx = Array.IndexOf(ar, '\n', idx, size - idx);
+                    idx = Array.IndexOf(m_ar, (byte)'\n', newidx, m_size - newidx);
                 }
-                if (idx > pos && ar[idx - 1] == '\r')
+                if (idx > m_pos && m_ar[idx - 1] == '\r')
                 {
                     return GetMessageFromBuffer(idx - 1, idx + 1);
                 }
@@ -181,32 +237,32 @@ namespace WolframeClient
                 }
             }
 
-            public byte[] FetchContent(Stream src)
+            public byte[] FetchContent()
             {
-                int idx = Array.IndexOf(ar, '\n', pos, size - pos);
-                while (idx >= pos)
+                int idx = Array.IndexOf(m_ar, (byte)'\n', m_pos, m_size - m_pos);
+                while (idx >= m_pos)
                 {
                     int nextidx = -1;
-                    if (size >= idx + 2)
+                    if (m_size >= idx + 2)
                     {
-                        if (ar[idx + 1] == '.')
+                        if (m_ar[idx + 1] == (byte)'.')
                         {
-                            if (ar[idx + 2] == '\n')
+                            if (m_ar[idx + 2] == (byte)'\n')
                             {
                                 nextidx = idx + 3;
                             }
-                            else if (ar[idx + 2] == '\r')
+                            else if (m_ar[idx + 2] == (byte)'\r')
                             {
-                                if (size >= idx + 3)
+                                if (m_size >= idx + 3)
                                 {
-                                    if (ar[idx + 3] == '\n')
+                                    if (m_ar[idx + 3] == (byte)'\n')
                                     {
                                         nextidx = idx + 4;
                                     }
                                 }
                                 else
                                 {
-                                    int newidx = FetchData(src, idx);
+                                    int newidx = FetchData(idx);
                                     if (newidx == -1) return null;
                                     idx = newidx;
                                 }
@@ -215,7 +271,7 @@ namespace WolframeClient
                     }
                     else
                     {
-                        int newidx = FetchData(src, idx);
+                        int newidx = FetchData(idx);
                         if (newidx == -1) return null;
                         idx = newidx;
                     }
@@ -223,14 +279,14 @@ namespace WolframeClient
                     {
                         return Protocol.UnescapeLFdot(GetMessageFromBuffer(idx, nextidx));
                     }
-                    idx = Array.IndexOf(ar, '\n', idx+1, size - idx-1);
+                    idx = Array.IndexOf(m_ar, (byte)'\n', idx+1, m_size - idx-1);
                 }
                 return null;
             }
 
             public bool HasData()
             {
-                return (pos < size);
+                return (m_pos < m_size);
             }
         };
     }

@@ -10,15 +10,6 @@ namespace WolframeClient
 {
     class Session
     {
-        private string m_banner;
-        private Connection m_connection;
-        private string m_authmethod;
-        private AutoResetEvent m_signal;
-        private string m_lasterror;
-        private enum State { Init, Running, Shutdown, Terminated };
-        private State m_state;
-        private object m_stateLock;
-
         public class Request
         {
             public int id { get; set; }
@@ -45,25 +36,34 @@ namespace WolframeClient
         };
         public delegate void AnswerDelegate( Answer msg);
 
+        private string m_banner;
+        private AutoResetEvent m_signal;
+        private Connection m_connection;
+        private string m_authmethod;
+        private string m_lasterror;
+        private enum State { Init, Running, Shutdown, Terminated };
+        private State m_state;
+        private object m_stateLock;
         private Queue<Request> m_requestqueue;
         private Queue<PendingRequest> m_pendingqueue;
         private AnswerDelegate m_answerDelegate;
         private Thread m_thread;
 
-        Session(string ip, int port, string authmethod, AnswerDelegate answerDelegate)
+        public Session(string ip, int port, string authmethod, AnswerDelegate answerDelegate)
         {
             m_banner = null;
+            m_signal = new AutoResetEvent(false);
             m_connection = new Connection(ip, port, m_signal);
             m_authmethod = authmethod;
 
-            m_signal = new AutoResetEvent(false);
             m_lasterror = null;
             m_state = State.Init;
             m_stateLock = new object();
-            m_answerDelegate = answerDelegate;
 
             m_requestqueue = new Queue<Request>();
             m_pendingqueue = new Queue<PendingRequest>();
+
+            m_answerDelegate = answerDelegate;
             m_thread = null;
         }
 
@@ -148,6 +148,7 @@ namespace WolframeClient
 
         private void Run()
         {
+            // This method is called by Connect in an own thread
             setState( State.Running);
             while (m_state == State.Running)
             {
@@ -187,6 +188,16 @@ namespace WolframeClient
             }
         }
 
+        public void Shutdown()
+        {
+            if (m_thread != null)
+            {
+                m_state = State.Shutdown;
+                m_signal.Set();
+                m_thread.Join();
+            }
+        }
+
         public bool Connect()
         {
             try
@@ -198,7 +209,7 @@ namespace WolframeClient
                     m_lasterror = "server closed connection";
                     return false;
                 }
-                m_banner = Encoding.UTF8.GetString(m_connection.ReadLine());
+                m_banner = Encoding.UTF8.GetString(ln);
                 ln = m_connection.ReadLine();
                 if (ln == null) 
                 {
@@ -227,6 +238,7 @@ namespace WolframeClient
                         {
                             ///... authorized (MECHS NONE)
                             m_thread = new Thread( new ThreadStart(this.Run));
+                            m_thread.Start();
                             return true;
                         }
                         else if (Protocol.IsCommand("ERR", ln))

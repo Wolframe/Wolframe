@@ -17,7 +17,6 @@ namespace WolframeClient
         private NetworkStream m_stream;
         private Protocol.Buffer m_buffer;
         private bool m_readRequestIssued;
-        private object m_readRequestIssuedLock;
         private AutoResetEvent m_signal;
 
         public Connection(string ipadr, int port, AutoResetEvent signal)
@@ -26,9 +25,8 @@ namespace WolframeClient
             m_port = port;
             m_client = new TcpClient();
             m_stream = null;
-            m_buffer = new Protocol.Buffer( 4096);
+            m_buffer = null;
             m_readRequestIssued = false;
-            m_readRequestIssuedLock = new object();
             m_signal = signal;
         }
 
@@ -36,6 +34,7 @@ namespace WolframeClient
         {
             m_client.Connect( m_address, m_port);
             m_stream = m_client.GetStream();
+            m_buffer = new Protocol.Buffer( m_stream, 4096);
         }
 
         public void Close()
@@ -50,49 +49,30 @@ namespace WolframeClient
 
         public bool HasReadData()
         {
-            return m_buffer.HasData();
+            return m_buffer != null && m_buffer.HasData();
         }
 
         public byte[] ReadLine()
         {
-            return m_buffer.FetchLine(m_stream);
+            if (m_buffer == null) throw new Exception("read line failed");
+            m_readRequestIssued = false;
+            return m_buffer.FetchLine();
         }
 
         public byte[] ReadContent()
         {
-            return m_buffer.FetchContent(m_stream);
-        }
-
-        public void ReadCallback(IAsyncResult result)
-        {
-            int readlen = m_stream.EndRead(result);
-            if (readlen <= 0)
-            {
-                Close();
-            }
-            else
-            {
-                if (m_buffer.pos + readlen <= m_buffer.size)
-                {
-                    m_buffer.pos = m_buffer.pos + readlen;
-                }
-                lock (m_readRequestIssuedLock)
-                {
-                    m_readRequestIssued = false;
-                }
-                m_signal.Set();
-            }
+            if (m_buffer == null) throw new Exception("read content failed");
+            m_readRequestIssued = false;
+            return m_buffer.FetchContent();
         }
 
         public void IssueReadRequest()
         {
-            lock (m_readRequestIssuedLock)
+            if (m_buffer == null) throw new Exception("issue read request failed");
+            if (!m_readRequestIssued)
             {
-                if (!m_readRequestIssued)
-                {
-                    m_stream.BeginRead(m_buffer.ar, m_buffer.pos, m_buffer.size - m_buffer.pos, ReadCallback, null);
-                    m_readRequestIssued = true;
-                }
+                m_buffer.IssueRead(m_signal);
+                m_readRequestIssued = true;
             }
         }
 
@@ -102,6 +82,7 @@ namespace WolframeClient
 
             Byte[] msg = utf8.GetBytes(ln);
             byte[] msg_with_EoLn = new byte[msg.Length + 2];
+            Array.Copy( msg, msg_with_EoLn, msg.Length);
             msg_with_EoLn[msg.Length + 0] = (byte)'\r';
             msg_with_EoLn[msg.Length + 1] = (byte)'\n';
             m_stream.Write(msg_with_EoLn, 0, msg_with_EoLn.Length);
@@ -125,12 +106,12 @@ namespace WolframeClient
             Array.Copy(hdr, 0, msg, 0, hdr.Length);
             Array.Copy(content_encoded, 0, msg, hdr.Length, content_encoded.Length);
             int EoDidx = content_encoded.Length + hdr.Length;
-            content_encoded[EoDidx + 0] = (byte)'\r';
-            content_encoded[EoDidx + 1] = (byte)'\n';
-            content_encoded[EoDidx + 2] = (byte)'.';
-            content_encoded[EoDidx + 3] = (byte)'\r';
-            content_encoded[EoDidx + 4] = (byte)'\n';
-            m_stream.Write(content_encoded, 0, content_encoded.Length);
+            msg[EoDidx + 0] = (byte)'\r';
+            msg[EoDidx + 1] = (byte)'\n';
+            msg[EoDidx + 2] = (byte)'.';
+            msg[EoDidx + 3] = (byte)'\r';
+            msg[EoDidx + 4] = (byte)'\n';
+            m_stream.Write( msg, 0, msg.Length);
         }
     };
 }
