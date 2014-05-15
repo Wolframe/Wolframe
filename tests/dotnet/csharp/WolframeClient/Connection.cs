@@ -12,68 +12,64 @@ namespace WolframeClient
 {
     class Connection
     {
+        public delegate void DataReadyDelegate();
+
         private IPAddress m_address;
         private int m_port;
         private TcpClient m_client;
         private NetworkStream m_stream;
         private Protocol.Buffer m_buffer;
-        private bool m_readRequestIssued;
-        private AutoResetEvent m_signal;
         private Queue<byte[]> m_writequeue;
         private bool m_waitwrite;
         private object m_waitwriteLock;
+        private bool m_waitread;
+        private object m_waitreadLock;
+        private bool m_eofread;
 
-        public Connection(string ipadr, int port, AutoResetEvent signal)
+        public Connection(string ipadr, int port)
         {
             m_address = IPAddress.Parse( ipadr);
             m_port = port;
             m_client = new TcpClient();
             m_stream = null;
             m_buffer = null;
-            m_readRequestIssued = false;
-            m_signal = signal;
             m_writequeue = new Queue<byte[]>();
             m_waitwrite = false;
             m_waitwriteLock = new object();
+            m_waitread = false;
+            m_waitreadLock = new object();
+            m_eofread = false;
         }
 
         public void Connect()
         {
             m_client.Connect( m_address, m_port);
             m_stream = m_client.GetStream();
-            m_buffer = new Protocol.Buffer( m_stream, 4096);
+            m_buffer = new Protocol.Buffer(m_stream, 4096, IssueReadRequest);
+            IssueReadRequest();
         }
 
         public void Close()
         {
-            if (m_stream != null)
-            {
-                m_stream.Close();
-                m_stream = null;
-            }
+            m_buffer.Close();
+            m_stream.Close();
             m_client.Close();
         }
 
         public bool HasReadData()
         {
-            return m_buffer != null && m_buffer.HasData();
+            return (m_buffer.HasData() || m_client.Available > 0);
         }
 
         public byte[] ReadLine()
         {
-            if (m_buffer == null) throw new Exception("read line failed");
-            m_readRequestIssued = false;
             byte[] ln = m_buffer.FetchLine();
-            /*[-]*/Console.WriteLine("+++ LINE {0}", Encoding.UTF8.GetString(ln));
             return ln;
         }
 
         public byte[] ReadContent()
         {
-            if (m_buffer == null) throw new Exception("read content failed");
-            m_readRequestIssued = false;
             byte[] msg = m_buffer.FetchContent();
-            Console.WriteLine("+++ MSG");
             return msg;
         }
 
@@ -105,13 +101,53 @@ namespace WolframeClient
             }
         }
 
+        public void EndReadCallback(IAsyncResult ev)
+        {
+            int nof_bytes_read;
+            if (m_stream.CanRead)
+            {
+                nof_bytes_read = m_stream.EndRead(ev);
+            }
+            else
+            {
+                nof_bytes_read = 0;
+            }
+            if (nof_bytes_read == 0)
+            {
+                m_eofread = true;
+                m_buffer.PushReadChunk(new Protocol.ReadChunk { ar = null, size = 0 } /*EOF*/);
+            }
+            else
+            {
+                m_buffer.PushReadChunk(new Protocol.ReadChunk { ar = ev.AsyncState as byte[], size = nof_bytes_read });
+            }
+            if (nof_bytes_read != 0)
+            {
+                m_waitread = false;
+                IssueReadRequest();
+            }
+        }
+
         public void IssueReadRequest()
         {
-            if (m_buffer == null) throw new Exception("issue read request failed");
-            if (!m_readRequestIssued)
+            int readsize = 2048;
+            if (m_client.Available > readsize)
             {
-                m_buffer.IssueRead(m_signal);
-                m_readRequestIssued = true;
+                readsize = m_client.Available;
+            }
+            bool doRead = false;
+            lock (m_waitreadLock)
+            {
+                if (!m_waitread && !m_eofread)
+                {
+                    doRead = true;
+                    m_waitread = true;
+                }
+            }
+            if (doRead)
+            {
+                byte[] buf = new byte[readsize];
+                m_stream.BeginRead(buf, 0, buf.Length, EndReadCallback, buf);
             }
         }
 

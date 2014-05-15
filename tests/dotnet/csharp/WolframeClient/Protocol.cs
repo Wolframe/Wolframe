@@ -112,25 +112,43 @@ namespace WolframeClient
             return Encoding.UTF8.GetString(msg, cmd.Length + 1, msg.Length - cmd.Length -1);
         }
 
+        public class ReadChunk
+        {
+            public byte[] ar { get; set; }
+            public int size { get; set; }
+        };
+
         public class Buffer
         {
+            public delegate void IssueReadRequest();
+
             private int m_pos;
+            private int m_scanidx;
             private int m_size;
             private byte[] m_ar;
-            private string m_lasterror;
-            private bool m_eod;
-            private Stream m_src;
-            AutoResetEvent m_dataready;
+            private object m_arLock;
+            private bool m_endOfData;
+            private IssueReadRequest m_issueReadRequestCallback;
+            private AutoResetEvent m_readqueue_signal;
+            private Queue<ReadChunk> m_readqueue;
 
-            public Buffer( Stream src_, int initsize)
+            public Buffer(Stream src_, int initsize, IssueReadRequest issueReadRequestCallback_)
             {
                 m_pos = 0;
+                m_scanidx = 0;
                 m_size = 0;
                 m_ar = new byte[initsize];
-                m_lasterror = null;
-                m_eod = false;
-                m_src = src_;
-                m_dataready = new AutoResetEvent(false); ;
+                m_arLock = new object();
+                m_endOfData = false;
+                m_issueReadRequestCallback = issueReadRequestCallback_;
+                m_readqueue_signal = new AutoResetEvent(false);
+                m_readqueue = new Queue<ReadChunk>();
+            }
+
+            public void Close()
+            {
+                m_endOfData = true;
+                m_readqueue_signal.Set();
             }
 
             private void Grow()
@@ -140,6 +158,7 @@ namespace WolframeClient
                     m_ar = new byte[4096];
                     m_size = 0;
                     m_pos = 0;
+                    m_scanidx = 0;
                 }
                 else
                 {
@@ -154,161 +173,197 @@ namespace WolframeClient
                     }
                     Array.Copy(m_ar, m_pos, new_ar, 0, m_size - m_pos);
                     m_size = m_size - m_pos;
+                    m_scanidx -= m_pos;
                     m_pos = 0;
+                    m_ar = new_ar;
                 }
             }
 
-            private byte[] GetMessageFromBuffer(int idx, int nextidx)
+            private void EatReadChunk(ReadChunk rc)
             {
-                byte[] msg = new byte[idx-m_pos];
-                Array.Copy(m_ar, m_pos, msg, 0, idx-m_pos);
-                m_pos = nextidx;
-                return msg;
-            }
-
-            private void EndReadCallback(IAsyncResult ev)
-            {
-                m_lasterror = null;
-                try
+                lock (m_arLock)
                 {
-                    int nof_bytes_read = m_src.EndRead(ev);
-                    if (nof_bytes_read > 0)
+                    while (m_size + rc.size > m_ar.Length)
                     {
-                        m_size = m_size + nof_bytes_read;
+                        Grow();
                     }
-                    else if (nof_bytes_read == 0)
+                    Array.Copy(rc.ar, 0, m_ar, m_size, rc.size);
+                    m_size += rc.size;
+                }
+            }
+
+            private byte[] GetMessageFromBuffer( int endOfDataMarkerSize)
+            {
+                lock (m_arLock)
+                {
+                    byte[] msg = new byte[m_scanidx - m_pos];
+                    Array.Copy(m_ar, m_pos, msg, 0, m_scanidx - m_pos);
+                    m_scanidx += endOfDataMarkerSize;
+                    m_pos = m_scanidx;
+                    return msg;
+                }
+            }
+
+            private bool FetchReadQueueElem()
+            {
+                    bool rt = false;
+                    try
                     {
-                        m_eod = true;
-                    }
-                }
-                catch (IOException e)
-                {
-                    m_lasterror = e.Message;
-                }
-                m_dataready.Set();
-            }
-
-            private int FetchData( int idx)
-            {
-                m_lasterror = null;
-                if (m_size >= m_ar.Length)
-                {
-                    int searchpos = idx - m_pos;
-                    Grow();
-                    idx = searchpos;
-                }
-                var ev = m_src.BeginRead(m_ar, m_size, m_ar.Length - m_size, EndReadCallback, null);
-                if (!ev.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(2)))
-                {
-                    throw new Exception("Timeout in socket stream read");
-                }
-                m_dataready.WaitOne();
-                if (m_lasterror != null)
-                {
-                    string err = m_lasterror;
-                    m_lasterror = null;
-                    throw new Exception("Read failed: " + m_lasterror);
-                }
-                if (m_eod)
-                {
-                    return -1;
-                }
-                return idx;
-            }
-
-            public void IssueRead(AutoResetEvent signal_)
-            {
-                m_src.BeginRead(
-                    m_ar, m_size, m_ar.Length - m_size,
-                    delegate(IAsyncResult r)
-                    {
-                        m_size = m_size + m_src.EndRead(r);
-                        AutoResetEvent sg = r.AsyncState as AutoResetEvent;
-                        sg.Set();
-                    }, signal_);
-            }
-
-            private int findEndOfLine( int idx)
-            {
-                idx = Array.IndexOf(m_ar, (byte)'\n', idx, m_size - idx);
-                int newidx = m_size;
-                while (idx == -1)
-                {
-                    newidx = FetchData(newidx);
-                    if (newidx == -1) return -1;
-                    idx = Array.IndexOf(m_ar, (byte)'\n', newidx, m_size - newidx);
-                }
-                return idx;
-            }
-
-            public byte[] FetchLine()
-            {
-                int idx = findEndOfLine( m_pos);
-                if (idx == -1) return null;
-                if (idx > m_pos && m_ar[idx - 1] == '\r')
-                {
-                    return GetMessageFromBuffer(idx - 1, idx + 1);
-                }
-                else
-                {
-                    return GetMessageFromBuffer(idx, idx + 1);
-                }
-            }
-
-            public byte[] FetchContent()
-            {
-                int idx = findEndOfLine( m_pos);
-                while (idx > 0)
-                {
-                    int nextidx = -1;
-                    if (m_size >= idx + 2)
-                    {
-                        if (m_ar[idx + 1] == (byte)'.')
+                        ReadChunk rc = m_readqueue.Dequeue();
+                        if (rc.ar == null)
                         {
-                            if (m_ar[idx + 2] == (byte)'\n')
+                            m_endOfData = true;
+                        }
+                        else
+                        {
+                            EatReadChunk(rc);
+                            rt = true;
+                        }
+                    }
+                    catch (InvalidOperationException)
+                    {}
+                    return rt;
+            }
+
+            private bool FetchData()
+            {
+                int nofChunksRead = 0;
+                while (!m_endOfData)
+                {
+                    if (FetchReadQueueElem())
+                    {
+                        nofChunksRead += 1;
+                    }
+                    else if (nofChunksRead != 0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        m_issueReadRequestCallback();
+                        m_readqueue_signal.WaitOne();
+                    }
+                }
+                return false/*EOF*/;
+            }
+
+            private bool FindEndOfLine()
+            {
+                do
+                {
+                    lock (m_arLock)
+                    {
+                        int idx = Array.IndexOf(m_ar, (byte)'\n', m_scanidx, m_size - m_scanidx);
+                        if (idx >= 0)
+                        {
+                            m_scanidx = idx;
+                            return true;
+                        }
+                    }
+                } while (FetchData());
+
+                return false;
+            }
+
+            private int ScanEndOfData()
+            {
+                int eodsize = -1;
+                lock (m_arLock)
+                {
+                    if (m_size >= m_scanidx + 2)
+                    {
+                        if (m_ar[m_scanidx + 1] == (byte)'.')
+                        {
+                            if (m_ar[m_scanidx + 2] == (byte)'\n')
                             {
-                                nextidx = idx + 3;
+                                eodsize = 3;
                             }
-                            else if (m_ar[idx + 2] == (byte)'\r')
+                            else if (m_ar[m_scanidx + 2] == (byte)'\r')
                             {
-                                if (m_size >= idx + 3)
+                                if (m_size >= m_scanidx + 3)
                                 {
-                                    if (m_ar[idx + 3] == (byte)'\n')
+                                    if (m_ar[m_scanidx + 3] == (byte)'\n')
                                     {
-                                        nextidx = idx + 4;
+                                        eodsize = 4;
                                     }
                                 }
                                 else
                                 {
-                                    int newidx = FetchData(idx);
-                                    if (newidx == -1) return null;
-                                    idx = newidx;
+                                    eodsize = 0;
                                 }
                             }
                         }
                     }
                     else
                     {
-                        int newidx = FetchData(idx);
-                        if (newidx == -1) return null;
-                        idx = newidx;
+                        eodsize = 0;
                     }
-                    if (nextidx > 0)
+                }
+                return eodsize;
+            }
+
+/* PUBLIC METHODS: */
+            public bool HasData()
+            {
+                lock (m_arLock)
+                {
+                    if (m_pos < m_size) return true;
+                }
+                return FetchReadQueueElem();
+            }
+
+            public byte[] FetchLine()
+            {
+                if (FindEndOfLine())
+                {
+                    int eolnsize = 1;
+                    lock (m_arLock)
                     {
-                        if (idx > m_pos && m_ar[idx - 1] == '\r')
+                        if (m_scanidx > m_pos && m_ar[m_scanidx - 1] == '\r')
                         {
-                            idx = idx - 1;
+                            m_scanidx -= 1;
+                            eolnsize += 1;
                         }
-                        return Protocol.UnescapeLFdot( GetMessageFromBuffer(idx, nextidx));
                     }
-                    idx = findEndOfLine( idx +1);
+                    return GetMessageFromBuffer(eolnsize);
                 }
                 return null;
             }
 
-            public bool HasData()
+            public byte[] FetchContent()
             {
-                return (m_pos < m_size);
+                while (FindEndOfLine())
+                {
+                    int eodsize;
+                    do
+                    {
+                        eodsize = ScanEndOfData();
+                    }
+                    while (eodsize == 0 && FetchData());
+
+                    if (eodsize == 0)
+                    {
+                        return null;
+                    }
+                    else if (eodsize == -1)
+                    {
+                        lock (m_arLock)
+                        {
+                            m_scanidx++;
+                        }
+                    }
+                    else
+                    {
+                        return Protocol.UnescapeLFdot( GetMessageFromBuffer( eodsize));
+                    }
+                }
+                return null;
+            }
+
+            public void PushReadChunk(ReadChunk rc)
+            {
+                m_readqueue.Enqueue(rc);
+                m_readqueue_signal.Set();
             }
         };
     }
