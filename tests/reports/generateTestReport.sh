@@ -3,6 +3,13 @@
 echo "Test report"
 echo "-----------"
 echo ""
+echo "Configuration"
+echo "-------------"
+echo ""
+echo "WOLFRAME_TESTREPORT_DIR: $WOLFRAME_TESTREPORT_DIR"
+echo "GTEST_OUTPUT: $GTEST_OUTPUT"
+echo ""
+
 echo "Summary"
 echo "-------"
 echo ""
@@ -42,7 +49,9 @@ echo ""
 echo "<testresults>"
 cat tests/reports/gtestReport.txt | sort | \
 while read test status nof_tests nof_errors; do
+	echo "<restresult name=\"$test\">"
 	cat tests/reports/$test.xml | grep -v '<?xml '
+	echo "</restresult>"
 done
 echo "</testresults>"
 
