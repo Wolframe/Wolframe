@@ -1447,6 +1447,12 @@ examples/demo/tutorial/step1/server/tutorial.conf
 examples/demo/tutorial/step2/server/tutorial.conf
 examples/demo/tutorial/step3/client/tutorial.conf
 examples/demo/tutorial/step3/server/tutorial.conf
+examples/demo/tutorial/step4a/README
+examples/demo/tutorial/step4a/server/Customer.tdl
+examples/demo/tutorial/step4a/server/data.sql
+examples/demo/tutorial/step4a/server/schema.sql
+examples/demo/tutorial/step4a/server/tutorial.conf
+examples/demo/tutorial/step4a/server/tutorial-windows.conf
 examples/demo/tutorial/step4/client/CustomerListRequest.netcat
 examples/demo/tutorial/step4/client/tutorial.conf
 examples/demo/tutorial/step4/server/Customer.tdl
@@ -2542,6 +2548,9 @@ tests/modules/tests/mod_test/mod_test.hpp
 tests/PBKDF2test.cpp
 tests/poolTest.cpp
 tests/protocolArgumentParsing.cpp
+tests/README
+tests/reports/generateTestReport.sh
+tests/reports/README
 tests/resolvePathTest.cpp
 tests/simpleFormCompiler/data/test1.simpleform
 tests/simpleFormCompiler/GNUmakefile
@@ -3300,6 +3309,7 @@ tests/wolfilter/template/README
 TODO
 wtest/cleanInput.cpp
 wtest/GNUmakefile
+wtest/include/wtest/pseudoRandomGenForTests.hpp
 wtest/include/wtest/testDescription.hpp
 wtest/include/wtest/testHandlerTemplates.hpp
 wtest/include/wtest/testModules.hpp
