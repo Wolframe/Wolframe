@@ -49,9 +49,9 @@ echo ""
 echo "<testresults>"
 cat tests/reports/gtestReport.txt | sort | \
 while read test status nof_tests nof_errors; do
-	echo "<restresult name=\"$test\">"
+	echo "<testresult name=\"$test\">"
 	cat tests/reports/$test.xml | grep -v '<?xml '
-	echo "</restresult>"
+	echo "</testresult>"
 done
 echo "</testresults>"
 
