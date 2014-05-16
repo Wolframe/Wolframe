@@ -30,34 +30,30 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file system/FSMinterface.hpp
-/// Finite State Machine interface
+/// \file AAAA/authenticator.hpp
+/// Authenticator FSM interface definition
 ///
 
-#ifndef _FSM_INTERFACE_HPP_INCLUDED
-#define _FSM_INTERFACE_HPP_INCLUDED
-
-#include <cstddef>		// for std::size_t
+#ifndef _AUTHENTICATOR_HPP_INCLUDED
+#define _AUTHENTICATOR_HPP_INCLUDED
 
 namespace _Wolframe {
 
-/// Finite State Machine interface
-class FSM
+/// Authenticator FSM interface
+class Authenticator
 {
 public:
 	/// Finite State Machine operation
 	class Operation
 	{
 	public:
-		enum FSMoperation	{
+		enum Operation	{
 			READ,
 			WRITE,
 			CLOSE
 		};
 	private:
-//		FSMoperation	m_op;
-//		const void*	m_data;
-//		std::size_t	m_dataSize;
+
 	};
 
 	/// Finite State Machine signals
@@ -85,4 +81,4 @@ public:
 
 } // namespace _Wolframe
 
-#endif // _FSM_INTERFACE_HPP_INCLUDED
+#endif // _AUTHENTICATOR_HPP_INCLUDED

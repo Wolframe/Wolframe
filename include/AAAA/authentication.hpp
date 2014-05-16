@@ -42,26 +42,15 @@
 
 #include "user.hpp"
 #include "database/DBprovider.hpp"
-#include "system/FSMinterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
-
-// interface for the authentication global mechanism
-class Authenticator : public _Wolframe::FSM
-{
-public:
-	virtual ~Authenticator()		{}
-
-	// close the authenticator and destroy all sensible data
-	virtual void close()			{}
-};
 
 
 /// AuthenticatorInstance
 /// This is the base class for authenticator slices implementations
 /// An authenticator has (usually) several authenticator instances
-class AuthenticatorInstance : public _Wolframe::FSM
+class AuthenticatorInstance
 {
 public:
 	enum AuthProtocol	{

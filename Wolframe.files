@@ -1587,6 +1587,7 @@ include/AAAA/AAAAinformation.hpp
 include/AAAA/AAAAprovider.hpp
 include/AAAA/audit.hpp
 include/AAAA/authentication.hpp
+include/AAAA/authenticator.hpp
 include/AAAA/authorization.hpp
 include/AAAA/CRAM.hpp
 include/AAAA/password.hpp
@@ -1725,7 +1726,6 @@ include/standardConfigs.hpp
 include/system/connectionEndpoint.hpp
 include/system/connectionHandler.hpp
 include/system/errorCode.hpp
-include/system/FSMinterface.hpp
 include/system/globalRngGen.hpp
 include/system/objectPool.hpp
 include/system/randomGenerator.hpp
