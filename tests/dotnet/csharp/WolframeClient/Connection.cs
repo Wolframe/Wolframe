@@ -6,34 +6,146 @@ using System.Net.Sockets;
 using System.Collections;
 using System.Threading;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using WolframeClient;
 
 namespace WolframeClient
 {
     class Connection
+        : ConnectionInterface
     {
-        public delegate void DataReadyDelegate();
-
         private IPAddress m_address;
         private int m_port;
         private TcpClient m_client;
         private NetworkStream m_stream;
+        private object m_streamLock;
         private Protocol.Buffer m_buffer;
-        private Queue<byte[]> m_writequeue;
-        private bool m_waitwrite;
+        private ConcurrentQueue<byte[]> m_writequeue;
+        private volatile bool m_waitwrite;
         private object m_waitwriteLock;
-        private bool m_waitread;
+        private volatile bool m_waitread;
         private object m_waitreadLock;
-        private bool m_eofread;
+        private volatile bool m_eofread;
 
+        private void EndWriteCallback(IAsyncResult ev)
+        {
+            lock (m_streamLock)
+            {
+                if (m_stream.CanWrite)
+                {
+                    m_stream.EndWrite(ev);
+                }
+            }
+            byte[] msg = null;
+            bool doBeginWrite = false;
+
+            lock (m_waitwriteLock)
+            {
+                doBeginWrite = m_writequeue.TryDequeue(out msg);
+                m_waitwrite = doBeginWrite;
+            }
+            lock (m_streamLock)
+            {
+                if (doBeginWrite && m_stream.CanWrite)
+                {
+                    m_stream.BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
+                }
+            }
+        }
+
+        private void FlushWriteQueue()
+        {
+            byte[] msg = null;
+            bool doBeginWrite = false;
+            lock (m_waitwriteLock)
+            {
+                if (!m_waitwrite)
+                {
+                    doBeginWrite = m_writequeue.TryDequeue(out msg);
+                    m_waitwrite = doBeginWrite;
+                }
+            }
+            if (doBeginWrite)
+            {
+                lock (m_streamLock)
+                {
+                    if (m_stream.CanWrite)
+                    {
+                        m_stream.BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
+                    }
+                }
+            }
+        }
+
+        private void EndReadCallback(IAsyncResult ev)
+        {
+            int nof_bytes_read;
+            lock (m_streamLock)
+            {
+                if (m_stream.CanRead)
+                {
+                    nof_bytes_read = m_stream.EndRead(ev);
+                }
+                else
+                {
+                    nof_bytes_read = 0;
+                }
+            }
+            lock (m_waitreadLock)
+            {
+                m_waitread = false;
+            }
+            if (nof_bytes_read == 0)
+            {
+                m_eofread = true;
+                m_buffer.PushReadChunk(new Protocol.ReadChunk { ar = null, size = 0 } /*EOF*/);
+            }
+            else
+            {
+                m_buffer.PushReadChunk(new Protocol.ReadChunk { ar = ev.AsyncState as byte[], size = nof_bytes_read });
+            }
+        }
+
+        public void IssueReadRequest()
+        {
+            int readsize = 2048;
+            int available = m_client.Available;
+            if (available > readsize)
+            {
+                readsize = available;
+            }
+            bool doRead = false;
+            lock (m_waitreadLock)
+            {
+                if (!m_waitread && !m_eofread)
+                {
+                    doRead = true;
+                    m_waitread = true;
+                }
+            }
+            if (doRead)
+            {
+                byte[] buf = new byte[readsize];
+                lock (m_streamLock)
+                {
+                    if (m_stream.CanRead)
+                    {
+                        m_stream.BeginRead(buf, 0, buf.Length, EndReadCallback, buf);
+                    }
+                }
+            }
+        }
+
+/* PUBLIC METHODS: */
         public Connection(string ipadr, int port)
         {
-            m_address = IPAddress.Parse( ipadr);
+            m_address = IPAddress.Parse(ipadr);
             m_port = port;
             m_client = new TcpClient();
             m_stream = null;
+            m_streamLock = new object();
             m_buffer = null;
-            m_writequeue = new Queue<byte[]>();
+            m_writequeue = new ConcurrentQueue<byte[]>();
             m_waitwrite = false;
             m_waitwriteLock = new object();
             m_waitread = false;
@@ -43,7 +155,7 @@ namespace WolframeClient
 
         public void Connect()
         {
-            m_client.Connect( m_address, m_port);
+            m_client.Connect(m_address, m_port);
             m_stream = m_client.GetStream();
             m_buffer = new Protocol.Buffer(m_stream, 4096, IssueReadRequest);
             IssueReadRequest();
@@ -52,7 +164,10 @@ namespace WolframeClient
         public void Close()
         {
             m_buffer.Close();
-            m_stream.Close();
+            lock (m_streamLock)
+            {
+                m_stream.Close();
+            }
             m_client.Close();
         }
 
@@ -71,84 +186,6 @@ namespace WolframeClient
         {
             byte[] msg = m_buffer.FetchContent();
             return msg;
-        }
-
-        public void EndWriteCallback(IAsyncResult ev)
-        {
-            m_stream.EndWrite(ev);
-            lock (m_waitwriteLock)
-            {
-                m_waitwrite = false;
-            }
-            FlushWriteQueue();
-        }
-
-        public void FlushWriteQueue()
-        {
-            lock (m_waitwriteLock)
-            {
-                if (!m_waitwrite)
-                {
-                    try
-                    {
-                        byte[] msg = m_writequeue.Dequeue();
-                        m_stream.BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
-                        m_waitwrite = true;
-                    }
-                    catch (InvalidOperationException)
-                    {}
-                }
-            }
-        }
-
-        public void EndReadCallback(IAsyncResult ev)
-        {
-            int nof_bytes_read;
-            if (m_stream.CanRead)
-            {
-                nof_bytes_read = m_stream.EndRead(ev);
-            }
-            else
-            {
-                nof_bytes_read = 0;
-            }
-            if (nof_bytes_read == 0)
-            {
-                m_eofread = true;
-                m_buffer.PushReadChunk(new Protocol.ReadChunk { ar = null, size = 0 } /*EOF*/);
-            }
-            else
-            {
-                m_buffer.PushReadChunk(new Protocol.ReadChunk { ar = ev.AsyncState as byte[], size = nof_bytes_read });
-            }
-            if (nof_bytes_read != 0)
-            {
-                m_waitread = false;
-                IssueReadRequest();
-            }
-        }
-
-        public void IssueReadRequest()
-        {
-            int readsize = 2048;
-            if (m_client.Available > readsize)
-            {
-                readsize = m_client.Available;
-            }
-            bool doRead = false;
-            lock (m_waitreadLock)
-            {
-                if (!m_waitread && !m_eofread)
-                {
-                    doRead = true;
-                    m_waitread = true;
-                }
-            }
-            if (doRead)
-            {
-                byte[] buf = new byte[readsize];
-                m_stream.BeginRead(buf, 0, buf.Length, EndReadCallback, buf);
-            }
         }
 
         public void WriteLine(string ln)

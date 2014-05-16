@@ -33,17 +33,17 @@ namespace WolframeClient
 {
     class Program
     {
-        static void ProcessAnswer(Session.Answer answer)
+        static void ProcessAnswer(Answer answer)
         {
             switch (answer.msgtype)
             {
-                case Session.Answer.MsgType.Error:
+                case Answer.MsgType.Error:
                     Console.WriteLine("Session error in answer {0}: #{1} {2}", answer.id, answer.number, (string)answer.obj);
                     break;
-                case Session.Answer.MsgType.Failure:
+                case Answer.MsgType.Failure:
                     Console.WriteLine("Request error in answer {0}: #{1} {2}", answer.id, answer.number, (string)answer.obj);
                     break;
-                case Session.Answer.MsgType.Result:
+                case Answer.MsgType.Result:
                     switch ((AnswerId)answer.id)
                     {
                         case AnswerId.CustomerInsertedObj:
@@ -74,7 +74,7 @@ namespace WolframeClient
                 Session session = new Session("127.0.0.1", 7661, "NONE", ProcessAnswer);
                 if (!session.Connect())
                 {
-                    Console.WriteLine("Error in connect of session: {0}", session.getLastError());
+                    Console.WriteLine("Error in connect of session: {0}", session.GetLastError());
                 }
                 else
                 {
@@ -84,12 +84,21 @@ namespace WolframeClient
                     int ii = 0;
                     for (ii = 0; ii < 100; ++ii)
                     {
-                        Session.Request request = new Session.Request { id = answerid, command = "Insert", number = ii, doctype = "Customer", root = "customer", obj = customer, objtype = typeof(Customer), answertype = typeof(CustomerInserted) };
+                        Request request = new Request { id = answerid, command = "Insert", number = ii, doctype = "Customer", root = "customer", obj = customer, objtype = typeof(Customer), answertype = typeof(CustomerInserted) };
                         session.IssueRequest(request);
                     }
-                    Console.WriteLine("End...");
-                    Thread.Sleep(20000);
+                    while (session.NofOpenRequests() > 0)
+                    {
+                        Thread.Sleep(200);
+                    }
+                    Console.WriteLine("All done");
                     session.Shutdown();
+                    session.Close();
+                    string err = session.GetLastError();
+                    if (err != null)
+                    {
+                        Console.WriteLine("Error in session: {0}", err);
+                    }
                 }
             }
             catch (Exception e)
