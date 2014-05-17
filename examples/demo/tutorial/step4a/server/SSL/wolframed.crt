@@ -1,0 +1,72 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 13 (0xd)
+    Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=XY, ST=Wolfland, L=Wolfville, O=Wolf Pack Ltd, OU=Dinowolves Group, CN=Wolf CA/emailAddress=CA@wolframe.net
+        Validity
+            Not Before: Nov 28 11:10:11 2013 GMT
+            Not After : Nov 28 11:10:11 2014 GMT
+        Subject: C=XY, ST=Wolfland, L=Wolfville, O=Wolf Pack Ltd, OU=Dinowolves Group, CN=Wolframe Server/emailAddress=server@wolframe.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:c6:93:32:24:7a:7c:21:d9:88:27:c2:2c:5d:bd:
+                    12:7a:c9:9b:cf:eb:d6:25:ec:be:b8:64:c6:fa:87:
+                    14:c9:a0:18:98:ae:a3:0b:0d:d4:74:1c:98:50:77:
+                    7b:61:4e:fc:fa:69:87:80:f5:9d:03:8d:c7:da:27:
+                    90:e3:75:d6:c0:37:b4:59:ca:6a:65:a1:b7:de:3b:
+                    2a:9a:42:e8:bd:1c:6c:0c:7d:64:c9:ca:3f:b0:e2:
+                    df:ee:59:fd:c3:fa:96:65:71:c3:c8:55:3e:f7:e1:
+                    51:59:e1:eb:84:93:22:de:d4:a9:ad:bb:86:75:06:
+                    82:bb:90:12:9e:24:e8:5b:bd
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                48:FF:9F:C1:6D:A0:E0:4C:4A:79:0E:7E:6A:F6:CC:9E:1F:41:F4:21
+            X509v3 Authority Key Identifier: 
+                keyid:4E:BA:C7:16:FD:E0:E8:D2:F8:E8:33:2C:8B:60:04:9C:17:E8:78:BD
+
+    Signature Algorithm: sha1WithRSAEncryption
+         a8:05:3a:79:8b:43:51:9f:a9:4e:e4:f1:81:ad:30:a3:45:b7:
+         e7:38:cd:2f:a9:56:9b:78:25:a7:e6:87:c0:9c:ec:dd:99:7e:
+         92:01:1b:90:cf:f0:ab:bb:bd:fb:dc:a5:6f:81:58:b4:6b:f1:
+         85:31:4e:ee:b8:ce:21:ff:be:16:47:25:26:69:00:fe:9a:36:
+         3d:54:e3:3e:e4:0c:8d:43:44:32:1b:a6:59:7b:1f:0f:7f:1a:
+         b1:64:aa:38:c1:f8:a6:08:85:19:10:be:fc:48:ec:56:cc:85:
+         04:ca:f7:45:96:97:80:78:dd:57:04:a9:80:9c:70:00:fb:ec:
+         f2:8d:08:e9:24:42:52:e4:48:12:7b:c3:dd:24:bb:5f:1b:f0:
+         28:68:3b:b5:72:6e:72:c3:49:dd:05:ed:85:2b:42:e8:f2:c4:
+         0a:d8:d0:7d:b3:0f:18:2a:a1:ab:38:ad:40:7f:bd:05:36:f3:
+         0b:03:0d:e6:4c:0d:fe:a6:15:b4:bd:e9:49:b1:bb:57:37:0d:
+         9d:59:cf:0c:db:d0:05:61:ff:13:4c:d5:07:f1:ae:53:5c:54:
+         e7:ca:fc:14:51:40:a7:7d:cd:e3:6e:6c:a8:69:e2:0b:d5:9a:
+         13:e4:bc:96:9a:b8:3f:8b:30:e2:29:95:ac:c8:d7:0a:49:46:
+         00:e7:ad:44
+-----BEGIN CERTIFICATE-----
+MIIDsjCCApqgAwIBAgIBDTANBgkqhkiG9w0BAQUFADCBmTELMAkGA1UEBhMCWFkx
+ETAPBgNVBAgTCFdvbGZsYW5kMRIwEAYDVQQHEwlXb2xmdmlsbGUxFjAUBgNVBAoT
+DVdvbGYgUGFjayBMdGQxGTAXBgNVBAsTEERpbm93b2x2ZXMgR3JvdXAxEDAOBgNV
+BAMTB1dvbGYgQ0ExHjAcBgkqhkiG9w0BCQEWD0NBQHdvbGZyYW1lLm5ldDAeFw0x
+MzExMjgxMTEwMTFaFw0xNDExMjgxMTEwMTFaMIGlMQswCQYDVQQGEwJYWTERMA8G
+A1UECBMIV29sZmxhbmQxEjAQBgNVBAcTCVdvbGZ2aWxsZTEWMBQGA1UEChMNV29s
+ZiBQYWNrIEx0ZDEZMBcGA1UECxMQRGlub3dvbHZlcyBHcm91cDEYMBYGA1UEAxMP
+V29sZnJhbWUgU2VydmVyMSIwIAYJKoZIhvcNAQkBFhNzZXJ2ZXJAd29sZnJhbWUu
+bmV0MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDGkzIkenwh2YgnwixdvRJ6
+yZvP69Yl7L64ZMb6hxTJoBiYrqMLDdR0HJhQd3thTvz6aYeA9Z0DjcfaJ5DjddbA
+N7RZymplobfeOyqaQui9HGwMfWTJyj+w4t/uWf3D+pZlccPIVT734VFZ4euEkyLe
+1Kmtu4Z1BoK7kBKeJOhbvQIDAQABo3sweTAJBgNVHRMEAjAAMCwGCWCGSAGG+EIB
+DQQfFh1PcGVuU1NMIEdlbmVyYXRlZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUSP+f
+wW2g4ExKeQ5+avbMnh9B9CEwHwYDVR0jBBgwFoAUTrrHFv3g6NL46DMsi2AEnBfo
+eL0wDQYJKoZIhvcNAQEFBQADggEBAKgFOnmLQ1GfqU7k8YGtMKNFt+c4zS+pVpt4
+Jafmh8Cc7N2ZfpIBG5DP8Ku7vfvcpW+BWLRr8YUxTu64ziH/vhZHJSZpAP6aNj1U
+4z7kDI1DRDIbpll7Hw9/GrFkqjjB+KYIhRkQvvxI7FbMhQTK90WWl4B43VcEqYCc
+cAD77PKNCOkkQlLkSBJ7w90ku18b8ChoO7VybnLDSd0F7YUrQujyxArY0H2zDxgq
+oas4rUB/vQU28wsDDeZMDf6mFbS96Umxu1c3DZ1Zzwzb0AVh/xNM1QfxrlNcVOfK
+/BRRQKd9zeNubKhp4gvVmhPkvJaauD+LMOIplazI1wpJRgDnrUQ=
+-----END CERTIFICATE-----

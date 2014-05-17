@@ -12,6 +12,19 @@ namespace WolframeClient
     public class Session
         :SessionInterface
     {
+        public class Configuration
+            :Connection.Configuration
+        {
+            public string banner { get; set; }
+            public string authmethod { get; set; }
+
+            public Configuration()
+            {
+                banner = null;
+                authmethod = null;
+            }
+        };
+
         public delegate void AnswerCallback(Answer msg);
 
         private class PendingRequest
@@ -20,10 +33,8 @@ namespace WolframeClient
             public int number { get; set; }
             public Type answertype { get; set; }
         };
-
-        private string m_banner;
+        private Configuration m_config;
         private Connection m_connection;
-        private string m_authmethod;
         private volatile string m_lasterror;
         public enum State { Init, Running, Shutdown, Terminated };
         private volatile State m_state;
@@ -215,11 +226,10 @@ namespace WolframeClient
         }
 
 /* PUBLIC METHODS: */
-        public Session(string ip, int port, string authmethod, AnswerCallback answerCallback_)
+        public Session( Configuration config_, AnswerCallback answerCallback_)
         {
-            m_banner = null;
-            m_connection = new Connection(ip, port);
-            m_authmethod = authmethod;
+            m_config = config_;
+            m_connection = new Connection( m_config);
 
             m_lasterror = null;
             m_state = State.Init;
@@ -267,7 +277,12 @@ namespace WolframeClient
                     SetState(State.Terminated, "server closed connection");
                     return false;
                 }
-                m_banner = Encoding.UTF8.GetString(ln);
+                string banner = Encoding.UTF8.GetString(ln);
+                if (m_config.banner != null && m_config.banner != banner)
+                {
+                    SetState(State.Terminated, "unknown service connected (banner does not match).");
+                    return false;
+                }
                 ln = m_connection.ReadLine();
                 if (ln == null) 
                 {
@@ -285,7 +300,14 @@ namespace WolframeClient
                     }
                     else if (Protocol.IsCommand("MECHS", ln))
                     {
-                        m_connection.WriteLine("MECH " + m_authmethod);
+                        if (m_config.authmethod != null)
+                        {
+                            m_connection.WriteLine("MECH " + m_config.authmethod);
+                        }
+                        else
+                        {
+                            m_connection.WriteLine("MECH NONE");
+                        }
                         ln = m_connection.ReadLine();
                         if (ln == null) 
                         {

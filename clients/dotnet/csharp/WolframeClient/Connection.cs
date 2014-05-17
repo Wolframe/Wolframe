@@ -3,6 +3,9 @@ using System.Text;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Authentication;
 using System.Collections;
 using System.Threading;
 using System.Collections.Generic;
@@ -14,11 +17,27 @@ namespace WolframeClient
     public class Connection
         : ConnectionInterface
     {
-        private string m_host;
+        public class Configuration
+        {
+            public string host { get; set; }
+            public int port { get; set; }
+            public string sslcert { get; set; }
+            public string password { get; set; }
+
+            public Configuration()
+            {
+                host = "localhost";
+                port = 7661;
+                sslcert = null;
+                password = null;
+            }
+        };
+
+        private Configuration m_config;
         private IPAddress[] m_addresses;
-        private int m_port;
         private TcpClient m_client;
         private NetworkStream m_stream;
+        private SslStream m_sslstream;
         private object m_streamLock;
         private Protocol.Buffer m_buffer;
         private ConcurrentQueue<byte[]> m_writequeue;
@@ -137,14 +156,34 @@ namespace WolframeClient
             }
         }
 
-/* PUBLIC METHODS: */
-        public Connection( string host_, int port_)
+        public static bool ValidateServerCertificate(
+              object sender,
+              X509Certificate certificate,
+              X509Chain chain,
+              SslPolicyErrors sslPolicyErrors)
         {
-            m_host = host_;
+            return true;
+        }
+
+        private void OpenSslStream()
+        {
+            // Create an SSL stream that will close the client's stream.
+            m_sslstream = new SslStream( m_client.GetStream(), 
+                false, 
+                new RemoteCertificateValidationCallback (ValidateServerCertificate), 
+                null
+                );
+            m_sslstream.AuthenticateAsClient(m_config.sslcert/*server name == certificate name*/);
+        }
+
+/* PUBLIC METHODS: */
+        public Connection( Configuration config_)
+        {
+            m_config = config_;
             m_addresses = null;
-            m_port = port_;
             m_client = new TcpClient();
             m_stream = null;
+            m_sslstream = null;
             m_streamLock = new object();
             m_buffer = null;
             m_writequeue = new ConcurrentQueue<byte[]>();
@@ -157,14 +196,14 @@ namespace WolframeClient
 
         public void Connect()
         {
-            m_addresses = Dns.GetHostAddresses( m_host);
+            m_addresses = Dns.GetHostAddresses( m_config.host);
             string err = null;
             int ii = 0;
             for (; ii<m_addresses.Length; ++ii)
             {
    	            try
 		        {
-                    m_client.Connect( m_addresses[ii], m_port);
+                    m_client.Connect(m_addresses[ii], m_config.port);
                     break;
                 }
                 catch (Exception e)
