@@ -104,6 +104,10 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	mandir=/opt/csw/share/man
 check_for_errors
 
+WOLFRAME_TESTREPORT_DIR=$PKGBUILD/BUILD/wolframe-$VERSION/tests/reports/
+GTEST_OUTPUT=xml:$PKGBUILD/BUILD/wolframe-$VERSION/tests/reports/
+export WOLFRAME_TESTREPORT_DIR
+export GTEST_OUTPUT
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	LDFLAGS='-Wl,-R/opt/csw/lib -Wl,-R/opt/csw/lib/wolframe' \
 	OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql LIBLT_DIR=/usr \
