@@ -46,7 +46,7 @@ package() {
 }
 
 check() {
-  cd ${srcdir}
+  cd ${srcdir}/$_gitname-build
 
   msg "Testing..."
   make test \
