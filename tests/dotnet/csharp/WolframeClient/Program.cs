@@ -71,7 +71,7 @@ namespace WolframeClient
         {
             try
             {
-                Session session = new Session("127.0.0.1", 7661, "NONE", ProcessAnswer);
+                Session session = new Session("localhost", 7661, "NONE", ProcessAnswer);
                 if (!session.Connect())
                 {
                     Console.WriteLine("Error in connect of session: {0}", session.GetLastError());

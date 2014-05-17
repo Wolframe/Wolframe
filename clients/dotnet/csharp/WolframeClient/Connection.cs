@@ -11,10 +11,11 @@ using WolframeClient;
 
 namespace WolframeClient
 {
-    class Connection
+    public class Connection
         : ConnectionInterface
     {
-        private IPAddress m_address;
+        private string m_host;
+        private IPAddress[] m_addresses;
         private int m_port;
         private TcpClient m_client;
         private NetworkStream m_stream;
@@ -137,10 +138,11 @@ namespace WolframeClient
         }
 
 /* PUBLIC METHODS: */
-        public Connection(string ipadr, int port)
+        public Connection( string host_, int port_)
         {
-            m_address = IPAddress.Parse(ipadr);
-            m_port = port;
+            m_host = host_;
+            m_addresses = null;
+            m_port = port_;
             m_client = new TcpClient();
             m_stream = null;
             m_streamLock = new object();
@@ -155,7 +157,37 @@ namespace WolframeClient
 
         public void Connect()
         {
-            m_client.Connect(m_address, m_port);
+            m_addresses = Dns.GetHostAddresses( m_host);
+            string err = null;
+            int ii = 0;
+            for (; ii<m_addresses.Length; ++ii)
+            {
+   	            try
+		        {
+                    m_client.Connect( m_addresses[ii], m_port);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    string errmsg = "Could not connect to " + m_addresses[ii].ToString() + ": " + e.Message;
+                    if (err == null)
+                    {
+                        err = errmsg;
+                    }
+                    else
+                    {
+                        err = err + "; " + errmsg;
+                    }
+                }
+            }
+            if (ii == m_addresses.Length)
+            {
+                if (err == null)
+                {
+                    err = "Could not resolve address";
+                }
+                throw new Exception(err);
+            }
             m_stream = m_client.GetStream();
             m_buffer = new Protocol.Buffer(m_stream, 4096, IssueReadRequest);
             IssueReadRequest();

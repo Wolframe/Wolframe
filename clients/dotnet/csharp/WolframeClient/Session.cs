@@ -9,9 +9,11 @@ using WolframeClient;
 
 namespace WolframeClient
 {
-    class Session
+    public class Session
         :SessionInterface
     {
+        public delegate void AnswerCallback(Answer msg);
+
         private class PendingRequest
         {
             public int id { get; set; }

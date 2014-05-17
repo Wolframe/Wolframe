@@ -219,3 +219,13 @@ qtcreator.xml
 3rdParty/textwolf/tests/tests/test_XMLPathSelect
 3rdParty/textwolf/tests/tests/test_XMLScanner
 tests/3rdParty/libhpdf/test2.raw
+clients/dotnet/csharp/WolframeClient/Properties/
+clients/dotnet/csharp/WolframeClient/obj/
+dotnet/WolframeProcessorProvider/WolframeProcessorProvider/bin/
+dotnet/WolframeProcessorProvider/WolframeProcessorProvider/obj/
+src/libwfshared/
+src/modules/cmdbind/dotnet/idl/
+tests/dotnet/csharp/Functions/bin/
+tests/dotnet/csharp/WolframeClient/Properties/
+tests/dotnet/csharp/WolframeClient/obj/
+tests/dotnet/interop/WolfCLR/WolfCLR/ipch/

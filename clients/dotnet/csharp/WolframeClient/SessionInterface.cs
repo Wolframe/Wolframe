@@ -6,7 +6,7 @@ using System.Text;
 /*
  * Wolframe Client Session Interface 
  * 
- * Session constructor: Session( string ipaddress, int port, string authmethod, AnswerCallback answerCallback)
+ * Session constructor: Session( string host, int port, string authmethod, AnswerCallback answerCallback)
  * The session class uses WolframeClient.Connection for the server connection
  */
 
@@ -37,8 +37,6 @@ namespace WolframeClient
         public int number { get; set; }                    ///< number of the request (as defined in Request)
         public object obj { get; set; }                    ///< answer object
     };
-    public delegate void AnswerCallback(Answer msg);
-
 
     interface SessionInterface
     {
