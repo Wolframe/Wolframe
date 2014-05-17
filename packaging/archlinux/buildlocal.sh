@@ -32,8 +32,8 @@ cp packaging/archlinux/* $PKGBUILD/BUILD/.
 
 # enable test reporting (Wolframe and GTest)
 sed -i "s/make test/make testreport/g" $PKGBUILD/BUILD/PKGBUILD
-export WOLFRAME_TESTREPORT_DIR=$PKGBUILD/BUILD/wolframe/src/wolframe-$VERSION/tests/reports/
-export GTEST_OUTPUT=xml:$PKGBUILD/BUILD/wolframe/src/wolframe-$VERSION/tests/reports/
+export WOLFRAME_TESTREPORT_DIR=$PKGBUILD/BUILD/src/wolframe-$VERSION/tests/reports/
+export GTEST_OUTPUT=xml:$PKGBUILD/BUILD/src/wolframe-$VERSION/tests/reports/
 
 cd $PKGBUILD/BUILD
 sed -i 's|"http://sourceforge.net/projects/wolframe/files/.*"|"${pkgname}-${pkgver}.tar.gz"|g' PKGBUILD
