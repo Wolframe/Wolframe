@@ -133,7 +133,7 @@ namespace WolframeClient
             private AutoResetEvent m_readqueue_signal;
             private ConcurrentQueue<ReadChunk> m_readqueue;
 
-            public Buffer(Stream src_, int initsize, IssueReadRequest issueReadRequestCallback_)
+            public Buffer( int initsize, IssueReadRequest issueReadRequestCallback_)
             {
                 m_pos = 0;
                 m_scanidx = 0;

@@ -47,15 +47,138 @@ namespace WolframeClient
         private object m_waitreadLock;
         private volatile bool m_eofread;
 
-        private void EndWriteCallback(IAsyncResult ev)
+        private void EndWrite(IAsyncResult ev)
         {
             lock (m_streamLock)
             {
-                if (m_stream.CanWrite)
+                if (m_sslstream != null)
                 {
-                    m_stream.EndWrite(ev);
+                    if (m_sslstream.CanWrite)
+                    {
+                        m_sslstream.EndWrite(ev);
+                    }
+                }
+                else
+                {
+                    if (m_stream.CanWrite)
+                    {
+                        m_stream.EndWrite(ev);
+                    }
                 }
             }
+        }
+
+        private int EndRead(IAsyncResult ev)
+        {
+            lock (m_streamLock)
+            {
+                if (m_sslstream != null)
+                {
+                    if (m_sslstream.CanRead)
+                    {
+                        return m_sslstream.EndRead(ev);
+                    }
+                }
+                else
+                {
+                    if (m_stream.CanRead)
+                    {
+                        return m_stream.EndRead(ev);
+                    }
+                }
+            }
+            return 0;
+        }
+
+        private void BeginWrite(byte[] msg_, int offset_, int size_, AsyncCallback callback_, object state_)
+        {
+            lock (m_streamLock)
+            {
+                if (m_sslstream != null)
+                {
+                    if (m_sslstream.CanWrite)
+                    {
+                        m_sslstream.BeginWrite(msg_, offset_, msg_.Length, callback_, state_);
+                    }
+                }
+                else
+                {
+                    if (m_stream.CanWrite)
+                    {
+                        m_stream.BeginWrite(msg_, offset_, msg_.Length, callback_, state_);
+                    }
+                }
+            }
+        }
+
+        private void BeginRead(byte[] msg_, int offset_, int size_, AsyncCallback callback_, object state_)
+        {
+            lock (m_streamLock)
+            {
+                if (m_sslstream != null)
+                {
+                    if (m_sslstream.CanRead)
+                    {
+                        m_sslstream.BeginRead(msg_, offset_, msg_.Length, callback_, state_);
+                    }
+                }
+                else
+                {
+                    if (m_stream.CanRead)
+                    {
+                        m_stream.BeginRead(msg_, offset_, msg_.Length, callback_, state_);
+                    }
+                }
+            }
+        }
+
+        private void CloseStream()
+        {
+            lock (m_streamLock)
+            {
+                if (m_sslstream != null)
+                {
+                    m_sslstream.Close();
+                }
+                else
+                {
+                    m_stream.Close();
+                }
+            }
+        }
+
+        public static bool ValidateServerCertificate(
+              object sender,
+              X509Certificate certificate,
+              X509Chain chain,
+              SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
+        }
+
+        private void OpenStream()
+        {
+            if (m_config.sslcert != null)
+            {
+                m_stream = null;
+                // Create an SSL stream that will close the client's stream.
+                m_sslstream = new SslStream(m_client.GetStream(),
+                    false,
+                    new RemoteCertificateValidationCallback(ValidateServerCertificate),
+                    null
+                    );
+                m_sslstream.AuthenticateAsClient(m_config.sslcert/*server name == certificate name*/);
+            }
+            else
+            {
+                m_stream = m_client.GetStream();
+                m_sslstream = null;
+            }
+        }
+
+        private void EndWriteCallback(IAsyncResult ev)
+        {
+            EndWrite(ev);
             byte[] msg = null;
             bool doBeginWrite = false;
 
@@ -64,12 +187,9 @@ namespace WolframeClient
                 doBeginWrite = m_writequeue.TryDequeue(out msg);
                 m_waitwrite = doBeginWrite;
             }
-            lock (m_streamLock)
+            if (doBeginWrite)
             {
-                if (doBeginWrite && m_stream.CanWrite)
-                {
-                    m_stream.BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
-                }
+                BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
             }
         }
 
@@ -87,30 +207,13 @@ namespace WolframeClient
             }
             if (doBeginWrite)
             {
-                lock (m_streamLock)
-                {
-                    if (m_stream.CanWrite)
-                    {
-                        m_stream.BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
-                    }
-                }
+                BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
             }
         }
 
         private void EndReadCallback(IAsyncResult ev)
         {
-            int nof_bytes_read;
-            lock (m_streamLock)
-            {
-                if (m_stream.CanRead)
-                {
-                    nof_bytes_read = m_stream.EndRead(ev);
-                }
-                else
-                {
-                    nof_bytes_read = 0;
-                }
-            }
+            int nof_bytes_read = EndRead(ev);
             lock (m_waitreadLock)
             {
                 m_waitread = false;
@@ -146,35 +249,10 @@ namespace WolframeClient
             if (doRead)
             {
                 byte[] buf = new byte[readsize];
-                lock (m_streamLock)
-                {
-                    if (m_stream.CanRead)
-                    {
-                        m_stream.BeginRead(buf, 0, buf.Length, EndReadCallback, buf);
-                    }
-                }
+                BeginRead(buf, 0, buf.Length, EndReadCallback, buf);
             }
         }
 
-        public static bool ValidateServerCertificate(
-              object sender,
-              X509Certificate certificate,
-              X509Chain chain,
-              SslPolicyErrors sslPolicyErrors)
-        {
-            return true;
-        }
-
-        private void OpenSslStream()
-        {
-            // Create an SSL stream that will close the client's stream.
-            m_sslstream = new SslStream( m_client.GetStream(), 
-                false, 
-                new RemoteCertificateValidationCallback (ValidateServerCertificate), 
-                null
-                );
-            m_sslstream.AuthenticateAsClient(m_config.sslcert/*server name == certificate name*/);
-        }
 
 /* PUBLIC METHODS: */
         public Connection( Configuration config_)
@@ -227,18 +305,15 @@ namespace WolframeClient
                 }
                 throw new Exception(err);
             }
-            m_stream = m_client.GetStream();
-            m_buffer = new Protocol.Buffer(m_stream, 4096, IssueReadRequest);
+            OpenStream();
+            m_buffer = new Protocol.Buffer( 4096, IssueReadRequest);
             IssueReadRequest();
         }
 
         public void Close()
         {
             m_buffer.Close();
-            lock (m_streamLock)
-            {
-                m_stream.Close();
-            }
+            CloseStream();
             m_client.Close();
         }
 
