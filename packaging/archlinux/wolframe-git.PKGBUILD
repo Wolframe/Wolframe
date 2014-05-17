@@ -9,7 +9,7 @@ arch=('i686' 'x86_64')
 url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
          'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'libharu'
-         'freeimage' 'python')
+         'python')
 makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 checkdepends=('expect' 'inetutils')
 backup=('etc/wolframe/wolframe.conf')
