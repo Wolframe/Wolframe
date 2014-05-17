@@ -1,0 +1,8 @@
+﻿
+You find the interface documentation of this client library in the modules
+   - ConnectionInterface.cs
+   - SessionInterface.cs
+
+and in the text file
+   - SerializerInterface.txt
+
