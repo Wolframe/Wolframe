@@ -64,6 +64,8 @@ cd $RPMBUILD/SPECS
 
 export CC='ccache gcc'
 export CXX='ccache g++'
+export WOLFRAME_TESTREPORT_DIR=$RPMBUILD/BUILD/wolframe-$VERSION/tests/reports/
+export GTEST_OUTPUT=xml:$RPMBUILD/BUILD/wolframe-$VERSION/tests/reports/
 rpmbuild -ba --define "$OSB_PLATFORM" wolframe.spec
 
 RET=$?
