@@ -2,6 +2,7 @@
 using System.Text;
 using System.IO;
 using System.Net;
+using System.Security;
 using System.Net.Sockets;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -22,7 +23,8 @@ namespace WolframeClient
             public string host { get; set; }
             public int port { get; set; }
             public string sslcert { get; set; }
-            public string password { get; set; }
+            public SecureString password { get; set; }
+            public bool validatecert { get; set; }
 
             public Configuration()
             {
@@ -30,6 +32,7 @@ namespace WolframeClient
                 port = 7661;
                 sslcert = null;
                 password = null;
+                validatecert = true;
             }
         };
 
@@ -153,6 +156,21 @@ namespace WolframeClient
               X509Chain chain,
               SslPolicyErrors sslPolicyErrors)
         {
+            Console.WriteLine("Validate certificate");
+            if (sslPolicyErrors == SslPolicyErrors.None)
+                return true;
+
+            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+            return false;
+        }
+
+        public static bool AcceptServerCertificate(
+              object sender,
+              X509Certificate certificate,
+              X509Chain chain,
+              SslPolicyErrors sslPolicyErrors)
+        {
+            //... accept any certificate
             return true;
         }
 
@@ -160,19 +178,27 @@ namespace WolframeClient
         {
             if (m_config.sslcert != null)
             {
+                X509Certificate cert = new X509Certificate2(m_config.sslcert, m_config.password);
+                X509CertificateCollection certColl = new X509CertificateCollection();
+                certColl.Add(cert);
+
                 m_stream = null;
-                // Create an SSL stream that will close the client's stream.
-                m_sslstream = new SslStream(m_client.GetStream(),
-                    false,
-                    new RemoteCertificateValidationCallback(ValidateServerCertificate),
-                    null
-                    );
-                m_sslstream.AuthenticateAsClient(m_config.sslcert/*server name == certificate name*/);
+                RemoteCertificateValidationCallback validateCallback;
+                if (m_config.validatecert)
+                {
+                    validateCallback = new RemoteCertificateValidationCallback(ValidateServerCertificate);
+                }
+                else
+                {
+                    validateCallback = new RemoteCertificateValidationCallback(AcceptServerCertificate);
+                }
+                m_sslstream = new SslStream(m_client.GetStream(), false, validateCallback, null);
+                m_sslstream.AuthenticateAsClient(m_config.host, certColl, SslProtocols.Tls, false);
             }
             else
             {
-                m_stream = m_client.GetStream();
                 m_sslstream = null;
+                m_stream = m_client.GetStream();
             }
         }
 

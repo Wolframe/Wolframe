@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Security;
 using WolframeClient;
 
 [XmlRoot("customer")]
@@ -71,7 +72,20 @@ namespace WolframeClient
         {
             try
             {
-                var cfg = new Session.Configuration{host="localhost",port=7661,authmethod="NONE"};
+                Console.WriteLine("Current path: {0}", Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString());
+                SecureString pw = new SecureString();
+                char[] pwar = {'w','o','l','f','r','a','m','e',(char)0};
+                for (int pi = 0; pwar[pi] != 0; ++pi) pw.AppendChar(pwar[pi]);
+
+                var cfg = new Session.Configuration
+                {
+                    host = "localhost",
+                    port = 7961,
+                    sslcert = "\\..\\..\\..\\..\\..\\..\\examples\\demo\\tutorial\\step4a\\server\\SSL\\wolframed.pfx",
+                    password = pw,
+                    validatecert = false,
+                    authmethod = "NONE"
+                };
                 Session session = new Session( cfg, ProcessAnswer);
                 if (!session.Connect())
                 {
