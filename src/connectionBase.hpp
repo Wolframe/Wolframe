@@ -226,11 +226,9 @@ protected:
 
 				if (e.value() == ERR_PACK(ERR_LIB_SSL, 0, SSL_R_SHORT_READ))
 				{
-					LOG_DEBUG << "Connection terminated abruptly by client. The SSL client did not close its connection properly (missing SSL_shutdown()); "
+					LOG_DEBUG << "Connection terminated abruptly by client, got no SSL_shutdown(); "
 							<< "error: " << e.value() << ", category: " << e.category().name()
 							<< ", message: " << err;
-					ns = ConnectionHandler::CONNECTION_RESET;
-					name = "CONNECTION RESET";
 					break;
 				}
 			}

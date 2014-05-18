@@ -72,6 +72,10 @@ namespace WolframeClient
         {
             try
             {
+                string relativeSslCertPath = "..\\..\\..\\..\\..\\..\\examples\\demo\\tutorial\\step4a\\server\\SSL\\wolframed.pfx";
+                string curpath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString();
+                string sslCertPath = Path.Combine( curpath, relativeSslCertPath).ToString();
+
                 SecureString pw = new SecureString();
                 char[] pwar = {'w','o','l','f','r','a','m','e',(char)0};
                 for (int pi = 0; pwar[pi] != 0; ++pi) pw.AppendChar(pwar[pi]);
@@ -80,7 +84,7 @@ namespace WolframeClient
                 {
                     host = "localhost",
                     port = 7961,
-                    sslcert = "\\..\\..\\..\\..\\..\\..\\examples\\demo\\tutorial\\step4a\\server\\SSL\\wolframed.pfx",
+                    sslcert = sslCertPath,
                     validatecert = false,
                     password = pw,
                     authmethod = "NONE"

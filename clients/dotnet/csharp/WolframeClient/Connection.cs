@@ -141,7 +141,11 @@ namespace WolframeClient
             {
                 if (m_sslstream != null)
                 {
+                    Console.WriteLine("+++ Closing SSL connection");
+                    Thread.Sleep(10000);
                     m_sslstream.Close();
+                    Console.WriteLine("+++ Closed SSL connection");
+                    Thread.Sleep(10000);
                 }
                 else
                 {
