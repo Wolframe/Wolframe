@@ -39,7 +39,7 @@
 
 #include "AAAA/AAAAprovider.hpp"
 #include "config/configurationBase.hpp"
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "AAAA/authorization.hpp"
 #include "AAAA/audit.hpp"
 
@@ -59,11 +59,23 @@ public:
 	~StandardAuthenticator();
 	void close();
 
-	// From the FSM interface
-	void receiveData( const void* data, std::size_t size );
-	const Operation nextOperation();
-	void signal( Signal event );
-	std::size_t dataLeft( const void*& begin );
+	/// Get the list of available mechs
+	virtual const std::list<std::string>& mechs() const;
+
+	/// Set the authentication mech
+	virtual bool setMech( const std::string& mech );
+
+	/// Input message
+	virtual void messageIn( const void* message, std::size_t size );
+
+	/// Output message
+	virtual int messageOut( const void** message, std::size_t size );
+
+	/// The current status of the authenticator
+	virtual Status status() const;
+
+	/// The authenticated user or NULL if not authenticated
+	virtual User* user() const;
 private:
 };
 

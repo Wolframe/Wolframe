@@ -37,7 +37,7 @@
 #ifndef _SASL_AUTHENTICATION_HPP_INCLUDED
 #define _SASL_AUTHENTICATION_HPP_INCLUDED
 
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "module/constructor.hpp"
 
 #include <string>

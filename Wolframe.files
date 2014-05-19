@@ -1393,6 +1393,13 @@ docs/Tutorial/Step9.xml
 docs/Tutorial/Steps.xml
 docs/Tutorial/Tutorial.ent
 docs/Tutorial.xml
+docs/UsingSSL/Introduction.xml
+docs/UsingSSL/OpenSSL.xml
+docs/UsingSSL/Preface.xml
+docs/UsingSSL/UsingSSL-book.xml
+docs/UsingSSL/UsingSSL.ent
+docs/UsingSSL/UsingSSL.xml
+docs/UsingSSL/Windows.xml
 docs/WolfBook.xml
 docs/wolfpasswd-man.xml
 docs/wolframe.conf-man.xml
@@ -1451,6 +1458,7 @@ examples/demo/tutorial/step4a/README
 examples/demo/tutorial/step4a/server/Customer.tdl
 examples/demo/tutorial/step4a/server/data.sql
 examples/demo/tutorial/step4a/server/schema.sql
+examples/demo/tutorial/step4a/server/SSL/README.txt
 examples/demo/tutorial/step4a/server/tutorial.conf
 examples/demo/tutorial/step4a/server/tutorial-windows.conf
 examples/demo/tutorial/step4/client/CustomerListRequest.netcat
@@ -2444,6 +2452,7 @@ tests/compileTDL/data/result_into.tdl
 tests/compileTDL/data/select_result.tdl
 tests/compileTDL/data/simple_subroutine.tdl
 tests/compileTDL/data/simple.tdl
+tests/compileTDL/data/simple_template.tdl
 tests/compileTDL/GNUmakefile
 tests/compileTDL/Makefile.W32
 tests/compileTDL/output/README
@@ -2506,6 +2515,7 @@ tests/dotnet/csharp/Functions/data/GetUserAddress.UTF-8.xml
 tests/dotnet/csharp/Functions/data/GetUserIdPair.UTF-8.xml
 tests/dotnet/csharp/Functions/data/wolframe.conf
 tests/dotnet/csharp/Functions/README.txt
+tests/dotnet/csharp/WolframeClient/Readme.txt
 tests/dotnet/interop/src/ddl_form.cpp
 tests/dotnet/interop/src/ddl_form.hpp
 tests/dotnet/interop/src/processor/execContext.hpp

@@ -54,7 +54,7 @@ static const bool	USERNAME_DEFAULT_CASE_SENSIVE = false;
 namespace _Wolframe {
 namespace AAAA {
 
-static const char* TEXT_FILE_AUTHENTICATION_CLASS_NAME = "TextFileAuth";
+static const char* TEXT_FILE_AUTH_CLASS_NAME = "TextFileAuth";
 
 class TextFileAuthConfig :  public config::NamedConfiguration
 {
@@ -63,7 +63,7 @@ public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* className() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
+	virtual const char* className() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
 
 	/// methods
 	bool parse( const config::ConfigurationNode& pt, const std::string& node,
@@ -81,12 +81,20 @@ class TextFileAuthenticator : public AuthenticationUnit
 {
 public:
 	TextFileAuthenticator( const std::string& Identifier, const std::string& filename );
+
 	~TextFileAuthenticator();
-	virtual const char* className() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
+
+	virtual const char* className() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
 
 	AuthenticatorInstance* instance();
 
-	/// \brief
+ /// \brief	Authenticate a user with its plain username and password
+ /// \note	This function is supposed to be used only for tests.
+ ///		DO NOT USE THIS FUNCTION IN REAL AUTHENTICATION MECHANISMS
+ ///
+ /// \param [in]	username
+ /// \param [in]	password	guess what this are :D
+ /// \param [in]	caseSensitveUser should the username be treated as case-sensitive or not
 	User* authenticatePlain( const std::string& username, const std::string& password,
 				 bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 
@@ -98,29 +106,49 @@ private:
 };
 
 
-/// Flow:
-/// Initialize --> send HMAC key --> receive username HMAC +-> user found --> send salt + challenge --> (*)
-///                                                        +-> user not found --> finish
-///
-/// (*) --> receive response --> send result
-///
+// Flow:
+// Initialize --> receive username key + HMAC --> + user found --> send salt + challenge --> (*)
+//                                                + user not found --> finish
+//
+// (*) --> receive response --> + got user
+//				+ invalid credentials
+//
 class TextFileAuthInstance : public AuthenticatorInstance
 {
-	enum	FSMstate	{
-		INITIALIZED,			///< It has been initialized OK.
-		HMAC_KEY_SENT,			///< Sent HMAC key
-		PARSING,
-		FINISHED
+	enum	State	{
+		INSTANCE_INITIALIZED,		///< Has been initialized, no other data
+		INSTANCE_USER_FOUND,		///< User has been found, will send challenge
+		INSTANCE_USER_NOT_FOUND,	///< User has not been found -> fail
+		INSTANCE_CHALLENGE_SENT,	///< Waiting for the response
+		INSTANCE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
+		INSTANCE_AUTHENTICATED		///< Response was correct -> user available
 	};
 
 public:
 	TextFileAuthInstance( const TextFileAuthenticator& backend );
+
 	~TextFileAuthInstance();
-	void close()					{ delete this; }
 
 	const char* typeName() const			{ return m_backend.className(); }
 
-	User* user();
+	/// Get the list of available mechs
+	virtual const std::list<std::string>& mechs() const;
+
+	/// Set the authentication mech
+	virtual bool setMech( const std::string& mech );
+
+	/// Input message
+	virtual void messageIn( const void* message, std::size_t size );
+
+	/// Output message
+	virtual int messageOut( const void** message, std::size_t size );
+
+	/// The current status of the authenticator
+	virtual Status status() const;
+
+	/// The authenticated user or NULL if not authenticated
+	virtual User* user() const;
+
 private:
 	const TextFileAuthenticator&	m_backend;
 	struct PwdFileUser		m_usr;
@@ -135,7 +163,9 @@ class TextFileAuthConstructor : public ConfiguredObjectConstructor< Authenticati
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 							{ return AUTHENTICATION_OBJECT; }
-	const char* objectClassName() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
+
+	const char* objectClassName() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
+
 	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
 };
 

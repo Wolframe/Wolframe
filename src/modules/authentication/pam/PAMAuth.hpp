@@ -38,7 +38,7 @@
 #define _PAM_AUTHENTICATION_HPP_INCLUDED
 
 #include <string>
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "module/constructor.hpp"
 
 #include <security/pam_appl.h>

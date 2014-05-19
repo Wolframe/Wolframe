@@ -68,7 +68,7 @@ public:
 	virtual ~Authenticator()	{}
 
 	/// Get the list of available mechs
-	virtual std::list<std::string>& mechs() const = 0;
+	virtual const std::list<std::string>& mechs() const = 0;
 
 	/// Set the authentication mech
 	/// \param [in]	mech	the name of the mech (case-insensitive)

@@ -101,33 +101,38 @@ StandardAuthenticator::~StandardAuthenticator()
 {
 }
 
-void StandardAuthenticator::close()
-{
-	//[PF:REMARK 'delete this' prevents use in different context] delete this;
-}
-
-// The FSM interface functions
-// The input data.
-void StandardAuthenticator::receiveData( const void* /*data*/, std::size_t /*size*/ )
+/// Get the list of available mechs
+const std::list<std::string>& StandardAuthenticator::mechs() const
 {
 }
 
-// What should be done next.
-const FSM::Operation StandardAuthenticator::nextOperation()
+/// Set the authentication mech
+bool StandardAuthenticator::setMech( const std::string& /*mech*/ )
 {
-	FSM::Operation	op;
-	return op;
+	return true;
 }
 
-// signal the FSM
-void StandardAuthenticator::signal( FSM::Signal /*event*/ )
+/// Input message
+void StandardAuthenticator::messageIn( const void* /*message*/, std::size_t /*size*/ )
 {
 }
 
-// Data not consumed.
-std::size_t StandardAuthenticator::dataLeft( const void*& /*begin*/ )
+/// Output message
+int StandardAuthenticator::messageOut( const void** /*message*/, std::size_t /*size*/ )
 {
-	return 0;
+	return 1;
+}
+
+/// The current status of the authenticator
+Authenticator::Status StandardAuthenticator::status() const
+{
+	return INITIALIZED;
+}
+
+/// The authenticated user or NULL if not authenticated
+User* StandardAuthenticator::user() const
+{
+	return NULL;
 }
 
 }} // namespace _Wolframe::AAAA
