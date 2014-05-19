@@ -8,8 +8,8 @@ license=('GPL3')
 arch=('i686' 'x86_64')
 url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
-         'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'libharu'
-         'freeimage' 'python')
+         'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt'
+         'python')
 makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 checkdepends=('expect' 'inetutils')
 backup=('etc/wolframe/wolframe.conf')
@@ -30,8 +30,8 @@ package() {
   make \
     WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-    WITH_LIBXSLT=1 WITH_SYSTEM_LIBHPDF=1 WITH_ICU=1 \
-    WITH_SYSTEM_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
+    WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
+    WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
     WITH_TEXTWOLF=1 RELEASE=1 \
     DESTDIR=${pkgdir} prefix=/usr sbindir=/usr/bin \
     sysconfdir=/etc \
@@ -46,7 +46,7 @@ package() {
 }
 
 check() {
-  cd ${srcdir}
+  cd ${srcdir}/$_gitname-build
 
   msg "Testing..."
   make test \
@@ -77,8 +77,8 @@ build() {
   make depend \
     WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-    WITH_LIBXSLT=1 WITH_SYSTEM_LIBHPDF=1 WITH_ICU=1 \
-    WITH_SYSTEM_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
+    WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
+    WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
     WITH_TEXTWOLF=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
     CFLAGS='-O2' CXXFLAGS='-O2' \
@@ -88,8 +88,8 @@ build() {
   make \
     WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-    WITH_LIBXSLT=1 WITH_SYSTEM_LIBHPDF=1 WITH_ICU=1 \
-    WITH_SYSTEM_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
+    WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
+    WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
     WITH_TEXTWOLF=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
     CFLAGS='-O2' CXXFLAGS='-O2' \

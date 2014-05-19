@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace WolframeClient
 {
-    class Serializer
+    public class Serializer
     {
         public static byte[] getRequestContent(string doctype, string root, Type type, object obj)
         {

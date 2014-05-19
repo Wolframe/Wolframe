@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface .NET runtime environment builder
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_BUILDER_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_BUILDER_HPP_INCLUDED
-#include "module/runtimeEnvironmentConstructor.hpp"
+#include "appdevel/module/runtimeEnvironmentConstructor.hpp"
 #include "dotnetRuntimeEnvironmentConfig.hpp"
 #include "dotnetRuntimeEnvironment.hpp"
 #include "module/moduleInterface.hpp"

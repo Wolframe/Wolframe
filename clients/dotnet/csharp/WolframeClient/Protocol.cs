@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace WolframeClient
 {
@@ -122,17 +123,17 @@ namespace WolframeClient
         {
             public delegate void IssueReadRequest();
 
-            private int m_pos;
-            private int m_scanidx;
-            private int m_size;
-            private byte[] m_ar;
+            private volatile int m_pos;
+            private volatile int m_scanidx;
+            private volatile int m_size;
+            private volatile byte[] m_ar;
             private object m_arLock;
-            private bool m_endOfData;
+            private volatile bool m_endOfData;
             private IssueReadRequest m_issueReadRequestCallback;
             private AutoResetEvent m_readqueue_signal;
-            private Queue<ReadChunk> m_readqueue;
+            private ConcurrentQueue<ReadChunk> m_readqueue;
 
-            public Buffer(Stream src_, int initsize, IssueReadRequest issueReadRequestCallback_)
+            public Buffer( int initsize, IssueReadRequest issueReadRequestCallback_)
             {
                 m_pos = 0;
                 m_scanidx = 0;
@@ -142,7 +143,7 @@ namespace WolframeClient
                 m_endOfData = false;
                 m_issueReadRequestCallback = issueReadRequestCallback_;
                 m_readqueue_signal = new AutoResetEvent(false);
-                m_readqueue = new Queue<ReadChunk>();
+                m_readqueue = new ConcurrentQueue<ReadChunk>();
             }
 
             public void Close()
@@ -207,9 +208,9 @@ namespace WolframeClient
             private bool FetchReadQueueElem()
             {
                     bool rt = false;
-                    try
+                    ReadChunk rc = null;
+                    if (m_readqueue.TryDequeue( out rc))
                     {
-                        ReadChunk rc = m_readqueue.Dequeue();
                         if (rc.ar == null)
                         {
                             m_endOfData = true;
@@ -220,8 +221,6 @@ namespace WolframeClient
                             rt = true;
                         }
                     }
-                    catch (InvalidOperationException)
-                    {}
                     return rt;
             }
 
@@ -241,7 +240,10 @@ namespace WolframeClient
                     else
                     {
                         m_issueReadRequestCallback();
-                        m_readqueue_signal.WaitOne();
+                        if (m_readqueue.Count == 0)
+                        {
+                            m_readqueue_signal.WaitOne();
+                        }
                     }
                 }
                 return false/*EOF*/;
@@ -349,7 +351,12 @@ namespace WolframeClient
                     {
                         lock (m_arLock)
                         {
+                            if (m_ar[m_scanidx] == (byte)'\r')
+                            {
+                                m_scanidx++;
+                            }
                             m_scanidx++;
+                            // ... skip over end of line to find next end of line marker in the following iteration
                         }
                     }
                     else

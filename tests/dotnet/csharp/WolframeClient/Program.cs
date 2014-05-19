@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Security;
 using WolframeClient;
 
 [XmlRoot("customer")]
@@ -33,17 +34,17 @@ namespace WolframeClient
 {
     class Program
     {
-        static void ProcessAnswer(Session.Answer answer)
+        static void ProcessAnswer(Answer answer)
         {
             switch (answer.msgtype)
             {
-                case Session.Answer.MsgType.Error:
+                case Answer.MsgType.Error:
                     Console.WriteLine("Session error in answer {0}: #{1} {2}", answer.id, answer.number, (string)answer.obj);
                     break;
-                case Session.Answer.MsgType.Failure:
+                case Answer.MsgType.Failure:
                     Console.WriteLine("Request error in answer {0}: #{1} {2}", answer.id, answer.number, (string)answer.obj);
                     break;
-                case Session.Answer.MsgType.Result:
+                case Answer.MsgType.Result:
                     switch ((AnswerId)answer.id)
                     {
                         case AnswerId.CustomerInsertedObj:
@@ -71,10 +72,27 @@ namespace WolframeClient
         {
             try
             {
-                Session session = new Session("127.0.0.1", 7661, "NONE", ProcessAnswer);
+                string relativeSslCertPath = "..\\..\\..\\..\\..\\..\\examples\\demo\\tutorial\\step4a\\server\\SSL\\wolframed.pfx";
+                string curpath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString();
+                string sslCertPath = Path.Combine( curpath, relativeSslCertPath).ToString();
+
+                SecureString pw = new SecureString();
+                char[] pwar = {'w','o','l','f','r','a','m','e',(char)0};
+                for (int pi = 0; pwar[pi] != 0; ++pi) pw.AppendChar(pwar[pi]);
+
+                var cfg = new Session.Configuration
+                {
+                    host = "localhost",
+                    port = 7961,
+                    sslcert = sslCertPath,
+                    validatecert = false,
+                    password = pw,
+                    authmethod = "NONE"
+                };
+                Session session = new Session( cfg, ProcessAnswer);
                 if (!session.Connect())
                 {
-                    Console.WriteLine("Error in connect of session: {0}", session.getLastError());
+                    Console.WriteLine("Error in connect of session: {0}", session.GetLastError());
                 }
                 else
                 {
@@ -84,12 +102,21 @@ namespace WolframeClient
                     int ii = 0;
                     for (ii = 0; ii < 100; ++ii)
                     {
-                        Session.Request request = new Session.Request { id = answerid, command = "Insert", number = ii, doctype = "Customer", root = "customer", obj = customer, objtype = typeof(Customer), answertype = typeof(CustomerInserted) };
+                        Request request = new Request { id = answerid, command = "Insert", number = ii, doctype = "Customer", root = "customer", obj = customer, objtype = typeof(Customer), answertype = typeof(CustomerInserted) };
                         session.IssueRequest(request);
                     }
-                    Console.WriteLine("End...");
-                    Thread.Sleep(20000);
+                    while (session.NofOpenRequests() > 0)
+                    {
+                        Thread.Sleep(200);
+                    }
+                    Console.WriteLine("All done");
                     session.Shutdown();
+                    session.Close();
+                    string err = session.GetLastError();
+                    if (err != null)
+                    {
+                        Console.WriteLine("Error in session: {0}", err);
+                    }
                 }
             }
             catch (Exception e)

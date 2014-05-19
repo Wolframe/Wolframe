@@ -1,0 +1,10 @@
+TEMPLATE <tb,item>
+SUBROUTINE simplesub( value)
+BEGIN
+	DO INSERT INTO tb (item) VALUES ($PARAM.value);
+END
+
+TRANSACTION simple
+BEGIN
+	DO simplesub<tab,name>('hugo');
+END

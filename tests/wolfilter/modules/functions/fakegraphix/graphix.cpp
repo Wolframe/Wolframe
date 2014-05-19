@@ -73,6 +73,18 @@ struct ImageThumbDescription : public serialize::StructDescription<ImageThumb>
 	}
 };
 
+struct ImageRescaleDescription : public serialize::StructDescription<ImageRescale>
+{
+	ImageRescaleDescription( )
+	{
+		( *this )
+		( "image", &ImageRescale::image )
+		( "height", &ImageRescale::height )
+		( "width", &ImageRescale::width )
+		;
+	}
+};
+
 struct ImageImplDescription : public serialize::StructDescription<ImageImpl>
 {
 	ImageImplDescription( )
@@ -97,6 +109,12 @@ const serialize::StructDescriptionBase *ImageInfo::getStructDescription( )
 const serialize::StructDescriptionBase *ImageThumb::getStructDescription( )
 {
 	static ImageThumbDescription rt;
+	return &rt;
+}
+
+const serialize::StructDescriptionBase *ImageRescale::getStructDescription( )
+{
+	static ImageRescaleDescription rt;
 	return &rt;
 }
 
