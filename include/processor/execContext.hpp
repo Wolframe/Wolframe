@@ -37,7 +37,7 @@
 #include "processor/procProviderInterface.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/authorization.hpp"
-#include "AAAA/authentication.hpp"
+#include "AAAA/authenticator.hpp"
 #include "AAAA/AAAAprovider.hpp"
 
 namespace _Wolframe {

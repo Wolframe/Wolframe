@@ -37,48 +37,65 @@
 #ifndef _AUTHENTICATOR_HPP_INCLUDED
 #define _AUTHENTICATOR_HPP_INCLUDED
 
+#include <string>
+#include <list>
+#include "AAAA/user.hpp"
+
 namespace _Wolframe {
+namespace AAAA {
 
 /// Authenticator FSM interface
+///
+/// \note	The authenticator works ony with complete messages.
+///		Sending a message in multiple parts will most likely
+///		result in an error. But that depends also on the authentication
+///		backend.
 class Authenticator
 {
 public:
-	/// Finite State Machine operation
-	class Operation
-	{
-	public:
-		enum Operation	{
-			READ,
-			WRITE,
-			CLOSE
-		};
-	private:
-
+	enum Status	{
+		INITIALIZED,		///< the authenticator is initialized,
+					///  no mech has been selected yet
+		MESSAGE_AVAILABLE,	///< an output message is available
+		AWAITING_MESSAGE,	///< waiting for an input message
+		AUTHENTICATED,		///< a user has been authenticated
+		INVALID_CREDENTIALS,	///< the user authentication failed,
+					///  either the username or the credentials are invalid
+		SYSTEM_FAILURE		///< some other error occurred
 	};
 
-	/// Finite State Machine signals
-	enum Signal	{
-		TIMEOUT,
-		TERMINATE,
-		END_OF_FILE,
-		CANCELLED,
-		BROKEN_PIPE,
-		UNKNOWN_ERROR
-	};
+	/// The virtual destructor
+	virtual ~Authenticator()	{}
 
-	/// The input data.
-	virtual void receiveData( const void* data, std::size_t size ) = 0;
+	/// Get the list of available mechs
+	virtual std::list<std::string>& mechs() const = 0;
 
-	/// What oeration the FSM expects next from the outside.
-	virtual const Operation nextOperation() = 0;
+	/// Set the authentication mech
+	/// \param [in]	mech	the name of the mech (case-insensitive)
+	/// \returns		true if the mech could be selected
+	///			false if the mech is not available or a mech
+	///			has already been selected
+	virtual bool setMech( const std::string& mech ) = 0;
 
-	/// Signal the FSM.
-	virtual void signal( Signal /*event*/ )	{}
+	/// The input message
+	/// \param [in]	message	pointer to the input message
+	/// \param [in]	size	the size of the input message
+	virtual void messageIn( const void* message, std::size_t size ) = 0;
 
-	/// Data that has not been consumed by the FSM.
-	virtual std::size_t dataLeft( const void*& begin ) = 0;
+	/// The output message
+	/// \param [in]	message	pointer to the buffer for the output message
+	/// \param [in]	size	the size of the output buffer
+	/// \returns		the size of the message in bytes
+	///			or -1 if the buffer is too small
+	virtual int messageOut( const void** message, std::size_t size ) = 0;
+
+	/// The current status of the authenticator
+	virtual Status status() const = 0;
+
+	/// The authenticated user or NULL if not authenticated
+	virtual User* user() const = 0;
 };
 
-} // namespace _Wolframe
+}} // namespace _Wolframe::AAAA
 
 #endif // _AUTHENTICATOR_HPP_INCLUDED

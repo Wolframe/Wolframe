@@ -51,10 +51,6 @@ AuthCommandHandler::AuthCommandHandler( const boost::shared_ptr<AAAA::Authentica
 
 AuthCommandHandler::~AuthCommandHandler()
 {
-	if (m_authenticator.get())
-	{
-		m_authenticator->close();
-	}
 }
 
 const char* AuthCommandHandler::interruptDataSessionMarker() const

@@ -37,7 +37,7 @@
 #define _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
 
 #include "cmdbind/lineCommandHandler.hpp"
-#include "AAAA/authentication.hpp"
+#include "AAAA/authenticator.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {

@@ -37,7 +37,7 @@
 #ifndef _DB_AUTHENTICATION_HPP_INCLUDED
 #define _DB_AUTHENTICATION_HPP_INCLUDED
 
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "module/constructor.hpp"
 #include "config/configurationTree.hpp"
 

@@ -39,7 +39,7 @@
 
 #include <string>
 #include <vector>
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "module/constructor.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/CRAM.hpp"
@@ -119,12 +119,6 @@ public:
 	void close()					{ delete this; }
 
 	const char* typeName() const			{ return m_backend.className(); }
-	AuthProtocol protocolType() const		{ return AuthenticatorInstance::PLAIN; }
-
-	void receiveData( const void* data, std::size_t size );
-	const Authenticator::Operation nextOperation();
-	void signal( FSM::Signal event );
-	std::size_t dataLeft( const void*& begin );
 
 	User* user();
 private:

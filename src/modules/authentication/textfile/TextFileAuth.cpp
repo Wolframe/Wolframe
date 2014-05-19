@@ -117,31 +117,5 @@ TextFileAuthInstance::~TextFileAuthInstance()
 		delete m_user;
 }
 
-void TextFileAuthInstance::receiveData( const void* /*data*/, std::size_t /*size*/ )
-{
-}
-
-const FSM::Operation TextFileAuthInstance::nextOperation()
-{
-	FSM::Operation	op;
-	return op;
-}
-
-void TextFileAuthInstance::signal( FSM::Signal /*event*/ )
-{
-}
-
-std::size_t TextFileAuthInstance::dataLeft( const void*& /*begin*/ )
-{
-	return 0;
-}
-
-User* TextFileAuthInstance::user()
-{
-	User* ret = m_user;
-	m_user = NULL;
-	return ret;
-}
-
 }} // namespace _Wolframe::AAAA
 

@@ -32,42 +32,21 @@
 ************************************************************************/
 ///
 /// \file authentication.hpp
-/// \brief top-level header file for authentication interface
+/// \brief top-level header file for authentication unit interface
 ///
 
-#ifndef _AUTHENTICATION_HPP_INCLUDED
-#define _AUTHENTICATION_HPP_INCLUDED
+#ifndef _AUTHENTICATION_UNIT_HPP_INCLUDED
+#define _AUTHENTICATION_UNIT_HPP_INCLUDED
 
 #include <string>
-
-#include "user.hpp"
+#include "AAAA/authInstance.hpp"
 #include "database/DBprovider.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-
-/// AuthenticatorInstance
-/// This is the base class for authenticator slices implementations
-/// An authenticator has (usually) several authenticator instances
-class AuthenticatorInstance
-{
-public:
-	enum AuthProtocol	{
-		PLAIN,			/// Plain text
-		CRAM,			/// Challenge-response
-		SASL			/// SASL dialog
-	};
-
-	virtual ~AuthenticatorInstance()		{}
-	virtual void close()			{}
-
-	virtual AuthProtocol protocolType() const = 0;
-	virtual User* user() = 0;
-};
-
 /// AuthenticationUnit Unit
-/// This is the base class for authentication unit implementations
+/// This is the base class for the authentication unit implementations
 class AuthenticationUnit
 {
 public:
@@ -89,4 +68,4 @@ private:
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUTHENTICATION_HPP_INCLUDED
+#endif // _AUTHENTICATION_UNIT_HPP_INCLUDED

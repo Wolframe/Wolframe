@@ -30,62 +30,34 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// AAAA provider interface
-//
+///
+/// \file authInstance.hpp
+/// \brief AuthenticationInstance interface
+///
 
-#ifndef _AAAA_PROVIDER_HPP_INCLUDED
-#define _AAAA_PROVIDER_HPP_INCLUDED
+#ifndef _AUTHENTICATION_INSTANCE_HPP_INCLUDED
+#define _AUTHENTICATION_INSTANCE_HPP_INCLUDED
 
-#include "authenticator.hpp"
-#include "authorization.hpp"
-#include "audit.hpp"
-#include "config/configurationBase.hpp"
-#include <boost/noncopyable.hpp>
+#include "AAAA/authenticator.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-class AAAAconfiguration : public config::ConfigurationBase
+/// AuthenticatorInstance
+/// This is the base class for authenticator slices implementations
+/// An authenticator has (usually) several authenticator instances
+/// The AuthenticatorInstance(s) are provided by the their respective
+/// AuthenticationUnit(s) in the AAAA provider
+///
+/// \note	For now the AuthenticatorInstance is just an Authenticator
+///		but this is very likely to change in the future
+
+
+class AuthenticatorInstance : public Authenticator
 {
-	friend class AAAAprovider;
-public:
-	/// x-structor
-	AAAAconfiguration();
-	~AAAAconfiguration();
 
-	/// methods
-	bool parse( const config::ConfigurationNode& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-private:
-	std::string					m_randomDevice;
-	std::list< config::NamedConfiguration* >	m_authConfig;
-	bool						m_authzDefault;
-	std::list< config::NamedConfiguration* >	m_authzConfig;
-	bool						m_mandatoryAudit;
-	std::list< config::NamedConfiguration* >	m_auditConfig;
-};
-
-class AAAAprovider : public boost::noncopyable
-{
-public:
-	AAAAprovider( const AAAAconfiguration* conf,
-		      const module::ModulesDirectory* modules );
-	~AAAAprovider();
-
-	bool resolveDB( const db::DatabaseProvider& db );
-
-	Authenticator* authenticator() const;
-	Authorizer* authorizer() const;
-	Auditor* auditor() const;
-private:
-	class AAAAprovider_Impl;
-	AAAAprovider_Impl*	m_impl;
 };
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AAAA_PROVIDER_HPP_INCLUDED
+#endif // _AUTHENTICATION_INSTANCE_HPP_INCLUDED
