@@ -39,7 +39,7 @@
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
-#include "AAAA/authentication.hpp"
+#include "AAAA/authenticator.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
