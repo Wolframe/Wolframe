@@ -64,26 +64,31 @@ bool OutputFilterImpl::flushBuffer()
 bool OutputFilterImpl::printHeader()
 {
 	types::DocMetaData md( getMetaData());
-	std::string doctype = md.doctype();
-	const char* root = md.root();
+	const char* root = md.getAttribute( "root");
 	if (!root)
 	{
 		setState( Error, "no XML root element defined");
 		return false;
 	}
-	if (!doctype.empty())
-	{
-		md.setDoctype( doctype, root);
-
-	}
-	const char* encoding = md.getAttribute( types::DocMetaData::Attribute::Encoding);
+	const char* encoding = md.getAttribute( "encoding");
 	if (!encoding) encoding = "UTF-8";
-	const char* doctype_public = md.getAttribute( types::DocMetaData::Attribute::DOCTYPE_PUBLIC);
-	const char* doctype_system = md.getAttribute( types::DocMetaData::Attribute::DOCTYPE_SYSTEM);
-	const char* xmlns = md.getAttribute( types::DocMetaData::Attribute::XmlNamespace);
-	const char* xsi = md.getAttribute( types::DocMetaData::Attribute::Xsi);
-	const char* schemaLocation = md.getAttribute( types::DocMetaData::Attribute::SchemaLocation);
-
+	const char* doctype_public = md.getAttribute( "PUBLIC");
+	std::string doctype_public_buf;
+	if (doctype_public && !md.doctype().empty())
+	{
+		doctype_public_buf = types::DocMetaData::replaceStem( doctype_public, md.doctype());
+		doctype_public = doctype_public_buf.c_str();
+	}
+	const char* doctype_system = md.getAttribute( "SYSTEM");
+	const char* xmlns = md.getAttribute( "xmlns");
+	const char* xsi = md.getAttribute( "xmlns:xsi");
+	const char* schemaLocation = md.getAttribute( "xmlns:schemaLocation");
+	std::string schemaLocation_buf;
+	if (schemaLocation && !md.doctype().empty())
+	{
+		schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
+		schemaLocation = schemaLocation_buf.c_str();
+	}
 	try
 	{
 		m_doc = DocumentWriter( encoding, root, doctype_public, doctype_system, xmlns, xsi, schemaLocation);

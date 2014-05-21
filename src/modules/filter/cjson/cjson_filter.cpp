@@ -55,7 +55,7 @@ struct CJsonFilter :public Filter
 		m_inputfilter.reset( new InputFilterImpl());
 		if (encoding)
 		{
-			m_inputfilter->setAttribute( types::DocMetaData::Attribute::Encoding, encoding);
+			m_inputfilter->setAttribute( "encoding", encoding);
 		}
 		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter->getMetaDataRef());
 		m_outputfilter.reset( oo);

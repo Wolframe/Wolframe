@@ -171,7 +171,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 					{
 						++nof_docattributes;
 						if (doctypeParsed) throw std::runtime_error("duplicate 'doctype' definition");
-						setAttribute( types::DocMetaData::Attribute::DoctypeId, m_firstnode->valuestring);
+						setAttribute( "doctype", m_firstnode->valuestring);
 						m_firstnode = m_firstnode->next;
 						continue;
 					}
@@ -179,7 +179,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 					{
 						++nof_docattributes;
 						types::String::EncodingAttrib ea = types::String::getEncodingFromName( m_firstnode->valuestring);
-						setAttribute( types::DocMetaData::Attribute::Encoding, m_firstnode->valuestring);
+						setAttribute( "encoding", m_firstnode->valuestring);
 
 						if (m_encattr.encoding != ea.encoding || ea.codepage != 0)
 						{

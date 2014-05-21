@@ -307,7 +307,7 @@ void OutputFilterImpl::setContentValue( const std::string& value)
 void OutputFilterImpl::printHeader()
 {
 	types::DocMetaData md = getMetaData();
-	const char* encname = md.getAttribute( types::DocMetaData::Attribute::Encoding);
+	const char* encname = md.getAttribute( "encoding");
 	if (encname)
 	{
 		m_encattr = types::String::getEncodingFromName( encname);

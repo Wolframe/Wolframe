@@ -1610,7 +1610,7 @@ LUA_FUNCTION_THROWS( "input:metadata()", function_input_metadata)
 				{
 					lua_pushlstring( ls, ai->value.c_str(), ai->value.size());
 					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-					lua_setfield( ls, -2, types::DocMetaData::Attribute::name( ai->id));
+					lua_setfield( ls, -2, ai->name.c_str());
 				}
 			}
 			else if (input->inputfilter()->state() == InputFilter::Error)
@@ -1685,6 +1685,8 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	Filter* filter = 0;							//< 1st argument (mandatory)
 	types::DocMetaData docmetadata;						//< 2nd argument (optional)
 	bool docmetadata_defined = false;
+	std::string doctype;
+	bool doctype_defined = false;
 	int ii=2,nn = lua_gettop( ls);
 	if (nn <= 1)
 	{
@@ -1698,19 +1700,13 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	{
 		if (lua_type( ls, ii) == LUA_TSTRING)
 		{
-			if (docmetadata_defined) throw std::runtime_error( "table of string with metadata specified twice");
-			docmetadata_defined = true;
-
-			proc::ExecContext* gtc = getExecContext( ls);
-			const char* doctype_id = lua_tostring( ls, ii);
-			const types::FormDescription* formdescr = gtc->provider()->formDescription( doctype_id);
-			if (!formdescr) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_id + "'");
-			std::string doctype_root = formdescr->root();
-			docmetadata.setDoctype( doctype_id, doctype_root);
+			if (doctype_defined) throw std::runtime_error( "argument string specifying the document type or document metadata table element with name 'doctype' specified twice");
+			doctype_defined = true;
+			doctype = lua_tostring( ls, ii);
 		}
 		else if (lua_type( ls, ii) == LUA_TTABLE)
 		{
-			if (docmetadata_defined) throw std::runtime_error( "document meta data (table argument) specified twice");
+			if (docmetadata_defined) throw std::runtime_error( "argument document meta data table specified twice");
 			docmetadata_defined = true;
 			lua_pushnil( ls);
 			while (lua_next( ls, -2))
@@ -1721,23 +1717,15 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 					throw std::runtime_error( "only strings expected as keys and values in document meta data table");
 				}
 				const char* idstr = lua_tostring( ls, -2);
-				bool attribute_found = false;
-				types::DocMetaData::Attribute::Id ai = types::DocMetaData::Attribute::firstid(), ae = types::DocMetaData::Attribute::lastid();
-				do
+				if (0==std::strcmp( idstr, "doctype"))
 				{
-					if (0==std::strcmp(idstr, types::DocMetaData::Attribute::name(ai)))
-					{
-						docmetadata.setAttribute( ai, lua_tostring( ls, -1));
-						attribute_found = true;
-						break;
-					}
-					ai = types::DocMetaData::Attribute::nextid(ai);
+					if (doctype_defined) throw std::runtime_error( "argument string specifying the document type or document metadata table element with name 'doctype' specified twice");
+					doctype_defined = true;
+					doctype = lua_tostring( ls, -1);
 				}
-				while (ai != ae);
-				if (!attribute_found)
+				else
 				{
-					lua_pop( ls, 1);
-					throw std::runtime_error( std::string("unknown document meta data attribute '") + idstr + "'");
+					docmetadata.setAttribute( idstr, lua_tostring( ls, -1));
 				}
 				lua_pop( ls, 1);
 			}
@@ -1782,6 +1770,21 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	if (docmetadata_defined)
 	{
 		output->outputfilter()->setMetaData( docmetadata);
+	}
+	if (doctype_defined)
+	{
+		docmetadata.setDoctype( doctype);
+		if (!docmetadata.getAttribute( "root"))
+		{
+			proc::ExecContext* gtc = getExecContext( ls);
+			const types::FormDescription* formdescr = gtc->provider()->formDescription( doctype);
+			if (formdescr)
+			{
+				docmetadata.setAttribute( "root", formdescr->root());
+			}
+		}
+		docmetadata.setDoctype( doctype);
+		docmetadata.setAttribute( "doctype", doctype);
 	}
 	return 0;
 }

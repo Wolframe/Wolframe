@@ -47,65 +47,54 @@ struct DocMetaData
 {
 	struct Attribute
 	{
-		enum Id
-		{
-			Encoding,
-			RootElement,
-			XmlNamespace,
-			Xsi,
-			SchemaLocation,
-			DOCTYPE_SYSTEM,
-			DOCTYPE_PUBLIC,
-			DoctypeId
-		};
-		static const char* name( Id i)
-		{
-			static const char* ar[] = {"encoding","root","xmlns","xsi","schema","system","public","doctype"};
-			return ar[i];
-		}
-		static Id firstid()	{return (Id)0;}
-		static Id lastid()	{return DoctypeId;}
-		static Id nextid( Id i)	{return (Id)((int)i + 1);}
-		static bool getid( Id& res, const char* id);
-
-		Id id;
+		std::string name;
 		std::string value;
 
-		Attribute( const Id& n, const std::string& v)
-			:id(n),value(v){}
+		Attribute(){}
+		Attribute( const std::string& n, const std::string& v)
+			:name(n),value(v){}
+		Attribute( const Attribute& o)
+			:name(o.name),value(o.value){}
 	};
 
 	DocMetaData( const DocMetaData& o);
-	explicit DocMetaData( const std::vector<Attribute>& attributes_);
+	DocMetaData( const std::string& doctype_, const std::vector<Attribute>& attributes_);
 	DocMetaData();
 
 	void clear();
 
-	void init( const std::vector<Attribute>& attributes_);
 	void join( const std::vector<Attribute>& attributes_);
 	void join( const DocMetaData& o)
 	{
 		join( o.attributes());
 	}
 
-	void setDoctype( const std::string& id_, const std::string& root_);
+	void setDoctype( const std::string& doctype_)
+	{
+		m_doctype = doctype_;
+	}
+
 	void setAttribute( const Attribute& attr);
-	void setAttribute( Attribute::Id id, const std::string& value);
+	void setAttribute( const std::string& name_, const std::string& value_);
 
-	void deleteAttribute( Attribute::Id id);
-	const char* getAttribute( Attribute::Id id) const;
-	const char* getAttribute( const char* id) const;
+	bool deleteAttribute( const std::string& name_);
+	const char* getAttribute( const std::string& name_) const;
 
-	const char* root() const;
-	std::string doctype() const;
-
+	const std::string& doctype() const
+	{
+		return m_doctype;
+	}
 	const std::vector<Attribute>& attributes() const
 	{
 		return m_attributes;
 	}
 
+	static std::string replaceStem( const std::string& src, const std::string& newstem);
+	static std::string extractStem( const std::string& src);
+
 private:
 	std::vector<Attribute> m_attributes;
+	std::string m_doctype;
 };
 
 typedef boost::shared_ptr<DocMetaData> DocMetaDataR;

@@ -159,7 +159,7 @@ struct InputFilterImpl :public InputFilter
 		,m_srcclosed(false)
 		,m_linecomplete(false)
 	{
-		setAttribute( types::DocMetaData::Attribute::Encoding , encoding_?encoding_:"UTF-8");
+		setAttribute( "encoding", encoding_?encoding_:"UTF-8");
 		setState( Open);
 	}
 

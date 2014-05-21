@@ -211,7 +211,8 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	}
 
 	// Set doctype for filters:
-	m_outputfilter->setDoctype( m_cmd->outputform, m_output_rootelement);
+	m_outputfilter->setDoctype( m_cmd->outputform);
+	m_outputfilter->setAttribute( "root", m_output_rootelement);
 
 	// Reset input/output objects:
 	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));

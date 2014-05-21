@@ -144,13 +144,13 @@ public:
 	const types::DocMetaDataR& getMetaDataRef() const	{return m_metadata;}
 
 	/// \brief Set a document meta data attribute
-	void setAttribute( types::DocMetaData::Attribute::Id id, const std::string& value)
+	void setAttribute( const std::string& name_, const std::string& value_)
 	{
 		if (state() != Start)
 		{
 			throw std::runtime_error( "Cannot set input filter attribute after input has been read");
 		}
-		m_metadata->setAttribute( id, value);
+		m_metadata->setAttribute( name_, value_);
 	}
 
 private:

@@ -81,7 +81,7 @@ struct Libxml2Filter :public Filter
 		m_outputfilter.reset( oo);
 		if (encoding)
 		{
-			m_outputfilter->setAttribute( types::DocMetaData::Attribute::Encoding, encoding);
+			m_outputfilter->setAttribute( "encoding", encoding);
 		}
 	}
 };

@@ -66,7 +66,7 @@ struct InputFilterImpl :public InputFilter
 		,m_srcsize(0)
 		,m_srcend(false)
 	{
-		setAttribute( types::DocMetaData::Attribute::Encoding, encoding);
+		setAttribute( "encoding", encoding);
 		setState( Open);
 	}
 

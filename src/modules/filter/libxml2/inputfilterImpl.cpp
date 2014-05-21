@@ -123,7 +123,7 @@ void InputFilterImpl::initDocMetaData()
 	const xmlChar* ec = m_doc.get()->encoding;
 	if (!ec)
 	{
-		setAttribute( types::DocMetaData::Attribute::Encoding, "UTF-8");
+		setAttribute( "encoding", "UTF-8");
 	}
 	else
 	{
@@ -132,13 +132,13 @@ void InputFilterImpl::initDocMetaData()
 		{
 			encoding.push_back((unsigned char)ec[ii]);
 		}
-		setAttribute( types::DocMetaData::Attribute::Encoding, encoding);
+		setAttribute( "encoding", encoding);
 	}
 	if (m_node && (m_node->type == XML_ELEMENT_NODE || m_node->type == XML_DOCUMENT_NODE))
 	{
 		if (m_node->name)
 		{
-			setAttribute( types::DocMetaData::Attribute::RootElement, (const char*)m_node->name);
+			setAttribute( "root", (const char*)m_node->name);
 		}
 		xmlAttr* rootattr = m_node->properties;
 		while (rootattr)
@@ -154,15 +154,15 @@ void InputFilterImpl::initDocMetaData()
 			}
 			if (attrname == "xmlns")
 			{
-				setAttribute( types::DocMetaData::Attribute::XmlNamespace, attrvalue);
+				setAttribute( attrname, attrvalue);
 			}
 			else if (attrname == "xmlns:xsi")
 			{
-				setAttribute( types::DocMetaData::Attribute::Xsi, attrvalue);
+				setAttribute( attrname, attrvalue);
 			}
 			else if (attrname == "xmlns:schemaLocation")
 			{
-				setAttribute( types::DocMetaData::Attribute::SchemaLocation, attrvalue);
+				setAttribute( attrname, attrvalue);
 			}
 			else
 			{
@@ -185,11 +185,11 @@ void InputFilterImpl::initDocMetaData()
 		xmlDtdPtr dtd = (xmlDtdPtr)nd;
 		if (dtd->SystemID)
 		{
-			setAttribute( types::DocMetaData::Attribute::DOCTYPE_SYSTEM, (const char*)dtd->SystemID);
+			setAttribute( "SYSTEM", (const char*)dtd->SystemID);
 		}
 		if (dtd->ExternalID)
 		{
-			setAttribute( types::DocMetaData::Attribute::DOCTYPE_PUBLIC, (const char*)dtd->ExternalID);
+			setAttribute( "PUBLIC", (const char*)dtd->ExternalID);
 		}
 	}
 }

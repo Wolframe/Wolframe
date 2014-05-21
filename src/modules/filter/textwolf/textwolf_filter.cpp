@@ -262,18 +262,19 @@ struct InputFilterImpl
 							m_metadatastate = MS_Root;
 							if (!m_parser.getDoctypePublic().empty())
 							{
-								setAttribute( types::DocMetaData::Attribute::DOCTYPE_PUBLIC, std::string( ee, eesize));
+								getMetaDataRef()->setAttribute( "PUBLIC", std::string( ee, eesize));
+								getMetaDataRef()->setDoctype( types::DocMetaData::extractStem( std::string( ee, eesize)));
 							}
 							if (!m_parser.getDoctypeSystem().empty())
 							{
-								setAttribute( types::DocMetaData::Attribute::DOCTYPE_SYSTEM, std::string( ee, eesize));
+								getMetaDataRef()->setAttribute( "SYSTEM", std::string( ee, eesize));
 							}
 							/*no break here!*/
 						case MS_Root:
 							et = m_parser.getNext( ee, eesize);
 							if (et == textwolf::XMLScannerBase::OpenTag)
 							{
-								setAttribute( types::DocMetaData::Attribute::RootElement, std::string( ee, eesize));
+								getMetaDataRef()->setAttribute( "root", std::string( ee, eesize));
 								m_metadatastate = MS_AttribName;
 							}
 							else
@@ -307,15 +308,16 @@ struct InputFilterImpl
 							{
 								if (m_elembuffer == "xmlns")
 								{
-									setAttribute( types::DocMetaData::Attribute::XmlNamespace, std::string( ee, eesize));
+									getMetaDataRef()->setAttribute( "xmlns", std::string( ee, eesize));
 								}
 								else if (m_elembuffer == "xmlns:xsi")
 								{
-									setAttribute( types::DocMetaData::Attribute::Xsi, std::string( ee, eesize));
+									getMetaDataRef()->setAttribute( "xmlns:xsi", std::string( ee, eesize));
 								}
 								else if (m_elembuffer == "xmlns:schemaLocation")
 								{
-									setAttribute( types::DocMetaData::Attribute::SchemaLocation, std::string( ee, eesize));
+									getMetaDataRef()->setAttribute( "xmlns:xsi", std::string( ee, eesize));
+									getMetaDataRef()->setDoctype( types::DocMetaData::extractStem( std::string( ee, eesize)));
 								}
 								else
 								{
@@ -426,25 +428,31 @@ struct OutputFilterImpl :public OutputFilter
 	bool printHeader()
 	{
 		types::DocMetaData md( getMetaData());
-		std::string doctype = md.doctype();
-		const char* root = md.root();
+		const char* root = md.getAttribute( "root");
 		if (!root)
 		{
 			setState( Error, "no XML root element defined");
 			return false;
 		}
-		if (!doctype.empty())
-		{
-			md.setDoctype( doctype, root);
-		}
-		const char* encoding = md.getAttribute( types::DocMetaData::Attribute::Encoding);
+		const char* encoding = md.getAttribute( "encoding");
 		if (!encoding) encoding = "UTF-8";
-		const char* doctype_public = md.getAttribute( types::DocMetaData::Attribute::DOCTYPE_PUBLIC);
-		const char* doctype_system = md.getAttribute( types::DocMetaData::Attribute::DOCTYPE_SYSTEM);
-		const char* xmlns = md.getAttribute( types::DocMetaData::Attribute::XmlNamespace);
-		const char* xsi = md.getAttribute( types::DocMetaData::Attribute::Xsi);
-		const char* schemaLocation = md.getAttribute( types::DocMetaData::Attribute::SchemaLocation);
-
+		const char* doctype_public = md.getAttribute( "PUBLIC");
+		std::string doctype_public_buf;
+		if (doctype_public && !md.doctype().empty())
+		{
+			doctype_public_buf = types::DocMetaData::replaceStem( doctype_public, md.doctype());
+			doctype_public = doctype_public_buf.c_str();
+		}
+		const char* doctype_system = md.getAttribute( "SYSTEM");
+		const char* xmlns = md.getAttribute( "xmlns");
+		const char* xsi = md.getAttribute( "xmlns:xsi");
+		const char* schemaLocation = md.getAttribute( "xmlns:schemaLocation");
+		std::string schemaLocation_buf;
+		if (schemaLocation && !md.doctype().empty())
+		{
+			schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
+			schemaLocation = schemaLocation_buf.c_str();
+		}
 		if (!m_printer.printDocumentStart( root, doctype_public, doctype_system, xmlns, xsi, schemaLocation, m_elembuf))
 		{
 			setState( Error, "failed to print XML document header");
@@ -549,7 +557,7 @@ public:
 		m_outputfilter.reset( oo);
 		if (encoding)
 		{
-			m_outputfilter->setAttribute( types::DocMetaData::Attribute::Encoding, encoding);
+			m_outputfilter->setAttribute( "encoding", encoding);
 		}
 	}
 };

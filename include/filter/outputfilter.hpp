@@ -178,23 +178,23 @@ public:
 	}
 
 	/// \brief Set one document meta data element
-	void setAttribute( types::DocMetaData::Attribute::Id id, const std::string& value)
+	void setAttribute( const std::string& name_, const std::string& value_)
 	{
 		if (state() != Start)
 		{
 			throw std::runtime_error( "cannot set output meta data anymore after first call of print");
 		}
-		m_metadata.setAttribute( id, value);
+		m_metadata.setAttribute( name_, value_);
 	}
 
-	/// \brief Set the document type (with optionally non empty root element) as meta data elements
-	void setDoctype( const std::string& id_, const std::string& root_)
+	/// \brief Set the document type meta data element
+	void setDoctype( const std::string& id_)
 	{
 		if (state() != Start)
 		{
 			throw std::runtime_error( "cannot set document type anymore after first call of print");
 		}
-		m_metadata.setDoctype( id_, root_);
+		m_metadata.setDoctype( id_);
 	}
 
 protected:
