@@ -32,39 +32,82 @@ Project Wolframe.
 ///\file documentWriter.hpp
 ///\brief Implemtation of document writer abstraction for the libxml2 library
 #include "documentWriter.hpp"
+#include <stdexcept>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-bool DocumentWriter::init( const char* encoding, bool standalone)
+static const xmlChar* getXmlString( const char* aa)
 {
+	return (const xmlChar*)aa;
+}
+
+DocumentWriter::DocumentWriter( const char* encoding, const char* root, const char* publicid, const char* systemid, const char* xmlns, const char* xsi, const char* schemaLocation)
+{
+	const char* standalone = "yes";
+	if (systemid)
+	{
+		standalone = "no";
+	}
+	else if (schemaLocation)
+	{
+		standalone = 0;
+	}
 	xmlBufferPtr bb = xmlBufferCreate();
-	if (!bb) return false;
+	if (!bb) throw std::runtime_error( "failed to create libxml2 buffer");
 
 	m_writerbuf = boost::shared_ptr<xmlBuffer>( bb, xmlBufferFree);
 	xmlTextWriterPtr ww = xmlNewTextWriterMemory( bb, 0);
-	if (!ww) return false;
+	if (!ww) throw std::runtime_error( "failed to create libxml2 writer");
 
 	m_writer = boost::shared_ptr<xmlTextWriter>( ww, xmlFreeTextWriter);
-	if (0>xmlTextWriterStartDocument( ww, "1.0", encoding, (standalone?"yes":"no")))
+	if (0>xmlTextWriterStartDocument( ww, "1.0", encoding, standalone))
 	{
 		m_writer.reset();
 		m_writerbuf.reset();
-		return false;
-	}
-	return true;
-}
 
-DocumentWriter::DocumentWriter( const char* encoding, const char* doctype, const char* publicid, const char* systemid)
-{
-	if (init( encoding, false))
+		throw std::runtime_error( "failed to write document header (XML header)");
+	}
+	if (systemid)
 	{
-		xmlTextWriterPtr ww = m_writer.get();
-		if (0>xmlTextWriterStartDTD( ww, (const xmlChar*)doctype, (const xmlChar*)publicid, (const xmlChar*)systemid)
+		if (0>xmlTextWriterStartDTD( ww, (const xmlChar*)root, (const xmlChar*)publicid, (const xmlChar*)systemid)
 		||  0>xmlTextWriterEndDTD(ww))
 		{
 			m_writer.reset();
 			m_writerbuf.reset();
 		}
+
+		throw std::runtime_error( "failed to write document header (DTD)");
+	}
+	if (!root)
+	{
+		throw std::runtime_error( "no XML root element defined");
+	}
+	if (0>xmlTextWriterStartElement( ww, getXmlString( root)))
+	{
+		throw std::runtime_error( "libxml2 filter: write root element error");
+	}
+	if (xmlns)
+	{
+		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xmlns"), getXmlString(xmlns)))
+		{
+			throw std::runtime_error( "libxml2 filter: write XML header attribute error");
+		}
+	}
+	if (xsi)
+	{
+		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xmlns::xsi"), getXmlString(xsi)))
+		{
+			throw std::runtime_error( "libxml2 filter: write XML header attribute error");
+		}
+	}
+	if (xmlns)
+	{
+		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xmlns::schemaLocation"), getXmlString(schemaLocation)))
+		{
+			throw std::runtime_error( "libxml2 filter: write XML header attribute error");
+		}
 	}
 }
+
+

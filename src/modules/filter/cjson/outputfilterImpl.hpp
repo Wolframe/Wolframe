@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file outputfilterImpl.hpp
-///\brief Output filter abstraction for the cjson library
+/// \file outputfilterImpl.hpp
+/// \brief Output filter abstraction for the cjson library
 
 #ifndef _Wolframe_CJSON_OUTPUT_FILTER_HPP_INCLUDED
 #define _Wolframe_CJSON_OUTPUT_FILTER_HPP_INCLUDED
@@ -56,12 +56,11 @@ class OutputFilterImpl
 public:
 	typedef OutputFilter Parent;
 
-	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
+	explicit OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData)
 		:utils::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
-		,OutputFilter("cjson",attr)
+		,OutputFilter("cjson", inheritedMetaData)
 		,m_elemitr(0)
-		,m_encattr_defined(false)
-		,m_headerPrinted(false)
+		,m_headerprinted(false)
 	{
 		m_stk.push_back( StackElement(""));
 		setFlags( FilterBase::SerializeWithIndices);
@@ -73,41 +72,30 @@ public:
 		,m_attribname(o.m_attribname)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
-		,m_doctypeid(o.m_doctypeid)
 		,m_encattr(o.m_encattr)
-		,m_encattr_defined(o.m_encattr_defined)
-		,m_headerPrinted(o.m_headerPrinted)
+		,m_headerprinted(o.m_headerprinted)
 		,m_stk(o.m_stk)
 		{}
 
 	virtual ~OutputFilterImpl(){}
 
-	///\brief Implementation of OutputFilter::copy()
+	/// \brief Implementation of OutputFilter::copy()
 	virtual OutputFilterImpl* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implementation of OutputFilter::setDocMetaData(const types::DocType&)
-	virtual void setDocMetaData( const types::DocMetaData& md);
-
-	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
+	/// \brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
 
-	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
+	/// \brief Implementation of FilterBase::getValue( const char*, std::string&)
 	virtual bool getValue( const char* name, std::string& val) const;
 
-	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
+	/// \brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
 
-	void setEncoding( const std::string& id)
-	{
-		m_encattr = types::String::getEncodingFromName( id);
-	}
-
-	void setEncoding();
-
 private:
+	void printHeader();
 	void addStructValue( const std::string name, const std::string& value);
 	void addStructItem( const std::string name, cJSON* val);
 	void setContentValue( const std::string& value);
@@ -117,12 +105,11 @@ private:
 	std::string elementpath() const;
 
 private:
-	std::string m_attribname;				//< attribute name buffer
-	std::string m_elembuf;					//< buffer for current element
-	std::size_t m_elemitr;					//< iterator on current element
-	types::String::EncodingAttrib m_encattr;		//< character set encoding attributes
-	bool m_encattr_defined;					//< true, if character set encoding is defined
-	bool m_headerPrinted;
+	std::string m_attribname;				///< attribute name buffer
+	std::string m_elembuf;					///< buffer for current element
+	std::size_t m_elemitr;					///< iterator on current element
+	types::String::EncodingAttrib m_encattr;		///< character set encoding attributes
+	bool m_headerprinted;					///< true if the header has already been printed
 
 	struct StackElement
 	{

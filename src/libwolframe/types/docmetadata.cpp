@@ -34,20 +34,37 @@ Project Wolframe.
 
 #include "types/docmetadata.hpp"
 #include <string>
+#include <cstring>
 #include <boost/shared_ptr.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
+bool DocMetaData::Attribute::getid( Id& res, const char* id)
+{
+	Id ai = firstid(), ae = lastid();
+	do
+	{
+		if (0==std::strcmp( id, name(ai)))
+		{
+			res = ai;
+			return true;
+		}
+		ai = nextid(ai);
+	}
+	while (ai != ae);
+	return false;
+}
+
 DocMetaData::DocMetaData( const DocMetaData& o)
 	:m_attributes(o.m_attributes){}
-DocMetaData::DocMetaData( const Type& type_, const std::vector<Attribute>& attributes_)
+DocMetaData::DocMetaData( const std::vector<Attribute>& attributes_)
 	:m_attributes(attributes_){}
 DocMetaData::DocMetaData(){}
 
 void DocMetaData::clear()
 {
-	attributes.clear();
+	m_attributes.clear();
 }
 
 void DocMetaData::init( const std::vector<Attribute>& attributes_)
@@ -71,7 +88,8 @@ static const char* findLastChar( const char* cc, char ch)
 	return (cc[0]==ch)?cc:0;
 }
 
-static std::pair<const char*, const char*> locateStem( const std::string& src)
+typedef std::pair<std::size_t, std::size_t> PositionRange;
+static PositionRange locateStem( const std::string& src)
 {
 	const char* lsp = findLastChar( src.c_str(), ' ');
 	if (!lsp)
@@ -96,24 +114,25 @@ static std::pair<const char*, const char*> locateStem( const std::string& src)
 	{
 		ext = 0;
 	}
-	return std::pair<const char*, const char*>( src.c_str(), src.c_str() + fnm - src.c_str());
+	std::size_t beginidx = fnm - src.c_str();
+	std::size_t endidx = ext ? (ext - src.c_str()):src.size();
+	return PositionRange( beginidx, endidx);
 }
 
 static std::string replaceStem( const std::string& src, const std::string& id)
 {
-	std::pair<const char*, const char*> pos = locateStem( src);
+	PositionRange pos = locateStem( src);
 	std::string rt;
-	rt.append( src.c_str(), pos.first - src.c_str());
+	rt.append( src.c_str(), pos.first);
 	rt.append( id);
-	if (pos.second) rt.append( pos.second);
+	rt.append( src.c_str() + pos.second, src.size() - pos.second);
 	return rt;
 }
 
 static std::string getStem( const std::string& src)
 {
-	std::pair<const char*, const char*> pos = locateStem( src);
-	if (!pos.second) pos.second = src.c_str() + src.size();
-	return std::string( pos.first, pos.second - pos.first);
+	PositionRange pos = locateStem( src);
+	return std::string( src.c_str() + pos.first, pos.second - pos.first);
 }
 
 void DocMetaData::deleteAttribute( Attribute::Id id)
@@ -121,7 +140,7 @@ void DocMetaData::deleteAttribute( Attribute::Id id)
 	std::vector<Attribute>::iterator ai = m_attributes.begin(), ae = m_attributes.end();
 	for (;ai != ae; ++ai)
 	{
-		if (ai->id == attr.id)
+		if (ai->id == id)
 		{
 			m_attributes.erase( ai);
 			break;
@@ -134,7 +153,7 @@ const char* DocMetaData::getAttribute( Attribute::Id id) const
 	std::vector<Attribute>::const_iterator ai = m_attributes.begin(), ae = m_attributes.end();
 	for (;ai != ae; ++ai)
 	{
-		if (ai->id == attr.id)
+		if (ai->id == id)
 		{
 			return ai->value.c_str();
 		}
@@ -142,23 +161,16 @@ const char* DocMetaData::getAttribute( Attribute::Id id) const
 	return 0;
 }
 
+const char* DocMetaData::getAttribute( const char* name) const
+{
+	DocMetaData::Attribute::Id id;
+	if (!DocMetaData::Attribute::getid( id, name)) return 0;
+	return getAttribute( id);
+}
+
 void DocMetaData::setAttribute( const Attribute& attr)
 {
 	bool attr_set = false;
-	switch (attr.id)
-	{
-		case Attribute::RootElement: break;
-		case Attribute::XmlNamespace: break;
-		case Attribute::Xsi: break;
-		case Attribute::SchemaLocation:
-			deleteAttribute( Attribute::DOCTYPE_SYSTEM);
-			deleteAttribute( Attribute::DOCTYPE_PUBLIC);
-			break;
-		case Attribute::DOCTYPE_SYSTEM: break;
-		case Attribute::DOCTYPE_PUBLIC: break;
-		case Attribute::Identifier: break;
-	}
-
 	std::vector<Attribute>::iterator ai = m_attributes.begin(), ae = m_attributes.end();
 	for (;ai != ae; ++ai)
 	{
@@ -201,7 +213,7 @@ void DocMetaData::setDoctype( const std::string& id_, const std::string& root_)
 			ai->value = root_;
 			root_set = true;
 		}
-		if (ai->id == Attribute::Identifier)
+		if (ai->id == Attribute::DoctypeId)
 		{
 			ai->value = id_;
 			id_set = true;
@@ -213,7 +225,7 @@ void DocMetaData::setDoctype( const std::string& id_, const std::string& root_)
 	}
 	if (!id_set)
 	{
-		m_attributes.push_back( Attribute( Attribute::Identifier, id_));
+		m_attributes.push_back( Attribute( Attribute::DoctypeId, id_));
 	}
 }
 
@@ -224,15 +236,22 @@ const char* DocMetaData::root() const
 	{
 		if (ai->id == Attribute::RootElement)
 		{
-			return ai->value;
+			return ai->value.c_str();
 		}
 	}
 	return 0;
 }
 
-const char* DocMetaData::doctype() const
+std::string DocMetaData::doctype() const
 {
 	std::vector<Attribute>::const_iterator ai, ae = m_attributes.end();
+	for (ai = m_attributes.begin(); ai != ae; ++ai)
+	{
+		if (ai->id == Attribute::DoctypeId)
+		{
+			return getStem( ai->value);
+		}
+	}
 	for (ai = m_attributes.begin(); ai != ae; ++ai)
 	{
 		if (ai->id == Attribute::DOCTYPE_SYSTEM)
@@ -247,14 +266,7 @@ const char* DocMetaData::doctype() const
 			return getStem( ai->value);
 		}
 	}
-	for (ai = m_attributes.begin(); ai != ae; ++ai)
-	{
-		if (ai->id == Attribute::Identifier)
-		{
-			return getStem( ai->value);
-		}
-	}
-	return 0;
+	return std::string();
 }
 
 

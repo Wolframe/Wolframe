@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/ioFilterCommandHandlerEscDLF.hpp
-///\brief Filter based command handler base class that escapes patterns in input/output that could be mixeed with the protocol end of content marker "Dot LF" or "Dot CR LF"
+/// \file cmdbind/ioFilterCommandHandlerEscDLF.hpp
+/// \brief Filter based command handler base class that escapes patterns in input/output that could be mixeed with the protocol end of content marker "Dot LF" or "Dot CR LF"
 
 #ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
@@ -43,45 +43,45 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class IOFilterCommandHandlerEscDLF
-///\brief Command handler processing filter input/output with end of content marked as Dot ('.') LF or Dot CR LF
-///\remark Dot ('.') on start of lines are escaped with Dot Dot LF
+/// \class IOFilterCommandHandlerEscDLF
+/// \brief Command handler processing filter input/output with end of content marked as Dot ('.') LF or Dot CR LF
+/// \remark Dot ('.') on start of lines are escaped with Dot Dot LF
 class IOFilterCommandHandlerEscDLF :public IOFilterCommandHandler
 {
 public:
 	typedef IOFilterCommandHandler Parent;
 
-	///\brief Constructor
+	/// \brief Constructor
 	IOFilterCommandHandlerEscDLF();
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~IOFilterCommandHandlerEscDLF();
 
-	///\brief See CommandHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
+	/// \brief See CommandHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
-	///\brief See CommandHandler::setOutputBuffer(void*,std::size_t,std::size_t)
+	/// \brief See CommandHandler::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
 
-	///\brief See CommandHandler::nextOperation()
+	/// \brief See CommandHandler::nextOperation()
 	virtual Operation nextOperation();
 
-	///\brief See CommandHandler::putInput(const void*,std::size_t);
+	/// \brief See CommandHandler::putInput(const void*,std::size_t);
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief See CommandHandler::getInputBlock(void*&,std::size_t&)
+	/// \brief See CommandHandler::getInputBlock(void*&,std::size_t&)
 	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
 
-	///\brief See CommandHandler::getOutput(const void*&,std::size_t&)
+	/// \brief See CommandHandler::getOutput(const void*&,std::size_t&)
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
 
-	///\brief See CommandHandler::getDataLeft(const void*&,std::size_t&)
+	/// \brief See CommandHandler::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	///\brief See CommandHandler::interruptDataSessionMarker()
+	/// \brief See CommandHandler::interruptDataSessionMarker()
 	virtual const char* interruptDataSessionMarker() const;
 
-	///\param[out] err error code in case of error
-	///\return CallResult status of the filter input for the state machine of this command handler
+	/// \param[out] err error code in case of error
+	/// \return CallResult status of the filter input for the state machine of this command handler
 	virtual CallResult call( const char*& err)=0;
 
 private:
@@ -103,16 +103,14 @@ private:
 
 	protocol::EscapeBuffer m_escapeBuffer;
 
-	State m_state;					//< processing state machine state
-	const void* m_writedata;			//< bytes to write next (WRITE)
-	std::size_t m_writedatasize;			//< number of bytes to write next (WRITE)
-	unsigned int m_writedata_chksum;		//< check sum to verify write
-	unsigned int m_writedata_chkpos;		//< check position to verify write
+	State m_state;					///< processing state machine state
+	const void* m_writedata;			///< bytes to write next (WRITE)
+	std::size_t m_writedatasize;			///< number of bytes to write next (WRITE)
 
-	protocol::InputBlock m_input;			//< input buffer
-	protocol::OutputBlock m_output;			//< output buffer
-	protocol::InputBlock::iterator m_eoD;		//< input end of data marker
-	std::size_t m_itrpos;				//< read start position in buffer for the command handler
+	protocol::InputBlock m_input;			///< input buffer
+	protocol::OutputBlock m_output;			///< output buffer
+	protocol::InputBlock::iterator m_eoD;		///< input end of data marker
+	std::size_t m_itrpos;				///< read start position in buffer for the command handler
 };
 }}
 #endif

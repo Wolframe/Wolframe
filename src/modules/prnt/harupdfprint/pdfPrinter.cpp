@@ -269,6 +269,7 @@ public:
 				}
 				switch (m_input->state())
 				{
+					case langbind::InputFilter::Start:
 					case langbind::InputFilter::Open:
 						m_resultpdfcontent = m_document->tostring();
 						m_result.reset( new langbind::SingleElementInputFilter( types::VariantConst( m_resultpdfcontent)));

@@ -112,70 +112,61 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	}
 	else
 	{
-		getDocMetaData();
+		initDocMetaData();
+		setState( Open);
 	}
 }
 
-const types::DocMetaData* InputFilterImpl::getDocMetaData()
+void InputFilterImpl::initDocMetaData()
 {
-	if (!m_doc.get())
-	{
-		return 0;
-	}
-	else if (m_metadata.get())
-	{
-		return m_metadata.get();
-	}
-	m_metadata.reset( new types::DocMetaData());
-
 	m_node = xmlDocGetRootElement( m_doc.get());
 	const xmlChar* ec = m_doc.get()->encoding;
 	if (!ec)
 	{
-		m_encoding = "UTF-8";
+		setAttribute( types::DocMetaData::Attribute::Encoding, "UTF-8");
 	}
 	else
 	{
-		m_encoding.clear();
+		std::string encoding;
 		for (int ii=0; ec[ii]!=0; ii++)
 		{
-			m_encoding.push_back((unsigned char)ec[ii]);
+			encoding.push_back((unsigned char)ec[ii]);
 		}
+		setAttribute( types::DocMetaData::Attribute::Encoding, encoding);
 	}
-
-	if (m_node && m_node->type == XML_ELEMENT_NODE || XML_DOCUMENT_NODE)
+	if (m_node && (m_node->type == XML_ELEMENT_NODE || m_node->type == XML_DOCUMENT_NODE))
 	{
 		if (m_node->name)
 		{
-			m_metadata.setAttribute( types::DocMetaData::Attribute::Root, m_node->name);
+			setAttribute( types::DocMetaData::Attribute::RootElement, (const char*)m_node->name);
 		}
 		xmlAttr* rootattr = m_node->properties;
 		while (rootattr)
 		{
 			xmlNode* rootvalues = 0;
 			if (rootattr) rootvalues = rootattr->children;
-			std::string name = getElementString( rootattr->name);
-			std::string value;
+			std::string attrname = getElementString( rootattr->name);
+			std::string attrvalue;
 			while (rootvalues)
 			{
-				value.append( getElementString( rootvalues->content));
+				attrvalue.append( getElementString( rootvalues->content));
 				rootvalues = rootvalues->next;
 			}
-			if (0==std::strcmp( name,"xmlns"))
+			if (attrname == "xmlns")
 			{
-				m_metadata.setAttribute( types::DocMetaData::Attribute::XmlNamespace, value);
+				setAttribute( types::DocMetaData::Attribute::XmlNamespace, attrvalue);
 			}
-			else if (0==std::strcmp( name,"xmlns:xsi"))
+			else if (attrname == "xmlns:xsi")
 			{
-				m_metadata.setAttribute( types::DocMetaData::Attribute::Xsi, value);
+				setAttribute( types::DocMetaData::Attribute::Xsi, attrvalue);
 			}
-			else if (0==std::strcmp( name,"xmlns:schemaLocation"))
+			else if (attrname == "xmlns:schemaLocation")
 			{
-				m_metadata.setAttribute( types::DocMetaData::Attribute::SchemaLocation, value);
+				setAttribute( types::DocMetaData::Attribute::SchemaLocation, attrvalue);
 			}
 			else
 			{
-				LOG_WARNING << "unknown XML root element attribute '" << name << "'";
+				LOG_WARNING << "unknown XML root element attribute '" << attrname << "'";
 			}
 			rootattr = rootattr->next;
 		}
@@ -194,18 +185,13 @@ const types::DocMetaData* InputFilterImpl::getDocMetaData()
 		xmlDtdPtr dtd = (xmlDtdPtr)nd;
 		if (dtd->SystemID)
 		{
-			m_metadata.setAttribute( types::DocMetaData::Attribute::SYSTEM, value);
+			setAttribute( types::DocMetaData::Attribute::DOCTYPE_SYSTEM, (const char*)dtd->SystemID);
 		}
-		if (dtd->PublicID)
+		if (dtd->ExternalID)
 		{
-			m_metadata.setAttribute( types::DocMetaData::Attribute::PUBLIC, value);
+			setAttribute( types::DocMetaData::Attribute::DOCTYPE_PUBLIC, (const char*)dtd->ExternalID);
 		}
 	}
-	else
-	{
-		return 0;
-	}
-	return &m_metadata;
 }
 
 bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
@@ -319,6 +305,16 @@ AGAIN:
 			goto AGAIN;
 	}
 	return rt;
+}
+
+const types::DocMetaData* InputFilterImpl::getMetaData()
+{
+	if (!m_doc.get())
+	{
+		setState( EndOfMessage);
+		return 0;
+	}
+	return getMetaDataRef().get();
 }
 
 std::string InputFilterImpl::getElementString( const xmlChar* str)

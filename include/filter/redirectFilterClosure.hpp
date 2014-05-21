@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/redirectFilterClosure.hpp
-///\brief Interface to redirect streaming from an input filter to an output filter interface
+/// \file filter/redirectFilterClosure.hpp
+/// \brief Interface to redirect streaming from an input filter to an output filter interface
 #ifndef _Wolframe_filter_REDIRECT_FILTER_CLOSURE_HPP_INCLUDED
 #define _Wolframe_filter_REDIRECT_FILTER_CLOSURE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -41,7 +41,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class RedirectFilterClosure
+/// \class RedirectFilterClosure
 class RedirectFilterClosure
 	:public virtual utils::TypeSignature
 {
@@ -75,8 +75,8 @@ public:
 
 	~RedirectFilterClosure(){}
 
-	///\brief Calls the fetching of input and printing it to output until end or interruption
-	///\return true when completed
+	/// \brief Calls the fetching of input and printing it to output until end or interruption
+	/// \return true when completed
 	bool call()
 	{
 		if (!m_inputfilter.get()) throw std::runtime_error( "no input defined for redirecting filter");
@@ -89,6 +89,7 @@ public:
 				{
 					switch (m_inputfilter->state())
 					{
+						case InputFilter::Start:
 						case InputFilter::Open:
 							m_state = 2;
 							return true;
@@ -120,6 +121,7 @@ public:
 				{
 					switch (m_outputfilter->state())
 					{
+						case OutputFilter::Start:
 						case OutputFilter::Open:
 							throw std::runtime_error( "unknown error in output filter");
 	
@@ -137,9 +139,9 @@ public:
 		}
 	}
 
-	///\brief Initialization of call context for a new call
-	///\param[in] i call input
-	///\param[in] o call output
+	/// \brief Initialization of call context for a new call
+	/// \param[in] i call input
+	/// \param[in] o call output
 	void init( const TypedInputFilterR& i, const TypedOutputFilterR& o)
 	{
 		m_inputfilter = i;

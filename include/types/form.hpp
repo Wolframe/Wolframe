@@ -66,7 +66,7 @@ public:
 		,m_root(root_)
 		,m_ddlname(ddlname_){}
 	explicit FormDescription( const std::string& ddlname_)
-		:m_name(name_)
+		:m_ddlname(ddlname_)
 		{}
 	/// \brief Copy constructor
 	FormDescription( const FormDescription& o)

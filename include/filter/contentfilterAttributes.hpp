@@ -32,19 +32,6 @@ Project Wolframe.
 ///\file filter/contentfilterAttributes.hpp
 ///\brief Interface for attributes synchronized between by inputfilter/outputfilter
 
-#ifndef _Wolframe_FILTER_CONTENTFILTER_ATTRIBUTES_HPP_INCLUDED
-#define _Wolframe_FILTER_CONTENTFILTER_ATTRIBUTES_HPP_INCLUDED
-#include "types/countedReference.hpp"
 
-namespace _Wolframe {
-namespace langbind {
-
-class ContentFilterAttributes
-{
-public:
-	virtual const char* getEncoding() const=0;
-};
-
-}}//namespace
-#endif
+#error DEPRECATED
 

@@ -53,12 +53,12 @@ struct CJsonFilter :public Filter
 	CJsonFilter( const char* encoding=0)
 	{
 		m_inputfilter.reset( new InputFilterImpl());
-		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter.get());
-		m_outputfilter.reset( oo);
 		if (encoding)
 		{
-			oo->setEncoding( encoding);
+			m_inputfilter->setAttribute( types::DocMetaData::Attribute::Encoding, encoding);
 		}
+		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter->getMetaDataRef());
+		m_outputfilter.reset( oo);
 	}
 };
 

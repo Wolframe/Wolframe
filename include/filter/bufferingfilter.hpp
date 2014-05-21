@@ -123,7 +123,7 @@ public:
 	{
 		if (m_end)
 		{
-			const types::DocMetaData* rt = m_ref->getMetaData( doctype);
+			const types::DocMetaData* rt = m_ref->getMetaData();
 			setState( m_ref->state(), m_ref->getError());
 			return rt;
 		}
@@ -132,11 +132,6 @@ public:
 			setState( EndOfMessage);
 			return false;
 		}
-	}
-
-	virtual const char* getEncoding() const
-	{
-		return m_ref->getEncoding();
 	}
 
 	///\brief Implements FilterBase::getValue(const char*,std::string&) const

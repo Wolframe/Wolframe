@@ -50,7 +50,10 @@ public:
 	Filter( const InputFilterR& i_, const OutputFilterR& o_)
 		:m_inputfilter(i_),m_outputfilter(o_)
 	{
-		m_outputfilter->setAttributes( m_inputfilter.get());
+		if (i_.get())
+		{
+			m_outputfilter->inheritMetaData( m_inputfilter->getMetaDataRef());
+		}
 	}
 	Filter( const Filter& o)
 		:m_inputfilter(o.m_inputfilter),m_outputfilter(o.m_outputfilter){}

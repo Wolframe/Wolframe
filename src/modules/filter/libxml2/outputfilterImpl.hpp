@@ -58,18 +58,18 @@ class OutputFilterImpl
 public:
 	typedef OutputFilter Parent;
 
-	explicit OutputFilterImpl( const XsltMapper& xsltMapper_, const ContentFilterAttributes* attr=0)
+	explicit OutputFilterImpl( const XsltMapper& xsltMapper_, const types::DocMetaDataR& inheritMetaData_)
 		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-		,OutputFilter("libxslt",attr)
+		,OutputFilter("libxslt", inheritMetaData_)
 		,m_xsltMapper(xsltMapper_)
 		,m_nofroot(0)
 		,m_taglevel(0)
 		,m_elemitr(0)
 		{}
 
-	explicit OutputFilterImpl( const ContentFilterAttributes* attr=0)
+	explicit OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
 		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-		,OutputFilter("libxml2",attr)
+		,OutputFilter("libxml2", inheritMetaData_)
 		,m_nofroot(0)
 		,m_taglevel(0)
 		,m_elemitr(0)
@@ -86,10 +86,7 @@ public:
 		,m_valuestrbuf(o.m_valuestrbuf)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
-		,m_doctype_root(o.m_doctype_root)
-		,m_doctype_public(o.m_doctype_public)
-		,m_doctype_system(o.m_doctype_system)
-		,m_encoding(o.m_encoding){}
+		{}
 
 	virtual ~OutputFilterImpl(){}
 
@@ -111,14 +108,9 @@ public:
 	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
 
-	void setEncoding( const std::string& value)
-	{
-		m_encoding = value;
-	}
-
-	const char* encoding() const;
-
 private:
+	bool printHeader();
+
 	static const xmlChar* getXmlString( const std::string& aa)
 	{
 		return (const xmlChar*)aa.c_str();
@@ -142,10 +134,6 @@ private:
 	std::string m_valuestrbuf;				//< value buffer
 	std::string m_elembuf;					//< buffer for current element
 	std::size_t m_elemitr;					//< iterator on current element
-	std::string m_doctype_root;				//< !DOCTYPE root element (1)
-	std::string m_doctype_public;				//< !DOCTYPE public element (2)
-	std::string m_doctype_system;				//< !DOCTYPE system element (3)
-	std::string m_encoding;					//< character set encoding
 };
 
 }}//namespace

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file inputfilterImpl.hpp
-///\brief Input filter abstraction for the cJSON library
+/// \file inputfilterImpl.hpp
+/// \brief Input filter abstraction for the cJSON library
 
 #ifndef _Wolframe_CJSON_INPUT_FILTER_HPP_INCLUDED
 #define _Wolframe_CJSON_INPUT_FILTER_HPP_INCLUDED
@@ -57,7 +57,6 @@ struct InputFilterImpl :public InputFilter
 	InputFilterImpl()
 		:utils::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
 		,InputFilter("cjson")
-		,m_encattr_defined(false)
 		,m_firstnode(0)
 	{
 		setFlags( langbind::FilterBase::PropagateNoAttr);
@@ -68,8 +67,6 @@ struct InputFilterImpl :public InputFilter
 		,InputFilter(o)
 		,m_content(o.m_content)
 		,m_encattr(o.m_encattr)
-		,m_encattr_defined(o.m_encattr_defined)
-		,m_docmetadata(o.m_docmetadata)
 		,m_root(o.m_root)
 		,m_firstnode(o.m_firstnode)
 		,m_stk(o.m_stk)
@@ -77,42 +74,39 @@ struct InputFilterImpl :public InputFilter
 
 	virtual ~InputFilterImpl(){}
 
-	///\brief Implements InputFilter::copy()
+	/// \brief Implements InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl(*this);
 	}
-	///\brief Implements InputFilter::initcopy()
+	/// \brief Implements InputFilter::initcopy()
 	virtual InputFilter* initcopy() const
 	{
 		return new InputFilterImpl();
 	}
 
-	///\brief Implements InputFilter::getRest( const void*&,std::size_t&,bool&);
+	/// \brief Implements InputFilter::getRest( const void*&,std::size_t&,bool&);
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end);
 
-	///\brief Implements FilterBase::getValue(const char*,std::string&) const
+	/// \brief Implements FilterBase::getValue(const char*,std::string&) const
 	virtual bool getValue( const char* name, std::string& val) const;
 
-	///\brief Implements FilterBase::setValue(const char*,const std::string&)
+	/// \brief Implements FilterBase::setValue(const char*,const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
 
-	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
+	/// \brief Implements InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* content, std::size_t contentsize, bool end);
 
-	///\brief Implements 'ContentFilterAttributes::getEncoding() const'
-	virtual const char* getEncoding() const;
+	/// \brief Implements InputFilter::getMetaData()
+	virtual const types::DocMetaData* getMetaData();
 
-	///\brief Implements InputFilter::getMetadata()
-	virtual const types::DocMetaData* getMetadata();
-
-	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
+	/// \brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize);
 
-	///\brief Implements FilterBase::setFlags()
+	/// \brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f);
 
-	///\brief Implements FilterBase::checkSetFlags()const
+	/// \brief Implements FilterBase::checkSetFlags()const
 	virtual bool checkSetFlags( Flags f) const;
 
 private:
@@ -122,8 +116,6 @@ private:
 private:
 	std::string m_content;
 	types::String::EncodingAttrib m_encattr;	//< character set encoding attributes
-	bool m_encattr_defined;				//< true, if character set encoding is defined
-	types::DocMetaData m_docmetadata;		//< document type
 	boost::shared_ptr<cJSON> m_root;		//< data structure holding the whole tree
 	const cJSON* m_firstnode;			//< first node (to detect if getNext has been called)
 

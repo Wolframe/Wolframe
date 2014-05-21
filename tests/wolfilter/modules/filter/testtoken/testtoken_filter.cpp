@@ -74,9 +74,9 @@ static char getElementTag( OutputFilter::ElementType tp)
 struct OutputFilterImpl :public OutputFilter
 {
 	///\brief Constructor
-	OutputFilterImpl()
+	explicit OutputFilterImpl( const types::DocMetaDataR& md)
 		:utils::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
-		,OutputFilter("token")
+		,OutputFilter("token", md)
 		,m_elemitr(0)
 		{}
 
@@ -169,7 +169,7 @@ private:
 struct InputFilterImpl :public InputFilter
 {
 	///\brief Constructor
-	InputFilterImpl( const char* encoding_)
+	InputFilterImpl()
 		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
 		,InputFilter("token")
 		,m_tag(0)
@@ -180,8 +180,7 @@ struct InputFilterImpl :public InputFilter
 		,m_srcpos(0)
 		,m_srcend(false)
 		,m_linecomplete(false)
-		,m_eolnread(false)
-		,m_encoding(encoding_?encoding_:"UTF-8"){}
+		,m_eolnread(false){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
@@ -197,8 +196,7 @@ struct InputFilterImpl :public InputFilter
 		,m_srcpos(o.m_srcpos)
 		,m_srcend(o.m_srcend)
 		,m_linecomplete(o.m_linecomplete)
-		,m_eolnread(o.m_eolnread)
-		,m_encoding(o.m_encoding){}
+		,m_eolnread(o.m_eolnread){}
 
 	///\brief Implement InputFilterImpl::copy()
 	virtual InputFilter* copy() const
@@ -209,7 +207,7 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implement InputFilterImpl::initcopy()
 	virtual InputFilter* initcopy() const
 	{
-		return new InputFilterImpl(m_encoding.c_str());
+		return new InputFilterImpl();
 	}
 
 	///\brief Implement InputFilterImpl::putInput(const void*,std::size_t,bool)
@@ -355,9 +353,9 @@ struct InputFilterImpl :public InputFilter
 		return InputFilter::setFlags( f);
 	}
 
-	virtual const char* getEncoding() const
+	virtual const types::DocMetaData* getMetaData()
 	{
-		return m_encoding.empty()?0:m_encoding.c_str();
+		return getMetaDataRef().get();
 	}
 
 private:
@@ -371,7 +369,6 @@ private:
 	bool m_srcend;			//< true if end of message is in current chunk parsed
 	bool m_linecomplete;		//< true if the last getNext could complete a line
 	bool m_eolnread;		//< true if the end of line has been read
-	std::string m_encoding;		//< character set encoding
 };
 
 }//end anonymous namespace
@@ -384,8 +381,8 @@ public:
 	{
 		if (!encoding || !encoding[0])
 		{
-			m_inputfilter.reset( new InputFilterImpl( "UTF-8"));
-			m_outputfilter.reset( new OutputFilterImpl());
+			m_inputfilter.reset( new InputFilterImpl());
+			m_outputfilter.reset( new OutputFilterImpl( m_inputfilter->getMetaDataRef()));
 		}
 		else
 		{
@@ -394,8 +391,8 @@ public:
 
 			if (enc.size() == 0 || enc == "utf8")
 			{
-				m_inputfilter.reset( new InputFilterImpl( encoding));
-				m_outputfilter.reset( new OutputFilterImpl());
+				m_inputfilter.reset( new InputFilterImpl());
+				m_outputfilter.reset( new OutputFilterImpl( m_inputfilter->getMetaDataRef()));
 			}
 			else
 			{

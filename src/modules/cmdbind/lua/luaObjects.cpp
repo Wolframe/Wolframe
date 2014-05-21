@@ -1215,7 +1215,7 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print_object_metadata)
 
 	if (!output->called())
 	{
-		if (!input->inputfilter()->getMetadata())
+		if (!input->inputfilter()->getMetaData())
 		{
 			lua_pushlightuserdata( ls, closure);
 			lua_pushlightuserdata( ls, input);
@@ -1261,7 +1261,7 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 					if (!output->called())
 					{
 						Input* input = LuaObject<Input>::getGlobal( ls, "input");
-						if (input && !input->inputfilter()->getMetadata())
+						if (input && !input->inputfilter()->getMetaData())
 						{
 							lua_pushvalue( ls, 2);			//... iterator argument
 							lua_pushlightuserdata( ls, closure);	//... redirect closure object
@@ -1292,7 +1292,7 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 	if (!output->called())
 	{
 		Input* input = LuaObject<Input>::getGlobal( ls, "input");
-		if (input && !input->inputfilter()->getMetadata())
+		if (input && !input->inputfilter()->getMetaData())
 		{
 			lua_pushlightuserdata( ls, const_cast<void*>( (const void*)item[0]));
 			lua_pushinteger( ls, itemsize[0]);
@@ -1340,7 +1340,7 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 	if (!output->called())
 	{
 		Input* input = LuaObject<Input>::getGlobal( ls, "input");
-		if (input && !input->inputfilter()->getMetadata())
+		if (input && !input->inputfilter()->getMetaData())
 		{
 			if (newEnter)
 			{
@@ -1383,7 +1383,7 @@ LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
 	if (!output->called())
 	{
 		Input* input = LuaObject<Input>::getGlobal( ls, "input");
-		if (input && !input->inputfilter()->getMetadata())
+		if (input && !input->inputfilter()->getMetaData())
 		{
 			lua_pushlightuserdata( ls, output);
 			lua_yieldk( ls, 0, 1, function_output_closetag);
@@ -1541,7 +1541,7 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 			Output* output = LuaObject<Output>::getGlobal( ls, "output");
 			if (output && output->outputfilter().get())
 			{
-				output->outputfilter()->setAttributes( ff);
+				output->outputfilter()->inheritMetaData( ff->getMetaDataRef());
 			}
 		}
 	}
@@ -1601,16 +1601,16 @@ LUA_FUNCTION_THROWS( "input:metadata()", function_input_metadata)
 	{
 		LuaExceptionHandlerScope escope(ls);
 		{
-			types::DocMetaData metadata;
-			if (input->inputfilter()->getMetaData( metadata))
+			const types::DocMetaData* metadata = input->inputfilter()->getMetaData();
+			if (metadata)
 			{
 				lua_newtable( ls);
-				std::vector<Attribute>::const_iterator ai = metadata.attributes().begin(), ae = metadata.attributes().end();
+				std::vector<types::DocMetaData::Attribute>::const_iterator ai = metadata->attributes().begin(), ae = metadata->attributes().end();
 				for (; ai != ae; ++ai)
 				{
 					lua_pushlstring( ls, ai->value.c_str(), ai->value.size());
 					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-					lua_setfield( ls, -2, Attribute::name( ai->id));
+					lua_setfield( ls, -2, types::DocMetaData::Attribute::name( ai->id));
 				}
 			}
 			else if (input->inputfilter()->state() == InputFilter::Error)
@@ -1648,15 +1648,15 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctypeid)
 		return 1;
 	}
 	{
-		const types::DocMetaData* metadata;
-		if (0!=(metadata=input->inputfilter()->getMetaData()))
+		const types::DocMetaData* metadata = input->inputfilter()->getMetaData();
+		if (metadata)
 		{
-			const char* doctype = metadata->doctype();
+			std::string doctype = metadata->doctype();
 			LuaExceptionHandlerScope escope(ls);
 			{
-				if (doctype)
+				if (!doctype.empty())
 				{
-					lua_pushstring( ls, doctype);
+					lua_pushlstring( ls, doctype.c_str(), doctype.size());
 				}
 				else
 				{
@@ -1705,7 +1705,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			const char* doctype_id = lua_tostring( ls, ii);
 			const types::FormDescription* formdescr = gtc->provider()->formDescription( doctype_id);
 			if (!formdescr) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_id + "'");
-			const char* doctype_root = formdescr->xmlRoot();
+			std::string doctype_root = formdescr->root();
 			docmetadata.setDoctype( doctype_id, doctype_root);
 		}
 		else if (lua_type( ls, ii) == LUA_TTABLE)
@@ -1765,7 +1765,10 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 				{
 					//... the global input and output share the attributes
 					Input* input = LuaObject<Input>::getGlobal( ls, "input");
-					ff->setAttributes( input?input->inputfilter().get():0);
+					if (input)
+					{
+						ff->inheritMetaData( input->inputfilter()->getMetaDataRef());
+					}
 				}
 				ff->assignState( *output->outputfilter());
 			}
@@ -1886,8 +1889,8 @@ static lua_CFunction get_input_struct_table_closure( lua_State* ls, Input* input
 		const types::DocMetaData* docmetadata;
 		if (0!=(docmetadata = input->inputfilter()->getMetaData()))
 		{
-			const char* doctype = docmetadata->doctype();
-			if (doctype)
+			std::string doctype = docmetadata->doctype();
+			if (!doctype.empty())
 			{
 				//... document with !DOCTYPE declaration -> lookup for form
 				proc::ExecContext* gtc = getExecContext( ls);
@@ -1961,8 +1964,8 @@ static lua_CFunction get_input_struct_form_closure( lua_State* ls, Input* input)
 		// try to get 'form' for validation if the document is not standalone:
 		if (0!=(docmetadata = input->inputfilter()->getMetaData()))
 		{
-			const char* doctype = docmetadata->doctype();
-			if (doctype)
+			std::string doctype = docmetadata->doctype();
+			if (!doctype.empty())
 			{
 				proc::ExecContext* gtc = getExecContext( ls);
 				const types::FormDescription* st = gtc->provider()->formDescription( doctype);

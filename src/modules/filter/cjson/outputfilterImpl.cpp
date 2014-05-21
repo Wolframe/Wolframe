@@ -85,7 +85,6 @@ void OutputFilterImpl::printStructToBuffer()
 
 	boost::shared_ptr<char> contentref( content, std::free);
 
-	setEncoding();
 	if (m_encattr.encoding == types::String::UTF8)
 	{
 		m_elembuf.append( content);
@@ -305,109 +304,94 @@ void OutputFilterImpl::setContentValue( const std::string& value)
 	}
 }
 
+void OutputFilterImpl::printHeader()
+{
+	types::DocMetaData md = getMetaData();
+	const char* encname = md.getAttribute( types::DocMetaData::Attribute::Encoding);
+	if (encname)
+	{
+		m_encattr = types::String::getEncodingFromName( encname);
+	}
+
+	std::string doctype = md.doctype();
+	if (!doctype.empty()) addStructValue( "doctype", doctype);
+	if (m_encattr.codepage) addStructValue( "encoding", encname);
+
+	m_headerprinted = true;
+	setState( Open);
+}
+
 bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t elementsize)
 {
-	if (!flushBuffer()) return false;
-	if (m_stk.empty())
+	try
 	{
-		setState( Error, "cjson filter illegal operation: printing after final close");
-	}
-	LOG_DATA << "[json output filter] print " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
-
-	switch (type)
-	{
-		case OutputFilter::OpenTag:
-			if (!m_headerPrinted)
-			{
-				if (!m_doctypeid.empty()) addStructValue( "doctype", m_doctypeid);
-				m_headerPrinted = true;
-			}
-			m_stk.push_back( StackElement( std::string( (const char*)element, elementsize)));
-			break;
-
-		case OutputFilter::Attribute:
-			if (!m_attribname.empty())
-			{
-				setState( Error, "cjson filter illegal operation: printing subsequent attributes");
-				return false;
-			}
-			m_attribname.append( (const char*)element, elementsize);
-			break;
-
-		case OutputFilter::Value:
-			if (m_attribname.empty())
-			{
-				setContentValue( std::string( (const char*)element, elementsize));
-			}
-			else
-			{
-				addStructValue( m_attribname, std::string( (const char*)element, elementsize));
-				m_attribname.clear();
-			}
-			break;
-
-		case OutputFilter::CloseTag:
-			closeElement();
-			break;
-
-		default:
-			setState( Error, "cjson filter: illegal state");
-			return false;
-	}
-	return flushBuffer();
-}
-
-void OutputFilterImpl::setDocMetaData( const types::DocMetaData& md)
-{
-	if (m_headerPrinted)
-	{
-		throw std::runtime_error( "cannot set document meda data anymore after elements printed");
-	}
-	m_docmetadata = md;
-}
-
-void OutputFilterImpl::setEncoding()
-{
-	if (!m_encattr_defined)
-	{
-		if (attributes())
+		if (!flushBuffer()) return false;
+		if (m_stk.empty())
 		{
-			const char* encstr = attributes()->getEncoding();
-			if (encstr)
-			{
-				m_encattr = types::String::getEncodingFromName( encstr);
-			}
-			m_encattr_defined = true;
+			setState( Error, "cjson filter illegal operation: printing after final close");
 		}
+		LOG_DATA << "[json output filter] print " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
+	
+		switch (type)
+		{
+			case OutputFilter::OpenTag:
+				if (!m_headerprinted)
+				{
+					printHeader();
+				}
+				m_stk.push_back( StackElement( std::string( (const char*)element, elementsize)));
+				break;
+	
+			case OutputFilter::Attribute:
+				if (!m_attribname.empty())
+				{
+					setState( Error, "cjson filter illegal operation: printing subsequent attributes");
+					return false;
+				}
+				m_attribname.append( (const char*)element, elementsize);
+				break;
+	
+			case OutputFilter::Value:
+				if (m_attribname.empty())
+				{
+					setContentValue( std::string( (const char*)element, elementsize));
+				}
+				else
+				{
+					addStructValue( m_attribname, std::string( (const char*)element, elementsize));
+					m_attribname.clear();
+				}
+				break;
+	
+			case OutputFilter::CloseTag:
+				closeElement();
+				break;
+	
+			default:
+				setState( Error, "cjson filter: illegal state");
+				return false;
+		}
+		return flushBuffer();
+	}
+	catch (const std::bad_alloc& e)
+	{
+		setState( Error, e.what());
+		return false;
+	}
+	catch (const std::runtime_error& e)
+	{
+		setState( Error, e.what());
+		return false;
 	}
 }
 
 bool OutputFilterImpl::getValue( const char* id, std::string& val) const
 {
-	if (std::strcmp( id, "encoding") == 0)
-	{
-		if (m_encattr_defined)
-		{
-			val = types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
-			return true;
-		}
-		return false;
-	}
 	return Parent::getValue( id, val);
 }
 
 bool OutputFilterImpl::setValue( const char* id, const std::string& value)
 {
-	if (std::strcmp( id, "encoding") == 0)
-	{
-		if (m_headerPrinted)
-		{
-			setState( Error, "setting of the encoding not allowed after first print operation");
-			return false;
-		}
-		m_encattr = types::String::getEncodingFromName( value);
-		return true;
-	}
 	return Parent::setValue( id, value);
 }
 

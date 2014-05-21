@@ -95,33 +95,29 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		m_inputform.reset( new types::Form( df));
 	}
 	// Initialize output form for validation if defined:
-	if (!m_cmd->outputform.empty())
+	if (m_cmd->outputform.empty())
+	{
+		m_output_rootelement = m_cmd->outputrootelem;
+	}
+	else
 	{
 		const types::FormDescription* df = provider->formDescription( m_cmd->outputform);
-		if (!df)
+		if (df)
 		{
-			if (m_cmd->outputrootelem.empty())
+			if (m_cmd->skipvalidation_output)
 			{
-				throw std::runtime_error( std::string( "root element is not defined for RETURN SKIP ") + m_cmd->outputform);
-			}
-		}
-		else
-		{
-			if (m_cmd->outputrootelem.empty())
-			{
-				if (df->xmlRoot())
-				{
-					m_outputform.reset( new types::Form( df));
-				}
+				m_output_rootelement = df->root();
 			}
 			else
 			{
-				if (df->xmlRoot())
+				m_outputform.reset( new types::Form( df));
+				if (m_cmd->outputrootelem.empty() && !df->root().empty())
 				{
-					if (m_cmd->outputrootelem != df->xmlRoot())
-					{
-						throw std::runtime_error( std::string( "root element of output form does not match '") + m_cmd->outputform + "'");
-					}
+					m_output_rootelement = df->root();
+				}
+				else
+				{
+					m_output_rootelement = m_cmd->outputrootelem;
 				}
 			}
 		}
@@ -214,17 +210,10 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		m_outputfilter = l_outputfilter;
 	}
 
-	if (m_outputform.get())
-	{
-		m_output_rootelement = m_outputform->description()->root();
-	}
-	else if (!m_cmd->outputrootelem.empty())
-	{
-		m_output_rootelement = m_cmd->outputrootelem;
-	}
-	// Synchronize attributes of filters:
-	m_outputfilter->setAttributes( m_inputfilter.get());
+	// Set doctype for filters:
+	m_outputfilter->setDoctype( m_cmd->outputform, m_output_rootelement);
 
+	// Reset input/output objects:
 	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));
 	m_output.reset( new langbind::TypingOutputFilter( m_outputfilter));
 }
@@ -258,8 +247,8 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					const types::DocMetaData* md = m_inputfilter->getMetaData();
 					if (md)
 					{
-						const char* doctype = md->doctype();
-						if (!doctype)
+						std::string doctype = md->doctype();
+						if (doctype.empty())
 						{
 							LOG_WARNING << "no document type defined in input. treating document as standalone";
 							m_state = 3;
@@ -285,6 +274,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					{
 						switch (m_inputfilter->state())
 						{
+							case InputFilter::Start:
 							case InputFilter::Open:
 							{
 								m_state = 3;
@@ -299,15 +289,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			case 2:
 			{
 				if (!m_inputform_parser->call()) return IOFilterCommandHandler::Yield;
-				const char* xmlroot = m_inputform->description()->xmlRoot();
-				if (xmlroot)
-				{
-					m_input.reset( new serialize::DDLStructSerializer( m_inputform->select( xmlroot)));
-				}
-				else
-				{
-					m_input.reset( new serialize::DDLStructSerializer( m_inputform.get()));
-				}
+				m_input.reset( new serialize::DDLStructSerializer( m_inputform.get()));
 				m_state = 3;
 				/* no break here ! */
 			}
@@ -335,24 +317,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					m_state = 6;
 					continue;
 				}
-				const types::DocMetaData* in_md_ref = m_inpufilter->getMetaData();
-				types::DocMetaData out_md( in_md_ref?*in_md_ref:types::DocMetaData());
 				if (m_outputform.get())
-				{
-					out_md.setDoctype( m_outputform->name(), m_output_rootelement);
-				}
-				else if (m_cmd->output_doctype_standalone)
-				{
-					out_md.clear();
-					out_md.setAttribute( types::DocMetaData::Attribute::Root, m_output_rootelement);
-				}
-				else
-				{
-					out_md.setDoctype( m_cmd->outputform, m_cmd->outputrootelem);
-				}
-				m_outputfilter->setDocMetaData( out_md);
-
-				if (m_outputform.get() && !m_cmd->skipvalidation_output)
 				{
 					serialize::DDLStructParser formparser( m_outputform.get());
 					formparser.init( m_functionclosure->result(), serialize::Context::ValidateInitialization);
@@ -395,6 +360,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					{
 						switch (m_inputfilter->state())
 						{
+							case InputFilter::Start: break;
 							case InputFilter::Open: break;
 							case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
 							case InputFilter::Error: throw std::runtime_error( std::string( "error in input: ") + m_inputfilter->getError());

@@ -474,6 +474,7 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 	}
 	switch (iflt->state())
 	{
+		case InputFilter::Start:
 		case InputFilter::Open:
 			break;
 
@@ -491,6 +492,7 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 	}
 	switch (oflt->state())
 	{
+		case OutputFilter::Start:
 		case OutputFilter::Open:
 			throw std::runtime_error( "unknown error");
 

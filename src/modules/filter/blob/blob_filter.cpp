@@ -121,9 +121,9 @@ struct InputFilterImpl :public InputFilter
 		return false;
 	}
 
-	virtual const char* getEncoding() const
+	virtual const types::DocMetaData* getMetaData()
 	{
-		return 0;
+		return getMetaDataRef().get();
 	}
 
 	virtual bool checkSetFlags( Flags f) const
@@ -151,9 +151,9 @@ private:
 struct OutputFilterImpl :public OutputFilter
 {
 	///\brief Constructor
-	OutputFilterImpl()
+	OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData)
 		:utils::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
-		,OutputFilter("blob")
+		,OutputFilter("blob", inheritedMetaData)
 		,m_elemitr(0){}
 
 	///\brief Copy constructor
@@ -226,7 +226,7 @@ struct BlobFilter :public Filter
 	BlobFilter()
 	{
 		m_inputfilter.reset( new InputFilterImpl());
-		m_outputfilter.reset( new OutputFilterImpl());
+		m_outputfilter.reset( new OutputFilterImpl( m_inputfilter->getMetaDataRef()));
 	}
 };
 

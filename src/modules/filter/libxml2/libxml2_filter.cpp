@@ -77,11 +77,11 @@ struct Libxml2Filter :public Filter
 	{
 		InputFilterImpl impl;
 		m_inputfilter.reset( new BufferingInputFilter( &impl,"libxml2"));
-		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter.get());
+		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter->getMetaDataRef());
 		m_outputfilter.reset( oo);
 		if (encoding)
 		{
-			oo->setEncoding( encoding);
+			m_outputfilter->setAttribute( types::DocMetaData::Attribute::Encoding, encoding);
 		}
 	}
 };

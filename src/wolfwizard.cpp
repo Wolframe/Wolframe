@@ -282,7 +282,7 @@ static void printStructXML( std::ostream& out, const types::VariantStructDescrip
 static void printFormXML( std::ostream& out, const types::Form& form)
 {
 	out << "<form name='" << form.description()->name() << "' " << "ddl='" << form.description()->ddlname() << "'";
-	if (form.description()->xmlRoot()) out << " xmlroot='" << form.description()->xmlRoot() << "'";
+	if (!form.description()->root().empty()) out << " xmlroot='" << form.description()->root() << "'";
 	out << ">" << std::endl;
 	printStructXML( out, form.description()->begin(), form.description()->end());
 	out << "</form>" << std::endl;

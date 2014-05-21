@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_TYPES_DOC_METADATA_HPP_INCLUDED
 #define _Wolframe_TYPES_DOC_METADATA_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -48,21 +49,24 @@ struct DocMetaData
 	{
 		enum Id
 		{
+			Encoding,
 			RootElement,
 			XmlNamespace,
 			Xsi,
 			SchemaLocation,
 			DOCTYPE_SYSTEM,
 			DOCTYPE_PUBLIC,
-			Identifier
+			DoctypeId
 		};
-		static const char name( Id id)
+		static const char* name( Id i)
 		{
-			static const char* ar[] = {"root","xmlns","xsi","schema","system","public","doctype"};
+			static const char* ar[] = {"encoding","root","xmlns","xsi","schema","system","public","doctype"};
+			return ar[i];
 		}
 		static Id firstid()	{return (Id)0;}
-		static Id lastid()	{return Identifier;}
+		static Id lastid()	{return DoctypeId;}
 		static Id nextid( Id i)	{return (Id)((int)i + 1);}
+		static bool getid( Id& res, const char* id);
 
 		Id id;
 		std::string value;
@@ -79,6 +83,10 @@ struct DocMetaData
 
 	void init( const std::vector<Attribute>& attributes_);
 	void join( const std::vector<Attribute>& attributes_);
+	void join( const DocMetaData& o)
+	{
+		join( o.attributes());
+	}
 
 	void setDoctype( const std::string& id_, const std::string& root_);
 	void setAttribute( const Attribute& attr);
@@ -86,9 +94,10 @@ struct DocMetaData
 
 	void deleteAttribute( Attribute::Id id);
 	const char* getAttribute( Attribute::Id id) const;
+	const char* getAttribute( const char* id) const;
 
 	const char* root() const;
-	const char* doctype() const;
+	std::string doctype() const;
 
 	const std::vector<Attribute>& attributes() const
 	{
