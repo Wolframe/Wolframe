@@ -48,11 +48,18 @@
 ///\brief Toplevel namespace of the library
 namespace textwolf {
 
+enum StandaloneDef
+{
+	Standalone_Yes,
+	Standalone_No,
+	Standalone_Unspecified
+};
+
 template <class BufferType>
 struct XMLPrinterBase
 {
 	typedef void (*PrintDoctype)( void* obj, const char* rootid, const char* publicid, const char* systemid, BufferType& buf);
-	typedef void (*PrintHeader)( void* obj, const char* encoding, bool standalone, BufferType& buf);
+	typedef void (*PrintHeader)( void* obj, const char* encoding, StandaloneDef standalone, BufferType& buf);
 	typedef bool (*PrintProc)( void* obj, const char* elemptr, std::size_t elemsize, BufferType& buf);
 	typedef bool (*PrintProcEmpty)( void* obj, BufferType& buf);
 	typedef void* (*CopyObj)( void* obj);
@@ -208,19 +215,22 @@ private:
 			m_output.print( (textwolf::UChar)(unsigned char)ch, buf);
 		}
 
-		void printHeader( const char* encoding, bool standalone, BufferType& buf)
+		void printHeader( const char* encoding, StandaloneDef standalone, BufferType& buf)
 		{
 			if (m_state != Init) throw std::logic_error( "printing document not starting with xml header");
 			std::string enc = encoding?encoding:"UTF-8";
 			printToBuffer( "<?xml version=\"1.0\" encoding=\"", 30, buf);
 			printToBuffer( enc.c_str(), enc.size(), buf);
-			if (standalone)
+			switch (standalone)
 			{
-				printToBuffer( "\" standalone=\"yes\"?>\n", 21, buf);
-			}
-			else
-			{
-				printToBuffer( "\" standalone=\"no\"?>\n", 20, buf);
+				case Standalone_Yes:
+					printToBuffer( "\" standalone=\"yes\"?>\n", 21, buf);
+					break;
+				case Standalone_No:
+					printToBuffer( "\" standalone=\"no\"?>\n", 20, buf);
+					break;
+				case Standalone_Unspecified:
+					break;
 			}
 			m_state = Content;
 		}
@@ -372,7 +382,7 @@ public:
 		return rt;
 	}
 
-	static void printHeader( void* obj_, const char* encoding, bool standalone, BufferType& buf)
+	static void printHeader( void* obj_, const char* encoding, StandaloneDef standalone, BufferType& buf)
 	{
 		This* obj = (This*)obj_;
 		obj->printHeader( encoding, standalone, buf);
@@ -453,9 +463,7 @@ public:
 	XMLPrinter( const XMLPrinter& o)
 		:m_mt(o.m_mt)
 		,m_obj(0)
-		,m_doctype_root(o.m_doctype_root)
-		,m_doctype_public(o.m_doctype_public)
-		,m_doctype_system(o.m_doctype_system)
+		,m_encoding(o.m_encoding)
 	{
 		if (o.m_obj)
 		{
@@ -466,13 +474,6 @@ public:
 	~XMLPrinter()
 	{
 		if (m_obj) m_mt.m_del( m_obj);
-	}
-
-	void setDocumentType( const char* rootid, const char* publicid, const char* systemid)
-	{
-		m_doctype_root = rootid?rootid:"";
-		m_doctype_public = publicid?publicid:"";
-		m_doctype_system = systemid?systemid:"";
 	}
 
 	bool printOpenTag( const char* src, std::size_t srcsize, BufferType& buf)
@@ -503,15 +504,55 @@ public:
 	{
 		if (m_obj) throw std::logic_error( "set encoding not possible in this state");
 		if (!createPrinter( encoding)) throw std::logic_error( "cannot create XML output for this character set encoding");
-		if (m_doctype_root.size())
+	}
+
+	void printRootAttributes( const char* xmlns, const char* xsi, const char* schemaLocation, BufferType& buf)
+	{
+		if (xmlns)
 		{
-			m_mt.m_printHeader( m_obj, encoding, false, buf);
-			m_mt.m_printDoctype( m_obj, m_doctype_root.c_str(), m_doctype_public.size()?m_doctype_public.c_str():0, m_doctype_system.size()?m_doctype_system.c_str():0, buf);
+			m_mt.m_printAttribute( m_obj, "xmlns", 5, buf);
+			m_mt.m_printValue( m_obj, xmlns, std::strlen(xmlns), buf);
+		}
+		if (xsi)
+		{
+			m_mt.m_printAttribute( m_obj, "xmlns::xsi", 10, buf);
+			m_mt.m_printValue( m_obj, xsi, std::strlen(xsi), buf);
+		}
+		if (schemaLocation)
+		{
+			m_mt.m_printAttribute( m_obj, "xmlns::schemaLocation", 21, buf);
+			m_mt.m_printValue( m_obj, schemaLocation, std::strlen(schemaLocation), buf);
+		}
+	}
+
+	bool printDocumentStart( const char* rootelem, const char* doctype_public, const char* doctype_system, const char* xmlns, const char* xsi, const char* schemaLocation, BufferType& buf)
+	{
+		if (!m_obj || !rootelem) return false;
+		if (doctype_system)
+		{
+			m_mt.m_printHeader( m_obj, m_encoding.c_str(), Standalone_No, buf);
+			m_mt.m_printDoctype( m_obj, rootelem, doctype_public, doctype_system, buf);
+			m_mt.m_printOpenTag( m_obj, rootelem, std::strlen(rootelem), buf);
+			printRootAttributes( xmlns, xsi, schemaLocation, buf);
+		}
+		else if (schemaLocation)
+		{
+			m_mt.m_printHeader( m_obj, m_encoding.c_str(), Standalone_Unspecified, buf);
+			m_mt.m_printDoctype( m_obj, rootelem, doctype_public, doctype_system, buf);
+			m_mt.m_printOpenTag( m_obj, rootelem, std::strlen(rootelem), buf);
+			printRootAttributes( xmlns, xsi, schemaLocation, buf);
 		}
 		else
 		{
-			m_mt.m_printHeader( m_obj, encoding, true, buf);
+			m_mt.m_printHeader( m_obj, m_encoding.c_str(), Standalone_Yes, buf);
+			m_mt.m_printOpenTag( m_obj, rootelem, std::strlen(rootelem), buf);
 		}
+		return true;
+	}
+
+	bool printDocumentEnd( BufferType& buf)
+	{
+		return m_mt.m_printCloseTag( m_obj, buf);
 	}
 
 private:
@@ -519,6 +560,7 @@ private:
 	{
 		std::string enc;
 		XMLPrinterBase<BufferType>::parseEncoding( enc, encoding);
+		m_encoding = encoding?encoding:"UTF-8";
 
 		if (m_obj)
 		{
@@ -566,10 +608,8 @@ private:
 	typedef typename XMLPrinterBase<BufferType>::MethodTable MethodTable;
 
 	MethodTable m_mt;			//< method table of m_obj
-	void* m_obj;				//< pointer to parser objecct
-	std::string m_doctype_root;		//< document type definition root element
-	std::string m_doctype_public;		//< document type public identifier
-	std::string m_doctype_system;		//< document type system URI of validation schema
+	void* m_obj;				//< pointer to parser object
+	std::string m_encoding;			//< character set encoding
 };
 
 } //namespace
