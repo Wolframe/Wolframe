@@ -31,20 +31,20 @@
 
 ************************************************************************/
 /// \file AAAA/authenticator.hpp
-/// Authenticator FSM interface definition
 ///
+/// Authenticator interface definition
 
 #ifndef _AUTHENTICATOR_HPP_INCLUDED
 #define _AUTHENTICATOR_HPP_INCLUDED
 
 #include <string>
-#include <list>
+#include <vector>
 #include "AAAA/user.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-/// Authenticator FSM interface
+/// Authenticator interface
 ///
 /// \note	The authenticator works ony with complete messages.
 ///		Sending a message in multiple parts will most likely
@@ -68,7 +68,7 @@ public:
 	virtual ~Authenticator()	{}
 
 	/// Get the list of available mechs
-	virtual const std::list<std::string>& mechs() const = 0;
+	virtual const std::vector<std::string>& mechs() const = 0;
 
 	/// Set the authentication mech
 	/// \param [in]	mech	the name of the mech (case-insensitive)

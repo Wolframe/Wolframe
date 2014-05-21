@@ -224,12 +224,11 @@ protected:
 				::ERR_error_string_n( e.value(), buf, sizeof( buf ) );
 				err += buf;
 
-				if (e.value() == ERR_PACK(ERR_LIB_SSL, 0, SSL_R_SHORT_READ))
-				{
+				if ( e.value() == ERR_PACK( ERR_LIB_SSL, 0, SSL_R_SHORT_READ ))	{
 					LOG_DEBUG << "Connection terminated abruptly by client, got no SSL_shutdown(); "
-							<< "error: " << e.value() << ", category: " << e.category().name()
-							<< ", message: " << err;
-					break;
+						  << "error: " << e.value() << ", category: " << e.category().name()
+						  << ", message: " << err;
+//					break;
 				}
 			}
 #endif // WITH_SSL

@@ -87,13 +87,14 @@ bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 
 Authenticator* AuthenticationFactory::authenticator()
 {
-	return new StandardAuthenticator();
+	return new StandardAuthenticator( m_mechs );
 }
 
 
 //*********************************************************************************
 // Standard authenticator
-StandardAuthenticator::StandardAuthenticator()
+StandardAuthenticator::StandardAuthenticator( const std::vector<std::string>& mechs_ )
+	: m_mechs( mechs_ )
 {
 }
 
@@ -102,8 +103,9 @@ StandardAuthenticator::~StandardAuthenticator()
 }
 
 /// Get the list of available mechs
-const std::list<std::string>& StandardAuthenticator::mechs() const
+const std::vector<std::string>& StandardAuthenticator::mechs() const
 {
+	return m_mechs;
 }
 
 /// Set the authentication mech

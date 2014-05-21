@@ -47,6 +47,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 
 namespace _Wolframe {
 namespace AAAA {
@@ -55,12 +56,12 @@ namespace AAAA {
 class StandardAuthenticator : public Authenticator
 {
 public:
-	StandardAuthenticator();
+	StandardAuthenticator( const std::vector<std::string>& mechs_ );
 	~StandardAuthenticator();
 	void close();
 
 	/// Get the list of available mechs
-	virtual const std::list<std::string>& mechs() const;
+	virtual const std::vector<std::string>& mechs() const;
 
 	/// Set the authentication mech
 	virtual bool setMech( const std::string& mech );
@@ -77,6 +78,7 @@ public:
 	/// The authenticated user or NULL if not authenticated
 	virtual User* user() const;
 private:
+	const std::vector<std::string>&	m_mechs;
 };
 
 class AuthenticationFactory
@@ -90,6 +92,7 @@ public:
 	Authenticator* authenticator();
 private:
 	std::list< AuthenticationUnit* > m_authenticators;
+	std::vector< std::string >	m_mechs;
 };
 
 

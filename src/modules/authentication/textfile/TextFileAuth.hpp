@@ -132,7 +132,7 @@ public:
 	const char* typeName() const			{ return m_backend.className(); }
 
 	/// Get the list of available mechs
-	virtual const std::list<std::string>& mechs() const;
+	virtual const std::vector<std::string>& mechs() const;
 
 	/// Set the authentication mech
 	virtual bool setMech( const std::string& mech );
