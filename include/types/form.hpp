@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/form.hpp
-///\brief Defines the unified form data structure as defined by a DDL (data definition language). A form data structure represents the document unit of a wolframe request or answer.
+/// \file types/form.hpp
+/// \brief Defines the unified form data structure as defined by a DDL (data definition language). A form data structure represents the document unit of a wolframe request or answer.
 
 #ifndef _Wolframe_TYPES_FORM_HPP_INCLUDED
 #define _Wolframe_TYPES_FORM_HPP_INCLUDED
@@ -45,51 +45,60 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace utils {
-	///\brief Forward declaration
+	/// \brief Forward declaration
 	struct PrintFormat;
 }
 namespace types {
 
-///\class FormDescription
-///\brief Description of a form structure
+/// \class FormDescription
+/// \brief Description of a form structure
 class FormDescription
 	:public types::VariantStructDescription
 {
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	FormDescription(){}
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~FormDescription(){}
-	///\brief Constructor
-	FormDescription( const std::string& ddlname_, const std::string& name_)
+	/// \brief Constructor
+	FormDescription( const std::string& ddlname_, const std::string& name_, const std::string& root_)
 		:m_name(name_)
+		,m_root(root_)
 		,m_ddlname(ddlname_){}
-	///\brief Copy constructor
+	explicit FormDescription( const std::string& ddlname_)
+		:m_name(name_)
+		{}
+	/// \brief Copy constructor
 	FormDescription( const FormDescription& o)
 		:types::VariantStructDescription(o)
 		,m_name(o.m_name)
+		,m_root(o.m_root)
 		,m_ddlname(o.m_ddlname){}
 
-	///\brief Assignement operator
-	///\param[in] o object to copy
+	/// \brief Assignement operator
+	/// \param[in] o object to copy
 	FormDescription& operator= ( const FormDescription& o)
 	{
 		types::VariantStructDescription::operator=( o);
 		m_name = o.m_name;
+		m_root = o.m_root;
 		m_ddlname = o.m_ddlname;
 		return *this;
 	}
 
-	const char* xmlRoot() const
+	/// \brief Get the root element of the form for filters that need it (like XML)
+	const std::string& root() const
 	{
-		return (size() == 1 && !m_name.empty())?begin()->name:0;
+		return m_root;
 	}
 
+	/// \brief Get the name of the form
 	const std::string& name() const
 	{
 		return m_name;
 	}
 
+	/// \brief Get the data definition language name of the form
 	const std::string& ddlname() const
 	{
 		return m_ddlname;
@@ -97,40 +106,41 @@ public:
 
 	void print( std::ostream& out, const utils::PrintFormat* pformat, size_t level=0) const;
 
-	///\brief Gets the form as string
+	/// \brief Gets the form as string
 	std::string tostring( const utils::PrintFormat* pformat=0) const;
 
 private:
-	std::string m_name;
-	std::string m_ddlname;
+	std::string m_name;		///< name of the form
+	std::string m_root;		///< root element of the form for filters that need it (like XML)
+	std::string m_ddlname;		///< data definition language name of the form
 };
 
 typedef boost::shared_ptr<FormDescription> FormDescriptionR;
 
 
-///\class Form
-///\brief Form data structure
+/// \class Form
+/// \brief Form data structure
 class Form
 	:public types::VariantStruct
 {
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	Form()
 		:m_description(0){}
-	///\brief Constructor
+	/// \brief Constructor
 	explicit Form( const FormDescription* description_)
 		:types::VariantStruct(description_)
 		,m_description(description_){}
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	Form( const Form& o)
 		:types::VariantStruct(o)
 		,m_description(o.m_description){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~Form(){}
 
-	///\brief Assignement operator
-	///\param[in] o object to copy
+	/// \brief Assignement operator
+	/// \param[in] o object to copy
 	Form& operator= ( const Form& o)
 	{
 		types::VariantStruct::operator=( o);
@@ -145,14 +155,14 @@ public:
 
 	void print( std::ostream& out, const utils::PrintFormat* pformat, size_t level=0) const;
 
-	///\brief Gets the form as string
+	/// \brief Gets the form as string
 	std::string tostring( const utils::PrintFormat* pformat=0) const;
 
 private:
 	const FormDescription* m_description;
 };
 
-///\brief shared ownership reference to form data structure
+/// \brief shared ownership reference to form data structure
 typedef boost::shared_ptr<Form> FormR;
 
 }}//namespace

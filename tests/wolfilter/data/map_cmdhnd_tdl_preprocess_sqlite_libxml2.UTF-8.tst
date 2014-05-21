@@ -272,24 +272,24 @@ end
 **file:preprocess.dmap
 COMMAND (AllDataRequest) CALL(run) RETURN(Data);
 **file:preprocess.sfrm
-FORM PersonRef
+STRUCT PersonRef
 {
 	prename string
 	surname string
 }
 
-FORM AddressRef
+STRUCT AddressRef
 {
 	street string
 	town string
 }
 
-FORM CompanyRef
+STRUCT CompanyRef
 {
 	name string
 }
 
-FORM Person
+STRUCT Person
 {
 	company CompanyRef[]
 	id int
@@ -301,7 +301,7 @@ FORM Person
 	tag ?int
 }
 
-FORM Company
+STRUCT Company
 {
 	id int
 	parent string
@@ -311,19 +311,13 @@ FORM Company
 	tag int[]
 }
 
-FORM Data
+FORM Data data
 {
-	data
-	{
-		person Person[]
-	}
+	person Person[]
 }
 
-FORM AllDataRequest
+FORM AllDataRequest data
 {
-	data
-	{
-	}
 }
 **file:preprocess.tdl
 

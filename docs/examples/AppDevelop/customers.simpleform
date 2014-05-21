@@ -1,12 +1,9 @@
 
-FORM Customer
+FORM Customer customer
 {
-   customer
-   {
-       ID !@int                  ; Internal customer id (mandatory)
-       name string               ; Name of the customer
-       canonical_Name string     ; Customer name in canonical form
-       country string            ; Country
-       locality ?string          ; Locality (optional)
-   }
+    ID !@int                  ; Internal customer id (mandatory)
+    name string               ; Name of the customer
+    canonical_Name string     ; Customer name in canonical form
+    country string            ; Country
+    locality ?string          ; Locality (optional)
 }

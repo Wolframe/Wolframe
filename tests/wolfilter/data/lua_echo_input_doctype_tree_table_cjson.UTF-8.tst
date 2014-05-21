@@ -4,8 +4,7 @@
 **requires:TEXTWOLF
 **input
 {
-  "doctype" : "trees",
-  "root": {
+    "doctype" : "trees",
     "mtree": {
       "-id": "1",
       "name": "eins",
@@ -44,7 +43,6 @@
         }
       }
     }
-  }
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
@@ -146,42 +144,40 @@ function run()
 end
 **output
 {
-	"doctype":	"trees",
-	"root":	{
-		"btree":	{
-			"id":	"1",
-			"left":	{
-				"id":	"11",
-				"name":	"EINS EINS"
-			},
-			"name":	"EINS",
-			"right":	{
-				"id":	"12",
-				"left":	{
-					"id":	"121",
-					"name":	"EINS ZWEI EINS"
-				},
-				"name":	"EINS ZWEI"
-			}
-		},
-		"mtree":	{
-			"id":	"1",
-			"name":	"EINS",
-			"node":	[{
-					"id":	"11",
-					"name":	"EINS EINS"
-				}, {
-					"id":	"12",
-					"name":	"EINS ZWEI",
-					"node":	{
-						"id":	"121",
-						"name":	"EINS ZWEI EINS"
-					}
-				}, {
-					"id":	"13",
-					"name":	"EINS DREI"
-				}]
-		}
-	}
+  "doctype":  "trees",
+  "btree":  {
+    "id":  "1",
+    "left":  {
+      "id":  "11",
+      "name":  "EINS EINS"
+    },
+    "name":  "EINS",
+    "right":  {
+      "id":  "12",
+      "left":  {
+        "id":  "121",
+        "name":  "EINS ZWEI EINS"
+      },
+      "name":  "EINS ZWEI"
+    }
+  },
+  "mtree":  {
+    "id":  "1",
+    "name":  "EINS",
+    "node":  [{
+        "id":  "11",
+        "name":  "EINS EINS"
+      }, {
+        "id":  "12",
+        "name":  "EINS ZWEI",
+        "node":  {
+          "id":  "121",
+          "name":  "EINS ZWEI EINS"
+        }
+      }, {
+        "id":  "13",
+        "name":  "EINS DREI"
+      }]
+  }
 }
 **end

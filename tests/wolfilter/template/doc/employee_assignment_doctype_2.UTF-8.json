@@ -1,6 +1,5 @@
 {
-  "doctype" : "employee_assignment_print",
-  "assignmentlist": {
+    "doctype" : "employee_assignment_print",
     "assignment": [
       {
         "task": [
@@ -36,5 +35,4 @@
         "issuedate": "13.5.2006"
       }
     ]
-  }
 }

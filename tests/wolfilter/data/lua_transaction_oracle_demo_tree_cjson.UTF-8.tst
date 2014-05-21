@@ -5,7 +5,6 @@
 **requires:ORACLE
 **input
 {
-  "transactions": {
     "treeAddRoot": { "name": "Albert" },
     "treeAddNode": [
       {
@@ -29,7 +28,6 @@
         "name": "Fred"
       }
     ]
-  }
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
@@ -294,7 +292,7 @@ END
 **outputfile:DBDUMP
 **output
 {
-	"result":	["", "ID { '2' } ", "ID { '3' } ", "ID { '4' } ", "ID { '5' } ", "ID { '6' } "]
+  "result":  ["", "ID { '2' } ", "ID { '3' } ", "ID { '4' } ", "ID { '5' } ", "ID { '6' } "]
 }
 TREE:
 ID, PARENT, NAME, LFT, RGT

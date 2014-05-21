@@ -185,7 +185,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 	return rt;
 }
 
-void OutputFilterImpl::setDocType( const types::DocType& doctype)
+void OutputFilterImpl::setDocMetaData( const types::DocMetaData& doctype)
 {
 	m_doctype_root = doctype.root;
 	m_doctype_public = "";

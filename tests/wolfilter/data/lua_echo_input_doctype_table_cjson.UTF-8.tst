@@ -4,8 +4,7 @@
 **requires:TEXTWOLF
 **input
 {
-  "doctype" : "employee_assignment_print",
-  "assignmentlist": {
+    "doctype" : "employee_assignment_print",
     "assignment": [
       {
         "task": [
@@ -41,7 +40,6 @@
         "issuedate": "13.5.2006"
       }
     ]
-  }
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
@@ -73,28 +71,25 @@ float=trim, floatingpoint( 10,10);
 currency=bigfxp(  2);
 percent_1=bigfxp(2 );
 **file:form.sfrm
-FORM Employee
+STRUCT Employee
 {
 	firstname string
 	surname string
 	phone string
 }
 
-FORM employee_assignment_print
+FORM employee_assignment_print assignmentlist
 {
-	assignmentlist
+	assignment []
 	{
-		assignment []
+		task []
 		{
-			task []
-			{
-				title string
-				key string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
+			title string
+			key string
+			customernumber int
 		}
+		employee Employee
+		issuedate string
 	}
 }
 **file:script.lua
@@ -145,37 +140,35 @@ end
 
 **output
 {
-	"doctype":	"employee_assignment_print",
-	"assignmentlist":	{
-		"assignment":	[{
-				"employee":	{
-					"firstname":	"Julia",
-					"phone":	"098 765 43 21",
-					"surname":	"Tegel-Sacher"
-				},
-				"issuedate":	"13.5.2006",
-				"task":	[{
-						"customernumber":	"324",
-						"key":	"A123",
-						"title":	"job 1"
-					}, {
-						"customernumber":	"567",
-						"key":	"V456",
-						"title":	"job 2"
-					}]
-			}, {
-				"employee":	{
-					"firstname":	"Jakob",
-					"phone":	"012 345 67 89",
-					"surname":	"Stegelin"
-				},
-				"issuedate":	"13.5.2006",
-				"task":	{
-					"customernumber":	"890",
-					"key":	"V789",
-					"title":	"job 4"
-				}
-			}]
-	}
+  "doctype":  "employee_assignment_print",
+  "assignment":  [{
+      "employee":  {
+        "firstname":  "Julia",
+        "phone":  "098 765 43 21",
+        "surname":  "Tegel-Sacher"
+      },
+      "issuedate":  "13.5.2006",
+      "task":  [{
+          "customernumber":  "324",
+          "key":  "A123",
+          "title":  "job 1"
+        }, {
+          "customernumber":  "567",
+          "key":  "V456",
+          "title":  "job 2"
+        }]
+    }, {
+      "employee":  {
+        "firstname":  "Jakob",
+        "phone":  "012 345 67 89",
+        "surname":  "Stegelin"
+      },
+      "issuedate":  "13.5.2006",
+      "task":  {
+        "customernumber":  "890",
+        "key":  "V789",
+        "title":  "job 4"
+      }
+    }]
 }
 **end

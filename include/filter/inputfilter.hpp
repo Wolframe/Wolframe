@@ -35,7 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
 #include "types/countedReference.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "filter/filterbase.hpp"
 #include "filter/contentfilterAttributes.hpp"
 #include <string>
@@ -57,6 +57,7 @@ public:
 	///\brief State of the input filter
 	enum State
 	{
+		Init,		//< header not parsed yet
 		Open,		//< serving data - normal input processing
 		EndOfMessage,	//< have to yield processing because end of message reached
 		Error		//< have to stop processing with an error
@@ -66,7 +67,7 @@ public:
 	explicit InputFilter( const char* name_)
 		:utils::TypeSignature("langbind::InputFilter", __LINE__)
 		,FilterBase(name_)
-		,m_state(Open){}
+		,m_state(Init){}
 
 	///\brief Copy constructor
 	///\param[in] o input filter to copy
@@ -131,20 +132,14 @@ public:
 	///\remark Check the filter state when false is returned
 	virtual bool getNext( ElementType& type, const void*& element, std::size_t& elementsize)=0;
 
-	///\brief Get type of the document
-	///\param [out] doctype the document type returned
-	///\return true, if success, false, if not.
-	///\remark Check the filter state when false is returned
-	virtual bool getDocType( types::DocType& doctype)
+	///\brief Get the document meta data if available
+	///\param [out] metadata the document metadata returned
+	///\return the metadata reference, if success, null, if not.
+	///\remark Check the filter state when null is returned
+	virtual const types::DocMetaData* getMetaData()
 	{
-		doctype = types::DocType();
-		return true;
-	}
-
-	///\brief Evaluate if the document metadata are avalable and set state for fetching them if needed
-	virtual bool getMetadata()
-	{
-		return true;
+		static const types::DocMetaData rt;
+		return &rt;
 	}
 
 	///\brief Get the current state

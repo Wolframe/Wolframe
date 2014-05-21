@@ -293,21 +293,38 @@ static void compile_forms( const std::string& filename, std::vector<types::FormD
 				
 				compile_forms( utils::getCanonicalPath( lx.value(), includepath), result, typemap, filenamestack2);
 			}
-			else if (lx.id() == Lexem::FORM || lx.id() == Lexem::STRUCT)
+			else if (lx.id() == Lexem::STRUCT)
 			{
-				bool isExported = (lx.id() == Lexem::FORM);
 				lx = lexer.next();
 				if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for name of structure");
-				if (lx.value().empty()) throw std::runtime_error( "non empty name expected for structure");
-				std::string structname( lx.value());				//< name of the structure in the reference table for indirections and sub structures
-				std::string formname( isExported?structname:std::string());	//< exported name of the form, empty for internal structure
+				if (lx.value().empty()) throw std::runtime_error( "non empty structure name expected after STRUCT");
+				std::string structname( lx.value());	//... name of the structure in the reference table for indirections and sub structures
 				lx = lexer.next();
 				if (lx.id() != Lexem::OpenStruct) throw std::runtime_error("open structure operator '{' expected (start of the form or structure declaration)");
 
-				types::FormDescriptionR form( new types::FormDescription( "simpleform", formname));
+				types::FormDescriptionR form( new types::FormDescription( "simpleform"));
 				compile_structure( lexer, *form, typemap, formmap, unresolvedSymbols);
 				formmap.insert( structname, form);
-				if (isExported) result.push_back( form);
+			}
+			else if (lx.id() == Lexem::FORM)
+			{
+				lx = lexer.next();
+				if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for name of structure");
+				if (lx.value().empty()) throw std::runtime_error( "non empty form name expected after FORM");
+				std::string structname( lx.value());	//... name of the form
+
+				lx = lexer.next();
+				if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for name of structure");
+				if (lx.value().empty()) throw std::runtime_error( "non empty root element name expected after FORM <name>");
+				std::string root( lx.value());		//... root element name of the form
+
+				lx = lexer.next();
+				if (lx.id() != Lexem::OpenStruct) throw std::runtime_error("open structure operator '{' expected (start of the form or structure declaration)");
+
+				types::FormDescriptionR form( new types::FormDescription( "simpleform", structname, root));
+				compile_structure( lexer, *form, typemap, formmap, unresolvedSymbols);
+				formmap.insert( structname, form);
+				result.push_back( form);
 			}
 			else
 			{

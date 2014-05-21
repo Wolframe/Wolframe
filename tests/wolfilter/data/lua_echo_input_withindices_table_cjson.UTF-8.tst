@@ -4,34 +4,32 @@
 **requires:TEXTWOLF
 **input
 {
-	"issuelist":	{
-		"issue":	[{
-				"date":	"8647993",
-				"subtask":	[{
-						"key":	"a876",
-						"title":	"ABC"
-					}, {
-						"key":	"v543",
-						"title":	"XYZ"
-					}],
-				"system":	{
-					"machine":	"orion7",
-					"OS":	"Windows",
-					"version":	"1.0.8"
-				}
-			}, {
-				"date":	"8647993",
-				"subtask":	[{
-						"key":	"a876",
-						"title":	"ABC"
-					}],
-				"system":	{
-					"machine":	"orion7",
-					"OS":	"Windows",
-					"version":	"1.0.8"
-				}
-			}]
-	}
+  "issue":  [{
+      "date":  "8647993",
+      "subtask":  [{
+          "key":  "a876",
+          "title":  "ABC"
+        }, {
+          "key":  "v543",
+          "title":  "XYZ"
+        }],
+      "system":  {
+        "machine":  "orion7",
+        "OS":  "Windows",
+        "version":  "1.0.8"
+      }
+    }, {
+      "date":  "8647993",
+      "subtask":  [{
+          "key":  "a876",
+          "title":  "ABC"
+        }],
+      "system":  {
+        "machine":  "orion7",
+        "OS":  "Windows",
+        "version":  "1.0.8"
+      }
+    }]
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
@@ -97,33 +95,31 @@ function run()
 end
 **output
 {
-	"issuelist":	{
-		"issue":	[{
-				"date":	"8647993",
-				"subtask":	[{
-						"key":	"a876",
-						"title":	"ABC"
-					}, {
-						"key":	"v543",
-						"title":	"XYZ"
-					}],
-				"system":	{
-					"machine":	"orion7",
-					"OS":	"Windows",
-					"version":	"1.0.8"
-				}
-			}, {
-				"date":	"8647993",
-				"subtask":	[{
-						"key":	"a876",
-						"title":	"ABC"
-					}],
-				"system":	{
-					"machine":	"orion7",
-					"OS":	"Windows",
-					"version":	"1.0.8"
-				}
-			}]
-	}
+  "issue":  [{
+      "date":  "8647993",
+      "subtask":  [{
+          "key":  "a876",
+          "title":  "ABC"
+        }, {
+          "key":  "v543",
+          "title":  "XYZ"
+        }],
+      "system":  {
+        "machine":  "orion7",
+        "OS":  "Windows",
+        "version":  "1.0.8"
+      }
+    }, {
+      "date":  "8647993",
+      "subtask":  [{
+          "key":  "a876",
+          "title":  "ABC"
+        }],
+      "system":  {
+        "machine":  "orion7",
+        "OS":  "Windows",
+        "version":  "1.0.8"
+      }
+    }]
 }
 **end

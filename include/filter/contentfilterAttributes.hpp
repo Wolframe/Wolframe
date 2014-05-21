@@ -45,8 +45,6 @@ public:
 	virtual const char* getEncoding() const=0;
 };
 
-typedef types::CountedReference<ContentFilterAttributes> ContentFilterAttributesR;
-
 }}//namespace
 #endif
 

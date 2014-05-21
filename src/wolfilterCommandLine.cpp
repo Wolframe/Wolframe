@@ -41,7 +41,6 @@
 #include "types/propertyTree.hpp"
 #include "serialize/structOptionParser.hpp"
 #include "utils/fileUtils.hpp"
-#include "types/doctype.hpp"
 #include "filter/redirectFilterClosure.hpp"
 #include "config/structSerialize.hpp"
 #include "logger-v1.hpp"

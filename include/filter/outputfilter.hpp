@@ -35,7 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #include "types/countedReference.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "filter/filterbase.hpp"
 #include "filter/contentfilterAttributes.hpp"
 #include <string>
@@ -55,6 +55,7 @@ public:
 	///\brief State of the input filter used in the application processor iterating loop to decide what to do
 	enum State
 	{
+		Init,		//< header not printed yet
 		Open,		//< serving data - normal input processing
 		EndOfBuffer,	//< have to yield processing because end of message reached
 		Error		//< have to stop processing with an error
@@ -64,7 +65,7 @@ public:
 	OutputFilter( const char* name_, const ContentFilterAttributes* attr_=0)
 		:utils::TypeSignature("langbind::OutputFilter", __LINE__)
 		,FilterBase(name_)
-		,m_state(Open)
+		,m_state(Init)
 		,m_buf(0)
 		,m_size(0)
 		,m_pos(0)
@@ -126,9 +127,9 @@ public:
 	///\brief Set type of the document.
 	///\param [in] doctype type of the document
 	///\remark For some types of filters (non buffering) the type has to be set before the first print
-	virtual void setDocType( const types::DocType&)
+	virtual void setDocMetaData( const types::DocMetaData& md)
 	{
-		throw std::runtime_error("document type can not be set for this type of filter");
+		metadata = m_docmetadata;
 	}
 
 	///\brief Print the follow element to the buffer
@@ -208,6 +209,9 @@ private:
 	std::size_t m_size;			//< buffer size in bytes
 	std::size_t m_pos;			//< write byte position
 	const ContentFilterAttributes* m_attr;	//< reference to attributes shared from input
+protected:
+	types::DocMetaData m_docmetadata;	//< document meta data
+
 #ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
 	unsigned int m_chksum;			//< check sum for error detection
 	unsigned int m_chkpos;			//< check bytes written for error detection

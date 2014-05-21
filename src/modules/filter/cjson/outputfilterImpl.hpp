@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_CJSON_OUTPUT_FILTER_HPP_INCLUDED
 #include "filter/outputfilter.hpp"
 #include "types/countedReference.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "types/string.hpp"
 extern "C"
 {
@@ -88,8 +88,8 @@ public:
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implementation of OutputFilter::setDocType(const types::DocType&)
-	virtual void setDocType( const types::DocType& doctype);
+	///\brief Implementation of OutputFilter::setDocMetaData(const types::DocType&)
+	virtual void setDocMetaData( const types::DocMetaData& md);
 
 	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
@@ -120,7 +120,6 @@ private:
 	std::string m_attribname;				//< attribute name buffer
 	std::string m_elembuf;					//< buffer for current element
 	std::size_t m_elemitr;					//< iterator on current element
-	std::string m_doctypeid;				//< document type
 	types::String::EncodingAttrib m_encattr;		//< character set encoding attributes
 	bool m_encattr_defined;					//< true, if character set encoding is defined
 	bool m_headerPrinted;

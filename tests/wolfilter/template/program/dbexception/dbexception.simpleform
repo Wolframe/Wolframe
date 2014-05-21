@@ -1,7 +1,5 @@
-FORM User
+FORM User user
 {
-	user
-	{
-		name string
-	}
+	name string
 }
+

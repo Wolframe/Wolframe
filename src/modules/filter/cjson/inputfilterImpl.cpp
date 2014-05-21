@@ -79,28 +79,14 @@ bool InputFilterImpl::getValue( const char* id, std::string& val) const
 	return Parent::getValue( id, val);
 }
 
-bool InputFilterImpl::getDocType( types::DocType& doctype)
+const types::DocMetaData* InputFilterImpl::getMetaData()
 {
 	if (!m_root.get())
 	{
 		setState( EndOfMessage);
-		return false;
+		return 0;
 	}
-	doctype = m_doctype;
-	return true;
-}
-
-bool InputFilterImpl::getMetadata()
-{
-	if (m_root.get())
-	{
-		return true;
-	}
-	else
-	{
-		setState( EndOfMessage);
-		return false;
-	}
+	return &m_docmetadata;
 }
 
 const char* InputFilterImpl::getEncoding() const
@@ -226,20 +212,9 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				}
 				break;
 			}
-			if (m_firstnode->string && !m_firstnode->next)
-			{
-				rootelem = m_firstnode->string;
-			}
 			if (doctypeid)
 			{
-				if (rootelem)
-				{
-					m_doctype = types::DocType( doctypeid, rootelem, types::DocType::SchemaPath());
-				}
-				else
-				{
-					setState( InputFilter::Error, "document type defined, but no singular root element");
-				}
+				m_docmetadata.setAttribute( types::DocMetaData::Attribute::Identifier, doctypeid);
 			}
 			m_stk.push_back( StackElement( m_firstnode));
 		}

@@ -1,6 +1,4 @@
-	FORM CustomerRequest
-	{
-		customer {
-			id !@string
-		}
-	}
+FORM CustomerRequest customer
+{
+	id !@string
+}

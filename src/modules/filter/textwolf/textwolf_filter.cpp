@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file textwolf_filter.cpp
 ///\brief Filter implementation reading/writing xml with the textwolf xml library
 #include "textwolf_filter.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "utils/fileUtils.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/xmlparser.hpp"
@@ -65,6 +65,7 @@ struct InputFilterImpl
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
+		,m_metadatastate(MS_Init)
 		{}
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
@@ -75,6 +76,9 @@ struct InputFilterImpl
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend)
+		,m_metadata(o.m_metadata)
+		,m_metadatastate(o.m_metadatastate)
+		,m_elembuffer(o.m_elembuffer)
 		{}
 
 	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
@@ -93,42 +97,6 @@ struct InputFilterImpl
 		return Parent::getValue( id, val);
 	}
 
-	///\brief Implementation of InputFilter::getDocType(std::string&)
-	bool getDocType( types::DocType& doctype)
-	{
-		try
-		{
-			if (m_parser.state() != XMLParser::ParseSource)
-			{
-				if (!getMetadata())
-				{
-					return false;
-				}
-				if (m_parser.isStandalone())
-				{
-					doctype.clear();
-					return true;
-				}
-			}
-			std::string systemid = m_parser.getDoctypeSystem();
-			std::string ext = utils::getFileExtension( systemid);
-			std::string id = utils::getFileStem( systemid);
-			std::string dir;
-			std::size_t namesize = ext.size() + id.size();
-			if (namesize < systemid.size())
-			{
-				dir = std::string( systemid.c_str(), systemid.size() - namesize);
-			}
-			std::string root = m_parser.getDoctypeRoot();
-			doctype.init( id, root, types::DocType::SchemaPath( dir, ext));
-			return true;
-		}
-		catch (textwolf::SrcIterator::EoM)
-		{
-			setState( EndOfMessage);
-			return false;
-		};
-	}
 
 	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* id, const std::string& value)
@@ -222,6 +190,10 @@ struct InputFilterImpl
 			}
 		};
 		static const ElementTypeMap tmap;
+		if (!m_metadatastate == MS_Init)
+		{
+			return false;
+		}
 		try
 		{
 			for (;;)
@@ -260,25 +232,110 @@ struct InputFilterImpl
 	}
 
 	///\brief Implements InputFilter::getMetadata()
-	virtual bool getMetadata()
+	virtual const types::DocMetaData* getMetadata()
 	{
+		if (m_metadatastate == MS_Done) return m_metadata.get();
+
 		try
 		{
 			for (;;) switch (m_parser.state())
 			{
 				case XMLParser::ParseHeader:
+				case XMLParser::ParseDoctype:
 				{
 					const char* err = 0;
 					if (!m_parser.parseHeader( err) || !m_parser.hasMetadataParsed())
 					{
-						setState( Error, err);
+						setState( Error, err?err:"unknown error");
 					}
 					continue;
 				}
-				case XMLParser::ParsedRoot:
 				case XMLParser::ParseSource:
-				case XMLParser::ParseDoctype:
-					return true;
+				case XMLParser::ParseSourceReady:
+				{
+					const char* ee;
+					std::size_t eesize;
+					textwolf::XMLScannerBase::ElementType et;
+
+					switch (m_metadatastate)
+					{
+						case MS_Init:
+							m_metadata.reset( new types::DocMetaData());
+							m_metadatastate = MS_Root;
+							if (!m_parser.getDoctypePublic().empty())
+							{
+								m_metadata->setAttribute( types::DocMetaData::Attribute::DOCTYPE_PUBLIC, std::string( ee, eesize));
+							}
+							if (!m_parser.getDoctypeSystem().empty())
+							{
+								m_metadata->setAttribute( types::DocMetaData::Attribute::DOCTYPE_SYSTEM, std::string( ee, eesize));
+							}
+							/*no break here!*/
+						case MS_Root:
+							et = m_parser.getNext( ee, eesize);
+							if (et == textwolf::XMLScannerBase::OpenTag)
+							{
+								m_metadata->setAttribute( types::DocMetaData::Attribute::Root, std::string( ee, eesize));
+								m_metadatastate = MS_AttribName;
+							}
+							else
+							{
+								setState( Error, "root element expected");
+								return 0;
+							}
+							/*no break here!*/
+						case MS_AttribName:
+							et = m_parser.getNext( ee, eesize);
+							if (et == textwolf::XMLScannerBase::OpenTag || et == textwolf::XMLScannerBase::CloseTag || et == textwolf::XMLScannerBase::CloseTagIm || et == textwolf::XMLScannerBase::Content)
+							{
+								m_parser.ungetElement( et, ee, eesize);
+								m_metadatastate = MS_Done;
+								return m_metadata.get();
+							}
+							else if (et == textwolf::XMLScannerBase::TagAttribName)
+							{
+								m_elembuffer = std::string( ee, eesize);
+								m_metadatastate = MS_AttribValue;
+							}
+							else
+							{
+								setState( Error, "root element attribute or document start expected");
+								return 0;
+							}
+							/*no break here!*/
+						case MS_AttribValue:
+							et = m_parser.getNext( ee, eesize);
+							if (et == textwolf::XMLScannerBase::TagAttribValue)
+							{
+								if (0==std::strcmp( m_elembuffer,"xmlns"))
+								{
+									m_metadata.setAttribute( types::DocMetaData::Attribute::XmlNamespace, std::string( ee, eesize));
+								}
+								else if (0==std::strcmp( m_elembuffer,"xmlns:xsi"))
+								{
+									m_metadata.setAttribute( types::DocMetaData::Attribute::Xsi, std::string( ee, eesize));
+								}
+								else if (0==std::strcmp( m_elembuffer,"xmlns:schemaLocation"))
+								{
+									m_metadata.setAttribute( types::DocMetaData::Attribute::SchemaLocation, std::string( ee, eesize));
+								}
+								else
+								{
+									setState( Error, "unknown XML root element attribute";
+								}
+							}
+							else
+							{
+								setState( Error, "root element attribute value expected");
+								return 0;
+							}
+							m_metadatastate = MS_AttribName;
+							break;
+							
+						case MS_Done:
+							return m_metadata.get();
+					}
+				}
 			}
 		}
 		catch (textwolf::SrcIterator::EoM)
@@ -317,6 +374,17 @@ private:
 	const char* m_src;			//< pointer to current chunk parsed
 	std::size_t m_srcsize;			//< size of the current chunk parsed in bytes
 	bool m_srcend;				//< true if end of message is in current chunk parsed
+	enum MetadataState
+	{
+		MS_Init,
+		MS_Root,
+		MS_AttribName,
+		MS_AttribValue,
+		MS_Done
+	};
+	MetadataParseState m_metadatastate;	//< state of document meta data parsing
+	types::DocMetaData m_metadata;		//< document meta data
+	std::string m_elembuffer;		//< buffer for element
 };
 
 ///\class OutputFilter
@@ -366,8 +434,8 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	///\brief Implementation of OutputFilter::setDocType( const types::DocType&)
-	virtual void setDocType( const types::DocType& doctype)
+	///\brief Implementation of OutputFilter::setDocMetaData( const types::DocMetaData&)
+	virtual void setDocMetaData( const types::DocMetaData& doctype)
 	{
 		const char* ro = doctype.root.empty()?0:doctype.root.c_str();
 		std::string sy = doctype.schemaURL();

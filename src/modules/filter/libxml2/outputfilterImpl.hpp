@@ -37,7 +37,7 @@ Project Wolframe.
 #include "documentWriter.hpp"
 #include "xsltMapper.hpp"
 #include "types/countedReference.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "filter/outputfilter.hpp"
 #include "libxml/parser.h"
 #include "libxml/tree.h"
@@ -99,8 +99,8 @@ public:
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implementation of OutputFilter::setDocType(const types::DocType&)
-	virtual void setDocType( const types::DocType& doctype);
+	///\brief Implementation of OutputFilter::setDocMetaData(const types::DocMetaData&)
+	virtual void setDocMetaData( const types::DocMetaData& doctype);
 
 	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);

@@ -34,6 +34,7 @@
 ///\file directmapProgram.hpp
 #ifndef _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
 #define _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
+#include "directmapCommandDescription.hpp"
 #include "types/keymap.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
@@ -41,51 +42,6 @@
 
 namespace _Wolframe {
 namespace langbind {
-
-struct DirectmapCommandDescription
-{
-	DirectmapCommandDescription()
-		:skipvalidation_input(false)
-		,skipvalidation_output(false)
-		,output_doctype_standalone(false)
-		,command_has_result(false)
-		{}
-	DirectmapCommandDescription( const DirectmapCommandDescription& o)
-		:name(o.name)
-		,call(o.call)
-		,inputfilter(o.inputfilter)
-		,inputfilterarg(o.inputfilterarg)
-		,outputfilter(o.outputfilter)
-		,outputfilterarg(o.outputfilterarg)
-		,inputform(o.inputform)
-		,outputform(o.outputform)
-		,outputrootelem(o.outputrootelem)
-		,authfunction(o.authfunction)
-		,authresource(o.authresource)
-		,skipvalidation_input(o.skipvalidation_input)
-		,skipvalidation_output(o.skipvalidation_output)
-		,output_doctype_standalone(o.output_doctype_standalone)
-		,command_has_result(o.command_has_result)
-		{}
-
-	std::string name;						//< name of program
-	std::string call;						//< name of the transaction or form function
-	std::string inputfilter;					//< name of the input filter
-	std::vector<langbind::FilterArgument> inputfilterarg;		//< arguments of the input filter
-	std::string outputfilter;					//< name of the output filter
-	std::vector<langbind::FilterArgument> outputfilterarg;		//< arguments of the output filter
-	std::string inputform;						//< name of the input form
-	std::string outputform;						//< name of the output form
-	std::string outputrootelem;					//< name of the output root element (in case of SKIP and no form defined)
-	std::string authfunction;					//< authorization function name
-	std::string authresource;					//< authorization resource name
-	bool skipvalidation_input;					//< input is not validated
-	bool skipvalidation_output;					//< output is not validated but document is not standalone and is with doctype returned
-	bool output_doctype_standalone;					//< no document type defined (only root element). document is standalone
-	bool command_has_result;					//< true, if command has a result
-
-	std::string tostring() const;
-};
 
 ///\class DirectmapProgram
 ///\brief Program describing direct mappings (many function descriptions per source file)

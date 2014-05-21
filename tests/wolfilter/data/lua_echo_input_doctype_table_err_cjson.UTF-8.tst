@@ -6,8 +6,7 @@
 try to use iterator for input/document twice
 **input
 {
-  "doctype" : "employee_assignment_print",
-  "assignmentlist": {
+    "doctype" : "employee_assignment_print",
     "assignment": [
       {
         "task": [
@@ -43,7 +42,6 @@ try to use iterator for input/document twice
         "issuedate": "13.5.2006"
       }
     ]
-  }
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
@@ -75,28 +73,25 @@ float=trim, floatingpoint( 10,10);
 currency=bigfxp(  2);
 percent_1=bigfxp(2 );
 **file:form.sfrm
-FORM Employee
+STRUCT Employee
 {
 	firstname string
 	surname string
 	phone string
 }
 
-FORM employee_assignment_print
+FORM employee_assignment_print assignmentlist
 {
-	assignmentlist
+	assignment []
 	{
-		assignment []
+		task []
 		{
-			task []
-			{
-				title string
-				key string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
+			title string
+			key string
+			customernumber int
 		}
+		employee Employee
+		issuedate string
 	}
 }
 **file:script.lua

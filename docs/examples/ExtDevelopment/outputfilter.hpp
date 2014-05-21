@@ -36,7 +36,7 @@ public:
         std::size_t elementsize)=0;
 
     // Set type of the document.
-    virtual void setDocType( const types::DocType&);
+    virtual void setDocMetaData( const types::DocMetaData& md);
 
     // Get the current state
     State state() const;

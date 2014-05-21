@@ -4,7 +4,6 @@
 **requires:SQLITE3
 **input
 {
-  "assignmentlist": {
     "assignment": [
       {
         "task": [
@@ -47,7 +46,6 @@
         "issuedate": "13.5.2006"
       }
     ]
-  }
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf schema_select_task_by_id
 
@@ -110,29 +108,27 @@ END
 **outputfile:DBDUMP
 **output
 {
-	"doc":	{
-		"task":	[{
-				"title":	"bla bla",
-				"id":	"1",
-				"start":	"1/4/2012 12:04:19",
-				"end":	"1/4/2012 12:41:14"
-			}, {
-				"title":	"bli blu",
-				"id":	"2",
-				"start":	"2/4/2012 11:14:29",
-				"end":	"2/4/2012 12:11:34"
-			}, {
-				"title":	"blu bli",
-				"id":	"3",
-				"start":	"3/4/2012 17:11:13",
-				"end":	"3/4/2012 18:19:31"
-			}, {
-				"title":	"ble ble",
-				"id":	"4",
-				"start":	"4/4/2012 19:14:29",
-				"end":	"4/4/2012 19:58:44"
-			}]
-	}
+  "task":  [{
+      "title":  "bla bla",
+      "id":  "1",
+      "start":  "1/4/2012 12:04:19",
+      "end":  "1/4/2012 12:41:14"
+    }, {
+      "title":  "bli blu",
+      "id":  "2",
+      "start":  "2/4/2012 11:14:29",
+      "end":  "2/4/2012 12:11:34"
+    }, {
+      "title":  "blu bli",
+      "id":  "3",
+      "start":  "3/4/2012 17:11:13",
+      "end":  "3/4/2012 18:19:31"
+    }, {
+      "title":  "ble ble",
+      "id":  "4",
+      "start":  "4/4/2012 19:14:29",
+      "end":  "4/4/2012 19:58:44"
+    }]
 }
 task:
 'bla bla', '1', '1/4/2012 12:04:19', '1/4/2012 12:41:14'

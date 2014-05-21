@@ -37,7 +37,7 @@ Project Wolframe.
 #include "filter/inputfilter.hpp"
 #include "types/countedReference.hpp"
 #include "types/string.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 extern "C"
 {
 #include "cJSON.h"
@@ -69,7 +69,7 @@ struct InputFilterImpl :public InputFilter
 		,m_content(o.m_content)
 		,m_encattr(o.m_encattr)
 		,m_encattr_defined(o.m_encattr_defined)
-		,m_doctype(o.m_doctype)
+		,m_docmetadata(o.m_docmetadata)
 		,m_root(o.m_root)
 		,m_firstnode(o.m_firstnode)
 		,m_stk(o.m_stk)
@@ -94,9 +94,6 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implements FilterBase::getValue(const char*,std::string&) const
 	virtual bool getValue( const char* name, std::string& val) const;
 
-	///\brief Implements InputFilter::getDocType(std::string&)
-	virtual bool getDocType( types::DocType& doctype);
-
 	///\brief Implements FilterBase::setValue(const char*,const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
 
@@ -107,7 +104,7 @@ struct InputFilterImpl :public InputFilter
 	virtual const char* getEncoding() const;
 
 	///\brief Implements InputFilter::getMetadata()
-	virtual bool getMetadata();
+	virtual const types::DocMetaData* getMetadata();
 
 	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize);
@@ -126,7 +123,7 @@ private:
 	std::string m_content;
 	types::String::EncodingAttrib m_encattr;	//< character set encoding attributes
 	bool m_encattr_defined;				//< true, if character set encoding is defined
-	types::DocType m_doctype;			//< document type
+	types::DocMetaData m_docmetadata;		//< document type
 	boost::shared_ptr<cJSON> m_root;		//< data structure holding the whole tree
 	const cJSON* m_firstnode;			//< first node (to detect if getNext has been called)
 

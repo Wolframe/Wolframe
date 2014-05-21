@@ -19,11 +19,8 @@ STRUCT FormDef
 	element Element[]
 }
 
-FORM Wolfwizard
+FORM Wolfwizard forms
 {
-	forms
-	{
-		form FormDef[]
-	}
+	form FormDef[]
 }
 

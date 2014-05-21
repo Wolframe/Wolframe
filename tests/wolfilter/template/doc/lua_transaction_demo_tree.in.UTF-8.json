@@ -1,5 +1,4 @@
 {
-  "transactions": {
     "treeAddRoot": { "name": "Albert" },
     "treeAddNode": [
       {
@@ -23,5 +22,4 @@
         "name": "Fred"
       }
     ]
-  }
 }

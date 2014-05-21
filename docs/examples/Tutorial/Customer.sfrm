@@ -1,9 +1,6 @@
-	FORM Customer
-	{
-		customer
-		{
-			id !@string
-			name string
-			address string
-		}
-	}
+FORM Customer customer
+{
+	id !@string
+	name string
+	address string
+}

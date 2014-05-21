@@ -1,5 +1,3 @@
-FORM CustomerListRequest
+FORM CustomerListRequest customer
 {
-	customer {
-	}
 }

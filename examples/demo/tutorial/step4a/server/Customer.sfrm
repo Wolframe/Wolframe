@@ -4,18 +4,14 @@ STRUCT CustomerStruct
 	address string
 }
 
-FORM Customer
+FORM Customer customer
 {
-	customer {
-		_ CustomerStruct
-	}
+	_ CustomerStruct
 }
 
-FORM CustomerInserted
+FORM CustomerInserted customer
 {
-	customer {
-		id string
-		_ CustomerStruct
-	}
+	id string
+	_ CustomerStruct
 }
 

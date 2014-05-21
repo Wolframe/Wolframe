@@ -35,7 +35,7 @@ Project Wolframe.
 #include "outputfilterImpl.hpp"
 #include "xsltMapper.hpp"
 #include "filter/bufferingfilter.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "types/countedReference.hpp"
 #include <cstddef>
 #include <cstring>

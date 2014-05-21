@@ -1,54 +1,52 @@
-FORM Invoice
+FORM Invoice invoice
 {
-	invoice
+	order
 	{
-		order
+		number string
+		reference string
+		representative string
+		terms uint
+		issuedate string
+		duedate string
+		description string
+	}
+	item []
+	{
+		name string
+		description string
+		quantity uint
+		discount currency
+		price
 		{
-			number string
-			reference string
-			representative string
-			terms uint
-			issuedate string
-			duedate string
-			description string
-		}
-		item []
-		{
-			name string
-			description string
-			quantity uint
-			discount currency
-			price
+			unit currency
+			total currency
+			tax
 			{
-				unit currency
-				total currency
-				tax
-				{
-					description @string
-					_ percent_1
-				}
-				gross currency
+				description @string
+				_ percent_1
 			}
-		}
-		bill
-		{
-			price
-			{
-				total currency
-				tax currency
-				gross currency
-			}
-			payed currency
-			open currency
-		}
-		address []
-		{
-			id @string
-			name string
-			street string
-			postalcode uint
-			city string
-			country string
+			gross currency
 		}
 	}
+	bill
+	{
+		price
+		{
+			total currency
+			tax currency
+			gross currency
+		}
+		payed currency
+		open currency
+	}
+	address []
+	{
+		id @string
+		name string
+		street string
+		postalcode uint
+		city string
+		country string
+	}
 }
+

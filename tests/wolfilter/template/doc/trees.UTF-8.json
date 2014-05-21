@@ -1,6 +1,5 @@
 {
-  "doctype" : "trees",
-  "root": {
+    "doctype" : "trees",
     "mtree": {
       "-id": "1",
       "name": "eins",
@@ -39,5 +38,4 @@
         }
       }
     }
-  }
 }

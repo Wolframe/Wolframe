@@ -119,11 +119,11 @@ public:
 		}
 	}
 
-	virtual bool getDocType( types::DocType& doctype)
+	virtual const types::DocMetaData* getMetaData()
 	{
 		if (m_end)
 		{
-			bool rt = m_ref->getDocType( doctype);
+			const types::DocMetaData* rt = m_ref->getMetaData( doctype);
 			setState( m_ref->state(), m_ref->getError());
 			return rt;
 		}

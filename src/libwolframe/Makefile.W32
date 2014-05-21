@@ -34,6 +34,7 @@ LIBRARIES = \
 	wolframe.lib
 
 TYPE_OBJS = \
+	types\docmetadata.obj \
 	types\conversions.obj \
 	types\numberBaseConversion.obj \
 	types\propertyTree.obj \

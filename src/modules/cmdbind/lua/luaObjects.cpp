@@ -37,7 +37,7 @@ Project Wolframe.
 #include "luaException.hpp"
 #include "luaCppCall.hpp"
 #include "types/normalizeFunction.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/typedfilterScope.hpp"
 #include "filter/inputfilterScope.hpp"
@@ -1579,7 +1579,56 @@ LUA_FUNCTION_THROWS( "input:docformat()", function_input_docformat)
 	}
 }
 
-LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
+LUA_FUNCTION_THROWS( "input:metadata()", function_input_metadata)
+{
+	Input* input;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		input = LuaObject<Input>::getSelf( ls, "input", "metadata");
+		check_parameters( ls, 1, 0);
+	}
+	else
+	{
+		input = (Input*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
+	if (!input->inputfilter().get())
+	{
+		lua_pushnil( ls);
+		return 1;
+	}
+	{
+		LuaExceptionHandlerScope escope(ls);
+		{
+			types::DocMetaData metadata;
+			if (input->inputfilter()->getMetaData( metadata))
+			{
+				lua_newtable( ls);
+				std::vector<Attribute>::const_iterator ai = metadata.attributes().begin(), ae = metadata.attributes().end();
+				for (; ai != ae; ++ai)
+				{
+					lua_pushlstring( ls, ai->value.c_str(), ai->value.size());
+					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+					lua_setfield( ls, -2, Attribute::name( ai->id));
+				}
+			}
+			else if (input->inputfilter()->state() == InputFilter::Error)
+			{
+				const char* err = input->inputfilter()->getError();
+				std::string msg( "error parsing DOCTYPE: ");
+				msg.append( err?err:"unknown");
+				throw std::runtime_error(msg);
+			}
+		}
+	}
+	lua_pushlightuserdata( ls, input);
+	lua_yieldk( ls, 0, 1, function_input_metadata);
+	return 0;
+}
+
+
+LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctypeid)
 {
 	Input* input;
 	int ctx;
@@ -1599,90 +1648,15 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 		return 1;
 	}
 	{
-		LuaExceptionHandlerScope escope(ls);
+		const types::DocMetaData* metadata;
+		if (0!=(metadata=input->inputfilter()->getMetaData()))
 		{
-			types::DocType doctype;
-			if (input->inputfilter()->getDocType( doctype))
-			{
-				if (doctype.defined())
-				{
-					lua_newtable( ls);
-					if (!doctype.root.empty())
-					{
-						lua_pushlstring( ls, doctype.root.c_str(), doctype.root.size());
-						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-						lua_setfield( ls, -2, "root");
-					}
-					if (!doctype.id.empty())
-					{
-						lua_pushlstring( ls, doctype.id.c_str(), doctype.id.size());
-						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-						lua_setfield( ls, -2, "id");
-					}
-					if (!doctype.schemapath.dir.empty())
-					{
-						lua_pushlstring( ls, doctype.schemapath.dir.c_str(), doctype.schemapath.dir.size());
-						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-						lua_setfield( ls, -2, "dir");
-					}
-					if (!doctype.schemapath.ext.empty())
-					{
-						lua_pushlstring( ls, doctype.schemapath.ext.c_str(), doctype.schemapath.ext.size());
-						lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-						lua_setfield( ls, -2, "ext");
-					}
-					return 1;
-				}
-				else
-				{
-					lua_pushnil( ls);
-					return 1;
-				}
-			}
-			else if (input->inputfilter()->state() == InputFilter::Error)
-			{
-				const char* err = input->inputfilter()->getError();
-				std::string msg( "error parsing DOCTYPE: ");
-				msg.append( err?err:"unknown");
-				throw std::runtime_error(msg);
-			}
-		}
-	}
-	lua_pushlightuserdata( ls, input);
-	lua_yieldk( ls, 0, 1, function_input_doctype);
-	return 0;
-}
-
-
-LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
-{
-	Input* input;
-	int ctx;
-	if (lua_getctx( ls, &ctx) != LUA_YIELD)
-	{
-		input = LuaObject<Input>::getSelf( ls, "input", "doctypeid");
-		check_parameters( ls, 1, 0);
-	}
-	else
-	{
-		input = (Input*)lua_touserdata( ls, -1);
-		lua_pop( ls, 1);
-	}
-	if (!input->inputfilter().get())
-	{
-		lua_pushnil( ls);
-		return 1;
-	}
-	{
-		types::DocType doctype;
-		if (input->inputfilter()->getDocType( doctype))
-		{
+			const char* doctype = metadata->doctype();
 			LuaExceptionHandlerScope escope(ls);
 			{
-				if (doctype.id.size())
+				if (doctype)
 				{
-					lua_pushlstring( ls, doctype.id.c_str(), doctype.id.size());
-					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+					lua_pushstring( ls, doctype);
 				}
 				else
 				{
@@ -1709,8 +1683,8 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 {
 	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");	//< self argument (mandatory)
 	Filter* filter = 0;							//< 1st argument (mandatory)
-	types::DocType doctype;				//< 2nd argument (optional)
-	bool doctype_defined = false;
+	types::DocMetaData docmetadata;						//< 2nd argument (optional)
+	bool docmetadata_defined = false;
 	int ii=2,nn = lua_gettop( ls);
 	if (nn <= 1)
 	{
@@ -1724,86 +1698,48 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	{
 		if (lua_type( ls, ii) == LUA_TSTRING)
 		{
-			if (doctype_defined) throw std::runtime_error( "doctype specified twice");
-			doctype_defined = true;
+			if (docmetadata_defined) throw std::runtime_error( "table of string with metadata specified twice");
+			docmetadata_defined = true;
 
 			proc::ExecContext* gtc = getExecContext( ls);
 			const char* doctype_id = lua_tostring( ls, ii);
 			const types::FormDescription* formdescr = gtc->provider()->formDescription( doctype_id);
 			if (!formdescr) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_id + "'");
 			const char* doctype_root = formdescr->xmlRoot();
-			if (!doctype_root) throw std::runtime_error( "string argument is referring to a form without xml root element defined");
-			std::string ext;
-			if (!formdescr->ddlname().empty())
-			{
-				ext.push_back( '.');
-				ext.append( formdescr->ddlname());
-			}
-			doctype = types::DocType( formdescr->name(), doctype_root, types::DocType::SchemaPath( "", ext));
+			docmetadata.setDoctype( doctype_id, doctype_root);
 		}
 		else if (lua_type( ls, ii) == LUA_TTABLE)
 		{
-			if (doctype_defined) throw std::runtime_error( "doctype specified twice");
-			doctype_defined = true;
-
-			proc::ExecContext* gtc = getExecContext( ls);
-			const char* doctype_root = 0;
-			const char* doctype_id = 0;
-			const char* doctype_dir = 0;
-			const char* doctype_ext = 0;
-
-			lua_getfield( ls, ii, "id");
-			if (!lua_isnil( ls, -1))
+			if (docmetadata_defined) throw std::runtime_error( "document meta data (table argument) specified twice");
+			docmetadata_defined = true;
+			lua_pushnil( ls);
+			while (lua_next( ls, -2))
 			{
-				doctype_id = lua_tostring( ls, -1);
-				if (!doctype_id) throw std::runtime_error( "in table argument doctype: doctype['id'] is not convertible to a string");
-			}
-			lua_getfield( ls, ii, "root");
-			if (!lua_isnil( ls, -1))
-			{
-				doctype_root = lua_tostring( ls, -1);
-				if (!doctype_root) throw std::runtime_error( "in table argument doctype: doctype['root'] is not convertible to a string");
-			}
-			lua_getfield( ls, ii, "dir");
-			if (!lua_isnil( ls, -1))
-			{
-				doctype_dir = lua_tostring( ls, -1);
-				if (!doctype_dir) throw std::runtime_error( "in table argument doctype: doctype['dir'] is not convertible to a string");
-			}
-			lua_getfield( ls, ii, "ext");
-			if (!lua_isnil( ls, -1))
-			{
-				doctype_ext = lua_tostring( ls, -1);
-				if (!doctype_ext) throw std::runtime_error( "in table argument doctype: doctype['ext'] is not convertible to a string");
-			}
-			if (doctype_root)
-			{
-				if (doctype_id)
+				if (lua_type( ls, -2) != LUA_TSTRING || lua_type( ls, -1) != LUA_TSTRING)
 				{
-					doctype = types::DocType( doctype_id, doctype_root, types::DocType::SchemaPath( doctype_dir?doctype_dir:"", doctype_ext?doctype_ext:".dtd"));
+					lua_pop( ls, 1);
+					throw std::runtime_error( "only strings expected as keys and values in document meta data table");
 				}
-				else
+				const char* idstr = lua_tostring( ls, -2);
+				bool attribute_found = false;
+				types::DocMetaData::Attribute::Id ai = types::DocMetaData::Attribute::firstid(), ae = types::DocMetaData::Attribute::lastid();
+				do
 				{
-					doctype = types::DocType( "", doctype_root, types::DocType::SchemaPath());
+					if (0==std::strcmp(idstr, types::DocMetaData::Attribute::name(ai)))
+					{
+						docmetadata.setAttribute( ai, lua_tostring( ls, -1));
+						attribute_found = true;
+						break;
+					}
+					ai = types::DocMetaData::Attribute::nextid(ai);
 				}
-			}
-			else if (doctype_id)
-			{
-				const types::FormDescription* formdescr = gtc->provider()->formDescription( doctype_id);
-				if (!formdescr) throw std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_id + "'");
-				doctype_root = formdescr->xmlRoot();
-				if (!doctype_root) throw std::runtime_error( "doctype['form'] is referring to a form without xml root element defined");
-				std::string ext;
-				if (!formdescr->ddlname().empty())
+				while (ai != ae);
+				if (!attribute_found)
 				{
-					ext.push_back( '.');
-					ext.append( formdescr->ddlname());
+					lua_pop( ls, 1);
+					throw std::runtime_error( std::string("unknown document meta data attribute '") + idstr + "'");
 				}
-				doctype = types::DocType( doctype_id, doctype_root, types::DocType::SchemaPath( "", ext));
-			}
-			else
-			{
-				std::runtime_error( "neither doctype['id'] nor doctype['root'] are defined in table passed");
+				lua_pop( ls, 1);
 			}
 		}
 		else if (lua_type( ls, ii) == LUA_TUSERDATA)
@@ -1840,9 +1776,9 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			throw std::runtime_error( "called with undefined output for the argument filter object");
 		}
 	}
-	if (doctype_defined)
+	if (docmetadata_defined)
 	{
-		output->outputfilter()->setDocType( doctype);
+		output->outputfilter()->setMetaData( docmetadata);
 	}
 	return 0;
 }
@@ -1947,23 +1883,24 @@ static lua_CFunction get_input_struct_table_closure( lua_State* ls, Input* input
 	if (input->inputfilter().get())
 	{
 		//... the filter provides no structure info. try to get the 'form' from the document type for it
-		types::DocType doctype;
-		if (input->inputfilter()->getDocType( doctype))
+		const types::DocMetaData* docmetadata;
+		if (0!=(docmetadata = input->inputfilter()->getMetaData()))
 		{
-			if (doctype.defined())
+			const char* doctype = docmetadata->doctype();
+			if (doctype)
 			{
 				//... document with !DOCTYPE declaration -> lookup for form
 				proc::ExecContext* gtc = getExecContext( ls);
-				const types::FormDescription* st = gtc->provider()->formDescription( doctype.id);
+				const types::FormDescription* st = gtc->provider()->formDescription( doctype);
 				if (!st)
 				{
-					LOG_DEBUG << "no form defined for document type '" << doctype.id << "'";
+					LOG_DEBUG << "no form defined for document type '" << doctype << "'";
 
 					//... no form defined -> map it without structure info but issue a warning
 					TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
 					if (!inp->setFlags( TypedInputFilter::SerializeWithIndices))
 					{
-						LOG_WARNING << "calling :table() on document type '" << doctype.id << "' without form defined for filter without input structure info";
+						LOG_WARNING << "calling :table() on document type '" << doctype << "' without form defined for filter without input structure info";
 					}
 					TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
 					LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
@@ -2020,14 +1957,15 @@ static lua_CFunction get_input_struct_form_closure( lua_State* ls, Input* input)
 {
 	if (input->inputfilter().get())
 	{
-		types::DocType doctype;
+		const types::DocMetaData* docmetadata;
 		// try to get 'form' for validation if the document is not standalone:
-		if (input->inputfilter()->getDocType( doctype))
+		if (0!=(docmetadata = input->inputfilter()->getMetaData()))
 		{
-			if (doctype.defined())
+			const char* doctype = docmetadata->doctype();
+			if (doctype)
 			{
 				proc::ExecContext* gtc = getExecContext( ls);
-				const types::FormDescription* st = gtc->provider()->formDescription( doctype.id);
+				const types::FormDescription* st = gtc->provider()->formDescription( doctype);
 				if (!st)
 				{
 					return &function_input_table_nil;
@@ -2518,8 +2456,8 @@ static const luaL_Reg input_methodtable[ 9] =
 	{"form",&function_input_form},
 	{"value",&function_input_table},
 	{"table",&function_input_table},
-	{"doctype",function_input_doctype},
-	{"doctypeid",function_input_doctypeid},
+	{"metadata",function_input_metadata},
+	{"doctype",function_input_doctypeid},
 	{"docformat",function_input_docformat},
 	{"get",&function_input_get},
 	{0,0}

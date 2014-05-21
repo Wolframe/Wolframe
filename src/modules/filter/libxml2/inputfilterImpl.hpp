@@ -38,7 +38,7 @@ Project Wolframe.
 #include "xsltMapper.hpp"
 #include "types/countedReference.hpp"
 #include "filter/inputfilter.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "libxml/parser.h"
 #include "libxml/tree.h"
 #include "libxml/encoding.h"
@@ -108,8 +108,8 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implements FilterBase::getValue(const char*,std::string&) const
 	virtual bool getValue( const char* id, std::string& val) const;
 
-	///\brief Implements InputFilter::getDocType(types::DocType&&)
-	bool getDocType( types::DocType& doctype);
+	///\brief Implements InputFilter::getDocMetaData(types::DocMetaData&&)
+	bool getDocMetaData( types::DocMetaData& doctype);
 
 	///\brief Implements FilterBase::setValue(const char*,const std::string&)
 	virtual bool setValue( const char* id, const std::string& value);
@@ -154,6 +154,7 @@ private:
 	bool m_withEmpty;			//< return empty tokens as W3C requires too
 	std::string m_elembuf;			//< buffer for current element
 	std::string m_encoding;			//< character set encoding
+	types::DocMetaDataR m_metadata;		//< document meta data
 };
 
 }}//namespace

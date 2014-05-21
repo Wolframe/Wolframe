@@ -5,7 +5,6 @@
 **requires:SQLITE3
 **input
 {
-  "class": {
     "-name": "indogermanic",
     "class": [
       {
@@ -517,7 +516,6 @@
         "-status": "dead"
       }
     ]
-  }
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
@@ -968,824 +966,822 @@ END
 **outputfile:DBDUMP
 **output
 {
-	"result":	{
-		"class":	{
-			"name":	"indogermanic",
-			"class":	[{
-					"name":	"celtic",
-					"class":	[{
-							"name":	"gaulisch"
-						}, {
-							"name":	"goidelic",
-							"class":	[{
-									"name":	"old irish"
-								}, {
-									"name":	"middle irish"
-								}, {
-									"name":	"manx"
-								}, {
-									"name":	"irish"
-								}, {
-									"name":	"scotts gaelic"
-								}]
-						}, {
-							"name":	"brythonic",
-							"class":	[{
-									"name":	"comish"
-								}, {
-									"name":	"welsh"
-								}, {
-									"name":	"breton"
-								}]
-						}]
-				}, {
-					"name":	"germanic",
-					"class":	[{
-							"name":	"west germanic",
-							"class":	[{
-									"name":	"anglo-frisian",
-									"class":	[{
-											"name":	"old english",
-											"class":	{
-												"name":	"middle english",
-												"class":	{
-													"name":	"english"
-												}
-											}
-										}, {
-											"name":	"old frisian",
-											"class":	{
-												"name":	"frisian"
-											}
-										}]
-								}, {
-									"name":	"german",
-									"class":	[{
-											"name":	"low german",
-											"class":	[{
-													"name":	"old saxon",
-													"class":	{
-														"name":	"plattdeutsch"
-													}
-												}, {
-													"name":	"old low franconian",
-													"class":	[{
-															"name":	"dutch"
-														}, {
-															"name":	"flemish"
-														}, {
-															"name":	"afrikaans"
-														}, {
-															"name":	"south african dutch"
-														}]
-												}]
-										}, {
-											"name":	"high german",
-											"class":	[{
-													"name":	"alemannic"
-												}, {
-													"name":	"alsatian"
-												}, {
-													"name":	"bavarian"
-												}, {
-													"name":	"franconian"
-												}, {
-													"name":	"german"
-												}, {
-													"name":	"pensilvania german"
-												}, {
-													"name":	"swiss"
-												}, {
-													"name":	"yiddish"
-												}]
-										}]
-								}]
-						}, {
-							"name":	"east germanic"
-						}, {
-							"name":	"north germanic",
-							"class":	[{
-									"name":	"old west norse",
-									"class":	[{
-											"name":	"islandic"
-										}, {
-											"name":	"faroese"
-										}]
-								}, {
-									"name":	"old east norse",
-									"class":	[{
-											"name":	"norwegian"
-										}, {
-											"name":	"danish"
-										}, {
-											"name":	"swedish"
-										}]
-								}]
-						}]
-				}, {
-					"name":	"italic",
-					"class":	[{
-							"name":	"oscan"
-						}, {
-							"name":	"umbrian"
-						}, {
-							"name":	"old latin",
-							"class":	[{
-									"name":	"catalan"
-								}, {
-									"name":	"french"
-								}, {
-									"name":	"galician"
-								}, {
-									"name":	"portuguese"
-								}, {
-									"name":	"italian"
-								}, {
-									"name":	"provencal"
-								}, {
-									"name":	"romansch"
-								}, {
-									"name":	"romanian"
-								}, {
-									"name":	"spanish"
-								}]
-						}]
-				}, {
-					"name":	"slavonic",
-					"class":	[{
-							"name":	"west slavic",
-							"class":	[{
-									"name":	"chech"
-								}, {
-									"name":	"polish"
-								}, {
-									"name":	"slovak"
-								}, {
-									"name":	"sorbian"
-								}]
-						}, {
-							"name":	"east slavic",
-							"class":	[{
-									"name":	"belarussian"
-								}, {
-									"name":	"russian"
-								}, {
-									"name":	"ukrainian"
-								}]
-						}, {
-							"name":	"south slavic",
-							"class":	[{
-									"name":	"bosnian"
-								}, {
-									"name":	"bulgarian"
-								}, {
-									"name":	"macedonian"
-								}, {
-									"name":	"serbo-croatian"
-								}, {
-									"name":	"slovene"
-								}]
-						}]
-				}, {
-					"name":	"albanian"
-				}, {
-					"name":	"armenian"
-				}, {
-					"name":	"hellenic",
-					"class":	{
-						"name":	"greek"
-					}
-				}, {
-					"name":	"baltic",
-					"class":	[{
-							"name":	"lettish"
-						}, {
-							"name":	"latvian"
-						}, {
-							"name":	"lithuanian"
-						}]
-				}, {
-					"name":	"hittie"
-				}, {
-					"name":	"indo iranian",
-					"class":	[{
-							"name":	"iranian",
-							"class":	[{
-									"name":	"avestan",
-									"class":	{
-										"name":	"pashto"
-									}
-								}, {
-									"name":	"old persian",
-									"class":	[{
-											"name":	"balushti"
-										}, {
-											"name":	"kurdish"
-										}, {
-											"name":	"ossetic"
-										}, {
-											"name":	"pashto"
-										}, {
-											"name":	"persian"
-										}]
-								}, {
-									"name":	"scythian"
-								}]
-						}, {
-							"name":	"indic",
-							"class":	[{
-									"name":	"sanskrit"
-								}, {
-									"name":	"prakrit"
-								}, {
-									"name":	"pali"
-								}, {
-									"name":	"bengali"
-								}, {
-									"name":	"bihari"
-								}, {
-									"name":	"bhili"
-								}, {
-									"name":	"gujarati"
-								}, {
-									"name":	"hindi"
-								}, {
-									"name":	"hindustani"
-								}, {
-									"name":	"marati"
-								}, {
-									"name":	"nepali"
-								}, {
-									"name":	"bahari"
-								}, {
-									"name":	"punjabi"
-								}, {
-									"name":	"rajasthani"
-								}, {
-									"name":	"sindhi"
-								}, {
-									"name":	"singhalese"
-								}, {
-									"name":	"urdu"
-								}]
-						}]
-				}, {
-					"name":	"tocharian"
-				}]
-		},
-		"subtree":	[{
-				"name":	"italic",
-				"node":	[{
-						"id":	"49",
-						"name":	"italic"
-					}, {
-						"id":	"50",
-						"name":	"oscan"
-					}, {
-						"id":	"51",
-						"name":	"umbrian"
-					}, {
-						"id":	"52",
-						"name":	"old latin"
-					}, {
-						"id":	"53",
-						"name":	"catalan"
-					}, {
-						"id":	"54",
-						"name":	"french"
-					}, {
-						"id":	"55",
-						"name":	"galician"
-					}, {
-						"id":	"56",
-						"name":	"portuguese"
-					}, {
-						"id":	"57",
-						"name":	"italian"
-					}, {
-						"id":	"58",
-						"name":	"provencal"
-					}, {
-						"id":	"59",
-						"name":	"romansch"
-					}, {
-						"id":	"60",
-						"name":	"romanian"
-					}, {
-						"id":	"61",
-						"name":	"spanish"
-					}]
-			}, {
-				"name":	"brythonic",
-				"node":	[{
-						"id":	"10",
-						"name":	"brythonic"
-					}, {
-						"id":	"11",
-						"name":	"comish"
-					}, {
-						"id":	"12",
-						"name":	"welsh"
-					}, {
-						"id":	"13",
-						"name":	"breton"
-					}]
-			}, {
-				"name":	"germanic",
-				"node":	[{
-						"id":	"14",
-						"name":	"germanic"
-					}, {
-						"id":	"15",
-						"name":	"west germanic"
-					}, {
-						"id":	"16",
-						"name":	"anglo-frisian"
-					}, {
-						"id":	"17",
-						"name":	"old english"
-					}, {
-						"id":	"18",
-						"name":	"middle english"
-					}, {
-						"id":	"19",
-						"name":	"english"
-					}, {
-						"id":	"20",
-						"name":	"old frisian"
-					}, {
-						"id":	"21",
-						"name":	"frisian"
-					}, {
-						"id":	"22",
-						"name":	"german"
-					}, {
-						"id":	"23",
-						"name":	"low german"
-					}, {
-						"id":	"24",
-						"name":	"old saxon"
-					}, {
-						"id":	"25",
-						"name":	"plattdeutsch"
-					}, {
-						"id":	"26",
-						"name":	"old low franconian"
-					}, {
-						"id":	"27",
-						"name":	"dutch"
-					}, {
-						"id":	"28",
-						"name":	"flemish"
-					}, {
-						"id":	"29",
-						"name":	"afrikaans"
-					}, {
-						"id":	"30",
-						"name":	"south african dutch"
-					}, {
-						"id":	"31",
-						"name":	"high german"
-					}, {
-						"id":	"32",
-						"name":	"alemannic"
-					}, {
-						"id":	"33",
-						"name":	"alsatian"
-					}, {
-						"id":	"34",
-						"name":	"bavarian"
-					}, {
-						"id":	"35",
-						"name":	"franconian"
-					}, {
-						"id":	"36",
-						"name":	"german"
-					}, {
-						"id":	"37",
-						"name":	"pensilvania german"
-					}, {
-						"id":	"38",
-						"name":	"swiss"
-					}, {
-						"id":	"39",
-						"name":	"yiddish"
-					}, {
-						"id":	"40",
-						"name":	"east germanic"
-					}, {
-						"id":	"41",
-						"name":	"north germanic"
-					}, {
-						"id":	"42",
-						"name":	"old west norse"
-					}, {
-						"id":	"43",
-						"name":	"islandic"
-					}, {
-						"id":	"44",
-						"name":	"faroese"
-					}, {
-						"id":	"45",
-						"name":	"old east norse"
-					}, {
-						"id":	"46",
-						"name":	"norwegian"
-					}, {
-						"id":	"47",
-						"name":	"danish"
-					}, {
-						"id":	"48",
-						"name":	"swedish"
-					}]
-			}, {
-				"name":	"anglo-frisian",
-				"node":	[{
-						"id":	"16",
-						"name":	"anglo-frisian"
-					}, {
-						"id":	"17",
-						"name":	"old english"
-					}, {
-						"id":	"18",
-						"name":	"middle english"
-					}, {
-						"id":	"19",
-						"name":	"english"
-					}, {
-						"id":	"20",
-						"name":	"old frisian"
-					}, {
-						"id":	"21",
-						"name":	"frisian"
-					}]
-			}],
-		"children":	[{
-				"name":	"gaulisch"
-			}, {
-				"name":	"slavonic",
-				"node":	[{
-						"id":	"63",
-						"name":	"west slavic"
-					}, {
-						"id":	"64",
-						"name":	"chech"
-					}, {
-						"id":	"65",
-						"name":	"polish"
-					}, {
-						"id":	"66",
-						"name":	"slovak"
-					}, {
-						"id":	"67",
-						"name":	"sorbian"
-					}, {
-						"id":	"68",
-						"name":	"east slavic"
-					}, {
-						"id":	"69",
-						"name":	"belarussian"
-					}, {
-						"id":	"70",
-						"name":	"russian"
-					}, {
-						"id":	"71",
-						"name":	"ukrainian"
-					}, {
-						"id":	"72",
-						"name":	"south slavic"
-					}, {
-						"id":	"73",
-						"name":	"bosnian"
-					}, {
-						"id":	"74",
-						"name":	"bulgarian"
-					}, {
-						"id":	"75",
-						"name":	"macedonian"
-					}, {
-						"id":	"76",
-						"name":	"serbo-croatian"
-					}, {
-						"id":	"77",
-						"name":	"slovene"
-					}]
-			}, {
-				"name":	"east germanic"
-			}, {
-				"name":	"indic",
-				"node":	[{
-						"id":	"99",
-						"name":	"sanskrit"
-					}, {
-						"id":	"100",
-						"name":	"prakrit"
-					}, {
-						"id":	"101",
-						"name":	"pali"
-					}, {
-						"id":	"102",
-						"name":	"bengali"
-					}, {
-						"id":	"103",
-						"name":	"bihari"
-					}, {
-						"id":	"104",
-						"name":	"bhili"
-					}, {
-						"id":	"105",
-						"name":	"gujarati"
-					}, {
-						"id":	"106",
-						"name":	"hindi"
-					}, {
-						"id":	"107",
-						"name":	"hindustani"
-					}, {
-						"id":	"108",
-						"name":	"marati"
-					}, {
-						"id":	"109",
-						"name":	"nepali"
-					}, {
-						"id":	"110",
-						"name":	"bahari"
-					}, {
-						"id":	"111",
-						"name":	"punjabi"
-					}, {
-						"id":	"112",
-						"name":	"rajasthani"
-					}, {
-						"id":	"113",
-						"name":	"sindhi"
-					}, {
-						"id":	"114",
-						"name":	"singhalese"
-					}, {
-						"id":	"115",
-						"name":	"urdu"
-					}]
-			}],
-		"cover":	[{
-				"name":	"italic",
-				"node":	[{
-						"id":	"1",
-						"name":	"indogermanic"
-					}, {
-						"id":	"49",
-						"name":	"italic"
-					}]
-			}, {
-				"name":	"brythonic",
-				"node":	[{
-						"id":	"1",
-						"name":	"indogermanic"
-					}, {
-						"id":	"2",
-						"name":	"celtic"
-					}, {
-						"id":	"10",
-						"name":	"brythonic"
-					}]
-			}, {
-				"name":	"germanic",
-				"node":	[{
-						"id":	"1",
-						"name":	"indogermanic"
-					}, {
-						"id":	"14",
-						"name":	"germanic"
-					}]
-			}, {
-				"name":	"anglo-frisian",
-				"node":	[{
-						"id":	"1",
-						"name":	"indogermanic"
-					}, {
-						"id":	"14",
-						"name":	"germanic"
-					}, {
-						"id":	"15",
-						"name":	"west germanic"
-					}, {
-						"id":	"16",
-						"name":	"anglo-frisian"
-					}]
-			}],
-		"parents":	[{
-				"name":	"gaulisch",
-				"node":	[{
-						"id":	"1",
-						"name":	"indogermanic"
-					}, {
-						"id":	"2",
-						"name":	"celtic"
-					}]
-			}, {
-				"name":	"slavonic",
-				"node":	{
-					"id":	"1",
-					"name":	"indogermanic"
-				}
-			}, {
-				"name":	"east germanic",
-				"node":	[{
-						"id":	"1",
-						"name":	"indogermanic"
-					}, {
-						"id":	"14",
-						"name":	"germanic"
-					}]
-			}, {
-				"name":	"indic",
-				"node":	[{
-						"id":	"1",
-						"name":	"indogermanic"
-					}, {
-						"id":	"87",
-						"name":	"indo iranian"
-					}]
-			}],
-		"sparsetree":	{
-			"class":	{
-				"name":	"indogermanic",
-				"class":	[{
-						"name":	"germanic",
-						"class":	[{
-								"name":	"west germanic",
-								"class":	[{
-										"name":	"anglo-frisian",
-										"class":	[{
-												"name":	"old english",
-												"class":	{
-													"name":	"middle english",
-													"class":	{
-														"name":	"english"
-													}
-												}
-											}, {
-												"name":	"old frisian",
-												"class":	{
-													"name":	"frisian"
-												}
-											}]
-									}, {
-										"name":	"german",
-										"class":	[{
-												"name":	"low german",
-												"class":	[{
-														"name":	"old saxon",
-														"class":	{
-															"name":	"plattdeutsch"
-														}
-													}, {
-														"name":	"old low franconian",
-														"class":	[{
-																"name":	"dutch"
-															}, {
-																"name":	"flemish"
-															}, {
-																"name":	"afrikaans"
-															}, {
-																"name":	"south african dutch"
-															}]
-													}]
-											}, {
-												"name":	"high german",
-												"class":	[{
-														"name":	"alemannic"
-													}, {
-														"name":	"alsatian"
-													}, {
-														"name":	"bavarian"
-													}, {
-														"name":	"franconian"
-													}, {
-														"name":	"german"
-													}, {
-														"name":	"pensilvania german"
-													}, {
-														"name":	"swiss",
-														"class":	[{
-																"name":	"bern german"
-															}, {
-																"name":	"eastern swiss german"
-															}, {
-																"name":	"grison german"
-															}]
-													}, {
-														"name":	"yiddish"
-													}]
-											}]
-									}]
-							}, {
-								"name":	"east germanic"
-							}, {
-								"name":	"north germanic",
-								"class":	[{
-										"name":	"old west norse",
-										"class":	[{
-												"name":	"islandic"
-											}, {
-												"name":	"faroese"
-											}]
-									}, {
-										"name":	"old east norse",
-										"class":	[{
-												"name":	"norwegian"
-											}, {
-												"name":	"danish"
-											}, {
-												"name":	"swedish"
-											}]
-									}]
-							}]
-					}, {
-						"name":	"italic",
-						"class":	[{
-								"name":	"oscan"
-							}, {
-								"name":	"umbrian"
-							}, {
-								"name":	"old latin",
-								"class":	[{
-										"name":	"catalan"
-									}, {
-										"name":	"french"
-									}, {
-										"name":	"galician"
-									}, {
-										"name":	"portuguese"
-									}, {
-										"name":	"italian"
-									}, {
-										"name":	"provencal"
-									}, {
-										"name":	"romansch"
-									}, {
-										"name":	"romanian"
-									}, {
-										"name":	"spanish"
-									}]
-							}]
-					}, {
-						"name":	"slavonic",
-						"class":	[{
-								"name":	"west slavic",
-								"class":	[{
-										"name":	"chech"
-									}, {
-										"name":	"polish"
-									}, {
-										"name":	"slovak"
-									}, {
-										"name":	"sorbian"
-									}]
-							}, {
-								"name":	"east slavic",
-								"class":	[{
-										"name":	"belarussian"
-									}, {
-										"name":	"russian"
-									}, {
-										"name":	"ukrainian"
-									}]
-							}, {
-								"name":	"south slavic",
-								"class":	[{
-										"name":	"bosnian"
-									}, {
-										"name":	"bulgarian"
-									}, {
-										"name":	"macedonian"
-									}, {
-										"name":	"serbo-croatian"
-									}, {
-										"name":	"slovene"
-									}]
-							}]
-					}, {
-						"name":	"albanian"
-					}, {
-						"name":	"armenian"
-					}, {
-						"name":	"baltic",
-						"class":	[{
-								"name":	"lettish"
-							}, {
-								"name":	"latvian"
-							}, {
-								"name":	"lithuanian"
-							}]
-					}, {
-						"name":	"tocharian"
-					}, {
-						"name":	"hittie"
-					}]
-			}
-		}
-	}
+  "class":  {
+    "name":  "indogermanic",
+    "class":  [{
+        "name":  "celtic",
+        "class":  [{
+            "name":  "gaulisch"
+          }, {
+            "name":  "goidelic",
+            "class":  [{
+                "name":  "old irish"
+              }, {
+                "name":  "middle irish"
+              }, {
+                "name":  "manx"
+              }, {
+                "name":  "irish"
+              }, {
+                "name":  "scotts gaelic"
+              }]
+          }, {
+            "name":  "brythonic",
+            "class":  [{
+                "name":  "comish"
+              }, {
+                "name":  "welsh"
+              }, {
+                "name":  "breton"
+              }]
+          }]
+      }, {
+        "name":  "germanic",
+        "class":  [{
+            "name":  "west germanic",
+            "class":  [{
+                "name":  "anglo-frisian",
+                "class":  [{
+                    "name":  "old english",
+                    "class":  {
+                      "name":  "middle english",
+                      "class":  {
+                        "name":  "english"
+                      }
+                    }
+                  }, {
+                    "name":  "old frisian",
+                    "class":  {
+                      "name":  "frisian"
+                    }
+                  }]
+              }, {
+                "name":  "german",
+                "class":  [{
+                    "name":  "low german",
+                    "class":  [{
+                        "name":  "old saxon",
+                        "class":  {
+                          "name":  "plattdeutsch"
+                        }
+                      }, {
+                        "name":  "old low franconian",
+                        "class":  [{
+                            "name":  "dutch"
+                          }, {
+                            "name":  "flemish"
+                          }, {
+                            "name":  "afrikaans"
+                          }, {
+                            "name":  "south african dutch"
+                          }]
+                      }]
+                  }, {
+                    "name":  "high german",
+                    "class":  [{
+                        "name":  "alemannic"
+                      }, {
+                        "name":  "alsatian"
+                      }, {
+                        "name":  "bavarian"
+                      }, {
+                        "name":  "franconian"
+                      }, {
+                        "name":  "german"
+                      }, {
+                        "name":  "pensilvania german"
+                      }, {
+                        "name":  "swiss"
+                      }, {
+                        "name":  "yiddish"
+                      }]
+                  }]
+              }]
+          }, {
+            "name":  "east germanic"
+          }, {
+            "name":  "north germanic",
+            "class":  [{
+                "name":  "old west norse",
+                "class":  [{
+                    "name":  "islandic"
+                  }, {
+                    "name":  "faroese"
+                  }]
+              }, {
+                "name":  "old east norse",
+                "class":  [{
+                    "name":  "norwegian"
+                  }, {
+                    "name":  "danish"
+                  }, {
+                    "name":  "swedish"
+                  }]
+              }]
+          }]
+      }, {
+        "name":  "italic",
+        "class":  [{
+            "name":  "oscan"
+          }, {
+            "name":  "umbrian"
+          }, {
+            "name":  "old latin",
+            "class":  [{
+                "name":  "catalan"
+              }, {
+                "name":  "french"
+              }, {
+                "name":  "galician"
+              }, {
+                "name":  "portuguese"
+              }, {
+                "name":  "italian"
+              }, {
+                "name":  "provencal"
+              }, {
+                "name":  "romansch"
+              }, {
+                "name":  "romanian"
+              }, {
+                "name":  "spanish"
+              }]
+          }]
+      }, {
+        "name":  "slavonic",
+        "class":  [{
+            "name":  "west slavic",
+            "class":  [{
+                "name":  "chech"
+              }, {
+                "name":  "polish"
+              }, {
+                "name":  "slovak"
+              }, {
+                "name":  "sorbian"
+              }]
+          }, {
+            "name":  "east slavic",
+            "class":  [{
+                "name":  "belarussian"
+              }, {
+                "name":  "russian"
+              }, {
+                "name":  "ukrainian"
+              }]
+          }, {
+            "name":  "south slavic",
+            "class":  [{
+                "name":  "bosnian"
+              }, {
+                "name":  "bulgarian"
+              }, {
+                "name":  "macedonian"
+              }, {
+                "name":  "serbo-croatian"
+              }, {
+                "name":  "slovene"
+              }]
+          }]
+      }, {
+        "name":  "albanian"
+      }, {
+        "name":  "armenian"
+      }, {
+        "name":  "hellenic",
+        "class":  {
+          "name":  "greek"
+        }
+      }, {
+        "name":  "baltic",
+        "class":  [{
+            "name":  "lettish"
+          }, {
+            "name":  "latvian"
+          }, {
+            "name":  "lithuanian"
+          }]
+      }, {
+        "name":  "hittie"
+      }, {
+        "name":  "indo iranian",
+        "class":  [{
+            "name":  "iranian",
+            "class":  [{
+                "name":  "avestan",
+                "class":  {
+                  "name":  "pashto"
+                }
+              }, {
+                "name":  "old persian",
+                "class":  [{
+                    "name":  "balushti"
+                  }, {
+                    "name":  "kurdish"
+                  }, {
+                    "name":  "ossetic"
+                  }, {
+                    "name":  "pashto"
+                  }, {
+                    "name":  "persian"
+                  }]
+              }, {
+                "name":  "scythian"
+              }]
+          }, {
+            "name":  "indic",
+            "class":  [{
+                "name":  "sanskrit"
+              }, {
+                "name":  "prakrit"
+              }, {
+                "name":  "pali"
+              }, {
+                "name":  "bengali"
+              }, {
+                "name":  "bihari"
+              }, {
+                "name":  "bhili"
+              }, {
+                "name":  "gujarati"
+              }, {
+                "name":  "hindi"
+              }, {
+                "name":  "hindustani"
+              }, {
+                "name":  "marati"
+              }, {
+                "name":  "nepali"
+              }, {
+                "name":  "bahari"
+              }, {
+                "name":  "punjabi"
+              }, {
+                "name":  "rajasthani"
+              }, {
+                "name":  "sindhi"
+              }, {
+                "name":  "singhalese"
+              }, {
+                "name":  "urdu"
+              }]
+          }]
+      }, {
+        "name":  "tocharian"
+      }]
+  },
+  "subtree":  [{
+      "name":  "italic",
+      "node":  [{
+          "id":  "49",
+          "name":  "italic"
+        }, {
+          "id":  "50",
+          "name":  "oscan"
+        }, {
+          "id":  "51",
+          "name":  "umbrian"
+        }, {
+          "id":  "52",
+          "name":  "old latin"
+        }, {
+          "id":  "53",
+          "name":  "catalan"
+        }, {
+          "id":  "54",
+          "name":  "french"
+        }, {
+          "id":  "55",
+          "name":  "galician"
+        }, {
+          "id":  "56",
+          "name":  "portuguese"
+        }, {
+          "id":  "57",
+          "name":  "italian"
+        }, {
+          "id":  "58",
+          "name":  "provencal"
+        }, {
+          "id":  "59",
+          "name":  "romansch"
+        }, {
+          "id":  "60",
+          "name":  "romanian"
+        }, {
+          "id":  "61",
+          "name":  "spanish"
+        }]
+    }, {
+      "name":  "brythonic",
+      "node":  [{
+          "id":  "10",
+          "name":  "brythonic"
+        }, {
+          "id":  "11",
+          "name":  "comish"
+        }, {
+          "id":  "12",
+          "name":  "welsh"
+        }, {
+          "id":  "13",
+          "name":  "breton"
+        }]
+    }, {
+      "name":  "germanic",
+      "node":  [{
+          "id":  "14",
+          "name":  "germanic"
+        }, {
+          "id":  "15",
+          "name":  "west germanic"
+        }, {
+          "id":  "16",
+          "name":  "anglo-frisian"
+        }, {
+          "id":  "17",
+          "name":  "old english"
+        }, {
+          "id":  "18",
+          "name":  "middle english"
+        }, {
+          "id":  "19",
+          "name":  "english"
+        }, {
+          "id":  "20",
+          "name":  "old frisian"
+        }, {
+          "id":  "21",
+          "name":  "frisian"
+        }, {
+          "id":  "22",
+          "name":  "german"
+        }, {
+          "id":  "23",
+          "name":  "low german"
+        }, {
+          "id":  "24",
+          "name":  "old saxon"
+        }, {
+          "id":  "25",
+          "name":  "plattdeutsch"
+        }, {
+          "id":  "26",
+          "name":  "old low franconian"
+        }, {
+          "id":  "27",
+          "name":  "dutch"
+        }, {
+          "id":  "28",
+          "name":  "flemish"
+        }, {
+          "id":  "29",
+          "name":  "afrikaans"
+        }, {
+          "id":  "30",
+          "name":  "south african dutch"
+        }, {
+          "id":  "31",
+          "name":  "high german"
+        }, {
+          "id":  "32",
+          "name":  "alemannic"
+        }, {
+          "id":  "33",
+          "name":  "alsatian"
+        }, {
+          "id":  "34",
+          "name":  "bavarian"
+        }, {
+          "id":  "35",
+          "name":  "franconian"
+        }, {
+          "id":  "36",
+          "name":  "german"
+        }, {
+          "id":  "37",
+          "name":  "pensilvania german"
+        }, {
+          "id":  "38",
+          "name":  "swiss"
+        }, {
+          "id":  "39",
+          "name":  "yiddish"
+        }, {
+          "id":  "40",
+          "name":  "east germanic"
+        }, {
+          "id":  "41",
+          "name":  "north germanic"
+        }, {
+          "id":  "42",
+          "name":  "old west norse"
+        }, {
+          "id":  "43",
+          "name":  "islandic"
+        }, {
+          "id":  "44",
+          "name":  "faroese"
+        }, {
+          "id":  "45",
+          "name":  "old east norse"
+        }, {
+          "id":  "46",
+          "name":  "norwegian"
+        }, {
+          "id":  "47",
+          "name":  "danish"
+        }, {
+          "id":  "48",
+          "name":  "swedish"
+        }]
+    }, {
+      "name":  "anglo-frisian",
+      "node":  [{
+          "id":  "16",
+          "name":  "anglo-frisian"
+        }, {
+          "id":  "17",
+          "name":  "old english"
+        }, {
+          "id":  "18",
+          "name":  "middle english"
+        }, {
+          "id":  "19",
+          "name":  "english"
+        }, {
+          "id":  "20",
+          "name":  "old frisian"
+        }, {
+          "id":  "21",
+          "name":  "frisian"
+        }]
+    }],
+  "children":  [{
+      "name":  "gaulisch"
+    }, {
+      "name":  "slavonic",
+      "node":  [{
+          "id":  "63",
+          "name":  "west slavic"
+        }, {
+          "id":  "64",
+          "name":  "chech"
+        }, {
+          "id":  "65",
+          "name":  "polish"
+        }, {
+          "id":  "66",
+          "name":  "slovak"
+        }, {
+          "id":  "67",
+          "name":  "sorbian"
+        }, {
+          "id":  "68",
+          "name":  "east slavic"
+        }, {
+          "id":  "69",
+          "name":  "belarussian"
+        }, {
+          "id":  "70",
+          "name":  "russian"
+        }, {
+          "id":  "71",
+          "name":  "ukrainian"
+        }, {
+          "id":  "72",
+          "name":  "south slavic"
+        }, {
+          "id":  "73",
+          "name":  "bosnian"
+        }, {
+          "id":  "74",
+          "name":  "bulgarian"
+        }, {
+          "id":  "75",
+          "name":  "macedonian"
+        }, {
+          "id":  "76",
+          "name":  "serbo-croatian"
+        }, {
+          "id":  "77",
+          "name":  "slovene"
+        }]
+    }, {
+      "name":  "east germanic"
+    }, {
+      "name":  "indic",
+      "node":  [{
+          "id":  "99",
+          "name":  "sanskrit"
+        }, {
+          "id":  "100",
+          "name":  "prakrit"
+        }, {
+          "id":  "101",
+          "name":  "pali"
+        }, {
+          "id":  "102",
+          "name":  "bengali"
+        }, {
+          "id":  "103",
+          "name":  "bihari"
+        }, {
+          "id":  "104",
+          "name":  "bhili"
+        }, {
+          "id":  "105",
+          "name":  "gujarati"
+        }, {
+          "id":  "106",
+          "name":  "hindi"
+        }, {
+          "id":  "107",
+          "name":  "hindustani"
+        }, {
+          "id":  "108",
+          "name":  "marati"
+        }, {
+          "id":  "109",
+          "name":  "nepali"
+        }, {
+          "id":  "110",
+          "name":  "bahari"
+        }, {
+          "id":  "111",
+          "name":  "punjabi"
+        }, {
+          "id":  "112",
+          "name":  "rajasthani"
+        }, {
+          "id":  "113",
+          "name":  "sindhi"
+        }, {
+          "id":  "114",
+          "name":  "singhalese"
+        }, {
+          "id":  "115",
+          "name":  "urdu"
+        }]
+    }],
+  "cover":  [{
+      "name":  "italic",
+      "node":  [{
+          "id":  "1",
+          "name":  "indogermanic"
+        }, {
+          "id":  "49",
+          "name":  "italic"
+        }]
+    }, {
+      "name":  "brythonic",
+      "node":  [{
+          "id":  "1",
+          "name":  "indogermanic"
+        }, {
+          "id":  "2",
+          "name":  "celtic"
+        }, {
+          "id":  "10",
+          "name":  "brythonic"
+        }]
+    }, {
+      "name":  "germanic",
+      "node":  [{
+          "id":  "1",
+          "name":  "indogermanic"
+        }, {
+          "id":  "14",
+          "name":  "germanic"
+        }]
+    }, {
+      "name":  "anglo-frisian",
+      "node":  [{
+          "id":  "1",
+          "name":  "indogermanic"
+        }, {
+          "id":  "14",
+          "name":  "germanic"
+        }, {
+          "id":  "15",
+          "name":  "west germanic"
+        }, {
+          "id":  "16",
+          "name":  "anglo-frisian"
+        }]
+    }],
+  "parents":  [{
+      "name":  "gaulisch",
+      "node":  [{
+          "id":  "1",
+          "name":  "indogermanic"
+        }, {
+          "id":  "2",
+          "name":  "celtic"
+        }]
+    }, {
+      "name":  "slavonic",
+      "node":  {
+        "id":  "1",
+        "name":  "indogermanic"
+      }
+    }, {
+      "name":  "east germanic",
+      "node":  [{
+          "id":  "1",
+          "name":  "indogermanic"
+        }, {
+          "id":  "14",
+          "name":  "germanic"
+        }]
+    }, {
+      "name":  "indic",
+      "node":  [{
+          "id":  "1",
+          "name":  "indogermanic"
+        }, {
+          "id":  "87",
+          "name":  "indo iranian"
+        }]
+    }],
+  "sparsetree":  {
+    "class":  {
+      "name":  "indogermanic",
+      "class":  [{
+          "name":  "germanic",
+          "class":  [{
+              "name":  "west germanic",
+              "class":  [{
+                  "name":  "anglo-frisian",
+                  "class":  [{
+                      "name":  "old english",
+                      "class":  {
+                        "name":  "middle english",
+                        "class":  {
+                          "name":  "english"
+                        }
+                      }
+                    }, {
+                      "name":  "old frisian",
+                      "class":  {
+                        "name":  "frisian"
+                      }
+                    }]
+                }, {
+                  "name":  "german",
+                  "class":  [{
+                      "name":  "low german",
+                      "class":  [{
+                          "name":  "old saxon",
+                          "class":  {
+                            "name":  "plattdeutsch"
+                          }
+                        }, {
+                          "name":  "old low franconian",
+                          "class":  [{
+                              "name":  "dutch"
+                            }, {
+                              "name":  "flemish"
+                            }, {
+                              "name":  "afrikaans"
+                            }, {
+                              "name":  "south african dutch"
+                            }]
+                        }]
+                    }, {
+                      "name":  "high german",
+                      "class":  [{
+                          "name":  "alemannic"
+                        }, {
+                          "name":  "alsatian"
+                        }, {
+                          "name":  "bavarian"
+                        }, {
+                          "name":  "franconian"
+                        }, {
+                          "name":  "german"
+                        }, {
+                          "name":  "pensilvania german"
+                        }, {
+                          "name":  "swiss",
+                          "class":  [{
+                              "name":  "bern german"
+                            }, {
+                              "name":  "eastern swiss german"
+                            }, {
+                              "name":  "grison german"
+                            }]
+                        }, {
+                          "name":  "yiddish"
+                        }]
+                    }]
+                }]
+            }, {
+              "name":  "east germanic"
+            }, {
+              "name":  "north germanic",
+              "class":  [{
+                  "name":  "old west norse",
+                  "class":  [{
+                      "name":  "islandic"
+                    }, {
+                      "name":  "faroese"
+                    }]
+                }, {
+                  "name":  "old east norse",
+                  "class":  [{
+                      "name":  "norwegian"
+                    }, {
+                      "name":  "danish"
+                    }, {
+                      "name":  "swedish"
+                    }]
+                }]
+            }]
+        }, {
+          "name":  "italic",
+          "class":  [{
+              "name":  "oscan"
+            }, {
+              "name":  "umbrian"
+            }, {
+              "name":  "old latin",
+              "class":  [{
+                  "name":  "catalan"
+                }, {
+                  "name":  "french"
+                }, {
+                  "name":  "galician"
+                }, {
+                  "name":  "portuguese"
+                }, {
+                  "name":  "italian"
+                }, {
+                  "name":  "provencal"
+                }, {
+                  "name":  "romansch"
+                }, {
+                  "name":  "romanian"
+                }, {
+                  "name":  "spanish"
+                }]
+            }]
+        }, {
+          "name":  "slavonic",
+          "class":  [{
+              "name":  "west slavic",
+              "class":  [{
+                  "name":  "chech"
+                }, {
+                  "name":  "polish"
+                }, {
+                  "name":  "slovak"
+                }, {
+                  "name":  "sorbian"
+                }]
+            }, {
+              "name":  "east slavic",
+              "class":  [{
+                  "name":  "belarussian"
+                }, {
+                  "name":  "russian"
+                }, {
+                  "name":  "ukrainian"
+                }]
+            }, {
+              "name":  "south slavic",
+              "class":  [{
+                  "name":  "bosnian"
+                }, {
+                  "name":  "bulgarian"
+                }, {
+                  "name":  "macedonian"
+                }, {
+                  "name":  "serbo-croatian"
+                }, {
+                  "name":  "slovene"
+                }]
+            }]
+        }, {
+          "name":  "albanian"
+        }, {
+          "name":  "armenian"
+        }, {
+          "name":  "baltic",
+          "class":  [{
+              "name":  "lettish"
+            }, {
+              "name":  "latvian"
+            }, {
+              "name":  "lithuanian"
+            }]
+        }, {
+          "name":  "tocharian"
+        }, {
+          "name":  "hittie"
+        }]
+    }
+  }
 }
 tree:
 '1', NULL, 'indogermanic', '1', '152'

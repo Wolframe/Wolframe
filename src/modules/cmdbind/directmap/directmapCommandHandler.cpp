@@ -33,7 +33,7 @@ Project Wolframe.
 #include "serialize/struct/structParser.hpp"
 #include "serialize/struct/structSerializer.hpp"
 #include "serialize/tostringUtils.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "types/variant.hpp"
 #include "filter/redirectFilterClosure.hpp"
 #include "filter/typingfilter.hpp"
@@ -216,27 +216,10 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 
 	if (m_outputform.get())
 	{
-		const char* xmlroot = m_outputform->description()->xmlRoot();
-		if (xmlroot)
-		{
-			std::string ext;
-			if (!m_outputform->description()->ddlname().empty())
-			{
-				ext.push_back( '.');
-				ext.append( m_outputform->description()->ddlname());
-			}
-			types::DocType doctype( m_outputform->description()->name(), xmlroot, types::DocType::SchemaPath( "", ext));
-			m_outputfilter->setDocType( doctype);
-			m_output_rootelement = xmlroot;
-		}
+		m_output_rootelement = m_outputform->description()->root();
 	}
 	else if (!m_cmd->outputrootelem.empty())
 	{
-		if (!m_cmd->output_doctype_standalone)
-		{
-			types::DocType doctype( m_cmd->outputform, m_cmd->outputrootelem, types::DocType::SchemaPath());
-			m_outputfilter->setDocType( doctype);
-		}
 		m_output_rootelement = m_cmd->outputrootelem;
 	}
 	// Synchronize attributes of filters:
@@ -267,16 +250,22 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				}
 				else if (m_cmd->skipvalidation_input)
 				{
-					m_state = 11;
+					m_state = 3;
 					continue;
 				}
 				else
 				{
-					types::DocType doctype;
-					if (m_inputfilter->getDocType( doctype) && doctype.defined())
+					const types::DocMetaData* md = m_inputfilter->getMetaData();
+					if (md)
 					{
+						const char* doctype = md->doctype();
+						if (!doctype)
+						{
+							LOG_WARNING << "no document type defined in input. treating document as standalone";
+							m_state = 3;
+						}
 						// if no input form is defined we check for the input document type and set the form on our own:
-						const types::FormDescription* df = execContext()->provider()->formDescription( doctype.id);
+						const types::FormDescription* df = execContext()->provider()->formDescription( doctype);
 						if (df)
 						{
 							m_inputform.reset( new types::Form( df));
@@ -287,8 +276,8 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						}
 						else
 						{
-							LOG_WARNING << "input form '" << doctype.id << "' is not defined (document type '" << doctype.id << "'). treating document as standalone (document processed with root element ignored)";
-							m_state = 11;
+							LOG_WARNING << "input form '" << doctype << "' is not defined (document type '" << doctype << "'). treating document as standalone";
+							m_state = 3;
 						}
 						continue;
 					}
@@ -298,7 +287,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						{
 							case InputFilter::Open:
 							{
-								m_state = 11;
+								m_state = 3;
 								LOG_WARNING << "input form: standalone document type and no input form defined. document processed with root element ignored";
 								break;
 							}
@@ -307,38 +296,6 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						}
 					}
 				}
-			case 11:
-			{
-				// ... treat document as standalone: swallow root element
-				langbind::InputFilter::ElementType typ;
-				types::VariantConst element;
-				if (m_input->getNext( typ, element))
-				{
-					if (typ == langbind::FilterBase::CloseTag)
-					{
-						// ... input document is empty
-					}
-					else if (typ == langbind::FilterBase::OpenTag)
-					{
-						m_checkIfInputLeft = true;
-					}
-					else
-					{
-						throw std::runtime_error( "input has not one unique root element");
-					}
-				}
-				else
-				{
-					switch (m_inputfilter->state())
-					{
-						case InputFilter::Open: break;
-						case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
-						case InputFilter::Error: throw std::runtime_error( std::string( "error in input: ") + m_inputfilter->getError());
-					}
-				}
-				m_state = 3;
-				break;
-			}
 			case 2:
 			{
 				if (!m_inputform_parser->call()) return IOFilterCommandHandler::Yield;
@@ -378,11 +335,26 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					m_state = 6;
 					continue;
 				}
+				const types::DocMetaData* in_md_ref = m_inpufilter->getMetaData();
+				types::DocMetaData out_md( in_md_ref?*in_md_ref:types::DocMetaData());
+				if (m_outputform.get())
+				{
+					out_md.setDoctype( m_outputform->name(), m_output_rootelement);
+				}
+				else if (m_cmd->output_doctype_standalone)
+				{
+					out_md.clear();
+					out_md.setAttribute( types::DocMetaData::Attribute::Root, m_output_rootelement);
+				}
+				else
+				{
+					out_md.setDoctype( m_cmd->outputform, m_cmd->outputrootelem);
+				}
+				m_outputfilter->setDocMetaData( out_md);
+
 				if (m_outputform.get() && !m_cmd->skipvalidation_output)
 				{
-					types::VariantStruct* substructure = (m_output_rootelement.size())?m_outputform->select(m_output_rootelement.c_str()):m_outputform.get();
-					substructure->setInitialized();
-					serialize::DDLStructParser formparser( substructure);
+					serialize::DDLStructParser formparser( m_outputform.get());
 					formparser.init( m_functionclosure->result(), serialize::Context::ValidateInitialization);
 					if (!formparser.call())
 					{
@@ -395,72 +367,13 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				else 
 				{
 					m_outputprinter.init( m_functionclosure->result(), m_output);
-					if (!m_output_rootelement.empty())
-					{
-						m_state = 51;
-						break;
-					}
-					else
-					{
-						if (!m_cmd->output_doctype_standalone)
-						{
-							throw std::runtime_error("RETURN with no valid output form (RETURN doctype, RETURN SKIP doctype [root]) defined and document is not standalone (RETURN STANDALONE root)");
-						}
-						m_state = 5;
-					}
+					m_state = 5;
 				}
 				/* no break here ! */
 			}
 			case 5:
 			{
 				if (!m_outputprinter.call()) return IOFilterCommandHandler::Yield;
-				m_state = 6;
-				continue;
-			}
-			case 51:
-			{
-				// Print open tag for root element
-				if (!m_output->print( FilterBase::OpenTag, m_cmd->outputrootelem))
-				{
-					switch (m_outputfilter->state())
-					{
-						case OutputFilter::Open:
-							throw std::runtime_error( "unknown error in output filter");
-	
-						case OutputFilter::EndOfBuffer:
-							return IOFilterCommandHandler::Yield;
-	
-						case OutputFilter::Error:
-							throw std::runtime_error( m_outputfilter->getError());
-					}
-				}
-				m_state = 52;
-				/* no break here ! */
-			}
-			case 52:
-			{
-				// same as state 5 in print with root element context
-				if (!m_outputprinter.call()) return IOFilterCommandHandler::Yield;
-				m_state = 53;
-				/* no break here ! */
-			}
-			case 53:
-			{
-				// Print close tag for root element
-				if (!m_output->print( FilterBase::CloseTag, types::Variant()))
-				{
-					switch (m_outputfilter->state())
-					{
-						case OutputFilter::Open:
-							throw std::runtime_error( "unknown error in output filter");
-	
-						case OutputFilter::EndOfBuffer:
-							return IOFilterCommandHandler::Yield;
-	
-						case OutputFilter::Error:
-							throw std::runtime_error( m_outputfilter->getError());
-					}
-				}
 				m_state = 6;
 				continue;
 			}
@@ -475,7 +388,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					{
 						if (typ != langbind::FilterBase::CloseTag)
 						{
-							throw std::runtime_error( "input has not one unique root element");
+							throw std::runtime_error( "unparsed input left (input tags not balanced)");
 						}
 					}
 					else

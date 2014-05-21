@@ -1,6 +1,4 @@
-	FORM CustomerDelete
-	{
-		customer {
-			id !@string
-		}
-	}
+FORM CustomerDelete customer
+{
+	id !@string
+}

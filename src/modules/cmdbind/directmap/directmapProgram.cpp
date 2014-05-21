@@ -43,46 +43,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-static std::string filterargAsString( const std::vector<langbind::FilterArgument>& arg)
-{
-	std::ostringstream out;
-	std::vector<langbind::FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-	for (; ai != ae; ++ai)
-	{
-		if (ai != arg.begin()) out << ", ";
-		out << ai->first << "='" << ai->second << "'";
-	}
-	return out.str();
-}
-
-std::string DirectmapCommandDescription::tostring() const
-{
-	std::ostringstream rt;
-	rt << "name='" << name << "'";
-	rt << ", call='" << call << "'";
-	rt << ", input filter='" << inputfilter;
-	if (inputfilterarg.size())
-	{
-		rt << "( " << filterargAsString( inputfilterarg) << " )'";
-	}
-	else
-	{
-		rt << "'";
-	}
-	rt << ", output filter='" << outputfilter;
-	if (outputfilterarg.size())
-	{
-		rt << "( " << filterargAsString( outputfilterarg) << " )'";
-	}
-	else
-	{
-		rt << "'";
-	}
-	rt << ", input form='" << inputform << "'";
-	rt << ", output form='" << outputform << "'";
-	return rt.str();
-}
-
 bool DirectmapProgram::checkReferences( const proc::ProcessorProviderInterface* provider) const
 {
 	bool rt = true;

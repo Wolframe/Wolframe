@@ -1,28 +1,26 @@
-FORM places
+FORM places PLACES
 {
-	PLACES {
-		GARDEN []
+	GARDEN []
+	{
+		NAME string
+		ADDRESS
 		{
-			NAME string
-			ADDRESS
-			{
-				COUNTRY int = 49
-				STREET string
-				CITY string
-				PHONE {
-					NUMBER string
-					MOBILE string
-				}
+			COUNTRY int = 49
+			STREET string
+			CITY string
+			PHONE {
+				NUMBER string
+				MOBILE string
 			}
-			PLANT []
-			{
-				COMMON string[]
-				BOTANICAL string
-				ZONE uint = 1
-				LIGHT string
-				PRICE string = "0.0"
-				AVAILABILITY uint = 0
-			}
+		}
+		PLANT []
+		{
+			COMMON string[]
+			BOTANICAL string
+			ZONE uint = 1
+			LIGHT string
+			PRICE string = "0.0"
+			AVAILABILITY uint = 0
 		}
 	}
 }

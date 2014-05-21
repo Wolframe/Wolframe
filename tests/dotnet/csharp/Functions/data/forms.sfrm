@@ -1,44 +1,33 @@
-FORM GetAddress_p
+FORM GetAddress_p doc
 {
-	doc
-	{
 	street string
-		country string
-	}
+	country string
 }
 
-FORM GetUserAddress
+FORM GetUserAddress doc
 {
-	doc
+	usr
 	{
-		usr
+		id string
+		name string
+		place
 		{
-			id string
-			name string
-			place
-			{
-				street string
-				country string
-			}
+			street string
+			country string
 		}
 	}
 }
 
-FORM Address
+FORM Address address
 {
-	address
-	{
 	street string
-		country string
-	}
+	country string
 }
 
-FORM IdPair
+FORM IdPair pair
 {
-	pair
-	{
-		a string
-		b string
-	}
+	a string
+	b string
 }
+
 

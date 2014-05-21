@@ -1,25 +1,22 @@
-FORM Employee
+STRUCT Employee
 {
 	firstname string
 	surname string
 	phone string
 }
 
-FORM employee_assignment_print
+FORM employee_assignment_print assignmentlist
 {
-	assignmentlist
+	assignment []
 	{
-		assignment []
+		task []
 		{
-			task []
-			{
-				title string
-				key string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
+			title string
+			key string
+			customernumber int
 		}
+		employee Employee
+		issuedate string
 	}
 }
 

@@ -1,8 +1,6 @@
 {
-  "doc": {
-    "item": [
-      "Im Französischen gibt es Buchstaben wie \"ç\" \"è\" \"à\" \"ë\" (e tréma)",
-      "Im Deutschen sind es die Umlate wie \"Ü\" \"Ä\" \"Ö\""
-    ]
-  }
+  "item": [
+    "Im Französischen gibt es Buchstaben wie \"ç\" \"è\" \"à\" \"ë\" (e tréma)",
+    "Im Deutschen sind es die Umlate wie \"Ü\" \"Ä\" \"Ö\""
+  ]
 }

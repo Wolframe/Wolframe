@@ -1,5 +1,4 @@
 {
-  "class": {
     "-name": "indogermanic",
     "class": [
       {
@@ -511,5 +510,4 @@
         "-status": "dead"
       }
     ]
-  }
 }

@@ -1,50 +1,33 @@
-FORM productList
+FORM productList products
 {
-	products
+	item []
 	{
-		item []
-		{
-			title string
-			key string
-			customernumber int
-			issuedate string
-		}
+		title string
+		key string
+		customernumber int
+		issuedate string
 	}
 }
-FORM treeAddNode
+FORM treeAddNode node
 {
-	node
-	{
-		parentid int
-		name name
-	}
+	parentid int
+	name name
 }
-FORM treeDeleteSubtree
+FORM treeDeleteSubtree node
 {
-	node
-	{
-		id int
-	}
+	id int
 }
 
-FORM treeSelectChildrenByName
+FORM treeSelectChildrenByName node
 {
-	node
-	{
-		name string
-	}
+	name string
 }
-FORM treeSelectChildren
+FORM treeSelectChildren node
 {
-	node
-	{
-		id int
-	}
+	id int
 }
-FORM treeSelectParents
+FORM treeSelectParents node
 {
-	node
-	{
-		id int
-	}
+	id int
 }
+

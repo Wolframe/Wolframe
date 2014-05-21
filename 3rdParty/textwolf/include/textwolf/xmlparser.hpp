@@ -259,12 +259,12 @@ public:
 	{
 		ParseHeader,			//< parsing the XML header section
 		ParseDoctype,			//< parsing DOCTYPE definition if available
-		ParsedRoot,			//< parsed XML root element
-		ParseSource			//< parsing the XML content section
+		ParseSource,			//< parsing the XML content section
+		ParseSourceReady		//< parsing the XML content section, but the follow element has already been parsed (one look forward)
 	};
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"ParseHeader", "ParseDoctype", "ParseSource"};
+		static const char* ar[] = {"ParseHeader", "ParseDoctype", "ParseSource", "ParseSourceReady"};
 		return ar[ (int)i];
 	}
 
@@ -307,7 +307,7 @@ public:
 	{
 		err = 0;
 		if (!m_obj) return XMLScannerBase::ErrorOccurred;
-		if (m_state == ParseSource) return true;
+		if (m_state == ParseSource || m_state == ParseSourceReady) return true;
 		for(;;)
 		{
 			const char* elemptr;
@@ -469,7 +469,7 @@ public:
 						m_lastelem = elemptr;
 						m_lastelemsize = elemsize;
 						m_lastelemtype = elemtype;
-						m_state = ParsedRoot;
+						m_state = ParseSourceReady;
 						m_doctype_state = 0;
 						return true;
 					}
@@ -482,7 +482,7 @@ public:
 						m_doctype_state = 0;
 						return true;
 					}
-				case ParsedRoot:
+				case ParseSourceReady:
 				case ParseSource:
 					err = "illegal state in xml header parser";
 					return false;
@@ -492,7 +492,30 @@ public:
 
 	bool hasMetadataParsed() const
 	{
-		return m_state == ParseSource || m_state == ParsedRoot;
+		return m_state == ParseSource || m_state == ParseSourceReady;
+	}
+
+	bool ungetElement( XMLScannerBase::ElementType type, const char* elemptr, std::size_t elemsize)
+	{
+		if (m_lastelemtype == XMLScannerBase::ErrorOccurred)
+		{
+			m_lastelem = elemptr;
+			m_lastelemsize = elemsize;
+			m_lastelemtype = type;
+			return true;
+		}
+		return false;
+	}
+
+	XMLScannerBase::ElementType getKeptElement( const char*& elemptr, std::size_t& elemsize)
+	{
+		elemptr = m_lastelem;
+		elemsize = m_lastelemsize;
+		XMLScannerBase::ElementType elemtype = m_lastelemtype;
+		m_lastelem = 0;
+		m_lastelemsize = 0;
+		m_lastelemtype = XMLScannerBase::ErrorOccurred;
+		return elemtype;
 	}
 
 	XMLScannerBase::ElementType getNext( const char*& elemptr, std::size_t& elemsize)
@@ -500,7 +523,7 @@ public:
 		if (!m_obj) return XMLScannerBase::ErrorOccurred;
 		if (m_state != ParseSource)
 		{
-			if (m_state != ParsedRoot)
+			if (m_state != ParseSourceReady)
 			{
 				const char* err = 0;
 				if (!parseHeader( err) || !hasMetadataParsed())
@@ -510,17 +533,10 @@ public:
 					return XMLScannerBase::ErrorOccurred;
 				}
 			}
-			if (m_state == ParsedRoot)
+			if (m_state == ParseSourceReady)
 			{
-				//... "unget" last element and return it
-				elemptr = m_lastelem;
-				elemsize = m_lastelemsize;
-				XMLScannerBase::ElementType elemtype = m_lastelemtype;
-				m_lastelem = 0;
-				m_lastelemsize = 0;
-				m_lastelemtype = XMLScannerBase::ErrorOccurred;
 				m_state = ParseSource;
-				return elemtype;
+				return getKeptElement( elemptr, elemsize);
 			}
 		}
 		for (;;)
