@@ -111,7 +111,7 @@ wolframeConnection::~wolframeConnection()
 		m_authorization = NULL;
 	}
 	if ( m_authentication )	{
-		m_authentication->close();
+		delete m_authentication;
 		m_authentication = NULL;
 	}
 	if ( m_audit )	{
