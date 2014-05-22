@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file filter/ptreefilter.hpp
-///\brief Filter for serialization/deserialization of a property tree
+/// \file filter/ptreefilter.hpp
+/// \brief Filter for serialization/deserialization of a property tree
 
 #ifndef _Wolframe_FILTER_PTREE_FILTER_HPP_INCLUDED
 #define _Wolframe_FILTER_PTREE_FILTER_HPP_INCLUDED
@@ -46,7 +46,7 @@ namespace langbind {
 class PropertyTreeInputFilter :public TypedInputFilter
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	PropertyTreeInputFilter( const types::PropertyTree::Node& pt)
 		:utils::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
 		,TypedInputFilter("ptree")
@@ -58,28 +58,28 @@ public:
 		m_stk.push_back(st);
 	}
 
-	///\brief Copy constructor
-	///\param[in] o input filter to copy
+	/// \brief Copy constructor
+	/// \param[in] o input filter to copy
 	PropertyTreeInputFilter( const PropertyTreeInputFilter& o)
 		:utils::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
 		,TypedInputFilter(o)
 		,m_stk(o.m_stk)
 		,m_state(o.m_state){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~PropertyTreeInputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual TypedInputFilter* copy() const		{return new PropertyTreeInputFilter(*this);}
 
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
+	/// \brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
 	virtual bool getNext( ElementType& type, types::VariantConst& element);
 
-	///\brief Implements FilterBase::setFlags()
+	/// \brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f);
 
-	///\brief Implements FilterBase::checkSetFlags()const
+	/// \brief Implements FilterBase::checkSetFlags()const
 	virtual bool checkSetFlags( Flags f) const;
 
 	std::string posLogText() const
@@ -100,25 +100,25 @@ private:
 	types::PropertyTree::Position m_position;	//< position of current element
 };
 
-///\class PropertyTreeOutputFilter
-///\brief Output filter for serializing a structure as property tree
+/// \class PropertyTreeOutputFilter
+/// \brief Output filter for serializing a structure as property tree
 class PropertyTreeOutputFilter :public TypedOutputFilter
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	PropertyTreeOutputFilter();
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~PropertyTreeOutputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const			{return new PropertyTreeOutputFilter(*this);}
 
-	///\brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
+	/// \brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
 	virtual bool print( ElementType type, const types::VariantConst& element);
 
-	///\brief Get the content
+	/// \brief Get the content
 	const types::PropertyTree::Node& content() const	{return m_stk.back().m_node;}
 
 private:

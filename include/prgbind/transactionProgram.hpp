@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for loading programs in the transaction definition language
-///\file prgbind/transactionProgram.hpp
+/// \brief Interface for loading programs in the transaction definition language
+/// \file prgbind/transactionProgram.hpp
 
 #ifndef _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
@@ -41,18 +41,25 @@
 namespace _Wolframe {
 namespace prgbind {
 
-///\class TransactionDefinitionProgram
-///\brief Program type for the transaction definition language (TDL)
+/// \class TransactionDefinitionProgram
+/// \brief Program type for the transaction definition language (TDL)
 class TransactionDefinitionProgram
 	:public Program
 {
 public:
+	/// \brief Default constructor
 	TransactionDefinitionProgram()
 		:Program( Function){}
 
+	/// \brief Destructor
 	virtual ~TransactionDefinitionProgram(){}
 
+	/// \brief Return true, if the program with path 'filename' is  recognized to be a TDL program
 	virtual bool is_mine( const std::string& filename) const;
+	/// \brief Load the program specified by file path into the program library
+	/// \param[in,out] library program library to feed
+	/// \param[in,out] transactionDB transaction database
+	/// \param[in] filename path of program file to load
 	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
 };
 

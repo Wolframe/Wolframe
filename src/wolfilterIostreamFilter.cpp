@@ -627,6 +627,10 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		{
 			if (!flt.inputfilter().get()->getNext( etype, elem, elemsize))
 			{
+				if (flt.inputfilter()->state() == InputFilter::Open || flt.inputfilter()->state() == InputFilter::Start)
+				{
+					throw std::runtime_error( "filter not delivering final close tag");
+				}
 				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 				continue;
 			}
@@ -638,14 +642,11 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			{
 				taglevel--;
 			}
-			if (taglevel >= 0)
+			while (!flt.outputfilter().get()->print( etype, elem, elemsize))
 			{
-				while (!flt.outputfilter().get()->print( etype, elem, elemsize))
-				{
-					processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
-				}
-				LOG_DATA << "[iostream filter] print " << std::string( (const char*)elem, elemsize);
+				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 			}
+			LOG_DATA << "[iostream filter] print " << std::string( (const char*)elem, elemsize);
 		}
 		checkUnconsumedInput( is, *flt.inputfilter());
 		writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());

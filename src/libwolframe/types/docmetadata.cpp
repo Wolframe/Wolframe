@@ -35,6 +35,8 @@ Project Wolframe.
 #include "types/docmetadata.hpp"
 #include <string>
 #include <cstring>
+#include <sstream>
+#include <iostream>
 #include <boost/shared_ptr.hpp>
 
 using namespace _Wolframe;
@@ -162,6 +164,18 @@ void DocMetaData::setAttribute( const Attribute& attr)
 void DocMetaData::setAttribute( const std::string& name_, const std::string& value_)
 {
 	setAttribute( Attribute( name_, value_));
+}
+
+std::string DocMetaData::tostring() const
+{
+	std::ostringstream rt;
+	std::vector<Attribute>::const_iterator ai = m_attributes.begin(), ae = m_attributes.end();
+	for (int aidx=0; ai != ae; ++ai,++aidx)
+	{
+		if (aidx) rt << ", ";
+		rt << ai->name << "='" << ai->value << "'";
+	}
+	return rt.str();
 }
 
 

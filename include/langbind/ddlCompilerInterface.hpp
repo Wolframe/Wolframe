@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/ddlCompilerInterface.hpp
-///\brief Defines the compiler interface for definition languages (DDL) used for specifying forms
+/// \file langbind/ddlCompilerInterface.hpp
+/// \brief Defines the compiler interface for definition languages (DDL) used for specifying forms
 
 #ifndef _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
@@ -43,35 +43,37 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class DDLCompiler
-///\brief Interface for DDL compilers
+/// \class DDLCompiler
+/// \brief Interface for DDL compilers
 struct DDLCompiler
 {
+	/// \brief Constructor
 	DDLCompiler( const std::string& n, const std::string& e)
 		:m_ddlname(n),m_fileext(e) {}
+	/// \brief Destructor
 	virtual ~DDLCompiler(){}
 
-	///\brief Compile a source from a string. Throws in case of error.
-	///\param[in] filename path of the file to compile as string
-	///\param[in] typemap map with atomic type definitions
-	///\return compilation result (a list of public and private forms).
-	///\renmark Forms with an empty name are declared as private and not inserted into the map of public forms. But they are also not deleted and kept in a list, so that they can still be referenced by other forms in the list (for indirection).
+	/// \brief Compile a source from a string. Throws in case of error.
+	/// \param[in] filename path of the file to compile as string
+	/// \param[in] typemap map with atomic type definitions
+	/// \return compilation result (a list of public and private forms).
+	/// \renmark Forms with an empty name are declared as private and not inserted into the map of public forms. But they are also not deleted and kept in a list, so that they can still be referenced by other forms in the list (for indirection).
 	virtual std::vector<types::FormDescriptionR> compile( const std::string& filename, const types::NormalizeFunctionMap* typemap) const=0;
 
-	///\brief Get the name of the ddl this compiler is for
+	/// \brief Get the name of the ddl this compiler is for
 	const std::string& ddlname() const		{return m_ddlname;}
 
-	///\brief Get the file extension for files implementing this DDL
+	/// \brief Get the file extension for files implementing this DDL
 	const std::string& fileext() const		{return m_fileext;}
 private:
-	std::string m_ddlname;
-	std::string m_fileext;
+	std::string m_ddlname;			///< name of the data defintion language
+	std::string m_fileext;			///< file extension of a program of this data defintion language
 };
 
-///\brief Reference to a DDL compiler
+/// \brief Reference to a DDL compiler
 typedef boost::shared_ptr<DDLCompiler> DDLCompilerR;
 
-///\brief Describes the creation of a DDL compiler object
+/// \brief Describes the creation of a DDL compiler object
 typedef DDLCompiler* (*CreateDDLCompilerFunc)();
 
 

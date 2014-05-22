@@ -497,12 +497,19 @@ public:
 
 	bool ungetElement( XMLScannerBase::ElementType type, const char* elemptr, std::size_t elemsize)
 	{
+		m_state = ParseSourceReady;
 		if (m_lastelemtype == XMLScannerBase::ErrorOccurred)
 		{
 			m_lastelem = elemptr;
 			m_lastelemsize = elemsize;
 			m_lastelemtype = type;
 			return true;
+		}
+		else
+		{
+			m_lastelemtype = XMLScannerBase::ErrorOccurred;
+			m_lastelem = "internal: two calls on unget";
+			m_lastelemsize = std::strlen(m_lastelem);
 		}
 		return false;
 	}
@@ -515,6 +522,7 @@ public:
 		m_lastelem = 0;
 		m_lastelemsize = 0;
 		m_lastelemtype = XMLScannerBase::ErrorOccurred;
+		m_state = ParseSource;
 		return elemtype;
 	}
 
@@ -535,7 +543,6 @@ public:
 			}
 			if (m_state == ParseSourceReady)
 			{
-				m_state = ParseSource;
 				return getKeptElement( elemptr, elemsize);
 			}
 		}

@@ -1687,6 +1687,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	bool docmetadata_defined = false;
 	std::string doctype;
 	bool doctype_defined = false;
+	bool root_defined = false;
 	int ii=2,nn = lua_gettop( ls);
 	if (nn <= 1)
 	{
@@ -1722,6 +1723,10 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 					if (doctype_defined) throw std::runtime_error( "argument string specifying the document type or document metadata table element with name 'doctype' specified twice");
 					doctype_defined = true;
 					doctype = lua_tostring( ls, -1);
+				}
+				else if (0==std::strcmp( idstr, "root"))
+				{
+					root_defined = true;
 				}
 				else
 				{
@@ -1774,7 +1779,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	if (doctype_defined)
 	{
 		docmetadata.setDoctype( doctype);
-		if (!docmetadata.getAttribute( "root"))
+		if (!root_defined)
 		{
 			proc::ExecContext* gtc = getExecContext( ls);
 			const types::FormDescription* formdescr = gtc->provider()->formDescription( doctype);

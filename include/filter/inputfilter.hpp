@@ -128,12 +128,12 @@ public:
 
 	/// \brief Get the current state
 	/// \return the current state
-	State state() const					{return m_state;}
+	State state() const						{return m_state;}
 
 	/// \brief Set input filter state with error message
 	/// \param [in] s new state
 	/// \param [in] msg (optional) error to set
-	void setState( State s, const char* msg=0)		{m_state=s; setError(msg);}
+	void setState( State s, const char* msg=0)			{m_state=s; setError(msg);}
 
 	/// \brief Get the document meta data if available
 	/// \return the metadata reference if already available, null, if not (if we have to feed more input or there was an error).
@@ -141,7 +141,7 @@ public:
 	virtual const types::DocMetaData* getMetaData()=0;
 
 	/// \brief Get a shared reference to the document meta data to link output filter to input filer meta data
-	const types::DocMetaDataR& getMetaDataRef() const	{return m_metadata;}
+	virtual const types::DocMetaDataR& getMetaDataRef() const	{return m_metadata;}
 
 	/// \brief Set a document meta data attribute
 	void setAttribute( const std::string& name_, const std::string& value_)

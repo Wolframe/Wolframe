@@ -500,10 +500,52 @@ public:
 		return m_mt.m_printValue( m_obj, src, srcsize, buf);
 	}
 
-	void setEncoding( const char* encoding, BufferType& buf)
+	bool createPrinter( const char* encoding)
 	{
-		if (m_obj) throw std::logic_error( "set encoding not possible in this state");
-		if (!createPrinter( encoding)) throw std::logic_error( "cannot create XML output for this character set encoding");
+		std::string enc;
+		XMLPrinterBase<BufferType>::parseEncoding( enc, encoding);
+		m_encoding = encoding?encoding:"UTF-8";
+
+		if (m_obj)
+		{
+			m_mt.m_del( m_obj);
+			m_obj = 0;
+		}
+
+		if ((enc.size() >= 8 && std::memcmp( enc.c_str(), "isolatin", 8)== 0)
+		||  (enc.size() >= 7 && std::memcmp( enc.c_str(), "iso8859", 7) == 0))
+		{
+			m_obj = XMLPrinterObject<BufferType, charset::IsoLatin, charset::UTF8>::create( m_mt);
+		}
+		else if (enc.size() == 0 || enc == "utf8")
+		{
+			m_obj = XMLPrinterObject<BufferType, charset::UTF8, charset::UTF8>::create( m_mt);
+		}
+		else if (enc == "utf16" || enc == "utf16be")
+		{
+			m_obj = XMLPrinterObject<BufferType, charset::UTF16BE, charset::UTF8>::create( m_mt);
+		}
+		else if (enc == "utf16le")
+		{
+			m_obj = XMLPrinterObject<BufferType, charset::UTF16LE, charset::UTF8>::create( m_mt);
+		}
+		else if (enc == "ucs2" || enc == "ucs2be")
+		{
+			m_obj = XMLPrinterObject<BufferType, charset::UCS2BE, charset::UTF8>::create( m_mt);
+		}
+		else if (enc == "ucs2le")
+		{
+			m_obj = XMLPrinterObject<BufferType, charset::UCS2LE, charset::UTF8>::create( m_mt);
+		}
+		else if (enc == "utf32" || enc == "ucs4" || enc == "utf32be" || enc == "ucs4be")
+		{
+			m_obj = XMLPrinterObject<BufferType, charset::UCS4BE, charset::UTF8>::create( m_mt);
+		}
+		else if (enc == "utf32le" || enc == "ucs4le")
+		{
+			m_obj = XMLPrinterObject<BufferType, charset::UCS4LE, charset::UTF8>::create( m_mt);
+		}
+		return m_obj;
 	}
 
 	void printRootAttributes( const char* xmlns, const char* xsi, const char* schemaLocation, BufferType& buf)
@@ -553,55 +595,6 @@ public:
 	bool printDocumentEnd( BufferType& buf)
 	{
 		return m_mt.m_printCloseTag( m_obj, buf);
-	}
-
-private:
-	bool createPrinter( const char* encoding)
-	{
-		std::string enc;
-		XMLPrinterBase<BufferType>::parseEncoding( enc, encoding);
-		m_encoding = encoding?encoding:"UTF-8";
-
-		if (m_obj)
-		{
-			m_mt.m_del( m_obj);
-			m_obj = 0;
-		}
-
-		if ((enc.size() >= 8 && std::memcmp( enc.c_str(), "isolatin", 8)== 0)
-		||  (enc.size() >= 7 && std::memcmp( enc.c_str(), "iso8859", 7) == 0))
-		{
-			m_obj = XMLPrinterObject<BufferType, charset::IsoLatin, charset::UTF8>::create( m_mt);
-		}
-		else if (enc.size() == 0 || enc == "utf8")
-		{
-			m_obj = XMLPrinterObject<BufferType, charset::UTF8, charset::UTF8>::create( m_mt);
-		}
-		else if (enc == "utf16" || enc == "utf16be")
-		{
-			m_obj = XMLPrinterObject<BufferType, charset::UTF16BE, charset::UTF8>::create( m_mt);
-		}
-		else if (enc == "utf16le")
-		{
-			m_obj = XMLPrinterObject<BufferType, charset::UTF16LE, charset::UTF8>::create( m_mt);
-		}
-		else if (enc == "ucs2" || enc == "ucs2be")
-		{
-			m_obj = XMLPrinterObject<BufferType, charset::UCS2BE, charset::UTF8>::create( m_mt);
-		}
-		else if (enc == "ucs2le")
-		{
-			m_obj = XMLPrinterObject<BufferType, charset::UCS2LE, charset::UTF8>::create( m_mt);
-		}
-		else if (enc == "utf32" || enc == "ucs4" || enc == "utf32be" || enc == "ucs4be")
-		{
-			m_obj = XMLPrinterObject<BufferType, charset::UCS4BE, charset::UTF8>::create( m_mt);
-		}
-		else if (enc == "utf32le" || enc == "ucs4le")
-		{
-			m_obj = XMLPrinterObject<BufferType, charset::UCS4LE, charset::UTF8>::create( m_mt);
-		}
-		return m_obj;
 	}
 
 private:

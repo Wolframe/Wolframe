@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file outputfilterImpl.hpp
-///\brief Output filter abstraction for the libxml2 library
+/// \file outputfilterImpl.hpp
+/// \brief Output filter abstraction for the libxml2 library
 
 #ifndef _Wolframe_LIBXML2_OUTPUT_FILTER_HPP_INCLUDED
 #define _Wolframe_LIBXML2_OUTPUT_FILTER_HPP_INCLUDED
@@ -57,55 +57,31 @@ class OutputFilterImpl
 {
 public:
 	typedef OutputFilter Parent;
+	/// \brief Constructor
+	OutputFilterImpl( const XsltMapper& xsltMapper_, const types::DocMetaDataR& inheritMetaData_);
 
-	explicit OutputFilterImpl( const XsltMapper& xsltMapper_, const types::DocMetaDataR& inheritMetaData_)
-		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-		,OutputFilter("libxslt", inheritMetaData_)
-		,m_xsltMapper(xsltMapper_)
-		,m_nofroot(0)
-		,m_taglevel(0)
-		,m_elemitr(0)
-		{}
+	/// \brief Constructor
+	explicit OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_);
 
-	explicit OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
-		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-		,OutputFilter("libxml2", inheritMetaData_)
-		,m_nofroot(0)
-		,m_taglevel(0)
-		,m_elemitr(0)
-		{}
+	/// \brief Copy constructor
+	OutputFilterImpl( const OutputFilterImpl& o);
 
-	OutputFilterImpl( const OutputFilterImpl& o)
-		:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-		,OutputFilter(o)
-		,m_doc(o.m_doc)
-		,m_xsltMapper(o.m_xsltMapper)
-		,m_nofroot(o.m_nofroot)
-		,m_taglevel(o.m_taglevel)
-		,m_attribname(o.m_attribname)
-		,m_valuestrbuf(o.m_valuestrbuf)
-		,m_elembuf(o.m_elembuf)
-		,m_elemitr(o.m_elemitr)
-		{}
-
+	/// \brief Destructor
 	virtual ~OutputFilterImpl(){}
 
-	///\brief Implementation of OutputFilter::copy()
+	/// \brief Implementation of OutputFilter::copy()
 	virtual OutputFilterImpl* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implementation of OutputFilter::setDocMetaData(const types::DocMetaData&)
-	virtual void setDocMetaData( const types::DocMetaData& doctype);
-
-	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
+	/// \brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
 
-	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
+	/// \brief Implementation of FilterBase::getValue( const char*, std::string&)
 	virtual bool getValue( const char* name, std::string& val) const;
 
-	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
+	/// \brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* name, const std::string& value);
 
 private:
@@ -125,15 +101,16 @@ private:
 
 	bool flushBuffer();
 
+	void setXmlError( const char* msg);
+
 private:
-	DocumentWriter m_doc;					//< document writer structure
-	XsltMapper m_xsltMapper;				//< optional XSLT mapper
-	int m_nofroot;						//< number of root elements parsed
-	int m_taglevel;						//< tag hierarchy level
-	std::string m_attribname;				//< attribute name buffer
-	std::string m_valuestrbuf;				//< value buffer
-	std::string m_elembuf;					//< buffer for current element
-	std::size_t m_elemitr;					//< iterator on current element
+	DocumentWriter m_doc;					///< document writer structure
+	XsltMapper m_xsltMapper;				///< optional XSLT mapper
+	int m_taglevel;						///< tag hierarchy level
+	std::string m_attribname;				///< attribute name buffer
+	std::string m_valuestrbuf;				///< value buffer
+	std::string m_elembuf;					///< buffer for current element
+	std::size_t m_elemitr;					///< iterator on current element
 };
 
 }}//namespace

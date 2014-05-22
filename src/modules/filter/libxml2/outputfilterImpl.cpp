@@ -36,6 +36,33 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+OutputFilterImpl::OutputFilterImpl( const XsltMapper& xsltMapper_, const types::DocMetaDataR& inheritMetaData_)
+	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+	,OutputFilter("libxslt", inheritMetaData_)
+	,m_xsltMapper(xsltMapper_)
+	,m_taglevel(0)
+	,m_elemitr(0)
+	{}
+
+OutputFilterImpl::OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
+	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+	,OutputFilter("libxml2", inheritMetaData_)
+	,m_taglevel(0)
+	,m_elemitr(0)
+	{}
+
+OutputFilterImpl::OutputFilterImpl( const OutputFilterImpl& o)
+	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+	,OutputFilter(o)
+	,m_doc(o.m_doc)
+	,m_xsltMapper(o.m_xsltMapper)
+	,m_taglevel(o.m_taglevel)
+	,m_attribname(o.m_attribname)
+	,m_valuestrbuf(o.m_valuestrbuf)
+	,m_elembuf(o.m_elembuf)
+	,m_elemitr(o.m_elemitr)
+	{}
+
 bool OutputFilterImpl::flushBuffer()
 {
 	bool rt = true;
@@ -61,9 +88,24 @@ bool OutputFilterImpl::flushBuffer()
 	return rt;
 }
 
+void OutputFilterImpl::setXmlError( const char* msg)
+{
+	xmlError* err = xmlGetLastError();
+	if (err)
+	{
+		std::string msgstr = std::string(msg) + ": " + (const char*)err->message;
+		setState( Error, msgstr.c_str());
+	}
+	else
+	{
+		setState( Error, msg);
+	}
+}
+
 bool OutputFilterImpl::printHeader()
 {
 	types::DocMetaData md( getMetaData());
+	/*[-]*/std::cout << "METADATA " << md.tostring() << std::endl;
 	const char* root = md.getAttribute( "root");
 	if (!root)
 	{
@@ -99,6 +141,7 @@ bool OutputFilterImpl::printHeader()
 		return false;
 	}
 	setState( Open);
+	m_taglevel = 1;
 	return true;
 }
 
@@ -113,18 +156,20 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 		{
 			return false;
 		}
+		xmlout = m_doc.get();
 	}
-	if (m_taglevel == 0 && m_nofroot == 1)
+	if (m_taglevel == 0)
 	{
 		return flushBuffer();
 	}
+	/*[-]*/std::cout << "ELEM [" << m_taglevel << "] " << OutputFilter::elementTypeName(type) << " '" << std::string((const char*)element, elementsize) << "'" << std::endl;
 	switch (type)
 	{
 		case OutputFilter::OpenTag:
 			m_attribname.clear();
 			if (0>xmlTextWriterStartElement( xmlout, getElement( element, elementsize)))
 			{
-				setState( Error, "libxml2 filter: write start element error");
+				setXmlError( "libxml2 write start element error");
 				rt = false;
 			}
 			m_taglevel += 1;
@@ -133,7 +178,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 		case OutputFilter::Attribute:
 			if (m_attribname.size())
 			{
-				setState( Error, "libxml2 filter: illegal operation");
+				setXmlError( "libxml2 illegal operation");
 				rt = false;
 			}
 			m_attribname.clear();
@@ -145,14 +190,16 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			{
 				if (0>xmlTextWriterWriteString( xmlout, getElement( element, elementsize)))
 				{
-					setState( Error, "libxml2 filter: write value error");
+					setXmlError( "libxml2 write value error");
 					rt = false;
+					break;
 				}
 			}
 			else if (0>xmlTextWriterWriteAttribute( xmlout, getXmlString(m_attribname), getElement( element, elementsize)))
 			{
-				setState( Error, "libxml2 filter: write attribute error");
+				setXmlError( "libxml2 write attribute error");
 				rt = false;
+				break;
 			}
 			else
 			{
@@ -163,37 +210,36 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 		case OutputFilter::CloseTag:
 			if (0>xmlTextWriterEndElement( xmlout))
 			{
-				setState( Error, "libxml2 filter: write close tag error");
+				setXmlError( "libxml2 write close tag error");
 				rt = false;
+				break;
 			}
-			else if (m_taglevel == 0)
+			m_taglevel -= 1;
+			if (m_taglevel == 0)
 			{
 				if (0>xmlTextWriterEndDocument( xmlout))
 				{
-					setState( Error, "libxml2 filter: write end document error");
+					setXmlError( "libxml2 write end document error");
 					rt = false;
+					break;
+				}
+#if WITH_LIBXSLT
+				if (m_xsltMapper.defined())
+				{
+					m_elembuf = m_xsltMapper.apply( m_doc.getContent());
 				}
 				else
 				{
-#if WITH_LIBXSLT
-					if (m_xsltMapper.defined())
-					{
-						m_elembuf = m_xsltMapper.apply( m_doc.getContent());
-					}
-					else
-					{
-						m_elembuf = m_doc.getContent();
-					}
-#else
 					m_elembuf = m_doc.getContent();
-#endif
-					m_elemitr = 0;
-					m_taglevel = 0;
-					return flushBuffer();
 				}
+#else
+				m_elembuf = m_doc.getContent();
+#endif
+				m_elemitr = 0;
+				m_taglevel = 0;
+				m_attribname.clear();
+				return flushBuffer();
 			}
-			m_taglevel -= 1;
-			m_attribname.clear();
 			break;
 
 		default:

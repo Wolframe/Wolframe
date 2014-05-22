@@ -41,13 +41,18 @@
 namespace _Wolframe {
 namespace config {
 
+/// \class ConfigurationTree
+/// \brief Configuration structure as tree
 class ConfigurationTree
 	:public types::PropertyTree
 {
 public:
+	/// \brief Default constructor
 	ConfigurationTree(){}
+	/// \brief Constructor
 	ConfigurationTree( const boost::property_tree::ptree& pt, const std::string& filename)
 		:types::PropertyTree( pt, filename){}
+	/// \brief Constructor
 	ConfigurationTree( const types::PropertyTree& pt)
 		:types::PropertyTree( pt){}
 };

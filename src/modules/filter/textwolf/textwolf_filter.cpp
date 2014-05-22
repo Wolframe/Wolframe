@@ -189,9 +189,9 @@ struct InputFilterImpl
 			}
 		};
 		static const ElementTypeMap tmap;
-		if (!m_metadatastate == MS_Init)
+		if (m_metadatastate != MS_Done)
 		{
-			return false;
+			if (!getMetaData()) return false;
 		}
 		try
 		{
@@ -230,7 +230,7 @@ struct InputFilterImpl
 		return false;
 	}
 
-	/// \brief Implements InputFilter::getMetadata()
+	/// \brief Implements InputFilter::getMetaData()
 	virtual const types::DocMetaData* getMetaData()
 	{
 		if (m_metadatastate == MS_Done) return getMetaDataRef().get();
@@ -260,6 +260,11 @@ struct InputFilterImpl
 					{
 						case MS_Init:
 							m_metadatastate = MS_Root;
+							ee = m_parser.getEncoding();
+							if (ee)
+							{
+								getMetaDataRef()->setAttribute( "encoding", ee);
+							}
 							if (!m_parser.getDoctypePublic().empty())
 							{
 								getMetaDataRef()->setAttribute( "PUBLIC", std::string( ee, eesize));
@@ -453,6 +458,11 @@ struct OutputFilterImpl :public OutputFilter
 			schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
 			schemaLocation = schemaLocation_buf.c_str();
 		}
+		if (!m_printer.createPrinter( encoding))
+		{
+			setState( Error, "failed to create XML serializer for this encoding");
+			return false;
+		}
 		if (!m_printer.printDocumentStart( root, doctype_public, doctype_system, xmlns, xsi, schemaLocation, m_elembuf))
 		{
 			setState( Error, "failed to print XML document header");
@@ -468,11 +478,6 @@ struct OutputFilterImpl :public OutputFilter
 	/// \return true, if success, false else
 	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		if (!m_headerPrinted)
-		{
-			if (!printHeader()) return false;
-			m_headerPrinted = true;
-		}
 		setState( Open);
 		if (m_elemitr < m_elembuf.size())
 		{
@@ -484,6 +489,11 @@ struct OutputFilterImpl :public OutputFilter
 			}
 			//... we've done the emptying of the buffer left
 			return true;
+		}
+		if (!m_headerPrinted)
+		{
+			if (!printHeader()) return false;
+			m_headerPrinted = true;
 		}
 		switch (type)
 		{

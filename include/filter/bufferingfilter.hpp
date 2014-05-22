@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/bufferingfilter.hpp
-///\brief Interface for input filter
+/// \file filter/bufferingfilter.hpp
+/// \brief Interface for input filter
 
 #ifndef _Wolframe_FILTER_BUFFERING_FILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_BUFFERING_FILTER_INTERFACE_HPP_INCLUDED
@@ -41,8 +41,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class BufferingInputFilter
-///\brief Input filter that buffers the input before redirecting to InputFilter::getNext(ElementType&,const void*&,std::size_t&)
+/// \class BufferingInputFilter
+/// \brief Input filter that buffers the input before redirecting to InputFilter::getNext(ElementType&,const void*&,std::size_t&)
 class BufferingInputFilter :public InputFilter
 {
 public:
@@ -64,19 +64,19 @@ public:
 		delete m_ref;
 	}
 
-	///\brief Implements InputFilter::copy()const
+	/// \brief Implements InputFilter::copy()const
 	virtual InputFilter* copy() const
 	{
 		return new BufferingInputFilter( *this);
 	}
 
-	///\brief Implements InputFilter::initcopy()const
+	/// \brief Implements InputFilter::initcopy()const
 	virtual InputFilter* initcopy() const
 	{
 		return new BufferingInputFilter( m_ref, m_ref->name());
 	}
 
-	///\brief Implements InputFilter::getRest(const void*&,std::size_t&,bool)
+	/// \brief Implements InputFilter::getRest(const void*&,std::size_t&,bool)
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end_)
 	{
 		end_ = m_end;
@@ -92,7 +92,7 @@ public:
 		}
 	}
 
-	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
+	/// \brief Implements InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end_)
 	{
 		m_buf.append( (const char*)ptr, size);
@@ -102,7 +102,7 @@ public:
 		}
 	}
 
-	///\brief Implements InputFilter::getNext(ElementType&,const void*&,std::size_t&)
+	/// \brief Implements InputFilter::getNext(ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (m_end)
@@ -119,6 +119,7 @@ public:
 		}
 	}
 
+	/// \brief Implements InputFilter::getMetaData()
 	virtual const types::DocMetaData* getMetaData()
 	{
 		if (m_end)
@@ -134,13 +135,19 @@ public:
 		}
 	}
 
-	///\brief Implements FilterBase::getValue(const char*,std::string&) const
+	/// \brief Implements InputFilter::getMetaDataRef()
+	virtual const types::DocMetaDataR& getMetaDataRef() const
+	{
+		return m_ref->getMetaDataRef();
+	}
+
+	/// \brief Implements FilterBase::getValue(const char*,std::string&) const
 	virtual bool getValue( const char* id, std::string& val) const
 	{
 		return m_ref->getValue( id, val);
 	}
 
-	///\brief Implements FilterBase::setValue(const char*,const std::string&)
+	/// \brief Implements FilterBase::setValue(const char*,const std::string&)
 	virtual bool setValue( const char* id, const std::string& val)
 	{
 		return m_ref->setValue( id, val);

@@ -101,12 +101,12 @@ public:
 	const void* allocContentCopy( const void* ptr, std::size_t size);
 
 private:
-	bool m_used;					//< only one iterator can be created from input. This is the guard for checking this.
-	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
-	std::string m_docformat;			//< document format as recognized by the document type detection as string {"xml","json",...}
-	boost::shared_ptr<char> m_content;		//< content source string is input is not from network
-	std::size_t m_contentsize;			//< size of content in bytes
-	bool m_isProcessorInput;			//< true, if this Input object represents a document and not the processor input
+	bool m_used;					///< only one iterator can be created from input. This is the guard for checking this.
+	InputFilterR m_inputfilter;			///< input is defined by the associated input filter
+	std::string m_docformat;			///< document format as recognized by the document type detection as string {"xml","json",...}
+	boost::shared_ptr<char> m_content;		///< content source string is input is not from network
+	std::size_t m_contentsize;			///< size of content in bytes
+	bool m_isProcessorInput;			///< true, if this Input object represents a document and not the processor input
 };
 
 }}//namespace

@@ -92,6 +92,8 @@ struct DocMetaData
 	static std::string replaceStem( const std::string& src, const std::string& newstem);
 	static std::string extractStem( const std::string& src);
 
+	std::string tostring() const;
+
 private:
 	std::vector<Attribute> m_attributes;
 	std::string m_doctype;

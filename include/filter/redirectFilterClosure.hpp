@@ -46,12 +46,14 @@ class RedirectFilterClosure
 	:public virtual utils::TypeSignature
 {
 public:
+	/// \brief Default constructor
 	RedirectFilterClosure()
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
 		,m_taglevel(0)
 		,m_elemtype(InputFilter::Value){}
 
+	/// \brief Constructor
 	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o)
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
@@ -63,6 +65,7 @@ public:
 			m_inputfilter->setFlags( m_outputfilter->flags());
 		}
 
+	/// \brief Copy constructor
 	RedirectFilterClosure( const RedirectFilterClosure& o)
 		:utils::TypeSignature(o)
 		,m_state(o.m_state)
@@ -73,6 +76,7 @@ public:
 		,m_elem(o.m_elem)
 		{}
 
+	/// \brief Destructor
 	~RedirectFilterClosure(){}
 
 	/// \brief Calls the fetching of input and printing it to output until end or interruption
@@ -108,12 +112,12 @@ public:
 				}
 				else if (m_elemtype == InputFilter::CloseTag)
 				{
-					--m_taglevel;
 					if (m_taglevel < 0)
 					{
 						m_state = 2;
 						return true;
 					}
+					--m_taglevel;
 				}
 				/*no break here!*/
 			case 1:
@@ -152,16 +156,18 @@ public:
 		m_inputfilter->setFlags( m_outputfilter->flags());
 	}
 
+	/// \brief Get the input filter reference
 	const TypedInputFilterR& inputfilter() const		{return m_inputfilter;}
+	/// \brief Get the output filter reference
 	const TypedOutputFilterR& outputfilter() const		{return m_outputfilter;}
 
 private:
-	int m_state;				//< current state of call
-	int m_taglevel;				//< current balance of open/close tags
-	TypedInputFilterR m_inputfilter;	//< input filter
-	TypedOutputFilterR m_outputfilter;	//< output filter
-	InputFilter::ElementType m_elemtype;	//< type of last element read from command result
-	types::VariantConst m_elem;		//< last element read from command result
+	int m_state;				///< current state of call
+	int m_taglevel;				///< current balance of open/close tags
+	TypedInputFilterR m_inputfilter;	///< input filter
+	TypedOutputFilterR m_outputfilter;	///< output filter
+	InputFilter::ElementType m_elemtype;	///< type of last element read from command result
+	types::VariantConst m_elem;		///< last element read from command result
 };
 
 }}//namespace

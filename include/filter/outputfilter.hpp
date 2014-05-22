@@ -153,7 +153,7 @@ public:
 		return rt;
 	}
 
-	void inheritMetaData( const types::DocMetaDataR mdr)
+	virtual void inheritMetaData( const types::DocMetaDataR mdr)
 	{
 		m_inheritMetadata = mdr;
 	}

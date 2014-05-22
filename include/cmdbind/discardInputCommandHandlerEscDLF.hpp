@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/discardInputCommandHandlerEscDLF.hpp
-///\brief Command handler that discards the input (> /dev/null ) instead of processing it. Used for handling rest of content when an error occurrs before the whole input has been consumed.
+/// \file cmdbind/discardInputCommandHandlerEscDLF.hpp
+/// \brief Command handler that discards the input (> /dev/null ) instead of processing it. Used for handling rest of content when an error occurrs before the whole input has been consumed.
 
 #ifndef _Wolframe_cmdbind_DISCARD_INPUT_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #define _Wolframe_cmdbind_DISCARD_INPUT_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
@@ -40,8 +40,8 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class DiscardInputCommandHandlerEscDLF
-///\brief Command handler that does nothing but seek for the end of content marker. Used to delegate protocol input in case of an error in the protocol on a command that expects "LT.LF" terminated content.
+/// \class DiscardInputCommandHandlerEscDLF
+/// \brief Command handler that does nothing but seek for the end of content marker. Used to delegate protocol input in case of an error in the protocol on a command that expects "LT.LF" terminated content.
 class DiscardInputCommandHandlerEscDLF :public IOFilterCommandHandlerEscDLF
 {
 public:
