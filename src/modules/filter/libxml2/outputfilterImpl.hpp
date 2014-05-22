@@ -78,6 +78,9 @@ public:
 	/// \brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
 
+	/// \brief Implementation of OutputFilter::close()
+	virtual bool close();
+
 	/// \brief Implementation of FilterBase::getValue( const char*, std::string&)
 	virtual bool getValue( const char* name, std::string& val) const;
 

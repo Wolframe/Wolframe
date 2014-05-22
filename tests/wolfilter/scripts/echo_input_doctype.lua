@@ -1,5 +1,4 @@
 function run()
-	type = input:doctype()
-	output:as( provider.filter(), type)
+	output:as( provider.filter(), input:metadata())
 	output:print( input:get())
 end

@@ -105,7 +105,6 @@ void OutputFilterImpl::setXmlError( const char* msg)
 bool OutputFilterImpl::printHeader()
 {
 	types::DocMetaData md( getMetaData());
-	/*[-]*/std::cout << "METADATA " << md.tostring() << std::endl;
 	const char* root = md.getAttribute( "root");
 	if (!root)
 	{
@@ -145,6 +144,15 @@ bool OutputFilterImpl::printHeader()
 	return true;
 }
 
+bool OutputFilterImpl::close()
+{
+	if (m_taglevel > 0)
+	{
+		return print( FilterBase::CloseTag, 0, 0);
+	}
+	return true;
+}
+
 bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t elementsize)
 {
 	bool rt = true;
@@ -162,7 +170,6 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 	{
 		return flushBuffer();
 	}
-	/*[-]*/std::cout << "ELEM [" << m_taglevel << "] " << OutputFilter::elementTypeName(type) << " '" << std::string((const char*)element, elementsize) << "'" << std::endl;
 	switch (type)
 	{
 		case OutputFilter::OpenTag:

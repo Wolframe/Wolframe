@@ -609,7 +609,11 @@ bool LuaTableOutputFilter::closeTag()
 {
 	if (m_statestk.size() > 0)
 	{
-		if (m_statestk.back() == Vector)
+		if (m_statestk.size() == 1)
+		{
+			m_statestk.pop_back();
+		}
+		else if (m_statestk.back() == Vector)
 		{
 			m_statestk.pop_back();				//... LUA STK: t k ar i v
 			_wrap_lua_settable( m_ls, -3);			//... LUA STK: t k ar		(ar[i] = v)
@@ -661,10 +665,18 @@ bool LuaTableOutputFilter::print( ElementType type, const types::VariantConst& e
 	}
 	if (m_statestk.size() == 0)
 	{
-		m_statestk.push_back( Struct);
-		_wrap_lua_newtable( m_ls);
+		if (state() == OutputFilter::Start)
+		{
+			setState( OutputFilter::Open);
+			m_statestk.push_back( Struct);
+			_wrap_lua_newtable( m_ls);
+		}
+		else
+		{
+			setState( OutputFilter::Error, "tags not balanced in input: print called after final close");
+			return false;
+		}
 	}
-
 	switch (type)
 	{
 		case OpenTag:

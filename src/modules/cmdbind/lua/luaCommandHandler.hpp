@@ -52,7 +52,7 @@ public:
 public:
 	///\brief Constructor
 	explicit LuaCommandHandler( const langbind::LuaScriptContext* ctx_)
-		:m_ctx(ctx_){}
+		:m_ctx(ctx_),m_done(false){}
 
 	///\brief Destructor
 	virtual ~LuaCommandHandler(){}
@@ -75,6 +75,7 @@ private:
 	const langbind::LuaScriptContext* m_ctx;
 	langbind::LuaScriptInstanceR m_interp;
 	std::string m_lasterror;
+	bool m_done;
 };
 
 }}//namespace

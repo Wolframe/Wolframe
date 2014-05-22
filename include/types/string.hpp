@@ -134,6 +134,11 @@ public:
 			:encoding(encoding_),codepage(codepage_){}
 		EncodingAttrib( const EncodingAttrib& o)
 			:encoding(o.encoding),codepage(o.codepage){}
+
+		/// \brief Get this encoding as string
+		/// \return the name of the encoding
+		const char* encodingName() const
+			{return String::encodingName((Encoding)encoding, codepage);}
 	};
 	/// \brief Parse the attributes of an encoding from an encoding name
 	/// \return the encoding attributes of name

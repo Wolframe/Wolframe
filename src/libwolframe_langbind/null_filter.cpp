@@ -134,6 +134,7 @@ struct OutputFilterImpl :public OutputFilter
 		setState( Error, "output filter not defined");
 		return false;
 	}
+	virtual bool close(){return true;}
 };
 }//end anonymous namespace
 

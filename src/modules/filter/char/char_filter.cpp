@@ -273,6 +273,10 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		return true;
 	}
+
+	/// \brief Implementation of OutputFilter::close()
+	virtual bool close(){return true;}
+
 private:
 	std::string m_elembuf;				//< buffer for the currently printed element
 	std::size_t m_elemitr;				//< iterator to pass it to output

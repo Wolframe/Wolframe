@@ -258,6 +258,11 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						const types::FormDescription* df = execContext()->provider()->formDescription( doctype);
 						if (df)
 						{
+							const char* root = m_inputfilter->getMetaData()->getAttribute( "root");
+							if (root && df->root() != root)
+							{
+								throw std::runtime_error( std::string("input root element '") + root + "' does not match to form root element '" + df->root() + "'");
+							}
 							m_inputform.reset( new types::Form( df));
 							m_inputform_parser.reset( new serialize::DDLStructParser( m_inputform.get()));
 							serialize::Context::Flags flg = serialize::Context::Flags((int)serialize::Context::ValidateInitialization | (int)serialize::Context::ValidateAttributes);

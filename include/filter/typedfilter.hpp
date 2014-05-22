@@ -61,7 +61,7 @@ public:
 	explicit TypedInputFilter( const char* name_)
 		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
 		,FilterBase(name_)
-		,m_state(InputFilter::Open)
+		,m_state(InputFilter::Start)
 		,m_data(0){}
 
 	/// \brief Copy constructor
@@ -124,7 +124,7 @@ public:
 	explicit TypedOutputFilter( const char* name_)
 		:utils::TypeSignature("langbind::TypedOutputFilter", __LINE__)
 		,FilterBase(name_)
-		,m_state(OutputFilter::Open) {}
+		,m_state(OutputFilter::Start) {}
 
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter to copy

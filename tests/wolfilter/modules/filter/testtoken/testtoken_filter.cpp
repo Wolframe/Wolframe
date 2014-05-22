@@ -160,6 +160,9 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		return true;
 	}
+
+	virtual bool close() {return true;}
+
 private:
 	std::string m_elembuf;				//< buffer for the currently printed element
 	std::size_t m_elemitr;				//< iterator to pass it to output

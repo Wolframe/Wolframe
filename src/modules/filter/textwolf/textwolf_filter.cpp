@@ -199,6 +199,7 @@ struct InputFilterImpl
 			{
 				const char* ee;
 				textwolf::XMLScannerBase::ElementType et = m_parser.getNext( ee, elementsize);
+
 				element = (const void*)ee;
 				int st = tmap[ et];
 				if (st < 0)
@@ -469,6 +470,12 @@ struct OutputFilterImpl :public OutputFilter
 			return false;
 		}
 		return true;
+	}
+
+	/// \brief Implementation of OutputFilter::close()
+	virtual bool close()
+	{
+		return print( FilterBase::CloseTag, 0, 0);
 	}
 
 	/// \brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)

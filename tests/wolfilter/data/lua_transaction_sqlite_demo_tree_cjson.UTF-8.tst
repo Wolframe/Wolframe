@@ -5,29 +5,29 @@
 **requires:SQLITE3
 **input
 {
-    "treeAddRoot": { "name": "Albert" },
-    "treeAddNode": [
-      {
-        "parentid": "1",
-        "name": "Bert"
-      },
-      {
-        "parentid": "1",
-        "name": "Chuck"
-      },
-      {
-        "parentid": "3",
-        "name": "Donna"
-      },
-      {
-        "parentid": "3",
-        "name": "Eddie"
-      },
-      {
-        "parentid": "3",
-        "name": "Fred"
-      }
-    ]
+	"treeAddRoot": { "name": "Albert" },
+	"treeAddNode": [
+		{
+			"parentid": "1",
+			"name": "Bert"
+		},
+		{
+			"parentid": "1",
+			"name": "Chuck"
+		},
+		{
+			"parentid": "3",
+			"name": "Donna"
+		},
+		{
+			"parentid": "3",
+			"name": "Eddie"
+		},
+		{
+			"parentid": "3",
+			"name": "Fred"
+		}
+	]
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
@@ -280,7 +280,7 @@ END
 **outputfile:DBDUMP
 **output
 {
-  "result":  ["", "ID { '2' } ", "ID { '3' } ", "ID { '4' } ", "ID { '5' } ", "ID { '6' } "]
+	"result":	["", "ID { '2' } ", "ID { '3' } ", "ID { '4' } ", "ID { '5' } ", "ID { '6' } "]
 }
 tree:
 '1', NULL, 'Albert', '1', '12'

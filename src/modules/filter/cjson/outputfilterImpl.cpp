@@ -78,8 +78,6 @@ bool OutputFilterImpl::flushBuffer()
 
 void OutputFilterImpl::printStructToBuffer()
 {
-	if (m_stk.size() != 1) throw std::logic_error( "internal: illegal call of 'printStructToBuffer()'");
-
 	char* content = cJSON_Print( m_stk.back().m_node);
 	if (!content) throw std::bad_alloc();
 
@@ -168,7 +166,10 @@ void OutputFilterImpl::closeElement()
 {
 	if (m_stk.size() <= 1)
 	{
-		if (!m_stk.empty()) m_stk.pop_back();
+		if (m_stk.empty()) throw std::runtime_error("tags not balanced, got a close too much");
+		printStructToBuffer();
+		m_stk.pop_back();
+		m_flushing = true;
 	}
 	else
 	{
@@ -228,11 +229,6 @@ void OutputFilterImpl::closeElement()
 					throw std::bad_alloc();
 				}
 			}
-		}
-		if (m_stk.size() == 1)
-		{
-			// close of a root element -> we print the document content to output
-			printStructToBuffer();
 		}
 	}
 }
@@ -297,11 +293,6 @@ void OutputFilterImpl::setContentValue( const std::string& value)
 		cJSON_AddItemToArray( ar, val);
 		m_stk.back().m_node = ar;
 	}
-	if (m_stk.size() == 0)
-	{
-		// set of a root element -> we print the document content to output
-		printStructToBuffer();
-	}
 }
 
 void OutputFilterImpl::printHeader()
@@ -319,6 +310,15 @@ void OutputFilterImpl::printHeader()
 
 	m_headerprinted = true;
 	setState( Open);
+}
+
+bool OutputFilterImpl::close()
+{
+	if (!m_stk.empty())
+	{
+		return print( FilterBase::CloseTag, 0, 0);
+	}
+	return true;
 }
 
 bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t elementsize)

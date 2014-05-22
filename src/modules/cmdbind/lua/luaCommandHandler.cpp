@@ -101,48 +101,59 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	errorCode = 0;
 	int nargs = 0;
 
-	if (!m_interp.get())
+	if (!m_done)
 	{
-		try
+		if (!m_interp.get())
 		{
-			initcall( m_argBuffer.size()?m_argBuffer.at(0):"");
-		}
-		catch (const std::exception& e)
-		{
-			LOG_ERROR << "Failed to load script and initialize execution context: " << e.what();
-			errorCode = "init script";
-			return Error;
-		}
-		// call the function (for the first time)
-		lua_getglobal( m_interp->thread(), m_name.c_str());
-		std::vector<std::string>::const_iterator itr=m_argBuffer.begin(),end=m_argBuffer.end();
-		for (;itr != end; ++itr)
-		{
-			lua_pushlstring( m_interp->thread(), itr->c_str(), itr->size());
-		}
-		nargs = (int)m_argBuffer.size();
-	}
-	do
-	{
-		// call the function (subsequently until termination)
-		rt = lua_resume( m_interp->thread(), NULL, nargs);
-		if (rt == LUA_YIELD)
-		{
-			if ((m_inputfilter.get() && m_inputfilter->state() != InputFilter::Open)
-			||  (m_outputfilter.get() && m_outputfilter->state() != OutputFilter::Open))
+			try
 			{
-				return Yield;
+				initcall( m_argBuffer.size()?m_argBuffer.at(0):"");
 			}
+			catch (const std::exception& e)
+			{
+				LOG_ERROR << "Failed to load script and initialize execution context: " << e.what();
+				errorCode = "init script";
+				return Error;
+			}
+			// call the function (for the first time)
+			lua_getglobal( m_interp->thread(), m_name.c_str());
+			std::vector<std::string>::const_iterator itr=m_argBuffer.begin(),end=m_argBuffer.end();
+			for (;itr != end; ++itr)
+			{
+				lua_pushlstring( m_interp->thread(), itr->c_str(), itr->size());
+			}
+			nargs = (int)m_argBuffer.size();
 		}
-		nargs = 0;
+		do
+		{
+			// call the function (subsequently until termination)
+			rt = lua_resume( m_interp->thread(), NULL, nargs);
+			if (rt == LUA_YIELD)
+			{
+				if ((m_inputfilter.get() && m_inputfilter->state() != InputFilter::Open)
+				||  (m_outputfilter.get() && m_outputfilter->state() != OutputFilter::Open))
+				{
+					return Yield;
+				}
+			}
+			nargs = 0;
+		}
+		while (rt == LUA_YIELD);
+		m_done = true;
 	}
-	while (rt == LUA_YIELD);
 	if (rt != 0)
 	{
 		m_lasterror.append( m_interp->luaUserErrorMessage( m_interp->thread()));
 		LOG_ERROR << "error calling lua function '" << m_name.c_str() << "':" << m_interp->luaErrorMessage( m_interp->thread());
 		errorCode = m_lasterror.c_str();
 		return Error;
+	}
+	else
+	{
+		if (!m_outputfilter->close())
+		{
+			return Yield;
+		}
 	}
 	return Ok;
 }

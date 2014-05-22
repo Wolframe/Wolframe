@@ -144,6 +144,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 {
 	try
 	{
+		setState( Start);
 		m_content.append( (const char*)content, contentsize);
 		if (end)
 		{
@@ -151,6 +152,10 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 			if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
 			m_encattr.encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
 			m_encattr.codepage = 0;
+			if (m_encattr.encoding != types::String::UTF8)
+			{
+				setAttribute( "encoding", m_encattr.encodingName());
+			}
 			m_root = parse( origcontent);
 			m_firstnode = m_root.get();
 			int nof_docattributes = 0;

@@ -176,7 +176,12 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, InputF
 		if (!is.eof()) ++pp;
 	}
 	iflt.putInput( buf, pp, is.eof());
-	iflt.setState( InputFilter::Open);
+	if (iflt.state() == InputFilter::Error)
+	{
+		std::ostringstream msg;
+		msg << "error processing input: '" << iflt.getError() << "'";
+		throw std::runtime_error( msg.str());
+	}
 }
 
 static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbind::CommandHandler* cmdh)
@@ -447,7 +452,6 @@ static void writeOutput( char* buf, unsigned int size, std::ostream& os, OutputF
 {
 	os.write( buf, oflt.getPosition());
 	oflt.setOutputBuffer( buf, size);
-	oflt.setState( OutputFilter::Open);
 }
 
 struct BufferStruct
@@ -647,6 +651,10 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 			}
 			LOG_DATA << "[iostream filter] print " << std::string( (const char*)elem, elemsize);
+		}
+		while (!flt.outputfilter().get()->close())
+		{
+			processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 		}
 		checkUnconsumedInput( is, *flt.inputfilter());
 		writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());

@@ -1,44 +1,44 @@
 {
-    "assignment": [
-      {
-        "task": [
-          {
-            "title": "title:job 1",
-            "key": "key:A123",
-            "customernumber": "customernumber:324"
-          },
-          {
-            "title": "title:job 2",
-            "key": "key:V456",
-            "customernumber": "customernumber:567"
-          }
-        ],
-        "employee": {
-          "firstname": "firstname:Julia",
-          "surname": "surname:Tegel-Sacher",
-          "phone": "phone:098 765 43 21"
-        },
-        "issuedate": "issuedate:13.5.2006"
-      },
-      {
-        "task": [
-          {
-            "title": "title:job 3",
-            "key": "key:A456",
-            "customernumber": "customernumber:567"
-          },
-          {
-            "title": "title:job 4",
-            "key": "key:V789",
-            "customernumber": "customernumber:890"
-          }
-        ],
-        "employee": {
-          "firstname": "firstname:Jakob",
-          "surname": "surname:Stegelin",
-          "phone": "phone:012 345 67 89"
-        },
-        "issuedate": "issuedate:13.5.2006"
-      }
-    ]
+	"assignment": [
+		{
+			"task": [
+				{
+					"title": "title:job 1",
+					"key": "key:A123",
+					"customernumber": "customernumber:324"
+				},
+				{
+					"title": "title:job 2",
+					"key": "key:V456",
+					"customernumber": "customernumber:567"
+				}
+			],
+			"employee": {
+				"firstname": "firstname:Julia",
+				"surname": "surname:Tegel-Sacher",
+				"phone": "phone:098 765 43 21"
+			},
+			"issuedate": "issuedate:13.5.2006"
+		},
+		{
+			"task": [
+				{
+					"title": "title:job 3",
+					"key": "key:A456",
+					"customernumber": "customernumber:567"
+				},
+				{
+					"title": "title:job 4",
+					"key": "key:V789",
+					"customernumber": "customernumber:890"
+				}
+			],
+			"employee": {
+				"firstname": "firstname:Jakob",
+				"surname": "surname:Stegelin",
+				"phone": "phone:012 345 67 89"
+			},
+			"issuedate": "issuedate:13.5.2006"
+		}
+	]
 }

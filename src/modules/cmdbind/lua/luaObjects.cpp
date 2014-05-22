@@ -698,7 +698,7 @@ LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 
 
 
-LUA_FUNCTION_THROWS( "form()", function_form)
+LUA_FUNCTION_THROWS( "provider.form()", function_form)
 {
 	check_parameters( ls, 0, 1, LUA_TSTRING);
 
@@ -1410,7 +1410,7 @@ static std::string filterargAsString( const std::vector<langbind::FilterArgument
 	return out.str();
 }
 
-LUA_FUNCTION_THROWS( "filter(..)", function_filter)
+LUA_FUNCTION_THROWS( "provider.filter(..)", function_filter)
 {
 	const char* name = "";
 	std::vector<FilterArgument> arg;
@@ -1484,7 +1484,6 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 		default: throw std::runtime_error( "too many arguments");
 	}
 }
-
 
 LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 {

@@ -1,37 +1,37 @@
 {
-  "doctype":  "trees",
-  "btree":  {
-    "id":  "1",
-    "left":  {
-      "id":  "11",
-      "name":  "EINS EINS"
-    },
-    "name":  "EINS",
-    "right":  {
-      "id":  "12",
-      "left":  {
-        "id":  "121",
-        "name":  "EINS ZWEI EINS"
-      },
-      "name":  "EINS ZWEI"
-    }
-  },
-  "mtree":  {
-    "id":  "1",
-    "name":  "EINS",
-    "node":  [{
-        "id":  "11",
-        "name":  "EINS EINS"
-      }, {
-        "id":  "12",
-        "name":  "EINS ZWEI",
-        "node":  {
-          "id":  "121",
-          "name":  "EINS ZWEI EINS"
-        }
-      }, {
-        "id":  "13",
-        "name":  "EINS DREI"
-      }]
-  }
+	"doctype":	"trees",
+	"btree":	{
+		"id":	"1",
+		"left":	{
+			"id":	"11",
+			"name":	"EINS EINS"
+		},
+		"name":	"EINS",
+		"right":	{
+			"id":	"12",
+			"left":	{
+				"id":	"121",
+				"name":	"EINS ZWEI EINS"
+			},
+			"name":	"EINS ZWEI"
+		}
+	},
+	"mtree":	{
+		"id":	"1",
+		"name":	"EINS",
+		"node":	[{
+				"id":	"11",
+				"name":	"EINS EINS"
+			}, {
+				"id":	"12",
+				"name":	"EINS ZWEI",
+				"node":	{
+					"id":	"121",
+					"name":	"EINS ZWEI EINS"
+				}
+			}, {
+				"id":	"13",
+				"name":	"EINS DREI"
+			}]
+	}
 }
