@@ -201,6 +201,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				break;
 			}
 			m_stk.push_back( StackElement( m_firstnode));
+			setState( Open);
 		}
 	}
 	catch (const std::runtime_error& err)
@@ -261,7 +262,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 {
 	if (!m_root.get())
 	{
-		if (state() == Open)
+		if (state() != Error)
 		{
 			setState( EndOfMessage);
 		}

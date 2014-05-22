@@ -297,7 +297,7 @@ void OutputFilterImpl::setContentValue( const std::string& value)
 		cJSON_AddItemToArray( ar, val);
 		m_stk.back().m_node = ar;
 	}
-	if (m_stk.size() == 1)
+	if (m_stk.size() == 0)
 	{
 		// set of a root element -> we print the document content to output
 		printStructToBuffer();
@@ -325,7 +325,15 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 {
 	try
 	{
-		if (!flushBuffer()) return false;
+		if (m_flushing)
+		{
+			if (flushBuffer())
+			{
+				m_flushing = false;
+				return true;
+			}
+			return false;
+		}
 		if (m_stk.empty())
 		{
 			setState( Error, "cjson filter illegal operation: printing after final close");
@@ -371,7 +379,13 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 				setState( Error, "cjson filter: illegal state");
 				return false;
 		}
-		return flushBuffer();
+		m_lastelemtype = type;
+		if (!flushBuffer())
+		{
+			m_flushing = true;
+			return false;
+		}
+		return true;
 	}
 	catch (const std::bad_alloc& e)
 	{

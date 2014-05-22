@@ -61,6 +61,8 @@ public:
 		,OutputFilter("cjson", inheritedMetaData)
 		,m_elemitr(0)
 		,m_headerprinted(false)
+		,m_flushing(false)
+		,m_lastelemtype(FilterBase::OpenTag)
 	{
 		m_stk.push_back( StackElement(""));
 		setFlags( FilterBase::SerializeWithIndices);
@@ -74,7 +76,9 @@ public:
 		,m_elemitr(o.m_elemitr)
 		,m_encattr(o.m_encattr)
 		,m_headerprinted(o.m_headerprinted)
+		,m_flushing(o.m_flushing)
 		,m_stk(o.m_stk)
+		,m_lastelemtype(o.m_lastelemtype)
 		{}
 
 	virtual ~OutputFilterImpl(){}
@@ -110,6 +114,7 @@ private:
 	std::size_t m_elemitr;					///< iterator on current element
 	types::String::EncodingAttrib m_encattr;		///< character set encoding attributes
 	bool m_headerprinted;					///< true if the header has already been printed
+	bool m_flushing;					///< true, if we are flushing the buffer to output
 
 	struct StackElement
 	{
@@ -128,6 +133,7 @@ private:
 		std::string m_name;
 	};
 	std::vector<StackElement> m_stk;
+	FilterBase::ElementType m_lastelemtype;			///< last element type
 };
 
 }}//namespace
