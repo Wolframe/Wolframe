@@ -39,6 +39,7 @@
 #define _AUTHENTICATION_UNIT_HPP_INCLUDED
 
 #include <string>
+
 #include "AAAA/authInstance.hpp"
 #include "database/DBprovider.hpp"
 
@@ -61,7 +62,15 @@ public:
 						{ return true; }
 	virtual const char* className() const = 0;
 
-	virtual AuthenticatorInstance* instance() = 0;
+	/// The list of mechs implemented by this unit
+	/// \note	The authentication unit returns the mechs as an
+	///		array of strings. The array ends with an empty string.
+	///		Be aware that the other interfaces use a vector instead.
+	virtual const std::string* mechs() const = 0;
+
+	/// An AuthenticatorInstance for the required mech (or NULL)
+	virtual AuthenticatorInstance* instance( const std::string& mech ) = 0;
+
 private:
 	const std::string	m_identifier;
 };

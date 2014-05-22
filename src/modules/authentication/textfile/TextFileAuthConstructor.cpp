@@ -40,11 +40,11 @@
 namespace _Wolframe {
 namespace AAAA {
 
-TextFileAuthenticator* TextFileAuthConstructor::object( const config::NamedConfiguration& conf )
+TextFileAuthUnit* TextFileAuthConstructor::object( const config::NamedConfiguration& conf )
 {
 	const TextFileAuthConfig& cfg = dynamic_cast< const TextFileAuthConfig& >( conf );
 
-	TextFileAuthenticator* m_auth = new TextFileAuthenticator( cfg.m_identifier, cfg.m_file );
+	TextFileAuthUnit* m_auth = new TextFileAuthUnit( cfg.m_identifier, cfg.m_file );
 	LOG_DEBUG << "Text file authenticator container created for '"
 		      << cfg.m_identifier << "'";
 	return m_auth;

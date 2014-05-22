@@ -42,37 +42,44 @@
 namespace _Wolframe {
 namespace AAAA {
 
-DBauthenticator::DBauthenticator( const std::string& Identifier, const std::string& dbLabel )
+static const std::string AUTHENTICATION_MECH = "WOLFRAME-CRAM";
+const std::string DBauthUnit::m_mechs[] = { AUTHENTICATION_MECH, "" };
+
+DBauthUnit::DBauthUnit( const std::string& Identifier, const std::string& dbLabel )
 	: AuthenticationUnit( Identifier ), m_dbLabel( dbLabel )
 {
 	m_db = NULL;
 	if ( m_dbLabel.empty() )
 		throw std::logic_error( "Empty database reference in DBauthContainer" );
 
-	LOG_DEBUG << "Database authenticator '" << identifier()
+	LOG_DEBUG << "Database authentication unit '" << identifier()
 		  << "' created with database reference '" << m_dbLabel << "'";
 }
 
-DBauthenticator::~DBauthenticator()
+DBauthUnit::~DBauthUnit()
 {
 }
 
 
-bool DBauthenticator::resolveDB( const db::DatabaseProvider& db )
+bool DBauthUnit::resolveDB( const db::DatabaseProvider& db )
 {
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			LOG_TRACE << "Database authenticator: database reference '" << m_dbLabel << "' resolved";
+			LOG_TRACE << "Database authentication unit: database reference '" << m_dbLabel << "' resolved";
 			return true;
 		}
 		else	{
-			LOG_ERROR << "Database authenticator: database labeled '" << m_dbLabel << "' not found !";
+			LOG_ERROR << "Database authentication unit: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
 	}
 	return true;
 }
 
+AuthenticatorInstance* DBauthUnit::instance( const std::string& /*mech*/ )
+{
+	return NULL;
+}
 }} // namespace _Wolframe::AAAA
 

@@ -38,7 +38,10 @@
 #ifndef _AUTHENTICATION_INSTANCE_HPP_INCLUDED
 #define _AUTHENTICATION_INSTANCE_HPP_INCLUDED
 
-#include "AAAA/authenticator.hpp"
+#include <string>
+#include <vector>
+
+#include "AAAA/user.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -49,13 +52,65 @@ namespace AAAA {
 /// The AuthenticatorInstance(s) are provided by the their respective
 /// AuthenticationUnit(s) in the AAAA provider
 ///
-/// \note	For now the AuthenticatorInstance is just an Authenticator
+/// \note	For now the AuthenticatorInstance is just like the Authenticator
 ///		but this is very likely to change in the future
-
-
-class AuthenticatorInstance : public Authenticator
+///
+class AuthenticatorInstance
 {
+public:
+	enum Status	{
+		INITIALIZED,		///< the instance is initialized,
+					///  no mech has been selected yet
+		MESSAGE_AVAILABLE,	///< an output message is available
+		AWAITING_MESSAGE,	///< waiting for an input message
+		AUTHENTICATED,		///< a user has been authenticated
+		INVALID_CREDENTIALS,	///< the user authentication failed,
+					///  either the username or the credentials are invalid
+		SYSTEM_FAILURE		///< some other error occurred
+	};
 
+	/// The virtual destructor
+	virtual ~AuthenticatorInstance()	{}
+
+	/// Destroy the authenticator
+	///
+	/// \note	In many cases this is a suicidal function (delete this),
+	///		so you should be very careful how you use it.
+	///		You should use this function instead of delete
+	///		because not all authentication instances are created with new.
+	virtual void destroy() = 0;
+
+	/// The list of available mechs
+	virtual const std::vector<std::string>& mechs() const = 0;
+
+	/// Set the authentication mech
+	/// \param [in]	mech	the name of the mech (case-insensitive)
+	/// \returns		true if the mech could be selected
+	///			false if the mech is not available or a mech
+	///			has already been selected
+	virtual bool setMech( const std::string& mech ) = 0;
+
+	/// The input message
+	/// \param [in]	message	pointer to the input message
+	/// \param [in]	size	the size of the input message
+	virtual void messageIn( const void* message, std::size_t size ) = 0;
+
+	/// The output message
+	/// \param [in]	message	pointer to the buffer for the output message
+	/// \param [in]	size	the size of the output buffer
+	/// \returns		the size of the message in bytes
+	///			or -1 if the buffer is too small
+	virtual int messageOut( const void** message, std::size_t size ) = 0;
+
+	/// The current status of the authenticator
+	virtual Status status() const = 0;
+
+	/// The authenticated user or NULL if not authenticated
+	/// \note	It is intended that this function can be called only once
+	///		As a security precaution, all the instance information regarding
+	///		the current authentication operation should be destroyed after
+	///		calling this function
+	virtual User* user() const = 0;
 };
 
 }} // namespace _Wolframe::AAAA

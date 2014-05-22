@@ -57,8 +57,9 @@ class StandardAuthenticator : public Authenticator
 {
 public:
 	StandardAuthenticator( const std::vector<std::string>& mechs_ );
+
 	~StandardAuthenticator();
-	void close();
+	void destroy();
 
 	/// Get the list of available mechs
 	virtual const std::vector<std::string>& mechs() const;

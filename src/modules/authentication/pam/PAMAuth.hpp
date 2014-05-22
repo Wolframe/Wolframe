@@ -77,25 +77,23 @@ typedef struct {
 	pam_handle_t *h;
 } pam_appdata;
 
-class PAMAuthenticator : public AuthenticationUnit
+class PAMAuthUnit : public AuthenticationUnit
 {
 public:
-	PAMAuthenticator( const std::string& Identifier,
+	PAMAuthUnit( const std::string& Identifier,
 			  const std::string& service );
-	~PAMAuthenticator();
+	~PAMAuthUnit();
 	virtual const char* className() const	{ return PAM_AUTHENTICATION_CLASS_NAME; }
 
-	AuthenticatorInstance* instance()	{ return NULL; }
+	const std::string* mechs() const	{ return m_mechs; }
+
+	AuthenticatorInstance* instance( const std::string& /*mech*/ )	{ return NULL; }
 
 private:
-	// name of the PAM service
-	const std::string	m_service;
-
-	// PAM internal data structure
-	struct pam_conv		m_conv;
-
-	// our void * for PAM data
-	pam_appdata		m_appdata;
+	static const std::string	m_mechs[];	///< list of mechs for the unit
+	const std::string		m_service;	///< name of the PAM service
+	struct pam_conv			m_conv;		///< PAM internal data structure
+	pam_appdata			m_appdata;	///< our void * for PAM data
 
 	// states of the authenticator state machine
 	enum {
@@ -114,7 +112,7 @@ public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
 	const char* objectClassName() const		{ return PAM_AUTHENTICATION_CLASS_NAME; }
-	PAMAuthenticator* object( const config::NamedConfiguration& conf );
+	PAMAuthUnit* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

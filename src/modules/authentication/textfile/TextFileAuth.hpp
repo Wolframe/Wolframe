@@ -77,32 +77,36 @@ private:
 };
 
 
-class TextFileAuthenticator : public AuthenticationUnit
+class TextFileAuthUnit : public AuthenticationUnit
 {
 public:
-	TextFileAuthenticator( const std::string& Identifier, const std::string& filename );
+	TextFileAuthUnit( const std::string& Identifier, const std::string& filename );
 
-	~TextFileAuthenticator();
+	~TextFileAuthUnit();
 
 	virtual const char* className() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
 
-	AuthenticatorInstance* instance();
+	const std::string* mechs() const		{ return m_mechs; }
 
- /// \brief	Authenticate a user with its plain username and password
- /// \note	This function is supposed to be used only for tests.
- ///		DO NOT USE THIS FUNCTION IN REAL AUTHENTICATION MECHANISMS
- ///
- /// \param [in]	username
- /// \param [in]	password	guess what this are :D
- /// \param [in]	caseSensitveUser should the username be treated as case-sensitive or not
+	AuthenticatorInstance* instance( const std::string& mech );
+
+	/// \brief	Authenticate a user with its plain username and password
+	/// \note	This function is supposed to be used only for tests.
+	///		DO NOT USE THIS FUNCTION IN REAL AUTHENTICATION MECHANISMS
+	///
+	/// \param [in]	username
+	/// \param [in]	password	guess what this are :D
+	/// \param [in]	caseSensitveUser should the username be treated as case-sensitive or not
 	User* authenticatePlain( const std::string& username, const std::string& password,
 				 bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 
 	/// \brief
 	PwdFileUser getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
 			     bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+
 private:
-	const PasswordFile	m_pwdFile;
+	static const std::string	m_mechs[];
+	const PasswordFile		m_pwdFile;
 };
 
 
@@ -125,9 +129,11 @@ class TextFileAuthInstance : public AuthenticatorInstance
 	};
 
 public:
-	TextFileAuthInstance( const TextFileAuthenticator& backend );
+	TextFileAuthInstance( const TextFileAuthUnit& backend );
 
 	~TextFileAuthInstance();
+
+	void destroy();
 
 	const char* typeName() const			{ return m_backend.className(); }
 
@@ -150,7 +156,7 @@ public:
 	virtual User* user() const;
 
 private:
-	const TextFileAuthenticator&	m_backend;
+	const TextFileAuthUnit&	m_backend;
 	struct PwdFileUser		m_usr;
 	User*				m_user;
 };
@@ -166,7 +172,7 @@ public:
 
 	const char* objectClassName() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
 
-	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
+	TextFileAuthUnit* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

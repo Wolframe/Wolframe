@@ -102,6 +102,11 @@ StandardAuthenticator::~StandardAuthenticator()
 {
 }
 
+void StandardAuthenticator::destroy()
+{
+	delete this;
+}
+
 /// Get the list of available mechs
 const std::vector<std::string>& StandardAuthenticator::mechs() const
 {

@@ -67,7 +67,15 @@ public:
 	/// The virtual destructor
 	virtual ~Authenticator()	{}
 
-	/// Get the list of available mechs
+	/// Destroy the authenticator
+	///
+	/// \note	In many cases this is a suicidal function (delete this),
+	///		so you should be very careful how you use it.
+	///		You should use this function instead of delete
+	///		because not all authentication instances are created with new.
+	virtual void destroy() = 0;
+
+	/// The list of available mechs
 	virtual const std::vector<std::string>& mechs() const = 0;
 
 	/// Set the authentication mech
@@ -93,6 +101,10 @@ public:
 	virtual Status status() const = 0;
 
 	/// The authenticated user or NULL if not authenticated
+	/// \note	It is intended that this function can be called only once.
+	///		As a security precaution, all the instance information regarding
+	///		the current authentication operation should be destroyed after
+	///		calling this function.
 	virtual User* user() const = 0;
 };
 
