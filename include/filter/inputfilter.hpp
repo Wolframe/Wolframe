@@ -153,6 +153,16 @@ public:
 		m_metadata->setAttribute( name_, value_);
 	}
 
+	/// \brief Set a document type
+	void setDoctype( const std::string& doctype_)
+	{
+		if (state() != Start)
+		{
+			throw std::runtime_error( "Cannot set input filter doctype after input has been read");
+		}
+		m_metadata->setDoctype( doctype_);
+	}
+
 private:
 	State m_state;				///< state
 	types::DocMetaDataR m_metadata;		///< meta data reference

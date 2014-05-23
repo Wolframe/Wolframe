@@ -2,7 +2,7 @@
 **requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<aa>1</aa><bb>2</bb>
+<doc><aa>1</aa><bb>2</bb></doc>
 **config
 --config wolframe.conf --filter textwolf testcall
 **file:wolframe.conf
@@ -38,7 +38,7 @@ END
 **outputfile:DBOUT
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result><item><id>1</id><name>hugo</name></item></result>
+<doc><result><item><id>1</id><name>hugo</name></item></result></doc>
 Code:
 [0] OUTPUT_OPEN TAG result
 [1] RESULT_SET_INIT

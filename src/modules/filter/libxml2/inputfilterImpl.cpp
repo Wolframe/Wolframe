@@ -113,6 +113,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	else
 	{
 		initDocMetaData();
+		LOG_DEBUG << "[libxml2 input] document meta data: {" << getMetaDataRef()->tostring() << "}";
 		setState( Open);
 	}
 }
@@ -134,6 +135,26 @@ void InputFilterImpl::initDocMetaData()
 		}
 		setAttribute( "encoding", encoding);
 	}
+	// Inspect !DOCTYPE entity for meta data:
+	xmlNode* nd = m_doc.get()->children;
+	while (nd && nd->type != XML_DTD_NODE)
+	{
+		nd = nd->next;
+	}
+	if (nd)
+	{
+		xmlDtdPtr dtd = (xmlDtdPtr)nd;
+		if (dtd->SystemID)
+		{
+			setAttribute( "SYSTEM", (const char*)dtd->SystemID);
+			setDoctype( types::DocMetaData::extractStem( (const char*)dtd->SystemID));
+		}
+		if (dtd->ExternalID)
+		{
+			setAttribute( "PUBLIC", (const char*)dtd->ExternalID);
+		}
+	}
+	// Inspect root xmlns attributes for meta data:
 	if (m_node && (m_node->type == XML_ELEMENT_NODE || m_node->type == XML_DOCUMENT_NODE))
 	{
 		if (m_node->name)
@@ -163,6 +184,7 @@ void InputFilterImpl::initDocMetaData()
 			else if (attrname == "xmlns:schemaLocation")
 			{
 				setAttribute( attrname, attrvalue);
+				setDoctype( types::DocMetaData::extractStem( attrvalue));
 			}
 			else
 			{
@@ -174,24 +196,6 @@ void InputFilterImpl::initDocMetaData()
 	m_nodestk.push_back( m_node->next);
 	m_node = m_node->children;
 	m_taglevel += 1;
-
-	xmlNode* nd = m_doc.get()->children;
-	while (nd && nd->type != XML_DTD_NODE)
-	{
-		nd = nd->next;
-	}
-	if (nd)
-	{
-		xmlDtdPtr dtd = (xmlDtdPtr)nd;
-		if (dtd->SystemID)
-		{
-			setAttribute( "SYSTEM", (const char*)dtd->SystemID);
-		}
-		if (dtd->ExternalID)
-		{
-			setAttribute( "PUBLIC", (const char*)dtd->ExternalID);
-		}
-	}
 }
 
 bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)

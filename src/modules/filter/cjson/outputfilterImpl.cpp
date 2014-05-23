@@ -95,8 +95,6 @@ void OutputFilterImpl::printStructToBuffer()
 		types::String convres = types::StringConst( res).translateEncoding( m_encattr.encoding, m_encattr.codepage);
 		m_elembuf.append( (const char*)convres.ptr(), convres.size() * convres.elementSize());
 	}
-	m_stk.clear();
-	m_stk.push_back( StackElement(""));
 }
 
 static bool deleteNameString( cJSON*& st)
@@ -298,6 +296,8 @@ void OutputFilterImpl::setContentValue( const std::string& value)
 void OutputFilterImpl::printHeader()
 {
 	types::DocMetaData md = getMetaData();
+	LOG_DEBUG << "[cjson output] document meta data: {" << md.tostring() << "}";
+
 	const char* encname = md.getAttribute( "encoding");
 	if (encname)
 	{
@@ -314,7 +314,7 @@ void OutputFilterImpl::printHeader()
 
 bool OutputFilterImpl::close()
 {
-	if (!m_stk.empty())
+	if (m_flushing || !m_stk.empty())
 	{
 		return print( FilterBase::CloseTag, 0, 0);
 	}

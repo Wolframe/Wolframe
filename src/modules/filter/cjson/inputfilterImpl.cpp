@@ -176,7 +176,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 					{
 						++nof_docattributes;
 						if (doctypeParsed) throw std::runtime_error("duplicate 'doctype' definition");
-						setAttribute( "doctype", m_firstnode->valuestring);
+						setDoctype( m_firstnode->valuestring);
 						m_firstnode = m_firstnode->next;
 						continue;
 					}
@@ -206,6 +206,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				break;
 			}
 			m_stk.push_back( StackElement( m_firstnode));
+			LOG_DEBUG << "[cjson input] document meta data: {" << getMetaDataRef()->tostring() << "}";
 			setState( Open);
 		}
 	}

@@ -2,7 +2,7 @@
 **requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<aa>1</aa><cc>3</cc><bb>2</bb>
+<doc><aa>1</aa><cc>3</cc><bb>2</bb></doc>
 **config
 --config wolframe.conf --filter textwolf testcall
 **file:wolframe.conf
@@ -29,7 +29,7 @@ Processor
 TRANSACTION testcall
 BEGIN
 	DO SELECT run( $(/aa) ,$(/bb),$(/cc) );
-	INTO doc FOREACH RESULT DO SELECT exec( $1,$2,$3);
+	INTO result FOREACH RESULT DO SELECT exec( $1,$2,$3);
 END
 **file: DBRES
 #id name street#1 hugo "bahnhof strasse 15"#2 miriam "zum gems weg 3"#3 sara "tannen steig 12"
@@ -38,8 +38,7 @@ END
 **outputfile:DBOUT
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<doc><offen>1</offen></doc>
-<doc><offen>2</offen></doc>
+<doc><result><offen>1</offen></result><result><offen>2</offen></result></doc>
 Code:
 [0] RESULT_SET_INIT
 [1] DBSTM_START STM (SELECT run( $1 ,$2,$3 ))
@@ -57,7 +56,7 @@ Code:
 [13] DBSTM_EXEC
 [14] NEXT
 [15] IF_COND GOTO @9
-[16] OUTPUT_OPEN_ARRAY TAG doc
+[16] OUTPUT_OPEN_ARRAY TAG result
 [17] OPEN_ITER_LAST_RESULT
 [18] NOT_IF_COND GOTO @24
 [19] OUTPUT_OPEN_ELEM

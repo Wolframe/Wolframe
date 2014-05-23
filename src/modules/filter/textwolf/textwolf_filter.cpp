@@ -39,6 +39,7 @@ Project Wolframe.
 #include "textwolf/xmlprinter.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "types/countedReference.hpp"
+#include "logger-v1.hpp"
 #include <string>
 #include <cstddef>
 #include <algorithm>
@@ -160,6 +161,7 @@ struct InputFilterImpl
 		m_srcend = end;
 		m_srcsize = size;
 		m_parser.putInput( m_src, m_srcsize, m_srcend);
+		setState( Open);
 	}
 
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
@@ -268,12 +270,12 @@ struct InputFilterImpl
 							}
 							if (!m_parser.getDoctypePublic().empty())
 							{
-								getMetaDataRef()->setAttribute( "PUBLIC", std::string( ee, eesize));
-								getMetaDataRef()->setDoctype( types::DocMetaData::extractStem( std::string( ee, eesize)));
+								getMetaDataRef()->setAttribute( "PUBLIC", m_parser.getDoctypePublic());
 							}
 							if (!m_parser.getDoctypeSystem().empty())
 							{
-								getMetaDataRef()->setAttribute( "SYSTEM", std::string( ee, eesize));
+								getMetaDataRef()->setAttribute( "SYSTEM", m_parser.getDoctypeSystem());
+								getMetaDataRef()->setDoctype( types::DocMetaData::extractStem( m_parser.getDoctypeSystem()));
 							}
 							/*no break here!*/
 						case MS_Root:
@@ -295,7 +297,7 @@ struct InputFilterImpl
 							{
 								m_parser.ungetElement( et, ee, eesize);
 								m_metadatastate = MS_Done;
-								return getMetaDataRef().get();
+								continue;
 							}
 							else if (et == textwolf::XMLScannerBase::TagAttribName)
 							{
@@ -339,6 +341,7 @@ struct InputFilterImpl
 							break;
 							
 						case MS_Done:
+							LOG_DEBUG << "[textwolf input] document meta data: {" << getMetaDataRef()->tostring() << "}";
 							return getMetaDataRef().get();
 					}
 				}
@@ -397,7 +400,9 @@ struct OutputFilterImpl :public OutputFilter
 		:utils::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
 		,OutputFilter("textwolf", inheritMetaData_)
 		,m_elemitr(0)
-		,m_headerPrinted(false){}
+		,m_emptyDocument(false)
+		,m_headerPrinted(false)
+		,m_gotFinalClose(false){}
 
 	/// \brief Copy constructor
 	/// \param [in] o output filter to copy
@@ -406,7 +411,9 @@ struct OutputFilterImpl :public OutputFilter
 		,OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
+		,m_emptyDocument(o.m_emptyDocument)
 		,m_headerPrinted(o.m_headerPrinted)
+		,m_gotFinalClose(o.m_gotFinalClose)
 		,m_printer(o.m_printer){}
 
 	virtual ~OutputFilterImpl(){}
@@ -434,6 +441,8 @@ struct OutputFilterImpl :public OutputFilter
 	bool printHeader()
 	{
 		types::DocMetaData md( getMetaData());
+		LOG_DEBUG << "[textwolf output] document meta data: {" << md.tostring() << "}";
+
 		const char* root = md.getAttribute( "root");
 		if (!root)
 		{
@@ -475,7 +484,20 @@ struct OutputFilterImpl :public OutputFilter
 	/// \brief Implementation of OutputFilter::close()
 	virtual bool close()
 	{
-		return print( FilterBase::CloseTag, 0, 0);
+		if (!m_gotFinalClose)
+		{
+			return print( FilterBase::CloseTag, 0, 0);
+		}
+		if (m_elemitr < m_elembuf.size())
+		{
+			// there is something to print left from last time
+			if (!emptybuf())
+			{
+				setState( EndOfBuffer);
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/// \brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
@@ -499,33 +521,50 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		if (!m_headerPrinted)
 		{
-			if (!printHeader()) return false;
+			if (m_emptyDocument)
+			{
+				setState( Error, "textwolf: illegal print operation after final close (empty document)");
+				return false;
+			}
+			if (type == FilterBase::CloseTag)
+			{
+				m_emptyDocument = true;
+				return true;
+			}
+			else
+			{
+				if (!printHeader()) return false;
+			}
 			m_headerPrinted = true;
 		}
 		switch (type)
 		{
-			case OutputFilter::OpenTag:
+			case FilterBase::OpenTag:
 				if (!m_printer.printOpenTag( (const char*)element, elementsize, m_elembuf))
 				{
 					setState( Error, "textwolf: illegal print operation (open tag)");
 					return false;
 				}
 				break;
-			case OutputFilter::CloseTag:
+			case FilterBase::CloseTag:
 				if (!m_printer.printCloseTag( m_elembuf))
 				{
-					setState( Error, "textwolf: illegal print operation (close tag)");
-					return false;
+					if (m_gotFinalClose)
+					{
+						setState( Error, "textwolf: illegal print operation (close tag)");
+						return false;
+					}
+					m_gotFinalClose = true;
 				}
 				break;
-			case OutputFilter::Attribute:
+			case FilterBase::Attribute:
 				if (!m_printer.printAttribute( (const char*)element, elementsize, m_elembuf))
 				{
 					setState( Error, "textwolf: illegal print operation (attribute)");
 					return false;
 				}
 				break;
-			case OutputFilter::Value:
+			case FilterBase::Value:
 				if (!m_printer.printValue( (const char*)element, elementsize, m_elembuf))
 				{
 					setState( Error, "textwolf: illegal print operation (value)");
@@ -558,7 +597,9 @@ private:
 
 	std::string m_elembuf;				///< buffer for the currently printed element
 	std::size_t m_elemitr;				///< iterator to pass it to output
+	bool m_emptyDocument;				///< true, if the printed document is empty
 	bool m_headerPrinted;				///< true, if the XML header has already been printed
+	bool m_gotFinalClose;				///< true, if we got the final close tag
 	XMLPrinter m_printer;				///< xml printer object
 };
 
@@ -580,6 +621,36 @@ public:
 };
 
 
+static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
+{
+	const char* encoding = 0;
+	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		{
+			if (encoding)
+			{
+				if (ai->first.empty())
+				{
+					throw std::runtime_error( "too many filter arguments");
+				}
+				else
+				{
+					throw std::runtime_error( "duplicate filter argument 'encoding'");
+				}
+			}
+			encoding = ai->second.c_str();
+			break;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "unknown filter argument '") + ai->first + "'");
+		}
+	}
+	return encoding;
+}
+
 class TextwolfXmlFilterType :public FilterType
 {
 public:
@@ -588,17 +659,7 @@ public:
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const
 	{
-		const char* encoding = 0;
-		std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-		for (; ai != ae; ++ai)
-		{
-			if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
-			{
-				encoding = ai->second.c_str();
-				break;
-			}
-		}
-		return new TextwolfXmlFilter( encoding);
+		return new TextwolfXmlFilter( getArgumentEncoding( arg));
 	}
 };
 

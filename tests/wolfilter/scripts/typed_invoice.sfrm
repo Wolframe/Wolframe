@@ -1,4 +1,4 @@
-FORM typed_invoice invoice
+FORM typed_invoice
 {
 	order
 	{

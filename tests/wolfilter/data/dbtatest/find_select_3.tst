@@ -2,7 +2,7 @@
 **requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<main><aa>1</aa><cc>3</cc><bb>2</bb></main>
+<doc><main><aa>1</aa><cc>3</cc><bb>2</bb></main></doc>
 **config
 --config wolframe.conf --filter textwolf testcall
 **file:wolframe.conf

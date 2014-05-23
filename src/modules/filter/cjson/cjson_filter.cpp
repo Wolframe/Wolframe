@@ -62,6 +62,36 @@ struct CJsonFilter :public Filter
 	}
 };
 
+static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
+{
+	const char* encoding = 0;
+	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		{
+			if (encoding)
+			{
+				if (ai->first.empty())
+				{
+					throw std::runtime_error( "too many filter arguments");
+				}
+				else
+				{
+					throw std::runtime_error( "duplicate filter argument 'encoding'");
+				}
+			}
+			encoding = ai->second.c_str();
+			break;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "unknown filter argument '") + ai->first + "'");
+		}
+	}
+	return encoding;
+}
+
 class CJsonFilterType :public FilterType
 {
 public:
@@ -70,17 +100,7 @@ public:
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const
 	{
-		const char* encoding = 0;
-		std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-		for (; ai != ae; ++ai)
-		{
-			if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
-			{
-				encoding = ai->second.c_str();
-				break;
-			}
-		}
-		return encoding?(new CJsonFilter( encoding)):(new CJsonFilter());
+		return new CJsonFilter( getArgumentEncoding( arg));
 	}
 };
 

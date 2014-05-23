@@ -160,6 +160,7 @@ static Filter getFilter( const proc::ProcessorProviderInterface* provider, const
 			msg << "unknown output filter: name = '" << ofl.first << "' arguments = '" << filterargAsString( ofl.second) << "'";
 			throw std::runtime_error( msg.str());
 		}
+		out->outputfilter()->inheritMetaData( in->inputfilter()->getMetaDataRef());
 		rt = Filter( in->inputfilter(), out->outputfilter());
 		delete in;
 		delete out;
@@ -483,7 +484,7 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 			break;
 
 		case InputFilter::EndOfMessage:
-			if (is.eof()) throw std::runtime_error( "unexpected end of input");
+			if (is.eof()) throw std::runtime_error( "unexpected end of input (EOF)");
 			readInput( buf.inbuf, buf.insize, is, *iflt);
 			return;
 
@@ -625,7 +626,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		const void* elem;
 		int taglevel = 0;
 		std::size_t elemsize;
-		InputFilter::ElementType etype;
+		FilterBase::ElementType etype;
 
 		while (taglevel >= 0)
 		{
@@ -650,7 +651,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			{
 				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 			}
-			LOG_DATA << "[iostream filter] print " << std::string( (const char*)elem, elemsize);
+			LOG_DATA << "[iostream filter] print " << FilterBase::elementTypeName(etype) << " '" << std::string( (const char*)elem, elemsize) << "'"; 
 		}
 		while (!flt.outputfilter().get()->close())
 		{

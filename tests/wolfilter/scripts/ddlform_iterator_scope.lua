@@ -62,26 +62,14 @@ function run_assignment( itr)
 	end
 end
 
-function run_assignmentlist( itr)
-	for v,t in itr do
-		if t == "assignment" then
-			output:opentag( t)
-			run_assignment( iterator.scope( itr))
-			output:closetag()
-		else
-			error( "unknown element " .. tostring(t) .. " " .. tostring(v))
-		end
-	end
-end
-
 function run()
 	r = provider.form("employee_assignment_print")
 	r:fill( input:table())
 	itr = r:get()
 	for v,t in itr do
-		if t == "assignmentlist" then
-			output:opentag( "assignmentlist")
-			run_assignmentlist( iterator.scope( itr))
+		if t == "assignment" then
+			output:opentag( t)
+			run_assignment( iterator.scope( itr))
 			output:closetag()
 		else
 			error( "unknown element " .. tostring(t) .. " " .. tostring(v))

@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file outputfilterImpl.cpp
 ///\brief Implementaion of output filter abstraction for the libxml2 library
 #include "outputfilterImpl.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -41,6 +42,7 @@ OutputFilterImpl::OutputFilterImpl( const XsltMapper& xsltMapper_, const types::
 	,OutputFilter("libxslt", inheritMetaData_)
 	,m_xsltMapper(xsltMapper_)
 	,m_taglevel(0)
+	,m_emptyDocument(false)
 	,m_elemitr(0)
 	{}
 
@@ -48,6 +50,7 @@ OutputFilterImpl::OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
 	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
 	,OutputFilter("libxml2", inheritMetaData_)
 	,m_taglevel(0)
+	,m_emptyDocument(false)
 	,m_elemitr(0)
 	{}
 
@@ -57,6 +60,7 @@ OutputFilterImpl::OutputFilterImpl( const OutputFilterImpl& o)
 	,m_doc(o.m_doc)
 	,m_xsltMapper(o.m_xsltMapper)
 	,m_taglevel(o.m_taglevel)
+	,m_emptyDocument(o.m_emptyDocument)
 	,m_attribname(o.m_attribname)
 	,m_valuestrbuf(o.m_valuestrbuf)
 	,m_elembuf(o.m_elembuf)
@@ -105,6 +109,7 @@ void OutputFilterImpl::setXmlError( const char* msg)
 bool OutputFilterImpl::printHeader()
 {
 	types::DocMetaData md( getMetaData());
+	LOG_DEBUG << "[libxml2 output] document meta data: {" << md.tostring() << "}";
 	const char* root = md.getAttribute( "root");
 	if (!root)
 	{
@@ -146,6 +151,10 @@ bool OutputFilterImpl::printHeader()
 
 bool OutputFilterImpl::close()
 {
+	if (m_taglevel == 0)
+	{
+		return flushBuffer();
+	}
 	if (m_taglevel > 0)
 	{
 		return print( FilterBase::CloseTag, 0, 0);
@@ -160,6 +169,16 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 
 	if (!xmlout)
 	{
+		if (m_emptyDocument)
+		{
+			setState( Error, "libxml2 illegal print operation after final close (empty document)");
+			return false;
+		}
+		if (type == FilterBase::CloseTag)
+		{
+			m_emptyDocument = true;
+			return true;
+		}
 		if (!printHeader())
 		{
 			return false;
@@ -172,7 +191,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 	}
 	switch (type)
 	{
-		case OutputFilter::OpenTag:
+		case FilterBase::OpenTag:
 			m_attribname.clear();
 			if (0>xmlTextWriterStartElement( xmlout, getElement( element, elementsize)))
 			{
@@ -182,7 +201,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			m_taglevel += 1;
 			break;
 
-		case OutputFilter::Attribute:
+		case FilterBase::Attribute:
 			if (m_attribname.size())
 			{
 				setXmlError( "libxml2 illegal operation");
@@ -192,7 +211,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			m_attribname.append( (const char*)element, elementsize);
 			break;
 
-		case OutputFilter::Value:
+		case FilterBase::Value:
 			if (m_attribname.empty())
 			{
 				if (0>xmlTextWriterWriteString( xmlout, getElement( element, elementsize)))
@@ -214,7 +233,7 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			}
 			break;
 
-		case OutputFilter::CloseTag:
+		case FilterBase::CloseTag:
 			if (0>xmlTextWriterEndElement( xmlout))
 			{
 				setXmlError( "libxml2 write close tag error");

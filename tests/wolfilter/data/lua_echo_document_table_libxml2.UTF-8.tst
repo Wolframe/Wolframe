@@ -67,6 +67,7 @@ function run()
 	t = input:value()
 	d = provider.document( t)
 	d:as( f)
+	output:as( { root=d:metadata()['root'] })
 	printTable( d:table())
 end
 **output

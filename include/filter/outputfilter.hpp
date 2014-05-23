@@ -134,7 +134,7 @@ public:
 		return print( type, element.c_str(), element.size());
 	}
 
-	/// \brief Print the final close tag, if not printed yet
+	/// \brief Print the final close tag, if not printed yet, to close the output
 	virtual bool close()=0;
 
 	/// \brief Set type of the document.

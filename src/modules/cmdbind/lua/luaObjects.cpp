@@ -1422,8 +1422,18 @@ LUA_FUNCTION_THROWS( "provider.filter(..)", function_filter)
 			{
 				Input* input = LuaObject<Input>::getGlobal( ls, "input");
 				Output* output = LuaObject<Output>::getGlobal( ls, "output");
-				Filter flt( langbind::InputFilterR(input->inputfilter()->copy()), langbind::OutputFilterR( output->outputfilter()->copy()));
-				LuaObject<Filter>::push_luastack( ls, flt);
+				if (!input || !output)
+				{
+					lua_pushnil( ls);
+					//... cannot call filter with empty arguments because 
+					//	the global input/output objects are not defined.
+					//	they are only defined in lua command handler mode.
+				}
+				else
+				{
+					Filter flt( langbind::InputFilterR(input->inputfilter()->copy()), langbind::OutputFilterR( output->outputfilter()->copy()));
+					LuaObject<Filter>::push_luastack( ls, flt);
+				}
 				return 1;
 			}
 		}
@@ -1611,12 +1621,14 @@ LUA_FUNCTION_THROWS( "input:metadata()", function_input_metadata)
 					lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 					lua_setfield( ls, -2, ai->name.c_str());
 				}
+				return 1;
 			}
 			else if (input->inputfilter()->state() == InputFilter::Error)
 			{
 				const char* err = input->inputfilter()->getError();
 				std::string msg( "error parsing DOCTYPE: ");
 				msg.append( err?err:"unknown");
+				lua_pop( ls, 1);
 				throw std::runtime_error(msg);
 			}
 		}
@@ -1726,6 +1738,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 				else if (0==std::strcmp( idstr, "root"))
 				{
 					root_defined = true;
+					docmetadata.setAttribute( "root", lua_tostring( ls, -1));
 				}
 				else
 				{
