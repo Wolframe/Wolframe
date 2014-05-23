@@ -17,7 +17,8 @@ Fixes:
 
 JSON:
 	doctype and encoding as top level attributes instead of values "-doctype" instead of "doctype"
+	all top level attributes ("-...") are considered to be document meta data
 
 FORMs:
-	"META 'root' name"  instead of second identifier "FORM id name"
+	": root name"  instead of second identifier "FORM id name" (":" on top level starts a meta data declaration)
 
