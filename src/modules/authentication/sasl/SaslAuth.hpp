@@ -80,7 +80,9 @@ public:
 
 	const std::string* mechs() const	{ return m_mechs; }
 
-	AuthenticatorInstance* instance( const std::string& /*mech*/ )	{ return NULL; }
+	AuthenticatorInstance* instance( const std::string& /*mech*/,
+					 const net::RemoteEndpoint& /*client*/ )
+						{ return NULL; }
 
 private:
 	static const std::string	m_mechs[];	///<	list of mechs for the unit

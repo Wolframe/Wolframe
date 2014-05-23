@@ -42,6 +42,7 @@
 
 #include "AAAA/authInstance.hpp"
 #include "database/DBprovider.hpp"
+#include "system/connectionEndpoint.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -69,7 +70,8 @@ public:
 	virtual const std::string* mechs() const = 0;
 
 	/// An AuthenticatorInstance for the required mech (or NULL)
-	virtual AuthenticatorInstance* instance( const std::string& mech ) = 0;
+	virtual AuthenticatorInstance* instance( const std::string& mech,
+						 const net::RemoteEndpoint& client ) = 0;
 
 private:
 	const std::string	m_identifier;

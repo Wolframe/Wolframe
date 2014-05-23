@@ -61,6 +61,8 @@ public:
 		AUTHENTICATED,		///< a user has been authenticated
 		INVALID_CREDENTIALS,	///< the user authentication failed,
 					///  either the username or the credentials are invalid
+		MECH_UNAVAILABLE,	///< the requested mech is not available,
+					///  usually due to configured restrictions
 		SYSTEM_FAILURE		///< some other error occurred
 	};
 

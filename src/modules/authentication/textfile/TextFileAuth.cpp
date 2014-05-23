@@ -70,7 +70,8 @@ TextFileAuthUnit::~TextFileAuthUnit()
 {
 }
 
-AuthenticatorInstance* TextFileAuthUnit::instance( const std::string& /*mech*/ )
+AuthenticatorInstance* TextFileAuthUnit::instance( const std::string& /*mech*/,
+						   const net::RemoteEndpoint& /*client*/ )
 {
 	return new TextFileAuthInstance( *this );
 }
