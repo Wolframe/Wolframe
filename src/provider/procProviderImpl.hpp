@@ -40,6 +40,7 @@
 #include "processor/procProvider.hpp"
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
+#include "types/keymap.hpp"
 #include "cmdbind/commandHandlerConstructor.hpp"
 #include "prgbind/programLibrary.hpp"
 #include <list>
@@ -58,7 +59,8 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
+	cmdbind::CommandHandler* cmdhandler( const std::string& command, const std::string& docformat) const;
+	bool existcmd( const std::string& command) const;
 
 	db::Database* transactionDatabase( bool suppressAlert=false) const;
 	db::Transaction* transaction( const std::string& name ) const;
@@ -68,12 +70,11 @@ public:
 	const langbind::FormFunction* formFunction( const std::string& name) const;
 	const types::FormDescription* formDescription( const std::string& name) const;
 	langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const;
+	const langbind::FilterType* filterType( const std::string& name) const;
 	const types::CustomDataType* customDataType( const std::string& name) const;
 	bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const;
 
-	bool loadPrograms();
-	bool checkReferences( const ProcessorProvider* provider) const;
-
+	bool loadPrograms( const ProcessorProviderInterface* provider);
 	const std::string& referencePath() const;
 
 private:
@@ -86,17 +87,17 @@ private:
 		CommandHandlerDef()
 			:configuration(0){}
 		CommandHandlerDef( const CommandHandlerDef& o)
-			:constructor(o.constructor),configuration(o.configuration){}
-		CommandHandlerDef( cmdbind::CommandHandlerConstructor* constructor_, const config::NamedConfiguration* configuration_)
-			:constructor(constructor_),configuration(configuration_){}
+			:unit(o.unit),configuration(o.configuration){}
+		CommandHandlerDef( cmdbind::CommandHandlerUnit* unit_, const config::NamedConfiguration* configuration_)
+			:unit(unit_),configuration(configuration_){}
 		~CommandHandlerDef(){}
+
 	public:
-		cmdbind::CommandHandlerConstructorR constructor;
+		cmdbind::CommandHandlerUnitR unit;
 		const config::NamedConfiguration* configuration;
 	};
 	std::vector<CommandHandlerDef> m_cmd;
-	typedef std::map<std::string,std::size_t> CmdMap;
-	CmdMap m_cmdMap;
+	types::keymap<std::size_t> m_cmdMap;
 
 	std::list<std::string> m_programfiles;
 	prgbind::ProgramLibrary* m_programs;

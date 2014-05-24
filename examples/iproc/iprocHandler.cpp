@@ -230,7 +230,7 @@ const net::NetworkOperation Connection::nextOperation()
 								LOG_ERROR << "No procesor provider defined";
 								return net::CloseConnection();
 							}
-							cmdbind::CommandHandler* chnd = provider->cmdhandler( procname);
+							cmdbind::CommandHandler* chnd = provider->cmdhandler( procname, "");
 							if (!chnd)
 							{
 								LOG_ERROR << "command handler not found for '" << procname << "'";

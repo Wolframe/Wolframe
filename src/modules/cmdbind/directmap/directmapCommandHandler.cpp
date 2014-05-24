@@ -46,33 +46,8 @@ using namespace _Wolframe;
 using namespace cmdbind;
 using namespace langbind;
 
-void DirectmapContext::loadPrograms( const std::vector<std::string>& prgfiles_)
+void DirectmapCommandHandler::initcall()
 {
-	std::vector<std::string>::const_iterator ci = prgfiles_.begin(), ce = prgfiles_.end();
-	for (; ci != ce; ++ci) m_program.loadProgram( *ci);
-}
-
-const std::string& DirectmapContext::filter( const std::string& docformat) const
-{
-	types::keymap<std::string>::const_iterator ki = m_filtermap.find( docformat);
-	if (ki == m_filtermap.end())
-	{
-		ki = m_filtermap.find( std::string());
-		if (ki == m_filtermap.end())
-		{
-			throw std::runtime_error( std::string("filter for document format '") + docformat + "' not defined");
-		}
-	}
-	return ki->second;
-}
-
-void DirectmapCommandHandler::initcall( const std::string& docformat)
-{
-	m_cmd = m_ctx->command( m_name);
-	if (!m_cmd)
-	{
-		throw std::runtime_error( std::string( "command is not defined '") + m_name + "'");
-	}
 	if (!execContext()) throw std::logic_error( "execution context is not defined");
 	const proc::ProcessorProviderInterface* provider = execContext()->provider();
 
@@ -131,7 +106,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	std::vector<langbind::FilterArgument> input_filterarg;
 	if (m_cmd->inputfilter.empty())
 	{
-		input_filtername = m_ctx->filter( docformat);
+		input_filtername = m_default_filter;
 	}
 	else
 	{
@@ -143,7 +118,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 	std::vector<langbind::FilterArgument> output_filterarg;
 	if (m_cmd->outputfilter.empty())
 	{
-		output_filtername = m_ctx->filter( docformat);
+		output_filtername = m_default_filter;
 	}
 	else
 	{
@@ -254,7 +229,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 		{
 			case 0:
 				m_state = 1;
-				initcall( m_argBuffer.size()?m_argBuffer.at(0):"");
+				initcall();
 				/* no break here ! */
 			case 1:
 				if (m_inputform.get())

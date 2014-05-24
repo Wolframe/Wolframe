@@ -2929,9 +2929,9 @@ bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScrip
 	return true;
 }
 
-std::list<std::string> LuaFunctionMap::commands() const
+std::vector<std::string> LuaFunctionMap::commands() const
 {
-	std::list<std::string> rt;
+	std::vector<std::string> rt;
 	std::map<std::string,std::size_t>::const_iterator ii = m_procmap.begin(), ee = m_procmap.end();
 	for (; ii != ee; ++ii) rt.push_back( ii->first);
 	return rt;

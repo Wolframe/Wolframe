@@ -143,7 +143,7 @@ bool DirectmapProgram::is_mine( const std::string& filename) const
 	return false;
 }
 
-void DirectmapProgram::loadProgram( const std::string& filename)
+void DirectmapProgram::loadProgram( const std::string& filename, const proc::ProcessorProviderInterface* provider)
 {
 	try
 	{
@@ -155,7 +155,11 @@ void DirectmapProgram::loadProgram( const std::string& filename)
 	}
 	catch (const std::runtime_error& err)
 	{
-		throw std::runtime_error( std::string( "error in directmap program file '") + filename + "' :" + err.what());
+		throw std::runtime_error( std::string( "error in standard command handler program '") + filename + "' :" + err.what());
+	}
+	if (!checkReferences( provider))
+	{
+		throw std::runtime_error( std::string( "undefined references in standard command handler program '") + filename + "'");
 	}
 }
 

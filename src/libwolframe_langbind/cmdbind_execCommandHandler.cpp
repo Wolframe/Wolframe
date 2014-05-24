@@ -284,7 +284,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 							m_argBuffer.clear();
 							return WRITE;
 						}
-						m_cmdhandler.reset( execContext()->provider()->cmdhandler( procname));						
+						m_cmdhandler.reset( execContext()->provider()->cmdhandler( procname, ""));
 						if (!m_cmdhandler.get())
 						{
 							LOG_ERROR << "Command handler not found for '" << procname << "'";

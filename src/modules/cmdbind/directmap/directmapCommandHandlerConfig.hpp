@@ -73,24 +73,24 @@ public:
 
 	virtual void print( std::ostream& os, size_t indent ) const;
 
-	const cmdbind::DirectmapContext* context() const
-	{
-		return &m_context;
-	}
-
 	virtual const char* className() const
 	{
 		return m_classname;
 	}
 
-	std::list<std::string> commands() const
+	const std::vector<std::string>& programfiles() const
 	{
-		return m_context.commands();
+		return m_programfiles;
+	}
+
+	const types::keymap<std::string>& filtermap() const
+	{
+		return m_filtermap;
 	}
 
 private:
 	std::vector<std::string> m_programfiles;
-	cmdbind::DirectmapContext m_context;
+	types::keymap<std::string> m_filtermap;
 	const char* m_classname;
 };
 

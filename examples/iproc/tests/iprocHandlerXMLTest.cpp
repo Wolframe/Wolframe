@@ -110,6 +110,7 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const boost::shared_ptr<proc::ProcProviderConfig>& cfg, prgbind::ProgramLibrary* prglib)
 {
 	boost::shared_ptr<proc::ProcessorProvider> rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory, prglib));
+	rt->loadPrograms();
 	return rt;
 }
 

@@ -73,6 +73,7 @@ static boost::filesystem::path g_referencePath;
 static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const proc::ProcProviderConfig* cfg, prgbind::ProgramLibrary* prglib)
 {
 	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg, g_modulesDirectory, prglib));
+	rt->loadPrograms();
 	return rt;
 }
 
@@ -306,8 +307,8 @@ int main( int argc, char **argv )
 
 	// [3] Execute tests:
 	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
-	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
-	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
+	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV);
+	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO);
 	return RUN_ALL_TESTS();
 	delete g_modulesDirectory;
 }

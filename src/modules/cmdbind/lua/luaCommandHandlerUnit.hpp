@@ -29,54 +29,43 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file luaCommandHandler.hpp
-///\brief Interface to the lua command handler
-#ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
-#include "luaObjects.hpp"
+///\file luaCommandHandlerUnit.hpp
+///\brief Interface to the lua command handler unit
+#ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_UNIT_HPP_INCLUDED
+#define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_UNIT_HPP_INCLUDED
 #include "luaScriptContext.hpp"
+#include "cmdbind/commandHandlerUnit.hpp"
+#include "luaCommandHandlerConfig.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <vector>
 #include <string>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class LuaCommandHandler
-///\brief command handler instance for processing a call as Lua script
-class LuaCommandHandler :public IOFilterCommandHandlerEscDLF
+///\class LuaCommandHandlerUnit
+class LuaCommandHandlerUnit
+	:public CommandHandlerUnit
 {
 public:
-	typedef IOFilterCommandHandlerEscDLF Parent;
+	LuaCommandHandlerUnit( const LuaCommandHandlerConfig* config_)
+		:m_config(config_){}
 
-public:
-	///\brief Constructor
-	explicit LuaCommandHandler( const langbind::LuaScriptInstanceR& interp_, const std::string& docformat_, const std::string& default_filter_)
-		:m_interp(interp_),m_called(false),m_docformat(docformat_),m_default_filter(default_filter_){}
+	~LuaCommandHandlerUnit(){}
 
-	///\brief Destructor
-	virtual ~LuaCommandHandler(){}
+	virtual CommandHandler* createCommandHandler( const std::string& cmdname, const std::string& docformat);
 
-	///\brief Execute the Lua script
-	///\param[out] err error code in case of error
-	///\return CallResult status (See IOFilterCommandHandler::CallResult)
-	virtual CallResult call( const char*& err);
-
-	///\brief Get the identifier of this command handler type
-	static const char* identifier()
+	///\brief Get the list of commands
+	virtual std::vector<std::string> commands() const
 	{
-		return "LuaCommandHandler";
+		return m_ctx.commands();
 	}
 
-private:
-	void initcall();
+	virtual bool loadPrograms( const proc::ProcessorProviderInterface* provider);
 
 private:
-	langbind::LuaScriptInstanceR m_interp;
-	bool m_called;
-	std::string m_docformat;
-	std::string m_default_filter;
-	std::string m_lasterror;
+	const LuaCommandHandlerConfig* m_config;
+	langbind::LuaScriptContext m_ctx;
 };
 
 }}//namespace

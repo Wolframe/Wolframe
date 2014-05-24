@@ -102,16 +102,16 @@ public:
 
 	bool is_mine( const std::string& filename) const;
 	void addProgram( const std::string& source);
-	void loadProgram( const std::string& filename);
-
-	///\brief Check that all functions configured exists
-	bool checkReferences( const proc::ProcessorProviderInterface* provider) const;
+	void loadProgram( const std::string& filename, const proc::ProcessorProviderInterface* provider);
 
 	const DirectmapCommandDescription* get( const std::string& name) const
 	{
 		Parent::const_iterator rt = Parent::find( name);
 		return (rt == Parent::end())?0:&rt->second;
 	}
+
+private:
+	bool checkReferences( const proc::ProcessorProviderInterface* provider) const;
 };
 
 }}
