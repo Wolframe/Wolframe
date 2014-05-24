@@ -92,8 +92,8 @@ public:
 
 	Authenticator* authenticator();
 private:
-	std::list< AuthenticationUnit* > m_authenticators;
-	std::vector< std::string >	m_mechs;
+	std::list< AuthenticationUnit* >	m_authUnits;
+	std::vector< std::string >		m_mechs;
 };
 
 

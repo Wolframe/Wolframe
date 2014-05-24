@@ -97,7 +97,7 @@ bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db 
 	LOG_DATA << "Resolving audit databases";
 	if ( !m_auditor.resolveDB( db ))
 		return false;
-	LOG_DEBUG << "AAAA database references resolved";
+	LOG_TRACE << "AAAA database references resolved";
 	return true;
 }
 

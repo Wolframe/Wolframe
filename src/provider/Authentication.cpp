@@ -58,7 +58,7 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 					  << "' is not an Authentication Unit builder";
 				throw std::logic_error( "object is not an AuthenticationUnit builder" );
 			}
-			m_authenticators.push_back( auth->object( **it ));
+			m_authUnits.push_back( auth->object( **it ));
 			LOG_TRACE << "'" << auth->objectClassName() << "' authentication unit registered";
 		}
 		else	{
@@ -66,19 +66,40 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor. See log" );
 		}
 	}
+
+	// Iterate through the list of authenticators (built at this point)
+	// and build the vector of available mechs
+	for ( std::list< AuthenticationUnit* >::const_iterator ait = m_authUnits.begin();
+						ait != m_authUnits.end(); ait ++ )	{
+		// add unit mechs to the list
+		const std::string* p_mech = (*ait)->mechs();
+		while ( ! p_mech->empty() )	{
+			std::string mech = boost::to_upper_copy( *p_mech );
+			bool exists = false;
+			for( std::vector< std::string >::const_iterator mit = m_mechs.begin();
+						mit != m_mechs.end(); mit++ )	{
+				if ( *mit == mech )
+					exists = true;
+			}
+			if ( ! exists )	{
+				m_mechs.push_back( mech );
+				LOG_TRACE << "'" << mech << "' authentication mechanism registered";
+			}
+		}
+	}
 }
 
 AuthenticationFactory::~AuthenticationFactory()
 {
-	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authenticators.begin();
-								it != m_authenticators.end(); it++ )
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authUnits.begin();
+								it != m_authUnits.end(); it++ )
 		delete *it;
 }
 
 bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 {
-	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authenticators.begin();
-								it != m_authenticators.end(); it++ )
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authUnits.begin();
+								it != m_authUnits.end(); it++ )
 		if ( ! (*it)->resolveDB( db ) )
 			return false;
 	return true;
@@ -108,7 +129,7 @@ void StandardAuthenticator::destroy()
 }
 
 /// Get the list of available mechs
-const std::vector<std::string>& StandardAuthenticator::mechs() const
+const std::vector< std::string >& StandardAuthenticator::mechs() const
 {
 	return m_mechs;
 }
