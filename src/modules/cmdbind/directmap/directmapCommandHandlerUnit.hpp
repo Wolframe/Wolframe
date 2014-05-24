@@ -29,54 +29,43 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file luaCommandHandler.hpp
-///\brief Interface to the lua command handler
-#ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
-#include "luaObjects.hpp"
-#include "luaScriptContext.hpp"
+///\file directmapCommandHandlerUnit.hpp
+///\brief Interface to the directmap command handler unit
+#ifndef _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_UNIT_HPP_INCLUDED
+#define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_UNIT_HPP_INCLUDED
+#include "directmapProgram.hpp"
+#include "directmapCommandHandlerConfig.hpp"
+#include "cmdbind/commandHandlerUnit.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <vector>
 #include <string>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class LuaCommandHandler
-///\brief command handler instance for processing a call as Lua script
-class LuaCommandHandler :public IOFilterCommandHandlerEscDLF
+///\class DirectmapCommandHandlerUnit
+class DirectmapCommandHandlerUnit
+	:public CommandHandlerUnit
 {
 public:
-	typedef IOFilterCommandHandlerEscDLF Parent;
+	DirectmapCommandHandlerUnit( const DirectmapCommandHandlerConfig* config_)
+		:m_config(config_){}
+	~DirectmapCommandHandlerUnit(){}
 
-public:
-	///\brief Constructor
-	explicit LuaCommandHandler( const langbind::LuaScriptInstanceR& interp_, const std::string& docformat_, const std::string& default_filter_)
-		:m_interp(interp_),m_called(false),m_docformat(docformat_),m_default_filter(default_filter_){}
+	virtual CommandHandler* createCommandHandler( const std::string& cmdname, const std::string& docformat);
 
-	///\brief Destructor
-	virtual ~LuaCommandHandler(){}
-
-	///\brief Execute the Lua script
-	///\param[out] err error code in case of error
-	///\return CallResult status (See IOFilterCommandHandler::CallResult)
-	virtual CallResult call( const char*& err);
-
-	///\brief Get the identifier of this command handler type
-	static const char* identifier()
+	///\brief Get the list of commands
+	virtual std::vector<std::string> commands() const
 	{
-		return "LuaCommandHandler";
+		return m_program.getkeys< std::vector<std::string> >();
 	}
 
-private:
-	void initcall();
+	virtual bool loadPrograms( const proc::ProcessorProviderInterface*);
 
 private:
-	langbind::LuaScriptInstanceR m_interp;
-	bool m_called;
-	std::string m_docformat;
-	std::string m_default_filter;
-	std::string m_lasterror;
+	const DirectmapCommandHandlerConfig* m_config;
+	langbind::DirectmapProgram m_program;
+	types::keymap<std::string> m_filtermap;
 };
 
 }}//namespace

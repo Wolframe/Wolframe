@@ -52,31 +52,11 @@ struct LuaScriptContext
 	void loadPrograms( const std::vector<std::string>& prgfiles_);
 	std::vector<std::string> loadProgram( const std::string& prgfile);
 
-	void setDefaultFilter( const std::string& docformat, const std::string& filter_)
-	{
-		m_defaultfiltermap[ docformat] = filter_;
-	}
-
-	const std::string& defaultFilter( const std::string& docformat) const
-	{
-		static const std::string empty;
-		types::keymap<std::string>::const_iterator ki = m_defaultfiltermap.find( docformat);
-		if (ki == m_defaultfiltermap.end())
-		{
-			ki = m_defaultfiltermap.find( std::string());
-			if (ki == m_defaultfiltermap.end()) return empty;
-		}
-		return ki->second;
-	}
-
 	///\brief Get the list of commands
-	std::list<std::string> commands() const
+	std::vector<std::string> commands() const
 	{
 		return funcmap.commands();
 	}
-
-private:
-	types::keymap<std::string> m_defaultfiltermap;
 
 private:
 	LuaScriptContext( const LuaScriptContext&) :funcmap(&modulemap){}	//non copyable

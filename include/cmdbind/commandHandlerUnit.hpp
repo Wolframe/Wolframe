@@ -30,18 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_command_lua.cpp
-///\brief Module for command handler executing lua scripts
-#include "appdevel/commandHandlerModuleMacros.hpp"
-#include "appdevel/programTypeModuleMacros.hpp"
-#include "appdevel/moduleFrameMacros.hpp"
-#include "luaCommandHandler.hpp"
-#include "luaCommandHandlerUnit.hpp"
-#include "luaCommandHandlerConfig.hpp"
-#include "luaFunctionProgramType.hpp"
+///\file cmdbind/commandHandlerUnit.hpp
+///\brief Interface to command handler units
+#ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_UNIT_HPP_INCLUDED
+#define _Wolframe_CMDBIND_COMMAND_HANDLER_UNIT_HPP_INCLUDED
+#include "cmdbind/commandHandler.hpp"
+#include <boost/shared_ptr.hpp>
+#include <string>
+#include <list>
 
-WF_MODULE_BEGIN( "LuaCommandHandler", "lua program and command handler module")
- WF_PROGRAM_TYPE( "Lua", _Wolframe::langbind::createLuaProgramType)
- WF_COMMAND_HANDLER( "lua command handler", "cmdhandler", "lua", _Wolframe::cmdbind::LuaCommandHandlerUnit, _Wolframe::cmdbind::LuaCommandHandlerConfig)
-WF_MODULE_END
+namespace _Wolframe {
+namespace cmdbind {
+
+class CommandHandlerUnit
+{
+public:
+	virtual bool loadPrograms( const proc::ProcessorProviderInterface*)=0;
+
+	virtual std::vector<std::string> commands() const=0;
+
+	virtual CommandHandler* createCommandHandler( const std::string& cmdname, const std::string& docformat)=0;
+};
+
+///\brief Command handler unit reference
+typedef boost::shared_ptr<CommandHandlerUnit> CommandHandlerUnitR;
+
+}}//namespace
+#endif
+
 

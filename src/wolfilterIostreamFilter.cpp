@@ -659,7 +659,6 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			//	and initialize the command handler with the docformat
 			//	as first parameter as the main protocol does.
 			Filter flt = getFilter( provider, ifl, ofl);
-			bool doEscapeLFdot = false;
 
 			cmdbind::DoctypeFilterCommandHandler* dtfh = new cmdbind::DoctypeFilterCommandHandler();
 			cmdbind::CommandHandlerR dtfh_scoped( dtfh);
@@ -668,29 +667,31 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			// Detect document format:
 			int stateEscIn = 0;
 			int stateEscOut = 0;
-			processCommandHandler( buf, stateEscIn, stateEscOut, dtfh, is, os, doEscapeLFdot);
+			processCommandHandler( buf, stateEscIn, stateEscOut, dtfh, is, os, true);
 
 			std::string docformat = dtfh->docformatid();
 			std::string doctype = dtfh->doctypeid();
 			std::string cmdname = std::string( proc.c_str(), proc.size()-1) + doctype;
 
-			cmdbind::CommandHandler* cmdh = provider->cmdhandler( cmdname);
+			cmdbind::CommandHandler* cmdh = provider->cmdhandler( cmdname, docformat);
+			if (!cmdh)
+			{
+				throw std::runtime_error( std::string("no command handler defined for '") + proc + " processing '" + docformat + "'");
+			}
 			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
 			if (cmdh)
 			{
 				cmdh->setExecContext( execContext);
 				cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
-
-				if (ifch) 
+				if (!ifch) 
 				{
-					LOG_DEBUG << "command handler is processing CRLFdot escaped content";
-					if (flt.inputfilter().get()) ifch->setFilter( flt.inputfilter());
-					if (flt.outputfilter().get())
-					{
-						ifch->setFilter( flt.outputfilter());
-						flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
-					}
-					doEscapeLFdot = true;
+					throw std::runtime_error( "expected command handler processing CRLFdot escaped content");
+				}
+				if (flt.inputfilter().get()) ifch->setFilter( flt.inputfilter());
+				if (flt.outputfilter().get())
+				{
+					ifch->setFilter( flt.outputfilter());
+					flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
 				}
 				const char* cmd_argv = docformat.c_str();
 				cmdh->passParameters( cmdname, 1, &cmd_argv);
@@ -713,7 +714,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 				//	to process if there is still input left:
 				if (redirectInput( buf, stateEscOut, databuf.c_str(), databuf.size(), cmdh, os))
 				{
-					processCommandHandler( buf, stateEscIn, stateEscOut, cmdh, is, os, doEscapeLFdot);
+					processCommandHandler( buf, stateEscIn, stateEscOut, cmdh, is, os, true);
 				}
 				// Check if there is unconsumed input left (must not happen):
 				bool end = false;
@@ -736,32 +737,12 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		}
 	}
 	{
-		cmdbind::CommandHandler* cmdh = provider->cmdhandler( proc);
-		if (cmdh)
+		if (provider->existcmd( proc))
 		{
 			// ... command is handled by a command handler
 			//	-> detect document format with the doctype detection
 			//	and initialize the command handler with the docformat
 			//	as first parameter as the main protocol does.
-			cmdh->setExecContext( execContext);
-
-			Filter flt = getFilter( provider, ifl, ofl);
-			bool doEscapeLFdot = false;
-
-			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
-			cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
-
-			if (ifch) 
-			{
-				LOG_DEBUG << "command handler is processing CRLFdot escaped content";
-				if (flt.inputfilter().get()) ifch->setFilter( flt.inputfilter());
-				if (flt.outputfilter().get())
-				{
-					ifch->setFilter( flt.outputfilter());
-					flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
-				}
-				doEscapeLFdot = true;
-			}
 			cmdbind::DoctypeFilterCommandHandler* dtfh = new cmdbind::DoctypeFilterCommandHandler();
 			cmdbind::CommandHandlerR dtfh_scoped( dtfh);
 			dtfh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
@@ -769,9 +750,30 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			// Detect document format:
 			int stateEscIn = 0;
 			int stateEscOut = 0;
-			processCommandHandler( buf, stateEscIn, stateEscOut, dtfh, is, os, doEscapeLFdot);
+			processCommandHandler( buf, stateEscIn, stateEscOut, dtfh, is, os, true);
 
 			std::string docformat = dtfh->docformatid();
+			cmdbind::CommandHandler* cmdh = provider->cmdhandler( proc, docformat);
+			if (!cmdh)
+			{
+				throw std::runtime_error( std::string("no command handler defined for '") + proc + " processing '" + docformat + "'");
+			}
+			cmdh->setExecContext( execContext);
+			Filter flt = getFilter( provider, ifl, ofl);
+
+			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
+			cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
+			if (!ifch) 
+			{
+				throw std::runtime_error( "expected command handler processing CRLFdot escaped content");
+			}
+			if (flt.inputfilter().get()) ifch->setFilter( flt.inputfilter());
+			if (flt.outputfilter().get())
+			{
+				ifch->setFilter( flt.outputfilter());
+				flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
+			}
+
 			const char* cmd_argv = docformat.c_str();
 			cmdh->passParameters( proc, 1, &cmd_argv);
 			cmdh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
@@ -793,7 +795,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			//	to process if there is still input left:
 			if (redirectInput( buf, stateEscOut, databuf.c_str(), databuf.size(), cmdh, os))
 			{
-				processCommandHandler( buf, stateEscIn, stateEscOut, cmdh, is, os, doEscapeLFdot);
+				processCommandHandler( buf, stateEscIn, stateEscOut, cmdh, is, os, true);
 			}
 			// Check if there is unconsumed input left (must not happen):
 			bool end = false;

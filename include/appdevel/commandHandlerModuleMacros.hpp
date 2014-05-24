@@ -47,24 +47,17 @@
 	public:\
 		CommandHandlerConstructor(){}\
 		virtual ~CommandHandlerConstructor(){}\
-		virtual _Wolframe::cmdbind::CommandHandler* object( const _Wolframe::config::NamedConfiguration& cfgi)\
+		virtual _Wolframe::cmdbind::CommandHandlerUnit* object( const _Wolframe::config::NamedConfiguration& cfgi)\
 		{\
 			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
 			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to " CONFIG_TITLE " command handler constructor");\
-			CLASSDEF* rt = new CLASSDEF( cfg->context());\
+			CLASSDEF* rt = new CLASSDEF(cfg);\
 			return rt;\
 		}\
 		virtual const char* objectClassName() const\
 		{\
 			return CONFIG_TITLE "CommandHandler";\
 		}\
-		virtual std::list<std::string> commands( const _Wolframe::config::NamedConfiguration& cfgi) const\
-		{\
-			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
-			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to " CONFIG_TITLE " command handler method");\
-			return cfg->commands();\
-		}\
-		virtual bool checkReferences( const _Wolframe::config::NamedConfiguration&, const _Wolframe::proc::ProcessorProviderInterface*) const	{return true;}\
 	};\
 	class CommandHandlerBuilder\
 		:public _Wolframe::module::ConfiguredBuilder\

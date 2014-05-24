@@ -47,43 +47,6 @@ Project Wolframe.
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class DirectmapContext
-class DirectmapContext
-{
-public:
-	DirectmapContext(){}
-	~DirectmapContext(){}
-
-	void loadPrograms( const std::vector<std::string>& prgfiles_);
-
-	///\brief Get the list of commands
-	std::list<std::string> commands() const
-	{
-		return m_program.getkeys< std::list<std::string> >();
-	}
-
-	const langbind::DirectmapCommandDescription* command( const std::string& name) const
-	{
-		return m_program.get( name);
-	}
-
-	void setFilter( const std::string& docformat, const std::string& filter_)
-	{
-		m_filtermap[ docformat] = filter_;
-	}
-
-	const std::string& filter( const std::string& docformat) const;
-
-	bool checkReferences( const proc::ProcessorProviderInterface* provider) const
-	{
-		return m_program.checkReferences( provider);
-	}
-
-private:
-	langbind::DirectmapProgram m_program;
-	types::keymap<std::string> m_filtermap;
-};
-
 ///\class DirectmapCommandHandler
 ///\brief Command handler instance for processing a call as Directmap (mapping with forms and a transaction or form function)
 class DirectmapCommandHandler :public IOFilterCommandHandlerEscDLF
@@ -91,12 +54,13 @@ class DirectmapCommandHandler :public IOFilterCommandHandlerEscDLF
 public:
 	typedef IOFilterCommandHandlerEscDLF Parent;
 	///\brief Constructor
-	explicit DirectmapCommandHandler( const DirectmapContext* ctx_)
-		:m_ctx(ctx_)
-		,m_cmd(0)
+	explicit DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const std::string& default_filter_)
+		:m_cmd(cmddescr)
 		,m_state(0)
 		,m_function(0)
-		,m_checkIfInputLeft(false){}
+		,m_checkIfInputLeft(false)
+		,m_default_filter(default_filter_)
+		{}
 
 	///\brief Destructor
 	virtual ~DirectmapCommandHandler(){}
@@ -107,15 +71,15 @@ public:
 	virtual CallResult call( const char*& err);
 
 private:
-	void initcall( const std::string& docformat);
+	void initcall();
 
 private:
-	const DirectmapContext* m_ctx;						//< execution context of the command handler
 	const langbind::DirectmapCommandDescription* m_cmd;			//< description of command to execute
 	int m_state;								//< internal state
 	const langbind::FormFunction* m_function;				//< function to execute
 	types::FormR m_inputform;						//< (optional) form for validating and formating input
 	types::FormR m_outputform;						//< (optional) form for validating and formating output
+	std::string m_output_rootelement;					//< output root
 	langbind::TypedInputFilterR m_input;					//< structure for input
 	langbind::TypedOutputFilterR m_output;					//< structure for output
 	langbind::FormFunctionClosureR m_functionclosure;			//< processor for the transaction
@@ -123,8 +87,8 @@ private:
 	boost::shared_ptr<serialize::DDLStructParser> m_inputform_parser;	//< parser to map the input to the input form
 	langbind::RedirectFilterClosure m_outputprinter;			//< processor for redirection of the transaction call result or if defined the output form content to output
 	std::string m_errormsg;							//< buffer for error message returned
-	std::string m_output_rootelement;					//< root element of non validated output
 	bool m_checkIfInputLeft;						//< true, if we need to check, if there is input left (SKIP)
+	const std::string m_default_filter;					//< default filter name defined by the document format
 };
 
 }}//namespace

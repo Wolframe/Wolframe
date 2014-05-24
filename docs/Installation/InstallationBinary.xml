@@ -39,78 +39,78 @@
 				<itemizedlist>
 					<listitem>
 						<para>
-							wolframe-&WolframeVersion;.rpm: contains the <application>Wolframe</application>
+							wolframe-&WolframeVersion;.x86_64.rpm: contains the <application>Wolframe</application>
 							core server with minimal 3rd party software requirements
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-sqlite3-&WolframeVersion;.rpm: the database module for Sqlite3 databases
+							wolframe-sqlite3-&WolframeVersion;.x86_64.rpm: the database module for Sqlite3 databases
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-postgresql-&WolframeVersion;.rpm: the database module for PostgreSQL databases
+							wolframe-postgresql-&WolframeVersion;.x86_64.rpm: the database module for PostgreSQL databases
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-libxml2-&WolframeVersion;.rpm: filtering module for XML and XSLT (using libxml2/libxslt)
+							wolframe-libxml2-&WolframeVersion;.x86_64.rpm: filtering module for XML and XSLT (using libxml2/libxslt)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-textwolf-&WolframeVersion;.rpm: filtering module for XML (using textwolf)
+							wolframe-textwolf-&WolframeVersion;.x86_64.rpm: filtering module for XML (using textwolf)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-cjson-&WolframeVersion;.rpm: filtering module for JSON (using cJSON)
+							wolframe-cjson-&WolframeVersion;.x86_64.rpm: filtering module for JSON (using cJSON)
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-pam-&WolframeVersion;.rpm: authentication module for PAM
+							wolframe-pam-&WolframeVersion;.x86_64.rpm: authentication module for PAM
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-sasl-&WolframeVersion;.rpm: authentication module for SASL
+							wolframe-sasl-&WolframeVersion;.x86_64.rpm: authentication module for SASL
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-python-&WolframeVersion;.rpm: language bindings for Python
+							wolframe-python-&WolframeVersion;.x86_64.rpm: language bindings for Python
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-lua-&WolframeVersion;.rpm: language bindings for Lua
+							wolframe-lua-&WolframeVersion;.x86_64.rpm: language bindings for Lua
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-libhpdf-&WolframeVersion;.rpm: printing module using libhpdf
+							wolframe-libhpdf-&WolframeVersion;.x86_64.rpm: printing module using libhpdf
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-freeimage-&WolframeVersion;.rpm: image manipuation module using FreeImage
+							wolframe-freeimage-&WolframeVersion;.x86_64.rpm: image manipuation module using FreeImage
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-libclient-&WolframeVersion;.rpm: C/C++ client library
+							wolframe-libclient-&WolframeVersion;.x86_64.rpm: C/C++ client library
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolframe-client-&WolframeVersion;.rpm: command line tool
+							wolframe-client-&WolframeVersion;.x86_64.rpm: command line tool
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							wolfclient-&WolfclientVersion;.rpm: Wolframe graphical frontend
+							wolfclient-&WolfclientVersion;.x86_64.rpm: Wolframe graphical frontend
 						</para>
 					</listitem>
 				</itemizedlist>				
@@ -190,6 +190,108 @@
 <!-- Debian -->
 		<sect2>
 			<title>Debian, Ubuntu and similar Linux distributions</title>
+
+			<sect3>
+				<title>Available packages</title>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							wolframe_&WolframeVersion;_amd64.deb: contains the <application>Wolframe</application>
+							core server with minimal 3rd party software requirements
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe_sqlite3-&WolframeVersion;_amd64.deb: the database module for Sqlite3 databases
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe_postgresql-&WolframeVersion;_amd64.deb: the database module for PostgreSQL databases
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-libxml2_&WolframeVersion;_amd64.deb: filtering module for XML and XSLT (using libxml2/libxslt)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe_textwolf_&WolframeVersion;_amd64.deb: filtering module for XML (using textwolf)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-cjson_&WolframeVersion;_amd64.deb: filtering module for JSON (using cJSON)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-pam_&WolframeVersion;_amd64.deb: authentication module for PAM
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-sasl_&WolframeVersion;_amd64.deb: authentication module for SASL
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-python_&WolframeVersion;_amd64.deb: language bindings for Python
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-lua_&WolframeVersion;_amd64.deb: language bindings for Lua
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-libhpdf_&WolframeVersion;_amd64.deb: printing module using libhpdf
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-freeimage_&WolframeVersion;_amd64.deb: image manipuation module using FreeImage
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-libclient_&WolframeVersion;_amd64.deb: C/C++ client library
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-client_&WolframeVersion;_amd64.deb: command line tool
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolfclient_&WolfclientVersion;_amd64.deb: Wolframe graphical frontend
+						</para>
+					</listitem>
+				</itemizedlist>				
+			</sect3>
+			
+			<sect3>
+				<title>Prerequisites</title>
+				
+				<para>
+					
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Install binary packages manually</title>
+				
+				<para>
+					Installing the packages via repositories is usually the prefered way.
+				</para>	
+			</sect3>
+			
+			<sect3>
+				<title>Install from repository</title>
 			<para>
 				Add a new repository file <filename>/etc/apt/sources.list.d/wolframe.list</filename>
 				which contains:
@@ -247,12 +349,116 @@
 	service wolframed start
 				</programlisting>
 			</para>
+
+			</sect3>
 			
 		</sect2>
 
 <!-- OpenSUSE -->
 		<sect2>
 			<title>openSUSE, SLES and similar Linux distributions</title>
+
+			<sect3>
+				<title>Available packages</title>
+				
+				<itemizedlist>
+					<listitem>
+						<para>
+							wolframe-&WolframeVersion;.x86_64.rpm: contains the <application>Wolframe</application>
+							core server with minimal 3rd party software requirements
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-sqlite3-&WolframeVersion;.x86_64.rpm: the database module for Sqlite3 databases
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-postgresql-&WolframeVersion;.x86_64.rpm: the database module for PostgreSQL databases
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-libxml2-&WolframeVersion;.x86_64.rpm: filtering module for XML and XSLT (using libxml2/libxslt)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-textwolf-&WolframeVersion;.x86_64.rpm: filtering module for XML (using textwolf)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-cjson-&WolframeVersion;.x86_64.rpm: filtering module for JSON (using cJSON)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-pam-&WolframeVersion;.x86_64.rpm: authentication module for PAM
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-sasl-&WolframeVersion;.x86_64.rpm: authentication module for SASL
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-python-&WolframeVersion;.x86_64.rpm: language bindings for Python
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-lua-&WolframeVersion;.x86_64.rpm: language bindings for Lua
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-libhpdf-&WolframeVersion;.x86_64.rpm: printing module using libhpdf
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-freeimage-&WolframeVersion;.x86_64.rpm: image manipuation module using FreeImage
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-libclient-&WolframeVersion;.x86_64.rpm: C/C++ client library
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolframe-client-&WolframeVersion;.x86_64.rpm: command line tool
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolfclient-&WolfclientVersion;.x86_64.rpm: Wolframe graphical frontend
+						</para>
+					</listitem>
+				</itemizedlist>				
+			</sect3>
+			
+			<sect3>
+				<title>Prerequisites</title>
+				
+				<para>
+					
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Install binary packages manually</title>
+				
+				<para>
+					Currently installing the packages directly is the prefered way.
+				</para>	
+			</sect3>
+			
+			<sect3>
+				<title>Install from repository</title>
 			
 			<para>
 				<emphasis role="bold">Note</emphasis>: This is currently not working,
@@ -355,11 +561,56 @@
 				on newer openSUSE systems.
 			</para>
 
+			</sect3>
+
 		</sect2>
 
 <!-- ArchLinux -->
 		<sect2>
 			<title>ArchLinux</title>
+
+			<sect3>
+				<title>Available packages</title>
+				
+				<para>
+					Wolframe is currently only available as two monolithic packages:
+				</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							wolframe-&WolframeVersion;.x86_64.rpm: contains the <application>Wolframe</application>
+							core server with all modules for 3rdParty software included,
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolfclient-&WolfclientVersion;.x86_64.rpm: Wolframe graphical frontend
+						</para>
+					</listitem>
+				</itemizedlist>				
+			</sect3>
+			
+			<sect3>
+				<title>Prerequisites</title>
+				
+				<para>
+					
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Install binary packages manually</title>
+				
+				<para>
+					You can use the packages from
+					<ulink url="http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/ArchLinux/">http://sourceforge.net/projects/wolframe/files/wolframe-binaries/&WolframeVersion;/ArchLinux/</ulink>
+					directly.
+				</para>	
+			</sect3>
+			
+			<sect3>
+				<title>Install from repository</title>
 			<para>
 				First add the following section to <filename>/etc/pacman.conf</filename>:
 				<programlisting language='shell'>
@@ -409,25 +660,77 @@
 	systemctl start wolframed
 				</programlisting>
 			</para>
+			</sect3>
+
+			<sect3>
+				<title>Install from the AUR</title>
+			<para>
+				You can also customize your build by downloading the 
+				build files from the AUR at <ulink url="https://aur.archlinux.org/packages/?O=0&amp;K=wolframe">https://aur.archlinux.org/packages/?O=0&amp;K=wolframe</ulink>
+				and customize them to your needs.
+			</para>
+
+			<para>
+				For instance:
+
+				<programlisting language='shell'>
+	yaourt -G wolframe
+	cd wolframe
+	makepkg 
+				</programlisting>
+			</para>
+			</sect3>
 		</sect2>
 
 <!-- Slackware -->
 		<sect2>
 			<title>Slackware</title>
+
+			<sect3>
+				<title>Available packages</title>
+				
+				<para>
+					Wolframe is currently only available as two monolithic packages:
+				</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							wolframe-&WolframeVersion;.x86_64.rpm: contains the <application>Wolframe</application>
+							core server with all modules for 3rdParty software included,
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							wolfclient-&WolfclientVersion;.x86_64.rpm: Wolframe graphical frontend
+						</para>
+					</listitem>
+				</itemizedlist>				
+			</sect3>
+			
+			<sect3>
+				<title>Prerequisites</title>
+				
+				<para>
+					
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Install binary packages manually</title>
+
 			<para>
-				Download the package file (we choose 64-bit Slackware 14 for example):
+				Download the package file (we picked 64-bit Slackware 14 for example):
 				<programlisting language='shell'>
-	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/Slackware-14/x86_64/wolframe-0.0.1-x86_64.tgz
+	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/&WolframeVersion;/Slackware-14/x86_64/wolframe-&WolframeVersion;-x86_64.tgz
 				</programlisting>
 			</para>
 
 			<para>
 				You install the Wolframe package with:
 				<programlisting language='shell'>
-	installpkg wolframe-0.0.1-x86_64.tgz 
+	installpkg wolframe-&WolframeVersion;-x86_64.tgz 
 				</programlisting>
-			
-				The Slackware packages contain the whole server and the whole client respectively.
 			</para>
 			
 			<para>
@@ -437,6 +740,8 @@
 	/etc/rc.d/rc.wolframed start
 				</programlisting>
 			</para>
+
+			</sect3>
 		</sect2>
 
 	</sect1>
@@ -450,14 +755,14 @@
 			<para>
 				Download the package file (we choose 64-bit FreeBSD 9 for example):
 				<programlisting language='shell'>
-	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/FreeBSD-9/x86_64/wolframe-0.0.1-x86_64.tgz
+	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/&WolframeVersion;/FreeBSD-9/x86_64/wolframe-&WolframeVersion;-x86_64.tgz
 				</programlisting>
 			</para>
 
 			<para>
 				You install the Wolframe package with:
 				<programlisting language='shell'>
-	pkg_add wolframe-0.0.1-x86_64.tgz 
+	pkg_add wolframe-&WolframeVersion;-x86_64.tgz 
 				</programlisting>
 			
 				The FreeBSD packages contain the whole server and the whole client respectively.
@@ -493,14 +798,14 @@
 			<para>
 				Download the package file (we choose 64-bit NetBSD 6 for example):
 				<programlisting language='shell'>
-	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/NetBSD-6/x86_64/wolframe-0.0.1-x86_64.tgz
+	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/&WolframeVersion;/NetBSD-6/x86_64/wolframe-&WolframeVersion;-x86_64.tgz
 				</programlisting>
 			</para>
 
 			<para>
 				You install the Wolframe package with:
 				<programlisting language='shell'>
-	pkg_add wolframe-0.0.1-x86_64.tgz 
+	pkg_add wolframe-&WolframeVersion;-x86_64.tgz 
 				</programlisting>
 			
 				The NetBSD packages contain the whole server and the whole client respectively.

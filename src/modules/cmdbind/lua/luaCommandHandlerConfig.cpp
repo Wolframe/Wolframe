@@ -38,7 +38,7 @@ Project Wolframe.
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
-using namespace _Wolframe::module;
+using namespace _Wolframe::cmdbind;
 
 bool LuaCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory* modules)
 {
@@ -54,11 +54,11 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const 
 				utils::splitString( filterdef, pi->second.data().string(), "=");
 				if (filterdef.size() == 1)
 				{
-					m_context.setDefaultFilter( "", filterdef.at(0));
+					m_filtermap.insert( "", filterdef.at(0));
 				}
 				else if (filterdef.size() == 2)
 				{
-					m_context.setDefaultFilter( filterdef.at(0), filterdef.at(1));
+					m_filtermap.insert( filterdef.at(0), filterdef.at(1));
 				}
 				else
 				{
@@ -90,7 +90,6 @@ void LuaCommandHandlerConfig::setCanonicalPathes( const std::string& referencePa
 	{
 		*pi = utils::getCanonicalPath( *pi, referencePath);
 	}
-	m_context.loadPrograms( m_programfiles);
 }
 
 bool LuaCommandHandlerConfig::check() const
