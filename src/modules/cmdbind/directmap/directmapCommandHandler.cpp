@@ -95,11 +95,7 @@ void DirectmapCommandHandler::initcall( const std::string& docformat)
 		m_inputform.reset( new types::Form( df));
 	}
 	// Initialize output form for validation if defined:
-	if (m_cmd->outputform.empty())
-	{
-		m_output_rootelement = m_cmd->outputrootelem;
-	}
-	else
+	if (!m_cmd->outputform.empty())
 	{
 		const types::FormDescription* df = provider->formDescription( m_cmd->outputform);
 		if (df)

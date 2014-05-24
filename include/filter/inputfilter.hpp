@@ -163,6 +163,11 @@ public:
 		m_metadata->setDoctype( doctype_);
 	}
 
+	virtual bool checkMetaData( const types::DocMetaData&) const
+	{
+		return true;
+	}
+
 private:
 	State m_state;				///< state
 	types::DocMetaDataR m_metadata;		///< meta data reference

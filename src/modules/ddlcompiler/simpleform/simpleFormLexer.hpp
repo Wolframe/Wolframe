@@ -66,7 +66,8 @@ public:
 		MandatoryTag,	//< '!'
 		OptionalTag,	//< '?'
 		Indirection,	//< '^'
-		Assign		//< '='
+		Assign,		//< '='
+		MetaDataDef	//< ':'
 	};
 public:
 	///\brief Default constructor

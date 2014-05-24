@@ -42,7 +42,7 @@ namespace _Wolframe {
 namespace types {
 
 ///\class DocMetaData
-///\brief Document metadata representation.
+///\brief Document meta data representation.
 struct DocMetaData
 {
 	struct Attribute
@@ -74,10 +74,18 @@ struct DocMetaData
 		m_doctype = doctype_;
 	}
 
+	/// \brief Set a unique attribute by name (add or redefine)
 	void setAttribute( const Attribute& attr);
+	/// \brief Set a unique attribute by name (add or redefine)
 	void setAttribute( const std::string& name_, const std::string& value_);
 
+	/// \brief Define a unique attribute and throw if attribute with this name is already defined
+	void defineAttribute( const std::string& name_, const std::string& value_);
+
+	/// \brief Delete an attribute identified by name
 	bool deleteAttribute( const std::string& name_);
+
+	/// \brief Get an attribute identified by name or NULL if not defined
 	const char* getAttribute( const std::string& name_) const;
 
 	const std::string& doctype() const

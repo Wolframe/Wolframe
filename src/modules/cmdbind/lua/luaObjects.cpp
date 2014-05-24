@@ -697,6 +697,21 @@ LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 }
 
 
+LUA_FUNCTION_THROWS( "form:metadata()", function_form_metadata)
+{
+	types::FormR* form = LuaObject<types::FormR>::getSelf( ls, "form", "get");
+
+	lua_newtable( ls);
+	std::vector<types::DocMetaData::Attribute>::const_iterator ai = (*form)->metadata().attributes().begin(), ae = (*form)->metadata().attributes().end();
+	for (; ai != ae; ++ai)
+	{
+		lua_pushlstring( ls, ai->value.c_str(), ai->value.size());
+		lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+		lua_setfield( ls, -2, ai->name.c_str());
+	}
+	return 1;
+}
+
 
 LUA_FUNCTION_THROWS( "provider.form()", function_form)
 {
@@ -2513,13 +2528,14 @@ static const luaL_Reg struct_methodtable[ 5] =
 	{0,0}
 };
 
-static const luaL_Reg form_methodtable[ 7] =
+static const luaL_Reg form_methodtable[ 8] =
 {
 	{"name",&function_form_name},
 	{"value",&function_form_table},
 	{"table",&function_form_table},
 	{"get",&function_form_get},
 	{"fill",&function_form_fill},
+	{"metadata",&function_form_metadata},
 	{"__tostring",&function_form_tostring},
 	{0,0}
 };

@@ -1,11 +1,12 @@
-STRUCT Employee
+FORM Employee
 {
 	firstname string
 	surname string
 	phone string
 }
 
-FORM employee_assignment_print assignmentlist
+FORM employee_assignment_print
+: root assignmentlist
 {
 	assignment []
 	{

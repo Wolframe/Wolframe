@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_TYPES_FORM_HPP_INCLUDED
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
+#include "types/docmetadata.hpp"
 #include <string>
 #include <cstddef>
 #include <stdexcept>
@@ -60,11 +61,12 @@ public:
 	FormDescription(){}
 	/// \brief Destructor
 	virtual ~FormDescription(){}
+
 	/// \brief Constructor
-	FormDescription( const std::string& ddlname_, const std::string& name_, const std::string& root_)
+	FormDescription( const std::string& ddlname_, const std::string& name_, const types::DocMetaData& metadata_)
 		:m_name(name_)
-		,m_root(root_)
-		,m_ddlname(ddlname_){}
+		,m_ddlname(ddlname_)
+		,m_metadata(metadata_){}
 	explicit FormDescription( const std::string& ddlname_)
 		:m_ddlname(ddlname_)
 		{}
@@ -72,8 +74,8 @@ public:
 	FormDescription( const FormDescription& o)
 		:types::VariantStructDescription(o)
 		,m_name(o.m_name)
-		,m_root(o.m_root)
-		,m_ddlname(o.m_ddlname){}
+		,m_ddlname(o.m_ddlname)
+		,m_metadata(o.m_metadata){}
 
 	/// \brief Assignement operator
 	/// \param[in] o object to copy
@@ -81,15 +83,15 @@ public:
 	{
 		types::VariantStructDescription::operator=( o);
 		m_name = o.m_name;
-		m_root = o.m_root;
 		m_ddlname = o.m_ddlname;
+		m_metadata = o.m_metadata;
 		return *this;
 	}
 
-	/// \brief Get the root element of the form for filters that need it (like XML)
-	const std::string& root() const
+	/// \brief Get the metadata attribute of the form
+	const char* attribute( const std::string& name_) const
 	{
-		return m_root;
+		return m_metadata.getAttribute( name_);
 	}
 
 	/// \brief Get the name of the form
@@ -109,10 +111,15 @@ public:
 	/// \brief Gets the form as string
 	std::string tostring( const utils::PrintFormat* pformat=0) const;
 
+	const types::DocMetaData& metadata() const
+	{
+		return m_metadata;
+	}
+
 private:
 	std::string m_name;		///< name of the form
-	std::string m_root;		///< root element of the form for filters that need it (like XML)
 	std::string m_ddlname;		///< data definition language name of the form
+	types::DocMetaData m_metadata;	///< document meta data
 };
 
 typedef boost::shared_ptr<FormDescription> FormDescriptionR;

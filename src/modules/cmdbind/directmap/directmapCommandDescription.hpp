@@ -35,6 +35,7 @@
 #ifndef _LANGBIND_DIRECTMAP_COMMAND_DESCRIPTION_HPP_INCLUDED
 #define _LANGBIND_DIRECTMAP_COMMAND_DESCRIPTION_HPP_INCLUDED
 #include "types/keymap.hpp"
+#include "types/docmetadata.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
 #include <string>
@@ -59,7 +60,7 @@ struct DirectmapCommandDescription
 		,outputfilterarg(o.outputfilterarg)
 		,inputform(o.inputform)
 		,outputform(o.outputform)
-		,outputrootelem(o.outputrootelem)
+		,outputmetadata(o.outputmetadata)
 		,authfunction(o.authfunction)
 		,authresource(o.authresource)
 		,skipvalidation_input(o.skipvalidation_input)
@@ -76,7 +77,7 @@ struct DirectmapCommandDescription
 	std::vector<langbind::FilterArgument> outputfilterarg;		//< arguments of the output filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
-	std::string outputrootelem;					//< name of the output root element (in case of SKIP and no form defined)
+	types::DocMetaData outputmetadata;				//< metadata of the output 
 	std::string authfunction;					//< authorization function name
 	std::string authresource;					//< authorization resource name
 	bool skipvalidation_input;					//< input is not validated

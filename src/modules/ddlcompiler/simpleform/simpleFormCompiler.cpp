@@ -300,6 +300,7 @@ static void compile_forms( const std::string& filename, std::vector<types::FormD
 				if (lx.value().empty()) throw std::runtime_error( "non empty structure name expected after STRUCT");
 				std::string structname( lx.value());	//... name of the structure in the reference table for indirections and sub structures
 				lx = lexer.next();
+				if (lx.id() == Lexem::MetaDataDef) throw std::runtime_error("meta data definition (':') not possible in STRUCT definition");
 				if (lx.id() != Lexem::OpenStruct) throw std::runtime_error("open structure operator '{' expected (start of the form or structure declaration)");
 
 				types::FormDescriptionR form( new types::FormDescription( "simpleform"));
@@ -313,15 +314,22 @@ static void compile_forms( const std::string& filename, std::vector<types::FormD
 				if (lx.value().empty()) throw std::runtime_error( "non empty form name expected after FORM");
 				std::string structname( lx.value());	//... name of the form
 
+				types::DocMetaData metadata;
 				lx = lexer.next();
-				if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for name of structure");
-				if (lx.value().empty()) throw std::runtime_error( "non empty root element name expected after FORM <name>");
-				std::string root( lx.value());		//... root element name of the form
-
-				lx = lexer.next();
+				while (lx.id() == Lexem::MetaDataDef)
+				{
+					lx = lexer.next();
+					if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for meta data attribute name after ':'");
+					if (lx.value().empty()) throw std::runtime_error( "non empty meta data attribute name name expected after ':'");
+					std::string attrnam( lx.value());
+					if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for meta data attribute value after ':' amd meta data name");
+					std::string attrval( lx.value());
+					lx = lexer.next();
+					metadata.defineAttribute( attrnam, attrval);
+				}
 				if (lx.id() != Lexem::OpenStruct) throw std::runtime_error("open structure operator '{' expected (start of the form or structure declaration)");
 
-				types::FormDescriptionR form( new types::FormDescription( "simpleform", structname, root));
+				types::FormDescriptionR form( new types::FormDescription( "simpleform", structname, metadata));
 				compile_structure( lexer, *form, typemap, formmap, unresolvedSymbols);
 				formmap.insert( structname, form);
 				result.push_back( form);

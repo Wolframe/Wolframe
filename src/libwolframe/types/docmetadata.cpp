@@ -37,6 +37,7 @@ Project Wolframe.
 #include <cstring>
 #include <sstream>
 #include <iostream>
+#include <stdexcept>
 #include <boost/shared_ptr.hpp>
 
 using namespace _Wolframe;
@@ -114,6 +115,15 @@ std::string DocMetaData::extractStem( const std::string& src)
 {
 	PositionRange pos = locateStem( src);
 	return std::string( src.c_str() + pos.first, pos.second - pos.first);
+}
+
+void DocMetaData::defineAttribute( const std::string& name_, const std::string& value_)
+{
+	if (getAttribute( name_))
+	{
+		throw std::runtime_error( std::string("duplicate definition of meta data attribute with name '") + name_ + "'");
+	}
+	m_attributes.push_back( Attribute( name_, value_));
 }
 
 bool DocMetaData::deleteAttribute( const std::string& name_)
