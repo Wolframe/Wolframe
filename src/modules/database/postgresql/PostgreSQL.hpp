@@ -146,10 +146,6 @@ public:
 	const std::string& ID() const;
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 
-	virtual void loadProgram( const std::string& filename );
-	virtual void loadAllPrograms();
-	virtual void addProgram( const std::string& program );
-
 	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );
 
@@ -182,12 +178,6 @@ public:
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 	Database* database();
 	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
-
-	virtual void loadProgram( const std::string& filename );
-	virtual void loadAllPrograms();
-
-	virtual void addProgram( const std::string& program )
-						{ m_program.load( program ); }
 
 	static void noticeProcessor( void* this_void, const char * message);
 

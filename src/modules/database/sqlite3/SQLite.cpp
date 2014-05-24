@@ -171,37 +171,6 @@ SQLiteDBunit::~SQLiteDBunit( )
 	LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
 }
 
-void SQLiteDBunit::loadProgram( const std::string& filename )
-{
-	// No program file, do nothing
-	if ( filename.empty())
-		return;
-	if ( !boost::filesystem::exists( filename ))	{
-		LOG_ALERT << "Program file '" << filename
-			      << "' does not exist (SQLite database '" << m_ID << "')";
-		return;
-	}
-	try
-	{
-		addProgram( utils::readSourceFileContent( filename));
-	}
-	catch (const std::runtime_error& e)
-	{
-		throw std::runtime_error( std::string("error in program '") + utils::getFileStem(filename) + "':" + e.what());
-	}
-}
-
-void SQLiteDBunit::loadAllPrograms()
-{
-	std::vector<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
-	for (; pi != pe; ++pi)
-	{
-		LOG_DEBUG << "Loading program '" << *pi << "' for SQLite database unit '" << m_ID << "'";
-		loadProgram( *pi);
-	}
-	LOG_DEBUG << "Programs for SQLite database unit '" << m_ID << "' loaded";
-}
-
 Database* SQLiteDBunit::database()
 {
 	return m_db.hasUnit() ? &m_db : NULL;
@@ -215,27 +184,6 @@ const std::string& SQLiteDatabase::ID() const
 		return m_unit->ID();
 	else
 		throw std::runtime_error( "SQLite database unit not initialized" );
-}
-
-void SQLiteDatabase::loadProgram( const std::string& filename )
-{
-	if ( !m_unit )
-		throw std::runtime_error( "loadProgram: SQLite database unit not initialized" );
-	m_unit->loadProgram( filename );
-}
-
-void SQLiteDatabase::loadAllPrograms()
-{
-	if ( !m_unit )
-		throw std::runtime_error( "loadAllPrograms: SQLite database unit not initialized" );
-	m_unit->loadAllPrograms();
-}
-
-void SQLiteDatabase::addProgram( const std::string& program )
-{
-	if ( !m_unit )
-		throw std::runtime_error( "addProgram: SQLite database unit not initialized" );
-	m_unit->addProgram( program );
 }
 
 Transaction* SQLiteDatabase::transaction( const std::string& name)
