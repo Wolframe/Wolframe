@@ -298,9 +298,6 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 {
 	try
 	{
-		// load all locally defined programs of the database:
-		if (m_db) m_db->loadAllPrograms();
-
 		// load all globally defined programs:
 		m_programs->loadPrograms( transactionDatabase( true), m_programfiles);
 
