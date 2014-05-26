@@ -4,7 +4,7 @@
 **requires:TEXTWOLF
 **input
 {
-	"doctype":	"employee_assignment_print",
+	"-doctype":	"employee_assignment_print",
 	"assignment":	[{
 			"task":	[{
 					"title":	"job 1",
@@ -77,7 +77,7 @@ FORM Employee
 }
 
 FORM employee_assignment_print
-: root assignmentlist
+	:root assignmentlist
 {
 	assignment []
 	{
@@ -101,7 +101,7 @@ end
 
 **output
 {
-	"doctype":	"employee_assignment_print",
+	"-doctype":	"employee_assignment_print",
 	"assignment":	[{
 			"task":	[{
 					"title":	"job 1",

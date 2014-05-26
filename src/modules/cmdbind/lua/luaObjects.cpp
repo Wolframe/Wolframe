@@ -702,7 +702,7 @@ LUA_FUNCTION_THROWS( "form:metadata()", function_form_metadata)
 	types::FormR* form = LuaObject<types::FormR>::getSelf( ls, "form", "get");
 
 	lua_newtable( ls);
-	std::vector<types::DocMetaData::Attribute>::const_iterator ai = (*form)->metadata().attributes().begin(), ae = (*form)->metadata().attributes().end();
+	std::vector<types::DocMetaData::Attribute>::const_iterator ai = (*form)->description()->metadata().attributes().begin(), ae = (*form)->description()->metadata().attributes().end();
 	for (; ai != ae; ++ai)
 	{
 		lua_pushlstring( ls, ai->value.c_str(), ai->value.size());
@@ -1270,7 +1270,7 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 					{
 						TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
 						TypedOutputFilterR outp( new TypingOutputFilter( output->outputfilter()));
-						LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+						LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp, false));
 						closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
 					}
 					if (!output->called())
@@ -1413,17 +1413,6 @@ LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
 	return 0;
 }
 
-static std::string filterargAsString( const std::vector<langbind::FilterArgument>& arg)
-{
-	std::ostringstream out;
-	std::vector<langbind::FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-	for (; ai != ae; ++ai)
-	{
-		if (ai != arg.begin()) out << ", ";
-		out << ai->first << "='" << ai->second << "'";
-	}
-	return out.str();
-}
 
 LUA_FUNCTION_THROWS( "provider.filter(..)", function_filter)
 {
@@ -1491,18 +1480,13 @@ LUA_FUNCTION_THROWS( "provider.filter(..)", function_filter)
 			if (!name) throw std::runtime_error( "filter name is not a string");
 
 			proc::ExecContext* ctx = getExecContext( ls);
-			types::CountedReference<Filter> flt( ctx->provider()->filter( name, arg));
-			if (!flt.get())
+			const FilterType* filtertype = ctx->provider()->filterType( name);
+			if (!filtertype)
 			{
-				if (!arg.empty())
-				{
-					throw std::runtime_error( std::string( "filter '") + name + "(" + filterargAsString(arg) + ")' is not defined");
-				}
-				else
-				{
-					throw std::runtime_error( std::string( "filter '") + name + "' is not defined");
-				}
+				throw std::runtime_error( std::string( "filter type '") + name + "' is not defined");
 			}
+			types::CountedReference<Filter> flt( filtertype->create( arg));
+
 			LuaObject<Filter>::push_luastack( ls, *flt);
 			return 1;
 		}
@@ -1707,13 +1691,12 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctypeid)
 
 LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 {
-	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");	//< self argument (mandatory)
-	Filter* filter = 0;							//< 1st argument (mandatory)
-	types::DocMetaData docmetadata;						//< 2nd argument (optional)
+	Output* output = LuaObject<Output>::getSelf( ls, "output", "as"); //< self argument (mandatory)
+	Filter* filter = 0;
+	types::DocMetaData docmetadata;
 	bool docmetadata_defined = false;
 	std::string doctype;
 	bool doctype_defined = false;
-	bool root_defined = false;
 	int ii=2,nn = lua_gettop( ls);
 	if (nn <= 1)
 	{
@@ -1744,21 +1727,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 					throw std::runtime_error( "only strings expected as keys and values in document meta data table");
 				}
 				const char* idstr = lua_tostring( ls, -2);
-				if (0==std::strcmp( idstr, "doctype"))
-				{
-					if (doctype_defined) throw std::runtime_error( "argument string specifying the document type or document metadata table element with name 'doctype' specified twice");
-					doctype_defined = true;
-					doctype = lua_tostring( ls, -1);
-				}
-				else if (0==std::strcmp( idstr, "root"))
-				{
-					root_defined = true;
-					docmetadata.setAttribute( "root", lua_tostring( ls, -1));
-				}
-				else
-				{
-					docmetadata.setAttribute( idstr, lua_tostring( ls, -1));
-				}
+				docmetadata.setAttribute( idstr, lua_tostring( ls, -1));
 				lua_pop( ls, 1);
 			}
 		}
@@ -1799,24 +1768,27 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			throw std::runtime_error( "called with undefined output for the argument filter object");
 		}
 	}
+	types::DocMetaData allmetadata;
+	if (doctype_defined)
+	{
+		proc::ExecContext* gtc = getExecContext( ls);
+		const types::FormDescription* formdescr = gtc->provider()->formDescription( doctype);
+		if (formdescr)
+		{
+			allmetadata.join( formdescr->metadata());
+		}
+	}
 	if (docmetadata_defined)
 	{
-		output->outputfilter()->setMetaData( docmetadata);
+		allmetadata.join( docmetadata);
 	}
 	if (doctype_defined)
 	{
-		docmetadata.setDoctype( doctype);
-		if (!root_defined)
-		{
-			proc::ExecContext* gtc = getExecContext( ls);
-			const types::FormDescription* formdescr = gtc->provider()->formDescription( doctype);
-			if (formdescr)
-			{
-				docmetadata.setAttribute( "root", formdescr->root());
-			}
-		}
-		docmetadata.setDoctype( doctype);
-		docmetadata.setAttribute( "doctype", doctype);
+		allmetadata.setDoctype( doctype);
+	}
+	if (doctype_defined || docmetadata_defined)
+	{
+		output->outputfilter()->setMetaData( allmetadata);
 	}
 	return 0;
 }
@@ -2906,9 +2878,9 @@ bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScrip
 	return true;
 }
 
-std::list<std::string> LuaFunctionMap::commands() const
+std::vector<std::string> LuaFunctionMap::commands() const
 {
-	std::list<std::string> rt;
+	std::vector<std::string> rt;
 	std::map<std::string,std::size_t>::const_iterator ii = m_procmap.begin(), ee = m_procmap.end();
 	for (; ii != ee; ++ii) rt.push_back( ii->first);
 	return rt;

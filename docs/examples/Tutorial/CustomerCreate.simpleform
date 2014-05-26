@@ -1,4 +1,5 @@
-	FORM CustomerCreate customer
+	FORM CustomerCreate
+		:root customer
 	{
 		name string
 		address string

@@ -149,13 +149,14 @@ public:
 	/// \brief Test if a flag can be set (allowed)
 	virtual bool checkSetFlags( Flags) const	{return true;}
 
+	/// \brief Get the name of the filter
 	const char* name() const			{return m_name;}
 
 private:
-	enum {ErrorBufSize=128};		//< maximum size of error string
-	char m_errorbuf[ ErrorBufSize];		//< error string
-	Flags m_flags;				//< flags
-	const char* m_name;			//< name of the filter
+	enum {ErrorBufSize=128};		///< maximum size of error string
+	char m_errorbuf[ ErrorBufSize];		///< error string
+	Flags m_flags;				///< flags
+	const char* m_name;			///< name of the filter
 };
 
 }}//namespace

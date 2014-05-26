@@ -229,7 +229,8 @@ protected:
 					LOG_DEBUG << "Connection terminated abruptly by client, got no SSL_shutdown(); "
 							<< "error: " << e.value() << ", category: " << e.category().name()
 							<< ", message: " << err;
-					break;
+///* MBa: This should go into the switch, I think */
+//					break;
 				}
 			}
 #endif // WITH_SSL

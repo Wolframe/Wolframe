@@ -36,11 +36,12 @@
 #include "appdevel/programTypeModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
 #include "luaCommandHandler.hpp"
+#include "luaCommandHandlerUnit.hpp"
 #include "luaCommandHandlerConfig.hpp"
 #include "luaFunctionProgramType.hpp"
 
 WF_MODULE_BEGIN( "LuaCommandHandler", "lua program and command handler module")
  WF_PROGRAM_TYPE( "Lua", _Wolframe::langbind::createLuaProgramType)
- WF_COMMAND_HANDLER( "lua command handler", "cmdhandler", "lua", _Wolframe::cmdbind::LuaCommandHandler, _Wolframe::module::LuaCommandHandlerConfig)
+ WF_COMMAND_HANDLER( "lua command handler", "cmdhandler", "lua", _Wolframe::cmdbind::LuaCommandHandlerUnit, _Wolframe::cmdbind::LuaCommandHandlerConfig)
 WF_MODULE_END
 

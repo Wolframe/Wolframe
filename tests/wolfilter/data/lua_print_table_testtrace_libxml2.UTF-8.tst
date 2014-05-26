@@ -3,7 +3,8 @@
 **requires:LIBXML2
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE invoice SYSTEM "Invoice.simpleform">
+<!DOCTYPE doc SYSTEM "Invoice.simpleform">
+<doc>
 <invoice>
 <order>
 <number>INS03-62</number>
@@ -104,7 +105,8 @@
 <city>Z&#252;rich</city>
 <country>Switzerland</country>
 </address>
-</invoice>**config
+</invoice>
+</doc>**config
 --input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf run
 
 **requires:LIBHPDF
@@ -134,7 +136,8 @@ Processor
 	}
 }
 **file:form.sfrm
-FORM Invoice invoice
+FORM Invoice
+	:root invoice
 {
 	order
 	{

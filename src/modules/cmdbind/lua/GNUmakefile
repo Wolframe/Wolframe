@@ -38,6 +38,7 @@ LUA_CPP_OBJS = \
 CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
 	luaCommandHandler.o \
+	luaCommandHandlerUnit.o \
 	luaCommandHandlerConfig.o \
 	mod_command_lua.o
 

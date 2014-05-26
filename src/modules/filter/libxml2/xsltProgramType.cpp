@@ -72,7 +72,7 @@ class XsltFilterType
 {
 public:
 	XsltFilterType( const std::string& sourcefile_)
-		:m_ptr(0)
+		:langbind::FilterType("xslt"),m_ptr(0)
 	{
 		m_ptr = xsltParseStylesheetFile( (const xmlChar *)sourcefile_.c_str());
 		if (!m_ptr)
@@ -93,7 +93,8 @@ public:
 	}
 
 private:
-	XsltFilterType( const XsltFilterType&)
+	XsltFilterType( const XsltFilterType& o)
+		:FilterType(o)
 	{
 		throw std::logic_error( "non copyable XsltFilterConstructor");
 	}

@@ -40,7 +40,7 @@
 namespace _Wolframe {
 namespace test {
 
-int assignmentListDocConvert( proc::ExecContext* ctx, AssignmentListDoc& res, const AssignmentListDoc& param);
+int assignmentListConvert( proc::ExecContext* ctx, AssignmentList& res, const AssignmentList& param);
 
 }} //namespace
 #endif

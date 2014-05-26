@@ -39,11 +39,12 @@ Project Wolframe.
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "config/configurationTree.hpp"
 #include "config/configurationBase.hpp"
+#include "types/keymap.hpp"
 #include <string>
 #include <map>
 
 namespace _Wolframe {
-namespace module {
+namespace cmdbind {
 
 ///\brief Named configuration definition based on a langbind::ScriptEnvironmentConfigStruct structure
 class LuaCommandHandlerConfig
@@ -69,25 +70,25 @@ public:
 
 	virtual void print( std::ostream& os, size_t indent ) const;
 
-	const langbind::LuaScriptContext* context() const
-	{
-		return &m_context;
-	}
-
 	virtual const char* className() const
 	{
 		return m_classname;
 	}
 
-	std::list<std::string> commands() const
+	std::vector<std::string> programfiles() const
 	{
-		return m_context.commands();
+		return m_programfiles;
+	}
+
+	const types::keymap<std::string>& filtermap() const
+	{
+		return m_filtermap;
 	}
 
 private:
 	std::vector<std::string> m_programfiles;
+	types::keymap<std::string> m_filtermap;
 	const module::ModulesDirectory* m_modules;
-	langbind::LuaScriptContext m_context;
 	const char* m_classname;
 };
 

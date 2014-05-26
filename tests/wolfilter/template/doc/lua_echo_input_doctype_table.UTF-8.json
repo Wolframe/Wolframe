@@ -1,5 +1,5 @@
 {
-	"doctype":	"employee_assignment_print",
+	"-doctype":	"employee_assignment_print",
 	"assignment":	[{
 			"employee":	{
 				"firstname":	"Julia",

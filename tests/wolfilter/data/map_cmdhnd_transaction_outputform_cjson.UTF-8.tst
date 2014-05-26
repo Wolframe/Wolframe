@@ -76,7 +76,8 @@ Processor
 	}
 }
 **file: map_cmdhnd_transaction_outputform.sfrm
-FORM map_cmdhnd_transaction_outputform doc
+FORM map_cmdhnd_transaction_outputform
+	:root doc
 {
 	task []
 	{
@@ -87,14 +88,15 @@ FORM map_cmdhnd_transaction_outputform doc
 	}
 }
 **file: employee_assignment_print.sfrm
-STRUCT Employee
+FORM Employee
 {
 	firstname string
 	surname string
 	phone string
 }
 
-FORM employee_assignment_print assignmentlist
+FORM employee_assignment_print
+	:root assignmentlist
 {
 	assignment []
 	{
@@ -121,7 +123,7 @@ BEGIN
 END
 **output
 {
-	"doctype":	"map_cmdhnd_transaction_outputform",
+	"-doctype":	"map_cmdhnd_transaction_outputform",
 	"task":	[{
 			"task":	"bla bla",
 			"start":	"12:04:19 1/3/2012",

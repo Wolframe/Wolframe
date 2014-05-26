@@ -58,28 +58,38 @@ static std::string filterargAsString( const std::vector<langbind::FilterArgument
 std::string DirectmapCommandDescription::tostring() const
 {
 	std::ostringstream rt;
-	rt << "name='" << name << "'";
-	rt << ", call='" << call << "'";
-	rt << ", input filter='" << inputfilter;
-	if (inputfilterarg.size())
+	rt << "commandname='" << cmdname << "'";
+	rt << ", call='" << functionname << "'";
+	if (inputfilterdef.filtertype)
 	{
-		rt << "( " << filterargAsString( inputfilterarg) << " )'";
+		rt << ", input filter='" << inputfilterdef.filtertype->name();
+		if (inputfilterdef.arg.size())
+		{
+			rt << "( " << filterargAsString( inputfilterdef.arg) << " )'";
+		}
+		else
+		{
+			rt << "'";
+		}
 	}
-	else
+	if (outputfilterdef.filtertype)
 	{
-		rt << "'";
+		rt << ", output filter='" << outputfilterdef.filtertype->name();
+		if (outputfilterdef.arg.size())
+		{
+			rt << "( " << filterargAsString( outputfilterdef.arg) << " )'";
+		}
+		else
+		{
+			rt << "'";
+		}
 	}
-	rt << ", output filter='" << outputfilter;
-	if (outputfilterarg.size())
-	{
-		rt << "( " << filterargAsString( outputfilterarg) << " )'";
-	}
-	else
-	{
-		rt << "'";
-	}
-	rt << ", input form='" << inputform << "'";
-	rt << ", output form='" << outputform << "'";
+	if (inputform) rt << ", input form='" << inputform->name() << "'";
+	if (outputform) rt << ", output form='" << outputform->name() << "'";
+	if (!has_result) rt << ", no result";
+	rt << ", metadata={" << outputmetadata.tostring() << "}";
+	rt << ", authfunction='" << authfunction << "'";
+	rt << ", authresource='" << authresource << "'";
 	return rt.str();
 }
 

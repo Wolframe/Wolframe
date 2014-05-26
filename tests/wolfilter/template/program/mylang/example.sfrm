@@ -1,4 +1,5 @@
-FORM CDCatalog CATALOG
+FORM CDCatalog
+	:root CATALOG
 {
 	CD []
 	{

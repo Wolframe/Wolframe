@@ -4,6 +4,7 @@ function run()
 	t = input:value()
 	d = provider.document( t)
 	d:as( f)
+	output:as( d:metadata())
 
 	for v,t in d:get()
 	do

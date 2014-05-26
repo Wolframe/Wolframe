@@ -98,7 +98,8 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 	bool loadPrograms();
 
-	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
+	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command, const std::string& docformat) const;
+	virtual bool existcmd( const std::string& command) const;
 
 	virtual db::Database* transactionDatabase() const;
 
@@ -109,7 +110,7 @@ public:
 	virtual const types::NormalizeFunctionType* normalizeFunctionType( const std::string& name) const;
 	virtual const langbind::FormFunction* formFunction( const std::string& name) const;
 	virtual const types::FormDescription* formDescription( const std::string& name) const;
-	virtual langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const;
+	virtual const langbind::FilterType* filterType( const std::string& name) const;
 	virtual const types::CustomDataType* customDataType( const std::string& name) const;
 	virtual bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const;
 	virtual const std::string& referencePath() const;

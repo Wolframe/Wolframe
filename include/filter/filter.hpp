@@ -40,6 +40,7 @@ Project Wolframe.
 #include <string>
 #include <vector>
 #include <utility>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace langbind {
@@ -92,13 +93,26 @@ protected:
 	OutputFilterR m_outputfilter;
 };
 
+typedef boost::shared_ptr<Filter> FilterR;
+
+
 typedef std::pair<std::string,std::string> FilterArgument;
 
 class FilterType
 {
 public:
+	explicit FilterType( const char* name_)
+		:m_name(name_){}
+	FilterType( const FilterType& o)
+		:m_name(o.m_name){}
+
 	virtual ~FilterType(){}
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const=0;
+	virtual Filter* create( const std::vector<FilterArgument>& arg = std::vector<FilterArgument>()) const=0;
+
+	const char* name() const
+		{return m_name;}
+private:
+	const char* m_name;
 };
 
 typedef boost::shared_ptr<FilterType> FilterTypeR;

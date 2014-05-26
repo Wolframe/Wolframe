@@ -537,7 +537,8 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 class TokenFilterType :public FilterType
 {
 public:
-	TokenFilterType(){}
+	TokenFilterType()
+		:FilterType("token"){}
 	virtual ~TokenFilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const

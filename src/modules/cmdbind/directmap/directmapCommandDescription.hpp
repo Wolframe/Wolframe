@@ -34,8 +34,10 @@
 ///\file directmapCommandDescription.hpp
 #ifndef _LANGBIND_DIRECTMAP_COMMAND_DESCRIPTION_HPP_INCLUDED
 #define _LANGBIND_DIRECTMAP_COMMAND_DESCRIPTION_HPP_INCLUDED
+#include "filter/filterdef.hpp"
 #include "types/keymap.hpp"
 #include "types/docmetadata.hpp"
+#include "types/form.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
 #include <string>
@@ -46,47 +48,41 @@ namespace langbind {
 struct DirectmapCommandDescription
 {
 	DirectmapCommandDescription()
-		:skipvalidation_input(false)
-		,skipvalidation_output(false)
-		,output_doctype_standalone(false)
-		,command_has_result(false)
+		:function(0)
+		,inputform(0)
+		,outputform(0)
+		,has_result(false)
 		{}
 	DirectmapCommandDescription( const DirectmapCommandDescription& o)
-		:name(o.name)
-		,call(o.call)
-		,inputfilter(o.inputfilter)
-		,inputfilterarg(o.inputfilterarg)
-		,outputfilter(o.outputfilter)
-		,outputfilterarg(o.outputfilterarg)
+		:cmdname(o.cmdname)
+		,functionname(o.functionname)
+		,function(o.function)
+		,inputfilterdef(o.inputfilterdef)
+		,outputfilterdef(o.outputfilterdef)
 		,inputform(o.inputform)
 		,outputform(o.outputform)
 		,outputmetadata(o.outputmetadata)
 		,authfunction(o.authfunction)
 		,authresource(o.authresource)
-		,skipvalidation_input(o.skipvalidation_input)
-		,skipvalidation_output(o.skipvalidation_output)
-		,output_doctype_standalone(o.output_doctype_standalone)
-		,command_has_result(o.command_has_result)
+		,has_result(o.has_result)
 		{}
 
-	std::string name;						//< name of program
-	std::string call;						//< name of the transaction or form function
-	std::string inputfilter;					//< name of the input filter
-	std::vector<langbind::FilterArgument> inputfilterarg;		//< arguments of the input filter
-	std::string outputfilter;					//< name of the output filter
-	std::vector<langbind::FilterArgument> outputfilterarg;		//< arguments of the output filter
-	std::string inputform;						//< name of the input form
-	std::string outputform;						//< name of the output form
-	types::DocMetaData outputmetadata;				//< metadata of the output 
-	std::string authfunction;					//< authorization function name
-	std::string authresource;					//< authorization resource name
-	bool skipvalidation_input;					//< input is not validated
-	bool skipvalidation_output;					//< output is not validated but document is not standalone and is with doctype returned
-	bool output_doctype_standalone;					//< no document type defined (only root element). document is standalone
-	bool command_has_result;					//< true, if command has a result
+	std::string cmdname;						///< name of command (prefix + doctype)
+	std::string functionname;					///< name of form function to execute
+	const langbind::FormFunction* function;				///< the form function to execute
+	langbind::FilterDef inputfilterdef;				///< the input filter definition
+	langbind::FilterDef outputfilterdef;				///< the output filter definition
+	const types::FormDescription* inputform;			///< the input form description
+	const types::FormDescription* outputform;			///< the output form description
+	types::DocMetaData outputmetadata;				///< metadata of the output 
+	std::string authfunction;					///< authorization function name
+	std::string authresource;					///< authorization resource name
+	bool has_result;						///< true, if this command has a result
 
 	std::string tostring() const;
 };
+
+typedef boost::shared_ptr<DirectmapCommandDescription> DirectmapCommandDescriptionR;
 
 }}
 #endif

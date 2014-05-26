@@ -4,7 +4,7 @@
 **requires:ORACLE
 **input
 {
-    "doctype": "Person",
+    "-doctype": "Person",
     "name": "Hugi Turbo",
     "address": "Gurkenstrasse 7a 3145 Gumligen"
 }**config
@@ -67,7 +67,7 @@ INSERT INTO Person (name,address) VALUES ('Carla','Camelstreet 34 Carassa');
 INSERT INTO Person (name,address) VALUES ('Dorothe','Demotastrasse 45 Durnfo');
 INSERT INTO Person (name,address) VALUES ('Erik','Erakimolstrasse 56 Enden');
 **file:audit.dmap
-COMMAND (Insert Person) SKIP CALL(insertPerson);
+COMMAND (Insert Person) SKIP CALL insertPerson;
 **file:audit.tdl
 
 TRANSACTION insertPerson

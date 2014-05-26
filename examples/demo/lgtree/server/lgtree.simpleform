@@ -15,7 +15,8 @@ STRUCT LanguageTreeNode
 	language	LanguageTreeNode[]
 }
 
-FORM LanguageTree languages
+FORM LanguageTree
+	:root languages
 {
 	language LanguageTreeNode[]
 }
@@ -39,35 +40,39 @@ STRUCT LanguageRefTreeNode
 	language	LanguageRefTreeNode[]
 }
 
-FORM LanguageRefTree languages
+FORM LanguageRefTree
+	:root languages
 {
 	language	LanguageRefTreeNode[]
 }
 
-Form InsertLanguage language		{ _ Language }
-Form UpdateLanguage language		{ _ LanguageInserted }
-Form DeleteLanguage language		{ id !@ID }
-Form GetLanguage language		{ id !@ID }
-Form GetLanguageTreeNode language	{ id !@ID }
-Form GetLanguageTree language		{ }
-Form GetLanguageTreeStructure language	{ }
-Form LanguageResult language		{ _ LanguageInserted }
-Form LanguageListResult languages	{ language LanguageInserted[] }
+FORM InsertLanguage	:root language		{ _ Language }
+FORM UpdateLanguage	:root language		{ _ LanguageInserted }
+FORM DeleteLanguage	:root language		{ id !@ID }
+FORM GetLanguage	:root language		{ id !@ID }
+FORM GetLanguageTreeNode :root language		{ id !@ID }
+FORM GetLanguageTree	:root language		{ }
+FORM GetLanguageTreeStructure :root language	{ }
+FORM LanguageResult	:root language		{ _ LanguageInserted }
+FORM LanguageListResult	:root languages		{ language LanguageInserted[] }
 
-Form LanguageSelection
+FORM LanguageSelection
+	:root language
 {
 	id		!@ID
 	name		!entityname
 }
-Form LanguageSelectionRef
+FORM LanguageSelectionRef
+	:root language
 {
 	id		!@ID
 }
-Form LanguageSelectionList language
+FORM LanguageSelectionList
+	:root language
 {
 	selected LanguageSelection[]
 }
-Form SaveSelectedLanguageList language	{selected LanguageSelectionRef[] }
-Form GetLanguageList language		{}
-Form GetSelectedLanguageList language	{selected LanguageSelectionRef[] }
+FORM SaveSelectedLanguageList	:root language		{selected LanguageSelectionRef[] }
+FORM GetLanguageList		:root language		{}
+FORM GetSelectedLanguageList	:root language		{selected LanguageSelectionRef[] }
 

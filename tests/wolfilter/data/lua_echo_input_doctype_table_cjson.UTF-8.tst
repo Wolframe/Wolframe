@@ -4,7 +4,7 @@
 **requires:TEXTWOLF
 **input
 {
-	"doctype" : "employee_assignment_print",
+	"-doctype" : "employee_assignment_print",
 	"assignment": [
 		{
 			"task": [
@@ -71,14 +71,15 @@ float=trim, floatingpoint( 10,10);
 currency=bigfxp(  2);
 percent_1=bigfxp(2 );
 **file:form.sfrm
-STRUCT Employee
+FORM Employee
 {
 	firstname string
 	surname string
 	phone string
 }
 
-FORM employee_assignment_print assignmentlist
+FORM employee_assignment_print
+	:root assignmentlist
 {
 	assignment []
 	{
@@ -140,7 +141,7 @@ end
 
 **output
 {
-	"doctype":	"employee_assignment_print",
+	"-doctype":	"employee_assignment_print",
 	"assignment":	[{
 			"employee":	{
 				"firstname":	"Julia",

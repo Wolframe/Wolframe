@@ -1,4 +1,5 @@
-FORM Customer customer
+FORM Customer
+	:root customer
 {
 	id !@string
 	name string

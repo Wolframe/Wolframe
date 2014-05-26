@@ -4,7 +4,7 @@
 **requires:SQLITE3
 **input
 {
-	"doctype" : "AllDataRequest",
+	"-doctype" : "AllDataRequest",
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf AllDataRequest
 
@@ -312,12 +312,14 @@ STRUCT Company
 	tag int[]
 }
 
-FORM Data data
+FORM Data
+	:root data
 {
 	person Person[]
 }
 
-FORM AllDataRequest data
+FORM AllDataRequest
+	:root data
 {
 }
 **file:preprocess.tdl
@@ -389,7 +391,7 @@ normname= convdia,lcname;
 **outputfile:DBDUMP
 **output
 {
-	"doctype":	"Data",
+	"-doctype":	"Data",
 	"person":	[{
 			"company":	[{
 					"name":	"Baluba Inc."

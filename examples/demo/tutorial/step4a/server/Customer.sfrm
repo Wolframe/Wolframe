@@ -4,12 +4,14 @@ STRUCT CustomerStruct
 	address string
 }
 
-FORM Customer customer
+FORM Customer
+	:root customer
 {
 	_ CustomerStruct
 }
 
-FORM CustomerInserted customer
+FORM CustomerInserted
+	:customer
 {
 	id string
 	_ CustomerStruct

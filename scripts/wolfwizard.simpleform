@@ -19,7 +19,8 @@ STRUCT FormDef
 	element Element[]
 }
 
-FORM Wolfwizard forms
+FORM Wolfwizard
+	:root forms
 {
 	form FormDef[]
 }

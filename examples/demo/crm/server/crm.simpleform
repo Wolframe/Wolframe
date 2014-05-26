@@ -24,16 +24,16 @@ STRUCT EmployeeRef
 }
 
 ; * Forms:
-FORM InsertEmployee employee 	{ _ Employee }
-FORM UpdateEmployee employee	{ _ EmployeeInserted }
-FORM DeleteEmployee employee	{ id !@ID }
-FORM GetEmployee employee	{ id !@ID }
-FORM EmployeeResult employee	{ _ EmployeeInserted }
-FORM EmployeeListResult employees { employee EmployeeInserted[] }
-FORM EmployeeRefListResult employees { EmployeeRef[] }
-FORM SearchEmployee employee	{ pattern string }
-FORM ListEmployee employee	{ }
-FORM ListEmployeeRef employee	{ }
+FORM InsertEmployee :root employee 	{ _ Employee }
+FORM UpdateEmployee :root employee	{ _ EmployeeInserted }
+FORM DeleteEmployee :root employee	{ id !@ID }
+FORM GetEmployee :root employee		{ id !@ID }
+FORM EmployeeResult :root employee	{ _ EmployeeInserted }
+FORM EmployeeListResult :root employees { employee EmployeeInserted[] }
+FORM EmployeeRefListResult :root employees { EmployeeRef[] }
+FORM SearchEmployee :root employee	{ pattern string }
+FORM ListEmployee :root employee	{ }
+FORM ListEmployeeRef :root employee	{ }
 
 
 
@@ -69,16 +69,16 @@ STRUCT CustomerRef
 }
 
 ; * Forms:
-FORM InsertCustomer customer		{ _ Customer }
-FORM UpdateCustomer customer		{ _ CustomerInserted }
-FORM DeleteCustomer customer		{ id !@ID }
-FORM GetCustomer customer		{ id !@ID }
-FORM CustomerResult customer		{ _ CustomerInserted }
-FORM CustomerListResult customers	{ customer CustomerInserted[] }
-FORM CustomerListShortResult customers	{ customer CustomerInsertedShort[] }
-FORM CustomerRefListResult customers	{ customer CustomerRef[] }
-FORM SearchCustomer customer		{ pattern string }
-FORM ListCustomer customer		{ }
+FORM InsertCustomer :root customer		{ _ Customer }
+FORM UpdateCustomer :root customer		{ _ CustomerInserted }
+FORM DeleteCustomer :root customer		{ id !@ID }
+FORM GetCustomer    :root customer		{ id !@ID }
+FORM CustomerResult :root customer		{ _ CustomerInserted }
+FORM CustomerListResult :root customers		{ customer CustomerInserted[] }
+FORM CustomerListShortResult :root customers	{ customer CustomerInsertedShort[] }
+FORM CustomerRefListResult :root customers	{ customer CustomerRef[] }
+FORM SearchCustomer :root customer		{ pattern string }
+FORM ListCustomer :root customer		{ }
 
 
 
@@ -103,20 +103,14 @@ STRUCT CustomerPictureInserted
 }
 
 ; * Forms:
-FORM InsertCustomerPicture picture		{ _ CustomerPicture }
-FORM UpdateCustomerPicture picture		{ _ CustomerPictureInserted }
-FORM DeleteCustomerPicture picture		{ id !@ID }
-FORM GetCustomerPicture picture			{ id !@ID }
-FORM CustomerPictureInsertResult picture 	{ id !@ID }
+FORM InsertCustomerPicture :root picture	{ _ CustomerPicture }
+FORM UpdateCustomerPicture :root picture	{ _ CustomerPictureInserted }
+FORM DeleteCustomerPicture :root picture	{ id !@ID }
+FORM GetCustomerPicture :root picture		{ id !@ID }
+FORM CustomerPictureInsertResult :root picture 	{ id !@ID }
 
-FORM CustomerPictureResult picture
-{
-	_ CustomerPictureInserted
-}
-FORM CustomerPictureListResult picturelist
-{
-	picture CustomerPictureResult[]
-}
+FORM CustomerPictureResult :root picture	{_ CustomerPictureInserted}
+FORM CustomerPictureListResult :root picturelist {picture CustomerPictureResult[]}
 
 
 
@@ -135,16 +129,16 @@ STRUCT CustomerRelationCustomerView
 	description	string
 }
 
-FORM InsertCustomerRelation	  relation		{ _ CustomerRelation }
-FORM UpdateCustomerRelation	  relation		{ _ CustomerRelation }
-FORM DeleteCustomerRelation	  relation		{ customerid !@ID employeeid !@ID }
-FORM GetCustomerRelation	  relation		{ customerid !@ID employeeid !@ID }
-FORM GetCustomerRelationCustomer  relation		{ customerid !@ID }
-FORM GetCustomerRelationEmployee  relation		{ employee !@ID }
+FORM InsertCustomerRelation	:root relation			{ _ CustomerRelation }
+FORM UpdateCustomerRelation	:root relation			{ _ CustomerRelation }
+FORM DeleteCustomerRelation	:root relation			{ customerid !@ID employeeid !@ID }
+FORM GetCustomerRelation	:root relation			{ customerid !@ID employeeid !@ID }
+FORM GetCustomerRelationCustomer :root relation			{ customerid !@ID }
+FORM GetCustomerRelationEmployee :root relation			{ employee !@ID }
 
-FORM CustomerRelationResult	  relation		{ _ CustomerRelation }
-FORM CustomerRelationListResult	  relations		{ relation CustomerRelation[] }
-FORM CustomerRelationCustomerViewListResult relations	{ relation CustomerRelationCustomerView[] }
+FORM CustomerRelationResult	  :root relation		{ _ CustomerRelation }
+FORM CustomerRelationListResult	  :root relations		{ relation CustomerRelation[] }
+FORM CustomerRelationCustomerViewListResult :root relations	{ relation CustomerRelationCustomerView[] }
 
 
 
@@ -166,23 +160,25 @@ STRUCT CustomerNoteInserted
 }
 
 ; * Forms:
-FORM InsertCustomerNote note		{ _ CustomerNote }
-FORM UpdateCustomerNote note		{ _ CustomerNoteInserted }
-FORM DeleteCustomerNote note		{ id !@ID }
-FORM GetCustomerNote note		{ id !@ID }
-FORM SearchCustomerNote note
+FORM InsertCustomerNote :root note		{ _ CustomerNote }
+FORM UpdateCustomerNote :root note		{ _ CustomerNoteInserted }
+FORM DeleteCustomerNote :root note		{ id !@ID }
+FORM GetCustomerNote :root note			{ id !@ID }
+FORM SearchCustomerNote :root note
 {
 	customerid ?ID
 	pattern string
 }
 
-FORM CustomerNoteResult note
+FORM CustomerNoteResult
+	:root note
 {
 	_ CustomerNoteInserted
 	timestamp	datetime
 }
 
-FORM CustomerNoteListResult notes
+FORM CustomerNoteListResult
+	:root notes
 {
 	note []
 	{
@@ -222,17 +218,18 @@ STRUCT ProjectCustomerListElem
 	description	?string
 }
 ; * Forms:
-FORM InsertProject project		{ _ Project }
-FORM UpdateProject project		{ _ ProjectInserted }
-FORM DeleteProject project		{ id !@ID }
-FORM GetProject project			{ id !@ID }
-FORM ProjectResult project		{ _ ProjectInserted }
-FORM ProjectListResult projects		{ project ProjectListElem[] }
-FORM ProjectCustomerListResult projects { project ProjectCustomerListElem[] }
-FORM ListProject project		{ }
-FORM ListProjectCustomer project	{ customerid !@ID } }
+FORM InsertProject :root project		{ _ Project }
+FORM UpdateProject :root project		{ _ ProjectInserted }
+FORM DeleteProject :root project		{ id !@ID }
+FORM GetProject :root project			{ id !@ID }
+FORM ProjectResult :root project		{ _ ProjectInserted }
+FORM ProjectListResult :root projects		{ project ProjectListElem[] }
+FORM ProjectCustomerListResult :root projects	{ project ProjectCustomerListElem[] }
+FORM ListProject :root project			{ }
+FORM ListProjectCustomer :root project		{ customerid !@ID } }
 
-FORM SearchProject project
+FORM SearchProject
+	:root project
 {
 	customerid ?ID
 	pattern string
@@ -257,21 +254,24 @@ STRUCT ProjectNoteInserted
 }
 
 ; * Forms:
-FORM InsertProjectNote note		{ _ ProjectNote }
-FORM UpdateProjectNote note		{ _ ProjectNoteInserted }
-FORM DeleteProjectNote note		{ id !@ID }
-FORM GetProjectNote note		{ id !@ID }
-FORM SearchProjectNote note
+FORM InsertProjectNote	:root note		{ _ ProjectNote }
+FORM UpdateProjectNote	:root note		{ _ ProjectNoteInserted }
+FORM DeleteProjectNote	:root note		{ id !@ID }
+FORM GetProjectNote	:root note		{ id !@ID }
+FORM SearchProjectNote
+	:root note
 {
 	projectid ?ID
 	pattern string
 }
-FORM ProjectNoteResult note
+FORM ProjectNoteResult
+	:root note
 {
 	_ ProjectNoteInserted
 	timestamp	datetime
 }
-FORM ProjectNoteListResult notes
+FORM ProjectNoteListResult
+	:root notes
 {
 	note []
 	{
@@ -298,14 +298,15 @@ STRUCT ActivityCategoryInserted
 }
 
 ; * Forms:
-FORM InsertActivityCategory category		{ _ ActivityCategory }
-FORM UpdateActivityCategory category		{ _ ActivityCategoryInserted }
-FORM DeleteActivityCategory category		{ id !@ID }
-FORM GetActivityCategory category		{ id !@ID }
-FORM ActivityCategoryResult category		{ _ ActivityCategoryInserted }
-FORM ActivityCategoryListResult categories	{ category ActivityCategoryInserted[] }
+FORM InsertActivityCategory :root category		{ _ ActivityCategory }
+FORM UpdateActivityCategory :root category		{ _ ActivityCategoryInserted }
+FORM DeleteActivityCategory :root category		{ id !@ID }
+FORM GetActivityCategory :root category			{ id !@ID }
+FORM ActivityCategoryResult :root category		{ _ ActivityCategoryInserted }
+FORM ActivityCategoryListResult :root categories	{ category ActivityCategoryInserted[] }
 
-FORM SearchActivityCategory category
+FORM SearchActivityCategory
+	:root category
 {
 	pattern string
 }
@@ -332,16 +333,17 @@ STRUCT ActivityChargingInserted
 }
 
 ; * Forms:
-FORM InsertActivityCharging charging	{ _ ActivityCharging }
-FORM UpdateActivityCharging charging	{ _ ActivityChargingInserted }
-FORM DeleteActivityCharging charging	{ id !@ID }
-FORM GetActivityCharging charging	{ id !@ID }
-FORM EvalActivityCharging charging
+FORM InsertActivityCharging :root charging	{ _ ActivityCharging }
+FORM UpdateActivityCharging :root charging	{ _ ActivityChargingInserted }
+FORM DeleteActivityCharging :root charging	{ id !@ID }
+FORM GetActivityCharging :root charging		{ id !@ID }
+FORM EvalActivityCharging
+	:root charging
 {
 	categoryid !ID
 	validat datetime
 }
-FORM ActivityChargingResult charging	{ _ ActivityChargingInserted }
+FORM ActivityChargingResult :root charging	{ _ ActivityChargingInserted }
 
 
 
@@ -366,14 +368,15 @@ STRUCT ActivityInserted
 }
 
 ; * Forms:
-FORM InsertActivity activity		{ _ Activity }
-FORM UpdateActivity activity		{ _ ActivityInserted }
-FORM DeleteActivity activity		{ id !@ID }
-FORM GetActivity activity		{ id !@ID }
-FORM ActivityResult activity		{ _ ActivityInserted }
-FORM ActivityListResult activities	{ activity ActivityCategoryInserted[] }
+FORM InsertActivity	:root activity		{ _ Activity }
+FORM UpdateActivity	:root activity		{ _ ActivityInserted }
+FORM DeleteActivity	:root activity		{ id !@ID }
+FORM GetActivity	:root activity		{ id !@ID }
+FORM ActivityResult	:root activity		{ _ ActivityInserted }
+FORM ActivityListResult :root activities	{ activity ActivityCategoryInserted[] }
 
-FORM SearchActivity activity
+FORM SearchActivity
+	:root activity
 {
 	customerid ?ID
 	categoryid ?ID
@@ -403,21 +406,24 @@ STRUCT ActivityNoteInserted
 }
 
 ; * Forms:
-FORM InsertActivityNote note	{ _ ActivityNote }
-FORM UpdateActivityNote note	{ _ ActivityNoteInserted }
-FORM DeleteActivityNote note	{ id !@ID }
-FORM GetActivityNote note	{ id !@ID }
-FORM SearchActivityNote note
+FORM InsertActivityNote	:root note	{ _ ActivityNote }
+FORM UpdateActivityNote	:root note	{ _ ActivityNoteInserted }
+FORM DeleteActivityNote	:root note	{ id !@ID }
+FORM GetActivityNote	:root note	{ id !@ID }
+FORM SearchActivityNote
+	:root note
 {
 	activityid ?ID
 	pattern string
 }
-FORM ActivityNoteResult note
+FORM ActivityNoteResult
+	:root note
 {
 	_ ActivityNoteInserted
 	timestamp	datetime
 }
-FORM ActivityNoteListResult notes
+FORM ActivityNoteListResult
+	:root notes
 {
 	note []
 	{

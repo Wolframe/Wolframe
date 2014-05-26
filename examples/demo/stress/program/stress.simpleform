@@ -1,4 +1,5 @@
-FORM insertNumber doc
+FORM insertNumber
+	:root doc
 {
 	numbr int
 	mul int
@@ -6,7 +7,8 @@ FORM insertNumber doc
 	trip int
 }
 
-FORM updateNumber doc
+FORM updateNumber
+	:root doc
 {
 	numbr int
 	mul int
@@ -14,12 +16,14 @@ FORM updateNumber doc
 	trip int
 }
 
-FORM deleteNumber doc
+FORM deleteNumber
+	:root doc
 {
 	numbr int
 }
 
-FORM selectNumber doc
+FORM selectNumber
+	:root doc
 {
 	id int
 }

@@ -1,4 +1,5 @@
-FORM User user
+FORM User
+	:root user
 {
 	name string
 }

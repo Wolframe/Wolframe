@@ -1,5 +1,5 @@
 {
-    "doctype" : "typed_invoice",
+    "-doctype" : "typed_invoice",
     "order": {
       "number": "INS03-62",
       "reference": "PO#6123",

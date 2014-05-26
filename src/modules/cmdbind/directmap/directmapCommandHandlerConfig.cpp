@@ -48,7 +48,6 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationNode& pt, 
 		config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 		for (; pi != pe; ++pi)
 		{
-			// optional configuration parameters:
 			if (boost::iequals( pi->first, "filter"))
 			{
 				++filterDefied;
@@ -57,18 +56,17 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationNode& pt, 
 				utils::splitString( filterdef, pi->second.data().string(), "=");
 				if (filterdef.size() == 1)
 				{
-					m_context.setFilter( "", filterdef.at(0));
+					m_filtermap.insert( "", filterdef.at(0));
 				}
 				else if (filterdef.size() == 2)
 				{
-					m_context.setFilter( filterdef.at(0), filterdef.at(1));
+					m_filtermap.insert( filterdef.at(0), filterdef.at(1));
 				}
 				else
 				{
 					throw std::runtime_error( std::string("illegal value for filter declaration. expected two items separated by a '=' ") + pi->second.data().position.logtext());
 				}
 			}
-			// required configuration parameters:
 			else if (boost::iequals( pi->first, "program"))
 			{
 				m_programfiles.push_back( pi->second.data().string());
@@ -98,7 +96,6 @@ void DirectmapCommandHandlerConfig::setCanonicalPathes( const std::string& refer
 	{
 		*pi = utils::getCanonicalPath( *pi, referencePath);
 	}
-	m_context.loadPrograms( m_programfiles);
 }
 
 bool DirectmapCommandHandlerConfig::check() const
@@ -116,9 +113,9 @@ bool DirectmapCommandHandlerConfig::check() const
 	return rt;
 }
 
-bool DirectmapCommandHandlerConfig::checkReferences( const proc::ProcessorProviderInterface* provider) const
+bool DirectmapCommandHandlerConfig::checkReferences( const proc::ProcessorProviderInterface*) const
 {
-	return m_context.checkReferences( provider);
+	return true;
 }
 
 void DirectmapCommandHandlerConfig::print( std::ostream& os, size_t indent ) const
@@ -127,7 +124,12 @@ void DirectmapCommandHandlerConfig::print( std::ostream& os, size_t indent ) con
 	std::vector<std::string>::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
 	for (; pi != pe; ++pi)
 	{
-		os << indentstr << "program " << *pi;
+		os << indentstr << "program " << *pi << std::endl;
+	}
+	types::keymap<std::string>::const_iterator fi = m_filtermap.begin(), fe = m_filtermap.end();
+	for (; fi != fe; ++fi)
+	{
+		os << indentstr << "filter " << fi->first << "=" << fi->second << std::endl;
 	}
 }
 

@@ -6,7 +6,7 @@ FORM Employee
 }
 
 FORM employee_assignment_print
-: root assignmentlist
+	:root assignmentlist
 {
 	assignment []
 	{

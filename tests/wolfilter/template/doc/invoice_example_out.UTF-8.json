@@ -1,5 +1,5 @@
 {
-	"doctype":	"Invoice",
+	"-doctype":	"Invoice",
 	"order":	{
 		"number":	"INS03-62",
 		"reference":	"PO#6123",

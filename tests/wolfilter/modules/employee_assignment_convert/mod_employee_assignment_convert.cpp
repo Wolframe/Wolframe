@@ -39,7 +39,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::test;
 
 WF_MODULE_BEGIN( "testFunction", "test form function employee_assignment_convert")
-WF_FORM_FUNCTION( "employee_assignment_convert", assignmentListDocConvert, AssignmentListDoc, AssignmentListDoc)
+WF_FORM_FUNCTION( "employee_assignment_convert", assignmentListConvert, AssignmentList, AssignmentList)
 WF_MODULE_END
 
 

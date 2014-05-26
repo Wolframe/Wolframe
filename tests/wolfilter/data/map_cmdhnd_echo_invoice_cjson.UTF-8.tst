@@ -3,7 +3,7 @@
 **requires:TEXTWOLF
 **input
 {
-	"doctype": "Invoice",
+	"-doctype": "Invoice",
 	"order": {
 		"number": "INS03-62",
 		"reference": "PO#6123",
@@ -156,7 +156,7 @@ Processor
 COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
 **output
 {
-	"doctype":	"Invoice",
+	"-doctype":	"Invoice",
 	"order":	{
 		"number":	"INS03-62",
 		"reference":	"PO#6123",

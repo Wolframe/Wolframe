@@ -442,7 +442,8 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 class LineFilterType :public FilterType
 {
 public:
-	LineFilterType(){}
+	LineFilterType()
+		:FilterType("line"){}
 	virtual ~LineFilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const

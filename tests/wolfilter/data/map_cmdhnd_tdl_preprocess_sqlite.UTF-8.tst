@@ -310,12 +310,14 @@ STRUCT Company
 	tag int[]
 }
 
-FORM Data data
+FORM Data
+	:root data
 {
 	person Person[]
 }
 
-FORM AllDataRequest data
+FORM AllDataRequest
+	:root data
 {
 }
 **file:preprocess.tdl

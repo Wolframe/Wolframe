@@ -74,10 +74,8 @@ end
 #name#job4
 **file:DBIN.tdl
 TRANSACTION test_transaction
-BEGIN INTO doc
-	BEGIN
-		INTO title FOREACH //task DO SELECT run( title);
-	END
+BEGIN
+	INTO title FOREACH //task DO SELECT run( title);
 END
 **output
 {

@@ -5,7 +5,8 @@ STRUCT Employee
 	phone string
 }
 
-FORM schema_select_task_by_id assignmentlist
+FORM schema_select_task_by_id
+	:root assignmentlist
 {
 	assignment []
 	{

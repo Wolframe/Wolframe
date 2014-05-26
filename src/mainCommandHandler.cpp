@@ -268,7 +268,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	{
 		m_command.append(doctype);
 	}
-	cmdbind::CommandHandler* execch = m_execContext->provider()->cmdhandler( m_command);
+	cmdbind::CommandHandler* execch = m_execContext->provider()->cmdhandler( m_command, docformat);
 	if (!execch)
 	{
 		std::ostringstream msg;

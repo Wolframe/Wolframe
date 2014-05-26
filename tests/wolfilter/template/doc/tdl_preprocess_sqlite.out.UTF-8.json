@@ -1,5 +1,5 @@
 {
-	"doctype":	"Data",
+	"-doctype":	"Data",
 	"person":	[{
 			"company":	[{
 					"name":	"Baluba Inc."

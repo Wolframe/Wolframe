@@ -237,7 +237,8 @@ struct BlobFilter :public Filter
 class BlobFilterType :public FilterType
 {
 public:
-	BlobFilterType(){}
+	BlobFilterType()
+		:FilterType("blob"){}
 	virtual ~BlobFilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const

@@ -305,8 +305,8 @@ void OutputFilterImpl::printHeader()
 	}
 
 	std::string doctype = md.doctype();
-	if (!doctype.empty()) addStructValue( "doctype", doctype);
-	if (m_encattr.codepage) addStructValue( "encoding", encname);
+	if (!doctype.empty()) addStructValue( "-doctype", doctype);
+	if (m_encattr.codepage) addStructValue( "-encoding", encname);
 
 	m_headerprinted = true;
 	setState( Open);

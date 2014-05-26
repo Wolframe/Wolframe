@@ -1,5 +1,5 @@
 {
-	"doctype" : "trees",
+	"-doctype" : "trees",
 	"mtree": {
 		"-id": "1",
 		"name": "eins",

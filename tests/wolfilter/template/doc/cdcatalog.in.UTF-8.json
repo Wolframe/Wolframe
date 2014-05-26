@@ -1,5 +1,5 @@
 {
-    "doctype" : "CDCatalog",
+    "-doctype" : "CDCatalog",
     "CD": [
       {
         "TITLE": "Empire Burlesque",

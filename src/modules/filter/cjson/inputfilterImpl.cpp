@@ -172,7 +172,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 			{
 				if (m_firstnode->string && m_firstnode->valuestring)
 				{
-					if (boost::iequals("doctype",m_firstnode->string))
+					if (boost::iequals("-doctype",m_firstnode->string))
 					{
 						++nof_docattributes;
 						if (doctypeParsed) throw std::runtime_error("duplicate 'doctype' definition");
@@ -180,7 +180,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 						m_firstnode = m_firstnode->next;
 						continue;
 					}
-					else if (boost::iequals("encoding", m_firstnode->string))
+					else if (boost::iequals("-encoding", m_firstnode->string))
 					{
 						++nof_docattributes;
 						types::String::EncodingAttrib ea = types::String::getEncodingFromName( m_firstnode->valuestring);

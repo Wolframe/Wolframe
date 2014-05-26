@@ -1,5 +1,6 @@
 
-FORM Customer customer
+FORM Customer
+	:root customer
 {
     ID !@int                  ; Internal customer id (mandatory)
     name string               ; Name of the customer

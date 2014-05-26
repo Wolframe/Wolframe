@@ -1,4 +1,5 @@
-FORM CustomerRequest customer
+FORM CustomerRequest
+	:root customer
 {
 	id !@string
 }

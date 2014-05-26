@@ -212,13 +212,18 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 
 bool ProcessorProvider::loadPrograms()
 {
-	return m_impl->loadPrograms() && m_impl->checkReferences( this);
+	return m_impl->loadPrograms( this);
 }
 
-cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name ) const
+cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name, const std::string& docformat) const
 {
-	cmdbind::CommandHandler* rt = m_impl->cmdhandler( name );
+	cmdbind::CommandHandler* rt = m_impl->cmdhandler( name, docformat);
 	return rt;
+}
+
+bool ProcessorProvider::existcmd( const std::string& command) const
+{
+	return m_impl->existcmd( command);
 }
 
 db::Database* ProcessorProvider::transactionDatabase() const
@@ -251,9 +256,9 @@ const types::FormDescription* ProcessorProvider::formDescription( const std::str
 	return m_impl->formDescription( name);
 }
 
-langbind::Filter* ProcessorProvider::filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg) const
+const langbind::FilterType* ProcessorProvider::filterType( const std::string& name) const
 {
-	return m_impl->filter( name, arg);
+	return m_impl->filterType( name);
 }
 
 const types::CustomDataType* ProcessorProvider::customDataType( const std::string& name) const

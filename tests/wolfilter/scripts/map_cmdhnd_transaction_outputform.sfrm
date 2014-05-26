@@ -1,4 +1,5 @@
-FORM map_cmdhnd_transaction_outputform doc
+FORM map_cmdhnd_transaction_outputform
+	:root doc
 {
 	task []
 	{

@@ -3,7 +3,7 @@
 **requires:TEXTWOLF
 **input
 {
-	"doctype" : "CategoryHierarchyRequest",
+	"-doctype" : "CategoryHierarchyRequest",
 	"category": { "-id": "1" }
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson - 

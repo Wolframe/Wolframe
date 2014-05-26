@@ -4,7 +4,7 @@
 **requires:TEXTWOLF
 **input
 {
-	"doctype":	"employee_assignment_print",
+	"-doctype":	"employee_assignment_print",
 	"assignment":	[{
 			"task":	[{
 					"title":	"job 1",
@@ -65,7 +65,7 @@ end
 
 **output
 {
-	"doctype":	"employee_assignment_print",
+	"-doctype":	"employee_assignment_print",
 	"assignment":	[{
 			"task":	[{
 					"title":	"job 1",

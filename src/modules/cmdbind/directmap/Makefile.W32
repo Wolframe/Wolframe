@@ -31,6 +31,7 @@ CPP_OBJS = \
 	directmapCommandDescription.obj \
 	directmapProgram.obj \
 	directmapCommandHandler.obj \
+	directmapCommandHandlerUnit.obj \
 	directmapCommandHandlerConfig.obj \
 	mod_command_directmap.obj
 

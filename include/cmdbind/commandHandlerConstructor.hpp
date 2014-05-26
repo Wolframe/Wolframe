@@ -35,6 +35,7 @@
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
+#include "cmdbind/commandHandlerUnit.hpp"
 #include "module/constructor.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/execContext.hpp"
@@ -48,7 +49,7 @@ namespace cmdbind {
 /// \class CommandHandlerConstructor
 /// \brief Handler for a set of commands adressable by identifiers
 class CommandHandlerConstructor
-	:public ConfiguredObjectConstructor<cmdbind::CommandHandler>
+	:public ConfiguredObjectConstructor<CommandHandlerUnit>
 {
 public:
 	/// \brief virtual destructor
@@ -58,9 +59,7 @@ public:
 	{
 		return ObjectConstructorBase::CMD_HANDLER_OBJECT;
 	}
-
-	virtual std::list<std::string> commands( const config::NamedConfiguration& cfgi) const=0;
-	virtual bool checkReferences( const config::NamedConfiguration&, const proc::ProcessorProviderInterface*) const=0;
+	virtual CommandHandlerUnit* object( const config::NamedConfiguration& conf)=0;
 };
 
 /// \brief Command handler constructor reference

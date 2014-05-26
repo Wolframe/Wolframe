@@ -110,39 +110,56 @@ bool OutputFilterImpl::printHeader()
 {
 	types::DocMetaData md( getMetaData());
 	LOG_DEBUG << "[libxml2 output] document meta data: {" << md.tostring() << "}";
+	const char* standalone = md.getAttribute( "standalone");
+	const char* encoding = md.getAttribute( "encoding");
+	if (!encoding) encoding = "UTF-8";
 	const char* root = md.getAttribute( "root");
 	if (!root)
 	{
 		setState( Error, "no XML root element defined");
 		return false;
 	}
-	const char* encoding = md.getAttribute( "encoding");
-	if (!encoding) encoding = "UTF-8";
-	const char* doctype_public = md.getAttribute( "PUBLIC");
-	std::string doctype_public_buf;
-	if (doctype_public && !md.doctype().empty())
+
+	if (standalone && 0==std::strcmp( standalone, "yes"))
 	{
-		doctype_public_buf = types::DocMetaData::replaceStem( doctype_public, md.doctype());
-		doctype_public = doctype_public_buf.c_str();
+		try
+		{
+			m_doc = DocumentWriter( encoding, root, 0/*public*/, 0/*system*/, 0/*xmlns*/, 0/*xsi*/, 0/*schemaLocation*/);
+		}
+		catch (const std::runtime_error& e)
+		{
+			setState( Error, e.what());
+			return false;
+		}
 	}
-	const char* doctype_system = md.getAttribute( "SYSTEM");
-	const char* xmlns = md.getAttribute( "xmlns");
-	const char* xsi = md.getAttribute( "xmlns:xsi");
-	const char* schemaLocation = md.getAttribute( "xmlns:schemaLocation");
-	std::string schemaLocation_buf;
-	if (schemaLocation && !md.doctype().empty())
+	else
 	{
-		schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
-		schemaLocation = schemaLocation_buf.c_str();
-	}
-	try
-	{
-		m_doc = DocumentWriter( encoding, root, doctype_public, doctype_system, xmlns, xsi, schemaLocation);
-	}
-	catch (const std::runtime_error& e)
-	{
-		setState( Error, e.what());
-		return false;
+		const char* doctype_public = md.getAttribute( "PUBLIC");
+		std::string doctype_public_buf;
+		if (doctype_public && !md.doctype().empty())
+		{
+			doctype_public_buf = types::DocMetaData::replaceStem( doctype_public, md.doctype());
+			doctype_public = doctype_public_buf.c_str();
+		}
+		const char* doctype_system = md.getAttribute( "SYSTEM");
+		const char* xmlns = md.getAttribute( "xmlns");
+		const char* xsi = md.getAttribute( "xmlns:xsi");
+		const char* schemaLocation = md.getAttribute( "xmlns:schemaLocation");
+		std::string schemaLocation_buf;
+		if (schemaLocation && !md.doctype().empty())
+		{
+			schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
+			schemaLocation = schemaLocation_buf.c_str();
+		}
+		try
+		{
+			m_doc = DocumentWriter( encoding, root, doctype_public, doctype_system, xmlns, xsi, schemaLocation);
+		}
+		catch (const std::runtime_error& e)
+		{
+			setState( Error, e.what());
+			return false;
+		}
 	}
 	setState( Open);
 	m_taglevel = 1;

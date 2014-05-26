@@ -442,7 +442,7 @@ struct OutputFilterImpl :public OutputFilter
 	{
 		types::DocMetaData md( getMetaData());
 		LOG_DEBUG << "[textwolf output] document meta data: {" << md.tostring() << "}";
-
+		const char* standalone = md.getAttribute( "standalone");
 		const char* root = md.getAttribute( "root");
 		if (!root)
 		{
@@ -451,32 +451,49 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		const char* encoding = md.getAttribute( "encoding");
 		if (!encoding) encoding = "UTF-8";
-		const char* doctype_public = md.getAttribute( "PUBLIC");
-		std::string doctype_public_buf;
-		if (doctype_public && !md.doctype().empty())
+
+		if (standalone && 0==std::strcmp( standalone, "yes"))
 		{
-			doctype_public_buf = types::DocMetaData::replaceStem( doctype_public, md.doctype());
-			doctype_public = doctype_public_buf.c_str();
+			if (!m_printer.createPrinter( encoding))
+			{
+				setState( Error, "failed to create XML serializer for this encoding");
+				return false;
+			}
+			if (!m_printer.printDocumentStart( root, 0/*public*/, 0/*system*/, 0/*xmlns*/, 0/*xsi*/, 0/*schemaLocation*/, m_elembuf))
+			{
+				setState( Error, "failed to print XML document header");
+				return false;
+			}
 		}
-		const char* doctype_system = md.getAttribute( "SYSTEM");
-		const char* xmlns = md.getAttribute( "xmlns");
-		const char* xsi = md.getAttribute( "xmlns:xsi");
-		const char* schemaLocation = md.getAttribute( "xmlns:schemaLocation");
-		std::string schemaLocation_buf;
-		if (schemaLocation && !md.doctype().empty())
+		else
 		{
-			schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
-			schemaLocation = schemaLocation_buf.c_str();
-		}
-		if (!m_printer.createPrinter( encoding))
-		{
-			setState( Error, "failed to create XML serializer for this encoding");
-			return false;
-		}
-		if (!m_printer.printDocumentStart( root, doctype_public, doctype_system, xmlns, xsi, schemaLocation, m_elembuf))
-		{
-			setState( Error, "failed to print XML document header");
-			return false;
+			const char* doctype_public = md.getAttribute( "PUBLIC");
+			std::string doctype_public_buf;
+			if (doctype_public && !md.doctype().empty())
+			{
+				doctype_public_buf = types::DocMetaData::replaceStem( doctype_public, md.doctype());
+				doctype_public = doctype_public_buf.c_str();
+			}
+			const char* doctype_system = md.getAttribute( "SYSTEM");
+			const char* xmlns = md.getAttribute( "xmlns");
+			const char* xsi = md.getAttribute( "xmlns:xsi");
+			const char* schemaLocation = md.getAttribute( "xmlns:schemaLocation");
+			std::string schemaLocation_buf;
+			if (schemaLocation && !md.doctype().empty())
+			{
+				schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
+				schemaLocation = schemaLocation_buf.c_str();
+			}
+			if (!m_printer.createPrinter( encoding))
+			{
+				setState( Error, "failed to create XML serializer for this encoding");
+				return false;
+			}
+			if (!m_printer.printDocumentStart( root, doctype_public, doctype_system, xmlns, xsi, schemaLocation, m_elembuf))
+			{
+				setState( Error, "failed to print XML document header");
+				return false;
+			}
 		}
 		return true;
 	}
@@ -654,7 +671,8 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 class TextwolfXmlFilterType :public FilterType
 {
 public:
-	TextwolfXmlFilterType(){}
+	TextwolfXmlFilterType()
+		:FilterType("textwolf"){}
 	virtual ~TextwolfXmlFilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const

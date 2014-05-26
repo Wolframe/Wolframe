@@ -1,5 +1,5 @@
 {
-	"doctype":	"trees",
+	"-doctype":	"trees",
 	"btree":	{
 		"id":	"1",
 		"left":	{

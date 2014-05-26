@@ -1,4 +1,5 @@
-FORM productList products
+FORM productList
+	:root products
 {
 	item []
 	{
@@ -8,25 +9,30 @@ FORM productList products
 		issuedate string
 	}
 }
-FORM treeAddNode node
+FORM treeAddNode
+	:root node
 {
 	parentid int
 	name name
 }
-FORM treeDeleteSubtree node
+FORM treeDeleteSubtree
+	:root node
 {
 	id int
 }
 
-FORM treeSelectChildrenByName node
+FORM treeSelectChildrenByName
+	:root node
 {
 	name string
 }
-FORM treeSelectChildren node
+FORM treeSelectChildren
+	:root node
 {
 	id int
 }
-FORM treeSelectParents node
+FORM treeSelectParents
+	:root node
 {
 	id int
 }

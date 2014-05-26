@@ -1,4 +1,5 @@
-FORM CustomerDelete customer
+FORM CustomerDelete
+	:root customer
 {
 	id !@string
 }

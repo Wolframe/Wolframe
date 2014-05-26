@@ -47,17 +47,20 @@ class RedirectFilterClosure
 {
 public:
 	/// \brief Default constructor
-	RedirectFilterClosure()
+	explicit RedirectFilterClosure( bool doPrintFinalClose=true)
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
 		,m_taglevel(0)
-		,m_elemtype(InputFilter::Value){}
+		,m_taglevel_terminate(doPrintFinalClose?-1:0)
+		,m_elemtype(InputFilter::Value)
+		{}
 
 	/// \brief Constructor
-	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o)
+	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o, bool doPrintFinalClose=true)
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
 		,m_taglevel(0)
+		,m_taglevel_terminate(doPrintFinalClose?-1:0)
 		,m_inputfilter(i)
 		,m_outputfilter(o)
 		,m_elemtype(InputFilter::Value)
@@ -70,6 +73,7 @@ public:
 		:utils::TypeSignature(o)
 		,m_state(o.m_state)
 		,m_taglevel(o.m_taglevel)
+		,m_taglevel_terminate(o.m_taglevel_terminate)
 		,m_inputfilter(o.m_inputfilter)
 		,m_outputfilter(o.m_outputfilter)
 		,m_elemtype(o.m_elemtype)
@@ -112,7 +116,7 @@ public:
 				}
 				else if (m_elemtype == InputFilter::CloseTag)
 				{
-					if (m_taglevel < 0)
+					if (m_taglevel <= m_taglevel_terminate)
 					{
 						m_state = 2;
 						return true;
@@ -164,6 +168,7 @@ public:
 private:
 	int m_state;				///< current state of call
 	int m_taglevel;				///< current balance of open/close tags
+	int m_taglevel_terminate;		///< terminate condition tag level
 	TypedInputFilterR m_inputfilter;	///< input filter
 	TypedOutputFilterR m_outputfilter;	///< output filter
 	InputFilter::ElementType m_elemtype;	///< type of last element read from command result

@@ -3,7 +3,7 @@
 **requires:TEXTWOLF
 **input
 {
-    "doctype" : "CDCatalog",
+    "-doctype" : "CDCatalog",
     "CD": [
       {
         "TITLE": "Empire Burlesque",
@@ -105,7 +105,7 @@ Processor
 }
 **output
 {
-	"doctype":	"CDCatalog",
+	"-doctype":	"CDCatalog",
 	"CD":	[{
 			"TITLE":	"EMPIRE BURLESQUE",
 			"ARTIST":	"BOB DYLAN",

@@ -72,9 +72,15 @@ class ProcessorProviderInterface
 public:
 	///\brief Destructor
 	virtual ~ProcessorProviderInterface(){};
-	///\brief Get the command handler for a specific command
+	///\brief Create a command handler for a specific command and doc format
 	///\param[in] command name of the command
-	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command) const=0;
+	///\param[in] docformat document format, e.g. "XML","JSON"
+	///\return the constructed command handler (owned now by the caller)
+	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command, const std::string& docformat) const=0;
+	///\brief Find out if there exists a command handler for a specific command without creating it
+	///\param[in] command name of the command
+	///\return true, if yes
+	virtual bool existcmd( const std::string& command) const=0;
 	///\brief Get the database for transactions
 	///\return reference to database
 	virtual db::Database* transactionDatabase() const=0;
@@ -98,11 +104,10 @@ public:
 	///\param[in] name name of the form
 	///\return reference to the form description
 	virtual const types::FormDescription* formDescription( const std::string& name) const=0;
-	///\brief Get a filter
+	///\brief Get a filter type
 	///\param[in] name name of the filter
-	///\param[in] arg initializer arguments for the filter instance
-	///\return allocated filter instance now owned by the caller and to destroy by the caller with delete
-	virtual langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const=0;
+	///\return constant filter reference
+	virtual const langbind::FilterType* filterType( const std::string& name) const=0;
 	///\brief Get a custom data type
 	///\param[in] name name of the type
 	///\return reference to the custom data type

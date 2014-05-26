@@ -14,12 +14,10 @@ STRUCT BinTreeNode
 }
 
 FORM trees
+	:root root
 {
-	root
-	{
-		mtree	MulTreeNode
-		btree	BinTreeNode
-	}
+	mtree	MulTreeNode
+	btree	BinTreeNode
 }
 
 

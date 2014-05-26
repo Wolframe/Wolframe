@@ -4,7 +4,7 @@
 **requires:TEXTWOLF
 **input
 {
-	"doctype" : "trees",
+	"-doctype" : "trees",
 	"mtree": {
 		"-id": "1",
 		"name": "eins",
@@ -91,12 +91,10 @@ STRUCT BinTreeNode
 }
 
 FORM trees
+	:root root
 {
-	root
-	{
-		mtree	MulTreeNode
-		btree	BinTreeNode
-	}
+	mtree	MulTreeNode
+	btree	BinTreeNode
 }
 **file:script.lua
 function printTable( tab)
@@ -144,7 +142,7 @@ function run()
 end
 **output
 {
-	"doctype":	"trees",
+	"-doctype":	"trees",
 	"btree":	{
 		"id":	"1",
 		"left":	{

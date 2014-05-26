@@ -1,4 +1,5 @@
-FORM places PLACES
+FORM places
+	:root PLACES
 {
 	GARDEN []
 	{

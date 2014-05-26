@@ -119,7 +119,8 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 class Libxml2FilterType :public FilterType
 {
 public:
-	Libxml2FilterType(){}
+	Libxml2FilterType()
+		:FilterType("libxml2"){}
 	virtual ~Libxml2FilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const

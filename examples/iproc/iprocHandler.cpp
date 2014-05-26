@@ -230,7 +230,7 @@ const net::NetworkOperation Connection::nextOperation()
 								LOG_ERROR << "No procesor provider defined";
 								return net::CloseConnection();
 							}
-							cmdbind::CommandHandler* chnd = provider->cmdhandler( procname);
+							cmdbind::CommandHandler* chnd = provider->cmdhandler( procname, "");
 							if (!chnd)
 							{
 								LOG_ERROR << "command handler not found for '" << procname << "'";
@@ -243,12 +243,13 @@ const net::NetworkOperation Connection::nextOperation()
 								LOG_ERROR << "command handler for '" << procname << "' is not an iofilter command handler";
 								return net::CloseConnection();
 							}
-							langbind::Filter* flt = provider->filter( "char");
-							if (!flt)
+							const langbind::FilterType* fltp = provider->filterType( "char");
+							if (!fltp)
 							{
 								LOG_ERROR << "failed to load filter 'char' (not defined)";
 								return net::CloseConnection();
 							}
+							langbind::FilterR flt( fltp->create());
 							m_inputfilter = flt->inputfilter();
 							m_outputfilter = flt->outputfilter();
 							if (!flt)
@@ -256,7 +257,6 @@ const net::NetworkOperation Connection::nextOperation()
 								LOG_ERROR << "filter 'char' not defined";
 								return net::CloseConnection();
 							}
-							delete flt;
 							hnd->setFilter( m_inputfilter);
 							hnd->setFilter( m_outputfilter);
 							m_cmdhandler.reset( hnd);

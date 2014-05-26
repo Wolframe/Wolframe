@@ -95,7 +95,8 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 class CJsonFilterType :public FilterType
 {
 public:
-	CJsonFilterType(){}
+	CJsonFilterType()
+		:FilterType("cjson"){}
 	virtual ~CJsonFilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const

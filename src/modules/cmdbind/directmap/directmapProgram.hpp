@@ -46,10 +46,10 @@ namespace langbind {
 ///\class DirectmapProgram
 ///\brief Program describing direct mappings (many function descriptions per source file)
 class DirectmapProgram
-	:public types::keymap<DirectmapCommandDescription>
+	:public types::keymap<DirectmapCommandDescriptionR>
 {
 public:
-	typedef types::keymap<DirectmapCommandDescription> Parent;
+	typedef types::keymap<DirectmapCommandDescriptionR> Parent;
 
 	DirectmapProgram(){}
 	DirectmapProgram( const DirectmapProgram& o)
@@ -57,16 +57,12 @@ public:
 	~DirectmapProgram(){}
 
 	bool is_mine( const std::string& filename) const;
-	void addProgram( const std::string& source);
-	void loadProgram( const std::string& filename);
-
-	///\brief Check that all functions configured exists
-	bool checkReferences( const proc::ProcessorProviderInterface* provider) const;
+	bool loadProgram( const std::string& filename, const proc::ProcessorProviderInterface* provider);
 
 	const DirectmapCommandDescription* get( const std::string& name) const
 	{
 		Parent::const_iterator rt = Parent::find( name);
-		return (rt == Parent::end())?0:&rt->second;
+		return (rt == Parent::end())?0:rt->second.get();
 	}
 };
 
