@@ -59,6 +59,7 @@ public:
 		,m_inputfilter(inputfilter_)
 		,m_outputfilter(outputfilter_)
 		,m_state(0)
+		,m_outputprinter(true)
 		{}
 
 	/// \brief Destructor

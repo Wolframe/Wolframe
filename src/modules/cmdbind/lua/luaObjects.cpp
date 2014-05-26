@@ -485,7 +485,7 @@ LUA_FUNCTION_THROWS( "<type>(..)", function_normalizer_call)
 	return 1;
 }
 
-LUA_FUNCTION_THROWS( "scope(..)", function_scope)
+LUA_FUNCTION_THROWS( "iterator.scope(..)", function_scope)
 {
 	check_parameters( ls, 0, 1, LUA_TFUNCTION);
 	if (lua_getupvalue( ls, 1, 1))
@@ -1009,7 +1009,7 @@ LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_typedinputfilter_tostr
 
 	ToStringFilter* flt = new ToStringFilter();
 	TypedOutputFilterR out( flt);
-	RedirectFilterClosure exc( obj, out);
+	RedirectFilterClosure exc( obj, out, false);
 	if (!exc.call())
 	{
 		throw std::logic_error( "internal: tostring serialization with yield");
@@ -1043,7 +1043,7 @@ LUA_FUNCTION_THROWS( "<structure>:table()", function_typedinputfilter_table)
 			LOG_WARNING << "calling table() for object without input structure info";
 		}
 		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-		LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( obj, outp));
+		LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( obj, outp, false));
 		closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
 	}
 	else
@@ -1913,7 +1913,7 @@ static lua_CFunction get_input_struct_table_closure( lua_State* ls, Input* input
 						LOG_WARNING << "calling :table() on document type '" << doctype << "' without form defined for filter without input structure info";
 					}
 					TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-					LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+					LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp, false));
 					RedirectFilterClosure* obj = LuaObject<RedirectFilterClosure>::get( ls, -1);
 					lua_pushlightuserdata( ls, obj);
 					return &function_input_table_RedirectFilterClosure;
@@ -1942,7 +1942,7 @@ static lua_CFunction get_input_struct_table_closure( lua_State* ls, Input* input
 					LOG_WARNING << "calling table() on standalone document for filter without input structure info";
 				}
 				TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-				LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+				LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp, false));
 				RedirectFilterClosure* obj = LuaObject<RedirectFilterClosure>::get( ls, -1);
 				lua_pushlightuserdata( ls, obj);
 				return &function_input_table_RedirectFilterClosure;

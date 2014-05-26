@@ -1,12 +1,12 @@
 FORM GetAddress_p
-	:root doc
+	-root doc
 {
 	street string
 	country string
 }
 
 FORM GetUserAddress
-	:root doc
+	-root doc
 {
 	usr
 	{
@@ -21,14 +21,14 @@ FORM GetUserAddress
 }
 
 FORM Address
-	:root address
+	-root address
 {
 	street string
 	country string
 }
 
 FORM IdPair
-	:root pair
+	-root pair
 {
 	a string
 	b string

@@ -117,14 +117,16 @@ INTO doc
 END
 **output
 {
-	"title":	[{
-			"name":	"job1"
-		}, {
-			"name":	"job2"
-		}, {
-			"name":	"job3"
-		}, {
-			"name":	"job4"
-		}]
+	"doc":	{
+		"title":	[{
+				"name":	"job1"
+			}, {
+				"name":	"job2"
+			}, {
+				"name":	"job3"
+			}, {
+				"name":	"job4"
+			}]
+	}
 }
 **end

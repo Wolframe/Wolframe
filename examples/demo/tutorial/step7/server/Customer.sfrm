@@ -1,10 +1,10 @@
 FORM CustomerListRequest
-	:root customer
+	-root customer
 {
 }
 
 FORM CustomerList
-	:root list
+	-root list
 {
 	customer []
 	{
@@ -15,13 +15,13 @@ FORM CustomerList
 }
 
 FORM CustomerRequest
-	:root customer
+	-root customer
 {
 	id !@string
 }
 
 FORM Customer
-	:root customer
+	-root customer
 {
 	id !@string
 	name string
@@ -29,7 +29,7 @@ FORM Customer
 }
 
 FORM CustomerUpdate
-	:root customer
+	-root customer
 {
 	id !@string
 	name string

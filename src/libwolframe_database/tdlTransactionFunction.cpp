@@ -355,6 +355,7 @@ TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransacti
 	,m_context(0)
 	,m_func(f)
 	,m_state(0)
+	,m_input(false/*doPrintFinalClose*/)
 	,m_inputstructptr(0)
 	,m_flags(serialize::Context::None)
 	{}

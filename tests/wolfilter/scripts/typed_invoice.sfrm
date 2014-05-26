@@ -1,5 +1,5 @@
 FORM typed_invoice
-	:root invoice
+	-root invoice
 {
 	order
 	{

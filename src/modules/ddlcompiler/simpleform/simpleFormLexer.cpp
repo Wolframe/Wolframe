@@ -45,7 +45,7 @@ std::string Lexem::positionLogtext() const
 	return std::string("at line ") + boost::lexical_cast<std::string>(m_position.line()) + " column " + boost::lexical_cast<std::string>(m_position.column());
 }
 
-static const utils::CharTable g_optab( "^=@!?[]{}:");
+static const utils::CharTable g_optab( "^=@!?[]{};-");
 
 std::string Lexer::curtoken() const
 {
@@ -136,7 +136,8 @@ Lexem Lexer::next()
 		case '^': return Lexem( m_position, Lexem::Indirection);
 		case '=': return Lexem( m_position, Lexem::Assign);
 		case '@': return Lexem( m_position, Lexem::AttributeTag);
-		case ':': return Lexem( m_position, Lexem::MetaDataDef);
+		case '-': return Lexem( m_position, Lexem::MetaDataDef);
+		case ';': return Lexem( m_position, Lexem::Semicolon);
 		default:
 			if (g_optab[m_tokch]) throw std::runtime_error( std::string("unexpected operator '") + (char)m_tokch + "'");
 			return Lexem( m_position, Lexem::Identifier, tok);

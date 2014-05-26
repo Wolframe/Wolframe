@@ -47,7 +47,7 @@ class RedirectFilterClosure
 {
 public:
 	/// \brief Default constructor
-	explicit RedirectFilterClosure( bool doPrintFinalClose=true)
+	explicit RedirectFilterClosure( bool doPrintFinalClose)
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
 		,m_taglevel(0)
@@ -56,7 +56,7 @@ public:
 		{}
 
 	/// \brief Constructor
-	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o, bool doPrintFinalClose=true)
+	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o, bool doPrintFinalClose)
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
 		,m_taglevel(0)

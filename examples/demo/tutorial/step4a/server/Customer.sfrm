@@ -5,13 +5,13 @@ STRUCT CustomerStruct
 }
 
 FORM Customer
-	:root customer
+	-root customer
 {
 	_ CustomerStruct
 }
 
 FORM CustomerInserted
-	:customer
+	-root customer
 {
 	id string
 	_ CustomerStruct

@@ -1,5 +1,5 @@
 FORM Invoice
-	:root invoice
+	-root invoice
 {
 	order
 	{

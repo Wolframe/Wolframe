@@ -50,9 +50,14 @@ static std::string substquot( const std::string& o)
 
 bool ToStringFilter::print( ElementType type, const types::VariantConst& element)
 {
+	if (m_taglevel < 0)
+	{
+		throw std::runtime_error("illegal print operation in tostring filter (print atfter final close)");
+	}
 	switch (type)
 	{
 		case OpenTag:
+			++m_taglevel;
 			m_content.append( m_indent);
 			m_content.append( element.tostring());
 			if (m_indentstr.size())
@@ -67,6 +72,11 @@ bool ToStringFilter::print( ElementType type, const types::VariantConst& element
 			m_lasttype = type;
 		return true;
 		case CloseTag:
+			--m_taglevel;
+			if (m_taglevel < 0)
+			{
+				return true;
+			}
 			if (m_indentstr.size())
 			{
 				if (m_indent.size() >= m_indentstr.size())

@@ -1,7 +1,7 @@
 FORM Customer
-	:root customer
+	-root customer
 {
-	id !@string
-	name string
+	id !@string;
+	name string;
 	address string
 }

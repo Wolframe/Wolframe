@@ -1,6 +1,6 @@
 
 FORM Employee
-	:root employee
+	-root employee
 {
     ID !@int                  ; Internal customer id (mandatory)
     name !string              ; Name of the customer (mandatory)

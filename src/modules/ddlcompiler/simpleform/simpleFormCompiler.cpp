@@ -92,7 +92,7 @@ static void compile_structure( Lexer& lexer, types::VariantStructDescription& re
 				//	to check when the next statement starts or the structure ends
 
 				Lexem::Id flx = lexer.forwardLookup();
-				for (; flx != Lexem::Identifier && flx != Lexem::CloseStruct; flx = lexer.forwardLookup())
+				for (; flx != Lexem::Semicolon && flx != Lexem::Identifier && flx != Lexem::CloseStruct; flx = lexer.forwardLookup())
 				{
 					lx = lexer.next();
 					if (lx.id() == Lexem::ArrayTag)
@@ -117,6 +117,10 @@ static void compile_structure( Lexer& lexer, types::VariantStructDescription& re
 					{
 						throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", default value assignment or array marker or following structure element declaration expected");
 					}
+				}
+				if (flx == Lexem::Semicolon)
+				{
+					lexer.next();
 				}
 
 				// Resolve type:

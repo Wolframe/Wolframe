@@ -4,6 +4,7 @@
 **requires:ORACLE
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tree>
 <class name="indogermanic">
 	<class name="celtic" status="living">
 		<class name="gaulisch" status="dead"/>
@@ -152,7 +153,8 @@
 	</class>
 	<class name="tocharian" status="dead">
 	</class>
-</class>**config
+</class>
+</tree>**config
 --input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf run
 
 **file:wolframe.conf

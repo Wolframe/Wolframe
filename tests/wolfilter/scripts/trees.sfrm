@@ -14,7 +14,7 @@ STRUCT BinTreeNode
 }
 
 FORM trees
-	:root root
+	-root root
 {
 	mtree	MulTreeNode
 	btree	BinTreeNode

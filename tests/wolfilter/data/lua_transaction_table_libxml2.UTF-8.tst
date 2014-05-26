@@ -83,5 +83,5 @@ INTO doc
 END
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<doc><title><name>job1</name></title><title><name>job2</name></title><title><name>job3</name></title><title><name>job4</name></title></doc>
+<assignmentlist><doc><title><name>job1</name></title><title><name>job2</name></title><title><name>job3</name></title><title><name>job4</name></title></doc></assignmentlist>
 **end

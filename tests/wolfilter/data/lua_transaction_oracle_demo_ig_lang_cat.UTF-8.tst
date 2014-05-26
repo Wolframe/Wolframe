@@ -3,6 +3,7 @@
 **requires:ORACLE
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tree>
 <class name="indogermanic">
 	<class name="celtic" status="living">
 		<class name="gaulisch" status="dead"/>
@@ -151,7 +152,8 @@
 	</class>
 	<class name="tocharian" status="dead">
 	</class>
-</class>**config
+</class>
+</tree>**config
 --input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
 **requires:TEXTWOLF
 **file:wolframe.conf

@@ -5,6 +5,7 @@
 **requires:SQLITE3
 **input
 {
+  "class": {
     "-name": "indogermanic",
     "class": [
       {
@@ -516,6 +517,7 @@
         "-status": "dead"
       }
     ]
+  }
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 

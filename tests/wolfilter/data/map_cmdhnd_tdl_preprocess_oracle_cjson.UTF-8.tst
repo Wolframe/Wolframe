@@ -332,13 +332,13 @@ STRUCT Company
 }
 
 FORM Data
-	:root data
+	-root data
 {
 	person Person[]
 }
 
 FORM AllDataRequest
-	:root data
+	-root data
 {
 }
 **file:preprocess.tdl

@@ -6,7 +6,7 @@ STRUCT Employee
 }
 
 FORM schema_select_task_by_id
-	:root assignmentlist
+	-root assignmentlist
 {
 	assignment []
 	{

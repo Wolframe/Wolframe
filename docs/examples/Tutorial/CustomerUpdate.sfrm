@@ -1,7 +1,7 @@
-	FORM CustomerUpdate
-		:root customer
-	{
-		id !@string
-		name string
-		address string
-	}
+FORM CustomerUpdate
+	-root customer
+{
+	id !@string
+	name string
+	address string
+}

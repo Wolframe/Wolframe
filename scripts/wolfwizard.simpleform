@@ -20,7 +20,7 @@ STRUCT FormDef
 }
 
 FORM Wolfwizard
-	:root forms
+	-root forms
 {
 	form FormDef[]
 }

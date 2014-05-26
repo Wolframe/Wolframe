@@ -831,7 +831,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 
 			while (!closure->call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			RedirectFilterClosure res( closure->result(), outp);
+			RedirectFilterClosure res( closure->result(), outp, true);
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());

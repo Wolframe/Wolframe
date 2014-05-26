@@ -1,5 +1,5 @@
 FORM insertNumber
-	:root doc
+	-root doc
 {
 	numbr int
 	mul int
@@ -8,7 +8,7 @@ FORM insertNumber
 }
 
 FORM updateNumber
-	:root doc
+	-root doc
 {
 	numbr int
 	mul int
@@ -17,13 +17,13 @@ FORM updateNumber
 }
 
 FORM deleteNumber
-	:root doc
+	-root doc
 {
 	numbr int
 }
 
 FORM selectNumber
-	:root doc
+	-root doc
 {
 	id int
 }

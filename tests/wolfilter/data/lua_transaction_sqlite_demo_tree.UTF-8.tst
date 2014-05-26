@@ -262,7 +262,7 @@ END
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result>
+<transactions><result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result></transactions>
 tree:
 '1', NULL, 'Albert', '1', '12'
 '2', '1', 'Bert', '2', '3'

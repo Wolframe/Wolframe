@@ -1,4 +1,4 @@
 FORM CustomerListRequest
-	:root customer
+	-root customer
 {
 }
