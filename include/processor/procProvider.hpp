@@ -98,7 +98,8 @@ public:
 	/// \brief Get a reference to a custom data type identified by name
 	virtual const types::CustomDataType* customDataType( const std::string& name) const;
 
-	/// \brief PF:HACK: Deprecated function to guess the document format of a content defined as string
+	/// \brief PF:HACK: Function to guess the document format of a content defined as string
+	///	This method is here because document format recognition may be dependent on modules loaded
 	virtual bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const;
 
 	/// \brief Get the application reference path for local path expansion
