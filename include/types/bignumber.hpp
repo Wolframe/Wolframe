@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/bignumber.hpp
-///\brief Type for representing arbitrary precision fixed point numbers and big integers as binary coded decimal (BCD) numbers
+/// \file types/bignumber.hpp
+/// \brief Type for representing arbitrary precision fixed point numbers and big integers as binary coded decimal (BCD) numbers
 
 #ifndef _Wolframe_TYPES_BIG_NUMBER_HPP_INCLUDED
 #define _Wolframe_TYPES_BIG_NUMBER_HPP_INCLUDED
@@ -41,153 +41,153 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-///\brief Forward declaration
+/// \brief Forward declaration
 class Variant;
 
-///\class BigNumber
-///\brief Type for representing big numbers as binary coded decimal (BCD) numbers
+/// \class BigNumber
+/// \brief Type for representing big numbers as binary coded decimal (BCD) numbers
 class BigNumber
 {
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	BigNumber();
-	///\brief Copy constructor
-	///\param[in] o number to copy
+	/// \brief Copy constructor
+	/// \param[in] o number to copy
 	BigNumber( const BigNumber& o);
-	///\brief Constructor from a variant type
-	///\param[in] val number value as variant type
+	/// \brief Constructor from a variant type
+	/// \param[in] val number value as variant type
 	BigNumber( const Variant& v);
-	///\brief Constructor from a double
-	///\param[in] val number value as double precision floating point number
+	/// \brief Constructor from a double
+	/// \param[in] val number value as double precision floating point number
 	BigNumber( double val);
-	///\brief Constructor from a signed integer
-	///\param[in] val number value as signed integer
+	/// \brief Constructor from a signed integer
+	/// \param[in] val number value as signed integer
 	BigNumber( _WOLFRAME_INTEGER val);
-	///\brief Constructor from an unsigned integer
-	///\param[in] val number value as unsigned integer
+	/// \brief Constructor from an unsigned integer
+	/// \param[in] val number value as unsigned integer
 	BigNumber( _WOLFRAME_UINTEGER val);
-	///\brief Constructor from a string
-	///\param[in] val number value as printable string
+	/// \brief Constructor from a string
+	/// \param[in] val number value as printable string
 	BigNumber( const std::string& val);
-	///\brief Constructor from a string
-	///\param[in] val number value as pointer to printable string
-	///\param[in] valsize size of val in bytes
+	/// \brief Constructor from a string
+	/// \param[in] val number value as pointer to printable string
+	/// \param[in] valsize size of val in bytes
 	BigNumber( const char* val, std::size_t valsize);
-	///\brief Constructor
-	///\param[in] sign_ true, if the number is negative, false if positive or 0
-	///\param[in] precision_ number of significant digits (also the number of elements in digits_)
-	///\param[in] scale_ number of digits right of the comma
-	///\param[in] digits_ decimal digits of the number [0x00..0x09]
+	/// \brief Constructor
+	/// \param[in] sign_ true, if the number is negative, false if positive or 0
+	/// \param[in] precision_ number of significant digits (also the number of elements in digits_)
+	/// \param[in] scale_ number of digits right of the comma
+	/// \param[in] digits_ decimal digits of the number [0x00..0x09]
 	BigNumber( bool sign_, unsigned short precision_, signed short scale_, const unsigned char* digits_);
-	///\brief Destructor
+	/// \brief Destructor
 	~BigNumber();
 
-	///\brief Get the number of significant digits (also the number of elements in digits())
-	///\return the precision
+	/// \brief Get the number of significant digits (also the number of elements in digits())
+	/// \return the precision
 	unsigned short precision() const	{return m_size;}
-	///\brief Get the number of digits right of the comma
-	///\return the scale
+	/// \brief Get the number of digits right of the comma
+	/// \return the scale
 	signed short scale() const		{return m_scale;}
-	///\brief Get the size of the number (number of significant digits)
-	///\return the size
+	/// \brief Get the size of the number (number of significant digits)
+	/// \return the size
 	unsigned short size() const		{return m_size;}
-	///\brief Get the sign of the number (true -> negative number)
-	///\return the sign
+	/// \brief Get the sign of the number (true -> negative number)
+	/// \return the sign
 	bool sign() const			{return m_sign;}
-	///\brief Get the significant digits of the number
-	///\return the digits [0x00..0x09]
+	/// \brief Get the significant digits of the number
+	/// \return the digits [0x00..0x09]
 	const unsigned char* digits() const	{return m_ar;}
 
-	///\brief Get the number value as printable string
-	///\return the number as string
+	/// \brief Get the number value as printable string
+	/// \return the number as string
 	std::string tostring() const;
-	///\brief Get the number value as printable string in normalized form ([0..1] + exponent if scale < 0 or scale > precision)
-	///\return the number as string
+	/// \brief Get the number value as printable string in normalized form ([0..1] + exponent if scale < 0 or scale > precision)
+	/// \return the number as string
 	std::string tostringNormalized() const;
-	///\brief Get the number value as integer if a conversion is possible
-	///\return the number as integer
+	/// \brief Get the number value as integer if a conversion is possible
+	/// \return the number as integer
 	_WOLFRAME_INTEGER toint() const;
-	///\brief Get the number value as unsigned integer if a conversion is possible
-	///\return the number as unsigned integer
+	/// \brief Get the number value as unsigned integer if a conversion is possible
+	/// \return the number as unsigned integer
 	_WOLFRAME_UINTEGER touint() const;
-	///\brief Get the number value as double precision floating point number if a conversion is possible
-	///\return the number as double precision floating point number
+	/// \brief Get the number value as double precision floating point number if a conversion is possible
+	/// \return the number as double precision floating point number
 	double todouble() const;
-	///\brief Check if the number is valid
-	///\return true, if yes
+	/// \brief Check if the number is valid
+	/// \return true, if yes
 	bool isvalid() const;
 
-	///\brief Test argument big number for equality
-	///\return true if yes
+	/// \brief Test argument big number for equality
+	/// \return true if yes
 	bool operator==( const BigNumber& o) const	{return compare(o)==0;}
-	///\brief Test argument big number for inequality
-	///\return true if yes
+	/// \brief Test argument big number for inequality
+	/// \return true if yes
 	bool operator!=( const BigNumber& o) const	{return compare(o)!=0;}
-	///\brief Test if this big number is bigger or equal than argument
-	///\return true if yes
+	/// \brief Test if this big number is bigger or equal than argument
+	/// \return true if yes
 	bool operator>=( const BigNumber& o) const	{return compare(o)>=0;}
-	///\brief Test if this big number is bigger than argument
-	///\return true if yes
+	/// \brief Test if this big number is bigger than argument
+	/// \return true if yes
 	bool operator> ( const BigNumber& o) const	{return compare(o)> 0;}
-	///\brief Test if this big number is smaller or equal than argument
-	///\return true if yes
+	/// \brief Test if this big number is smaller or equal than argument
+	/// \return true if yes
 	bool operator<=( const BigNumber& o) const	{return compare(o)<=0;}
-	///\brief Test if this big number is smaller than argument
-	///\return true if yes
+	/// \brief Test if this big number is smaller than argument
+	/// \return true if yes
 	bool operator< ( const BigNumber& o) const	{return compare(o)< 0;}
 
-	///\brief Compare with argument
-	///\return int {-1,0,+1} depending on comparison result
+	/// \brief Compare with argument
+	/// \return int {-1,0,+1} depending on comparison result
 	int compare( const BigNumber& o) const;
 
 private:
-	///\brief Constructor function
-	///\param[in] val string value to construct object from
+	/// \brief Constructor function
+	/// \param[in] val string value to construct object from
 	void constructor( const std::string& val);
-	///\brief Constructor function
-	///\param[in] val pointer to string to construct object from
-	///\param[in] valsize size of string in bytes
+	/// \brief Constructor function
+	/// \param[in] val pointer to string to construct object from
+	/// \param[in] valsize size of string in bytes
 	void constructor( const char* val, std::size_t valsize);
-	///\brief Constructor function
-	///\param[in] val variant value to construct object from
+	/// \brief Constructor function
+	/// \param[in] val variant value to construct object from
 	void constructor( const Variant& val);
 
 	friend class BigNumberConst;
 	enum ConstQualifier {ConstC};
-	///\brief Helper constructor for types::BigNumberConst
-	///\param[in] sign_ true, if the number is negative, false if positive or 0
-	///\param[in] precision_ number of significant digits (also the number of elements in digits_)
-	///\param[in] scale_ number of digits right of the comma
-	///\param[in] digits_ decimal digits of the number [0x00..0x09]
+	/// \brief Helper constructor for types::BigNumberConst
+	/// \param[in] sign_ true, if the number is negative, false if positive or 0
+	/// \param[in] precision_ number of significant digits (also the number of elements in digits_)
+	/// \param[in] scale_ number of digits right of the comma
+	/// \param[in] digits_ decimal digits of the number [0x00..0x09]
 	BigNumber( const ConstQualifier&, bool sign_, unsigned short precision_, signed short scale_, const unsigned char* digits_);
 
 private:
-	signed short m_scale;		//< scale number of digits right of the comma
-	bool m_sign;			//< sign (true, if the number is negative, false if positive or 0)
-	bool m_const;			//< true if the value is not allocated (no ownership)
-	unsigned short m_size;		//< size of 'm_ar' in bytes
-	unsigned char* m_ar;		//< decimal digits of the number [0x00..0x09]
+	signed short m_scale;		///< scale number of digits right of the comma
+	bool m_sign;			///< sign (true, if the number is negative, false if positive or 0)
+	bool m_const;			///< true if the value is not allocated (no ownership)
+	unsigned short m_size;		///< size of 'm_ar' in bytes
+	unsigned char* m_ar;		///< decimal digits of the number [0x00..0x09]
 };
 
-///\class BigNumberConst
-///\brief Constant big number that is not owned by the structure (caller has ownership)
-///\remark This object holds only reference. No copy is made. The life time of this has to be covered by the scope of the parameters used to construct the big number
+/// \class BigNumberConst
+/// \brief Constant big number that is not owned by the structure (caller has ownership)
+/// \remark This object holds only reference. No copy is made. The life time of this has to be covered by the scope of the parameters used to construct the big number
 class BigNumberConst
 	:public BigNumber
 {
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	BigNumberConst()
 		:BigNumber(ConstC,false,0,0,0){}
-	///\brief Constructor
-	///\param[in] sign_ true, if the number is negative, false if positive or 0
-	///\param[in] precision_ number of significant digits (also the number of elements in digits_)
-	///\param[in] scale_ number of digits right of the comma
-	///\param[in] digits_ decimal digits of the number [0x00..0x09]
+	/// \brief Constructor
+	/// \param[in] sign_ true, if the number is negative, false if positive or 0
+	/// \param[in] precision_ number of significant digits (also the number of elements in digits_)
+	/// \param[in] scale_ number of digits right of the comma
+	/// \param[in] digits_ decimal digits of the number [0x00..0x09]
 	BigNumberConst( bool sign_, unsigned short precision_, signed short scale_, const unsigned char* digits_)
 		:BigNumber(ConstC,sign_,precision_,scale_,digits_){}
-	///\brief Copy constructor
-	///\brief o big number reference to copy
+	/// \brief Copy constructor
+	/// \brief o big number reference to copy
 	BigNumberConst( const BigNumberConst& o)
 		:BigNumber(ConstC,o.sign(),o.precision(),o.scale(),o.digits()){}
 };

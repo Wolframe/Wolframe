@@ -53,14 +53,14 @@ public:
 	/// \brief Encoding of a database string
 	enum Encoding
 	{
-		ISO8859,	//Latin (full range only with WITH_TEXTWOLF=1, range 0..255 (code page 1) and range 0..127 (other code pages) otherwise
-		UTF8,		//UTF-8 (full range only with WITH_TEXTWOLF=1, range 0..127 otherwise)
-		UTF16BE,	//UTF-16BE (full range only with WITH_TEXTWOLF=1, range 0..255 otherwise)
-		UTF16LE,	//UTF-16LE (only available with WITH_TEXTWOLF=1)
-		UCS2BE,		//UCS-2BE (only available with WITH_TEXTWOLF=1)
-		UCS2LE,		//UCS-2LE (only available with WITH_TEXTWOLF=1)
-		UCS4BE,		//UCS-4BE (only available with WITH_TEXTWOLF=1)
-		UCS4LE		//UCS-4LE (only available with WITH_TEXTWOLF=1)
+		ISO8859,	///< Latin (full range only with WITH_TEXTWOLF=1, range 0..255 (code page 1) and range 0..127 (other code pages) otherwise
+		UTF8,		///< UTF-8 (full range only with WITH_TEXTWOLF=1, range 0..127 otherwise)
+		UTF16BE,	///< UTF-16BE (full range only with WITH_TEXTWOLF=1, range 0..255 otherwise)
+		UTF16LE,	///< UTF-16LE (only available with WITH_TEXTWOLF=1)
+		UCS2BE,		///< UCS-2BE (only available with WITH_TEXTWOLF=1)
+		UCS2LE,		///< UCS-2LE (only available with WITH_TEXTWOLF=1)
+		UCS4BE,		///< UCS-4BE (only available with WITH_TEXTWOLF=1)
+		UCS4LE		///< UCS-4LE (only available with WITH_TEXTWOLF=1)
 	};
 
 	/// \brief Default constructor
@@ -164,10 +164,10 @@ public:
 
 	/// \brief Get the encoding of this string
 	/// \return the encoding
-	Encoding encoding() const		{return (Encoding)m_encoding;}	//< encoding (type Encoding)
+	Encoding encoding() const		{return (Encoding)m_encoding;}	///< encoding (type Encoding)
 	/// \brief Get the code page of this string in case of an ISO8859 encoding
 	/// \return the code page or 0
-	unsigned char codepage() const		{return m_codepage;}		//< codepage for ISO8859 encodings
+	unsigned char codepage() const		{return m_codepage;}		///< codepage for ISO8859 encodings
 
 	/// \brief Get the content of the string as std::string in UTF-8
 	/// \return the string
@@ -202,11 +202,11 @@ private:
 	String( const ConstQualifier&, const void* content, std::size_t contentsize, Encoding encoding_=UTF8, unsigned char codepage_=0);
 
 private:
-	unsigned char m_encoding;		//< encoding (type Encoding)
-	unsigned char m_codepage;		//< codepage for ISO8859 encodings
-	bool m_isconst;				//< true, if the string is allocated
-	std::size_t m_size;			//< number of elements in string
-	unsigned char* m_ar;			//< array of elements
+	unsigned char m_encoding;		///< encoding (type Encoding)
+	unsigned char m_codepage;		///< codepage for ISO8859 encodings
+	bool m_isconst;				///< true, if the string is allocated
+	std::size_t m_size;			///< number of elements in string
+	unsigned char* m_ar;			///< array of elements
 };
 
 /// \class StringConst

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/ddlStructParse.hpp
-///\brief Defines the DDL structure deserialization
+/// \file serialize/ddl/ddlStructParse.hpp
+/// \brief Defines the DDL structure deserialization
 
 #ifndef _Wolframe_SERIALIZE_DDL_STRUCT_PARSER_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DDL_STRUCT_PARSER_HPP_INCLUDED
@@ -44,21 +44,29 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class DDLStructParser
-///\brief Initializer of a DDL structure from an iterator (serialization)
+/// \class DDLStructParser
+/// \brief Initializer of a DDL structure from an iterator (serialization)
 class DDLStructParser
 {
 public:
+	/// \brief Default constructor
 	DDLStructParser(){}
+	/// \brief Constructor
 	explicit DDLStructParser( types::VariantStruct* st);
 
+	/// \brief Copy constructor
 	DDLStructParser( const DDLStructParser& o);
+	/// \brief Destructor
 	virtual ~DDLStructParser(){}
 
+	/// \brief Assignment operator
 	DDLStructParser& operator=( const DDLStructParser& o);
 
+	/// \brief Parser start initialization
 	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
 
+	/// \brief Call of one processing step the parser
+	/// \remark The processing is finished when the call returns true. In case of false returned you have to inspect the input filter state to determine what is to do next. In case of a validation error, the function throws a SerializationErrorException
 	bool call();
 
 private:

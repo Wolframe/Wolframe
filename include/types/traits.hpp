@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Type traits
-///\file types/traits.hpp
+/// \brief Type traits
+/// \file types/traits.hpp
 #ifndef _TYPES_TRAITS_HPP_INCLUDED
 #define _TYPES_TRAITS_HPP_INCLUDED
 
@@ -39,6 +39,8 @@ namespace _Wolframe {
 namespace types {
 namespace traits {
 
+/// \brief Enable-if template for deciding wheter elements can be added to the class T with 'push_back' as for example std::vector
+/// \remark STL backward insertion sequences all fulfill this criterion 
 template<typename T>
 struct is_back_insertion_sequence
 {
@@ -52,7 +54,7 @@ struct is_back_insertion_sequence
 	template<typename U>
 	static large_type has_matching_member(...);
 
-	///\brief value with the boolean property corresponding
+	/// \brief value with the boolean property corresponding
 	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
 };
 

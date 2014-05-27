@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/serializationErrorException.hpp
-///\brief Defines the error exception of serialization/deserialization
+/// \file serialize/serializationErrorException.hpp
+/// \brief Defines the error exception of serialization/deserialization
 
 #ifndef _Wolframe_SERIALIZE_ERROR_EXCEPTION_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_ERROR_EXCEPTION_HPP_INCLUDED
@@ -41,12 +41,18 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
+/// \class SerializationErrorException
+/// \brief Serialization exception object for uniform error exceptions
 class SerializationErrorException :public std::runtime_error
 {
 public:
+	/// \brief Constructor
 	SerializationErrorException( const char* title, const std::string& element, const std::string& tag, const std::string& comment);
+	/// \brief Constructor
 	SerializationErrorException( const char* title, const std::string& element, const std::string& tag);
+	/// \brief Constructor
 	SerializationErrorException( const char* title, const std::string& tag);
+	/// \brief Constructor
 	SerializationErrorException( const char* title);
 };
 

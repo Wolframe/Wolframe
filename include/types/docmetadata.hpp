@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/docmetadata.hpp
-///\brief Structure representing document meta data
+/// \file types/docmetadata.hpp
+/// \brief Structure representing document meta data
 
 #ifndef _Wolframe_TYPES_DOC_METADATA_HPP_INCLUDED
 #define _Wolframe_TYPES_DOC_METADATA_HPP_INCLUDED
@@ -41,8 +41,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-///\class DocMetaData
-///\brief Document meta data representation.
+/// \class DocMetaData
+/// \brief Document meta data representation.
 struct DocMetaData
 {
 	struct Attribute

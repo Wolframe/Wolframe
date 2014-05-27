@@ -51,7 +51,7 @@ public:
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
 		,m_taglevel(0)
-		,m_taglevel_terminate(doPrintFinalClose?-1:0)
+		,m_do_print_final_close(doPrintFinalClose)
 		,m_elemtype(InputFilter::Value)
 		{}
 
@@ -60,7 +60,7 @@ public:
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
 		,m_taglevel(0)
-		,m_taglevel_terminate(doPrintFinalClose?-1:0)
+		,m_do_print_final_close(doPrintFinalClose)
 		,m_inputfilter(i)
 		,m_outputfilter(o)
 		,m_elemtype(InputFilter::Value)
@@ -73,7 +73,7 @@ public:
 		:utils::TypeSignature(o)
 		,m_state(o.m_state)
 		,m_taglevel(o.m_taglevel)
-		,m_taglevel_terminate(o.m_taglevel_terminate)
+		,m_do_print_final_close(o.m_do_print_final_close)
 		,m_inputfilter(o.m_inputfilter)
 		,m_outputfilter(o.m_outputfilter)
 		,m_elemtype(o.m_elemtype)
@@ -99,8 +99,8 @@ public:
 					{
 						case InputFilter::Start:
 						case InputFilter::Open:
-							m_state = 2;
-							return true;
+							m_state = (m_do_print_final_close)?2:3;
+							continue;
 	
 						case InputFilter::EndOfMessage:
 							return false;
@@ -116,12 +116,12 @@ public:
 				}
 				else if (m_elemtype == InputFilter::CloseTag)
 				{
-					if (m_taglevel <= m_taglevel_terminate)
-					{
-						m_state = 2;
-						return true;
-					}
 					--m_taglevel;
+					if (m_taglevel < 0)
+					{
+						m_state = (m_do_print_final_close)?2:3;
+						continue;
+					}
 				}
 				/*no break here!*/
 			case 1:
@@ -142,6 +142,24 @@ public:
 				}
 				m_state = 0;
 				continue;
+			case 2:
+				if (!m_outputfilter->print( m_elemtype, m_elem))
+				{
+					switch (m_outputfilter->state())
+					{
+						case OutputFilter::Start:
+						case OutputFilter::Open:
+							throw std::runtime_error( "unknown error in output filter");
+	
+						case OutputFilter::EndOfBuffer:
+							return false;
+	
+						case OutputFilter::Error:
+							throw std::runtime_error( m_outputfilter->getError());
+					}
+				}
+				m_state = 3;
+				/*no break here!*/
 			default:
 				return true;
 		}
@@ -168,7 +186,7 @@ public:
 private:
 	int m_state;				///< current state of call
 	int m_taglevel;				///< current balance of open/close tags
-	int m_taglevel_terminate;		///< terminate condition tag level
+	bool m_do_print_final_close;		///< true, if the final close is printed, false if it is only consumed
 	TypedInputFilterR m_inputfilter;	///< input filter
 	TypedOutputFilterR m_outputfilter;	///< output filter
 	InputFilter::ElementType m_elemtype;	///< type of last element read from command result

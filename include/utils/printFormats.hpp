@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Templates describing printing of structures
-///\file utils/printFormats.hpp
+/// \brief Templates describing printing of structures
+/// \file utils/printFormats.hpp
 #ifndef _Wolframe_PRINT_FORMATS_HPP_INCLUDED
 #define _Wolframe_PRINT_FORMATS_HPP_INCLUDED
 #include <string>
@@ -40,29 +40,29 @@
 namespace _Wolframe {
 namespace utils {
 
-///\class PrintFormat
-///\brief Structure with info for uniform printing for a type of message (log format as compact one liner, text as multi liner)
+/// \class PrintFormat
+/// \brief Structure with info for uniform printing for a type of message (log format as compact one liner, text as multi liner)
 struct PrintFormat
 {
-	const char* indent;		//< string to print for indentiation per level of hierarchy for a new item (after 'newitem')
-	const char* newitem;		//< string to print for a new item
-	const char* openstruct;		//< string to print as start marker of a structure
-	const char* closestruct;	//< string to print as end marker of a structure
-	const char* endheader;		//< string to print as end marker of a header
-	const char* startvalue;		//< string to print as start marker of a value
-	const char* endvalue;		//< string to print as end marker of a value
-	const char* decldelimiter;	//< string to print as delimiter of declarations
-	const char* itemdelimiter;	//< string to print as delimiter of values
-	const char* assign;		//< assignment operator for attributes
-	std::size_t maxitemsize;	//< maximum size of printed items
+	const char* indent;		///< string to print for indentiation per level of hierarchy for a new item (after 'newitem')
+	const char* newitem;		///< string to print for a new item
+	const char* openstruct;		///< string to print as start marker of a structure
+	const char* closestruct;	///< string to print as end marker of a structure
+	const char* endheader;		///< string to print as end marker of a header
+	const char* startvalue;		///< string to print as start marker of a value
+	const char* endvalue;		///< string to print as end marker of a value
+	const char* decldelimiter;	///< string to print as delimiter of declarations
+	const char* itemdelimiter;	///< string to print as delimiter of values
+	const char* assign;		///< assignment operator for attributes
+	std::size_t maxitemsize;	///< maximum size of printed items
 };
 
-///\brief Get the print format for logger output
+/// \brief Get the print format for logger output
 const PrintFormat* logPrintFormat();
-///\brief Get the print format for readable multi line output similar to property tree format
+/// \brief Get the print format for readable multi line output similar to property tree format
 const PrintFormat* ptreePrintFormat();
 
-///\brief Get a string to log out of a variant structure with a restriction of the size of the atomic elements
+/// \brief Get a string to log out of a variant structure with a restriction of the size of the atomic elements
 std::string getLogString( const types::Variant& val, std::size_t maxsize=60);
 
 }}

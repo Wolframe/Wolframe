@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/structProgramOption.hpp
-///\brief Provides uniform handling of structures in program command line options
+/// \file serialize/structProgramOption.hpp
+/// \brief Provides uniform handling of structures in program command line options
 #ifndef _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_OPTION_PARSER_HPP_INCLUDED
 #include "serialize/struct/structParser.hpp"
