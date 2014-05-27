@@ -64,10 +64,6 @@ struct DocMetaData
 	void clear();
 
 	void join( const std::vector<Attribute>& attributes_);
-	void join( const DocMetaData& o)
-	{
-		join( o.attributes());
-	}
 
 	void setDoctype( const std::string& doctype_)
 	{

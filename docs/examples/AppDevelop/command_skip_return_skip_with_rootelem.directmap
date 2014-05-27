@@ -1,2 +1,2 @@
 
-COMMAND process Document CALL doProcessDocument RETURN SKIP Document list;
+COMMAND process Document CALL doProcessDocument RETURN SKIP Document {root='list'};

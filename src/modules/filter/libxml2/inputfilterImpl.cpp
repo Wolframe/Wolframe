@@ -354,3 +354,30 @@ bool InputFilterImpl::setFlags( Flags f)
 	return InputFilter::setFlags( f);
 }
 
+bool InputFilterImpl::checkMetaData( const types::DocMetaData& md)
+{
+	if (state() == Start)
+	{
+		setState( Error, "input filter did not parse its meta data yet - cannot check them therefore");
+	}
+	// Check the XML root element:
+	const char* form_rootelem = md.getAttribute( "root");
+	const char* doc_rootelem = getMetaDataRef()->getAttribute( "root");
+	if (form_rootelem)
+	{
+		if (!doc_rootelem)
+		{
+			setState( Error, "input document has no root element defined");
+			return false;
+		}
+		if (0!=std::strcmp(form_rootelem,doc_rootelem))
+		{
+			std::string msg = std::string("input document root element '") + doc_rootelem + "' does not match the root element '" + form_rootelem + "'' required";
+			setState( Error, msg.c_str());
+			return false;
+		}
+	}
+	return true;
+}
+
+

@@ -58,6 +58,7 @@ struct InputFilterImpl :public InputFilter
 		:utils::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
 		,InputFilter("cjson")
 		,m_firstnode(0)
+		,m_done(false)
 	{
 		setFlags( langbind::FilterBase::PropagateNoAttr);
 	}
@@ -70,6 +71,7 @@ struct InputFilterImpl :public InputFilter
 		,m_root(o.m_root)
 		,m_firstnode(o.m_firstnode)
 		,m_stk(o.m_stk)
+		,m_done(o.m_done)
 		{}
 
 	virtual ~InputFilterImpl(){}
@@ -115,9 +117,9 @@ private:
 
 private:
 	std::string m_content;
-	types::String::EncodingAttrib m_encattr;	//< character set encoding attributes
-	boost::shared_ptr<cJSON> m_root;		//< data structure holding the whole tree
-	const cJSON* m_firstnode;			//< first node (to detect if getNext has been called)
+	types::String::EncodingAttrib m_encattr;	///< character set encoding attributes
+	boost::shared_ptr<cJSON> m_root;		///< data structure holding the whole tree
+	const cJSON* m_firstnode;			///< first node (to detect if getNext has been called)
 
 	struct StackElement
 	{
@@ -132,11 +134,12 @@ private:
 			static const char* ar[] = {"StateOpen","StateAttributeValue","StateContentValue","StateChild","StateValue","StateNext","StateCheckEnd","StateReopen","StateCloseNode"};
 			return ar[i];
 		}
-		State m_state;				//< current state
-		const cJSON* m_node;			//< current node
-		const char* m_tag;			//< current tag name
+		State m_state;				///< current state
+		const cJSON* m_node;			///< current node
+		const char* m_tag;			///< current tag name
 	};
-	std::vector<StackElement> m_stk;		//< state stack
+	std::vector<StackElement> m_stk;		///< state stack
+	bool m_done;					///< true, when final close has been returned
 };
 
 }}//namespace

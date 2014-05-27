@@ -168,7 +168,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				m_firstnode = m_firstnode->child;
 			}
 
-			for (;;)
+			while (m_firstnode)
 			{
 				if (m_firstnode->string && m_firstnode->valuestring)
 				{
@@ -205,7 +205,10 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				}
 				break;
 			}
-			m_stk.push_back( StackElement( m_firstnode));
+			if (m_firstnode)
+			{
+				m_stk.push_back( StackElement( m_firstnode));
+			}
 			LOG_DEBUG << "[cjson input] document meta data: {" << getMetaDataRef()->tostring() << "}";
 			setState( Open);
 		}
@@ -486,6 +489,15 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 					return true;
 			}
 		}
+	}
+	if (!m_done)
+	{
+		//... emit final close
+		type = InputFilter::CloseTag;
+		element = 0;
+		elementsize = 0;
+		m_done = true;
+		return true;
 	}
 	return false;
 }

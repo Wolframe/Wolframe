@@ -304,8 +304,16 @@ void OutputFilterImpl::printHeader()
 		m_encattr = types::String::getEncodingFromName( encname);
 	}
 
-	std::string doctype = md.doctype();
-	if (!doctype.empty()) addStructValue( "-doctype", doctype);
+	const char* standalone = md.getAttribute( "standalone");
+	if (standalone && 0==std::strcmp( standalone, "yes"))
+	{
+		//... explicit standalone -> no meta data except encoding
+	}
+	else
+	{
+		std::string doctype = md.doctype();
+		if (!doctype.empty()) addStructValue( "-doctype", doctype);
+	}
 	if (m_encattr.codepage) addStructValue( "-encoding", encname);
 
 	m_headerprinted = true;
@@ -338,15 +346,15 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 		{
 			setState( Error, "cjson filter illegal operation: printing after final close");
 		}
+		if (!m_headerprinted)
+		{
+			printHeader();
+		}
 		LOG_DATA << "[json output filter] print " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 	
 		switch (type)
 		{
 			case OutputFilter::OpenTag:
-				if (!m_headerprinted)
-				{
-					printHeader();
-				}
 				m_stk.push_back( StackElement( std::string( (const char*)element, elementsize)));
 				break;
 	

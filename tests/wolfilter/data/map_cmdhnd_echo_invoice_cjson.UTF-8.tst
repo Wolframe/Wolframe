@@ -153,7 +153,7 @@ Processor
 	}
 }
 **file: test.dmap
-COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;
+COMMAND (echo Invoice) CALL echo_invoice_table RETURN Invoice;
 **output
 {
 	"-doctype":	"Invoice",

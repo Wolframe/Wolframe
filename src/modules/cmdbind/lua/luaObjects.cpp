@@ -1702,7 +1702,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	{
 		throw std::runtime_error( "too few arguments");
 	}
-	else if (nn > 3)
+	else if (nn > 4)
 	{
 		throw std::runtime_error( "too many arguments");
 	}
@@ -1719,7 +1719,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			if (docmetadata_defined) throw std::runtime_error( "argument document meta data table specified twice");
 			docmetadata_defined = true;
 			lua_pushnil( ls);
-			while (lua_next( ls, -2))
+			while (lua_next( ls, ii))
 			{
 				if (lua_type( ls, -2) != LUA_TSTRING || lua_type( ls, -1) != LUA_TSTRING)
 				{
@@ -1775,12 +1775,12 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 		const types::FormDescription* formdescr = gtc->provider()->formDescription( doctype);
 		if (formdescr)
 		{
-			allmetadata.join( formdescr->metadata());
+			allmetadata.join( formdescr->metadata().attributes());
 		}
 	}
 	if (docmetadata_defined)
 	{
-		allmetadata.join( docmetadata);
+		allmetadata.join( docmetadata.attributes());
 	}
 	if (doctype_defined)
 	{

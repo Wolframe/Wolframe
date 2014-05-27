@@ -42,7 +42,7 @@ Processor
 	}
 }
 **file: test.dmap
-COMMAND schema_select_task_by_id CALL test_transaction RETURN STANDALONE doc;
+COMMAND schema_select_task_by_id CALL test_transaction RETURN SKIP doc {standalone='yes',root='doc'};
 **file: DBDATA
 `cat program/schema_select_task_by_id.sql`
 **file:DBPRG.tdl

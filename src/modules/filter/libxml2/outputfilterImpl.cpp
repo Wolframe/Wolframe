@@ -135,13 +135,13 @@ bool OutputFilterImpl::printHeader()
 	else
 	{
 		const char* doctype_public = md.getAttribute( "PUBLIC");
-		std::string doctype_public_buf;
-		if (doctype_public && !md.doctype().empty())
-		{
-			doctype_public_buf = types::DocMetaData::replaceStem( doctype_public, md.doctype());
-			doctype_public = doctype_public_buf.c_str();
-		}
 		const char* doctype_system = md.getAttribute( "SYSTEM");
+		std::string doctype_system_buf;
+		if (doctype_system && !md.doctype().empty())
+		{
+			doctype_system_buf = types::DocMetaData::replaceStem( doctype_system, md.doctype());
+			doctype_system = doctype_system_buf.c_str();
+		}
 		const char* xmlns = md.getAttribute( "xmlns");
 		const char* xsi = md.getAttribute( "xmlns:xsi");
 		const char* schemaLocation = md.getAttribute( "xmlns:schemaLocation");

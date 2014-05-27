@@ -54,13 +54,7 @@ class DirectmapCommandHandler :public IOFilterCommandHandlerEscDLF
 public:
 	typedef IOFilterCommandHandlerEscDLF Parent;
 	/// \brief Constructor
-	explicit DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const langbind::InputFilterR& inputfilter_, const langbind::OutputFilterR& outputfilter_)
-		:m_cmd(cmddescr)
-		,m_inputfilter(inputfilter_)
-		,m_outputfilter(outputfilter_)
-		,m_state(0)
-		,m_outputprinter(true)
-		{}
+	explicit DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const langbind::InputFilterR& inputfilter_, const langbind::OutputFilterR& outputfilter_);
 
 	/// \brief Destructor
 	virtual ~DirectmapCommandHandler(){}
@@ -75,8 +69,6 @@ private:
 
 private:
 	const langbind::DirectmapCommandDescription* m_cmd;			///< description of command to execute
-	langbind::InputFilterR m_inputfilter;					///< input filter
-	langbind::OutputFilterR m_outputfilter;					///< output filter
 	int m_state;								///< internal state
 	types::FormR m_inputform;						///< (optional) form for validating and formating input
 	types::FormR m_outputform;						///< (optional) form for validating and formating output

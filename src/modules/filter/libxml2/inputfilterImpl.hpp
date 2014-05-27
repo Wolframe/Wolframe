@@ -126,6 +126,9 @@ struct InputFilterImpl :public InputFilter
 	/// \brief Implements FilterBase::checkSetFlags()const
 	virtual bool checkSetFlags( Flags f) const;
 
+	/// \brief Implement InputFilter::checkMetaData(const types::DocMetaData&) const
+	virtual bool checkMetaData( const types::DocMetaData& md);
+
 private:
 	std::string getElementString( const xmlChar* str);
 	void getElement( const void*& element, std::size_t& elementsize, const xmlChar* str);

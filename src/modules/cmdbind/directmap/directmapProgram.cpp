@@ -68,7 +68,6 @@ static void parseMetaData( types::DocMetaData& metadata, std::string::const_iter
 		ch = utils::gotoNextToken( si, se);
 		if (ch == '}') break;
 		if (!ch) throw std::runtime_error("unexpected end of file parsing return document meta data");
-		++si;
 		std::string key;
 		ch = utils::parseNextToken( key, si, se, optab, keytab);
 		if (optab[ch]) throw std::runtime_error("identifier expected, key of document meta data attribute");
@@ -141,8 +140,8 @@ static std::string errorToken( char ch, const std::string& tok)
 static const utils::CharTable g_fchartab( "a..zA..Z_0..9.");
 static const utils::CharTable g_fcharoptab( ";#()");
 
-static const char* g_directmap_ids[] = {"SKIP","FILTER","RESULT","CALL","AUTHORIZE",0};
-enum DirectmapKeyword{ d_NONE, d_SKIP,d_FILTER,d_RESULT,d_CALL,d_AUTHORIZE };
+static const char* g_directmap_ids[] = {"SKIP","FILTER","RETURN","CALL","AUTHORIZE",0};
+enum DirectmapKeyword{ d_NONE, d_SKIP,d_FILTER,d_RETURN,d_CALL,d_AUTHORIZE };
 static const utils::IdentifierTable g_directmap_idtab( false, g_directmap_ids);
 
 
@@ -357,25 +356,30 @@ static DirectmapCommandDescriptionR parseCommandDescription( std::string::const_
 					}
 					break;
 				}
-				case d_RESULT:
+				case d_RETURN:
 				{
+					rt->has_result = true;
+
 					std::string doctype;
 					if (parseKeyword( si, se, "SKIP"))
 					{
-						if (skipvalidation_output) std::runtime_error( "SKIP after RESULT specified twice in command");
+						if (skipvalidation_output) std::runtime_error( "SKIP after RETURN specified twice in command");
 						skipvalidation_output = true;
-						doctype = parseName( si, se, "(doctype) after RESULT SKIP");
-						const types::FormDescription* fd = provider->formDescription( doctype);
-						if (fd)
+						if (utils::gotoNextToken( si, se) != '{')
 						{
-							// ... take meta data from form if defined, even with SKIP
-							rt->outputmetadata = fd->metadata();
+							doctype = parseName( si, se, "(doctype or meta data) after RETURN SKIP");
+							const types::FormDescription* fd = provider->formDescription( doctype);
+							if (fd)
+							{
+								// ... take meta data from form if defined, even with SKIP
+								rt->outputmetadata = fd->metadata();
+							}
+							rt->outputmetadata.setDoctype( doctype);
 						}
-						rt->outputmetadata.setDoctype( doctype);
 					}
 					else
 					{
-						doctype = parseName( si, se, "(doctype) after RESULT");
+						doctype = parseName( si, se, "(doctype) after RETURN");
 						rt->outputform = provider->formDescription( doctype);
 						if (!rt->outputform) throw std::runtime_error( std::string("referenced undefined form for output in result '") + doctype + "'");
 						rt->outputmetadata = rt->outputform->metadata();

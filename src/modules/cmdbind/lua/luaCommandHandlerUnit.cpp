@@ -79,7 +79,7 @@ bool LuaCommandHandlerUnit::loadPrograms( const proc::ProcessorProviderInterface
 	}
 	catch (const std::runtime_error& e)
 	{
-		LOG_ERROR << "could not load all Lua command handler programs";
+		LOG_ERROR << "could not load all Lua command handler programs: " << e.what();
 		rt = false;
 	}
 	return rt;

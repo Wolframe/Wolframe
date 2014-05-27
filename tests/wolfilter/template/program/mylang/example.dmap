@@ -1,1 +1,1 @@
-COMMAND(get CDCatalog) CALL(run) RETURN(CDCatalog);
+COMMAND (get CDCatalog) CALL run RETURN CDCatalog;

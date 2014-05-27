@@ -143,7 +143,7 @@ struct InputFilterImpl
 		return new InputFilterImpl( *this);
 	}
 
-	//\brief Implement InputFilter::initcopy()
+	/// \brief Implement InputFilter::initcopy()
 	virtual InputFilter* initcopy() const
 	{
 		bool withEmpty_ = m_parser.withEmpty();
@@ -164,6 +164,7 @@ struct InputFilterImpl
 		setState( Open);
 	}
 
+	/// \brief Implement InputFilter::getRest(const void*&,std::size_t&,bool&)
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
 	{
 		std::size_t pp = m_parser.getPosition();
@@ -329,7 +330,8 @@ struct InputFilterImpl
 								}
 								else
 								{
-									setState( Error, "unknown XML root element attribute");
+									std::string msg = std::string("unknown XML root element attribute '") + m_elembuffer + "'";
+									setState( Error, msg.c_str());
 								}
 							}
 							else
@@ -352,6 +354,33 @@ struct InputFilterImpl
 			setState( EndOfMessage);
 			return false;
 		};
+	}
+
+	/// \brief Implement InputFilter::checkMetaData(const types::DocMetaData&) const
+	virtual bool checkMetaData( const types::DocMetaData& md)
+	{
+		if (m_metadatastate != MS_Done)
+		{
+			setState( Error, "input filter did not parse its meta data yet - cannot check them therefore");
+		}
+		// Check the XML root element:
+		const char* form_rootelem = md.getAttribute( "root");
+		const char* doc_rootelem = getMetaDataRef()->getAttribute( "root");
+		if (form_rootelem)
+		{
+			if (!doc_rootelem)
+			{
+				setState( Error, "input document has no root element defined");
+				return false;
+			}
+			if (0!=std::strcmp(form_rootelem,doc_rootelem))
+			{
+				std::string msg = std::string("input document root element '") + doc_rootelem + "' does not match the root element '" + form_rootelem + "'' required";
+				setState( Error, msg.c_str());
+				return false;
+			}
+		}
+		return true;
 	}
 
 private:
@@ -468,13 +497,13 @@ struct OutputFilterImpl :public OutputFilter
 		else
 		{
 			const char* doctype_public = md.getAttribute( "PUBLIC");
-			std::string doctype_public_buf;
-			if (doctype_public && !md.doctype().empty())
-			{
-				doctype_public_buf = types::DocMetaData::replaceStem( doctype_public, md.doctype());
-				doctype_public = doctype_public_buf.c_str();
-			}
 			const char* doctype_system = md.getAttribute( "SYSTEM");
+			std::string doctype_system_buf;
+			if (doctype_system && !md.doctype().empty())
+			{
+				doctype_system_buf = types::DocMetaData::replaceStem( doctype_system, md.doctype());
+				doctype_system = doctype_system_buf.c_str();
+			}
 			const char* xmlns = md.getAttribute( "xmlns");
 			const char* xsi = md.getAttribute( "xmlns:xsi");
 			const char* schemaLocation = md.getAttribute( "xmlns:schemaLocation");
@@ -545,6 +574,7 @@ struct OutputFilterImpl :public OutputFilter
 			}
 			if (type == FilterBase::CloseTag)
 			{
+				m_gotFinalClose = true;
 				m_emptyDocument = true;
 				return true;
 			}

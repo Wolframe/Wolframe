@@ -4,7 +4,7 @@
 **requires:ORACLE
 **input
 {
-	"-doctype" : "AllDataRequest",
+	"-doctype" : "AllDataRequest"
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf AllDataRequest
 
@@ -290,7 +290,7 @@ function addSuffixToName( inp)
 	return rec
 end
 **file:preprocess.dmap
-COMMAND (AllDataRequest) CALL(run) RETURN(Data);
+COMMAND AllDataRequest CALL run RETURN Data;
 **file:preprocess.sfrm
 STRUCT PersonRef
 {

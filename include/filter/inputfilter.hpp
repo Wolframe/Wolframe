@@ -163,7 +163,9 @@ public:
 		m_metadata->setDoctype( doctype_);
 	}
 
-	virtual bool checkMetaData( const types::DocMetaData&) const
+	/// \brief Validate the meta data passed to be correct for this filter
+	/// \return true, if the meta data defined in the argument structure are correct for this filter
+	virtual bool checkMetaData( const types::DocMetaData&)
 	{
 		return true;
 	}

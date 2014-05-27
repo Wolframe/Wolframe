@@ -46,6 +46,15 @@ using namespace _Wolframe;
 using namespace cmdbind;
 using namespace langbind;
 
+DirectmapCommandHandler::DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const langbind::InputFilterR& inputfilter_, const langbind::OutputFilterR& outputfilter_)
+	:m_cmd(cmddescr)
+	,m_state(0)
+	,m_outputprinter(true)
+{
+	setFilterAs( inputfilter_);
+	setFilterAs( outputfilter_);
+}
+
 void DirectmapCommandHandler::initcall()
 {
 	if (!execContext()) throw std::logic_error( "execution context is not defined");
@@ -107,22 +116,33 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				}
 			case 2:
 			{
+				// Fill the form with the serialized input to validate it:
 				if (!m_inputform_parser->call()) return IOFilterCommandHandler::Yield;
 				m_input.reset( new serialize::DDLStructSerializer( m_inputform.get()));
+
+				// Validate the input meta data depending on what is required in th filter:
+				if (!m_inputfilter->checkMetaData( m_cmd->inputform->metadata()))
+				{
+					LOG_ERROR << "error validating input form metadata: " << m_inputfilter->getError();
+					throw std::runtime_error( "input validation failed");
+				}
 				m_state = 3;
 				/* no break here ! */
 			}
 			case 3:
+				// Initialize the function execution context:
 				m_functionclosure.reset( m_cmd->function->createClosure());
 				m_functionclosure->init( execContext(), m_input);
 				m_state = 4;
 				/* no break here ! */
 			case 4:
 			{
+				// Call the function:
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
 				langbind::TypedInputFilterR res = m_functionclosure->result();
 				if (!m_cmd->has_result)
 				{
+					// Validate that there is no result if the function did not declare it:
 					langbind::InputFilter::ElementType typ;
 					types::VariantConst element;
 

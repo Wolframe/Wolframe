@@ -658,7 +658,6 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			//	evaluate the command to execute (substitute '~' with doctype id)
 			//	and initialize the command handler with the docformat
 			//	as first parameter as the main protocol does.
-			Filter flt = getFilter( provider, ifl, ofl);
 
 			cmdbind::DoctypeFilterCommandHandler* dtfh = new cmdbind::DoctypeFilterCommandHandler();
 			cmdbind::CommandHandlerR dtfh_scoped( dtfh);
@@ -681,14 +680,19 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
 			if (cmdh)
 			{
+				Filter flt = getFilter( provider, ifl, ofl);
+
 				cmdh->setExecContext( execContext);
 				cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
 				if (!ifch) 
 				{
 					throw std::runtime_error( "expected command handler processing CRLFdot escaped content");
 				}
-				if (flt.inputfilter().get()) ifch->setFilter( flt.inputfilter());
-				if (flt.outputfilter().get())
+				if (ifl.size() && flt.inputfilter().get())
+				{
+					ifch->setFilter( flt.inputfilter());
+				}
+				if (ofl.size() && flt.outputfilter().get())
 				{
 					ifch->setFilter( flt.outputfilter());
 					flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
@@ -767,8 +771,11 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			{
 				throw std::runtime_error( "expected command handler processing CRLFdot escaped content");
 			}
-			if (flt.inputfilter().get()) ifch->setFilter( flt.inputfilter());
-			if (flt.outputfilter().get())
+			if (ifl.size() && flt.inputfilter().get())
+			{
+				ifch->setFilter( flt.inputfilter());
+			}
+			if (ofl.size() && flt.outputfilter().get())
 			{
 				ifch->setFilter( flt.outputfilter());
 				flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
@@ -833,6 +840,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 
 			RedirectFilterClosure res( closure->result(), outp, true);
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+			while (!flt.outputfilter()->close()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 			checkUnconsumedInput( is, *flt.inputfilter());
@@ -864,6 +872,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			res.init( outp, serialize::Context::None);
 
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+			while (!flt.outputfilter()->close()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 			checkUnconsumedInput( is, *flt.inputfilter());

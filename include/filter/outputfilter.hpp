@@ -151,8 +151,8 @@ public:
 
 	types::DocMetaData getMetaData() const
 	{
-		types::DocMetaData rt( *m_inheritMetadata);
-		rt.join( m_metadata);
+		types::DocMetaData rt( m_metadata.doctype(), m_inheritMetadata->attributes());
+		rt.join( m_metadata.attributes());
 		return rt;
 	}
 
