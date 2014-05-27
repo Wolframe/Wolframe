@@ -136,7 +136,7 @@ public:
 		else
 		{
 			setState( EndOfMessage);
-			return false;
+			return 0;
 		}
 	}
 

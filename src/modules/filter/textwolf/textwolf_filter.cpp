@@ -352,7 +352,7 @@ struct InputFilterImpl
 		catch (textwolf::SrcIterator::EoM)
 		{
 			setState( EndOfMessage);
-			return false;
+			return 0;
 		};
 	}
 
