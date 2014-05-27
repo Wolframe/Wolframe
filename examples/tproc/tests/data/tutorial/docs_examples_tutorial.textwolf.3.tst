@@ -39,7 +39,6 @@ OK enter cmd
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <recipe><item amount="100g">chocolate</item><item amount="0.5l">milk</item></recipe>
 
-
 .
 OK
 BYE
