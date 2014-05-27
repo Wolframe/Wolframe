@@ -4,21 +4,9 @@ Core:
 	- Client UI files from server with protocol support as ordinary wolframe function call - eliminate process specific stuff from core (PF & MBa)
 	- For different type of transactions (get UI files, process request, etc..) chose DB in context
 
-Filter:
-	- XML header and attributes as document attributes and root element is not part of serialization
-	- Document type recognition filters with general rules depending on attributes (xmlns:xsi document type declaration)
-
 Processors:
 	- Python (ABa, with support PF)
 
 Fixes:
 	- Start SDK and splitting of graphix module and others
-
-
-JSON:
-	doctype and encoding as top level attributes instead of values "-doctype" instead of "doctype"
-	all top level attributes ("-...") are considered to be document meta data
-
-FORMs:
-	": root name"  instead of second identifier "FORM id name" (":" on top level starts a meta data declaration)
 
