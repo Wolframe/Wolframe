@@ -313,11 +313,6 @@ public:
 			const char* elemptr;
 			std::size_t elemsize;
 			XMLScannerBase::ElementType elemtype = m_mt.m_getNext( m_obj, elemptr, elemsize);
-			if ((int)elemtype > (int)XMLScannerBase::DocAttribEnd)
-			{
-				err = "xml header not complete";
-				return false;
-			}
 			switch (m_state)
 			{
 				case ParseHeader:

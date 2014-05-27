@@ -44,6 +44,7 @@
 #include "wtest/testHandlerTemplates.hpp"
 #include "testUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testModules.hpp"
 #include "wtest/testReport.hpp"

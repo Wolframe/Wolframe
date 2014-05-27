@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/module/cppFormFunctionFunctionBuilder.hpp
+///\file appdevel/module/cppFormFunctionBuilder.hpp
 ///\brief Interface template for object builder of built-in functions
 #ifndef _Wolframe_MODULE_CPP_FORM_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_CPP_FORM_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED

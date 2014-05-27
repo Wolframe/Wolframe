@@ -35,10 +35,14 @@
 //
 
 #include "processor/procProvider.hpp"
-#include "procProviderImpl.hpp"
-
-#include "config/valueParser.hpp"
-#include "config/configurationTree.hpp"
+#include "cmdbind/commandHandlerConstructor.hpp"
+#include "appdevel/module/runtimeEnvironmentConstructor.hpp"
+#include "appdevel/module/filterBuilder.hpp"
+#include "appdevel/module/ddlcompilerBuilder.hpp"
+#include "appdevel/module/programTypeBuilder.hpp"
+#include "appdevel/module/cppFormFunctionBuilder.hpp"
+#include "appdevel/module/normalizeFunctionBuilder.hpp"
+#include "appdevel/module/customDataTypeBuilder.hpp"
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"
@@ -49,231 +53,385 @@
 #include <ostream>
 #include <string>
 
-namespace _Wolframe {
-namespace proc {
+using namespace _Wolframe;
+using namespace _Wolframe::proc;
 
-//***  Processor Provider Configuration  ************************************
-bool ProcProviderConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
-				const module::ModulesDirectory* modules )
+ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
+					const module::ModulesDirectory* modules,
+					prgbind::ProgramLibrary* programs_)
+	:m_programs(programs_),m_referencePath(conf->referencePath())
 {
-	using namespace _Wolframe::config;
-	bool retVal = true;
+	m_db = NULL;
+	if ( !conf->m_dbLabel.empty())
+		m_dbLabel = conf->m_dbLabel;
+	m_programfiles = conf->programFiles();
 
-	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( "database", L1it->first ))	{
-			bool isDefined = ( ! m_dbLabel.empty());
-			if ( ! Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
-				retVal = false;
-		}
-		else if ( boost::algorithm::iequals( "program", L1it->first ) )	{
-			std::string programFile;
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
-				retVal = false;
-			else
-				m_programFiles.push_back( programFile );
-		}
-		else if ( boost::algorithm::iequals( "cmdhandler", L1it->first )
-			|| boost::algorithm::iequals( "runtimeenv", L1it->first ) )	{
-			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
-									  L2it != L1it->second.end(); L2it++ )	{
-				if ( modules )	{
-					module::ConfiguredBuilder* builder = modules->getBuilder( L1it->first, L2it->first );
-					if ( builder )	{
-						config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
-						if ( conf->parse( L2it->second, L2it->first, modules ))
-							m_procConfig.push_back( conf );
-						else	{
-							delete conf;
-							retVal = false;
-						}
-					}
-					else
-						LOG_WARNING << logPrefix() << "unknown '" << L1it->first << "' configuration option: '"
-							    << L2it->first << "'";
+	// Build the list of command handlers and runtime environments (configured objects)
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
+									it != conf->m_procConfig.end(); it++ )	{
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
+		if ( builder )
+		{
+			if (builder->objectType() == ObjectConstructorBase::CMD_HANDLER_OBJECT)
+			{
+				cmdbind::CommandHandlerConstructorR constructor( dynamic_cast<cmdbind::CommandHandlerConstructor*>( builder->constructor()));
+
+				if (!constructor.get())	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << builder->objectClassName()
+						  << "' is not a command handler";
+					throw std::logic_error( "Object is not a commandHandler. See log." );
+				}
+				else	{
+					m_cmd.push_back( CommandHandlerDef( constructor->object( **it), *it));
+				}
+			}
+			else if (builder->objectType() == ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT)
+			{
+				module::RuntimeEnvironmentConstructorR constructor( dynamic_cast<module::RuntimeEnvironmentConstructor*>( builder->constructor()));
+				if (!constructor.get())
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << builder->objectClassName()
+						  << "' is not a runtime environment constructor";
+					throw std::logic_error( "Object is not a runtime environment constructor. See log." );
 				}
 				else
-					LOG_WARNING << logPrefix() << "unknown '" << L1it->first << "' configuration option: '"
-						    << L2it->first << "'";
+				{
+					langbind::RuntimeEnvironmentR env( constructor->object( **it));
+					m_programs->defineRuntimeEnvironment( env);
+
+					LOG_TRACE << "Registered runtime environment '" << env->name() << "'";
+				}
+			}
+			else	{
+				LOG_ALERT << "Wolframe Processor Provider: unknown processor type '" << (*it)->className() << "'";
+				throw std::domain_error( "Unknown command handler type constructor. See log." );
 			}
 		}
 		else	{
-			if ( modules )	{
-				module::ConfiguredBuilder* builder = modules->getBuilder( "processor", L1it->first );
-				if ( builder )	{
-					config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
-					if ( conf->parse( L1it->second, L1it->first, modules ))
-						m_procConfig.push_back( conf );
-					else	{
-						delete conf;
-						retVal = false;
+			LOG_ALERT << "Wolframe Processor Provider: processor provider configuration can not handle objects of this type '" << (*it)->className() << "'";
+			throw std::domain_error( "Unknown configurable object for processor provider. See log." );
+		}
+	}
+
+	// Build the lists of objects without configuration
+	for ( module::ModulesDirectory::simpleBuilder_iterator it = modules->objectsBegin();
+								it != modules->objectsEnd(); it++ )	{
+		switch( it->objectType() )	{
+			case ObjectConstructorBase::FILTER_OBJECT:	{	// object is a filter
+				module::FilterConstructorR fltr( dynamic_cast< module::FilterConstructor* >((*it)->constructor()));
+				if (!fltr.get())	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "' is not a filter";
+					throw std::logic_error( "Object is not a filter. See log." );
+				}
+				else	{
+					try
+					{
+						langbind::FilterTypeR filtertype( fltr->object());
+						m_programs->defineFilterType( fltr->name(), filtertype);
+						LOG_TRACE << "registered filter '" << fltr->name() << "' (" << fltr->objectClassName() << ")";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_ERROR << "error loading filter object module: " << e.what();
 					}
 				}
-				else
-					LOG_WARNING << logPrefix() << "unknown processor configuration option: '"
-						    << L1it->first << "'";
+				break;
 			}
-			else
-				LOG_WARNING << logPrefix() << "unknown processor configuration option: '"
-					    << L1it->first << "'";
+
+			case ObjectConstructorBase::DDL_COMPILER_OBJECT:
+			{	// object is a DDL compiler
+				module::DDLCompilerConstructorR ffo( dynamic_cast< module::DDLCompilerConstructor* >((*it)->constructor()));
+				if (!ffo.get())	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "' is not a DDL compiler";
+					throw std::logic_error( "Object is not a form function. See log." );
+				}
+				else {
+					try
+					{
+						langbind::DDLCompilerR constructor( ffo->object());
+						m_programs->defineFormDDL( constructor);
+						LOG_TRACE << "registered '" << constructor->ddlname() << "' DDL compiler";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading DDL compiler '" << ffo->name() << "':" << e.what();
+					}
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::PROGRAM_TYPE_OBJECT:
+			{	// object is a form function program type
+				module::ProgramTypeConstructorR ffo( dynamic_cast< module::ProgramTypeConstructor* >((*it)->constructor()));
+				if (!ffo.get())	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "' is not a program type";
+					throw std::logic_error( "Object is not a program type. See log." );
+				}
+				else {
+					try
+					{
+						prgbind::ProgramR prgtype( ffo->object());
+						m_programs->defineProgramType( prgtype);
+						LOG_TRACE << "registered '" << ffo->name() << "' program type";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading program type '" << ffo->name() << "':" << e.what();
+					}
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:
+			{	// object is a form function
+				module::CppFormFunctionConstructorR ffo( dynamic_cast< module::CppFormFunctionConstructor* >((*it)->constructor()));
+				if (!ffo.get())	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "' is not a form function";
+					throw std::logic_error( "Object is not a form function. See log." );
+				}
+				else
+				{
+					try
+					{
+						m_programs->defineCppFormFunction( ffo->identifier(), ffo->function());
+						LOG_TRACE << "registered C++ form function '" << ffo->identifier() << "'";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading form function object '" << ffo->objectClassName() << "':" << e.what();
+					}
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::NORMALIZE_FUNCTION_OBJECT:
+			{	// object is a normalize function constructor
+				module::NormalizeFunctionConstructorR constructor( dynamic_cast< module::NormalizeFunctionConstructor* >((*it)->constructor()));
+				if ( !constructor.get() )
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "' is not a normalize function constructor";
+					throw std::logic_error( "Object is not a normalize function constructor. See log." );
+				}
+				else
+				{
+					try {
+						m_programs->defineNormalizeFunctionType( constructor->identifier(), constructor->function());
+						LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function '" << constructor->identifier() << "'";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading normalize function object '" << constructor->objectClassName() << "':" << e.what();
+					}
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::CUSTOM_DATA_TYPE_OBJECT:
+			{
+				module::CustomDataTypeConstructorR constructor( dynamic_cast< module::CustomDataTypeConstructor* >((*it)->constructor()));
+				if ( !constructor.get() )
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "' is not a custom data type constructor";
+					throw std::logic_error( "Object is not a custom data type constructor. See log." );
+				}
+				else
+				{
+					try {
+						m_programs->defineCustomDataType( constructor->identifier(), constructor->object());
+						LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << constructor->identifier() << "'";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading custom data type '" << constructor->objectClassName() << "':" << e.what();
+					}
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::AUDIT_OBJECT:
+			case ObjectConstructorBase::AUTHENTICATION_OBJECT:
+			case ObjectConstructorBase::AUTHORIZATION_OBJECT:
+			case ObjectConstructorBase::JOB_SCHEDULE_OBJECT:
+			case ObjectConstructorBase::DATABASE_OBJECT:
+			case ObjectConstructorBase::CMD_HANDLER_OBJECT:
+			case ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT:
+			case ObjectConstructorBase::TEST_OBJECT:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+					  << "' is marked as '" << ObjectConstructorBase::objectTypeName( it->objectType())
+					  << "' object but has a simple object constructor";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
+				break;
+			default:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+					  << "' is of an unknown object type";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
 		}
 	}
-	return retVal;
 }
 
-} // namespace config
-
-
-namespace proc {
-
-ProcProviderConfig::~ProcProviderConfig()
-{
-	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
-								it != m_procConfig.end(); it++ )
-		delete *it;
-}
-
-void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
-{
-	os << sectionName() << std::endl;
-	os << "   Database: " << (m_dbLabel.empty() ? "(none)" : m_dbLabel) << std::endl;
-	if ( m_procConfig.size() > 0 )	{
-		for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
-								it != m_procConfig.end(); it++ )	{
-			(*it)->print( os, 3 );
-		}
-	}
-	else
-		os << "   None configured" << std::endl;
-
-	std::string indStr( indent + 1, '\t');
-	if ( m_programFiles.size() == 0 )
-		os << "   Program file: none" << std::endl;
-	else if ( m_programFiles.size() == 1 )
-		os << "   Program file: " << m_programFiles.front() << std::endl;
-	else	{
-		std::list< std::string >::const_iterator it = m_programFiles.begin();
-		os << "   Program files: " << *it++ << std::endl;
-		while ( it != m_programFiles.end() )
-			os << "                  " << *it++ << std::endl;
-	}
-}
-
-
-/// Check if the configuration makes sense
-bool ProcProviderConfig::check() const
-{
-	bool correct = true;
-
-	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
-								it != m_procConfig.end(); it++ )	{
-		if ( !(*it)->check() )
-			correct = false;
-	}
-	return correct;
-}
-
-void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
-{
-	m_referencePath = refPath;
-	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
-								it != m_procConfig.end(); it++ )	{
-		(*it)->setCanonicalPathes( refPath );
-	}
-	for ( std::list< std::string >::iterator it = m_programFiles.begin();
-						it != m_programFiles.end(); it++ )	{
-		std::string oldPath = *it;
-		*it = utils::getCanonicalPath( *it, refPath );
-		if ( oldPath != *it )	{
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using program absolute filename '" << *it
-				   << "' instead of '" << oldPath << "'";
-		}
-	}
-}
-
-
-//**** Processor Provider PIMPL *********************************************
-ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
-				      const module::ModulesDirectory* modules,
-				      prgbind::ProgramLibrary* programs_)
-	: m_impl(0)
-{
-	m_impl = new ProcessorProvider_Impl( conf, modules, programs_);
-}
 
 ProcessorProvider::~ProcessorProvider()
+{}
+
+bool ProcessorProvider::loadPrograms()
 {
-	delete m_impl;
+	try
+	{
+		// load all globally defined programs:
+		m_programs->loadPrograms( m_db, m_programfiles);
+
+		// load command handler programs and register commands 
+		std::vector<CommandHandlerDef>::const_iterator di = m_cmd.begin(), de = m_cmd.end();
+		for (; di != de; ++di)
+		{
+			if (!di->unit->loadPrograms( this))
+			{
+				LOG_ERROR << "failed to load command handler programs";
+			}
+			const std::vector<std::string>& cmds = di->unit->commands();
+			for (std::vector<std::string>::const_iterator cmdIt = cmds.begin(); cmdIt != cmds.end(); cmdIt++)
+			{
+				types::keymap<std::size_t>::const_iterator ci = m_cmdMap.find( *cmdIt);
+				if (ci != m_cmdMap.end())
+				{
+					const char* c1 = m_cmd.at(ci->second).configuration->className();
+					const char* c2 = di->configuration->className();
+					LOG_ERROR << "duplicate definition of command '" << *cmdIt << "' (in '" << c1 << "' and in '" << c2 << "')";
+					throw std::runtime_error( "duplicate command definition");
+				}
+				else
+				{
+					m_cmdMap[ *cmdIt] = m_cmd.size()-1;
+				}
+				LOG_TRACE << "Command '" << *cmdIt << "' registered for '" << di->configuration->className() << "' command handler";
+			}
+		}
+		return true;
+	}
+	catch (const std::runtime_error& e)
+	{
+		LOG_ERROR << "failed to load programs: " << e.what();
+		return false;
+	}
 }
 
 bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 {
-	return m_impl->resolveDB( db );
-}
-
-bool ProcessorProvider::loadPrograms()
-{
-	return m_impl->loadPrograms( this);
-}
-
-cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name, const std::string& docformat) const
-{
-	cmdbind::CommandHandler* rt = m_impl->cmdhandler( name, docformat);
+	bool rt = true;
+	if ( m_db == NULL && ! m_dbLabel.empty() )	{
+		m_db = db.database( m_dbLabel );
+		if ( m_db )	{
+			LOG_DEBUG << "Processor database: database reference '" << m_dbLabel << "' resolved";
+		}
+		else	{
+			LOG_ALERT << "Processor database: database labeled '" << m_dbLabel << "' not found !";
+			return false;
+		}
+	}
 	return rt;
-}
-
-bool ProcessorProvider::existcmd( const std::string& command) const
-{
-	return m_impl->existcmd( command);
-}
-
-db::Database* ProcessorProvider::transactionDatabase() const
-{
-	return m_impl->transactionDatabase();
-}
-
-db::Transaction* ProcessorProvider::transaction( const std::string& name ) const
-{
-	return m_impl->transaction( name );
 }
 
 const types::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
 {
-	return m_impl->normalizeFunction( name);
+	return m_programs->getNormalizeFunction( name);
 }
 
 const types::NormalizeFunctionType* ProcessorProvider::normalizeFunctionType( const std::string& name) const
 {
-	return m_impl->normalizeFunctionType( name);
+	return m_programs->getNormalizeFunctionType( name);
 }
 
 const langbind::FormFunction* ProcessorProvider::formFunction( const std::string& name) const
 {
-	return m_impl->formFunction( name);
+	LOG_TRACE << "[provider] get function '" << name << "'";
+	return m_programs->getFormFunction( name);
 }
 
 const types::FormDescription* ProcessorProvider::formDescription( const std::string& name) const
 {
-	return m_impl->formDescription( name);
+	LOG_TRACE << "[provider] get form description '" << name << "'";
+	return m_programs->getFormDescription( name);
 }
 
 const langbind::FilterType* ProcessorProvider::filterType( const std::string& name) const
 {
-	return m_impl->filterType( name);
+	return m_programs->getFilterType( name);
 }
 
 const types::CustomDataType* ProcessorProvider::customDataType( const std::string& name) const
 {
-	return m_impl->customDataType( name);
+	LOG_TRACE << "[provider] get custom data type '" << name << "'";
+	return m_programs->getCustomDataType( name);
 }
 
 bool ProcessorProvider::guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const
 {
-	return m_impl->guessDocumentFormat( result, content, contentsize);
+	//PF:HACK: Currently very very simple hardcoded guesser
+	//TODO Replace by module based guessers that implement also document type recognition
+	std::size_t ii=0;
+	for (; ii<contentsize && content[ii] == 0; ++ii){}
+	if (ii == contentsize) return false;
+	if (content[ii] == '<')
+	{
+		result = "xml";
+		return true;
+	}
+	else if (content[ii] == '{')
+	{
+		result = "json";
+		return true;
+	}
+	else
+	{
+		result = "text";
+		return false;
+	}
+}
+
+cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& command, const std::string& docformat) const
+{
+	types::keymap<std::size_t>::const_iterator ci = m_cmdMap.find( command);
+	if (ci == m_cmdMap.end())
+	{
+		return 0;
+	}
+	cmdbind::CommandHandlerUnit* unit = m_cmd.at( ci->second).unit.get();
+	return unit->createCommandHandler( command, docformat);
+}
+
+bool ProcessorProvider::existcmd( const std::string& command) const
+{
+	return m_cmdMap.find( command) != m_cmdMap.end();
+}
+
+db::Database* ProcessorProvider::transactionDatabase() const
+{
+	if ( ! m_db )	{
+		LOG_ALERT << "No database defined for the processor provider";
+	}
+	return m_db;
+}
+
+db::Transaction* ProcessorProvider::transaction( const std::string& name ) const
+{
+	if ( m_db )
+	{
+		LOG_TRACE << "[provider] get transaction '" << name << "'";
+		return m_db->transaction( name );
+	} else	{
+		LOG_ALERT << "No database defined for the processor provider";
+		return NULL;
+	}
 }
 
 const std::string& ProcessorProvider::referencePath() const
 {
-	return m_impl->referencePath();
+	return m_referencePath;
 }
 
-}} // namespace _Wolframe::proc

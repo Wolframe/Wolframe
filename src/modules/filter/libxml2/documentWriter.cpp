@@ -111,14 +111,14 @@ DocumentWriter::DocumentWriter( const char* encoding, const char* root, const ch
 	}
 	if (xsi)
 	{
-		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xmlns::xsi"), getXmlString(xsi)))
+		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xmlns:xsi"), getXmlString(xsi)))
 		{
 			throw std::runtime_error( errorMessage( "libxml2 filter: write XML header attribute error"));
 		}
 	}
 	if (xmlns)
 	{
-		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xmlns::schemaLocation"), getXmlString(schemaLocation)))
+		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xsi:schemaLocation"), getXmlString(schemaLocation)))
 		{
 			throw std::runtime_error( errorMessage( "libxml2 filter: write XML header attribute error"));
 		}

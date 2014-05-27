@@ -161,11 +161,25 @@ void InputFilterImpl::initDocMetaData()
 		{
 			setAttribute( "root", (const char*)m_node->name);
 		}
+		if (m_node->nsDef && m_node->nsDef->href)
+		{
+			std::string xmlns( getElementString( m_node->nsDef->href));
+			setAttribute( "xmlns", xmlns);
+		}
 		xmlAttr* rootattr = m_node->properties;
 		while (rootattr)
 		{
 			xmlNode* rootvalues = 0;
 			if (rootattr) rootvalues = rootattr->children;
+			std::string prefix;
+			if (rootattr->ns && rootattr->ns->prefix)
+			{
+				prefix = getElementString( rootattr->ns->prefix);
+				if (rootattr->ns->href)
+				{
+					setAttribute( std::string("xmlns:") + prefix, getElementString( rootattr->ns->href));
+				}
+			}
 			std::string attrname = getElementString( rootattr->name);
 			std::string attrvalue;
 			while (rootvalues)
@@ -173,18 +187,13 @@ void InputFilterImpl::initDocMetaData()
 				attrvalue.append( getElementString( rootvalues->content));
 				rootvalues = rootvalues->next;
 			}
-			if (attrname == "xmlns")
+			if (prefix.size())
 			{
-				setAttribute( attrname, attrvalue);
-			}
-			else if (attrname == "xmlns:xsi")
-			{
-				setAttribute( attrname, attrvalue);
-			}
-			else if (attrname == "xmlns:schemaLocation")
-			{
-				setAttribute( attrname, attrvalue);
-				setDoctype( types::DocMetaData::extractStem( attrvalue));
+				setAttribute( prefix + ":" + attrname, attrvalue);
+				if (attrname == "schemaLocation")
+				{
+					setDoctype( types::DocMetaData::extractStem( attrvalue));
+				}
 			}
 			else
 			{

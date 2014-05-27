@@ -58,7 +58,7 @@ enum StandaloneDef
 template <class BufferType>
 struct XMLPrinterBase
 {
-	typedef void (*PrintDoctype)( void* obj, const char* rootid, const char* publicid, const char* systemid, BufferType& buf);
+	typedef void (*PrintDoctype)( void* obj, StandaloneDef standalone, const char* rootid, const char* publicid, const char* systemid, BufferType& buf);
 	typedef void (*PrintHeader)( void* obj, const char* encoding, StandaloneDef standalone, BufferType& buf);
 	typedef bool (*PrintProc)( void* obj, const char* elemptr, std::size_t elemsize, BufferType& buf);
 	typedef bool (*PrintProcEmpty)( void* obj, BufferType& buf);
@@ -230,39 +230,47 @@ private:
 					printToBuffer( "\" standalone=\"no\"?>\n", 20, buf);
 					break;
 				case Standalone_Unspecified:
+					printToBuffer( "\"?>\n", 4, buf);
 					break;
 			}
 			m_state = Content;
 		}
 
-		void printDoctype( const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
+		void printDoctype( StandaloneDef standalone, const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
 		{
 			if (rootid)
 			{
-				if (publicid)
+				switch (standalone)
 				{
-					if (!systemid) throw std::logic_error("defined DOCTYPE with PUBLIC id but no SYSTEM id");
-					printToBuffer( "<!DOCTYPE ", 10, buf);
-					printToBuffer( rootid, std::strlen( rootid), buf);
-					printToBuffer( " PUBLIC \"", 9, buf);
-					printToBuffer( publicid, std::strlen( publicid), buf);
-					printToBuffer( "\" \"", 3, buf);
-					printToBuffer( systemid, std::strlen( systemid), buf);
-					printToBuffer( "\">", 2, buf);
-				}
-				else if (systemid)
-				{
-					printToBuffer( "<!DOCTYPE ", 10, buf);
-					printToBuffer( rootid, std::strlen( rootid), buf);
-					printToBuffer( " SYSTEM \"", 9, buf);
-					printToBuffer( systemid, std::strlen( systemid), buf);
-					printToBuffer( "\">", 2, buf);
-				}
-				else
-				{
-					printToBuffer( "<!DOCTYPE ", 11, buf);
-					printToBuffer( rootid, std::strlen( rootid), buf);
-					printToBuffer( ">", 2, buf);
+				case Standalone_Yes:
+					break;
+				case Standalone_No:
+				case Standalone_Unspecified:
+					if (publicid)
+					{
+						if (!systemid) throw std::logic_error("defined DOCTYPE with PUBLIC id but no SYSTEM id");
+						printToBuffer( "<!DOCTYPE ", 10, buf);
+						printToBuffer( rootid, std::strlen( rootid), buf);
+						printToBuffer( " PUBLIC \"", 9, buf);
+						printToBuffer( publicid, std::strlen( publicid), buf);
+						printToBuffer( "\" \"", 3, buf);
+						printToBuffer( systemid, std::strlen( systemid), buf);
+						printToBuffer( "\">", 2, buf);
+					}
+					else if (systemid)
+					{
+						printToBuffer( "<!DOCTYPE ", 10, buf);
+						printToBuffer( rootid, std::strlen( rootid), buf);
+						printToBuffer( " SYSTEM \"", 9, buf);
+						printToBuffer( systemid, std::strlen( systemid), buf);
+						printToBuffer( "\">", 2, buf);
+					}
+					else if (standalone == Standalone_No)
+					{
+						printToBuffer( "<!DOCTYPE ", 11, buf);
+						printToBuffer( rootid, std::strlen( rootid), buf);
+						printToBuffer( ">", 2, buf);
+					}
 				}
 			}
 		}
@@ -388,10 +396,10 @@ public:
 		obj->printHeader( encoding, standalone, buf);
 	}
 
-	static void printDoctype( void* obj_, const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
+	static void printDoctype( void* obj_, StandaloneDef standalone, const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
 	{
 		This* obj = (This*)obj_;
-		obj->printDoctype( rootid, publicid, systemid, buf);
+		obj->printDoctype( standalone, rootid, publicid, systemid, buf);
 	}
 
 	static bool printOpenTag( void* obj_, const char* src, std::size_t srcsize, BufferType& buf)
@@ -557,12 +565,12 @@ public:
 		}
 		if (xsi)
 		{
-			m_mt.m_printAttribute( m_obj, "xmlns::xsi", 10, buf);
+			m_mt.m_printAttribute( m_obj, "xmlns:xsi", 9, buf);
 			m_mt.m_printValue( m_obj, xsi, std::strlen(xsi), buf);
 		}
 		if (schemaLocation)
 		{
-			m_mt.m_printAttribute( m_obj, "xmlns::schemaLocation", 21, buf);
+			m_mt.m_printAttribute( m_obj, "xsi:schemaLocation", 18, buf);
 			m_mt.m_printValue( m_obj, schemaLocation, std::strlen(schemaLocation), buf);
 		}
 	}
@@ -573,14 +581,14 @@ public:
 		if (doctype_system)
 		{
 			m_mt.m_printHeader( m_obj, m_encoding.c_str(), Standalone_No, buf);
-			m_mt.m_printDoctype( m_obj, rootelem, doctype_public, doctype_system, buf);
+			m_mt.m_printDoctype( m_obj, Standalone_No, rootelem, doctype_public, doctype_system, buf);
 			m_mt.m_printOpenTag( m_obj, rootelem, std::strlen(rootelem), buf);
 			printRootAttributes( xmlns, xsi, schemaLocation, buf);
 		}
 		else if (schemaLocation)
 		{
 			m_mt.m_printHeader( m_obj, m_encoding.c_str(), Standalone_Unspecified, buf);
-			m_mt.m_printDoctype( m_obj, rootelem, doctype_public, doctype_system, buf);
+			m_mt.m_printDoctype( m_obj, Standalone_Unspecified, rootelem, doctype_public, doctype_system, buf);
 			m_mt.m_printOpenTag( m_obj, rootelem, std::strlen(rootelem), buf);
 			printRootAttributes( xmlns, xsi, schemaLocation, buf);
 		}

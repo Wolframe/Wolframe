@@ -250,6 +250,7 @@ struct InputFilterImpl
 					if (!m_parser.parseHeader( err) || !m_parser.hasMetadataParsed())
 					{
 						setState( Error, err?err:"unknown error");
+						return 0;
 					}
 					continue;
 				}
@@ -317,21 +318,25 @@ struct InputFilterImpl
 							{
 								if (m_elembuffer == "xmlns")
 								{
-									getMetaDataRef()->setAttribute( "xmlns", std::string( ee, eesize));
+									getMetaDataRef()->setAttribute( m_elembuffer, std::string( ee, eesize));
 								}
-								else if (m_elembuffer == "xmlns:xsi")
+								else if (0==std::memcmp( m_elembuffer.c_str(), "xmlns:", 6/*strlen("xmlns:")*/))
 								{
-									getMetaDataRef()->setAttribute( "xmlns:xsi", std::string( ee, eesize));
+									getMetaDataRef()->setAttribute( m_elembuffer.c_str(), std::string( ee, eesize));
 								}
-								else if (m_elembuffer == "xmlns:schemaLocation")
+								else if (0==std::memcmp( m_elembuffer.c_str(), "xsi:", 4/*strlen("xsi:")*/))
 								{
-									getMetaDataRef()->setAttribute( "xmlns:xsi", std::string( ee, eesize));
-									getMetaDataRef()->setDoctype( types::DocMetaData::extractStem( std::string( ee, eesize)));
+									getMetaDataRef()->setAttribute( m_elembuffer.c_str(), std::string( ee, eesize));
+									if (m_elembuffer == "xsi:schemaLocation")
+									{
+										getMetaDataRef()->setDoctype( types::DocMetaData::extractStem( std::string( ee, eesize)));
+									}
 								}
 								else
 								{
 									std::string msg = std::string("unknown XML root element attribute '") + m_elembuffer + "'";
 									setState( Error, msg.c_str());
+									return 0;
 								}
 							}
 							else
@@ -362,6 +367,7 @@ struct InputFilterImpl
 		if (m_metadatastate != MS_Done)
 		{
 			setState( Error, "input filter did not parse its meta data yet - cannot check them therefore");
+			return false;
 		}
 		// Check the XML root element:
 		const char* form_rootelem = md.getAttribute( "root");
@@ -506,7 +512,7 @@ struct OutputFilterImpl :public OutputFilter
 			}
 			const char* xmlns = md.getAttribute( "xmlns");
 			const char* xsi = md.getAttribute( "xmlns:xsi");
-			const char* schemaLocation = md.getAttribute( "xmlns:schemaLocation");
+			const char* schemaLocation = md.getAttribute( "xsi:schemaLocation");
 			std::string schemaLocation_buf;
 			if (schemaLocation && !md.doctype().empty())
 			{

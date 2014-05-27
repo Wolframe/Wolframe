@@ -46,6 +46,7 @@
 #include "processor/procProvider.hpp"
 #include "wtest/testHandlerTemplates.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
 #include "wtest/testModules.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>

@@ -34,6 +34,7 @@
 ///\brief Implementation of a simple protocol based command handler calling a lus script
 #include "iprocHandler.hpp"
 #include "processor/procProvider.hpp"
+#include "cmdbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 

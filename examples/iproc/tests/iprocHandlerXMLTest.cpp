@@ -41,8 +41,9 @@
 #include "config/configurationTree.hpp"
 #include "processor/procProvider.hpp"
 #include "wtest/testHandlerTemplates.hpp"
-#include "testUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
+#include "testUtils.hpp"
 #include "wtest/testModules.hpp"
 #include "wtest/testReport.hpp"
 #include <iostream>
