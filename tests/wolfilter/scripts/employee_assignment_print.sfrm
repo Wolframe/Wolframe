@@ -6,20 +6,18 @@ FORM Employee
 }
 
 FORM employee_assignment_print
+	-root assignmentlist
 {
-	assignmentlist
+	assignment []
 	{
-		assignment []
+		task []
 		{
-			task []
-			{
-				title string
-				key string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
+			title string
+			key string
+			customernumber int
 		}
+		employee Employee
+		issuedate string
 	}
 }
 

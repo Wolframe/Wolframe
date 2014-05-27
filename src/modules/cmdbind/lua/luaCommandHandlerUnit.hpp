@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Interface to the lua command handler unit
 #ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_UNIT_HPP_INCLUDED
 #define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_UNIT_HPP_INCLUDED
+#include "filter/filterdef.hpp"
 #include "luaScriptContext.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 #include "luaCommandHandlerConfig.hpp"
@@ -66,6 +67,7 @@ public:
 private:
 	const LuaCommandHandlerConfig* m_config;
 	langbind::LuaScriptContext m_ctx;
+	types::keymap<langbind::FilterDef> m_filtermap;
 };
 
 }}//namespace

@@ -119,7 +119,7 @@ private:
 	void addTransition( ControlCharacter inputchr, int nextState) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
-		if (inputchr >= NofControlCharacter) throw exception( InvalidParamChar);
+		if ((int)inputchr >= (int)NofControlCharacter) throw exception( InvalidParamChar);
 		if (nextState < 0 || nextState > MaxNofStates) throw exception( InvalidParamState);
 		if (tab[ size-1].next[ inputchr] != -1) throw exception( DuplicateStateTransition);
 		tab[ size-1].next[ inputchr] = (unsigned char)nextState;
@@ -243,7 +243,8 @@ public:
 		ErrExpectedCDATATag,			//< expected CDATA tag definition
 		ErrInternal,				//< internal error (textwolf implementation error)
 		ErrUnexpectedEndOfInput,		//< unexpected end of input stream
-		ErrExpectedEndOfLine			//< expected mandatory end of line (after XML header)
+		ErrExpectedEndOfLine,			//< expected mandatory end of line (after XML header)
+		ErrExpectedDash2			//< expected second '-' after '<!-' to start an XML comment as '<!-- ... -->'
 	};
 
 	///\brief Get the error code as string
@@ -266,7 +267,8 @@ public:
 				"expected CDATA tag",
 				"internal",
 				"unexpected end of input",
-				"expected end of line"
+				"expected end of line",
+				"expected 2nd '-' to complete marker for start of comment '<!--'"
 		};
 		return sError[(unsigned int)ee];
 	}
@@ -277,7 +279,8 @@ public:
 	{
 		START, STARTTAG, XTAG, PITAG, PITAGEND, XTAGEND, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
 		CONTENT, TOKEN, SEEKTOK, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
-		TAGCLIM, ENTITYSL, ENTITY, ENTITYE, ENTITYID, ENTITYSQ, ENTITYDQ, ENTITYLC, CDATA, CDATA1, CDATA2, CDATA3, EXIT
+		TAGCLIM, ENTITYSL, ENTITY, ENTITYE, ENTITYID, ENTITYSQ, ENTITYDQ, ENTITYLC, 
+		COMDASH2, COMSEEKE, COMENDD2, COMENDCL, CDATA, CDATA1, CDATA2, CDATA3, EXIT
 	};
 
 	///\brief Get the scanner state machine state as string
@@ -285,7 +288,7 @@ public:
 	///\return the state as string
 	static const char* getStateString( STMState s)
 	{
-		enum Constant {NofStates=43};
+		enum Constant {NofStates=47};
 		static const char* sState[NofStates]
 		= {
 			"START", "STARTTAG", "XTAG", "PITAG", "PITAGEND",
@@ -295,8 +298,9 @@ public:
 			"OPENTAG", "CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM",
 			"TAGAESK", "TAGAVSK", "TAGAVID", "TAGAVSQ", "TAGAVDQ",
 			"TAGAVQE", "TAGCLIM", "ENTITYSL", "ENTITY", "ENTITYE",
-			"ENTITYID", "ENTITYSQ", "ENTITYDQ",  "ENTITYLC", "CDATA",
-			"CDATA1", "CDATA2", "CDATA3", "EXIT"
+			"ENTITYID", "ENTITYSQ", "ENTITYDQ",  "ENTITYLC",
+			"COMDASH2", "COMSEEKE", "COMENDD2", "COMENDCL",
+			"CDATA", "CDATA1", "CDATA2", "CDATA3", "EXIT"
 		};
 		return sState[(unsigned int)s];
 	}
@@ -368,13 +372,17 @@ public:
 			[ TAGAVDQ  ].action(ReturnDQString,TagAttribValue)(Dq,TAGAVQE).miss(ErrStringNotTerminated)
 			[ TAGAVQE  ](EndOfLine,Cntrl,Space,TAGAISK)(Slash,TAGCLIM)(Gt,CONTENT).miss(ErrExpectedTagAttribute)
 			[ TAGCLIM  ].action(Return,CloseTagIm)(EndOfLine)(Cntrl)(Space)(Gt,CONTENT).miss(ErrExpectedTagEnd)
-			[ ENTITYSL ](Osb,CDATA).fallback(ENTITY)
+			[ ENTITYSL ](Osb,CDATA)(Dash,COMDASH2).fallback(ENTITY)
 			[ ENTITY   ](Gt,ENTITYE)(EndOfLine)(Cntrl)(Space)(Dq,ENTITYDQ)(Sq,ENTITYSQ)(Osb,ENTITYLC).fallback(ENTITYID)
 			[ ENTITYE  ].action(Return,DocAttribEnd).fallback(SEEKTOK)
 			[ ENTITYID ].action(ReturnIdentifier,DocAttribValue)(EndOfLine,Cntrl,Space,ENTITY)(Gt,ENTITYE).miss(ErrIllegalDocumentAttributeDef)
 			[ ENTITYSQ ].action(ReturnSQString,DocAttribValue)(Sq,ENTITY).miss(ErrStringNotTerminated)
 			[ ENTITYDQ ].action(ReturnDQString,DocAttribValue)(Dq,ENTITY).miss(ErrStringNotTerminated)
 			[ ENTITYLC ](Csb,ENTITY).other( ENTITYLC)
+			[ COMDASH2 ](Dash,COMSEEKE).miss(ErrExpectedDash2)
+			[ COMSEEKE ](Dash,COMENDD2).other(COMSEEKE)
+			[ COMENDD2 ](Dash,COMENDCL).other(COMSEEKE)
+			[ COMENDCL ](Gt,SEEKTOK)(Dash,COMENDD2).other(COMSEEKE)
 			[ CDATA    ].action(ExpectIdentifierCDATA)(Osb,CDATA1).miss(ErrExpectedCDATATag)
 			[ CDATA1   ](Csb,CDATA2).other(CDATA1)
 			[ CDATA2   ](Csb,CDATA3).other(CDATA1)
@@ -393,7 +401,7 @@ public:
 	{
 		IsTagCharMap()
 		{
-			(*this)(Undef,true)(Any,true);
+			(*this)(Undef,true)(Any,true)(Dash,true);
 		}
 	};
 
@@ -403,7 +411,7 @@ public:
 	{
 		IsWordCharMap()
 		{
-			(*this)(Undef,true)(Equal,true)(Gt,true)(Slash,true)(Exclam,true)(Questm,true)(Sq,true)(Dq,true)(Osb,true)(Csb,true)(Any,true);
+			(*this)(Undef,true)(Equal,true)(Gt,true)(Slash,true)(Dash,true)(Exclam,true)(Questm,true)(Sq,true)(Dq,true)(Osb,true)(Csb,true)(Any,true);
 		}
 	};
 
@@ -413,7 +421,7 @@ public:
 	{
 		IsContentCharMap()
 		{
-			(*this)(Cntrl,true)(Space,true)(EndOfLine,true)(Undef,true)(Equal,true)(Gt,true)(Slash,true)(Exclam,true)(Questm,true)(Sq,true)(Dq,true)(Osb,true)(Csb,true)(Any,true);
+			(*this)(Cntrl,true)(Space,true)(EndOfLine,true)(Undef,true)(Equal,true)(Gt,true)(Slash,true)(Dash,true)(Exclam,true)(Questm,true)(Sq,true)(Dq,true)(Osb,true)(Csb,true)(Any,true);
 		}
 	};
 

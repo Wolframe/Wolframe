@@ -59,8 +59,8 @@ PROVIDER_OBJS = \
 	provider\AAAAproviderConfig.obj \
 	provider\DBproviderImpl.obj \
 	provider\DBproviderConfig.obj \
-	provider\procProvider.obj \
-	provider\procProviderImpl.obj
+	provider\procProviderConfig.obj \
+	provider\procProvider.obj
 
 PROGRAM_OBJS = \
 	prgbind\transactionProgram.obj \

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/structDescriptionBase.hpp
-///\brief Defines the non intrusive base class of serialization/deserialization of objects interfaced as TypedInputFilter/TypedOutputFilter.
+/// \file serialize/struct/structDescriptionBase.hpp
+/// \brief Defines the non intrusive base class of serialization/deserialization of objects interfaced as TypedInputFilter/TypedOutputFilter.
 #ifndef _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_BASE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_BASE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -47,16 +47,18 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class StructDescriptionBase
-///\brief Base class for structure description used for introspection in serialization/deserialization
+/// \class StructDescriptionBase
+/// \brief Base class for structure description used for introspection in serialization/deserialization
 class StructDescriptionBase
 {
 public:
+	/// \enum ElementType
+	/// \brief Type of a structure element
 	enum ElementType
 	{
-		Atomic,		//< Atomic element type
-		Struct,		//< Structure with fixed number of named elements
-		Vector		//< Array of structures or atomic values
+		Atomic,		///< Atomic element type
+		Struct,		///< Structure with fixed number of named elements
+		Vector		///< Array of structures or atomic values
 	};
 
 	typedef std::vector<std::pair<std::string,StructDescriptionBase> > Map;
@@ -65,98 +67,120 @@ public:
 	typedef bool (*Constructor)( void* obj);
 	typedef void (*Destructor)( void* obj);
 
+	/// \brief Non intrusive parser call function of this sructure
 	Parse parse() const		{return m_parse;}
+	/// \brief Non intrusive serializer call (fetch the next element) function of this sructure
 	Fetch fetch() const		{return m_fetch;}
 
+	/// \enum ElementRequirement
+	/// \brief Constraints definition of a structure element
 	enum ElementRequirement
 	{
-		NoRequirement,
-		Mandatory,
-		Optional
+		NoRequirement,		///< no explicit condition
+		Mandatory,		///< element is always mandatory, even if structure is filled and validated in "relaxed" mode
+		Optional		///< element is always optional, even if structure is filled and validated in "strict" mode
 	};
+	/// \brief Constructor
 	StructDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, ElementRequirement req_);
+	/// \brief Constructor
 	StructDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, ElementRequirement req_);
+	/// \brief Copy constructor
 	StructDescriptionBase( const StructDescriptionBase& o);
+	/// \brief Default constructor
 	StructDescriptionBase();
 
+	/// \brief Call of parser of the serialization passed to fill an object and validate the serialization sequence
 	bool parse( void* obj, langbind::TypedInputFilter& in, Context& ctx, ParseStateStack& stk) const;
 
-	///\brief Initializes an atomic element in a structure
-	///\remark Not very efficient implementation
+	/// \brief Initializes an atomic element in a structure
+	/// \remark Not very efficient implementation
 	bool setAtomicValue( void* obj, std::size_t idx, const std::string& value) const;
 
+	/// \brief Initialize the structure referenced with 'obj'
 	bool init( void* obj) const
 	{
 		return (m_constructor)?m_constructor( obj):true;
 	}
 
+	/// \brief Destroy the structure referenced with 'obj'
 	void done( void* obj) const
 	{
 		if (m_destructor) m_destructor( obj);
 	}
 
+	/// \brief Get the allocation size of this structure in bytes
 	std::size_t size() const
 	{
 		return m_size;
 	}
 
+	/// \brief Get the offset of this structure inside the holding parent structure
 	std::size_t ofs() const
 	{
 		return m_ofs;
 	}
 
+	/// \brief Get the element kind (type of access) of this structure or atomic element
 	ElementType type() const
 	{
 		return m_type;
 	}
 
+	/// \brief Find an element in this structure by name
 	Map::const_iterator find( const std::string& name) const;
+	/// \brief Case insensitive find an element in this structure by name
 	Map::const_iterator find_cis( const std::string& name) const;
+	/// \brief Return the element names of this structure as string for error messages
 	std::string names( const char* sep) const;
 
+	/// \brief Get the start iterator on the elements of this structure
 	Map::const_iterator begin() const {return m_elem.begin();}
+	/// \brief Get the end iterator on the elements of this structure
 	Map::const_iterator end() const {return m_elem.end();}
 
+	/// \brief Define an element of this structure
+	/// \remark Does not check for duplicate definitions
 	void define( const std::string& name, const StructDescriptionBase& dd)
 	{
 		m_elem.push_back( Map::value_type(name,dd));
 	}
 
-	///\brief Get the number of attributes of a struct
-	///\remark returns 0 this is not of type (ContentType) Struct
-	///\return the number of attributes or 0
+	/// \brief Get the number of attributes of a struct
+	/// \remark returns 0 this is not of type (ContentType) Struct
+	/// \return the number of attributes or 0
 	std::size_t nof_attributes() const
 	{
 		return m_nof_attributes;
 	}
 
-	///\brief Define the number of attributes of a struct
-	///\return the number of attributes or 0
-	///\remark returns 0 this is not of type Struct
+	/// \brief Define the number of attributes of a struct
+	/// \return the number of attributes or 0
+	/// \remark returns 0 this is not of type Struct
 	void defineEndOfAttributes()
 	{
 		m_nof_attributes = m_elem.size();
 	}
 
-	///\brief Get the number of elements in the structure or array
-	///\return the number of elements or 0 in case of an atomic value
+	/// \brief Get the number of elements in the structure or array
+	/// \return the number of elements or 0 in case of an atomic value
 	std::size_t nof_elements() const
 	{
 		return m_elem.size();
 	}
 
+	/// \brief Get the type name of this structure
 	const char* typeName() const
 	{
 		return m_typename;
 	}
 
-	///\brief Find out if the element in the structure is mandatory
-	///\return true, if yes
+	/// \brief Find out if the element in the structure is mandatory
+	/// \return true, if yes
 	bool mandatory() const				{return m_requirement == Mandatory;}
-	///\brief Find out if the element in the structure is optional
-	///\return true, if yes
+	/// \brief Find out if the element in the structure is optional
+	/// \return true, if yes
 	bool optional() const				{return m_requirement == Optional;}
-	///\brief Set element occurrence requirement
+	/// \brief Set element occurrence requirement
 	void requirement( ElementRequirement requirement_){m_requirement = requirement_;}
 
 protected:

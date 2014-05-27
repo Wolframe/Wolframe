@@ -76,13 +76,6 @@ struct AssignmentList
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
-struct AssignmentListDoc
-{
-	AssignmentList assignmentlist;
-
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
 }}
 #endif
 

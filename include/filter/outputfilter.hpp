@@ -29,54 +29,59 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/outputfilter.hpp
-///\brief Interface for output filter
+/// \file filter/outputfilter.hpp
+/// \brief Interface for output filter
 
 #ifndef _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #include "types/countedReference.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "filter/filterbase.hpp"
-#include "filter/contentfilterAttributes.hpp"
 #include <string>
 #include <cstring>
-#undef WOLFRAME_OUTPUT_WITH_CHECKSUM
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class OutputFilter
-///\brief Output filter
+/// \class OutputFilter
+/// \brief Output filter
 class OutputFilter
 	:public FilterBase
 {
 public:
-	///\enum State
-	///\brief State of the input filter used in the application processor iterating loop to decide what to do
+	/// \enum State
+	/// \brief State of the input filter used in the application processor iterating loop to decide what to do
 	enum State
 	{
-		Open,		//< serving data - normal input processing
-		EndOfBuffer,	//< have to yield processing because end of message reached
-		Error		//< have to stop processing with an error
+		Start,		///< state after first initialization
+		Open,		///< serving data - normal input processing
+		EndOfBuffer,	///< have to yield processing because end of message reached
+		Error		///< have to stop processing with an error
 	};
 
-	///\brief Default constructor
-	OutputFilter( const char* name_, const ContentFilterAttributes* attr_=0)
+	/// \brief Constructor
+	OutputFilter( const char* name_, const types::DocMetaDataR& inheritMetadata_)
 		:utils::TypeSignature("langbind::OutputFilter", __LINE__)
 		,FilterBase(name_)
-		,m_state(Open)
+		,m_state(Start)
 		,m_buf(0)
 		,m_size(0)
 		,m_pos(0)
-		,m_attr(attr_)
-#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
-		,m_chksum(0)
-		,m_chkpos(0)
-#endif
+		,m_inheritMetadata(inheritMetadata_)
 	{}
 
-	///\brief Copy constructor
-	///\param[in] o output filter to copy
+	/// \brief Constructor
+	explicit OutputFilter( const char* name_)
+		:utils::TypeSignature("langbind::OutputFilter", __LINE__)
+		,FilterBase(name_)
+		,m_state(Start)
+		,m_buf(0)
+		,m_size(0)
+		,m_pos(0)
+	{}
+
+	/// \brief Copy constructor
+	/// \param[in] o output filter to copy
 	OutputFilter( const OutputFilter& o)
 		:utils::TypeSignature(o)
 		,FilterBase(o)
@@ -84,23 +89,20 @@ public:
 		,m_buf(o.m_buf)
 		,m_size(o.m_size)
 		,m_pos(o.m_pos)
-		,m_attr(o.m_attr)
-#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
-		,m_chksum(o.m_chksum)
-		,m_chkpos(o.m_chkpos)
-#endif
+		,m_inheritMetadata(o.m_inheritMetadata)
+		,m_metadata(o.m_metadata)
 		{}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~OutputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual OutputFilter* copy() const=0;
 
-	///\brief Declare the next input chunk to the filter
-	///\param [in] buf the start of the input chunk
-	///\param [in] bufsize the size of the input chunk in bytes
+	/// \brief Declare the next input chunk to the filter
+	/// \param [in] buf the start of the input chunk
+	/// \param [in] bufsize the size of the input chunk in bytes
 	void setOutputBuffer( void* buf, std::size_t bufsize)
 	{
 		if (m_state == EndOfBuffer && bufsize > 0) m_state = Open;
@@ -109,48 +111,67 @@ public:
 		m_pos = 0;
 	}
 
-	///\brief Get the output size printed
-	///\return size of the output printed in bytes
+	/// \brief Get the output size printed
+	/// \return size of the output printed in bytes
 	std::size_t getPosition() const
 	{
 		return m_pos;
 	}
 
-	///\brief Print the follow element to the buffer
-	///\param [in] type type of element to print
-	///\param [in] element content of element to print
-	///\param [in] elementsize size of element to print in bytes
-	///\return true, on success, false, if failed
+	/// \brief Print the follow element to the buffer
+	/// \param [in] type type of element to print
+	/// \param [in] element content of element to print
+	/// \param [in] elementsize size of element to print in bytes
+	/// \return true, on success, false, if failed
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize)=0;
 
-	///\brief Set type of the document.
-	///\param [in] doctype type of the document
-	///\remark For some types of filters (non buffering) the type has to be set before the first print
-	virtual void setDocType( const types::DocType&)
-	{
-		throw std::runtime_error("document type can not be set for this type of filter");
-	}
-
-	///\brief Print the follow element to the buffer
-	///\param [in] type type of element to print
-	///\param [in] element content of element to print
-	///\return true, on success, false, if failed
+	/// \brief Print the follow element to the buffer
+	/// \param [in] type type of element to print
+	/// \param [in] element content of element to print
+	/// \return true, on success, false, if failed
 	bool print( ElementType type, const std::string& element)
 	{
 		return print( type, element.c_str(), element.size());
 	}
 
-	///\brief Get the current state
-	///\return the current state
+	/// \brief Print the final close tag, if not printed yet, to close the output
+	virtual bool close()=0;
+
+	/// \brief Set type of the document.
+	/// \param [in] doctype type of the document
+	/// \remark For some types of filters (non buffering) the type has to be set before the first print
+	void setMetaData( const types::DocMetaData& md)
+	{
+		if (state() != Start)
+		{
+			throw std::runtime_error( "cannot set output meta data anymore after first call of print");
+		}
+		m_metadata = md;
+	}
+
+	types::DocMetaData getMetaData() const
+	{
+		types::DocMetaData rt( m_metadata.doctype(), m_inheritMetadata->attributes());
+		rt.join( m_metadata.attributes());
+		return rt;
+	}
+
+	virtual void inheritMetaData( const types::DocMetaDataR mdr)
+	{
+		m_inheritMetadata = mdr;
+	}
+
+	/// \brief Get the current state
+	/// \return the current state
 	State state() const					{return m_state;}
 
-	///\brief Set output filter state with error message
-	///\param [in] s new state
-	///\param [in] msg (optional) error to set
+	/// \brief Set output filter state with error message
+	/// \param [in] s new state
+	/// \param [in] msg (optional) error to set
 	void setState( State s, const char* msg=0)		{m_state=s; setError(msg);}
 
-	///\brief Assigns the output filter state of another output filter
-	///\param [in] o the output filter to get the state from
+	/// \brief Assigns the output filter state of another output filter
+	/// \param [in] o the output filter to get the state from
 	void assignState( const OutputFilter& o)
 	{
 		m_state = o.m_state;
@@ -159,35 +180,25 @@ public:
 		m_pos = o.m_pos;
 	}
 
-	const ContentFilterAttributes* attributes() const	{return m_attr;}
-	void setAttributes( const ContentFilterAttributes* a)	{m_attr = a;}
+	/// \brief Set one document meta data element
+	void setAttribute( const std::string& name_, const std::string& value_)
+	{
+		if (state() != Start)
+		{
+			throw std::runtime_error( "cannot set output meta data anymore after first call of print");
+		}
+		m_metadata.setAttribute( name_, value_);
+	}
 
-#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
-	unsigned int chksum() const
+	/// \brief Set the document type meta data element
+	void setDoctype( const std::string& id_)
 	{
-		return m_chksum;
+		if (state() != Start)
+		{
+			throw std::runtime_error( "cannot set document type anymore after first call of print");
+		}
+		m_metadata.setDoctype( id_);
 	}
-	unsigned int chkpos() const
-	{
-		return m_chkpos;
-	}
-	static void calculateCheckSum( unsigned int& chksum_, std::size_t pos_, const char* buf_, std::size_t bufsize_)
-	{
-		std::size_t ii = 0;
-		for (; ii < bufsize_; ++ii) chksum_ += ((unsigned char)buf_[ pos_+ii] + 1U);
-	}
-#else
-	static void calculateCheckSum( unsigned int&, std::size_t, const char* , std::size_t ){}
-
-	unsigned int chksum() const
-	{
-		return 0;
-	}
-	unsigned int chkpos() const
-	{
-		return 0;
-	}
-#endif
 
 protected:
 	std::size_t write( const void* dt, std::size_t dtsize)
@@ -195,27 +206,20 @@ protected:
 		std::size_t nn = m_size - m_pos;
 		if (nn > dtsize) nn = dtsize;
 		std::memcpy( m_buf+m_pos, dt, nn);
-#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
-		calculateCheckSum( m_chksum, m_pos, m_buf, nn);
-		m_chkpos += nn;
-#endif
 		m_pos += nn;
 		return nn;
 	}
 private:
-	State m_state;				//< state
-	char* m_buf;				//< buffer base pointer
-	std::size_t m_size;			//< buffer size in bytes
-	std::size_t m_pos;			//< write byte position
-	const ContentFilterAttributes* m_attr;	//< reference to attributes shared from input
-#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
-	unsigned int m_chksum;			//< check sum for error detection
-	unsigned int m_chkpos;			//< check bytes written for error detection
-#endif
+	State m_state;					///< state
+	char* m_buf;					///< buffer base pointer
+	std::size_t m_size;				///< buffer size in bytes
+	std::size_t m_pos;				///< write byte position
+	types::DocMetaDataR m_inheritMetadata;		///< reference to meta data inherited from input
+	types::DocMetaData m_metadata;			///< document meta data
 };
 
-///\typedef OutputFilterR
-///\brief Shared output filter reference
+/// \typedef OutputFilterR
+/// \brief Shared output filter reference
 typedef types::CountedReference<OutputFilter> OutputFilterR;
 
 }}//namespace

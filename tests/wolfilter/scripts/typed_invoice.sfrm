@@ -1,54 +1,52 @@
 FORM typed_invoice
+	-root invoice
 {
-	invoice
+	order
 	{
-		order
+		number f_int
+		reference string
+		representative string
+		terms uint
+		issuedate string
+		duedate string
+		description text_ascii_de
+	}
+	item []
+	{
+		name text_ascii_de
+		description text_ascii_de
+		quantity f_uint
+		discount f_float
+		price
 		{
-			number f_int
-			reference string
-			representative string
-			terms uint
-			issuedate string
-			duedate string
-			description text_ascii_de
-		}
-		item []
-		{
-			name text_ascii_de
-			description text_ascii_de
-			quantity f_uint
-			discount f_float
-			price
+			unit float
+			total float
+			tax
 			{
-				unit float
-				total float
-				tax
-				{
-					description @string
-					_ float
-				}
-				gross float
+				description @string
+				_ float
 			}
+			gross float
 		}
-		bill
+	}
+	bill
+	{
+		price
 		{
-			price
-			{
-				total float
-				tax float
-				gross float
-			}
-			payed float
-			open float
+			total float
+			tax float
+			gross float
 		}
-		address []
-		{
-			id @string
-			name text_ascii_eu
-			street text_ascii_de
-			postalcode uint
-			city string
-			country string
-		}
+		payed float
+		open float
+	}
+	address []
+	{
+		id @string
+		name text_ascii_eu
+		street text_ascii_de
+		postalcode uint
+		city string
+		country string
 	}
 }

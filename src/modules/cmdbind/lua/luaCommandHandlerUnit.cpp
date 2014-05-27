@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of the directmap command handler unit
 #include "luaCommandHandlerUnit.hpp"
 #include "luaCommandHandlerConfig.hpp"
+#include "utils/parseUtils.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -47,13 +48,15 @@ CommandHandler* LuaCommandHandlerUnit::createCommandHandler( const std::string& 
 	{
 		throw std::runtime_error( std::string( "unknown lua script '") + cmdname + "'");
 	}
-	types::keymap<std::string>::const_iterator fi = m_config->filtermap().find( docformat);
-	std::string defaultfilter;
-	if (fi != m_config->filtermap().end())
+	types::keymap<langbind::FilterDef>::const_iterator fi = m_filtermap.find( docformat);
+	if (fi != m_filtermap.end())
 	{
-		defaultfilter = fi->second;
+		return new LuaCommandHandler( interp, docformat, fi->second);
 	}
-	return new LuaCommandHandler( interp, docformat, defaultfilter);
+	else
+	{
+		return new LuaCommandHandler( interp, docformat, langbind::FilterDef());
+	}
 }
 
 bool LuaCommandHandlerUnit::loadPrograms( const proc::ProcessorProviderInterface* provider)
@@ -64,17 +67,19 @@ bool LuaCommandHandlerUnit::loadPrograms( const proc::ProcessorProviderInterface
 		types::keymap<std::string>::const_iterator fi = m_config->filtermap().begin(), fe = m_config->filtermap().end();
 		for (; fi != fe; ++fi)
 		{
-			if (!provider->filterType( fi->second))
+			std::string::const_iterator si = fi->second.begin(), se = fi->second.end();
+			langbind::FilterDef fd = langbind::FilterDef::parse( si, se, provider);
+			if (utils::gotoNextToken( si, se))
 			{
-				rt = false;
-				LOG_ERROR << "undefined configured filter type '" << fi->second << "'";
+				LOG_ERROR << "superfluous tokens after filter definition: '" << std::string(si,se) << "'";
 			}
+			m_filtermap.insert( fi->first, fd);
 		}
 		m_ctx.loadPrograms( m_config->programfiles());
 	}
 	catch (const std::runtime_error& e)
 	{
-		LOG_ERROR << "could not load all Lua command handler programs";
+		LOG_ERROR << "could not load all Lua command handler programs: " << e.what();
 		rt = false;
 	}
 	return rt;

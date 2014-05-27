@@ -29,16 +29,17 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file textwolf_filter.cpp
-///\brief Filter implementation reading/writing xml with the textwolf xml library
+/// \file textwolf_filter.cpp
+/// \brief Filter implementation reading/writing xml with the textwolf xml library
 #include "textwolf_filter.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "utils/fileUtils.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/xmlparser.hpp"
 #include "textwolf/xmlprinter.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "types/countedReference.hpp"
+#include "logger-v1.hpp"
 #include <string>
 #include <cstddef>
 #include <algorithm>
@@ -51,23 +52,24 @@ namespace {
 
 typedef textwolf::XMLParser<std::string>  XMLParser;
 
-///\class InputFilterImpl
-///\brief input filter for XML using textwolf
+/// \class InputFilterImpl
+/// \brief input filter for XML using textwolf
 struct InputFilterImpl
 	:public InputFilter
 {
 	typedef InputFilter Parent;
 
-	///\brief Constructor
+	/// \brief Constructor
 	InputFilterImpl()
 		:utils::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
 		,InputFilter("textwolf")
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
+		,m_metadatastate(MS_Init)
 		{}
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:utils::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
 		,InputFilter( o)
@@ -75,9 +77,11 @@ struct InputFilterImpl
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend)
+		,m_metadatastate(o.m_metadatastate)
+		,m_elembuffer(o.m_elembuffer)
 		{}
 
-	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
+	/// \brief Implementation of FilterBase::getValue( const char*, std::string&)
 	virtual bool getValue( const char* id, std::string& val) const
 	{
 		if (std::strcmp( id, "empty") == 0)
@@ -93,44 +97,8 @@ struct InputFilterImpl
 		return Parent::getValue( id, val);
 	}
 
-	///\brief Implementation of InputFilter::getDocType(std::string&)
-	bool getDocType( types::DocType& doctype)
-	{
-		try
-		{
-			if (m_parser.state() != XMLParser::ParseSource)
-			{
-				if (!getMetadata())
-				{
-					return false;
-				}
-				if (m_parser.isStandalone())
-				{
-					doctype.clear();
-					return true;
-				}
-			}
-			std::string systemid = m_parser.getDoctypeSystem();
-			std::string ext = utils::getFileExtension( systemid);
-			std::string id = utils::getFileStem( systemid);
-			std::string dir;
-			std::size_t namesize = ext.size() + id.size();
-			if (namesize < systemid.size())
-			{
-				dir = std::string( systemid.c_str(), systemid.size() - namesize);
-			}
-			std::string root = m_parser.getDoctypeRoot();
-			doctype.init( id, root, types::DocType::SchemaPath( dir, ext));
-			return true;
-		}
-		catch (textwolf::SrcIterator::EoM)
-		{
-			setState( EndOfMessage);
-			return false;
-		};
-	}
 
-	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
+	/// \brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* id, const std::string& value)
 	{
 		if (std::strcmp( id, "empty") == 0)
@@ -168,14 +136,14 @@ struct InputFilterImpl
 		return Parent::setValue( id, value);
 	}
 
-	///\brief self copy
-	///\return copy of this
+	/// \brief self copy
+	/// \return copy of this
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	//\brief Implement InputFilter::initcopy()
+	/// \brief Implement InputFilter::initcopy()
 	virtual InputFilter* initcopy() const
 	{
 		bool withEmpty_ = m_parser.withEmpty();
@@ -186,15 +154,17 @@ struct InputFilterImpl
 		return rt;
 	}
 
-	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
+	/// \brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_src = (const char*)ptr;
 		m_srcend = end;
 		m_srcsize = size;
 		m_parser.putInput( m_src, m_srcsize, m_srcend);
+		setState( Open);
 	}
 
+	/// \brief Implement InputFilter::getRest(const void*&,std::size_t&,bool&)
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
 	{
 		std::size_t pp = m_parser.getPosition();
@@ -203,7 +173,7 @@ struct InputFilterImpl
 		end = m_srcend;
 	}
 
-	///\brief implement interface member InputFilter::getNext(typename InputFilter::ElementType&,const void*&,std::size_t&)
+	/// \brief implement interface member InputFilter::getNext(typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		struct ElementTypeMap :public textwolf::CharMap<int,-1,textwolf::XMLScannerBase::NofElementTypes>
@@ -222,12 +192,17 @@ struct InputFilterImpl
 			}
 		};
 		static const ElementTypeMap tmap;
+		if (m_metadatastate != MS_Done)
+		{
+			if (!getMetaData()) return false;
+		}
 		try
 		{
 			for (;;)
 			{
 				const char* ee;
 				textwolf::XMLScannerBase::ElementType et = m_parser.getNext( ee, elementsize);
+
 				element = (const void*)ee;
 				int st = tmap[ et];
 				if (st < 0)
@@ -259,43 +234,163 @@ struct InputFilterImpl
 		return false;
 	}
 
-	///\brief Implements InputFilter::getMetadata()
-	virtual bool getMetadata()
+	/// \brief Implements InputFilter::getMetaData()
+	virtual const types::DocMetaData* getMetaData()
 	{
+		if (m_metadatastate == MS_Done) return getMetaDataRef().get();
+
 		try
 		{
 			for (;;) switch (m_parser.state())
 			{
 				case XMLParser::ParseHeader:
+				case XMLParser::ParseDoctype:
 				{
 					const char* err = 0;
 					if (!m_parser.parseHeader( err) || !m_parser.hasMetadataParsed())
 					{
-						setState( Error, err);
+						setState( Error, err?err:"unknown error");
+						return 0;
 					}
 					continue;
 				}
-				case XMLParser::ParsedRoot:
 				case XMLParser::ParseSource:
-				case XMLParser::ParseDoctype:
-					return true;
+				case XMLParser::ParseSourceReady:
+				{
+					const char* ee;
+					std::size_t eesize;
+					textwolf::XMLScannerBase::ElementType et;
+
+					switch (m_metadatastate)
+					{
+						case MS_Init:
+							m_metadatastate = MS_Root;
+							ee = m_parser.getEncoding();
+							if (ee)
+							{
+								getMetaDataRef()->setAttribute( "encoding", ee);
+							}
+							if (!m_parser.getDoctypePublic().empty())
+							{
+								getMetaDataRef()->setAttribute( "PUBLIC", m_parser.getDoctypePublic());
+							}
+							if (!m_parser.getDoctypeSystem().empty())
+							{
+								getMetaDataRef()->setAttribute( "SYSTEM", m_parser.getDoctypeSystem());
+								getMetaDataRef()->setDoctype( types::DocMetaData::extractStem( m_parser.getDoctypeSystem()));
+							}
+							/*no break here!*/
+						case MS_Root:
+							et = m_parser.getNext( ee, eesize);
+							if (et == textwolf::XMLScannerBase::OpenTag)
+							{
+								getMetaDataRef()->setAttribute( "root", std::string( ee, eesize));
+								m_metadatastate = MS_AttribName;
+							}
+							else
+							{
+								setState( Error, "root element expected");
+								return 0;
+							}
+							/*no break here!*/
+						case MS_AttribName:
+							et = m_parser.getNext( ee, eesize);
+							if (et == textwolf::XMLScannerBase::OpenTag || et == textwolf::XMLScannerBase::CloseTag || et == textwolf::XMLScannerBase::CloseTagIm || et == textwolf::XMLScannerBase::Content)
+							{
+								m_parser.ungetElement( et, ee, eesize);
+								m_metadatastate = MS_Done;
+								continue;
+							}
+							else if (et == textwolf::XMLScannerBase::TagAttribName)
+							{
+								m_elembuffer = std::string( ee, eesize);
+								m_metadatastate = MS_AttribValue;
+							}
+							else
+							{
+								setState( Error, "root element attribute or document start expected");
+								return 0;
+							}
+							/*no break here!*/
+						case MS_AttribValue:
+							et = m_parser.getNext( ee, eesize);
+							if (et == textwolf::XMLScannerBase::TagAttribValue)
+							{
+								if (m_elembuffer == "xmlns")
+								{
+									getMetaDataRef()->setAttribute( m_elembuffer, std::string( ee, eesize));
+								}
+								else if (0==std::memcmp( m_elembuffer.c_str(), "xmlns:", 6/*strlen("xmlns:")*/))
+								{
+									getMetaDataRef()->setAttribute( m_elembuffer.c_str(), std::string( ee, eesize));
+								}
+								else if (0==std::memcmp( m_elembuffer.c_str(), "xsi:", 4/*strlen("xsi:")*/))
+								{
+									getMetaDataRef()->setAttribute( m_elembuffer.c_str(), std::string( ee, eesize));
+									if (m_elembuffer == "xsi:schemaLocation")
+									{
+										getMetaDataRef()->setDoctype( types::DocMetaData::extractStem( std::string( ee, eesize)));
+									}
+								}
+								else
+								{
+									std::string msg = std::string("unknown XML root element attribute '") + m_elembuffer + "'";
+									setState( Error, msg.c_str());
+									return 0;
+								}
+							}
+							else
+							{
+								setState( Error, "root element attribute value expected");
+								return 0;
+							}
+							m_metadatastate = MS_AttribName;
+							break;
+							
+						case MS_Done:
+							LOG_DEBUG << "[textwolf input] document meta data: {" << getMetaDataRef()->tostring() << "}";
+							return getMetaDataRef().get();
+					}
+				}
 			}
 		}
 		catch (textwolf::SrcIterator::EoM)
 		{
 			setState( EndOfMessage);
-			return false;
+			return 0;
 		};
 	}
 
-private:
-	///\brief Implements 'ContentFilterAttributes::getEncoding() const'
-	virtual const char* getEncoding() const
+	/// \brief Implement InputFilter::checkMetaData(const types::DocMetaData&) const
+	virtual bool checkMetaData( const types::DocMetaData& md)
 	{
-		return m_parser.getEncoding();
+		if (m_metadatastate != MS_Done)
+		{
+			setState( Error, "input filter did not parse its meta data yet - cannot check them therefore");
+			return false;
+		}
+		// Check the XML root element:
+		const char* form_rootelem = md.getAttribute( "root");
+		const char* doc_rootelem = getMetaDataRef()->getAttribute( "root");
+		if (form_rootelem)
+		{
+			if (!doc_rootelem)
+			{
+				setState( Error, "input document has no root element defined");
+				return false;
+			}
+			if (0!=std::strcmp(form_rootelem,doc_rootelem))
+			{
+				std::string msg = std::string("input document root element '") + doc_rootelem + "' does not match the root element '" + form_rootelem + "'' required";
+				setState( Error, msg.c_str());
+				return false;
+			}
+		}
+		return true;
 	}
 
-	///\brief Implements FilterBase::setFlags()
+private:
+	/// \brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f)
 	{
 		if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
@@ -305,7 +400,7 @@ private:
 		return InputFilter::setFlags( f);
 	}
 
-	///\brief Implements FilterBase::checkSetFlags()const
+	/// \brief Implements FilterBase::checkSetFlags()const
 	virtual bool checkSetFlags( Flags f) const
 	{
 		return (0==((int)f & (int)langbind::FilterBase::SerializeWithIndices));
@@ -313,41 +408,53 @@ private:
 
 private:
 	typedef textwolf::XMLParser<std::string> XMLParser;
-	XMLParser m_parser;			//< XML parser
-	const char* m_src;			//< pointer to current chunk parsed
-	std::size_t m_srcsize;			//< size of the current chunk parsed in bytes
-	bool m_srcend;				//< true if end of message is in current chunk parsed
+	XMLParser m_parser;			///< XML parser
+	const char* m_src;			///< pointer to current chunk parsed
+	std::size_t m_srcsize;			///< size of the current chunk parsed in bytes
+	bool m_srcend;				///< true if end of message is in current chunk parsed
+	enum MetadataState
+	{
+		MS_Init,			///< parsing document header
+		MS_Root,			///< scanning header for document root
+		MS_AttribName,			///< scanning header for meta data document attribute name or end of meta data
+		MS_AttribValue,			///< scanning header for meta data document attribute value
+		MS_Done				///< meta data parsed, now parsing content
+	};
+	MetadataState m_metadatastate;		///< state of document meta data parsing
+	std::string m_elembuffer;		///< buffer for element
 };
 
-///\class OutputFilter
-///\brief output filter filter for XML using textwolf
+/// \class OutputFilter
+/// \brief output filter filter for XML using textwolf
 struct OutputFilterImpl :public OutputFilter
 {
 	typedef OutputFilter Parent;
 
-	///\brief Constructor
-	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
-	OutputFilterImpl( const ContentFilterAttributes* attr=0)
+	/// \brief Constructor
+	OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
 		:utils::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
-		,OutputFilter("textwolf",attr)
+		,OutputFilter("textwolf", inheritMetaData_)
 		,m_elemitr(0)
-		,m_encodingSet(false){}
+		,m_emptyDocument(false)
+		,m_headerPrinted(false)
+		,m_gotFinalClose(false){}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:utils::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
 		,OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
-		,m_encoding(o.m_encoding)
-		,m_encodingSet(o.m_encodingSet)
+		,m_emptyDocument(o.m_emptyDocument)
+		,m_headerPrinted(o.m_headerPrinted)
+		,m_gotFinalClose(o.m_gotFinalClose)
 		,m_printer(o.m_printer){}
 
 	virtual ~OutputFilterImpl(){}
 
-	///\brief self copy
-	///\return copy of this
+	/// \brief self copy
+	/// \return copy of this
 	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
@@ -366,25 +473,90 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	///\brief Implementation of OutputFilter::setDocType( const types::DocType&)
-	virtual void setDocType( const types::DocType& doctype)
+	bool printHeader()
 	{
-		const char* ro = doctype.root.empty()?0:doctype.root.c_str();
-		std::string sy = doctype.schemaURL();
+		types::DocMetaData md( getMetaData());
+		LOG_DEBUG << "[textwolf output] document meta data: {" << md.tostring() << "}";
+		const char* standalone = md.getAttribute( "standalone");
+		const char* root = md.getAttribute( "root");
+		if (!root)
+		{
+			setState( Error, "no XML root element defined");
+			return false;
+		}
+		const char* encoding = md.getAttribute( "encoding");
+		if (!encoding) encoding = "UTF-8";
 
-		m_printer.setDocumentType( ro, 0, sy.empty()?0:sy.c_str());
+		if (standalone && 0==std::strcmp( standalone, "yes"))
+		{
+			if (!m_printer.createPrinter( encoding))
+			{
+				setState( Error, "failed to create XML serializer for this encoding");
+				return false;
+			}
+			if (!m_printer.printDocumentStart( root, 0/*public*/, 0/*system*/, 0/*xmlns*/, 0/*xsi*/, 0/*schemaLocation*/, m_elembuf))
+			{
+				setState( Error, "failed to print XML document header");
+				return false;
+			}
+		}
+		else
+		{
+			const char* doctype_public = md.getAttribute( "PUBLIC");
+			const char* doctype_system = md.getAttribute( "SYSTEM");
+			std::string doctype_system_buf;
+			if (doctype_system && !md.doctype().empty())
+			{
+				doctype_system_buf = types::DocMetaData::replaceStem( doctype_system, md.doctype());
+				doctype_system = doctype_system_buf.c_str();
+			}
+			const char* xmlns = md.getAttribute( "xmlns");
+			const char* xsi = md.getAttribute( "xmlns:xsi");
+			const char* schemaLocation = md.getAttribute( "xsi:schemaLocation");
+			std::string schemaLocation_buf;
+			if (schemaLocation && !md.doctype().empty())
+			{
+				schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
+				schemaLocation = schemaLocation_buf.c_str();
+			}
+			if (!m_printer.createPrinter( encoding))
+			{
+				setState( Error, "failed to create XML serializer for this encoding");
+				return false;
+			}
+			if (!m_printer.printDocumentStart( root, doctype_public, doctype_system, xmlns, xsi, schemaLocation, m_elembuf))
+			{
+				setState( Error, "failed to print XML document header");
+				return false;
+			}
+		}
+		return true;
 	}
 
-	void setEncoding( const std::string& value)
+	/// \brief Implementation of OutputFilter::close()
+	virtual bool close()
 	{
-		m_encoding = value;
+		if (!m_gotFinalClose)
+		{
+			return print( FilterBase::CloseTag, 0, 0);
+		}
+		if (m_elemitr < m_elembuf.size())
+		{
+			// there is something to print left from last time
+			if (!emptybuf())
+			{
+				setState( EndOfBuffer);
+				return false;
+			}
+		}
+		return true;
 	}
 
-	///\brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
-	///\param [in] type type of the element to print
-	///\param [in] element pointer to the element to print
-	///\param [in] elementsize size of the element to print in bytes
-	///\return true, if success, false else
+	/// \brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
+	/// \param [in] type type of the element to print
+	/// \param [in] element pointer to the element to print
+	/// \param [in] elementsize size of the element to print in bytes
+	/// \return true, if success, false else
 	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
@@ -399,36 +571,53 @@ struct OutputFilterImpl :public OutputFilter
 			//... we've done the emptying of the buffer left
 			return true;
 		}
+		if (!m_headerPrinted)
+		{
+			if (m_emptyDocument)
+			{
+				setState( Error, "textwolf: illegal print operation after final close (empty document)");
+				return false;
+			}
+			if (type == FilterBase::CloseTag)
+			{
+				m_gotFinalClose = true;
+				m_emptyDocument = true;
+				return true;
+			}
+			else
+			{
+				if (!printHeader()) return false;
+			}
+			m_headerPrinted = true;
+		}
 		switch (type)
 		{
-			case OutputFilter::OpenTag:
-				if (!m_encodingSet)
-				{
-					const char* enc = encoding();
-					m_printer.setEncoding( enc?enc:"UTF-8", m_elembuf);
-					m_encodingSet = true;
-				}
+			case FilterBase::OpenTag:
 				if (!m_printer.printOpenTag( (const char*)element, elementsize, m_elembuf))
 				{
 					setState( Error, "textwolf: illegal print operation (open tag)");
 					return false;
 				}
 				break;
-			case OutputFilter::CloseTag:
+			case FilterBase::CloseTag:
 				if (!m_printer.printCloseTag( m_elembuf))
 				{
-					setState( Error, "textwolf: illegal print operation (close tag)");
-					return false;
+					if (m_gotFinalClose)
+					{
+						setState( Error, "textwolf: illegal print operation (close tag)");
+						return false;
+					}
+					m_gotFinalClose = true;
 				}
 				break;
-			case OutputFilter::Attribute:
+			case FilterBase::Attribute:
 				if (!m_printer.printAttribute( (const char*)element, elementsize, m_elembuf))
 				{
 					setState( Error, "textwolf: illegal print operation (attribute)");
 					return false;
 				}
 				break;
-			case OutputFilter::Value:
+			case FilterBase::Value:
 				if (!m_printer.printValue( (const char*)element, elementsize, m_elembuf))
 				{
 					setState( Error, "textwolf: illegal print operation (value)");
@@ -444,57 +633,27 @@ struct OutputFilterImpl :public OutputFilter
 		return true;
 	}
 
-	const char* encoding() const
-	{
-		if (m_encoding.empty())
-		{
-			if (attributes())
-			{
-				return attributes()->getEncoding();
-			}
-			return 0;
-		}
-		else
-		{
-			return m_encoding.c_str();
-		}
-	}
-
-	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
+	/// \brief Implementation of FilterBase::getValue( const char*, std::string&)
 	virtual bool getValue( const char* id, std::string& val) const
 	{
-		if (std::strcmp( id, "encoding") == 0)
-		{
-			const char* ee = encoding();
-			if (ee)
-			{
-				val = ee;
-				return true;
-			}
-			return false;
-		}
 		return Parent::getValue( id, val);
 	}
 
-	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
+	/// \brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* id, const std::string& value)
 	{
-		if (std::strcmp( id, "encoding") == 0)
-		{
-			m_encoding = value;
-			return true;
-		}
 		return Parent::setValue( id, value);
 	}
 
 private:
 	typedef textwolf::XMLPrinter<std::string> XMLPrinter;
 
-	std::string m_elembuf;				//< buffer for the currently printed element
-	std::size_t m_elemitr;				//< iterator to pass it to output
-	std::string m_encoding;				//< common attributes of input and output filter
-	bool m_encodingSet;				//< true, if the output character set encoding has been defined
-	XMLPrinter m_printer;				//< xml printer object
+	std::string m_elembuf;				///< buffer for the currently printed element
+	std::size_t m_elemitr;				///< iterator to pass it to output
+	bool m_emptyDocument;				///< true, if the printed document is empty
+	bool m_headerPrinted;				///< true, if the XML header has already been printed
+	bool m_gotFinalClose;				///< true, if we got the final close tag
+	XMLPrinter m_printer;				///< xml printer object
 };
 
 }//end anonymous namespace
@@ -505,35 +664,56 @@ public:
 	TextwolfXmlFilter( const char* encoding=0)
 	{
 		m_inputfilter.reset( new InputFilterImpl());
-		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter.get());
+		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter->getMetaDataRef());
 		m_outputfilter.reset( oo);
 		if (encoding)
 		{
-			oo->setEncoding( encoding);
+			m_outputfilter->setAttribute( "encoding", encoding);
 		}
 	}
 };
 
 
+static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
+{
+	const char* encoding = 0;
+	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		{
+			if (encoding)
+			{
+				if (ai->first.empty())
+				{
+					throw std::runtime_error( "too many filter arguments");
+				}
+				else
+				{
+					throw std::runtime_error( "duplicate filter argument 'encoding'");
+				}
+			}
+			encoding = ai->second.c_str();
+			break;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "unknown filter argument '") + ai->first + "'");
+		}
+	}
+	return encoding;
+}
+
 class TextwolfXmlFilterType :public FilterType
 {
 public:
-	TextwolfXmlFilterType(){}
+	TextwolfXmlFilterType()
+		:FilterType("textwolf"){}
 	virtual ~TextwolfXmlFilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const
 	{
-		const char* encoding = 0;
-		std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-		for (; ai != ae; ++ai)
-		{
-			if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
-			{
-				encoding = ai->second.c_str();
-				break;
-			}
-		}
-		return new TextwolfXmlFilter( encoding);
+		return new TextwolfXmlFilter( getArgumentEncoding( arg));
 	}
 };
 

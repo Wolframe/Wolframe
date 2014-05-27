@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/inputfilterScope.hpp
-///\brief Interface to scope of an input filter
+/// \file filter/inputfilterScope.hpp
+/// \brief Interface to scope of an input filter
 
 #ifndef _Wolframe_FILTER_INPUTFILTER_SCOPE_HPP_INCLUDED
 #define _Wolframe_FILTER_INPUTFILTER_SCOPE_HPP_INCLUDED
@@ -41,18 +41,18 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class InputFilterScope
-///\brief InputFilter that stops fetching elements after the creation tag level has been left
+/// \class InputFilterScope
+/// \brief InputFilter that stops fetching elements after the creation tag level has been left
 class InputFilterScope :public InputFilter
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	InputFilterScope()
 		:utils::TypeSignature("langbind::InputFilterScope", __LINE__)
 		,InputFilter("scope")
 		,m_taglevel(0){}
 
-	///\brief Constructor
+	/// \brief Constructor
 	explicit InputFilterScope( const InputFilterR& i)
 		:utils::TypeSignature("langbind::InputFilterScope", __LINE__)
 		,InputFilter(i->name())
@@ -63,47 +63,47 @@ public:
 		if (prev) m_inputfilter = prev->inputfilter();
 	}
 
-	///\brief Copy constructor
-	///\param[in] o typed output filter scope to copy
+	/// \brief Copy constructor
+	/// \param[in] o typed output filter scope to copy
 	InputFilterScope( const InputFilterScope& o)
 		:utils::TypeSignature("langbind::InputFilterScope", __LINE__)
 		,InputFilter(o)
 		,m_inputfilter(o.m_inputfilter)
 		,m_taglevel(o.m_taglevel){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~InputFilterScope(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterScope(*this);
 	}
 
-	///\brief Implement InputFilter::initcopy()
+	/// \brief Implement InputFilter::initcopy()
 	virtual InputFilter* initcopy() const
 	{
 		return new InputFilterScope( m_inputfilter);
 	}
 
-	///\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
+	/// \brief Implement InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void*, std::size_t, bool)
 	{
 		throw std::logic_error( "put input to an input filter scope");
 	}
 
-	virtual const char* getEncoding() const
+	virtual const types::DocMetaData* getMetaData()
 	{
-		return m_inputfilter->getEncoding();
+		return m_inputfilter->getMetaData();
 	}
 
-	///\brief Get next element
-	///\param [out] type element type parsed
-	///\param [out] element reference to element returned
-	///\param [out] elementsize size of element returned in bytes
-	///\return true, if success, false, if not.
-	///\remark Check the state when false is returned
+	/// \brief Get next element
+	/// \param [out] type element type parsed
+	/// \param [out] element reference to element returned
+	/// \param [out] elementsize size of element returned in bytes
+	/// \return true, if success, false, if not.
+	/// \remark Check the state when false is returned
 	virtual bool getNext( ElementType& type, const void*& element, std::size_t& elementsize);
 
 	const InputFilterR& inputfilter()		{return m_inputfilter;}

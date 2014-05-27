@@ -38,7 +38,7 @@ Project Wolframe.
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
 #include "types/normalizeFunction.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
 #include "types/customDataType.hpp"

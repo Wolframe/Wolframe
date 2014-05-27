@@ -29,23 +29,37 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/contentfilterAttributes.hpp
-///\brief Interface for attributes synchronized between by inputfilter/outputfilter
+///\file filter/filterdef.hpp
+///\brief Interface for parsing filter definitions
 
-#ifndef _Wolframe_FILTER_CONTENTFILTER_ATTRIBUTES_HPP_INCLUDED
-#define _Wolframe_FILTER_CONTENTFILTER_ATTRIBUTES_HPP_INCLUDED
-#include "types/countedReference.hpp"
+#ifndef _Wolframe_FILTER_FILTERDEF_HPP_INCLUDED
+#define _Wolframe_FILTER_FILTERDEF_HPP_INCLUDED
+#include "filter/filter.hpp"
+#include "types/variant.hpp"
+#include "processor/procProviderInterface.hpp"
+#include <string>
+#include <vector>
 
 namespace _Wolframe {
 namespace langbind {
 
-class ContentFilterAttributes
+struct FilterDef
 {
-public:
-	virtual const char* getEncoding() const=0;
-};
+	const langbind::FilterType* filtertype;
+	std::vector<langbind::FilterArgument> arg;
 
-typedef types::CountedReference<ContentFilterAttributes> ContentFilterAttributesR;
+	FilterDef()
+		:filtertype(0){}
+	FilterDef( const FilterDef& o)
+		:filtertype(o.filtertype),arg(o.arg){}
+
+	static FilterDef parse( std::string::const_iterator& si, const std::string::const_iterator& se, const proc::ProcessorProviderInterface* provider);
+
+	langbind::Filter* create() const
+	{
+		return filtertype->create( arg);
+	}
+};
 
 }}//namespace
 #endif

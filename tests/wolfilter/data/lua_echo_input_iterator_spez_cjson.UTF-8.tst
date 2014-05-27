@@ -4,20 +4,18 @@
 **requires:TEXTWOLF
 **input
 {
-  "doc": {
-    "image": [
-      { "-id": "1" },
-      {
-        "-id": "1",
-        "-name": "troll"
-      },
-      { "-id": "2" },
-      {
-        "-id": "3",
-        "#text": "X"
-      }
-    ]
-  }
+	"image": [
+		{ "-id": "1" },
+		{
+			"-id": "1",
+			"-name": "troll"
+		},
+		{ "-id": "2" },
+		{
+			"-id": "3",
+			"#text": "X"
+		}
+	]
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
@@ -58,18 +56,16 @@ function run()
 end
 **output
 {
-	"doc":	{
-		"image":	[{
-				"id":	"1"
-			}, {
-				"id":	"1",
-				"name":	"troll"
-			}, {
-				"id":	"2"
-			}, {
-				"id":	"3",
-				"#text":	"X"
-			}]
-	}
+	"image":	[{
+			"id":	"1"
+		}, {
+			"id":	"1",
+			"name":	"troll"
+		}, {
+			"id":	"2"
+		}, {
+			"id":	"3",
+			"#text":	"X"
+		}]
 }
 **end

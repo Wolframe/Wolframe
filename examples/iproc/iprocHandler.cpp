@@ -34,6 +34,7 @@
 ///\brief Implementation of a simple protocol based command handler calling a lus script
 #include "iprocHandler.hpp"
 #include "processor/procProvider.hpp"
+#include "cmdbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -243,12 +244,13 @@ const net::NetworkOperation Connection::nextOperation()
 								LOG_ERROR << "command handler for '" << procname << "' is not an iofilter command handler";
 								return net::CloseConnection();
 							}
-							langbind::Filter* flt = provider->filter( "char");
-							if (!flt)
+							const langbind::FilterType* fltp = provider->filterType( "char");
+							if (!fltp)
 							{
 								LOG_ERROR << "failed to load filter 'char' (not defined)";
 								return net::CloseConnection();
 							}
+							langbind::FilterR flt( fltp->create());
 							m_inputfilter = flt->inputfilter();
 							m_outputfilter = flt->outputfilter();
 							if (!flt)
@@ -256,7 +258,6 @@ const net::NetworkOperation Connection::nextOperation()
 								LOG_ERROR << "filter 'char' not defined";
 								return net::CloseConnection();
 							}
-							delete flt;
 							hnd->setFilter( m_inputfilter);
 							hnd->setFilter( m_outputfilter);
 							m_cmdhandler.reset( hnd);

@@ -55,7 +55,7 @@ struct InputFilterImpl :public InputFilter
 	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
 
 	//\brief Constructor
-	explicit InputFilterImpl( const char* encoding_, const IOCharset& iocharset_=IOCharset())
+	explicit InputFilterImpl( const char* encoding, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
 		,InputFilter("char")
 		,m_charset(iocharset_)
@@ -65,7 +65,25 @@ struct InputFilterImpl :public InputFilter
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
-		,m_encoding(encoding_?encoding_:"UTF-8"){}
+	{
+		setAttribute( "encoding", encoding);
+		setState( Open);
+	}
+
+	//\brief Constructor
+	explicit InputFilterImpl( const types::DocMetaData& md, const IOCharset& iocharset_=IOCharset())
+		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
+		,InputFilter("char",md)
+		,m_charset(iocharset_)
+		,m_itr(iocharset_)
+		,m_output(AppCharset())
+		,m_elembuf( m_elembufmem, sizeof(m_elembufmem))
+		,m_src(0)
+		,m_srcsize(0)
+		,m_srcend(false)
+	{
+		setState( Open);
+	}
 
 	//\brief Copy constructor
 	//\param [in] o output filter to copy
@@ -79,7 +97,6 @@ struct InputFilterImpl :public InputFilter
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend)
-		,m_encoding(o.m_encoding)
 	{
 		m_elembuf.resize( o.m_elembuf.size());
 		std::memcpy( m_elembufmem, o.m_elembufmem, o.m_elembuf.size());
@@ -93,7 +110,7 @@ struct InputFilterImpl :public InputFilter
 	//\brief Implement InputFilter::initcopy()
 	virtual InputFilter* initcopy() const
 	{
-		return new InputFilterImpl( m_encoding.c_str(), m_charset);
+		return new InputFilterImpl( *getMetaDataRef(), m_charset);
 	}
 
 	//\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
@@ -139,11 +156,11 @@ struct InputFilterImpl :public InputFilter
 		return false;
 	}
 
-	virtual const char* getEncoding() const
+	virtual const types::DocMetaData* getMetaData()
 	{
-		return m_encoding.empty()?0:m_encoding.c_str();
+		return getMetaDataRef().get();
 	}
-
+	
 	virtual bool checkSetFlags( Flags f) const
 	{
 		return (0==((int)f & (int)langbind::FilterBase::SerializeWithIndices));
@@ -167,7 +184,6 @@ private:
 	const char* m_src;			//< pointer to current chunk parsed
 	std::size_t m_srcsize;			//< size of the current chunk parsed in bytes
 	bool m_srcend;				//< true if end of message is in current chunk parsed
-	std::string m_encoding;			//< character set encoding
 };
 
 //\class OutputFilterImpl
@@ -176,9 +192,9 @@ template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct OutputFilterImpl :public OutputFilter
 {
 	//\brief Constructor
-	OutputFilterImpl( const IOCharset& iocharset_=IOCharset())
+	OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::OutputFilterImpl (char)", __LINE__)
-		,OutputFilter("char")
+		,OutputFilter("char", inheritedMetaData)
 		,m_elemitr(0)
 		,m_output(iocharset_){}
 
@@ -257,6 +273,10 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		return true;
 	}
+
+	/// \brief Implementation of OutputFilter::close()
+	virtual bool close(){return true;}
+
 private:
 	std::string m_elembuf;				//< buffer for the currently printed element
 	std::size_t m_elemitr;				//< iterator to pass it to output
@@ -271,8 +291,8 @@ struct CharFilter :public Filter
 	{
 		if (!encoding)
 		{
-			m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>( encoding));
-			m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
+			m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>( "UTF-8"));
+			m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>( m_inputfilter->getMetaDataRef()));
 		}
 		else
 		{
@@ -290,48 +310,48 @@ struct CharFilter :public Filter
 				if (codepage[0] == '1')
 				{
 					m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin>( encoding));
-					m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin>());
+					m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin>( m_inputfilter->getMetaDataRef()));
 				}
 				else
 				{
 					m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin>( encoding, textwolf::charset::IsoLatin( codepage[0] - '0')));
-					m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin>( textwolf::charset::IsoLatin( codepage[0] - '0')));
+					m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin>( m_inputfilter->getMetaDataRef(), textwolf::charset::IsoLatin( codepage[0] - '0')));
 				}
 			}
 			else if (enc.size() == 0 || enc == "utf8")
 			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>( encoding));
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>( m_inputfilter->getMetaDataRef()));
 			}
 			else if (enc == "utf16" || enc == "utf16be")
 			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16BE>( encoding));
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16BE>( m_inputfilter->getMetaDataRef()));
 			}
 			else if (enc == "utf16le")
 			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF16LE>( encoding));
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16LE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF16LE>( m_inputfilter->getMetaDataRef()));
 			}
 			else if (enc == "ucs2" || enc == "ucs2be")
 			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2BE>( encoding));
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2BE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2BE>( m_inputfilter->getMetaDataRef()));
 			}
 			else if (enc == "ucs2le")
 			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS2LE>( encoding));
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS2LE>( m_inputfilter->getMetaDataRef()));
 			}
 			else if (enc == "utf32" || enc == "ucs4" || enc == "utf32be" || enc == "ucs4be")
 			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4BE>( encoding));
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4BE>( m_inputfilter->getMetaDataRef()));
 			}
 			else if (enc == "utf32le" || enc == "ucs4le")
 			{
 				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UCS4LE>( encoding));
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>());
+				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UCS4LE>( m_inputfilter->getMetaDataRef()));
 			}
 			else
 			{
@@ -354,25 +374,46 @@ struct CharFilter :public Filter
 	}
 };
 
+static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
+{
+	const char* encoding = 0;
+	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		{
+			if (encoding)
+			{
+				if (ai->first.empty())
+				{
+					throw std::runtime_error( "too many filter arguments");
+				}
+				else
+				{
+					throw std::runtime_error( "duplicate filter argument 'encoding'");
+				}
+			}
+			encoding = ai->second.c_str();
+			break;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "unknown filter argument '") + ai->first + "'");
+		}
+	}
+	return encoding;
+}
+
 class CharFilterType :public FilterType
 {
 public:
-	CharFilterType(){}
+	CharFilterType()
+		:FilterType("char"){}
 	virtual ~CharFilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const
 	{
-		const char* encoding = 0;
-		std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-		for (; ai != ae; ++ai)
-		{
-			if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
-			{
-				encoding = ai->second.c_str();
-				break;
-			}
-		}
-		return encoding?(new CharFilter( encoding)):(new CharFilter());
+		return new CharFilter( getArgumentEncoding( arg));
 	}
 };
 

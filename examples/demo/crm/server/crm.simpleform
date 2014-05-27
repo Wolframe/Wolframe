@@ -1,6 +1,6 @@
 ; ------------ Employee
 ; * Sub structures:
-Form Employee
+STRUCT Employee
 {
 	name		entityname
 	status		entityname
@@ -11,36 +11,36 @@ Form Employee
 	addr_country	entityname
 }
 
-Form EmployeeInserted
+STRUCT EmployeeInserted
 {
 	id		!@ID
 	_ Employee
 }
 
-Form EmployeeRef
+STRUCT EmployeeRef
 {
 	id		!@ID
 	_		entityname
 }
 
 ; * Forms:
-Form InsertEmployee	{ employee { _ Employee } }
-Form UpdateEmployee	{ employee { _ EmployeeInserted } }
-Form DeleteEmployee	{ employee { id !@ID } }
-Form GetEmployee	{ employee { id !@ID } }
-Form EmployeeResult	{ employee { _ EmployeeInserted } }
-Form EmployeeListResult	{ employees { employee EmployeeInserted[] } }
-Form EmployeeRefListResult { employees { employee EmployeeRef[] } }
-Form SearchEmployee	{ employee { pattern string } }
-Form ListEmployee	{ employee { } }
-Form ListEmployeeRef	{ employee { } }
+FORM InsertEmployee -root employee 	{ _ Employee }
+FORM UpdateEmployee -root employee	{ _ EmployeeInserted }
+FORM DeleteEmployee -root employee	{ id !@ID }
+FORM GetEmployee -root employee		{ id !@ID }
+FORM EmployeeResult -root employee	{ _ EmployeeInserted }
+FORM EmployeeListResult -root employees { employee EmployeeInserted[] }
+FORM EmployeeRefListResult -root employees { EmployeeRef[] }
+FORM SearchEmployee -root employee	{ pattern string }
+FORM ListEmployee -root employee	{ }
+FORM ListEmployeeRef -root employee	{ }
 
 
 
 
 ; ------------ Customer
 ; * Sub structures:
-Form Customer
+STRUCT Customer
 {
 	name		entityname
 	description	string
@@ -51,41 +51,41 @@ Form Customer
 	addr_country	entityname
 }
 
-Form CustomerInserted
+STRUCT CustomerInserted
 {
 	id		!@ID
 	_ Customer
 }
-Form CustomerInsertedShort
+STRUCT CustomerInsertedShort
 {
 	id		!@ID
 	name		entityname
 	description	string
 }
-Form CustomerRef
+STRUCT CustomerRef
 {
 	id		!@ID
 	_		entityname
 }
 
 ; * Forms:
-Form InsertCustomer	{ customer { _ Customer } }
-Form UpdateCustomer	{ customer { _ CustomerInserted } }
-Form DeleteCustomer	{ customer { id !@ID } }
-Form GetCustomer	{ customer { id !@ID } }
-Form CustomerResult	{ customer { _ CustomerInserted } }
-Form CustomerListResult	{ customers { customer CustomerInserted[] } }
-Form CustomerListShortResult	{ customers { customer CustomerInsertedShort[] } }
-Form CustomerRefListResult { customers { customer CustomerRef[] } }
-Form SearchCustomer	{ customer { pattern string } }
-Form ListCustomer	{ customer { } }
+FORM InsertCustomer -root customer		{ _ Customer }
+FORM UpdateCustomer -root customer		{ _ CustomerInserted }
+FORM DeleteCustomer -root customer		{ id !@ID }
+FORM GetCustomer    -root customer		{ id !@ID }
+FORM CustomerResult -root customer		{ _ CustomerInserted }
+FORM CustomerListResult -root customers		{ customer CustomerInserted[] }
+FORM CustomerListShortResult -root customers	{ customer CustomerInsertedShort[] }
+FORM CustomerRefListResult -root customers	{ customer CustomerRef[] }
+FORM SearchCustomer -root customer		{ pattern string }
+FORM ListCustomer -root customer		{ }
 
 
 
 
 ; ------------ CustomerPicture
 ; * Sub structures:
-Form CustomerPicture
+STRUCT CustomerPicture
 {
 	customerid	@!ID
 	caption		string
@@ -96,44 +96,32 @@ Form CustomerPicture
 	thumbnail	string
 }
 
-Form CustomerPictureInserted
+STRUCT CustomerPictureInserted
 {
 	id		!@ID
 	_ CustomerPicture
 }
 
 ; * Forms:
-Form InsertCustomerPicture		{ picture { _ CustomerPicture } }
-Form UpdateCustomerPicture		{ picture { _ CustomerPictureInserted } }
-Form DeleteCustomerPicture		{ picture { id !@ID } }
-Form GetCustomerPicture			{ picture { id !@ID } }
-Form CustomerPictureInsertResult	{ picture { id !@ID } }
+FORM InsertCustomerPicture -root picture	{ _ CustomerPicture }
+FORM UpdateCustomerPicture -root picture	{ _ CustomerPictureInserted }
+FORM DeleteCustomerPicture -root picture	{ id !@ID }
+FORM GetCustomerPicture -root picture		{ id !@ID }
+FORM CustomerPictureInsertResult -root picture 	{ id !@ID }
 
-Form CustomerPictureResult
-{
-	picture
-	{
-		_ CustomerPictureInserted
-	}
-}
-Form CustomerPictureListResult
-{
-	picturelist
-	{
-		picture CustomerPictureResult[]
-	}
-}
+FORM CustomerPictureResult -root picture	{_ CustomerPictureInserted}
+FORM CustomerPictureListResult -root picturelist {picture CustomerPictureResult[]}
 
 
 
 ; ------------ CustomerRelation
-Form CustomerRelation
+STRUCT CustomerRelation
 {
 	customerid	@!ID
 	employeeid	@!ID
 	description	string
 }
-Form CustomerRelationCustomerView
+STRUCT CustomerRelationCustomerView
 {
 	employeeid	@!ID
 	employeename	string
@@ -141,16 +129,16 @@ Form CustomerRelationCustomerView
 	description	string
 }
 
-Form InsertCustomerRelation			{ relation { _ CustomerRelation } }
-Form UpdateCustomerRelation			{ relation { _ CustomerRelation } }
-Form DeleteCustomerRelation			{ relation { customerid !@ID employeeid !@ID } }
-Form GetCustomerRelation			{ relation { customerid !@ID employeeid !@ID } }
-Form GetCustomerRelationCustomer		{ relation { customerid !@ID } }
-Form GetCustomerRelationEmployee		{ relation { employee !@ID } }
+FORM InsertCustomerRelation	-root relation			{ _ CustomerRelation }
+FORM UpdateCustomerRelation	-root relation			{ _ CustomerRelation }
+FORM DeleteCustomerRelation	-root relation			{ customerid !@ID employeeid !@ID }
+FORM GetCustomerRelation	-root relation			{ customerid !@ID employeeid !@ID }
+FORM GetCustomerRelationCustomer -root relation			{ customerid !@ID }
+FORM GetCustomerRelationEmployee -root relation			{ employee !@ID }
 
-Form CustomerRelationResult			{ relation { _ CustomerRelation } }
-Form CustomerRelationListResult			{ relations { relation CustomerRelation[] } }
-Form CustomerRelationCustomerViewListResult	{ relations { relation CustomerRelationCustomerView[] } }
+FORM CustomerRelationResult	  -root relation		{ _ CustomerRelation }
+FORM CustomerRelationListResult	  -root relations		{ relation CustomerRelation[] }
+FORM CustomerRelationCustomerViewListResult -root relations	{ relation CustomerRelationCustomerView[] }
 
 
 
@@ -158,50 +146,44 @@ Form CustomerRelationCustomerViewListResult	{ relations { relation CustomerRelat
 
 ; ------------ CustomerNote
 ; * Sub structures:
-Form CustomerNote
+STRUCT CustomerNote
 {
 	customerid	!ID
 	content		string
 	link		?URI
 }
 
-Form CustomerNoteInserted
+STRUCT CustomerNoteInserted
 {
 	id		!@ID
 	_ CustomerNote
 }
 
 ; * Forms:
-Form InsertCustomerNote	{ note { _ CustomerNote } }
-Form UpdateCustomerNote	{ note { _ CustomerNoteInserted } }
-Form DeleteCustomerNote	{ note { id !@ID } }
-Form GetCustomerNote	{ note { id !@ID } }
-Form SearchCustomerNote
+FORM InsertCustomerNote -root note		{ _ CustomerNote }
+FORM UpdateCustomerNote -root note		{ _ CustomerNoteInserted }
+FORM DeleteCustomerNote -root note		{ id !@ID }
+FORM GetCustomerNote -root note			{ id !@ID }
+FORM SearchCustomerNote -root note
 {
-	note
-	{
-		customerid ?ID
-		pattern string
-	}
+	customerid ?ID
+	pattern string
 }
 
-Form CustomerNoteResult
+FORM CustomerNoteResult
+	-root note
 {
-	note
+	_ CustomerNoteInserted
+	timestamp	datetime
+}
+
+FORM CustomerNoteListResult
+	-root notes
+{
+	note []
 	{
 		_ CustomerNoteInserted
 		timestamp	datetime
-	}
-}
-Form CustomerNoteListResult
-{
-	notes
-	{
-		note []
-		{
-			_ CustomerNoteInserted
-			timestamp	datetime
-		}
 	}
 }
 
@@ -210,49 +192,47 @@ Form CustomerNoteListResult
 
 ; ------------ Project
 ; * Sub structures:
-Form Project
+STRUCT Project
 {
 	customerid	!@ID
 	name		entityname
 	description	?string
 }
-Form ProjectInserted
+STRUCT ProjectInserted
 {
 	id		!@ID
 	customername	?entityname
 	_ Project
 }
-Form ProjectListElem
+STRUCT ProjectListElem
 {
 	id		!@ID
 	customername	entityname
 	name		entityname
 	description	?string
 }
-Form ProjectCustomerListElem
+STRUCT ProjectCustomerListElem
 {
 	id		!@ID
 	name		entityname
 	description	?string
 }
 ; * Forms:
-Form InsertProject		{ project { _ Project } }
-Form UpdateProject		{ project { _ ProjectInserted } }
-Form DeleteProject		{ project { id !@ID } }
-Form GetProject			{ project { id !@ID } }
-Form ProjectResult		{ project { _ ProjectInserted } }
-Form ProjectListResult		{ projects { project ProjectListElem[] } }
-Form ProjectCustomerListResult	{ projects { project ProjectCustomerListElem[] } }
-Form ListProject		{ project { } }
-Form ListProjectCustomer	{ project { customerid !@ID } }
+FORM InsertProject -root project		{ _ Project }
+FORM UpdateProject -root project		{ _ ProjectInserted }
+FORM DeleteProject -root project		{ id !@ID }
+FORM GetProject -root project			{ id !@ID }
+FORM ProjectResult -root project		{ _ ProjectInserted }
+FORM ProjectListResult -root projects		{ project ProjectListElem[] }
+FORM ProjectCustomerListResult -root projects	{ project ProjectCustomerListElem[] }
+FORM ListProject -root project			{ }
+FORM ListProjectCustomer -root project		{ customerid !@ID } }
 
-Form SearchProject
+FORM SearchProject
+	-root project
 {
-	project
-	{
-		customerid ?ID
-		pattern string
-	}
+	customerid ?ID
+	pattern string
 }
 
 
@@ -260,49 +240,43 @@ Form SearchProject
 
 ; ------------ ProjectNote
 ; * Sub structures:
-Form ProjectNote
+STRUCT ProjectNote
 {
 	projectid	!ID
 	content		string
 	link		?URI
 }
 
-Form ProjectNoteInserted
+STRUCT ProjectNoteInserted
 {
 	id		!@ID
 	_ ProjectNote
 }
 
 ; * Forms:
-Form InsertProjectNote	{ note { _ ProjectNote } }
-Form UpdateProjectNote	{ note { _ ProjectNoteInserted } }
-Form DeleteProjectNote	{ note { id !@ID } }
-Form GetProjectNote	{ note { id !@ID } }
-Form SearchProjectNote
+FORM InsertProjectNote	-root note		{ _ ProjectNote }
+FORM UpdateProjectNote	-root note		{ _ ProjectNoteInserted }
+FORM DeleteProjectNote	-root note		{ id !@ID }
+FORM GetProjectNote	-root note		{ id !@ID }
+FORM SearchProjectNote
+	-root note
 {
-	note
-	{
-		projectid ?ID
-		pattern string
-	}
+	projectid ?ID
+	pattern string
 }
-Form ProjectNoteResult
+FORM ProjectNoteResult
+	-root note
 {
-	note
+	_ ProjectNoteInserted
+	timestamp	datetime
+}
+FORM ProjectNoteListResult
+	-root notes
+{
+	note []
 	{
 		_ ProjectNoteInserted
 		timestamp	datetime
-	}
-}
-Form ProjectNoteListResult
-{
-	notes
-	{
-		note []
-		{
-			_ ProjectNoteInserted
-			timestamp	datetime
-		}
 	}
 }
 
@@ -311,32 +285,30 @@ Form ProjectNoteListResult
 
 ; ------------ ActivityCategory
 ; * Sub structures:
-Form ActivityCategory
+STRUCT ActivityCategory
 {
 	name		entityname
 	description	?string
 }
 
-Form ActivityCategoryInserted
+STRUCT ActivityCategoryInserted
 {
 	id		!@ID
 	_ ActivityCategory
 }
 
 ; * Forms:
-Form InsertActivityCategory	{ category { _ ActivityCategory } }
-Form UpdateActivityCategory	{ category { _ ActivityCategoryInserted } }
-Form DeleteActivityCategory	{ category { id !@ID } }
-Form GetActivityCategory	{ category { id !@ID } }
-Form ActivityCategoryResult	{ category { _ ActivityCategoryInserted } }
-Form ActivityCategoryListResult	{ categories { category ActivityCategoryInserted[] } }
+FORM InsertActivityCategory -root category		{ _ ActivityCategory }
+FORM UpdateActivityCategory -root category		{ _ ActivityCategoryInserted }
+FORM DeleteActivityCategory -root category		{ id !@ID }
+FORM GetActivityCategory -root category			{ id !@ID }
+FORM ActivityCategoryResult -root category		{ _ ActivityCategoryInserted }
+FORM ActivityCategoryListResult -root categories	{ category ActivityCategoryInserted[] }
 
-Form SearchActivityCategory
+FORM SearchActivityCategory
+	-root category
 {
-	category
-	{
-		pattern string
-	}
+	pattern string
 }
 
 
@@ -344,7 +316,7 @@ Form SearchActivityCategory
 
 ; ------------ ActivityCharging
 ; * Sub structures:
-Form ActivityCharging
+STRUCT ActivityCharging
 {
 	categoryid	!ID
 	validfrom	datetime
@@ -354,33 +326,31 @@ Form ActivityCharging
 	taxes		percentage
 }
 
-Form ActivityChargingInserted
+STRUCT ActivityChargingInserted
 {
 	id		!@ID
 	_ ActivityCharging
 }
 
 ; * Forms:
-Form InsertActivityCharging	{ charging { _ ActivityCharging } }
-Form UpdateActivityCharging	{ charging { _ ActivityChargingInserted } }
-Form DeleteActivityCharging	{ charging { id !@ID } }
-Form GetActivityCharging	{ charging { id !@ID } }
-Form EvalActivityCharging
+FORM InsertActivityCharging -root charging	{ _ ActivityCharging }
+FORM UpdateActivityCharging -root charging	{ _ ActivityChargingInserted }
+FORM DeleteActivityCharging -root charging	{ id !@ID }
+FORM GetActivityCharging -root charging		{ id !@ID }
+FORM EvalActivityCharging
+	-root charging
 {
-	charging
-	{
-		categoryid !ID
-		validat datetime
-	}
+	categoryid !ID
+	validat datetime
 }
-Form ActivityChargingResult	{ charging { _ ActivityChargingInserted } }
+FORM ActivityChargingResult -root charging	{ _ ActivityChargingInserted }
 
 
 
 
 ; ------------ Activity
 ; * Sub structures:
-Form Activity
+STRUCT Activity
 {
 	categoryid	!ID
 	projectid	!ID
@@ -390,7 +360,7 @@ Form Activity
 	duration	timediff
 }
 
-Form ActivityInserted
+STRUCT ActivityInserted
 {
 	id		!@ID
 	chargingid	!ID
@@ -398,25 +368,23 @@ Form ActivityInserted
 }
 
 ; * Forms:
-Form InsertActivity	{ activity { _ Activity } }
-Form UpdateActivity	{ activity { _ ActivityInserted } }
-Form DeleteActivity	{ activity { id !@ID } }
-Form GetActivity	{ activity { id !@ID } }
-Form ActivityResult	{ activity { _ ActivityInserted } }
-Form ActivityListResult	{ activities { activity ActivityCategoryInserted[] } }
+FORM InsertActivity	-root activity		{ _ Activity }
+FORM UpdateActivity	-root activity		{ _ ActivityInserted }
+FORM DeleteActivity	-root activity		{ id !@ID }
+FORM GetActivity	-root activity		{ id !@ID }
+FORM ActivityResult	-root activity		{ _ ActivityInserted }
+FORM ActivityListResult -root activities	{ activity ActivityCategoryInserted[] }
 
-Form SearchActivity
+FORM SearchActivity
+	-root activity
 {
-	activity
-	{
-		customerid ?ID
-		categoryid ?ID
-		projectid ?ID
-		employeeid ?ID
-		rangefrom ?datetime
-		rangeto ?datetime
-		pattern string
-	}
+	customerid ?ID
+	categoryid ?ID
+	projectid ?ID
+	employeeid ?ID
+	rangefrom ?datetime
+	rangeto ?datetime
+	pattern string
 }
 
 
@@ -424,49 +392,43 @@ Form SearchActivity
 
 ; ------------ ActivityNote
 ; * Sub structures:
-Form ActivityNote
+STRUCT ActivityNote
 {
 	activityid	!ID
 	content		string
 	link		?URI
 }
 
-Form ActivityNoteInserted
+STRUCT ActivityNoteInserted
 {
 	id		!@ID
 	_ ActivityNote
 }
 
 ; * Forms:
-Form InsertActivityNote	{ note { _ ActivityNote } }
-Form UpdateActivityNote	{ note { _ ActivityNoteInserted } }
-Form DeleteActivityNote	{ note { id !@ID } }
-Form GetActivityNote	{ note { id !@ID } }
-Form SearchActivityNote
+FORM InsertActivityNote	-root note	{ _ ActivityNote }
+FORM UpdateActivityNote	-root note	{ _ ActivityNoteInserted }
+FORM DeleteActivityNote	-root note	{ id !@ID }
+FORM GetActivityNote	-root note	{ id !@ID }
+FORM SearchActivityNote
+	-root note
 {
-	note
-	{
-		activityid ?ID
-		pattern string
-	}
+	activityid ?ID
+	pattern string
 }
-Form ActivityNoteResult
+FORM ActivityNoteResult
+	-root note
 {
-	note
+	_ ActivityNoteInserted
+	timestamp	datetime
+}
+FORM ActivityNoteListResult
+	-root notes
+{
+	note []
 	{
 		_ ActivityNoteInserted
 		timestamp	datetime
-	}
-}
-Form ActivityNoteListResult
-{
-	notes
-	{
-		note []
-		{
-			_ ActivityNoteInserted
-			timestamp	datetime
-		}
 	}
 }
 

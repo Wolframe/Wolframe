@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/typingfilter.hpp
-///\brief Interface of filters that wrap untyped to typed input/output filters
+/// \file filter/typingfilter.hpp
+/// \brief Interface of filters that wrap untyped to typed input/output filters
 #ifndef _Wolframe_TYPING_FILTER_HPP_INCLUDED
 #define _Wolframe_TYPING_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -40,12 +40,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class TypingInputFilter
-///\brief Typed fascade for input filter
+/// \class TypingInputFilter
+/// \brief Typed fascade for input filter
 class TypingInputFilter :public TypedInputFilter
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	explicit TypingInputFilter( const InputFilterR& inp)
 		:utils::TypeSignature("langbind::TypingInputFilter", __LINE__)
 		,TypedInputFilter(inp->name())
@@ -54,28 +54,28 @@ public:
 		setFlags( inp->flags());
 	}
 
-	///\brief Copy constructor
-	///\param[in] o input filter to copy
+	/// \brief Copy constructor
+	/// \param[in] o input filter to copy
 	TypingInputFilter( const TypingInputFilter& o)
 		:utils::TypeSignature(o)
 		,TypedInputFilter(o)
 		,m_inputfilter(o.m_inputfilter)
 		,m_stack(o.m_stack){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~TypingInputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual TypedInputFilter* copy() const		{return new TypingInputFilter(*this);}
 
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
+	/// \brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
 	virtual bool getNext( ElementType& type, types::VariantConst& element);
 
-	///\brief Implementation of TypedInputFilter::setFlags(Flags)
+	/// \brief Implementation of TypedInputFilter::setFlags(Flags)
 	virtual bool setFlags( Flags f);
 
-	///\brief Implements FilterBase::checkSetFlags()const
+	/// \brief Implements FilterBase::checkSetFlags()const
 	virtual bool checkSetFlags( Flags f) const;
 
 private:
@@ -93,12 +93,12 @@ private:
 	std::vector<StackElement> m_stack;
 };
 
-///\class TypingOutputFilter
-///\brief Typed fascade for output filter
+/// \class TypingOutputFilter
+/// \brief Typed fascade for output filter
 class TypingOutputFilter :public TypedOutputFilter
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	explicit TypingOutputFilter( const OutputFilterR& outp)
 		:utils::TypeSignature("langbind::TypingOutputFilter", __LINE__)
 		,TypedOutputFilter(outp->name())
@@ -107,21 +107,21 @@ public:
 		setFlags( outp->flags());
 	}
 
-	///\brief Copy constructor
-	///\param[in] o typed output filter to copy
+	/// \brief Copy constructor
+	/// \param[in] o typed output filter to copy
 	TypingOutputFilter( const TypingOutputFilter& o)
 		:utils::TypeSignature(o)
 		,TypedOutputFilter(o)
 		,m_outputfilter(o.m_outputfilter){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~TypingOutputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const		{return new TypingOutputFilter(*this);}
 
-	///\brief Implementation of TypedOutputFilter::print( ElementType,const types::VariantConst&)
+	/// \brief Implementation of TypedOutputFilter::print( ElementType,const types::VariantConst&)
 	virtual bool print( ElementType type, const types::VariantConst& element);
 
 private:

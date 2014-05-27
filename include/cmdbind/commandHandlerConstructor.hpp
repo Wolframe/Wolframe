@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/commandHandlerConstructor.hpp
-///\brief Interface to command handler constructors
+/// \file cmdbind/commandHandlerConstructor.hpp
+/// \brief Interface to command handler constructors
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
@@ -46,13 +46,13 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class CommandHandlerConstructor
-///\brief Handler for a set of commands adressable by identifiers
+/// \class CommandHandlerConstructor
+/// \brief Handler for a set of commands adressable by identifiers
 class CommandHandlerConstructor
 	:public ConfiguredObjectConstructor<CommandHandlerUnit>
 {
 public:
-	///\brief virtual destructor
+	/// \brief virtual destructor
 	virtual ~CommandHandlerConstructor(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
@@ -62,7 +62,7 @@ public:
 	virtual CommandHandlerUnit* object( const config::NamedConfiguration& conf)=0;
 };
 
-///\brief Command handler constructor reference
+/// \brief Command handler constructor reference
 typedef boost::shared_ptr<CommandHandlerConstructor> CommandHandlerConstructorR;
 
 }} //namespace _Wolframe::cmdbind

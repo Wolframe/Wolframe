@@ -50,12 +50,8 @@ public:
         ElementType& type,
         const void*& element, std::size_t& elementsize)=0;
 
-    // Get type of the document
-    virtual bool getDocType( types::DocType& doctype);
-
-    // Evaluate if the document metadata are avalable
-    // and set state for fetching them if needed
-    virtual bool getMetadata();
+    // Get the document meta data
+    virtual const types::DocMetaData* getMetaData();
 
     // Get the current state
     State state() const;

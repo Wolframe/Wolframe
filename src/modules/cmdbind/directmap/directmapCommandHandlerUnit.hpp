@@ -34,6 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_UNIT_HPP_INCLUDED
 #define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_UNIT_HPP_INCLUDED
 #include "directmapProgram.hpp"
+#include "filter/filterdef.hpp"
 #include "directmapCommandHandlerConfig.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 #include "processor/procProviderInterface.hpp"
@@ -52,9 +53,10 @@ public:
 		:m_config(config_){}
 	~DirectmapCommandHandlerUnit(){}
 
+	/// \brief Create a new command handler
 	virtual CommandHandler* createCommandHandler( const std::string& cmdname, const std::string& docformat);
 
-	///\brief Get the list of commands
+	/// \brief Get the list of commands
 	virtual std::vector<std::string> commands() const
 	{
 		return m_program.getkeys< std::vector<std::string> >();
@@ -65,7 +67,7 @@ public:
 private:
 	const DirectmapCommandHandlerConfig* m_config;
 	langbind::DirectmapProgram m_program;
-	types::keymap<std::string> m_filtermap;
+	types::keymap<langbind::FilterDef> m_filtermap;
 };
 
 }}//namespace

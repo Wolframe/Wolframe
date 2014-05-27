@@ -1,6 +1,5 @@
 {
-  "doctype" : "CDCatalog",
-  "CATALOG": {
+    "-doctype" : "CDCatalog",
     "CD": [
       {
         "TITLE": "Empire Burlesque",
@@ -73,5 +72,4 @@
         }
       }
     ]
-  }
 }

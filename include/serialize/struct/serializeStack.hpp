@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/serializeStack.hpp
-///\brief Defines the parsing stack for serialization of objects
+/// \file serialize/struct/serializeStack.hpp
+/// \brief Defines the parsing stack for serialization of objects
 
 #ifndef _Wolframe_SERIALIZE_STRUCT_SERIALIZE_STACK_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_SERIALIZE_STACK_HPP_INCLUDED
@@ -43,22 +43,29 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class SerializeState
-///\brief State stack element for an iterator on a structure (serializer)
+/// \class SerializeState
+/// \brief State stack element for an iterator on a structure (serializer)
 class SerializeState
 {
 public:
 	typedef bool (*Fetch)( Context& ctx, std::vector<SerializeState>& stk);
 
 public:
+	/// \brief Copy constructor
 	SerializeState( const SerializeState& o);
 
+	/// \brief Constructor
 	SerializeState( const char* name_, Fetch p, const void* v);
 
+	/// \brief Get the base pointer to the value of the object handled by this state
 	const void* value() const			{return m_value;}
+	/// \brief Get the name of the object handled by this state
 	const char* name() const			{return m_name;}
+	/// \brief Get the fetch function of the object handled by this state
 	Fetch fetch() const				{return m_fetch;}
+	/// \brief Get the internal state of the serialization handled by this state
 	std::size_t state() const			{return m_stateidx;}
+	/// \brief Set the internal state of the serialization handled by this state
 	void state( std::size_t idx)			{m_stateidx = idx;}
 
 private:
@@ -68,7 +75,7 @@ private:
 	std::size_t m_stateidx;
 };
 
-///\brief State stack for an iterator on a structure (serializer)
+/// \brief State stack for an iterator on a structure (serializer)
 typedef std::vector<SerializeState> SerializeStateStack;
 
 }}//namespace

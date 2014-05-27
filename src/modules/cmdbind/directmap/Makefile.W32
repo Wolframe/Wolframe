@@ -28,6 +28,7 @@ DYNAMIC_MODULE = \
 	mod_command_directmap.dll
 
 CPP_OBJS = \
+	directmapCommandDescription.obj \
 	directmapProgram.obj \
 	directmapCommandHandler.obj \
 	directmapCommandHandlerUnit.obj \

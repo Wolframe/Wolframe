@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file utils/fileLineInfo.hpp
-///\brief Defines a data structure to hold positional info in a source file for error messsages etc.
+/// \file utils/fileLineInfo.hpp
+/// \brief Defines a data structure to hold positional info in a source file for error messsages etc.
 
 #ifndef _WOLFRAME_FILE_LINE_INFO_HPP_INCLUDED
 #define _WOLFRAME_FILE_LINE_INFO_HPP_INCLUDED

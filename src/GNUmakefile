@@ -58,8 +58,8 @@ PROVIDER_OBJS = \
 	provider/AAAAproviderConfig.o \
 	provider/DBproviderImpl.o \
 	provider/DBproviderConfig.o \
-	provider/procProvider.o \
-	provider/procProviderImpl.o
+	provider/procProviderConfig.o \
+	provider/procProvider.o
 
 PROGRAM_OBJS = \
 	prgbind/transactionProgram.o \

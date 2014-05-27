@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/parseStack.hpp
-///\brief Defines the parsing stack for deserialization
+/// \file serialize/struct/parseStack.hpp
+/// \brief Defines the parsing stack for deserialization
 
 #ifndef _Wolframe_SERIALIZE_STRUCT_PARSE_STACK_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_PARSE_STACK_HPP_INCLUDED
@@ -43,11 +43,11 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\brief Forward declaration
+/// \brief Forward declaration
 class ParseStateStack;
 
-///\class ParseState
-///\brief State stack element for an initializer of a structure
+/// \class ParseState
+/// \brief State stack element for an initializer of a structure
 class ParseState
 {
 public:
@@ -75,8 +75,8 @@ private:
 	std::size_t m_stateidx;
 };
 
-///\class ParseStateStack
-///\brief State stack for an initializer of a structure
+/// \class ParseStateStack
+/// \brief State stack for an initializer of a structure
 class ParseStateStack :public std::vector<ParseState>
 {
 public:

@@ -1,2 +1,2 @@
-COMMAND (AllDataRequest) CALL(run) RETURN(Data);
+COMMAND AllDataRequest CALL run RETURN Data;
 

@@ -31,9 +31,11 @@ Project Wolframe.
 ************************************************************************/
 ///\file directmapCommandHandlerUnit.cpp
 ///\brief Implementation of the directmap command handler unit
+#include "filter/filterdef.hpp"
 #include "directmapCommandHandlerUnit.hpp"
 #include "directmapCommandHandlerConfig.hpp"
 #include "directmapProgram.hpp"
+#include "utils/parseUtils.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -45,27 +47,31 @@ bool DirectmapCommandHandlerUnit::loadPrograms( const proc::ProcessorProviderInt
 {
 	bool rt = true;
 
-	m_filtermap = m_config->filtermap();
-	types::keymap<std::string>::const_iterator fi = m_filtermap.begin(), fe = m_filtermap.end();
+	types::keymap<std::string>::const_iterator fi = m_config->filtermap().begin(), fe = m_config->filtermap().end();
 	for (; fi != fe; ++fi)
 	{
-		if (!provider->filterType( fi->second))
+		try
+		{
+			std::string::const_iterator si = fi->second.begin(), se = fi->second.end();
+			langbind::FilterDef fd = langbind::FilterDef::parse( si, se, provider);
+			if (utils::gotoNextToken( si, se))
+			{
+				LOG_ERROR << "superfluous tokens after filter definition: '" << std::string(si,se) << "'";
+			}
+			m_filtermap.insert( fi->first, fd);
+		}
+		catch (const std::runtime_error& e)
 		{
 			rt = false;
-			LOG_ERROR << "undefined configured filter type '" << fi->second << "'";
+			LOG_ERROR << "error in configured default filter: " << e.what();
 		}
 	}
 	std::vector<std::string>::const_iterator ci = m_config->programfiles().begin(), ce = m_config->programfiles().end();
 	for (; ci != ce; ++ci)
 	{
-		try
-		{
-			m_program.loadProgram( *ci, provider);
-		}
-		catch (const std::runtime_error& e)
+		if (!m_program.loadProgram( *ci, provider))
 		{
 			rt = false;
-			LOG_ERROR << "Failed to load standard command handler program '" << *ci << "'";
 		}
 	}
 	return rt;
@@ -73,23 +79,46 @@ bool DirectmapCommandHandlerUnit::loadPrograms( const proc::ProcessorProviderInt
 
 CommandHandler* DirectmapCommandHandlerUnit::createCommandHandler( const std::string& cmdname, const std::string& docformat)
 {
-	DirectmapCommandHandler* rt = 0;
 	const DirectmapCommandDescription* descr = m_program.get( cmdname);
 	if (!descr) throw std::runtime_error( std::string( "command is not defined '") + cmdname + "'");
 
-	types::keymap<std::string>::const_iterator fi = m_filtermap.find( docformat);
-	if (fi == m_filtermap.end()) fi = m_filtermap.find( "");
-	if (fi == m_filtermap.end())
+	InputFilterR inputfilter;
+	OutputFilterR outputfilter;
+
+	if (descr->inputfilterdef.filtertype)
 	{
-		LOG_WARNING << "Default filter for document format '" << docformat << "' is not defined";
-		rt = new DirectmapCommandHandler( descr, "");
+		langbind::FilterR filter( descr->inputfilterdef.filtertype->create( descr->inputfilterdef.arg));
+		inputfilter = filter->inputfilter();
 	}
-	else
+	if (descr->outputfilterdef.filtertype)
 	{
-		rt = new DirectmapCommandHandler( descr, fi->second);
+		langbind::FilterR filter( descr->outputfilterdef.filtertype->create( descr->outputfilterdef.arg));
+		outputfilter = filter->outputfilter();
 	}
-	return rt;
+	if (!descr->inputfilterdef.filtertype || !descr->outputfilterdef.filtertype)
+	{
+		langbind::FilterR filter;
+
+		types::keymap<langbind::FilterDef>::const_iterator fi = m_filtermap.find( docformat);
+		if (fi == m_filtermap.end()) fi = m_filtermap.find( "");
+		if (fi == m_filtermap.end())
+		{
+			throw std::runtime_error( std::string( "filter not defined for command '") + cmdname + "' and no default filter defined for document format '" + docformat + "'");
+		}
+		filter.reset( fi->second.create());
+
+		if (!descr->outputfilterdef.filtertype)
+		{
+			outputfilter = filter->outputfilter();
+		}
+		if (!descr->inputfilterdef.filtertype)
+		{
+			inputfilter = filter->inputfilter();
+		}
+	}
+	return new DirectmapCommandHandler( descr, inputfilter, outputfilter);
 }
+
 
 
 

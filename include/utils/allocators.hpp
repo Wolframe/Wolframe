@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for special purpose memory allocators
-///\file utils/allocators.hpp
+/// \brief Interface for special purpose memory allocators
+/// \file utils/allocators.hpp
 #ifndef _UTILS_ALLOCATORS_HPP_INCLUDED
 #define _UTILS_ALLOCATORS_HPP_INCLUDED
 #include <cstddef>
@@ -41,8 +41,8 @@
 namespace _Wolframe {
 namespace utils {
 
-///\class GreedySmallChunkAllocator
-///\brief Interface for an allocator for small chunks without a free. Memory is freed in the destructor of the allocator
+/// \class GreedySmallChunkAllocator
+/// \brief Interface for an allocator for small chunks without a free. Memory is freed in the destructor of the allocator
 class GreedySmallChunkAllocator
 {
 public:
@@ -56,8 +56,8 @@ private:
 };
 
 
-///\class ArrayDoublingAllocator
-///\brief Interface for an allocator implemented with the strategy of array doubling
+/// \class ArrayDoublingAllocator
+/// \brief Interface for an allocator implemented with the strategy of array doubling
 class ArrayDoublingAllocator
 {
 public:
@@ -77,8 +77,8 @@ private:
 };
 
 
-///\class TypedArrayDoublingAllocator
-///\brief Interface for an array doubling allocator that allocates only one fixed size type of element
+/// \class TypedArrayDoublingAllocator
+/// \brief Interface for an array doubling allocator that allocates only one fixed size type of element
 template <typename Type>
 struct TypedArrayDoublingAllocator :public ArrayDoublingAllocator
 {

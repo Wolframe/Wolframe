@@ -355,6 +355,7 @@ TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransacti
 	,m_context(0)
 	,m_func(f)
 	,m_state(0)
+	,m_input(false/*doPrintFinalClose*/)
 	,m_inputstructptr(0)
 	,m_flags(serialize::Context::None)
 	{}
@@ -388,10 +389,13 @@ bool TdlTransactionFunctionClosure::call()
 				throw std::runtime_error( std::string("execution of transaction function '") + m_func->name() + "' denied in this authorization context");
 			}
 			LOG_DEBUG << "execute transaction '" << m_func->name() << "'";
-
-			if (!m_input.call()) return false;
 			m_state = 2;
+			/*no break here!*/
 		case 2:
+			if (!m_input.call()) return false;
+			m_state = 3;
+			/*no break here!*/
+		case 3:
 		{
 			// Execute function:
 			m_inputstructptr->finalize( m_context);
@@ -508,7 +512,7 @@ bool TdlTransactionFunctionClosure::call()
 				//	to be respected in mapping to structures.
 				m_result->setFlags( langbind::TypedInputFilter::PropagateNoCase);
 			}
-			m_state = 3;
+			m_state = 4;
 			return true;
 		}
 		default:

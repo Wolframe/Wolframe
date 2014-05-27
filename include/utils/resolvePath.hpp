@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file utils/resolvePath.hpp
-///\brief Functions for resolving relative pathes
+/// \file utils/resolvePath.hpp
+/// \brief Functions for resolving relative pathes
 
 #ifndef _WOLFRAME_UTILS_RESOLVE_PATH_HPP_INCLUDED
 #define _WOLFRAME_UTILS_RESOLVE_PATH_HPP_INCLUDED
@@ -40,14 +40,14 @@
 namespace _Wolframe {
 namespace utils {
 
-///\brief Remove .. and . from a path
-///\param[in] path Path to process
+/// \brief Remove .. and . from a path
+/// \param[in] path Path to process
 std::string resolvePath( const std::string& path );
 
-///\brief Get the path 'path' relative to 'refpath' if it is not absolute
-///\param[in] path relative part of the path or absolute path
-///\param[in] refPath absolute part of the path if 'path' is relative
-///\return the canonical path
+/// \brief Get the path 'path' relative to 'refpath' if it is not absolute
+/// \param[in] path relative part of the path or absolute path
+/// \param[in] refPath absolute part of the path if 'path' is relative
+/// \return the canonical path
 std::string getCanonicalPath( const std::string& path, const std::string& refPath);
 
 }}//namespace

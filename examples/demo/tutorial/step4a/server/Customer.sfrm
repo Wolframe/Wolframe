@@ -5,17 +5,15 @@ STRUCT CustomerStruct
 }
 
 FORM Customer
+	-root customer
 {
-	customer {
-		_ CustomerStruct
-	}
+	_ CustomerStruct
 }
 
 FORM CustomerInserted
+	-root customer
 {
-	customer {
-		id string
-		_ CustomerStruct
-	}
+	id string
+	_ CustomerStruct
 }
 

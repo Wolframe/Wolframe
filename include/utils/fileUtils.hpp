@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file utils/fileUtils.hpp
-///\brief Utility functions for file handling
+/// \file utils/fileUtils.hpp
+/// \brief Utility functions for file handling
 
 #ifndef _WOLFRAME_FILE_UTILS_HPP_INCLUDED
 #define _WOLFRAME_FILE_UTILS_HPP_INCLUDED
@@ -42,65 +42,65 @@
 namespace _Wolframe {
 namespace utils {
 
-///\brief Remove .. and . from a path
-///\param[in] path Path to process
+/// \brief Remove .. and . from a path
+/// \param[in] path Path to process
 std::string resolvePath( const std::string& path );
 
-///\brief Get the extension of a file
-///\param[in] path The path to the file to get the extension from
-///\return The file extension including the extension marking dot '.'
+/// \brief Get the extension of a file
+/// \param[in] path The path to the file to get the extension from
+/// \return The file extension including the extension marking dot '.'
 std::string getFileExtension( const std::string& path);
 
-///\brief Get the stem of a file
-///\param[in] path The path to the file to get the stem from
-///\return The file stem without the extension marking dot '.'
+/// \brief Get the stem of a file
+/// \param[in] path The path to the file to get the stem from
+/// \return The file stem without the extension marking dot '.'
 std::string getFileStem( const std::string& path);
 
-///\brief Get the path 'path' relative to 'refpath' if it is not absolute
-///\param[in] path relative part of the path or absolute path
-///\param[in] refPath absolute part of the path if 'path' is relative
-///\return the canonical path
+/// \brief Get the path 'path' relative to 'refpath' if it is not absolute
+/// \param[in] path relative part of the path or absolute path
+/// \param[in] refPath absolute part of the path if 'path' is relative
+/// \return the canonical path
 std::string getCanonicalPath( const std::string& path, const std::string& refPath);
 
-///\brief Get the parent path of 'path' (skipping /./ as parent path unlike boost::filesystem does)
-///\param[in] path the path to get the parent path from
-///\param[in] levels how many level (1 = parent, 2 = granparent, etc.)
-///\return the parent path
+/// \brief Get the parent path of 'path' (skipping /./ as parent path unlike boost::filesystem does)
+/// \param[in] path the path to get the parent path from
+/// \param[in] levels how many level (1 = parent, 2 = granparent, etc.)
+/// \return the parent path
 std::string getParentPath( const std::string& path, unsigned int levels=1);
 
-///\brief Join path with an item of the path to a combined path
-///\param[in] path the main path 
-///\param[in] item the sub path to join to path
-///\return the joined path
+/// \brief Join path with an item of the path to a combined path
+/// \param[in] path the main path 
+/// \param[in] item the sub path to join to path
+/// \return the joined path
 std::string joinPath( const std::string& path, const std::string& item);
 
-///\brief Returns true, if the file with path 'path' exists
+/// \brief Returns true, if the file with path 'path' exists
 bool fileExists( const std::string& path);
 
-///\brief Reading the content of a source file as one string in UTF-8 (with implicit conversion of other known unicode character encodings to UTF-8)
-///\remark Throws on error
+/// \brief Reading the content of a source file as one string in UTF-8 (with implicit conversion of other known unicode character encodings to UTF-8)
+/// \remark Throws on error
 std::string readSourceFileContent( const std::string& filename);
 
-///\brief Reading the content of a file as one string without any conversions applied
-///\remark Throws on error
+/// \brief Reading the content of a file as one string without any conversions applied
+/// \remark Throws on error
 std::string readBinaryFileContent( const std::string& filename);
 
-///\brief Reading the content of a source file as property tree (with property tree syntax)
-///\remark Throws on error
+/// \brief Reading the content of a source file as property tree (with property tree syntax)
+/// \remark Throws on error
 types::PropertyTree readPropertyTreeFile( const std::string& filename);
-///\brief Reading the content of an XML source file as property tree (with property tree syntax)
-///\remark Throws on error
+/// \brief Reading the content of an XML source file as property tree (with property tree syntax)
+/// \remark Throws on error
 types::PropertyTree readXmlPropertyTreeFile( const std::string& filename);
-///\brief Reading the content of an Info format source file as property tree (with property tree syntax)
-///\remark Throws on error
+/// \brief Reading the content of an Info format source file as property tree (with property tree syntax)
+/// \remark Throws on error
 types::PropertyTree readInfoPropertyTreeFile( const std::string& filename);
 
-///\brief Writing a file
-///\remark Throws on error
+/// \brief Writing a file
+/// \remark Throws on error
 void writeFile( const std::string& filename, const std::string& content);
 
-///\brief Get the file type
-///\return the file type
+/// \brief Get the file type
+/// \return the file type
 struct FileType
 {
 	enum Encoding {Undefined,UCS1,UCS2BE,UCS2LE,UCS4BE,UCS4LE};

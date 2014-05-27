@@ -4,41 +4,39 @@
 **requires:TEXTWOLF
 **input
 {
-	"assignmentlist":	{
-		"assignment":	[{
-				"task":	[{
-						"title":	"job 1",
-						"key":	"A123",
-						"customernumber":	"324"
-					}, {
-						"title":	"job 2",
-						"key":	"V456",
-						"customernumber":	"567"
-					}],
-				"employee":	{
-					"firstname":	"Julia",
-					"surname":	"Tegel-Sacher",
-					"phone":	"098 765 43 21"
-				},
-				"issuedate":	"13.5.2006"
-			}, {
-				"task":	[{
-						"title":	"job 3",
-						"key":	"A456",
-						"customernumber":	"567"
-					}, {
-						"title":	"job 4",
-						"key":	"V789",
-						"customernumber":	"890"
-					}],
-				"employee":	{
-					"firstname":	"Jakob",
-					"surname":	"Stegelin",
-					"phone":	"012 345 67 89"
-				},
-				"issuedate":	"13.5.2006"
-			}]
-	}
+	"assignment":	[{
+			"task":	[{
+					"title":	"job 1",
+					"key":	"A123",
+					"customernumber":	"324"
+				}, {
+					"title":	"job 2",
+					"key":	"V456",
+					"customernumber":	"567"
+				}],
+			"employee":	{
+				"firstname":	"Julia",
+				"surname":	"Tegel-Sacher",
+				"phone":	"098 765 43 21"
+			},
+			"issuedate":	"13.5.2006"
+		}, {
+			"task":	[{
+					"title":	"job 3",
+					"key":	"A456",
+					"customernumber":	"567"
+				}, {
+					"title":	"job 4",
+					"key":	"V789",
+					"customernumber":	"890"
+				}],
+			"employee":	{
+				"firstname":	"Jakob",
+				"surname":	"Stegelin",
+				"phone":	"012 345 67 89"
+			},
+			"issuedate":	"13.5.2006"
+		}]
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 
@@ -78,20 +76,18 @@ FORM Employee
 }
 
 FORM employee_assignment_print
+	-root assignmentlist
 {
-	assignmentlist
+	assignment []
 	{
-		assignment []
+		task []
 		{
-			task []
-			{
-				title string
-				key string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
+			title string
+			key string
+			customernumber int
 		}
+		employee Employee
+		issuedate string
 	}
 }
 **file:script.lua
@@ -159,7 +155,10 @@ function run_assignment( itr)
 	end
 end
 
-function run_assignmentlist( itr)
+function run()
+	r = provider.form("employee_assignment_print")
+	r:fill( input:table())
+	itr = r:get()
 	for v,t in itr do
 		if t == "assignment" then
 			output:opentag( t)
@@ -170,59 +169,42 @@ function run_assignmentlist( itr)
 		end
 	end
 end
-
-function run()
-	r = provider.form("employee_assignment_print")
-	r:fill( input:table())
-	itr = r:get()
-	for v,t in itr do
-		if t == "assignmentlist" then
-			output:opentag( "assignmentlist")
-			run_assignmentlist( iterator.scope( itr))
-			output:closetag()
-		else
-			error( "unknown element " .. tostring(t) .. " " .. tostring(v))
-		end
-	end
-end
 **requires:DISABLED NETBSD
 
 **output
 {
-	"assignmentlist":	{
-		"assignment":	[{
-				"task":	[{
-						"title":	"job 1",
-						"key":	"A123",
-						"customernumber":	"324"
-					}, {
-						"title":	"job 2",
-						"key":	"V456",
-						"customernumber":	"567"
-					}],
-				"employee":	{
-					"firstname":	"Julia",
-					"surname":	"Tegel-Sacher",
-					"phone":	"098 765 43 21"
-				},
-				"issuedate":	"13.5.2006"
-			}, {
-				"task":	[{
-						"title":	"job 3",
-						"key":	"A456",
-						"customernumber":	"567"
-					}, {
-						"title":	"job 4",
-						"key":	"V789",
-						"customernumber":	"890"
-					}],
-				"employee":	{
-					"firstname":	"Jakob",
-					"surname":	"Stegelin",
-					"phone":	"012 345 67 89"
-				},
-				"issuedate":	"13.5.2006"
-			}]
-	}
+	"assignment":	[{
+			"task":	[{
+					"title":	"job 1",
+					"key":	"A123",
+					"customernumber":	"324"
+				}, {
+					"title":	"job 2",
+					"key":	"V456",
+					"customernumber":	"567"
+				}],
+			"employee":	{
+				"firstname":	"Julia",
+				"surname":	"Tegel-Sacher",
+				"phone":	"098 765 43 21"
+			},
+			"issuedate":	"13.5.2006"
+		}, {
+			"task":	[{
+					"title":	"job 3",
+					"key":	"A456",
+					"customernumber":	"567"
+				}, {
+					"title":	"job 4",
+					"key":	"V789",
+					"customernumber":	"890"
+				}],
+			"employee":	{
+				"firstname":	"Jakob",
+				"surname":	"Stegelin",
+				"phone":	"012 345 67 89"
+			},
+			"issuedate":	"13.5.2006"
+		}]
 }
 **end

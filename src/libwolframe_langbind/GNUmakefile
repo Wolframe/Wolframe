@@ -29,6 +29,7 @@ DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
 	protocol_ioblocks.o \
+	filterdef.o \
 	input.o \
 	output.o \
 	null_filter.o \

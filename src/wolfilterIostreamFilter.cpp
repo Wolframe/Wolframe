@@ -107,18 +107,6 @@ std::pair<std::string, std::vector<langbind::FilterArgument> > filterIdentifier(
 	return rt;
 }
 
-static std::string filterargAsString( const std::vector<langbind::FilterArgument>& arg)
-{
-	std::ostringstream out;
-	std::vector<langbind::FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-	for (; ai != ae; ++ai)
-	{
-		if (ai != arg.begin()) out << ", ";
-		out << ai->first << "='" << ai->second << "'";
-	}
-	return out.str();
-}
-
 static Filter getFilter( const proc::ProcessorProviderInterface* provider, const std::string& ifl_, const std::string& ofl_)
 {
 	Filter rt;
@@ -130,39 +118,40 @@ static Filter getFilter( const proc::ProcessorProviderInterface* provider, const
 	std::pair<std::string,std::vector<langbind::FilterArgument> > ofl = filterIdentifier( ofl_);
 	if (boost::iequals( ofl_, ifl_))
 	{
-		Filter* fp = provider->filter( ifl.first, ifl.second);
-		if (!fp)
+		const FilterType* ft = provider->filterType( ifl.first);
+		if (!ft)
 		{
 			std::ostringstream msg;
-			msg << "unknown filter: name = '" << ifl.first << "' ,arguments = '" << filterargAsString(ofl.second) << "'";
+			msg << "unknown filter '" << ifl.first << "'";
 			throw std::runtime_error( msg.str());
 		}
 		else
 		{
+			FilterR fp( ft->create( ifl.second));
 			rt = *fp;
-			delete fp;
 		}
 	}
 	else
 	{
-		Filter* in = provider->filter( ifl.first, ifl.second);
-		Filter* out = provider->filter( ofl.first, ofl.second);
-		if (!in)
+		const FilterType* inft = provider->filterType( ifl.first);
+		const FilterType* outft = provider->filterType( ofl.first);
+		if (!inft)
 		{
 			std::ostringstream msg;
-			msg << "unknown input filter: name = '" << ifl.first << "' arguments = '" << filterargAsString( ifl.second) << "'";
+			msg << "unknown input filter '" << ifl.first << "'";
 			throw std::runtime_error( msg.str());
 		}
-		if (!out)
+		if (!outft)
 		{
-			delete in;
 			std::ostringstream msg;
-			msg << "unknown output filter: name = '" << ofl.first << "' arguments = '" << filterargAsString( ofl.second) << "'";
+			msg << "unknown output filter '" << ofl.first << "'";
 			throw std::runtime_error( msg.str());
 		}
+		FilterR in( inft->create( ifl.second));
+		FilterR out( outft->create( ofl.second));
+		
+		out->outputfilter()->inheritMetaData( in->inputfilter()->getMetaDataRef());
 		rt = Filter( in->inputfilter(), out->outputfilter());
-		delete in;
-		delete out;
 	}
 	return rt;
 }
@@ -176,7 +165,12 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, InputF
 		if (!is.eof()) ++pp;
 	}
 	iflt.putInput( buf, pp, is.eof());
-	iflt.setState( InputFilter::Open);
+	if (iflt.state() == InputFilter::Error)
+	{
+		std::ostringstream msg;
+		msg << "error processing input: '" << iflt.getError() << "'";
+		throw std::runtime_error( msg.str());
+	}
 }
 
 static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbind::CommandHandler* cmdh)
@@ -447,7 +441,6 @@ static void writeOutput( char* buf, unsigned int size, std::ostream& os, OutputF
 {
 	os.write( buf, oflt.getPosition());
 	oflt.setOutputBuffer( buf, size);
-	oflt.setState( OutputFilter::Open);
 }
 
 struct BufferStruct
@@ -474,11 +467,12 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 	}
 	switch (iflt->state())
 	{
+		case InputFilter::Start:
 		case InputFilter::Open:
 			break;
 
 		case InputFilter::EndOfMessage:
-			if (is.eof()) throw std::runtime_error( "unexpected end of input");
+			if (is.eof()) throw std::runtime_error( "unexpected end of input (EOF)");
 			readInput( buf.inbuf, buf.insize, is, *iflt);
 			return;
 
@@ -491,6 +485,7 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 	}
 	switch (oflt->state())
 	{
+		case OutputFilter::Start:
 		case OutputFilter::Open:
 			throw std::runtime_error( "unknown error");
 
@@ -619,12 +614,16 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		const void* elem;
 		int taglevel = 0;
 		std::size_t elemsize;
-		InputFilter::ElementType etype;
+		FilterBase::ElementType etype;
 
 		while (taglevel >= 0)
 		{
 			if (!flt.inputfilter().get()->getNext( etype, elem, elemsize))
 			{
+				if (flt.inputfilter()->state() == InputFilter::Open || flt.inputfilter()->state() == InputFilter::Start)
+				{
+					throw std::runtime_error( "filter not delivering final close tag");
+				}
 				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 				continue;
 			}
@@ -636,14 +635,15 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			{
 				taglevel--;
 			}
-			if (taglevel >= 0)
+			while (!flt.outputfilter().get()->print( etype, elem, elemsize))
 			{
-				while (!flt.outputfilter().get()->print( etype, elem, elemsize))
-				{
-					processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
-				}
-				LOG_DATA << "[iostream filter] print " << std::string( (const char*)elem, elemsize);
+				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 			}
+			LOG_DATA << "[iostream filter] print " << FilterBase::elementTypeName(etype) << " '" << std::string( (const char*)elem, elemsize) << "'"; 
+		}
+		while (!flt.outputfilter().get()->close())
+		{
+			processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 		}
 		checkUnconsumedInput( is, *flt.inputfilter());
 		writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
@@ -658,7 +658,6 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			//	evaluate the command to execute (substitute '~' with doctype id)
 			//	and initialize the command handler with the docformat
 			//	as first parameter as the main protocol does.
-			Filter flt = getFilter( provider, ifl, ofl);
 
 			cmdbind::DoctypeFilterCommandHandler* dtfh = new cmdbind::DoctypeFilterCommandHandler();
 			cmdbind::CommandHandlerR dtfh_scoped( dtfh);
@@ -681,14 +680,19 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
 			if (cmdh)
 			{
+				Filter flt = getFilter( provider, ifl, ofl);
+
 				cmdh->setExecContext( execContext);
 				cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
 				if (!ifch) 
 				{
 					throw std::runtime_error( "expected command handler processing CRLFdot escaped content");
 				}
-				if (flt.inputfilter().get()) ifch->setFilter( flt.inputfilter());
-				if (flt.outputfilter().get())
+				if (ifl.size() && flt.inputfilter().get())
+				{
+					ifch->setFilter( flt.inputfilter());
+				}
+				if (ofl.size() && flt.outputfilter().get())
 				{
 					ifch->setFilter( flt.outputfilter());
 					flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
@@ -767,8 +771,11 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			{
 				throw std::runtime_error( "expected command handler processing CRLFdot escaped content");
 			}
-			if (flt.inputfilter().get()) ifch->setFilter( flt.inputfilter());
-			if (flt.outputfilter().get())
+			if (ifl.size() && flt.inputfilter().get())
+			{
+				ifch->setFilter( flt.inputfilter());
+			}
+			if (ofl.size() && flt.outputfilter().get())
 			{
 				ifch->setFilter( flt.outputfilter());
 				flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
@@ -831,8 +838,9 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 
 			while (!closure->call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			RedirectFilterClosure res( closure->result(), outp);
+			RedirectFilterClosure res( closure->result(), outp, true);
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+			while (!flt.outputfilter()->close()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 			checkUnconsumedInput( is, *flt.inputfilter());
@@ -864,6 +872,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			res.init( outp, serialize::Context::None);
 
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+			while (!flt.outputfilter()->close()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 			checkUnconsumedInput( is, *flt.inputfilter());

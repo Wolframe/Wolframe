@@ -34,19 +34,28 @@
 		The type is defined by a typename and some operators that describe additional properties.
 	</para>
 	<para>
-		Each form declaration starts with a keyword 'FORM' or 'STRUCT'. The difference between 'FORM' and 'STRUCT' is that the later is used for declarations that are only referenced inside the same file as sub structure reference,
+		Each form declaration starts with a keyword 'FORM' or 'STRUCT'. The difference 
+		between 'FORM' and 'STRUCT' is that the later is used for declarations that are 
+		only referenced inside the same file as sub structure reference,
 		while 'FORM' declares a structure to be exported as global form declaration.
+		The keyword 'FORM' is followed by 2 identifiers. The first one defines the
+		name of the form and the second the root element for serializations that need
+		a root element to be defined like XML.
 		This header is followed by the structure declaration inside curly brackets '{' '}'.
+		The keyword 'STRUCT' is followed by the name of the structure and the body as
+		for forms. No root element is defined here.
 	</para>
 	<para>
-		There is only one predefined data type known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>: "string".
-		All other data types are defined as sequence of <glossterm>normalizer</glossterm> functions in a normalize definition file.
-		The <glossterm>normalizer</glossterm> functions assigned to a type validate the value and transform it to its normalized form.
+		There is only one predefined data type known in <glossterm>simpleform</glossterm>
+		<acronym>DDL</acronym>: "string". All other data types are defined as sequence of 
+		<glossterm>normalizer</glossterm> functions in a normalize definition file.
+		The <glossterm>normalizer</glossterm> functions assigned to a type validate 
+		the value and transform it to its normalized form.
 		We explain in the next section how data types are defined.
 	</para>
 	<para>
 		The following element attributes are known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>:
-		
+
 		<table frame="all" width="100%">
 			<title>element attributes in simpleform</title>
 			<tgroup cols="3">
@@ -105,9 +114,10 @@
 		</table>
 	</para>
 	<para>
-		Using a single underscore as typename ('_') means that element is embedded into the structure
-		without being referenceable by name. In case of an atomic value it means that value represents the
-		content value of the structure. In case of a substructure it means that the structure inherits
+		Using a single underscore as typename ('_') means that element is embedded 
+		into the structure without being referenceable by name. In case of an atomic 
+		value it means that value represents the content value of the structure. In 
+		case of a substructure it means that the structure inherits
 		the embedded elements of the substructure.
 	</para>
 	<para>

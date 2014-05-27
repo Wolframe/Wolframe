@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/mapContext.hpp
-///\brief Defines the data structure holding the global serialization state variables (without the stack)
+/// \file serialize/mapContext.hpp
+/// \brief Defines the data structure holding the global serialization state variables (without the stack)
 
 #ifndef _Wolframe_SERIALIZE_MAPCONTEXT_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_MAPCONTEXT_HPP_INCLUDED
@@ -40,8 +40,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class Context
-///\brief Global state variables of a running serialization/deserialization procedure (without the stack)
+/// \class Context
+/// \brief Global state variables of a running serialization/deserialization procedure (without the stack)
 class Context
 {
 public:

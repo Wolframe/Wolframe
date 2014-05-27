@@ -7,12 +7,10 @@
 error in transaction 'insertCustomer':*Customers must have a unique name.
 **input
 {
-  "customers": {
-    "customer": [
-      { "name": "Hugo" },
-      { "name": "Hugo" }
-    ]
-  }
+	"customer": [
+		{ "name": "Hugo" },
+		{ "name": "Hugo" }
+	]
 }**config
 --input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
 

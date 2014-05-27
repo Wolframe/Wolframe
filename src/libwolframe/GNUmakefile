@@ -40,6 +40,7 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 TYP_OBJS = \
+	types/docmetadata.o \
 	types/conversions.o \
 	types/numberBaseConversion.o \
 	types/propertyTree.o \

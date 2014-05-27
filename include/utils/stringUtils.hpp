@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file utils/stringUtils.hpp
-///\brief Utility functions for string handling (Mainly to hide intrusive stuff. Implementation is done with help of STL/boost)
+/// \file utils/stringUtils.hpp
+/// \brief Utility functions for string handling (Mainly to hide intrusive stuff. Implementation is done with help of STL/boost)
 
 #ifndef _WOLFRAME_STRING_UTILS_HPP_INCLUDED
 #define _WOLFRAME_STRING_UTILS_HPP_INCLUDED
@@ -41,17 +41,17 @@
 namespace _Wolframe {
 namespace utils {
 
-///\brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
-///\param[out] res result of the split
-///\param[in] inp string to split
-///\param[in] splitchr set of characters to split with (each of them is one separating character)
+/// \brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
+/// \param[out] res result of the split
+/// \param[in] inp string to split
+/// \param[in] splitchr set of characters to split with (each of them is one separating character)
 void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchr);
 
-///\brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
-///\param[out] res result of the split
-///\param[in] begin begin input iterator
-///\param[in] end end input iterator
-///\param[in] splitchr set of characters to split with (each of them is one separating character)
+/// \brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
+/// \param[out] res result of the split
+/// \param[in] begin begin input iterator
+/// \param[in] end end input iterator
+/// \param[in] splitchr set of characters to split with (each of them is one separating character)
 void splitString( std::vector<std::string>& res, std::string::const_iterator begin, std::string::const_iterator end, const char* splitchr);
 
 }} //namespace _Wolframe::utils

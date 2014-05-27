@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/doctypeFilterCommandHandler.hpp
-///\brief Command handler that does nothing but extracting the document type from the content and buffering the input processed. The document type extracted and the current command determine what command handler has to process the buffered plus the unprocessed content.
+/// \file cmdbind/doctypeFilterCommandHandler.hpp
+/// \brief Command handler that does nothing but extracting the document type from the content and buffering the input processed. The document type extracted and the current command determine what command handler has to process the buffered plus the unprocessed content.
 #ifndef _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"
@@ -41,47 +41,47 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class DoctypeFilterCommandHandler
-///\brief Command handler for exctracting the document type identifier from a content
-///\remark This is a pre-processing command handler. It is returning the consumed input as data left for following processing
+/// \class DoctypeFilterCommandHandler
+/// \brief Command handler for exctracting the document type identifier from a content
+/// \remark This is a pre-processing command handler. It is returning the consumed input as data left for following processing
 class DoctypeFilterCommandHandler :public CommandHandler
 {
 public:
 	typedef CommandHandler Parent;
 
-	///\brief Constructor
+	/// \brief Constructor
 	DoctypeFilterCommandHandler();
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~DoctypeFilterCommandHandler();
 
-	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
+	/// \brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
-	///\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
+	/// \brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
 
-	///\brief See Parent::nextOperation()
+	/// \brief See Parent::nextOperation()
 	virtual Operation nextOperation();
 
-	///\brief See Parent::putInput(const void*,std::size_t);
+	/// \brief See Parent::putInput(const void*,std::size_t);
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief See Parent::getInputBlock(void*&,std::size_t&)
+	/// \brief See Parent::getInputBlock(void*&,std::size_t&)
 	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
 
-	///\brief See Parent::getOutput(const void*&,std::size_t&)
+	/// \brief See Parent::getOutput(const void*&,std::size_t&)
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
 
-	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
+	/// \brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	///\brief See Get the document type of the document
+	/// \brief See Get the document type of the document
 	std::string doctypeid() const;
 
-	///\brief See Get the document format class of the document (XML,JSON,etc..)
+	/// \brief See Get the document format class of the document (XML,JSON,etc..)
 	std::string docformatid() const;
 
-	///\brief Get all input consumed (buffered)
+	/// \brief Get all input consumed (buffered)
 	void getInputBuffer( void*& begin, std::size_t& nofBytes);
 
 private:

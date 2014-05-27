@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/printValue.hpp
-///\brief Defines the intrusive printing of a value for serialization
+/// \file serialize/struct/printValue.hpp
+/// \brief Defines the intrusive printing of a value for serialization
 #ifndef _Wolframe_SERIALIZE_STRUCT_PRINT_VALUE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_PRINT_VALUE_HPP_INCLUDED
 #include "types/datetime.hpp"
@@ -41,62 +41,62 @@ Project Wolframe.
 #include <string>
 
 namespace {
-///\class PrintValueType
-///\brief type traits for print value types
+/// \class PrintValueType
+/// \brief type traits for print value types
 struct PrintValueType
 {
-	struct String {};		//< atomic type category tag for a string value to print
-	struct Bool {};			//< atomic type category tag for a boolean value to print
-	struct Double {};		//< atomic type category tag for a double precision value to print
-	struct UInt {};			//< atomic type category tag for an unsinged integer value to print
-	struct Int {};			//< atomic type category tag for an integer value to print
-	struct DateTime {};		//< atomic type category tag for a datetime value to print
-	struct BigNumber {};		//< atomic type category tag for a big number value to print
+	struct String {};		///< atomic type category tag for a string value to print
+	struct Bool {};			///< atomic type category tag for a boolean value to print
+	struct Double {};		///< atomic type category tag for a double precision value to print
+	struct UInt {};			///< atomic type category tag for an unsinged integer value to print
+	struct Int {};			///< atomic type category tag for an integer value to print
+	struct DateTime {};		///< atomic type category tag for a datetime value to print
+	struct BigNumber {};		///< atomic type category tag for a big number value to print
 
-	///\brief get category String for a type
-	///\return String if T is a std::string
+	/// \brief get category String for a type
+	/// \return String if T is a std::string
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,std::string>::value
 		,const String&>::type get( const T&) { static String rt; return rt;}
 
-	///\brief get category Bool for a type
-	///\return Bool if T is a bool
+	/// \brief get category Bool for a type
+	/// \return Bool if T is a bool
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,bool>::value
 		,const Bool&>::type get( const T&) { static Bool rt; return rt;}
 
-	///\brief get category Double for a type
-	///\return Double if T is a floating point number
+	/// \brief get category Double for a type
+	/// \return Double if T is a floating point number
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_floating_point<T>::value
 		,const Double&>::type get( const T&) { static Double rt; return rt;}
 
-	///\brief get category Int for a type
-	///\return Int if T is a signed integer number
+	/// \brief get category Int for a type
+	/// \return Int if T is a signed integer number
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_arithmetic<T>::value && boost::is_signed<T>::value && !boost::is_floating_point<T>::value && !boost::is_same<T,bool>::value
 		,const Int&>::type get( const T&) { static Int rt; return rt;}
 
-	///\brief get category UInt for a type
-	///\return UInt if T is an unsigned integer number
+	/// \brief get category UInt for a type
+	/// \return UInt if T is an unsigned integer number
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_arithmetic<T>::value && boost::is_unsigned<T>::value && !boost::is_floating_point<T>::value && !boost::is_same<T,bool>::value
 		,const UInt&>::type get( const T&) { static UInt rt; return rt;}
 
-	///\brief get category DateTime for a type
-	///\return DateTime if T is a types::DateTime
+	/// \brief get category DateTime for a type
+	/// \return DateTime if T is a types::DateTime
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,_Wolframe::types::DateTime>::value
 		,const DateTime&>::type get( const T&) { static DateTime rt; return rt;}
 
-	///\brief get category BigNumber for a type
-	///\return BigNumber if T is a types::BigNumber
+	/// \brief get category BigNumber for a type
+	/// \return BigNumber if T is a types::BigNumber
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,_Wolframe::types::BigNumber>::value

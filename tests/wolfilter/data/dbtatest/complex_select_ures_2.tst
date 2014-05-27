@@ -2,7 +2,7 @@
 **requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<doc><item></item><item><aa>1</aa><bb>2</bb></item><item><aa>11</aa><bb>22</bb></item><item><aa>111</aa><bb>222</bb></item><item><bb></bb></item></doc>
+<root><doc><item></item><item><aa>1</aa><bb>2</bb></item><item><aa>11</aa><bb>22</bb></item><item><aa>111</aa><bb>222</bb></item><item><bb></bb></item></doc></root>
 **config
 --config wolframe.conf --filter textwolf testcall
 **file:wolframe.conf
@@ -48,7 +48,7 @@ END
 **outputfile:DBOUT
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<da><da><res>a</res></da><da><res>b</res></da><da><res>c</res></da><do><res>111</res></do><do><res>222</res></do><do><res>333</res></do></da>
+<root><da><da><res>a</res></da><da><res>b</res></da><da><res>c</res></da><do><res>111</res></do><do><res>222</res></do><do><res>333</res></do></da></root>
 Code:
 [0] OUTPUT_OPEN TAG da
 [1] RESULT_SET_INIT

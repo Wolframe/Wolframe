@@ -1,9 +1,9 @@
 **
 **input
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE category SYSTEM 'CategoryHierarchyRequest.simpleform'><category state="" id="1"/>**config
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE doc SYSTEM "CategoryHierarchyRequest.simpleform"><doc><category state="" id="1"/></doc>**config
 --input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf - 
 **requires:TEXTWOLF
 **output
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<category state="" id="1"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE doc SYSTEM "CategoryHierarchyRequest.simpleform"><doc><category state="" id="1"/></doc>
 **end

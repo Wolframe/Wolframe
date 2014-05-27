@@ -282,8 +282,14 @@ static void printStructXML( std::ostream& out, const types::VariantStructDescrip
 static void printFormXML( std::ostream& out, const types::Form& form)
 {
 	out << "<form name='" << form.description()->name() << "' " << "ddl='" << form.description()->ddlname() << "'";
-	if (form.description()->xmlRoot()) out << " xmlroot='" << form.description()->xmlRoot() << "'";
 	out << ">" << std::endl;
+	out << "<metadata>" << std::endl;
+	std::vector<types::DocMetaData::Attribute>::const_iterator ai = form.description()->metadata().attributes().begin(), ae = form.description()->metadata().attributes().end();
+	for (; ai != ae; ++ai)
+	{
+		out << "<attribute name='" << ai->name << "'>" << ai->value << "</attribute>" << std::endl;
+	}
+	out << "</metadata>" << std::endl;
 	printStructXML( out, form.description()->begin(), form.description()->end());
 	out << "</form>" << std::endl;
 }

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/redirectFilterClosure.hpp
-///\brief Interface to redirect streaming from an input filter to an output filter interface
+/// \file filter/redirectFilterClosure.hpp
+/// \brief Interface to redirect streaming from an input filter to an output filter interface
 #ifndef _Wolframe_filter_REDIRECT_FILTER_CLOSURE_HPP_INCLUDED
 #define _Wolframe_filter_REDIRECT_FILTER_CLOSURE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -41,21 +41,26 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class RedirectFilterClosure
+/// \class RedirectFilterClosure
 class RedirectFilterClosure
 	:public virtual utils::TypeSignature
 {
 public:
-	RedirectFilterClosure()
+	/// \brief Default constructor
+	explicit RedirectFilterClosure( bool doPrintFinalClose)
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
 		,m_taglevel(0)
-		,m_elemtype(InputFilter::Value){}
+		,m_do_print_final_close(doPrintFinalClose)
+		,m_elemtype(InputFilter::Value)
+		{}
 
-	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o)
+	/// \brief Constructor
+	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o, bool doPrintFinalClose)
 		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
 		,m_state(0)
 		,m_taglevel(0)
+		,m_do_print_final_close(doPrintFinalClose)
 		,m_inputfilter(i)
 		,m_outputfilter(o)
 		,m_elemtype(InputFilter::Value)
@@ -63,20 +68,23 @@ public:
 			m_inputfilter->setFlags( m_outputfilter->flags());
 		}
 
+	/// \brief Copy constructor
 	RedirectFilterClosure( const RedirectFilterClosure& o)
 		:utils::TypeSignature(o)
 		,m_state(o.m_state)
 		,m_taglevel(o.m_taglevel)
+		,m_do_print_final_close(o.m_do_print_final_close)
 		,m_inputfilter(o.m_inputfilter)
 		,m_outputfilter(o.m_outputfilter)
 		,m_elemtype(o.m_elemtype)
 		,m_elem(o.m_elem)
 		{}
 
+	/// \brief Destructor
 	~RedirectFilterClosure(){}
 
-	///\brief Calls the fetching of input and printing it to output until end or interruption
-	///\return true when completed
+	/// \brief Calls the fetching of input and printing it to output until end or interruption
+	/// \return true when completed
 	bool call()
 	{
 		if (!m_inputfilter.get()) throw std::runtime_error( "no input defined for redirecting filter");
@@ -89,9 +97,10 @@ public:
 				{
 					switch (m_inputfilter->state())
 					{
+						case InputFilter::Start:
 						case InputFilter::Open:
-							m_state = 2;
-							return true;
+							m_state = (m_do_print_final_close)?2:3;
+							continue;
 	
 						case InputFilter::EndOfMessage:
 							return false;
@@ -110,8 +119,8 @@ public:
 					--m_taglevel;
 					if (m_taglevel < 0)
 					{
-						m_state = 2;
-						return true;
+						m_state = (m_do_print_final_close)?2:3;
+						continue;
 					}
 				}
 				/*no break here!*/
@@ -120,6 +129,7 @@ public:
 				{
 					switch (m_outputfilter->state())
 					{
+						case OutputFilter::Start:
 						case OutputFilter::Open:
 							throw std::runtime_error( "unknown error in output filter");
 	
@@ -132,14 +142,32 @@ public:
 				}
 				m_state = 0;
 				continue;
+			case 2:
+				if (!m_outputfilter->print( m_elemtype, m_elem))
+				{
+					switch (m_outputfilter->state())
+					{
+						case OutputFilter::Start:
+						case OutputFilter::Open:
+							throw std::runtime_error( "unknown error in output filter");
+	
+						case OutputFilter::EndOfBuffer:
+							return false;
+	
+						case OutputFilter::Error:
+							throw std::runtime_error( m_outputfilter->getError());
+					}
+				}
+				m_state = 3;
+				/*no break here!*/
 			default:
 				return true;
 		}
 	}
 
-	///\brief Initialization of call context for a new call
-	///\param[in] i call input
-	///\param[in] o call output
+	/// \brief Initialization of call context for a new call
+	/// \param[in] i call input
+	/// \param[in] o call output
 	void init( const TypedInputFilterR& i, const TypedOutputFilterR& o)
 	{
 		m_inputfilter = i;
@@ -150,16 +178,19 @@ public:
 		m_inputfilter->setFlags( m_outputfilter->flags());
 	}
 
+	/// \brief Get the input filter reference
 	const TypedInputFilterR& inputfilter() const		{return m_inputfilter;}
+	/// \brief Get the output filter reference
 	const TypedOutputFilterR& outputfilter() const		{return m_outputfilter;}
 
 private:
-	int m_state;				//< current state of call
-	int m_taglevel;				//< current balance of open/close tags
-	TypedInputFilterR m_inputfilter;	//< input filter
-	TypedOutputFilterR m_outputfilter;	//< output filter
-	InputFilter::ElementType m_elemtype;	//< type of last element read from command result
-	types::VariantConst m_elem;		//< last element read from command result
+	int m_state;				///< current state of call
+	int m_taglevel;				///< current balance of open/close tags
+	bool m_do_print_final_close;		///< true, if the final close is printed, false if it is only consumed
+	TypedInputFilterR m_inputfilter;	///< input filter
+	TypedOutputFilterR m_outputfilter;	///< output filter
+	InputFilter::ElementType m_elemtype;	///< type of last element read from command result
+	types::VariantConst m_elem;		///< last element read from command result
 };
 
 }}//namespace

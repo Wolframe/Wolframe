@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/contentBufferCommandHandlerEscDLF.hpp
-///\brief Command handler base class for handlers buffering the input processed
+/// \file cmdbind/contentBufferCommandHandlerEscDLF.hpp
+/// \brief Command handler base class for handlers buffering the input processed
 
 #ifndef _Wolframe_cmdbind_CONTENT_BUFFER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #define _Wolframe_cmdbind_CONTENT_BUFFER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
@@ -42,37 +42,37 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class ContentBufferCommandHandlerEscDLF
-///\brief Command handler base class for handlers buffering the input processed
+/// \class ContentBufferCommandHandlerEscDLF
+/// \brief Command handler base class for handlers buffering the input processed
 class ContentBufferCommandHandlerEscDLF :public CommandHandler
 {
 public:
 	typedef CommandHandler Parent;
 
-	///\brief Constructor
+	/// \brief Constructor
 	ContentBufferCommandHandlerEscDLF();
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~ContentBufferCommandHandlerEscDLF();
 
-	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
+	/// \brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
-	///\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
+	/// \brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
 
-	///\brief See Parent::nextOperation()
+	/// \brief See Parent::nextOperation()
 	virtual Operation nextOperation();
 
-	///\brief See Parent::putInput(const void*,std::size_t);
+	/// \brief See Parent::putInput(const void*,std::size_t);
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief See Parent::getInputBlock(void*&,std::size_t&)
+	/// \brief See Parent::getInputBlock(void*&,std::size_t&)
 	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
 
-	///\brief See Parent::getOutput(const void*&,std::size_t&)
+	/// \brief See Parent::getOutput(const void*&,std::size_t&)
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
 
-	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
+	/// \brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
 	const std::string& content() const

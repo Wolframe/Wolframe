@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file directmapCommandHandler.hpp
-///\brief Interface to the directmap command handler
+/// \file directmapCommandHandler.hpp
+/// \brief Interface to the directmap command handler
 #ifndef _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #include "directmapProgram.hpp"
@@ -47,48 +47,37 @@ Project Wolframe.
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class DirectmapCommandHandler
-///\brief Command handler instance for processing a call as Directmap (mapping with forms and a transaction or form function)
+/// \class DirectmapCommandHandler
+/// \brief Command handler instance for processing a call as Directmap (mapping with forms and a transaction or form function)
 class DirectmapCommandHandler :public IOFilterCommandHandlerEscDLF
 {
 public:
 	typedef IOFilterCommandHandlerEscDLF Parent;
-	///\brief Constructor
-	explicit DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const std::string& default_filter_)
-		:m_cmd(cmddescr)
-		,m_state(0)
-		,m_function(0)
-		,m_checkIfInputLeft(false)
-		,m_default_filter(default_filter_)
-		{}
+	/// \brief Constructor
+	explicit DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const langbind::InputFilterR& inputfilter_, const langbind::OutputFilterR& outputfilter_);
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~DirectmapCommandHandler(){}
 
-	///\brief Execute the Directmap
-	///\param[out] err error code in case of error
-	///\return CallResult status (See IOFilterCommandHandler::CallResult)
+	/// \brief Execute the Directmap
+	/// \param[out] err error code in case of error
+	/// \return CallResult status (See IOFilterCommandHandler::CallResult)
 	virtual CallResult call( const char*& err);
 
 private:
 	void initcall();
 
 private:
-	const langbind::DirectmapCommandDescription* m_cmd;			//< description of command to execute
-	int m_state;								//< internal state
-	const langbind::FormFunction* m_function;				//< function to execute
-	types::FormR m_inputform;						//< (optional) form for validating and formating input
-	types::FormR m_outputform;						//< (optional) form for validating and formating output
-	std::string m_output_rootelement;					//< output root
-	langbind::TypedInputFilterR m_input;					//< structure for input
-	langbind::TypedOutputFilterR m_output;					//< structure for output
-	langbind::FormFunctionClosureR m_functionclosure;			//< processor for the transaction
-	langbind::TypedInputFilterR m_outputform_serialize;			//< serializer of the data in the output form
-	boost::shared_ptr<serialize::DDLStructParser> m_inputform_parser;	//< parser to map the input to the input form
-	langbind::RedirectFilterClosure m_outputprinter;			//< processor for redirection of the transaction call result or if defined the output form content to output
-	std::string m_errormsg;							//< buffer for error message returned
-	bool m_checkIfInputLeft;						//< true, if we need to check, if there is input left (SKIP)
-	const std::string m_default_filter;					//< default filter name defined by the document format
+	const langbind::DirectmapCommandDescription* m_cmd;			///< description of command to execute
+	int m_state;								///< internal state
+	types::FormR m_inputform;						///< (optional) form for validating and formating input
+	types::FormR m_outputform;						///< (optional) form for validating and formating output
+	langbind::TypedInputFilterR m_input;					///< structure for input
+	langbind::TypedOutputFilterR m_output;					///< structure for output
+	langbind::FormFunctionClosureR m_functionclosure;			///< processor for the transaction
+	boost::shared_ptr<serialize::DDLStructParser> m_inputform_parser;	///< parser to map the input to the input form
+	langbind::RedirectFilterClosure m_outputprinter;			///< processor for redirection of the transaction call result or if defined the output form content to output
+	std::string m_errormsg;							///< buffer for error message returned
 };
 
 }}//namespace

@@ -35,7 +35,7 @@ Project Wolframe.
 #include "outputfilterImpl.hpp"
 #include "xsltMapper.hpp"
 #include "filter/bufferingfilter.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "types/countedReference.hpp"
 #include <cstddef>
 #include <cstring>
@@ -77,35 +77,55 @@ struct Libxml2Filter :public Filter
 	{
 		InputFilterImpl impl;
 		m_inputfilter.reset( new BufferingInputFilter( &impl,"libxml2"));
-		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter.get());
+		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter->getMetaDataRef());
 		m_outputfilter.reset( oo);
 		if (encoding)
 		{
-			oo->setEncoding( encoding);
+			m_outputfilter->setAttribute( "encoding", encoding);
 		}
 	}
 };
 
+static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
+{
+	const char* encoding = 0;
+	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		{
+			if (encoding)
+			{
+				if (ai->first.empty())
+				{
+					throw std::runtime_error( "too many filter arguments");
+				}
+				else
+				{
+					throw std::runtime_error( "duplicate filter argument 'encoding'");
+				}
+			}
+			encoding = ai->second.c_str();
+			break;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "unknown filter argument '") + ai->first + "'");
+		}
+	}
+	return encoding;
+}
 
 class Libxml2FilterType :public FilterType
 {
 public:
-	Libxml2FilterType(){}
+	Libxml2FilterType()
+		:FilterType("libxml2"){}
 	virtual ~Libxml2FilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const
 	{
-		const char* encoding = 0;
-		std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-		for (; ai != ae; ++ai)
-		{
-			if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
-			{
-				encoding = ai->second.c_str();
-				break;
-			}
-		}
-		return encoding?(new Libxml2Filter( encoding)):(new Libxml2Filter());
+		return new Libxml2Filter( getArgumentEncoding( arg));
 	}
 };
 

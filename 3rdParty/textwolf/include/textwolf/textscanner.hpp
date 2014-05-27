@@ -79,6 +79,7 @@ public:
 			('=',Equal)
 			('>',Gt)
 			('/',Slash)
+			('-',Dash)
 			('!',Exclam)
 			('?',Questm)
 			('\'',Sq)

@@ -43,30 +43,38 @@ namespace _Wolframe {
 namespace serialize {
 
 
+/// \class DDLFormSerializer
+/// \brief Serializer of a form defined by a DDL
 class DDLFormSerializer
 	:public virtual utils::TypeSignature
 	,public serialize::DDLStructSerializer
 {
 public:
+	/// \brief Default constructor
 	DDLFormSerializer()
 		:utils::TypeSignature("langbind::DDLFormSerializer", __LINE__){}
 
+	/// \brief Constructor
 	explicit DDLFormSerializer( const types::FormR& form_)
 		:utils::TypeSignature("langbind::DDLFormSerializer", __LINE__)
 		,DDLStructSerializer(form_.get())
 		,m_form(form_){}
 
+	/// \brief Constructor
 	explicit DDLFormSerializer( const types::FormR& form_, const types::VariantStruct* substructure)
 		:utils::TypeSignature("langbind::DDLFormSerializer", __LINE__)
 		,DDLStructSerializer(substructure)
 		,m_form(form_){}
 
+	/// \brief Copy constructor
 	DDLFormSerializer( const DDLFormSerializer& o)
 		:utils::TypeSignature(o)
 		,DDLStructSerializer(o)
 		,m_form(o.m_form){}
+	/// \brief Destructor
 	virtual ~DDLFormSerializer(){}
 
+	/// \brief Assignment operator
 	DDLFormSerializer& operator =( const DDLFormSerializer& o)
 	{
 		utils::TypeSignature::operator=( o);
@@ -75,10 +83,11 @@ public:
 		return *this;
 	}
 
+	/// \brief Get a shared reference to the form of this serializer
 	const types::FormR& form() const	{return m_form;}
 
 private:
-	types::FormR m_form;
+	types::FormR m_form;		///< reference to the form of this serializer
 };
 
 }}//namespace

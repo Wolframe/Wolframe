@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/keymap.hpp
-///\brief template for map with case insensitive key strings
+/// \file types/keymap.hpp
+/// \brief template for map with case insensitive key strings
 
 #ifndef _Wolframe_TYPES_KEYMAP_HPP_INCLUDED
 #define _Wolframe_TYPES_KEYMAP_HPP_INCLUDED
@@ -46,8 +46,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-///\class keystring
-///\brief Constructor for implementing implicit type reductions in key maps that store the key as upper case string.
+/// \class keystring
+/// \brief Constructor for implementing implicit type reductions in key maps that store the key as upper case string.
 struct keystring
 	:public std::string
 {
@@ -60,8 +60,8 @@ struct keystring
 	keystring(){}
 };
 
-///\class keymap
-///\brief Map with case insensitive strings as keys
+/// \class keymap
+/// \brief Map with case insensitive strings as keys
 template <typename ValueType>
 struct keymap
 	:public std::map<keystring,ValueType>

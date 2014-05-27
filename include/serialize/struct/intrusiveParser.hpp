@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/intrusiveParser.hpp
-///\brief Defines the intrusive implementation of the deserialization of objects interfaced as TypedInputFilter
+/// \file serialize/struct/intrusiveParser.hpp
+/// \brief Defines the intrusive implementation of the deserialization of objects interfaced as TypedInputFilter
 #ifndef _Wolframe_SERIALIZE_STRUCT_INTRUSIVE_PARSER_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_INTRUSIVE_PARSER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -50,7 +50,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\brief forward declaration
+/// \brief forward declaration
 template <typename TYPE>
 struct IntrusiveParser
 {

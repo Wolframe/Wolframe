@@ -39,6 +39,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+/// \brief Create a new line (CR/CRLF terminated line) filter type (with new, to be destroyed with delete)
 FilterType* createLineFilterType();
 
 }}//namespace

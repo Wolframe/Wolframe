@@ -182,6 +182,7 @@ private://data:
 	const TagTable* m_tagmap;				//< map names used in selections to node tag identifiers
 	TagTable m_privatetagmap;				//< map unused names to node tag identifiers
 	InputNodeVisitor m_visitor;				//< context for building the tree without visitor
+	bool m_done;						//< final close has been put (end of input)
 };
 
 }}}//namespace

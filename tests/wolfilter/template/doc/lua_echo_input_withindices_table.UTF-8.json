@@ -1,30 +1,28 @@
 {
-	"issuelist":	{
-		"issue":	[{
-				"date":	"8647993",
-				"subtask":	[{
-						"key":	"a876",
-						"title":	"ABC"
-					}, {
-						"key":	"v543",
-						"title":	"XYZ"
-					}],
-				"system":	{
-					"machine":	"orion7",
-					"OS":	"Windows",
-					"version":	"1.0.8"
-				}
-			}, {
-				"date":	"8647993",
-				"subtask":	[{
-						"key":	"a876",
-						"title":	"ABC"
-					}],
-				"system":	{
-					"machine":	"orion7",
-					"OS":	"Windows",
-					"version":	"1.0.8"
-				}
-			}]
-	}
+	"issue":	[{
+			"date":	"8647993",
+			"subtask":	[{
+					"key":	"a876",
+					"title":	"ABC"
+				}, {
+					"key":	"v543",
+					"title":	"XYZ"
+				}],
+			"system":	{
+				"machine":	"orion7",
+				"OS":	"Windows",
+				"version":	"1.0.8"
+			}
+		}, {
+			"date":	"8647993",
+			"subtask":	[{
+					"key":	"a876",
+					"title":	"ABC"
+				}],
+			"system":	{
+				"machine":	"orion7",
+				"OS":	"Windows",
+				"version":	"1.0.8"
+			}
+		}]
 }

@@ -20,10 +20,8 @@ STRUCT FormDef
 }
 
 FORM Wolfwizard
+	-root forms
 {
-	forms
-	{
-		form FormDef[]
-	}
+	form FormDef[]
 }
 

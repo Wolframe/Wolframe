@@ -23,6 +23,7 @@ LIBRARIES = \
 
 CPP_OBJS = \
 	protocol_ioblocks.obj \
+	filterdef.obj \
 	input.obj \
 	output.obj \
 	tostringfilter.obj \

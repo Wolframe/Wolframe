@@ -84,7 +84,8 @@
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			return new CommandHandlerBuilder();\
+			static CommandHandlerBuilder rt;\
+			return &rt;\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\

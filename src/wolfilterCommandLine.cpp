@@ -41,7 +41,6 @@
 #include "types/propertyTree.hpp"
 #include "serialize/structOptionParser.hpp"
 #include "utils/fileUtils.hpp"
-#include "types/doctype.hpp"
 #include "filter/redirectFilterClosure.hpp"
 #include "config/structSerialize.hpp"
 #include "logger-v1.hpp"
@@ -77,7 +76,7 @@ static std::string configurationTree_tostring( const types::PropertyTree::Node& 
 	langbind::TypedInputFilterR inp( new langbind::PropertyTreeInputFilter( pt));
 	langbind::ToStringFilter* res;
 	langbind::TypedOutputFilterR out( res = new langbind::ToStringFilter( "\t"));
-	langbind::RedirectFilterClosure redirect( inp, out);
+	langbind::RedirectFilterClosure redirect( inp, out, false);
 	if (!redirect.call()) throw std::runtime_error( "can't map configuration tree to string");
 	return res->content();
 }

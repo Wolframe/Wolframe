@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/integer.hpp
-///\brief Integer number value type
+/// \file types/integer.hpp
+/// \brief Application wide definitions of integer number value types
 
 #ifndef _Wolframe_TYPES_INTEGER_HPP_INCLUDED
 #define _Wolframe_TYPES_INTEGER_HPP_INCLUDED

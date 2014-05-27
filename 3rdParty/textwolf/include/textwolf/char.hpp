@@ -112,15 +112,16 @@ enum ControlCharacter
 	Equal,			//< equal '='
 	Gt,			//< greater than '>'
 	Slash,			//< slash '/'
+	Dash,			//< en dash (minus) '-'
 	Exclam,			//< exclamation mark '!'
 	Questm,			//< question mark '?'
 	Sq,			//< single quote
 	Dq,			//< double quote
 	Osb,			//< open square bracket '['
 	Csb,			//< close square bracket ']'
-	Any,			//< any ascii character with meaning
-	NofControlCharacter=17	//< total number of control characters
+	Any			//< any ascii character with meaning
 };
+enum {NofControlCharacter=18};	//< total number of control characters
 
 ///\class ControlCharacterM
 ///\brief Map of the enumeration of control characters to their names for debug messages
@@ -130,7 +131,7 @@ struct ControlCharacterM
 	///\param [in] c the control character to map
 	static const char* name( ControlCharacter c)
 	{
-		static const char* name[ NofControlCharacter] = {"Undef", "EndOfText", "EndOfLine", "Cntrl", "Space", "Amp", "Lt", "Equal", "Gt", "Slash", "Exclam", "Questm", "Sq", "Dq", "Osb", "Csb", "Any"};
+		static const char* name[ NofControlCharacter] = {"Undef", "EndOfText", "EndOfLine", "Cntrl", "Space", "Amp", "Lt", "Equal", "Gt", "Slash", "Dash", "Exclam", "Questm", "Sq", "Dq", "Osb", "Csb", "Any"};
 		return name[ (unsigned int)(unsigned char)c];
 	}
 };
