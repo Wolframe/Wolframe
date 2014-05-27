@@ -744,7 +744,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 					}
 					else
 					{
-						if (m_itembuf == "xmlns:schemaLocation")
+						if (m_itembuf == "xsi:schemaLocation")
 						{
 							setState( SearchXMLRootAttribAssign);
 						}
