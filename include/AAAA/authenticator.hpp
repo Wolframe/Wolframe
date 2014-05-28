@@ -45,6 +45,8 @@ namespace _Wolframe {
 namespace AAAA {
 
 /// Authenticator interface
+/// This the only interface to be used by the system. All other interfaces
+/// are internal to the authentication objects.
 ///
 /// \note	The authenticator works ony with complete messages.
 ///		Sending a message in multiple parts will most likely

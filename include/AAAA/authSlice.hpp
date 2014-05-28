@@ -31,12 +31,12 @@
 
 ************************************************************************/
 ///
-/// \file authInstance.hpp
-/// \brief AuthenticationInstance interface
+/// \file authSlice.hpp
+/// \brief AuthenticationSlice interface
 ///
 
-#ifndef _AUTHENTICATION_INSTANCE_HPP_INCLUDED
-#define _AUTHENTICATION_INSTANCE_HPP_INCLUDED
+#ifndef _AUTHENTICATION_SLICE_HPP_INCLUDED
+#define _AUTHENTICATION_SLICE_HPP_INCLUDED
 
 #include <string>
 #include <vector>
@@ -48,14 +48,14 @@ namespace AAAA {
 
 /// AuthenticatorInstance
 /// This is the base class for authenticator slices implementations
-/// An authenticator has (usually) several authenticator instances
-/// The AuthenticatorInstance(s) are provided by the their respective
+/// An authenticator has (usually) several authenticator slices
+/// The AuthenticatorSlice(s) are provided by the their respective
 /// AuthenticationUnit(s) in the AAAA provider
 ///
-/// \note	For now the AuthenticatorInstance is just like the Authenticator
+/// \note	For now the AuthenticatorSlice is similar to the Authenticator
 ///		but this is very likely to change in the future
 ///
-class AuthenticatorInstance
+class AuthenticatorSlice
 {
 public:
 	enum Status	{
@@ -70,7 +70,7 @@ public:
 	};
 
 	/// The virtual destructor
-	virtual ~AuthenticatorInstance()	{}
+	virtual ~AuthenticatorSlice()	{}
 
 	/// Destroy the authenticator
 	///
@@ -115,4 +115,4 @@ public:
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUTHENTICATION_INSTANCE_HPP_INCLUDED
+#endif // _AUTHENTICATION_SLICE_HPP_INCLUDED

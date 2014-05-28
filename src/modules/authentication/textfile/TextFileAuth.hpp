@@ -88,8 +88,7 @@ public:
 
 	const std::string* mechs() const		{ return m_mechs; }
 
-	AuthenticatorInstance* instance( const std::string& mech,
-					 const net::RemoteEndpoint& client );
+	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client );
 
 	/// \brief	Authenticate a user with its plain username and password
 	/// \note	This function is supposed to be used only for tests.
@@ -118,7 +117,7 @@ private:
 // (*) --> receive response --> + got user
 //				+ invalid credentials
 //
-class TextFileAuthInstance : public AuthenticatorInstance
+class TextFileAuthSlice : public AuthenticatorSlice
 {
 	enum	State	{
 		INSTANCE_INITIALIZED,		///< Has been initialized, no other data
@@ -130,9 +129,9 @@ class TextFileAuthInstance : public AuthenticatorInstance
 	};
 
 public:
-	TextFileAuthInstance( const TextFileAuthUnit& backend );
+	TextFileAuthSlice( const TextFileAuthUnit& backend );
 
-	~TextFileAuthInstance();
+	~TextFileAuthSlice();
 
 	void destroy();
 

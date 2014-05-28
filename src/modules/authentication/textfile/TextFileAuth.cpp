@@ -70,18 +70,18 @@ TextFileAuthUnit::~TextFileAuthUnit()
 {
 }
 
-AuthenticatorInstance* TextFileAuthUnit::instance( const std::string& /*mech*/,
-						   const net::RemoteEndpoint& /*client*/ )
+AuthenticatorSlice* TextFileAuthUnit::slice( const std::string& /*mech*/,
+					     const net::RemoteEndpoint& /*client*/ )
 {
-	return new TextFileAuthInstance( *this );
+	return new TextFileAuthSlice( *this );
 }
 
 // clang says unused
 //static const std::size_t PWD_LINE_SIZE = 1024;
 
 User* TextFileAuthUnit::authenticatePlain( const std::string& username,
-						const std::string& password,
-						bool caseSensitveUser ) const
+					   const std::string& password,
+					   bool caseSensitveUser ) const
 {
 	PwdFileUser	user;
 
@@ -111,19 +111,19 @@ PwdFileUser TextFileAuthUnit::getUser( const std::string& hash, const std::strin
 
 // Text file authentication - authentication slice
 //***********************************************************************
-TextFileAuthInstance::TextFileAuthInstance( const TextFileAuthUnit& backend )
+TextFileAuthSlice::TextFileAuthSlice( const TextFileAuthUnit& backend )
 	: m_backend( backend )
 {
 	m_user = NULL;
 }
 
-TextFileAuthInstance::~TextFileAuthInstance()
+TextFileAuthSlice::~TextFileAuthSlice()
 {
 	if ( m_user != NULL )
 		delete m_user;
 }
 
-void TextFileAuthInstance::destroy()
+void TextFileAuthSlice::destroy()
 {
 	delete this;
 }
