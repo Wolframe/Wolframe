@@ -67,11 +67,11 @@ public:
 	/// Set the authentication mech
 	virtual bool setMech( const std::string& mech );
 
-	/// Input message
-	virtual void messageIn( const void* message, std::size_t size );
+	/// The input message
+	virtual void messageIn( const std::string& message );
 
-	/// Output message
-	virtual int messageOut( const void** message, std::size_t size );
+	/// The output message
+	virtual const std::string& messageOut();
 
 	/// The current status of the authenticator
 	virtual Status status() const;

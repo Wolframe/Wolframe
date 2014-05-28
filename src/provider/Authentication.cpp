@@ -128,36 +128,38 @@ void StandardAuthenticator::destroy()
 	delete this;
 }
 
-/// Get the list of available mechs
+// Get the list of available mechs
 const std::vector< std::string >& StandardAuthenticator::mechs() const
 {
 	return m_mechs;
 }
 
-/// Set the authentication mech
+// Set the authentication mech
 bool StandardAuthenticator::setMech( const std::string& /*mech*/ )
 {
 	return true;
 }
 
-/// Input message
-void StandardAuthenticator::messageIn( const void* /*message*/, std::size_t /*size*/ )
+// The input message
+void StandardAuthenticator::messageIn( const std::string& /*message*/ )
 {
+
 }
 
-/// Output message
-int StandardAuthenticator::messageOut( const void** /*message*/, std::size_t /*size*/ )
+// The output message
+const std::string& StandardAuthenticator::messageOut()
 {
-	return 1;
+	static std::string	dummy = "Bla Bla";
+	return dummy;
 }
 
-/// The current status of the authenticator
+// The current status of the authenticator
 Authenticator::Status StandardAuthenticator::status() const
 {
 	return INITIALIZED;
 }
 
-/// The authenticated user or NULL if not authenticated
+// The authenticated user or NULL if not authenticated
 User* StandardAuthenticator::user() const
 {
 	return NULL;

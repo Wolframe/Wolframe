@@ -90,16 +90,12 @@ public:
 	virtual bool setMech( const std::string& mech ) = 0;
 
 	/// The input message
-	/// \param [in]	message	pointer to the input message
-	/// \param [in]	size	the size of the input message
-	virtual void messageIn( const void* message, std::size_t size ) = 0;
+	/// \param [in]	message	the input message
+	virtual void messageIn( const std::string& message ) = 0;
 
 	/// The output message
-	/// \param [in]	message	pointer to the buffer for the output message
-	/// \param [in]	size	the size of the output buffer
-	/// \returns		the size of the message in bytes
-	///			or -1 if the buffer is too small
-	virtual int messageOut( const void** message, std::size_t size ) = 0;
+	/// \returns		the output message
+	virtual const std::string& messageOut() = 0;
 
 	/// The current status of the authenticator
 	virtual Status status() const = 0;
