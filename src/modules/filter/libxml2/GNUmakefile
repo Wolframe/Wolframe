@@ -16,12 +16,14 @@ INCLUDE_CXXFLAGS += \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwfsingleton \
 	$(LIBXML2_LIB_DIRS) \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	$(LIBXML2_LIBS)
-
+	$(LIBXML2_LIBS) \
+	-lwfsingleton \
+	-lwolframe
 
 # libxslt
 
