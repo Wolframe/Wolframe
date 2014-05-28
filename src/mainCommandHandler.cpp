@@ -78,7 +78,13 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 static MainSTM mainstm;
 
 MainCommandHandler::MainCommandHandler()
-	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>( &mainstm ){}
+	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>(&mainstm)
+	,m_remoteEndpoint(0){}
+
+void MainCommandHandler::setPeer( const net::RemoteEndpoint& remote)
+{
+	m_remoteEndpoint = &remote;
+}
 
 int MainCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
@@ -168,7 +174,11 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		out << "ERR to many arguments for MECH" << endl();
 		return stateidx();
 	}
-	if (!m_authenticator->setMech( argv[0]))
+	if (!m_remoteEndpoint)
+	{
+		throw std::logic_error("no remote endpoint set, cannot authenticate");
+	}
+	if (!m_authenticator->setMech( argv[0], *m_remoteEndpoint))
 	{
 		out << "ERR denied" << endl();
 		out << "MECHS " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
