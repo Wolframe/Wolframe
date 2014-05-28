@@ -59,7 +59,7 @@ struct DocMetaData
 
 	DocMetaData( const DocMetaData& o);
 	DocMetaData( const std::string& doctype_, const std::vector<Attribute>& attributes_);
-	DocMetaData();
+	DocMetaData(){}
 
 	void clear();
 
