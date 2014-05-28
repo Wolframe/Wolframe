@@ -112,7 +112,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 				if (!(flt = m_outputfilter.get()))
 				{
 					LOG_ERROR << "Output filter undefined";
-					m_lastError = "internal";
+					setLastError( "internal: output filter undefined");
 					m_state = DiscardInput;
 					return READ;
 				}
@@ -155,7 +155,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 						if (errmsg)
 						{
 							LOG_ERROR << "Error calling procedure: " << (errmsg?errmsg:"unknown");
-							m_lastError = (errmsg?errmsg:"processing error");
+							setLastError( (errmsg?errmsg:"processing error"));
 						}
 						continue;
 
@@ -172,7 +172,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 									if (m_input.gotEoD())
 									{
 										LOG_ERROR << "error in input filter: unexpected end of input";
-										m_lastError = "input";
+										setLastError( "unexpected end of input");
 										m_state = DiscardInput;
 										continue;
 									}
@@ -181,7 +181,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 								case InputFilter::Error:
 									errmsg = m_inputfilter->getError();
 									LOG_ERROR << "error in input filter: " << (errmsg?errmsg:"unknown");
-									m_lastError = "input";
+									setLastError( std::string( "error in input: ") + (errmsg?errmsg:"unknown"));
 									m_state = DiscardInput;
 									return READ;
 							}
@@ -202,13 +202,13 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 								case OutputFilter::Error:
 									errmsg = m_outputfilter->getError();
 									LOG_ERROR << "error in output filter: " << (errmsg?errmsg:"unknown");
-									m_lastError = "internal";
+									setLastError( std::string("error in output: ") + (errmsg?errmsg:"unknown"));
 									m_state = DiscardInput;
 									return READ;
 							}
 						}
-						LOG_ERROR << "Illegal state (missing filter)";
-						m_lastError = "internal";
+						LOG_ERROR << "illegal state (missing filter)";
+						setLastError( "internal: illegal state (missing filter)");
 						m_state = DiscardInput;
 						return READ;
 				}

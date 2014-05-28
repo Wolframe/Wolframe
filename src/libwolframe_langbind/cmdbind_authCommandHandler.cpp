@@ -45,7 +45,6 @@ AuthCommandHandler::AuthCommandHandler( const boost::shared_ptr<AAAA::Authentica
 	,m_outputbufsize(0)
 	,m_outputbufpos(0)
 	,m_state(Init)
-//	,m_readpos(0)	-> see authCommandHandler.hpp
 	,m_writepos(0)
 {}
 
@@ -90,7 +89,7 @@ void AuthCommandHandler::putInput( const void *begin, std::size_t bytesTransferr
 	m_readbuffer.append( start.ptr(), m_eoD-start);
 	if (m_input.gotEoD())
 	{
-		//[+] m_authenticator->putReadMessage( AAAA::Authenticator::Message( (const void*)m_readbuffer.c_str(), m_readbuffer.size()));
+		m_authenticator->messageIn( (const void*)m_readbuffer.c_str(), m_readbuffer.size());
 		m_state = ReadConsumed;
 	}
 }
@@ -111,7 +110,7 @@ void AuthCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTran
 	{
 		bytesToTransfer = m_writebuffer.size() - m_writepos;
 	}
-	if (bytesToTransfer == 0) throw std::logic_error( "protocol error: empty write in authorization command handler");
+	if (bytesToTransfer == 0) throw std::logic_error( "protocol error: empty write in authentication command handler");
 
 	std::memcpy( m_outputbuf + m_outputbufpos, m_writebuffer.c_str() + m_writepos, bytesToTransfer);
 	begin = m_outputbuf + m_outputbufpos;
@@ -131,7 +130,7 @@ void AuthCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 	{
 		if (m_readbuffer.size() > m_input.size())
 		{
-			throw std::logic_error("data requested but EoD not consumed in authorization commmand handler");
+			throw std::logic_error("data requested but EoD not consumed in authentication commmand handler");
 		}
 		std::memcpy( m_input.charptr(), m_readbuffer.c_str(), m_readbuffer.size());
 		m_input.setPos( nofBytes = m_readbuffer.size());
@@ -147,29 +146,36 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 		switch (m_state)
 		{
 			case Init:
-				//[+] m_authenticator->init();
 				m_state = NextOperation;
 				/*no break here!*/
 
 			case NextOperation:
+				switch (m_authenticator->status())
+				{
+					case AAAA::Authenticator::INITIALIZED:
+						throw std::logic_error("authentication protocol operation in state INITIALIZED");
+					case AAAA::Authenticator::MESSAGE_AVAILABLE:
+						m_writebuffer = protocol::escapeStringDLF( std::string( (const char*)0, 0));
+						m_writebuffer.append( "\r\n.\r\n");
+						m_writepos = 0;
+						m_state = FlushOutput;
+						continue;
+					case AAAA::Authenticator::AWAITING_MESSAGE:
+						return READ;
+					case AAAA::Authenticator::AUTHENTICATED:
+						return CLOSE;
+					case AAAA::Authenticator::INVALID_CREDENTIALS:
+						setLastError( "either the username or the credentials are invalid");
+						return CLOSE;
+					case AAAA::Authenticator::MECH_UNAVAILABLE:
+						setLastError( "the requested authentication mech is not available");
+						return CLOSE;
+					case AAAA::Authenticator::SYSTEM_FAILURE:
+						setLastError( "unspecified authentication system error");
+						return CLOSE;
+				}
+				setLastError( "internal: unhandled authenticator status");
 				return CLOSE;
-				//[+] switch (m_authenticator->nextOperation())
-				//[+] {
-				//[+] 	case READ:
-				//[+] 		return READ;
-				//[+]
-				//[+] 	case WRITE:
-				//[+] 	{
-				//[+] 		AAAA::Authenticator::Message msg = m_authenticator->getWriteMessage();
-				//[+] 		m_writebuffer = protocol::escapeStringDLF( std::string( (const char*)msg.ptr, msg.size));
-				//[+] 		m_writebuffer.append( "\r\n.\r\n");
-				//[+] 		m_writepos = 0;
-				//[+] 		m_state = FlushOutput;
-				//[+] 		continue;
-				//[+] 	}
-				//[+] 	case CLOSE:
-				//[+] 		return CLOSE;
-				//[+] }
 
 			case ReadConsumed:
 				m_readbuffer.clear();
@@ -187,6 +193,7 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 				return WRITE;
 		}
 	}//for(;;)
+	setLastError( "internal: unhandled state in authentication protocol");
 	return CLOSE;
 }
 
