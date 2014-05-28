@@ -248,6 +248,9 @@ box):
         export CCACHE_CPP2=1
 
 
+The same applies for some versions of 'icc' (for instance 14.0.2 20140120). You
+get spurious errors when you don't set 'CCACHE_CPP2'!
+
 1.7. Platform-specific build instructions
 
 FreeBSD
