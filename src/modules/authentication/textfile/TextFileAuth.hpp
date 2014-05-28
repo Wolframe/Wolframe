@@ -119,13 +119,13 @@ private:
 //
 class TextFileAuthSlice : public AuthenticatorSlice
 {
-	enum	State	{
-		INSTANCE_INITIALIZED,		///< Has been initialized, no other data
-		INSTANCE_USER_FOUND,		///< User has been found, will send challenge
-		INSTANCE_USER_NOT_FOUND,	///< User has not been found -> fail
-		INSTANCE_CHALLENGE_SENT,	///< Waiting for the response
-		INSTANCE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
-		INSTANCE_AUTHENTICATED		///< Response was correct -> user available
+	enum	SliceState	{
+		SLICE_INITIALIZED,		///< Has been initialized, no other data
+		SLICE_USER_FOUND,		///< User has been found, will send challenge
+		SLICE_USER_NOT_FOUND,		///< User has not been found -> fail
+		SLICE_CHALLENGE_SENT,		///< Waiting for the response
+		SLICE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
+		SLICE_AUTHENTICATED		///< Response was correct -> user available
 	};
 
 public:
@@ -135,7 +135,7 @@ public:
 
 	void destroy();
 
-	const char* typeName() const			{ return m_backend.className(); }
+	virtual const char* typeName() const		{ return m_backend.className(); }
 
 	/// Get the list of available mechs
 	virtual const std::vector<std::string>& mechs() const;
@@ -149,7 +149,7 @@ public:
 	/// The output message
 	virtual const std::string& messageOut();
 
-	/// The current status of the authenticator
+	/// The current status of the authenticator slice
 	virtual Status status() const;
 
 	/// The authenticated user or NULL if not authenticated
@@ -157,8 +157,8 @@ public:
 
 private:
 	const TextFileAuthUnit&	m_backend;
-	struct PwdFileUser		m_usr;
-	User*				m_user;
+	struct PwdFileUser	m_usr;
+	User*			m_user;
 };
 
 

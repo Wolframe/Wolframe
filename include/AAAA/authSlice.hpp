@@ -59,8 +59,6 @@ class AuthenticatorSlice
 {
 public:
 	enum Status	{
-		INITIALIZED,		///< the instance is initialized,
-					///  no mech has been selected yet
 		MESSAGE_AVAILABLE,	///< an output message is available
 		AWAITING_MESSAGE,	///< waiting for an input message
 		AUTHENTICATED,		///< a user has been authenticated
@@ -79,6 +77,9 @@ public:
 	///		You should use this function instead of delete
 	///		because not all authentication instances are created with new.
 	virtual void destroy() = 0;
+
+	/// The name of the authentication unit / subunit
+	virtual const char* typeName() const = 0;
 
 	/// The list of available mechs
 	virtual const std::vector<std::string>& mechs() const = 0;

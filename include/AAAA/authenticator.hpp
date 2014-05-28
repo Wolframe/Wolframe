@@ -40,6 +40,7 @@
 #include <string>
 #include <vector>
 #include "AAAA/user.hpp"
+#include "system/connectionEndpoint.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -84,10 +85,15 @@ public:
 
 	/// Set the authentication mech
 	/// \param [in]	mech	the name of the mech (case-insensitive)
+	/// \param [in] client	reference to the client network endpoint
 	/// \returns		true if the mech could be selected
 	///			false if the mech is not available or a mech
 	///			has already been selected
-	virtual bool setMech( const std::string& mech ) = 0;
+	/// \note	This function works like a reset function
+	///		Whenever it is called it will release all the allocated
+	///		resources and it will reinitialize all the data structures
+	virtual bool setMech( const std::string& mech,
+			      const net::RemoteEndpoint& client ) = 0;
 
 	/// The input message
 	/// \param [in]	message	the input message
@@ -104,8 +110,9 @@ public:
 	/// \note	It is intended that this function can be called only once.
 	///		As a security precaution, all the instance information regarding
 	///		the current authentication operation should be destroyed after
-	///		calling this function.
-	virtual User* user() const = 0;
+	///		the authentication is complete and the user is no longer
+	///		available after the call of this function
+	virtual User* user() = 0;
 };
 
 }} // namespace _Wolframe::AAAA

@@ -56,7 +56,8 @@ namespace AAAA {
 class StandardAuthenticator : public Authenticator
 {
 public:
-	StandardAuthenticator( const std::vector<std::string>& mechs_ );
+	StandardAuthenticator( const std::vector<std::string>& mechs_,
+			       const std::list< AuthenticationUnit* >& units_ );
 
 	~StandardAuthenticator();
 	void destroy();
@@ -65,7 +66,8 @@ public:
 	virtual const std::vector<std::string>& mechs() const;
 
 	/// Set the authentication mech
-	virtual bool setMech( const std::string& mech );
+	virtual bool setMech( const std::string& mech,
+			      const net::RemoteEndpoint& client  );
 
 	/// The input message
 	virtual void messageIn( const std::string& message );
@@ -74,12 +76,18 @@ public:
 	virtual const std::string& messageOut();
 
 	/// The current status of the authenticator
-	virtual Status status() const;
+	virtual Status status() const		{ return m_status; }
 
 	/// The authenticated user or NULL if not authenticated
-	virtual User* user() const;
+	virtual User* user();
 private:
-	const std::vector<std::string>&	m_mechs;
+	const std::vector< std::string >&	m_mechs;
+	const std::list< AuthenticationUnit* >&	m_authUnits;
+
+	Authenticator::Status			m_status;
+	std::vector< AuthenticatorSlice* >	m_slices;
+	AuthenticatorSlice*			m_selectedSlice;
+	AAAA::User*				m_user;
 };
 
 class AuthenticationFactory
