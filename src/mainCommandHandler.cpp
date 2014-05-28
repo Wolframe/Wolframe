@@ -126,7 +126,7 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 	}
 	else
 	{
-		out << "MECHS " << "NONE " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
+		out << "MECHS NONE " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
 		return MainSTM::Authentication;
 	}
 }
@@ -137,7 +137,7 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 	const char* error = ch->lastError();
 	if (error)
 	{
-		out << "ERR authentication " << error << endl();
+		out << "ERR authentication failed: " << error << endl();
 		return -1;
 	}
 	else
@@ -145,12 +145,12 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 		AAAA::User* usr = m_authenticator->user();
 		if (usr)
 		{
-			out << "OK authorization" << endl();
+			out << "OK authenticated" << endl();
 			execContext()->setUser( usr);
 		}
 		else
 		{
-			out << "ERR authentication got no user" << endl();
+			out << "ERR authentication failed" << endl();
 		}
 		return MainSTM::Authenticated;
 	}
@@ -168,15 +168,26 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		out << "ERR to many arguments for MECH" << endl();
 		return stateidx();
 	}
-	if (!m_authenticator->setMech( argv[0]))
+	if (0==std::strcmp(argv[0],"NONE"))
 	{
-		out << "ERR denied" << endl();
-		out << "MECHS " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
-		return MainSTM::Authentication;
+		out << "OK no authentication";
+		return MainSTM::Authenticated;
 	}
-	cmdbind::AuthCommandHandler* authch = new cmdbind::AuthCommandHandler( m_authenticator);
-	authch->setExecContext( execContext());
-	delegateProcessing<&MainCommandHandler::endMech>( authch);
+	else
+	{
+		if (!m_authenticator->setMech( argv[0]))
+		{
+			out << "ERR denied" << endl();
+			out << "MECHS NONE " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
+			return MainSTM::Authentication;
+		}
+		else
+		{
+			cmdbind::AuthCommandHandler* authch = new cmdbind::AuthCommandHandler( m_authenticator);
+			authch->setExecContext( execContext());
+			delegateProcessing<&MainCommandHandler::endMech>( authch);
+		}
+	}
 	return stateidx();
 }
 
