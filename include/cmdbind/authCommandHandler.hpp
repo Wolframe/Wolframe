@@ -109,8 +109,6 @@ private:
 
 	State m_state;						///< processing state of the command handler
 	std::string m_readbuffer;				///< buffer for chunkwise network read
-// MBa: temporary, avoid not used error
-//	std::size_t m_readpos;					///< current position in buffer for chunkwise network read
 	std::string m_writebuffer;				///< buffer for chunkwise network write
 	std::size_t m_writepos;					///< current position in buffer for chunkwise network write
 };
