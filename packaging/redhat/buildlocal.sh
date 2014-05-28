@@ -77,6 +77,7 @@ if test -f /opt/intel/bin/iccvars.sh; then
 		fi
 	fi
 	. /opt/intel/bin/iccvars.sh $ICC_ARCH
+	export CCACHE_CPP2=1
 	export CC='ccache icc'
 	export CXX='ccache icpc'	
 else
