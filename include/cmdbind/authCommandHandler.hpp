@@ -37,7 +37,7 @@
 #define _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
 
 #include "cmdbind/lineCommandHandler.hpp"
-#include "AAAA/authenticator.hpp"
+#include "AAAA/authInstance.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -51,15 +51,6 @@ class AuthCommandHandler
 public:
 	explicit AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_);
 	virtual ~AuthCommandHandler();
-
-	const AAAA::User& user() const
-	{
-		static const AAAA::User undefined;
-		return undefined;
-		//[+] if (!m_authenticator) return undefined;
-		//[+] AAAA::User* usr = m_authenticator->user();
-		//[+] return usr?*usr:undefined;
-	}
 
 	/// \brief See CommandHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);

@@ -35,6 +35,7 @@
 #ifndef _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
 #define _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
 #include "processor/procProviderInterface.hpp"
+#include "types/secureReference.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/authorization.hpp"
 #include "AAAA/authenticator.hpp"
@@ -54,17 +55,14 @@ public:
 	/// \brief Constructor
 	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a)
 		:m_provider(p),m_aaaaProvider(a){}
-	/// \brief Copy constructor
-	ExecContext( const ExecContext& o)
-		:m_provider(o.m_provider),m_user(o.m_user),m_authorizer(o.m_authorizer),m_aaaaProvider(o.m_aaaaProvider){}
 
 	/// \brief Get the processor provider interface
 	const ProcessorProviderInterface* provider() const	{return m_provider;}
 
-	/// \brief Get the user data
-	const AAAA::User& user() const				{return m_user;}
-	/// \brief Set the user data
-	void setUser( const AAAA::User& u)			{m_user = u;}
+	/// \brief Get the the user instance reference
+	const AAAA::User* user() const				{return m_user.get();}
+	/// \brief Set the user instance (own by this from now)
+	void setUser( AAAA::User* u)				{m_user.reset( u);}
 
 	/// \brief Get the authorization instance interface
 	const AAAA::Authorizer* authorizer() const		{return m_authorizer;}
@@ -80,9 +78,13 @@ public:
 		return true;
 	}
 
+private:
+	ExecContext( const ExecContext&);			//... non copyable
+	void operator=( const ExecContext&);			//... non copyable
+
 public:
 	const ProcessorProviderInterface* m_provider;		///< processor provider interface
-	AAAA::User m_user;					///< user data
+	types::SecureReference<AAAA::User> m_user;		///< user instance
 	const AAAA::Authorizer* m_authorizer;			///< instance to query for execution permission based on login data
 	const AAAA::AAAAprovider* m_aaaaProvider;		///< instance to query for an authenticator
 };

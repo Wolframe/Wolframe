@@ -268,7 +268,7 @@ public:
 	boost::shared_ptr<proc::ProcessorProvider> m_provider;
 	boost::shared_ptr<iproc::Connection> m_connection;
 	IProcTestConfiguration m_config;
-	proc::ExecContext m_execContext;
+	boost::shared_ptr<proc::ExecContext> m_execContext;
 
 	enum
 	{
@@ -293,8 +293,8 @@ protected:
 		TestDescription test;
 		m_provider = getProcProvider( m_config.providerConfig(), m_config.prglib());
 		m_connection.reset( new iproc::Connection( ep, &m_config));
-		m_execContext = proc::ExecContext( m_provider.get(), 0);
-		m_connection->setExecContext( &m_execContext);
+		m_execContext.reset( new proc::ExecContext( m_provider.get(), 0));
+		m_connection->setExecContext( m_execContext.get());
 
 		m_input.clear();
 		m_expected.clear();

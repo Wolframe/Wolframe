@@ -140,6 +140,7 @@ protected:
 	std::string m_lastError;				//< error operation for the client
 	std::string m_name;					//< name of the command to execute
 	std::vector< std::string > m_argBuffer;			//< the command arguments
+private:
 	proc::ExecContext* m_execContext;			//< the reference to the execution context of the connection
 };
 
