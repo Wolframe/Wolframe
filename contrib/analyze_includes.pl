@@ -19,7 +19,7 @@ use Data::Dumper;
 
 
 
-require "doxygen/perlmod/DoxyDocs.pm";
+require "docs/doxygen/perlmod/DoxyDocs.pm";
 
 my $precompiled_filename = "stdafx";
 my $cpp_extension = "cpp";
