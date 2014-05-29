@@ -34,10 +34,11 @@
 
 function userHash( $username )
 {
-	$seed = array( 8 );
-	for ( i = 0; i < 8; i++ )
-		$seed[ i ] = rand( 0, 255 );
-	$hash = hash_hmac( "sha1", $username, $seed, true );
+	$seedArray = array( 8 );
+	for ( $i = 0; $i < 8; $i++ )
+		$seed[ $i ] = rand( 0, 255 );
+	$seed = implode( array_map ( "chr", $seedArray ));
+	$hash = hash_hmac( "sha1", $username, $seed, 'true' );
 
 	return $hash;
 }
