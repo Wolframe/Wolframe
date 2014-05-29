@@ -87,8 +87,7 @@ public:
 	/// \param [in]	mech	the name of the mech (case-insensitive)
 	/// \param [in] client	reference to the client network endpoint
 	/// \returns		true if the mech could be selected
-	///			false if the mech is not available or a mech
-	///			has already been selected
+	///			false if the mech is not available
 	/// \note	This function works like a reset function
 	///		Whenever it is called it will release all the allocated
 	///		resources and it will reinitialize all the data structures

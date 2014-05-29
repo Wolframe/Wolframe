@@ -191,7 +191,7 @@ bool StandardAuthenticator::setMech( const std::string& mech,
 			m_slices.push_back( slice );
 		}
 	}
-	// Note the the following logic is badly flawed. A lot more knoledge is needed
+	// Note the the following logic is badly flawed. A lot more knowledge is needed
 	// in order to do this reasonably correct
 	if ( ! m_slices.empty() )	{
 		m_selectedSlice = m_slices[ 0 ];
@@ -203,12 +203,16 @@ bool StandardAuthenticator::setMech( const std::string& mech,
 				m_status = AWAITING_MESSAGE;
 				break;
 			case AuthenticatorSlice::AUTHENTICATED:
-				m_status = AUTHENTICATED;
+				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is AUTHENTICATED" );
+				m_status = SYSTEM_FAILURE;
 				break;
 			case AuthenticatorSlice::INVALID_CREDENTIALS:
-				m_status = INVALID_CREDENTIALS;
+				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is INVALID_CREDENTIALS" );
+				m_status = SYSTEM_FAILURE;
 				break;
 			case AuthenticatorSlice::SYSTEM_FAILURE:
+				LOG_DEBUG << "StandardAuthenticator: authentication slice '"
+					  << m_selectedSlice->typeName() << "' status is SYSTEM_FAILURE";
 				m_status = SYSTEM_FAILURE;
 				break;
 		}

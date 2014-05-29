@@ -52,9 +52,6 @@ namespace AAAA {
 /// The AuthenticatorSlice(s) are provided by the their respective
 /// AuthenticationUnit(s) in the AAAA provider
 ///
-/// \note	For now the AuthenticatorSlice is similar to the Authenticator
-///		but this is very likely to change in the future
-///
 class AuthenticatorSlice
 {
 public:
@@ -80,16 +77,6 @@ public:
 
 	/// The name of the authentication unit / subunit
 	virtual const char* typeName() const = 0;
-
-	/// The list of available mechs
-	virtual const std::vector<std::string>& mechs() const = 0;
-
-	/// Set the authentication mech
-	/// \param [in]	mech	the name of the mech (case-insensitive)
-	/// \returns		true if the mech could be selected
-	///			false if the mech is not available or a mech
-	///			has already been selected
-	virtual bool setMech( const std::string& mech ) = 0;
 
 	/// The input message
 	/// \param [in]	message	the input message
