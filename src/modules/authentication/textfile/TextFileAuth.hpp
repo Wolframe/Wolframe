@@ -135,7 +135,9 @@ public:
 
 	void destroy();
 
-	virtual const char* typeName() const		{ return m_backend.className(); }
+	virtual const char* className() const		{ return m_backend.className(); }
+
+	virtual const std::string& identifier() const	{ return m_backend.identifier(); }
 
 	/// Get the list of available mechs
 	virtual const std::vector<std::string>& mechs() const;

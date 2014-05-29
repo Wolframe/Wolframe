@@ -75,8 +75,13 @@ public:
 	///		because not all authentication instances are created with new.
 	virtual void destroy() = 0;
 
-	/// The name of the authentication unit / subunit
-	virtual const char* typeName() const = 0;
+	/// The class name of the authentication unit / subunit
+	///\note	This is the name of the authentication type / class
+	virtual const char* className() const = 0;
+
+	/// The identifier of the authentication unit / slice
+	///\note	This is the identifier of the authentication unit / slice
+	virtual const std::string& identifier() const = 0;
 
 	/// The input message
 	/// \param [in]	message	the input message

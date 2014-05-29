@@ -120,7 +120,7 @@ Authenticator* AuthenticationFactory::authenticator()
 StandardAuthenticator::StandardAuthenticator( const std::vector<std::string>& mechs_,
 					      const std::list<AuthenticationUnit *> &units_ )
 	: m_mechs( mechs_ ), m_authUnits( units_ ),
-	  m_status( INITIALIZED ), m_selectedSlice( NULL ), m_user( NULL )
+	  m_status( INITIALIZED ), m_currentSlice( -1 ), m_user( NULL )
 {
 }
 
@@ -154,7 +154,7 @@ bool StandardAuthenticator::setMech( const std::string& mech,
 	for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
 							it != m_slices.end(); it++ )
 		delete *it;
-	m_selectedSlice = NULL;
+	m_currentSlice = -1;
 
 	bool	mechAvailable = false;
 
@@ -194,25 +194,33 @@ bool StandardAuthenticator::setMech( const std::string& mech,
 	// Note the the following logic is badly flawed. A lot more knowledge is needed
 	// in order to do this reasonably correct
 	if ( ! m_slices.empty() )	{
-		m_selectedSlice = m_slices[ 0 ];
-		switch ( m_selectedSlice->status() )	{
+		m_currentSlice = 0;
+		LOG_TRACE << "StandardAuthenticator: authentication slice set to '"
+			  << m_slices[ m_currentSlice ]->identifier() << "'";
+		switch ( m_slices[ m_currentSlice ]->status() )	{
 			case AuthenticatorSlice::MESSAGE_AVAILABLE:
 				m_status = MESSAGE_AVAILABLE;
+				LOG_TRACE << "StandardAuthenticator: status is MESSAGE_AVAILABLE";
 				break;
 			case AuthenticatorSlice::AWAITING_MESSAGE:
 				m_status = AWAITING_MESSAGE;
+				LOG_TRACE << "StandardAuthenticator: status is AWAITING_MESSAGE";
 				break;
 			case AuthenticatorSlice::AUTHENTICATED:
-				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is AUTHENTICATED" );
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is AUTHENTICATED at initialization";
 				m_status = SYSTEM_FAILURE;
+				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is AUTHENTICATED" );
 				break;
 			case AuthenticatorSlice::INVALID_CREDENTIALS:
-				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is INVALID_CREDENTIALS" );
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is INVALID_CREDENTIALS at initialization";
 				m_status = SYSTEM_FAILURE;
+				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is INVALID_CREDENTIALS" );
 				break;
 			case AuthenticatorSlice::SYSTEM_FAILURE:
-				LOG_DEBUG << "StandardAuthenticator: authentication slice '"
-					  << m_selectedSlice->typeName() << "' status is SYSTEM_FAILURE";
+				LOG_WARNING << "StandardAuthenticator: authentication slice '"
+					    << m_slices[ m_currentSlice ]->identifier() << "' status is SYSTEM_FAILURE";
 				m_status = SYSTEM_FAILURE;
 				break;
 		}
@@ -233,8 +241,8 @@ void StandardAuthenticator::messageIn( const std::string& message )
 
 	if ( m_status != AWAITING_MESSAGE )
 		throw std::logic_error( "StandardAuthenticator: unexpected message received" );
-	if ( m_selectedSlice != NULL )
-		m_selectedSlice->messageIn( message );
+	if ( m_currentSlice >= 0 )
+		m_slices[ m_currentSlice ]->messageIn( message );
 	else
 		throw std::logic_error( "StandardAuthenticator: message received but no authentication slice selected" );
 }
@@ -246,9 +254,9 @@ const std::string& StandardAuthenticator::messageOut()
 
 	if ( m_status != MESSAGE_AVAILABLE )
 		throw std::logic_error( "StandardAuthenticator: unexpected request for output message" );
-	if ( m_selectedSlice == NULL )
+	if ( m_currentSlice < 0 )
 		throw std::logic_error( "StandardAuthenticator: message requested but no authentication slice selected" );
-	return m_selectedSlice->messageOut();
+	return m_slices[ m_currentSlice ]->messageOut();
 }
 
 // The authenticated user or NULL if not authenticated

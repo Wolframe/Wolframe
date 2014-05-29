@@ -86,7 +86,7 @@ private:
 
 	Authenticator::Status			m_status;
 	std::vector< AuthenticatorSlice* >	m_slices;
-	AuthenticatorSlice*			m_selectedSlice;
+	int					m_currentSlice;
 	AAAA::User*				m_user;
 };
 
