@@ -205,7 +205,9 @@ done
 cd $PKGBUILD/PKG/wolframe-$VERSION
 
 pkgmk -o -r .
+check_for_errors
 pkgtrans -s /var/spool/pkg $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$OSARCH-$OSVER.pkg WFRGwolfrm
+check_for_errors
 
 compress -f $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$OSARCH-$OSVER.pkg
 
