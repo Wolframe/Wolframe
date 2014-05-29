@@ -839,7 +839,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 	}
 	catch (const std::runtime_error& err)
 	{
-		m_lastError = "failed to evaluate input document type";
+		setLastError( "failed to evaluate input document type");
 		LOG_ERROR << "error in document type recognition: " << err.what();
 		m_state = Done;
 	}
