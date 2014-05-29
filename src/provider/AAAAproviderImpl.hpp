@@ -57,7 +57,8 @@ class StandardAuthenticator : public Authenticator
 {
 public:
 	StandardAuthenticator( const std::vector<std::string>& mechs_,
-			       const std::list< AuthenticationUnit* >& units_ );
+			       const std::list< AuthenticationUnit* >& units_,
+			       const net::RemoteEndpoint& client_ );
 
 	~StandardAuthenticator();
 	void destroy();
@@ -66,8 +67,7 @@ public:
 	virtual const std::vector<std::string>& mechs() const;
 
 	/// Set the authentication mech
-	virtual bool setMech( const std::string& mech,
-			      const net::RemoteEndpoint& client  );
+	virtual bool setMech( const std::string& mech );
 
 	/// The input message
 	virtual void messageIn( const std::string& message );
@@ -83,6 +83,7 @@ public:
 private:
 	const std::vector< std::string >&	m_mechs;
 	const std::list< AuthenticationUnit* >&	m_authUnits;
+	const net::RemoteEndpoint&		m_client;
 
 	Authenticator::Status			m_status;
 	std::vector< AuthenticatorSlice* >	m_slices;
@@ -98,7 +99,7 @@ public:
 	~AuthenticationFactory();
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authenticator* authenticator();
+	Authenticator* authenticator( const net::RemoteEndpoint& client );
 private:
 	std::list< AuthenticationUnit* >	m_authUnits;
 	std::vector< std::string >		m_mechs;
@@ -173,7 +174,8 @@ public:
 	~AAAAprovider_Impl()				{}
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authenticator* authenticator()		{ return m_authenticator.authenticator(); }
+	Authenticator* authenticator( const net::RemoteEndpoint& client )
+						{ return m_authenticator.authenticator( client ); }
 	Authorizer* authorizer()		{ return m_authorizer.authorizer(); }
 	Auditor* auditor()			{ return m_auditor.auditor(); }
 private:

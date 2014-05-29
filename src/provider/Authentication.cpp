@@ -109,17 +109,18 @@ bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 }
 
 
-Authenticator* AuthenticationFactory::authenticator()
+Authenticator* AuthenticationFactory::authenticator( const net::RemoteEndpoint& client )
 {
-	return new StandardAuthenticator( m_mechs, m_authUnits );
+	return new StandardAuthenticator( m_mechs, m_authUnits, client );
 }
 
 
 //*********************************************************************************
 // Standard authenticator
 StandardAuthenticator::StandardAuthenticator( const std::vector<std::string>& mechs_,
-					      const std::list<AuthenticationUnit *> &units_ )
-	: m_mechs( mechs_ ), m_authUnits( units_ ),
+					      const std::list<AuthenticationUnit *> &units_,
+					      const net::RemoteEndpoint &client_ )
+	: m_mechs( mechs_ ), m_authUnits( units_ ), m_client( client_ ),
 	  m_status( INITIALIZED ), m_currentSlice( -1 ), m_user( NULL )
 {
 }
@@ -145,8 +146,7 @@ const std::vector< std::string >& StandardAuthenticator::mechs() const
 }
 
 // Set the authentication mech
-bool StandardAuthenticator::setMech( const std::string& mech,
-				     const net::RemoteEndpoint& client  )
+bool StandardAuthenticator::setMech( const std::string& mech )
 {
 	// Reset all data
 	if ( m_user )
@@ -184,7 +184,7 @@ bool StandardAuthenticator::setMech( const std::string& mech,
 
 	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authUnits.begin();
 							it != m_authUnits.end(); it++ )	{
-		AuthenticatorSlice* slice = (*it)->slice( mech, client );
+		AuthenticatorSlice* slice = (*it)->slice( mech, m_client );
 		if ( slice != NULL )	{
 			LOG_TRACE << "StandardAuthenticator: authentication mechanism '"
 				  << mech << "' provided by '" << (*it)->className();

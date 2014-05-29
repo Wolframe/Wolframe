@@ -91,8 +91,7 @@ public:
 	/// \note	This function works like a reset function
 	///		Whenever it is called it will release all the allocated
 	///		resources and it will reinitialize all the data structures
-	virtual bool setMech( const std::string& mech,
-			      const net::RemoteEndpoint& client ) = 0;
+	virtual bool setMech( const std::string& mech ) = 0;
 
 	/// The input message
 	/// \param [in]	message	the input message

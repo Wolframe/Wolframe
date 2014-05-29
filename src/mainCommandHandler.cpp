@@ -118,7 +118,11 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
 	if (!m_authenticator.get())
 	{
-		m_authenticator.reset( execContext()->authenticator());
+		if (!m_remoteEndpoint)
+		{
+			throw std::logic_error("no remote endpoint set, cannot authenticate");
+		}
+		m_authenticator.reset( execContext()->authenticator( *m_remoteEndpoint ));
 		if (!m_authenticator.get())
 		{
 			out << "ERR AUTH denied" << endl();
@@ -174,10 +178,6 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		out << "ERR to many arguments for MECH" << endl();
 		return stateidx();
 	}
-	if (!m_remoteEndpoint)
-	{
-		throw std::logic_error("no remote endpoint set, cannot authenticate");
-	}
 	if (0==std::strcmp(argv[0],"NONE"))
 	{
 		out << "OK no authentication";
@@ -185,7 +185,7 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 	}
 	else
 	{
-		if (!m_authenticator->setMech( argv[0], *m_remoteEndpoint))
+		if (!m_authenticator->setMech( argv[0] ))
 		{
 			out << "ERR denied" << endl();
 			out << "MECHS NONE " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
