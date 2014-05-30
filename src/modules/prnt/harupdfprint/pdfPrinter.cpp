@@ -174,7 +174,7 @@ class PrintFunctionClosure
 public:
 	explicit PrintFunctionClosure( const HaruPdfPrintFunction::Impl* func_)
 		:m_execContext(0)
-		,m_flags(serialize::Context::None)
+		,m_flags(serialize::Flags::None)
 		,m_state(0)
 		,m_document(func_->createDocument())
 		,m_func(func_)
@@ -287,7 +287,7 @@ public:
 		throw std::runtime_error( "internal: illegal state in print function closure automaton");
 	}
 
-	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f)
 	{
 		m_execContext = c;
 		m_input = i;
@@ -305,7 +305,7 @@ private:
 	langbind::TypedInputFilterR m_input;
 	std::string m_resultpdfcontent;
 	langbind::TypedInputFilterR m_result;
-	serialize::Context::Flags m_flags;
+	serialize::Flags::Enum m_flags;
 	int m_state;
 	boost::shared_ptr<Document> m_document;
 	VariableScope m_variableScope;

@@ -834,7 +834,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
 			FormFunctionClosureR closure( func->createClosure());
-			closure->init( execContext, inp, serialize::Context::ValidateAttributes);
+			closure->init( execContext, inp, serialize::Flags::ValidateAttributes);
 
 			while (!closure->call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
@@ -864,12 +864,12 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
 			serialize::DDLStructParser closure( &df);
-			closure.init( inp, serialize::Context::ValidateAttributes);
+			closure.init( inp, serialize::Flags::ValidateAttributes);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			serialize::DDLStructSerializer res( &df);
-			res.init( outp, serialize::Context::None);
+			res.init( outp, serialize::Flags::None);
 
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 			while (!flt.outputfilter()->close()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
