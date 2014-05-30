@@ -270,11 +270,11 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 					{
 						boost::shared_ptr<cmdbind::DoctypeDetectorType> type( dtcr->object());
 						m_doctypes.push_back( *type);
-						LOG_TRACE << "registered document type/format detector for '" << bld->name() << "' (" << (*it)->objectClassName() << ")";
+						LOG_TRACE << "registered document type/format detection for '" << bld->name() << "' (" << (*it)->objectClassName() << ")";
 					}
 					catch (const std::runtime_error& e)
 					{
-						LOG_ERROR << "error loading document type/format detector module object: " << e.what();
+						LOG_ERROR << "error loading document type/format detection object: " << e.what();
 					}
 				}
 				break;
