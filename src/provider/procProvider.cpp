@@ -43,6 +43,7 @@
 #include "appdevel/module/cppFormFunctionBuilder.hpp"
 #include "appdevel/module/normalizeFunctionBuilder.hpp"
 #include "appdevel/module/customDataTypeBuilder.hpp"
+#include "appdevel/module/doctypeDetectorBuilder.hpp"
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"
@@ -52,9 +53,136 @@
 
 #include <ostream>
 #include <string>
+#include <vector>
 
 using namespace _Wolframe;
 using namespace _Wolframe::proc;
+
+class CombinedDoctypeDetector
+	:public cmdbind::DoctypeDetector
+{
+public:
+	CombinedDoctypeDetector( const std::vector<cmdbind::DoctypeDetectorType>& dtlist)
+		:m_doctypes(&dtlist),m_nof_finished(0),m_got_eod(false)
+	{
+		std::vector<cmdbind::DoctypeDetectorType>::const_iterator di = dtlist.begin(), de = dtlist.end();
+		for (; di != de; ++di)
+		{
+			m_detectors.push_back( cmdbind::DoctypeDetectorR( di->create()));
+			m_finished.push_back( false);
+		}
+	}
+
+	/// \brief Implement cmdbind::DoctypeDetector::putInput( const std::string&,std::size)
+	virtual void putInput( const char* chunk, std::size_t chunksize, bool eof)
+	{
+		m_got_eod = eof;
+		std::vector<cmdbind::DoctypeDetectorR>::const_iterator di = m_detectors.begin(), de = m_detectors.end();
+		std::size_t idx = 0;
+		for (; di != de; ++di,++idx)
+		{
+			if (!m_finished.at(idx))
+			{
+				(*di)->putInput( chunk, chunksize, eof);
+			}
+		}
+	}
+
+	/// \brief Implement cmdbind::DoctypeDetector::run()
+	virtual bool run()
+	{
+		try
+		{
+			m_lastError.clear();
+			std::size_t idx = 0;
+			std::vector<cmdbind::DoctypeDetectorR>::const_iterator di = m_detectors.begin(), de = m_detectors.end();
+			for (; di != de; ++di,++idx)
+			{
+				if (!m_finished.at(idx))
+				{
+					if ((*di)->run())
+					{
+						if ((*di)->info().get())
+						{
+							//... we got a positive result
+							LOG_DEBUG << "document type/format detection matches for '" << m_doctypes->at(idx).name() << "'";
+							m_info = (*di)->info();
+							return true;
+						}
+						else
+						{
+							//... we got a negative result
+							LOG_DEBUG << "document type/format detection for '" << m_doctypes->at(idx).name() << "' returned negative result";
+							++m_nof_finished;
+							m_finished[ idx] = true;
+
+							if (m_nof_finished == m_finished.size())
+							{
+								//... all results are negative
+								LOG_DEBUG << "no document type/format detection returned a positive result";
+								return false;
+							}
+						}
+					}
+					else
+					{
+						const char* err = (*di)->lastError();
+						if (err)
+						{
+							m_lastError.append( err);
+							return false;
+						}
+						
+					}
+				}
+			}
+			if (m_got_eod)
+			{
+				//... no result after we processed the last chunk (after we got end of data)
+				//	we give up and return an error
+
+				di = m_detectors.begin();
+				for (; di != de; ++di,++idx)
+				{
+					if (!m_finished.at(idx))
+					{
+						LOG_DEBUG << "document type/format detection for '" << m_doctypes->at(idx).name() << "' returned negative result";
+					}
+				}
+				LOG_DEBUG << "no document type/format detection returned a positive result";
+
+				return false;
+			}
+		}
+		catch (const std::runtime_error& e)
+		{
+			m_lastError = std::string("exception while detecing document type: ") + e.what();
+		}
+		return false;
+	}
+
+	/// \brief Implement cmdbind::DoctypeDetector::lastError()
+	virtual const char* lastError() const
+	{
+		return m_lastError.empty()?0:m_lastError.c_str();
+	}
+
+	/// \brief Implement cmdbind::DoctypeDetector::info()
+	const boost::shared_ptr<types::DoctypeInfo>& info() const
+	{
+		return m_info;
+	}
+
+private:
+	const std::vector<cmdbind::DoctypeDetectorType>* m_doctypes;	///< list of sub document type detectors
+	std::vector<cmdbind::DoctypeDetectorR> m_detectors;		///< list of all detector instances
+	std::string m_lastError;					///< last error occurred
+	std::vector<bool> m_finished;					///< bit field marking document type recognition termination
+	std::size_t m_nof_finished;					///< count of finished document type detection processes (number of elements in m_nof_finished set to 'true')
+	bool m_got_eod;							///< true, if we got end of data
+	boost::shared_ptr<types::DoctypeInfo> m_info;			///< info object of the first positive match
+};
+
 
 ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 					const module::ModulesDirectory* modules,
@@ -63,8 +191,10 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 {
 	m_db = NULL;
 	if ( !conf->m_dbLabel.empty())
+	{
 		m_dbLabel = conf->m_dbLabel;
-	m_programfiles = conf->programFiles();
+	}
+	m_programfiles.insert( m_programfiles.end(), conf->programFiles().begin(), conf->programFiles().end());
 
 	// Build the list of command handlers and runtime environments (configured objects)
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
@@ -117,6 +247,38 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 	for ( module::ModulesDirectory::simpleBuilder_iterator it = modules->objectsBegin();
 								it != modules->objectsEnd(); it++ )	{
 		switch( it->objectType() )	{
+			case ObjectConstructorBase::DOCTYPE_DETECTOR_OBJECT:
+			{
+				// object defines a document type/format detector
+				const module::DoctypeDetectorBuilder* bld = dynamic_cast<const module::DoctypeDetectorBuilder*>( *it);
+				if (!bld)
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "' is not a document type/format detector";
+					throw std::logic_error( "Object is not a document type/format detector. See log." );
+				}
+				module::DoctypeDetectorConstructorR dtcr( dynamic_cast<module::DoctypeDetectorConstructor*>((*it)->constructor()));
+				if (!dtcr.get())
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "' is not a document type/format detector";
+					throw std::logic_error( "Object is not a document type/format detector. See log." );
+				}
+				else
+				{
+					try
+					{
+						boost::shared_ptr<cmdbind::DoctypeDetectorType> type( dtcr->object());
+						m_doctypes.push_back( *type);
+						LOG_TRACE << "registered document type/format detector for '" << bld->name() << "' (" << (*it)->objectClassName() << ")";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_ERROR << "error loading document type/format detector module object: " << e.what();
+					}
+				}
+				break;
+			}
 			case ObjectConstructorBase::FILTER_OBJECT:	{	// object is a filter
 				module::FilterConstructorR fltr( dynamic_cast< module::FilterConstructor* >((*it)->constructor()));
 				if (!fltr.get())	{
@@ -392,6 +554,11 @@ bool ProcessorProvider::guessDocumentFormat( std::string& result, const char* co
 		result = "text";
 		return false;
 	}
+}
+
+cmdbind::DoctypeDetector* ProcessorProvider::doctypeDetector() const
+{
+	return new CombinedDoctypeDetector( m_doctypes);
 }
 
 cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& command, const std::string& docformat) const

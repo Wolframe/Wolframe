@@ -45,15 +45,66 @@ namespace cmdbind {
 /// \brief Interface to document type and format detection.
 struct DoctypeDetector
 {
-public:
-	/// \brief Try to detect the document type format
-	/// \param[in] data document to process as UTF-8 string
-	/// \return true, if the detection process has come to a result (negative or positive), false if the detection process needs more data
-	virtual bool detect( const std::string& data)=0;
+	/// \brief Destructor
+	virtual ~DoctypeDetector(){}
+
+	/// \brief Feed document type detection with more data
+	/// \param[in] chunk first/next chunk of data of the document to process
+	/// \param[in] chunksize size of chunk in bytes
+	/// \remark The implementation does not have to buffer the input because run is called when references to chunk are still valid
+	virtual void putInput( const char* chunk, std::size_t chunksize, bool eof)=0;
+
+	/// \brief Start or continue running the document type and format detection
+	/// \return true, if the detection process has come to a result (negative or positive), false if the detection process needs more data or there was an error (check with 'lastError()'
+	virtual bool run()=0;
+
+	/// \brief Get the last error occurred
+	/// \note Use this function to check for an error if 'run()' returned false
+	/// \return the message or NULL if there was no error
+	virtual const char* lastError() const=0;
 
 	/// \brief Get the result of document type and format recognition
 	/// \return a doctype info reference in case of successful recognition, null in case of document format not recognized
-	const boost::shared_ptr<types::DoctypeInfo>& info() const=0;
+	virtual const boost::shared_ptr<types::DoctypeInfo>& info() const=0;
+};
+
+/// \brief Shared doctype detector reference
+typedef boost::shared_ptr<DoctypeDetector> DoctypeDetectorR;
+
+/// \brief Constructor function for doctype detector instance
+typedef DoctypeDetector* (*CreateDoctypeDetector)();
+
+
+/// \class DoctypeDetectorType
+/// \brief Constructor as class
+class DoctypeDetectorType
+{
+public:
+	/// \brief Default constructor
+	DoctypeDetectorType()
+		:m_create(0){}
+	/// \brief Constructor
+	DoctypeDetectorType( const std::string& name_, CreateDoctypeDetector create_)
+		:m_name(name_),m_create(create_){}
+
+	DoctypeDetectorType( const DoctypeDetectorType& o)
+		:m_name(o.m_name),m_create(o.m_create){}
+
+	/// \brief Create an instance
+	DoctypeDetector* create() const
+	{
+		return m_create();
+	}
+
+	/// \brief Get the doctype detector name (usually docformat name)
+	const std::string& name() const
+	{
+		return m_name;
+	}
+
+private:
+	std::string m_name;
+	CreateDoctypeDetector m_create;
 };
 
 }}//namespace

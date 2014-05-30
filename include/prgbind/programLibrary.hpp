@@ -46,7 +46,7 @@
 #include "types/customDataType.hpp"
 #include "prgbind/program.hpp"
 #include <string>
-#include <list>
+#include <vector>
 
 
 namespace _Wolframe {
@@ -107,7 +107,7 @@ public:
 	virtual const langbind::FilterType* getFilterType( const std::string& name) const;
 
 	/// \brief Load all programs passed in 'filenames'
-	virtual void loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames);
+	virtual void loadPrograms( db::Database* transactionDB, const std::vector<std::string>& filenames);
 
 private:
 	class Impl;
