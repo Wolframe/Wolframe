@@ -67,8 +67,8 @@ test: all
 
 .PHONY: testreport
 testreport:
-	WOLFRAME_TESTREPORT_DIR=$(TOPDIR)/tests/reports/ \
-	GTEST_OUTPUT=xml:$(TOPDIR)/tests/reports/ \
+	WOLFRAME_TESTREPORT_DIR=$(CURDIR)/tests/reports/ \
+	GTEST_OUTPUT=xml:$(CURDIR)/tests/reports/ \
 		$(MAKE) -r test
 	@tests/reports/generateTestReport.sh
 
