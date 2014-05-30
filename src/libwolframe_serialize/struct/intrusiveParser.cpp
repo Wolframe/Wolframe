@@ -170,7 +170,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 		case langbind::InputFilter::OpenTag:
 		{
 			StructDescriptionBase::Map::const_iterator itr;
-			if (ctx.flag( Context::CaseInsensitiveCompare))
+			if (ctx.flag( serialize::Flags::CaseInsensitiveCompare))
 			{
 				itr = descr->find_cis( element.tostring());
 			}
@@ -185,7 +185,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 			std::size_t idx = itr - descr->begin();
 			if (idx < descr->nof_attributes())
 			{
-				if (ctx.flag( Context::ValidateAttributes))
+				if (ctx.flag( serialize::Flags::ValidateAttributes))
 				{
 					throw SerializationErrorException( "attribute element expected", element.tostring(), StructParser::getElementPath( stk));
 				}
@@ -209,7 +209,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 		case langbind::InputFilter::Attribute:
 		{
 			StructDescriptionBase::Map::const_iterator itr;
-			if (ctx.flag( Context::CaseInsensitiveCompare))
+			if (ctx.flag( serialize::Flags::CaseInsensitiveCompare))
 			{
 				itr = descr->find_cis( element.tostring());
 			}
@@ -224,7 +224,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 			std::size_t idx = itr - descr->begin();
 			if (idx >= descr->nof_attributes())
 			{
-				if (ctx.flag( Context::ValidateAttributes))
+				if (ctx.flag( serialize::Flags::ValidateAttributes))
 				{
 					throw SerializationErrorException( "content element expected", element.tostring(), StructParser::getElementPath( stk));
 				}
@@ -277,7 +277,7 @@ bool serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind:
 					throw SerializationErrorException( "undefined structure element", itr->first, StructParser::getElementPath( stk));
 				}
 			}
-			if (ctx.flag( Context::ValidateInitialization))
+			if (ctx.flag( serialize::Flags::ValidateInitialization))
 			{
 				for (;itr != end; ++itr)
 				{

@@ -58,7 +58,7 @@ public:
 
 	virtual bool call();
 
-	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None);
+	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f=serialize::Flags::None);
 
 	virtual langbind::TypedInputFilterR result() const;
 

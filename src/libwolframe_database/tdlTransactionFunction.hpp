@@ -71,7 +71,7 @@ public:
 
 	virtual bool call();
 
-	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f);
+	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f);
 
 	virtual langbind::TypedInputFilterR result() const;
 
@@ -84,7 +84,7 @@ private:
 	InputStructure* m_inputstructptr;			///< input structure implementation interface
 	langbind::TypedOutputFilterR m_inputstruct;		///< input structure
 	langbind::TypedInputFilterR m_result;			///< function call result
-	serialize::Context::Flags m_flags;			///< flags for input serialization
+	serialize::Flags::Enum m_flags;				///< flags for input serialization
 };
 
 /// \class TdlTransactionFunction
