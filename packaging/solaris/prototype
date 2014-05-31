@@ -55,6 +55,7 @@ f none opt/csw/lib/wolframe/modules/mod_db_postgresql.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_db_sqlite3.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_datatype_datetime.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_datatype_bcdnumber.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_doctype_xml.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_filter_blob.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_filter_textwolf.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_filter_token.so 0775 root staff
@@ -188,6 +189,7 @@ f none opt/csw/include/wolframe/logger/logLevel.hpp 0644 root staff
 f none opt/csw/include/wolframe/logger/logObject.hpp 0644 root staff
 f none opt/csw/include/wolframe/logger/logSyslogFacility.hpp 0644 root staff
 d none opt/csw/include/wolframe/utils 0755 root root
+f none opt/csw/include/wolframe/utils/asciiCharParser.hpp 0644 root staff
 f none opt/csw/include/wolframe/utils/allocators.hpp 0644 root staff
 f none opt/csw/include/wolframe/utils/fileLineInfo.hpp 0644 root staff
 f none opt/csw/include/wolframe/utils/fileUtils.hpp 0644 root staff
@@ -203,6 +205,7 @@ d none opt/csw/include/wolframe/serialize 0755 root root
 f none opt/csw/include/wolframe/serialize/cppFormFunction.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/ddlFormParser.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/ddlFormSerializer.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/flags.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/mapContext.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/serializationErrorException.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/structOptionParser.hpp 0644 root staff
