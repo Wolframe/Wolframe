@@ -11,10 +11,12 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lwfsingleton \
 	-lwolframe
 
 DYNAMIC_MODULE = mod_doctype_xml.so

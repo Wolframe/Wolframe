@@ -43,8 +43,10 @@ namespace cmdbind {
 
 /// \class DoctypeDetector
 /// \brief Interface to document type and format detection.
-struct DoctypeDetector
+class DoctypeDetector
 {
+	public:
+	
 	/// \brief Destructor
 	virtual ~DoctypeDetector(){}
 
