@@ -7,7 +7,7 @@
 	<item>Im Französischen gibt es Buchstaben wie "ç" "è" "à" "ë" (e tréma)</item>
 	<item>Im Deutschen sind es die Umlate wie "Ü" "Ä" "Ö"</item>
 </doc>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf run
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 
 **file:wolframe.conf
 LoadModules

@@ -35,7 +35,8 @@ Project Wolframe.
 #include "xsltMapper.hpp"
 #include "inputfilterImpl.hpp"
 #include "outputfilterImpl.hpp"
-#include "processor/procProvider.hpp"
+#include "filter/bufferingfilter.hpp"
+#include "prgbind/programLibrary.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/shared_ptr.hpp>

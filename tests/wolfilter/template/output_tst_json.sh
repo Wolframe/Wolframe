@@ -30,7 +30,7 @@ topdir=`dirname $PWD/$0`"/../../../../"
 filter="cjson"
 if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 	modpath="../../src/modules"
-	testcmd="--module $modpath/filter/cjson/mod_filter_cjson $testcmd"
+	testcmd="--module $modpath/filter/cjson/mod_filter_cjson --module $modpath/doctype/json/mod_doctype_json $testcmd"
 fi
 
 testname="$TESTNAME""_cjson"

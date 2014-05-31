@@ -59,12 +59,12 @@ public:
 	static std::string getElementPath( const SerializeStateStack& stk);
 
 	/// \brief Serialize start initialization
-	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
+	void init( const langbind::TypedOutputFilterR& out, serialize::Flags::Enum flags=serialize::Flags::None);
 	void reset();
 
 	/// \brief Call of one processing step the serializer
 	/// \remark The processing is finished when the call returns true. In case of false returned you have to inspect the output filter state to determine what is to do next.
-	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,Context::Flags)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
+	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,serialize::Flags)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
 	bool call();
 
 	/// \brief Get a self copy
@@ -72,12 +72,12 @@ public:
 	virtual langbind::TypedInputFilter* copy() const;
 
 	/// \brief Get the next element of the serialization, implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,types::VariantConst&)
-	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,Context::Flags)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
+	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,serialize::Flags)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
 	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
 
-	/// \brief Set the flags stearing the serialization, implements FilterBase::setFlags()
+	/// \brief Set the flags stearing the serialization, implements FilterBase::setFlags(FilterBase::Flags)
 	/// \return false, if not all flags have the behaviour implemented and are accepted 
-	virtual bool setFlags( Flags f);
+	virtual bool setFlags( FilterBase::Flags f);
 
 private:
 	const void* m_ptr;

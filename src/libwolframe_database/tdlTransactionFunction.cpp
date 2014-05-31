@@ -274,7 +274,7 @@ std::string inputfilter_logtext( const langbind::TypedInputFilterR& inp)
 	return out.str();
 }
 
-void TdlTransactionFunctionClosure::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+void TdlTransactionFunctionClosure::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f)
 {
 	m_context = c;
 	m_inputstructptr = new TdlTransactionFunctionClosure::InputStructure( m_func);
@@ -357,7 +357,7 @@ TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransacti
 	,m_state(0)
 	,m_input(false/*doPrintFinalClose*/)
 	,m_inputstructptr(0)
-	,m_flags(serialize::Context::None)
+	,m_flags(serialize::Flags::None)
 	{}
 
 TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransactionFunctionClosure& o)

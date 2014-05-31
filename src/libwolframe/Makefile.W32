@@ -48,6 +48,7 @@ TYPE_OBJS = \
 	types\form.obj
 
 UTIL_OBJS = \
+	utils\asciiCharParser.obj \
 	utils\fileLineInfo.obj \
 	utils\sourceLineInfo.obj \
 	utils\typeSignature.obj \

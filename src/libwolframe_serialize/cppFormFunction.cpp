@@ -83,7 +83,7 @@ CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunctionClosure& o)
 	,m_context(o.m_context)
 	{}
 
-void CppFormFunctionClosure::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Context::Flags flags)
+void CppFormFunctionClosure::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum flags)
 {
 	m_context = c;
 	m_parser.init(i,flags);

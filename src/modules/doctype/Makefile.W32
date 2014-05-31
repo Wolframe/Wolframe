@@ -1,0 +1,15 @@
+TOPDIR = ..\..\..
+
+SUBDIRS = xml json
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:

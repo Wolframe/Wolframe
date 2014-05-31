@@ -39,6 +39,7 @@
 #include <vector>
 #include <errno.h>
 #include <cstdio>
+#include <cstdlib>
 #include "gtest/gtest.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>

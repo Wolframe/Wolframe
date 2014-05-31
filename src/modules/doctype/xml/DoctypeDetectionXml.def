@@ -1,0 +1,4 @@
+LIBRARY mod_doctype_xml
+
+EXPORTS
+entryPoint	@1

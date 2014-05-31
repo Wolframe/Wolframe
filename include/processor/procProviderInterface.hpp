@@ -61,6 +61,8 @@ namespace cmdbind
 {
 /// \brief Forward declaration
 class CommandHandler;
+/// \brief Forward declaration
+class DoctypeDetector;
 }
 
 namespace proc {
@@ -118,6 +120,9 @@ public:
 	/// \param[out] result document format as string
 	/// \return true, if decision was possible, false, if more data is needed
 	virtual bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const=0;
+	/// \brief Create a new document type and format detector (defined in modules)
+	/// \return a document type and format detector reference allocated (owned and deleted by the caller)
+	virtual cmdbind::DoctypeDetector* doctypeDetector() const=0;
 	/// \brief Get the application configuration reference path
 	/// \return the reference path
 	virtual const std::string& referencePath() const=0;

@@ -39,7 +39,7 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-Context::Context( Flags f)
+Context::Context( Flags::Enum f)
 	:m_flags(f)
 	,m_has_elem(false)
 {}
