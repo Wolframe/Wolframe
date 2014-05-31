@@ -518,30 +518,6 @@ const types::CustomDataType* ProcessorProvider::customDataType( const std::strin
 	return m_programs->getCustomDataType( name);
 }
 
-bool ProcessorProvider::guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const
-{
-	//PF:HACK: Currently very very simple hardcoded guesser
-	//TODO Replace by module based guessers that implement also document type recognition
-	std::size_t ii=0;
-	for (; ii<contentsize && content[ii] == 0; ++ii){}
-	if (ii == contentsize) return false;
-	if (content[ii] == '<')
-	{
-		result = "xml";
-		return true;
-	}
-	else if (content[ii] == '{')
-	{
-		result = "json";
-		return true;
-	}
-	else
-	{
-		result = "text";
-		return false;
-	}
-}
-
 cmdbind::DoctypeDetector* ProcessorProvider::doctypeDetector() const
 {
 	return new CombinedDoctypeDetector( m_doctypes);

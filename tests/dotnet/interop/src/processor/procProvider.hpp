@@ -112,9 +112,9 @@ public:
 		return 0;
 	}
 
-	virtual bool guessDocumentFormat( std::string&, const char*, std::size_t) const
+	virtual cmdbind::DoctypeDetector* doctypeDetector() const
 	{
-		return false;
+		return 0;
 	}
 
 	virtual const std::string& referencePath() const
