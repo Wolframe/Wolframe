@@ -4,7 +4,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE data SYSTEM "www.blabla.com/AllDataRequest.dtd">
 <data/>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf AllDataRequest
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf AllDataRequest
 **requires:TEXTWOLF
 **file:wolframe.conf
 LoadModules

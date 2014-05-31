@@ -57,7 +57,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf typed_invoice
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf typed_invoice
 
 **file:wolframe.conf
 LoadModules

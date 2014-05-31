@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_TYPES_DOCTYPE_INFO_HPP_INCLUDED
 #define _Wolframe_TYPES_DOCTYPE_INFO_HPP_INCLUDED
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace types {
@@ -53,10 +54,24 @@ public:
 	/// \brief Default constructor
 	DoctypeInfo(){}
 
+	/// \brief Get the document format
+	const std::string& docformat() const
+	{
+		return m_docformat;
+	}
+
+	/// \brief Get the document type
+	const std::string& doctype() const
+	{
+		return m_doctype;
+	}
+
 private:
-	std::string m_docformat;
-	std::string m_doctype;
+	std::string m_docformat;	///< format of the document (e.g. 'XML','JSON','CSV',etc...)
+	std::string m_doctype;		///< type of the document (doctype identifier)
 };
+
+typedef boost::shared_ptr<DoctypeInfo> DoctypeInfoR;
 
 }}//namespace
 #endif

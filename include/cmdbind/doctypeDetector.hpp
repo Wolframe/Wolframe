@@ -54,7 +54,7 @@ class DoctypeDetector
 	/// \param[in] chunk first/next chunk of data of the document to process
 	/// \param[in] chunksize size of chunk in bytes
 	/// \remark The implementation does not have to buffer the input because run is called when references to chunk are still valid
-	virtual void putInput( const char* chunk, std::size_t chunksize, bool eof)=0;
+	virtual void putInput( const char* chunk, std::size_t chunksize)=0;
 
 	/// \brief Start or continue running the document type and format detection
 	/// \return true, if the detection process has come to a result (negative or positive), false if the detection process needs more data or there was an error (check with 'lastError()'
@@ -67,7 +67,7 @@ class DoctypeDetector
 
 	/// \brief Get the result of document type and format recognition
 	/// \return a doctype info reference in case of successful recognition, null in case of document format not recognized
-	virtual const boost::shared_ptr<types::DoctypeInfo>& info() const=0;
+	virtual const types::DoctypeInfoR& info() const=0;
 };
 
 /// \brief Shared doctype detector reference

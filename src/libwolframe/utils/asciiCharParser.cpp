@@ -34,6 +34,7 @@
 /// \brief Utility functions for guessing encoding and parsing ascii character in different encodings 
 #include "utils/asciiCharParser.hpp"
 #include <cstring>
+/*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::utils;
@@ -105,25 +106,23 @@ static AsciiCharParser::Encoding guessEncoding( const unsigned char* src, std::s
 	return AsciiCharParser::NONE;
 }
 
-void AsciiCharParser::putInput( const char* src, std::size_t srcsize, bool eof_)
+void AsciiCharParser::putInput( const char* src, std::size_t srcsize)
 {
 	m_src = src;
 	m_itr = 0;
 	m_end = srcsize;
-	m_eof = eof_;
 
-	if (m_encoding == NONE && m_itr == 0)
+	if (m_encoding == NONE)
 	{
-		std::size_t ii = 0;
-		while (m_bufsize < BufSize && ii < srcsize)
+		while (m_bufsize < BufSize && m_itr < m_end)
 		{
-			m_buf[ m_bufsize++] = (unsigned char)src[ ii++];
+			m_buf[ m_bufsize++] = (unsigned char)m_src[ m_itr++];
 		}
-		m_encoding = guessEncoding( m_buf, m_itr, m_end);
-		if (m_encoding != NONE && m_itr > 0)
+		std::size_t ii = 0;
+		m_encoding = guessEncoding( m_buf, ii, m_end);
+		if (m_encoding != NONE && ii > 0)
 		{
-			std::memmove( m_buf, m_buf + m_itr, m_bufsize - m_itr);
-			m_itr = 0;
+			std::memmove( m_buf, m_buf + ii, m_bufsize - ii);
 		}
 	}
 }
@@ -134,7 +133,7 @@ bool AsciiCharParser::prepareChar( unsigned int chrsize)
 	{
 		m_buf[ m_bufsize++] = (unsigned char)m_src[ m_itr++];
 	}
-	return (m_bufsize == chrsize);
+	return (m_bufsize >= chrsize);
 }
 
 void AsciiCharParser::consumeChar( unsigned int chrsize)
@@ -168,7 +167,7 @@ unsigned char AsciiCharParser::getNext()
 			break;
 		case UCS2BE:
 			if (!prepareChar( 2)) return 0;
-			rt = (m_buf[0] != 0 || m_buf[1] > 127)?0xFF:m_buf[0];
+			rt = (m_buf[0] != 0 || m_buf[1] > 127)?0xFF:m_buf[1];
 			consumeChar( 2);
 			break;
 		case UCS2LE:
@@ -178,7 +177,7 @@ unsigned char AsciiCharParser::getNext()
 			break;
 		case UCS4BE:
 			if (!prepareChar( 4)) return 0;
-			rt = (m_buf[0] != 0 || m_buf[1] != 0 || m_buf[2] != 0 || m_buf[3] > 127)?0xFF:m_buf[0];
+			rt = (m_buf[0] != 0 || m_buf[1] != 0 || m_buf[2] != 0 || m_buf[3] > 127)?0xFF:m_buf[3];
 			consumeChar( 4);
 			break;
 		case UCS4LE:
@@ -189,6 +188,4 @@ unsigned char AsciiCharParser::getNext()
 	}
 	return rt;
 }
-
-
 

@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS = xml
+SUBDIRS = xml json
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 

@@ -37,7 +37,7 @@
 			"issuedate":	"13.5.2006"
 		}]
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../wolfilter/modules//employee_assignment_convert//mod_employee_assignment_convert employee_assignment_convert
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json --module ../wolfilter/modules//employee_assignment_convert//mod_employee_assignment_convert employee_assignment_convert
 
 **requires:DISABLED NETBSD
 

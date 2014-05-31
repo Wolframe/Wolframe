@@ -161,9 +161,9 @@ public:
 	/// \brief Destructor
 	virtual ~DoctypeDetectorXml(){}
 
-	virtual void putInput( const char* chunk, std::size_t chunksize, bool eof)
+	virtual void putInput( const char* chunk, std::size_t chunksize)
 	{
-		m_charparser.putInput( chunk, chunksize, eof);
+		m_charparser.putInput( chunk, chunksize);
 	}
 
 	void setState( State state_)
@@ -506,14 +506,14 @@ public:
 		return m_lasterror.empty()?0:m_lasterror.c_str();
 	}
 
-	virtual const boost::shared_ptr<types::DoctypeInfo>& info() const
+	virtual const types::DoctypeInfoR& info() const
 	{
 		return m_info;
 	}
 
 private:
-	boost::shared_ptr<types::DoctypeInfo> m_info;
-	std::string m_lasterror;
+	types::DoctypeInfoR m_info;			///< the result of doctype detection
+	std::string m_lasterror;			///< the last error occurred
 	State m_state;					///< processing state machine state
 	utils::AsciiCharParser m_charparser;		///< character by caracter parser for source
 	std::string m_itembuf;				///< value item parsed (value depending on state)

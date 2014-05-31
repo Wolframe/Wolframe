@@ -36,7 +36,8 @@
 #define _Wolframe_MAIN_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
-#include "cmdbind/doctypeFilterCommandHandler.hpp"
+#include "doctypeFilterCommandHandler.hpp"
+#include "interfaceCommandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
 #include "AAAA/authentication.hpp"

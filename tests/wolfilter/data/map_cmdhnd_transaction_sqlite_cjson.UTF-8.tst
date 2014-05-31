@@ -47,7 +47,7 @@
 		}
 	]
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf schema_select_task_by_id
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json -c wolframe.conf schema_select_task_by_id
 
 **file:wolframe.conf
 LoadModules
