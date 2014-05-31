@@ -112,7 +112,7 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
 	if (!m_authenticator.get())
 	{
-		m_authenticator.reset( m_execContext->authenticator());
+		m_authenticator.reset( execContext()->authenticator());
 		if (!m_authenticator.get())
 		{
 			out << "ERR AUTH denied" << endl();
@@ -269,7 +269,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	LOG_DEBUG << "Got document type '" << info->doctype() << "' format '" << info->docformat() << "' command prefix '" << m_command << "'";
 	m_command.append(info->doctype());
 
-	cmdbind::CommandHandler* execch = m_execContext->provider()->cmdhandler( m_command, info->docformat());
+	cmdbind::CommandHandler* execch = execContext()->provider()->cmdhandler( m_command, info->docformat());
 	if (!execch)
 	{
 		std::ostringstream msg;
@@ -282,7 +282,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 			msg << "no command handler for '" << m_command << "'";
 		}
 		execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
-		execch->setExecContext( m_execContext);
+		execch->setExecContext( execContext());
 		if (m_commandtag.empty())
 		{
 			out << "ANSWER" << endl();
@@ -306,7 +306,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	{
 		const char* docformatptr = info->docformat().c_str();
 
-		execch->setExecContext( m_execContext);
+		execch->setExecContext( execContext());
 		execch->passParameters( m_command, 1, &docformatptr);
 		if (m_commandtag.empty())
 		{
@@ -371,7 +371,7 @@ int MainCommandHandler::doRequest( int argc, const char** argv, std::ostream& ou
 		}
 	}
 	CommandHandler* ch = (CommandHandler*)new cmdbind::DoctypeFilterCommandHandler();
-	ch->setExecContext( m_execContext);
+	ch->setExecContext( execContext());
 
 	delegateProcessing<&MainCommandHandler::endDoctypeDetection>( ch);
 	return stateidx();
