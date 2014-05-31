@@ -71,42 +71,17 @@ void InputFilterImpl::getRest( const void*& ptr, std::size_t& size, bool& end)
 
 bool InputFilterImpl::getValue( const char* id, std::string& val) const
 {
-	if (std::strcmp(id,"encoding") == 0 && m_encattr_defined)
-	{
-		val = types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
-		return true;
-	}
 	return Parent::getValue( id, val);
 }
 
-bool InputFilterImpl::getDocType( types::DocType& doctype)
+const types::DocMetaData* InputFilterImpl::getMetaData()
 {
 	if (!m_root.get())
 	{
 		setState( EndOfMessage);
-		return false;
+		return 0;
 	}
-	doctype = m_doctype;
-	return true;
-}
-
-bool InputFilterImpl::getMetadata()
-{
-	if (m_root.get())
-	{
-		return true;
-	}
-	else
-	{
-		setState( EndOfMessage);
-		return false;
-	}
-}
-
-const char* InputFilterImpl::getEncoding() const
-{
-	if (!m_encattr_defined) return 0;
-	return types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
+	return getMetaDataRef().get();
 }
 
 bool InputFilterImpl::setValue( const char* id, const std::string& value)
@@ -139,14 +114,13 @@ static types::String::Encoding guessCharsetEncoding( const void* content, std::s
 
 boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
 {
-	if (!m_encattr_defined || m_encattr.encoding == types::String::UTF8)
+	if (m_encattr.encoding == types::String::UTF8)
 	{
 		m_content = content;
 	}
 	else
 	{
-		m_content = types::StringConst( content.c_str(), content.size(), m_encattr.encoding, m_encattr.codepage)
-				.tostring();
+		m_content = types::StringConst( content.c_str(), content.size(), m_encattr.encoding, m_encattr.codepage).tostring();
 	}
 	cJSON_Context ctx;
 	cJSON* pp = cJSON_Parse( &ctx, m_content.c_str());
@@ -170,6 +144,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 {
 	try
 	{
+		setState( Start);
 		m_content.append( (const char*)content, contentsize);
 		if (end)
 		{
@@ -177,36 +152,40 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 			if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
 			m_encattr.encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
 			m_encattr.codepage = 0;
-			m_encattr_defined = true;
+			if (m_encattr.encoding != types::String::UTF8)
+			{
+				setAttribute( "encoding", m_encattr.encodingName());
+			}
 			m_root = parse( origcontent);
 			m_firstnode = m_root.get();
 			int nof_docattributes = 0;
 			bool encodingParsed = false;
+			bool doctypeParsed = false;
 	
 			if (!m_firstnode->string && !m_firstnode->valuestring && !m_firstnode->next && m_firstnode->type == cJSON_Object)
 			{
 				//CJSON creates a toplevel object for multiple root nodes:
 				m_firstnode = m_firstnode->child;
 			}
-			const char* rootelem = 0;
-			const char* doctypeid = 0;
-	
-			for (;;)
+
+			while (m_firstnode)
 			{
 				if (m_firstnode->string && m_firstnode->valuestring)
 				{
-					if (boost::iequals("doctype",m_firstnode->string))
+					if (boost::iequals("-doctype",m_firstnode->string))
 					{
 						++nof_docattributes;
-						if (doctypeid) throw std::runtime_error("duplicate 'doctype' definition");
-						doctypeid = m_firstnode->valuestring;
+						if (doctypeParsed) throw std::runtime_error("duplicate 'doctype' definition");
+						setDoctype( m_firstnode->valuestring);
 						m_firstnode = m_firstnode->next;
 						continue;
 					}
-					else if (boost::iequals("encoding", m_firstnode->string))
+					else if (boost::iequals("-encoding", m_firstnode->string))
 					{
 						++nof_docattributes;
 						types::String::EncodingAttrib ea = types::String::getEncodingFromName( m_firstnode->valuestring);
+						setAttribute( "encoding", m_firstnode->valuestring);
+
 						if (m_encattr.encoding != ea.encoding || ea.codepage != 0)
 						{
 							// ... encoding different than guessed. Parse again
@@ -226,22 +205,12 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 				}
 				break;
 			}
-			if (m_firstnode->string && !m_firstnode->next)
+			if (m_firstnode)
 			{
-				rootelem = m_firstnode->string;
+				m_stk.push_back( StackElement( m_firstnode));
 			}
-			if (doctypeid)
-			{
-				if (rootelem)
-				{
-					m_doctype = types::DocType( doctypeid, rootelem, types::DocType::SchemaPath());
-				}
-				else
-				{
-					setState( InputFilter::Error, "document type defined, but no singular root element");
-				}
-			}
-			m_stk.push_back( StackElement( m_firstnode));
+			LOG_DEBUG << "[cjson input] document meta data: {" << getMetaDataRef()->tostring() << "}";
+			setState( Open);
 		}
 	}
 	catch (const std::runtime_error& err)
@@ -302,7 +271,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 {
 	if (!m_root.get())
 	{
-		if (state() == Open)
+		if (state() != Error)
 		{
 			setState( EndOfMessage);
 		}
@@ -520,6 +489,15 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 					return true;
 			}
 		}
+	}
+	if (!m_done)
+	{
+		//... emit final close
+		type = InputFilter::CloseTag;
+		element = 0;
+		elementsize = 0;
+		m_done = true;
+		return true;
 	}
 	return false;
 }

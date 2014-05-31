@@ -325,38 +325,6 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 	LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
-void PostgreSQLdbUnit::loadProgram( const std::string& filename )
-{
-	// No program file, do nothing
-	if ( filename.empty())
-		return;
-	if ( !boost::filesystem::exists( filename ))	{
-		LOG_ALERT << "Program file '" << filename
-			      << "' does not exist (PostgreSQL database '" << m_ID << "')";
-		return;
-	}
-	try
-	{
-		addProgram( utils::readSourceFileContent( filename));
-	}
-	catch (const std::runtime_error& e)
-	{
-		throw std::runtime_error( std::string("error in program '") + utils::getFileStem(filename) + "':" + e.what());
-	}
-}
-
-void PostgreSQLdbUnit::loadAllPrograms()
-{
-	std::vector<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
-	for (; pi != pe; ++pi)
-	{
-		LOG_DEBUG << "Load Program '" << *pi << "' for PostgreSQL database unit '" << m_ID << "'";
-		loadProgram( *pi);
-	}
-	LOG_DEBUG << "Programs for PostgreSQL database unit '" << m_ID << "' loaded";
-}
-
-
 Database* PostgreSQLdbUnit::database()
 {
 	return m_db.hasUnit() ? &m_db : NULL;
@@ -371,27 +339,6 @@ const std::string& PostgreSQLdatabase::ID() const
 		return m_unit->ID();
 	else
 		throw std::runtime_error( "PostgreSQL database unit not initialized" );
-}
-
-void PostgreSQLdatabase::loadProgram( const std::string& filename )
-{
-	if ( !m_unit )
-		throw std::runtime_error( "loadProgram: PostgreSQL database unit not initialized" );
-	m_unit->loadProgram( filename );
-}
-
-void PostgreSQLdatabase::loadAllPrograms()
-{
-	if ( !m_unit )
-		throw std::runtime_error( "loadAllPrograms: PostgreSQL database unit not initialized" );
-	m_unit->loadAllPrograms();
-}
-
-void PostgreSQLdatabase::addProgram( const std::string& program )
-{
-	if ( !m_unit )
-		throw std::runtime_error( "addProgram: PostgreSQL database unit not initialized" );
-	m_unit->addProgram( program );
 }
 
 Transaction* PostgreSQLdatabase::transaction( const std::string& name)

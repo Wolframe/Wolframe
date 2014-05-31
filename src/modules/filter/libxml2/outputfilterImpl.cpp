@@ -32,9 +32,40 @@ Project Wolframe.
 ///\file outputfilterImpl.cpp
 ///\brief Implementaion of output filter abstraction for the libxml2 library
 #include "outputfilterImpl.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
+
+OutputFilterImpl::OutputFilterImpl( const XsltMapper& xsltMapper_, const types::DocMetaDataR& inheritMetaData_)
+	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+	,OutputFilter("libxslt", inheritMetaData_)
+	,m_xsltMapper(xsltMapper_)
+	,m_taglevel(0)
+	,m_emptyDocument(false)
+	,m_elemitr(0)
+	{}
+
+OutputFilterImpl::OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
+	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+	,OutputFilter("libxml2", inheritMetaData_)
+	,m_taglevel(0)
+	,m_emptyDocument(false)
+	,m_elemitr(0)
+	{}
+
+OutputFilterImpl::OutputFilterImpl( const OutputFilterImpl& o)
+	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+	,OutputFilter(o)
+	,m_doc(o.m_doc)
+	,m_xsltMapper(o.m_xsltMapper)
+	,m_taglevel(o.m_taglevel)
+	,m_emptyDocument(o.m_emptyDocument)
+	,m_attribname(o.m_attribname)
+	,m_valuestrbuf(o.m_valuestrbuf)
+	,m_elembuf(o.m_elembuf)
+	,m_elemitr(o.m_elemitr)
+	{}
 
 bool OutputFilterImpl::flushBuffer()
 {
@@ -61,6 +92,93 @@ bool OutputFilterImpl::flushBuffer()
 	return rt;
 }
 
+void OutputFilterImpl::setXmlError( const char* msg)
+{
+	xmlError* err = xmlGetLastError();
+	if (err)
+	{
+		std::string msgstr = std::string(msg) + ": " + (const char*)err->message;
+		setState( Error, msgstr.c_str());
+	}
+	else
+	{
+		setState( Error, msg);
+	}
+}
+
+bool OutputFilterImpl::printHeader()
+{
+	types::DocMetaData md( getMetaData());
+	LOG_DEBUG << "[libxml2 output] document meta data: {" << md.tostring() << "}";
+	const char* standalone = md.getAttribute( "standalone");
+	const char* encoding = md.getAttribute( "encoding");
+	if (!encoding) encoding = "UTF-8";
+	const char* root = md.getAttribute( "root");
+	if (!root)
+	{
+		setState( Error, "no XML root element defined");
+		return false;
+	}
+
+	if (standalone && 0==std::strcmp( standalone, "yes"))
+	{
+		try
+		{
+			m_doc = DocumentWriter( encoding, root, 0/*public*/, 0/*system*/, 0/*xmlns*/, 0/*xsi*/, 0/*schemaLocation*/);
+		}
+		catch (const std::runtime_error& e)
+		{
+			setState( Error, e.what());
+			return false;
+		}
+	}
+	else
+	{
+		const char* doctype_public = md.getAttribute( "PUBLIC");
+		const char* doctype_system = md.getAttribute( "SYSTEM");
+		std::string doctype_system_buf;
+		if (doctype_system && !md.doctype().empty())
+		{
+			doctype_system_buf = types::DocMetaData::replaceStem( doctype_system, md.doctype());
+			doctype_system = doctype_system_buf.c_str();
+		}
+		const char* xmlns = md.getAttribute( "xmlns");
+		const char* xsi = md.getAttribute( "xmlns:xsi");
+		const char* schemaLocation = md.getAttribute( "xsi:schemaLocation");
+		std::string schemaLocation_buf;
+		if (schemaLocation && !md.doctype().empty())
+		{
+			schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
+			schemaLocation = schemaLocation_buf.c_str();
+		}
+		try
+		{
+			m_doc = DocumentWriter( encoding, root, doctype_public, doctype_system, xmlns, xsi, schemaLocation);
+		}
+		catch (const std::runtime_error& e)
+		{
+			setState( Error, e.what());
+			return false;
+		}
+	}
+	setState( Open);
+	m_taglevel = 1;
+	return true;
+}
+
+bool OutputFilterImpl::close()
+{
+	if (m_taglevel == 0)
+	{
+		return flushBuffer();
+	}
+	if (m_taglevel > 0)
+	{
+		return print( FilterBase::CloseTag, 0, 0);
+	}
+	return true;
+}
+
 bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t elementsize)
 {
 	bool rt = true;
@@ -68,73 +186,63 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 
 	if (!xmlout)
 	{
-		const char* ec = encoding();
-		if (m_doctype_root.size())
+		if (m_emptyDocument)
 		{
-			m_doc = DocumentWriter( ec?ec:"UTF-8", m_doctype_root.c_str(), m_doctype_public.size()?m_doctype_public.c_str():0, m_doctype_system.size()?m_doctype_system.c_str():0);
-		}
-		else
-		{
-			m_doc = DocumentWriter( ec?ec:"UTF-8");
-		}
-		xmlout = m_doc.get();
-		if (!xmlout)
-		{
-			setState( Error, "libxml2 filter: writer creation failed");
+			setState( Error, "libxml2 illegal print operation after final close (empty document)");
 			return false;
 		}
+		if (type == FilterBase::CloseTag)
+		{
+			m_emptyDocument = true;
+			return true;
+		}
+		if (!printHeader())
+		{
+			return false;
+		}
+		xmlout = m_doc.get();
 	}
-	if (m_taglevel == 0 && m_nofroot == 1)
+	if (m_taglevel == 0)
 	{
 		return flushBuffer();
 	}
 	switch (type)
 	{
-		case OutputFilter::OpenTag:
+		case FilterBase::OpenTag:
 			m_attribname.clear();
-			if (m_taglevel == 0)
-			{
-				if (m_nofroot > 0)
-				{
-					setState( Error, "libxml2 filter: multi root element error");
-					rt = false;
-				}
-				else
-				{
-					m_nofroot += 1;
-				}
-			}
 			if (0>xmlTextWriterStartElement( xmlout, getElement( element, elementsize)))
 			{
-				setState( Error, "libxml2 filter: write start element error");
+				setXmlError( "libxml2 write start element error");
 				rt = false;
 			}
 			m_taglevel += 1;
 			break;
 
-		case OutputFilter::Attribute:
+		case FilterBase::Attribute:
 			if (m_attribname.size())
 			{
-				setState( Error, "libxml2 filter: illegal operation");
+				setXmlError( "libxml2 illegal operation");
 				rt = false;
 			}
 			m_attribname.clear();
 			m_attribname.append( (const char*)element, elementsize);
 			break;
 
-		case OutputFilter::Value:
+		case FilterBase::Value:
 			if (m_attribname.empty())
 			{
 				if (0>xmlTextWriterWriteString( xmlout, getElement( element, elementsize)))
 				{
-					setState( Error, "libxml2 filter: write value error");
+					setXmlError( "libxml2 write value error");
 					rt = false;
+					break;
 				}
 			}
 			else if (0>xmlTextWriterWriteAttribute( xmlout, getXmlString(m_attribname), getElement( element, elementsize)))
 			{
-				setState( Error, "libxml2 filter: write attribute error");
+				setXmlError( "libxml2 write attribute error");
 				rt = false;
+				break;
 			}
 			else
 			{
@@ -142,40 +250,39 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			}
 			break;
 
-		case OutputFilter::CloseTag:
+		case FilterBase::CloseTag:
 			if (0>xmlTextWriterEndElement( xmlout))
 			{
-				setState( Error, "libxml2 filter: write close tag error");
+				setXmlError( "libxml2 write close tag error");
 				rt = false;
+				break;
 			}
-			else if (m_taglevel == 1)
+			m_taglevel -= 1;
+			if (m_taglevel == 0)
 			{
 				if (0>xmlTextWriterEndDocument( xmlout))
 				{
-					setState( Error, "libxml2 filter: write end document error");
+					setXmlError( "libxml2 write end document error");
 					rt = false;
+					break;
+				}
+#if WITH_LIBXSLT
+				if (m_xsltMapper.defined())
+				{
+					m_elembuf = m_xsltMapper.apply( m_doc.getContent());
 				}
 				else
 				{
-#if WITH_LIBXSLT
-					if (m_xsltMapper.defined())
-					{
-						m_elembuf = m_xsltMapper.apply( m_doc.getContent());
-					}
-					else
-					{
-						m_elembuf = m_doc.getContent();
-					}
-#else
 					m_elembuf = m_doc.getContent();
-#endif
-					m_elemitr = 0;
-					m_taglevel = 0;
-					return flushBuffer();
 				}
+#else
+				m_elembuf = m_doc.getContent();
+#endif
+				m_elemitr = 0;
+				m_taglevel = 0;
+				m_attribname.clear();
+				return flushBuffer();
 			}
-			m_taglevel -= 1;
-			m_attribname.clear();
 			break;
 
 		default:
@@ -185,51 +292,13 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 	return rt;
 }
 
-void OutputFilterImpl::setDocType( const types::DocType& doctype)
-{
-	m_doctype_root = doctype.root;
-	m_doctype_public = "";
-	m_doctype_system = doctype.schemaURL();
-}
-
-const char* OutputFilterImpl::encoding() const
-{
-	if (m_encoding.empty())
-	{
-		if (attributes())
-		{
-			return attributes()->getEncoding();
-		}
-		return 0;
-	}
-	else
-	{
-		return m_encoding.c_str();
-	}
-}
-
 bool OutputFilterImpl::getValue( const char* id, std::string& val) const
 {
-	if (std::strcmp( id, "encoding") == 0)
-	{
-		const char* ee = encoding();
-		if (ee)
-		{
-			val = ee;
-			return true;
-		}
-		return false;
-	}
 	return Parent::getValue( id, val);
 }
 
 bool OutputFilterImpl::setValue( const char* id, const std::string& value)
 {
-	if (std::strcmp( id, "encoding") == 0)
-	{
-		m_encoding = value;
-		return true;
-	}
 	return Parent::setValue( id, value);
 }
 

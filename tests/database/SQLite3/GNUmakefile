@@ -53,8 +53,6 @@ local_all:
 
 local_clean:
 	@-rm -f test.db garbage.db
-	@-rm -f gtestReport.txt
-	@-rm -f sqliteUnit*.xml
 
 local_distclean:
 

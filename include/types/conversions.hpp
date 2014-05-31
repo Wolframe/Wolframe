@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/conversions.hpp
-///\brief Conversions of atomic types
+/// \file types/conversions.hpp
+/// \brief Conversions of atomic types
 
 #ifndef _Wolframe_TYPES_CONVERSIONS_HPP_INCLUDED
 #define _Wolframe_TYPES_CONVERSIONS_HPP_INCLUDED
@@ -40,9 +40,21 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+/// \brief Get the value of an unsigned integer as string (throws on failure)
+/// \param[in] val the unsigned integer value to convert
+/// \return the value as string
 std::string tostring_cast( _WOLFRAME_UINTEGER val);
+/// \brief Get the value of a signed integer as string (throws on failure)
+/// \param[in] val the signed integer value to convert
+/// \return the value as string
 std::string tostring_cast( _WOLFRAME_INTEGER val);
+/// \brief Interprete a string as unsigned integer and return its value (throws on failure)
+/// \param[in] val the number string to convert
+/// \return the value as unsigned integer
 _WOLFRAME_UINTEGER touint_cast( const std::string& val);
+/// \brief Interprete a string as signed integer and return its value (throws on failure)
+/// \param[in] val the number string to convert
+/// \return the value as signed integer
 _WOLFRAME_INTEGER toint_cast( const std::string& val);
 
 }}//namespace

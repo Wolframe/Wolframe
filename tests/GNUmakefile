@@ -175,9 +175,8 @@ local_clean:
 	-rm -f *.o
 	-rm -f logTest.log
 	-rm -rf temp
-	-rm -f gtestReport.txt
-	-rm -f *.xml
-
+	-rm -f reports/gtestReport.txt reports/*.xml
+	
 local_distclean:
 
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/wtest"
@@ -194,6 +193,10 @@ ifeq ($(WITH_LIBXML2),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBXML2_LIB_DIR)"
 endif
 
+ifeq ($(WITH_LIBXSLT),1)
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBXSLT_LIB_DIR)"
+endif
+
 ifeq ($(WITH_LIBHPDF),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBHPDF_LIB_DIR)"
 endif
@@ -204,7 +207,6 @@ endif
 
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
-	@-rm -f gtestReport.txt
 	@mkdir -p temp
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testMethodMemberPointerTemplate
 	@echo

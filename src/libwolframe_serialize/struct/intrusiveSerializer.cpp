@@ -157,7 +157,7 @@ bool serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& 
 		}
 		else
 		{
-			if (itr->second.type() == StructDescriptionBase::Vector && !ctx.flag( Context::SerializeWithIndices))
+			if (itr->second.type() == StructDescriptionBase::Vector && !ctx.flag( serialize::Flags::SerializeWithIndices))
 			{
 				stk.back().state( idx+1);
 				stk.push_back( SerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
@@ -204,7 +204,7 @@ bool serialize::fetchObjectVectorElement( FetchElement fetchElement, const void*
 	bool rt = false;
 	std::size_t idx = stk.back().state();
 
-	if (ctx.flag( Context::SerializeWithIndices))
+	if (ctx.flag( serialize::Flags::SerializeWithIndices))
 	{
 		ctx.setElem( langbind::FilterBase::OpenTag, types::VariantConst( (unsigned int)idx+1));
 		stk.back().state( idx+1);

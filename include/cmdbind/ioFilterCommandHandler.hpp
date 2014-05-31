@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/ioFilterCommandHandler.hpp
-///\brief Command handler base class for processing content and writing output through filters
+/// \file cmdbind/ioFilterCommandHandler.hpp
+/// \brief Command handler base class for processing content and writing output through filters
 
 #ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
 #define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
@@ -43,14 +43,14 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class IOFilterCommandHandler
-///\brief Abstract class for command handler processing filter input/output
+/// \class IOFilterCommandHandler
+/// \brief Abstract class for command handler processing filter input/output
 class IOFilterCommandHandler :public CommandHandler
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	IOFilterCommandHandler(){}
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~IOFilterCommandHandler(){}
 
 	void setFilter( const langbind::InputFilterR& in)
@@ -75,6 +75,10 @@ public:
 
 	void setFilterAs( const langbind::InputFilterR& in)
 	{
+		if (m_inputfilter->state() != langbind::InputFilter::Start)
+		{
+			throw std::runtime_error( "cannot change input filter after first read");
+		}
 		// assign the rest of the input to the new filter attached:
 		const void* chunk;
 		std::size_t chunksize;
@@ -96,24 +100,28 @@ public:
 			throw e;
 		}
 		m_inputfilter.reset( incopy);
-		// synchronize attributes:
+		// synchronize inherited meta data:
 		if (m_outputfilter.get())
 		{
-			m_outputfilter->setAttributes( incopy);
+			m_outputfilter->inheritMetaData( incopy->getMetaDataRef());
 		}
 	}
 
 	void setFilterAs( const langbind::OutputFilterR& out)
 	{
+		if (m_outputfilter->state() != langbind::OutputFilter::Start)
+		{
+			throw std::runtime_error( "cannot change output filter after first print");
+		}
 		langbind::OutputFilter* of = out->copy();
 		of->assignState( *m_outputfilter);
 		m_outputfilter.reset( of);;
-		// synchronize attributes:
-		m_outputfilter->setAttributes( m_inputfilter.get());
+		// synchronize inherited meta data:
+		m_outputfilter->inheritMetaData( m_inputfilter->getMetaDataRef());
 	}
 
-	///\enum CallResult
-	///\brief Enumeration of call states of this application processor instance
+	/// \enum CallResult
+	/// \brief Enumeration of call states of this application processor instance
 	enum CallResult
 	{
 		Ok,		//< successful termination of call
@@ -127,8 +135,8 @@ public:
 		return ar[ (int)cr];
 	}
 
-	///\param[out] err error code in case of error
-	///\return CallResult status of the filter input for the state machine of this command handler
+	/// \param[out] err error code in case of error
+	/// \return CallResult status of the filter input for the state machine of this command handler
 	virtual CallResult call( const char*& err)=0;
 
 protected:

@@ -369,7 +369,7 @@ void Tdl2vmTranslator::begin_DO_subroutine( const std::string& name, const std::
 				sr.subroutine.substituteStatementTemplates( templateParamValues);
 			}
 			m_calledSubroutines.push_back( sr);
-			m_sub_program.add( *si->second.program());
+			m_sub_program.add( *sr.subroutine.program());
 		}
 		frameIdx = m_main_program.signatures.size();
 		m_main_program.signatures.push_back( m_calledSubroutines.at(subroutineIdx).subroutine.params());

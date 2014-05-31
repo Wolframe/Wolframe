@@ -35,7 +35,6 @@ Project Wolframe.
 #include "inputfilterImpl.hpp"
 #include "outputfilterImpl.hpp"
 #include "filter/bufferingfilter.hpp"
-#include "types/doctype.hpp"
 #include "types/countedReference.hpp"
 #include <cstddef>
 #include <cstring>
@@ -54,34 +53,55 @@ struct CJsonFilter :public Filter
 	CJsonFilter( const char* encoding=0)
 	{
 		m_inputfilter.reset( new InputFilterImpl());
-		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter.get());
-		m_outputfilter.reset( oo);
 		if (encoding)
 		{
-			oo->setEncoding( encoding);
+			m_inputfilter->setAttribute( "encoding", encoding);
 		}
+		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter->getMetaDataRef());
+		m_outputfilter.reset( oo);
 	}
 };
+
+static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
+{
+	const char* encoding = 0;
+	std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
+		{
+			if (encoding)
+			{
+				if (ai->first.empty())
+				{
+					throw std::runtime_error( "too many filter arguments");
+				}
+				else
+				{
+					throw std::runtime_error( "duplicate filter argument 'encoding'");
+				}
+			}
+			encoding = ai->second.c_str();
+			break;
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "unknown filter argument '") + ai->first + "'");
+		}
+	}
+	return encoding;
+}
 
 class CJsonFilterType :public FilterType
 {
 public:
-	CJsonFilterType(){}
+	CJsonFilterType()
+		:FilterType("cjson"){}
 	virtual ~CJsonFilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const
 	{
-		const char* encoding = 0;
-		std::vector<FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-		for (; ai != ae; ++ai)
-		{
-			if (ai->first.empty() || boost::algorithm::iequals( ai->first, "encoding"))
-			{
-				encoding = ai->second.c_str();
-				break;
-			}
-		}
-		return encoding?(new CJsonFilter( encoding)):(new CJsonFilter());
+		return new CJsonFilter( getArgumentEncoding( arg));
 	}
 };
 

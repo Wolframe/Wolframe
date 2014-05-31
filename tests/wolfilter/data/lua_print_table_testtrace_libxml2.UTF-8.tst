@@ -3,7 +3,8 @@
 **requires:LIBXML2
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE invoice SYSTEM "Invoice.simpleform">
+<!DOCTYPE doc SYSTEM "Invoice.simpleform">
+<doc>
 <invoice>
 <order>
 <number>INS03-62</number>
@@ -104,8 +105,9 @@
 <city>Z&#252;rich</city>
 <country>Switzerland</country>
 </address>
-</invoice>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf run
+</invoice>
+</doc>**config
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 
 **requires:LIBHPDF
 **file:wolframe.conf
@@ -135,57 +137,55 @@ Processor
 }
 **file:form.sfrm
 FORM Invoice
+	-root invoice
 {
-	invoice
+	order
 	{
-		order
+		number string
+		reference string
+		representative string
+		terms uint
+		issuedate string
+		duedate string
+		description string
+	}
+	item []
+	{
+		name string
+		description string
+		quantity uint
+		discount currency
+		price
 		{
-			number string
-			reference string
-			representative string
-			terms uint
-			issuedate string
-			duedate string
-			description string
-		}
-		item []
-		{
-			name string
-			description string
-			quantity uint
-			discount currency
-			price
+			unit currency
+			total currency
+			tax
 			{
-				unit currency
-				total currency
-				tax
-				{
-					description @string
-					_ percent_1
-				}
-				gross currency
+				description @string
+				_ percent_1
 			}
+			gross currency
 		}
-		bill
+	}
+	bill
+	{
+		price
 		{
-			price
-			{
-				total currency
-				tax currency
-				gross currency
-			}
-			payed currency
-			open currency
+			total currency
+			tax currency
+			gross currency
 		}
-		address []
-		{
-			id @string
-			name string
-			street string
-			postalcode uint
-			city string
-			country string
-		}
+		payed currency
+		open currency
+	}
+	address []
+	{
+		id @string
+		name string
+		street string
+		postalcode uint
+		city string
+		country string
 	}
 }
 **file:normalize.wnmp

@@ -1,34 +1,28 @@
 FORM CustomerListRequest
+	-root customer
 {
-	customer {
-	}
 }
 
 FORM CustomerList
+	-root list
 {
-	list { 
-		customer []
-		{
-			id !@string
-			name string
-			address string
-		}
-	}
-}
-
-FORM CustomerRequest
-{
-	customer {
-		id !@string
-	}
-}
-
-FORM Customer
-{
-	customer
+	customer []
 	{
 		id !@string
 		name string
 		address string
 	}
+}
+
+FORM CustomerRequest
+	-root customer
+{
+	id !@string
+}
+
+FORM Customer customer
+{
+	id !@string
+	name string
+	address string
 }

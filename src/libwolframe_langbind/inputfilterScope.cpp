@@ -42,8 +42,10 @@ bool InputFilterScope::getNext( ElementType& type, const void*& element, std::si
 	setState( InputFilter::Open);
 
 	InputFilter* ref = m_inputfilter.get();
-	if (m_taglevel == 0 || !ref)
+	if (m_taglevel <= 0 || !ref)
 	{
+		if (m_taglevel < 0) return false;
+		--m_taglevel;
 		type = InputFilter::CloseTag;
 		element = "";
 		elementsize = 0;

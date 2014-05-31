@@ -1,0 +1,2 @@
+COMMAND CustomerListRequest CALL SelectCustomerList RETURN STANDALONE list;
+COMMAND (Insert Customer) CALL insertCustomer RETURN CustomerInserted;

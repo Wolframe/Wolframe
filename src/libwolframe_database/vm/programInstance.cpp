@@ -33,6 +33,7 @@
 //\file vm/programInstance.cpp
 //\brief Implementation of the code executed as database input
 #include "database/vm/programInstance.hpp"
+#include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;

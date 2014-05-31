@@ -226,14 +226,14 @@ static void logNetwork( const char* title, const void* ptr, std::size_t size)
 				}
 				hexblk.push_back( hex[ ch / 16]);
 				hexblk.push_back( hex[ ch % 16]);
-				if ((eidx & 3) == 0) hexblk.push_back( ' ');
+				if ((eidx & 1) == 0) hexblk.push_back( ' ');
 			}
 			for (eidx=1; ci < 16; ++ci,++eidx)
 			{
 				chrblk.push_back( ' ');
 				hexblk.push_back( ' ');
 				hexblk.push_back( ' ');
-				if ((eidx & 3) == 0) hexblk.push_back( ' ');
+				if ((eidx & 1) == 0) hexblk.push_back( ' ');
 			}
 			std::string idxstr;
 			idxstr.push_back( hex[ (blkidx % 256) / 16]);
@@ -331,7 +331,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 /// Parse incoming data..
 void wolframeConnection::networkInput( const void* begin, std::size_t bytesTransferred )
 {
-	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
+	LOG_DATA << "network input got " << bytesTransferred << " bytes";
 	if ( _Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA)
 	{
 		logNetwork( "read", begin, bytesTransferred);

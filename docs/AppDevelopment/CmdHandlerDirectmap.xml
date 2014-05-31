@@ -59,15 +59,13 @@
 			<title>Keywords</title>
 			<para>
 			Conflicts with keywords and names are solved by using strings instead
-			of identifiers for names defined or alternatively by enclosing 
-			names of list of names in '(' ')' brackets.
-			The command description language has the following keywords:
+			of identifiers. The standard command handler description language has 
+			the following keywords:
 			<simplelist type="horiz" columns="1">
 			<member>COMMAND</member>
 			<member>CALL</member>
 			<member>RETURN</member>
 			<member>SKIP</member>
-			<member>STANDALONE</member>
 			<member>FILTER</member>
 			<member>INPUT</member>
 			<member>OUTPUT</member>
@@ -151,13 +149,9 @@
 			<title>Return a Standalone Document</title>
 			<para>
 				If we want to return a document as standalone 
-				(standalone="yes" in the header in case of XML) without validation
-				(validation depends on the document type) the we have to declare
-				this with <code>RETURN STANDALONE</code> instead of <code>RETURN SKIP</code>.
-				The argument of <code>RETURN STANDALONE</code> is the document
-				root element used in document format that need a root element 
-				to be declared (XML and JSON). The following example shows such
-				a declaration:
+				(standalone="yes" in the header in case of XML) without validation,
+				we have to declare this with explicit document meta data as
+				 <code>RETURN SKIP {standalone='yes',root='root'}</code>.
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_return_standalone.directmap" parse="text" />
 				</programlisting>

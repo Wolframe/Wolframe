@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/structParser.hpp
-///\brief Deserialization interface
+/// \file serialize/struct/structParser.hpp
+/// \brief Deserialization interface
 #ifndef _Wolframe_SERIALIZE_STRUCT_PARSER_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_PARSER_HPP_INCLUDED
 #include "serialize/struct/structDescriptionBase.hpp"
@@ -38,25 +38,35 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class StructParser
-///\brief Initializer of a structure based on a structure description feeded with a serialization
+/// \class StructParser
+/// \brief Initializer of a structure based on a structure description feeded with a serialization
 class StructParser
 {
 public:
 	typedef boost::shared_ptr<void> ObjectReference;
 
+	/// \brief Constructor
 	StructParser( void* obj, const StructDescriptionBase* descr);
+	/// \brief Constructor
 	StructParser( const ObjectReference& obj, const StructDescriptionBase* descr);
+	/// \brief Copy cnstructor
 	StructParser( const StructParser& o);
+	/// \brief Destructor
 	virtual ~StructParser(){}
 
+	/// \brief Get the current element path defined by the stack 'stk' as string for error messages
 	static std::string getElementPath( const ParseStateStack& stk);
 
-	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
+	/// \brief Parser start initialization
+	void init( const langbind::TypedInputFilterR& i, serialize::Flags::Enum flags=serialize::Flags::None);
 
+	/// \brief Get a shared reference of the parsed objects base pointer
 	const ObjectReference& object() const					{return m_obj;}
+	/// \brief Get the structure description of the parsed object
 	const StructDescriptionBase* descr() const				{return m_descr;}
 
+	/// \brief Call of one processing step the parser
+	/// \remark The processing is finished when the call returns true. In case of false returned you have to inspect the input filter state to determine what is to do next. In case of a validation error, the function throws a SerializationErrorException
 	bool call();
 
 private:

@@ -4,7 +4,7 @@
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assignmentlist><assignment><task><title>job 1</title><id>1</id><customernumber>324</customernumber></task><task><title>job 2</title><id>2</id><customernumber>567</customernumber></task><employee><firstname>Julia</firstname><surname>Tegel-Sacher</surname><phone>098 765 43 21</phone></employee><issuedate>13.5.2006</issuedate></assignment><assignment><task><title>job 3</title><id>3</id><customernumber>567</customernumber></task><task><title>job 4</title><id>4</id><customernumber>890</customernumber></task><employee><firstname>Jakob</firstname><surname>Stegelin</surname><phone>012 345 67 89</phone></employee><issuedate>13.5.2006</issuedate></assignment></assignmentlist>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf schema_select_task_by_id
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf schema_select_task_by_id
 
 **file:wolframe.conf
 LoadModules
@@ -43,7 +43,7 @@ Processor
 	}
 }
 **file: test.dmap
-COMMAND schema_select_task_by_id CALL test_transaction RETURN STANDALONE doc;
+COMMAND schema_select_task_by_id CALL test_transaction RETURN SKIP doc {standalone='yes',root='doc'};
 **file: DBDATA
 CREATE TABLE task
 (

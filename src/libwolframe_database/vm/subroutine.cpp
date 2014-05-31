@@ -62,7 +62,8 @@ static std::string substituteTemplateArguments( const std::string& cmd, const st
 
 	while (0!=(ch=utils::parseNextToken( tok, si, se, g_optab)))
 	{
-		if (isAlpha(ch))
+		char stringQuot = (ch == '\'' || ch == '\"')?ch:0;
+		if (isAlpha(ch) || stringQuot)
 		{
 			std::vector<std::string>::const_iterator ai = templateParamNames.begin(), ae = templateParamNames.end();
 			std::vector<std::string>::const_iterator vi = templateParamValues.begin(), ve = templateParamValues.end();
@@ -70,9 +71,18 @@ static std::string substituteTemplateArguments( const std::string& cmd, const st
 			{
 				if (boost::algorithm::iequals( tok, *ai))
 				{
-					// ... substiture identifier
+					// ... substiture identifier or string
 					rt.append( start, si - tok.size());
-					rt.append( *vi);
+					if (stringQuot)
+					{
+						rt.push_back(stringQuot);
+						rt.append( *vi);
+						rt.push_back(stringQuot);
+					}
+					else
+					{
+						rt.append( *vi);
+					}
 					start = si;
 				}
 			}

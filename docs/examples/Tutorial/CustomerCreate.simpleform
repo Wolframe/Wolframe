@@ -1,8 +1,6 @@
-	FORM CustomerCreate
-	{
-		customer
-		{
-			name string
-			address string
-		}
-	}
+FORM CustomerCreate
+	-root customer
+{
+	name string
+	address string
+}

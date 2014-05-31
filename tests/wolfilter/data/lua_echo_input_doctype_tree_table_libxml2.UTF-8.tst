@@ -34,7 +34,7 @@
 </btree>
 </root>
 **config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf run
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 
 **file:wolframe.conf
 LoadModules
@@ -81,12 +81,10 @@ STRUCT BinTreeNode
 }
 
 FORM trees
+	-root root
 {
-	root
-	{
-		mtree	MulTreeNode
-		btree	BinTreeNode
-	}
+	mtree	MulTreeNode
+	btree	BinTreeNode
 }
 **file:script.lua
 function printTable( tab)

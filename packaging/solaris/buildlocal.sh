@@ -119,7 +119,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
 	mandir=/opt/csw/share/man \
-	test
+	testreport
 check_for_errors
 
 LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
@@ -199,7 +199,9 @@ done
 cd $PKGBUILD/PKG/wolframe-$VERSION
 
 pkgmk -o -r .
+check_for_errors
 pkgtrans -s /var/spool/pkg $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$OSARCH-$OSVER.pkg WFRGwolfrm
+check_for_errors
 
 compress -f $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$OSARCH-$OSVER.pkg
 

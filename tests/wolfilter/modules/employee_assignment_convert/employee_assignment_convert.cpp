@@ -83,17 +83,7 @@ struct AssignmentListDescription :public serialize::StructDescription<Assignment
 		("assignment", &AssignmentList::assignment);
 	}
 };
-
-struct AssignmentListDocDescription :public serialize::StructDescription<AssignmentListDoc>
-{
-	AssignmentListDocDescription()
-	{
-		(*this)
-		("assignmentlist", &AssignmentListDoc::assignmentlist);
-	}
-};
 }
-
 
 const serialize::StructDescriptionBase* Task::getStructDescription()
 {
@@ -119,9 +109,4 @@ const serialize::StructDescriptionBase* AssignmentList::getStructDescription()
 	return &rt;
 }
 
-const serialize::StructDescriptionBase* AssignmentListDoc::getStructDescription()
-{
-	static AssignmentListDocDescription rt;
-	return &rt;
-}
 

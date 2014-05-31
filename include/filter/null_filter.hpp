@@ -39,9 +39,10 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+/// \brief Create a new null filter
 Filter createNullFilter( const std::string& name, const std::string& arg);
+/// \brief Create a new null filter (with new, to be destroyed with delete)
 Filter* createNullFilterPtr( const std::string& name, const std::string& arg);
-
 
 }}//namespace
 #endif

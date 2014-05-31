@@ -11,7 +11,7 @@
 <treeAddNode><parentid>3</parentid><name>Eddie</name></treeAddNode>
 <treeAddNode><parentid>3</parentid><name>Fred</name></treeAddNode>
 </transactions>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 **requires:TEXTWOLF
 **file:wolframe.conf
 LoadModules
@@ -274,7 +274,7 @@ END
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result>
+<transactions><result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result></transactions>
 TREE:
 ID, PARENT, NAME, LFT, RGT
 '1', NULL, 'Albert', '1', '12'

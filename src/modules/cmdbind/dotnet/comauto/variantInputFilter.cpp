@@ -39,7 +39,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::comauto;
 
-VariantInputFilter::VariantInputFilter( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Context::Flags flags_)
+VariantInputFilter::VariantInputFilter( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Flags::Enum flags_)
 	:utils::TypeSignature( "comauto::VariantInputFilter", __LINE__)
 	,TypedInputFilter("dotNetVariantInputFilter")
 	,m_typelib(typelib_)
@@ -158,7 +158,7 @@ AGAIN:
 						goto AGAIN;
 					}
 					cur.state = VarClose;
-					if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0 || cur.name.empty())
+					if (((int)m_flags & serialize::Flags::SerializeWithIndices) != 0 || cur.name.empty())
 					{
 						element = types::VariantConst( cur.idx+1);
 					}
@@ -251,7 +251,7 @@ AGAIN:
 					{
 						bool rt = false;
 						std::string elemname;
-						if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0)
+						if (((int)m_flags & serialize::Flags::SerializeWithIndices) != 0)
 						{
 							type = OpenTag;
 							element = types::VariantConst( m_elembuf = comauto::utf8string( varname));

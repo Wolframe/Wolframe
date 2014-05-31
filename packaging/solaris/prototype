@@ -55,6 +55,7 @@ f none opt/csw/lib/wolframe/modules/mod_db_postgresql.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_db_sqlite3.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_datatype_datetime.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_datatype_bcdnumber.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_doctype_xml.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_filter_blob.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_filter_textwolf.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_filter_token.so 0775 root staff
@@ -152,9 +153,11 @@ f none opt/csw/include/wolframe/protocol/parser.hpp 0644 root staff
 d none opt/csw/include/wolframe/cmdbind 0755 root root
 f none opt/csw/include/wolframe/cmdbind/authCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/commandHandler.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/commandHandlerUnit.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/commandHandlerConstructor.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/doctypeDetector.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/execCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/ioFilterCommandHandler.hpp 0644 root staff
@@ -186,6 +189,7 @@ f none opt/csw/include/wolframe/logger/logLevel.hpp 0644 root staff
 f none opt/csw/include/wolframe/logger/logObject.hpp 0644 root staff
 f none opt/csw/include/wolframe/logger/logSyslogFacility.hpp 0644 root staff
 d none opt/csw/include/wolframe/utils 0755 root root
+f none opt/csw/include/wolframe/utils/asciiCharParser.hpp 0644 root staff
 f none opt/csw/include/wolframe/utils/allocators.hpp 0644 root staff
 f none opt/csw/include/wolframe/utils/fileLineInfo.hpp 0644 root staff
 f none opt/csw/include/wolframe/utils/fileUtils.hpp 0644 root staff
@@ -201,6 +205,7 @@ d none opt/csw/include/wolframe/serialize 0755 root root
 f none opt/csw/include/wolframe/serialize/cppFormFunction.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/ddlFormParser.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/ddlFormSerializer.hpp 0644 root staff
+f none opt/csw/include/wolframe/serialize/flags.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/mapContext.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/serializationErrorException.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/structOptionParser.hpp 0644 root staff
@@ -228,11 +233,12 @@ f none opt/csw/include/wolframe/processor/execContext.hpp 0644 root staff
 f none opt/csw/include/wolframe/processor/jobSchedule.hpp 0644 root staff
 f none opt/csw/include/wolframe/processor/procProvider.hpp 0644 root staff
 f none opt/csw/include/wolframe/processor/procProviderInterface.hpp 0644 root staff
+f none opt/csw/include/wolframe/processor/procProviderConfig.hpp 0644 root staff
 d none opt/csw/include/wolframe/filter 0755 root root
 f none opt/csw/include/wolframe/filter/bufferingfilter.hpp 0644 root staff
-f none opt/csw/include/wolframe/filter/contentfilterAttributes.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filterbase.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/filterdef.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/inputfilter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/inputfilterScope.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/null_filter.hpp 0644 root staff
@@ -251,10 +257,11 @@ f none opt/csw/include/wolframe/types/bignumber.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/byte2hex.h 0644 root staff
 f none opt/csw/include/wolframe/types/conversions.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/countedReference.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/docmetadata.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/doctypeinfo.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/customDataNormalizer.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/customDataType.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/datetime.hpp 0644 root staff
-f none opt/csw/include/wolframe/types/doctype.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/form.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/integer.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/keymap.hpp 0644 root staff
@@ -262,6 +269,7 @@ f none opt/csw/include/wolframe/types/normalizeFunction.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/numberBaseConversion.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/propertyTree.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/string.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/secureReference.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/traits.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/variant.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/variantStruct.hpp 0644 root staff

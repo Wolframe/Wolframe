@@ -2,7 +2,7 @@
 testname=`basename $0 ".tst"`				# name of the test
 luascript=print_table_textwolf.lua
 testcmd="-c wolframe.conf run"				# command to execute by the test
-docin=invoice_example					# input document name
+docin=invoice_example_envelop				# input document name
 docout=lua_print_table_testtrace2			# output document name
 testdata="
 **requires:LIBHPDF

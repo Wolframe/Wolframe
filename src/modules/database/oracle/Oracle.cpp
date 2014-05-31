@@ -309,38 +309,6 @@ OracleDbUnit::~OracleDbUnit()
 	LOG_TRACE << "Oracle database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
-void OracleDbUnit::loadProgram( const std::string& filename )
-{
-	// No program file, do nothing
-	if ( filename.empty())
-		return;
-	if ( !boost::filesystem::exists( filename ))	{
-		LOG_ALERT << "Program file '" << filename
-			      << "' does not exist (Oracle database '" << m_ID << "')";
-		return;
-	}
-	try
-	{
-		addProgram( utils::readSourceFileContent( filename));
-	}
-	catch (const std::runtime_error& e)
-	{
-		throw std::runtime_error( std::string("error in program '") + utils::getFileStem(filename) + "':" + e.what());
-	}
-}
-
-void OracleDbUnit::loadAllPrograms()
-{
-	std::vector<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
-	for (; pi != pe; ++pi)
-	{
-		LOG_DEBUG << "Load Program '" << *pi << "' for Oracle database unit '" << m_ID << "'";
-		loadProgram( *pi);
-	}
-	LOG_DEBUG << "Programs for Oracle database unit '" << m_ID << "' loaded";
-}
-
-
 Database* OracleDbUnit::database()
 {
 	return m_db.hasUnit() ? &m_db : NULL;
@@ -355,27 +323,6 @@ const std::string& OracleDatabase::ID() const
 		return m_unit->ID();
 	else
 		throw std::runtime_error( "Oracle database unit not initialized" );
-}
-
-void OracleDatabase::loadProgram( const std::string& filename )
-{
-	if ( !m_unit )
-		throw std::runtime_error( "loadProgram: Oracle database unit not initialized" );
-	m_unit->loadProgram( filename );
-}
-
-void OracleDatabase::loadAllPrograms()
-{
-	if ( !m_unit )
-		throw std::runtime_error( "loadAllPrograms: Oracle database unit not initialized" );
-	m_unit->loadAllPrograms();
-}
-
-void OracleDatabase::addProgram( const std::string& program )
-{
-	if ( !m_unit )
-		throw std::runtime_error( "addProgram: Oracle database unit not initialized" );
-	m_unit->addProgram( program );
 }
 
 Transaction* OracleDatabase::transaction( const std::string& name)

@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/xml');
 require 'session.php';
 use Wolframe\Session as Session;
 
@@ -55,12 +56,13 @@ try
 	$conn = new Session( "127.0.0.1", 7661, NULL, "NONE");
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
 	{
-		echo "<html><head><title>FAILED</title></head><body>" . $conn->lasterror() . "</body></html>";
+		echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+		echo "<error><class>ANSWER</class><message>" . $conn->lasterror() . "</message></error>";
 	}
 	else
 	{
 		$ar = explode( "\n", $result);
-		$hdr = preg_replace( "([ ]standalone[=][\"]no[\"])", "", $ar[0]);
+		$hdr = preg_replace( "([ ]standalone[=][\"]no[\"])", " standalone=\"yes\"", $ar[0]);
 		$ar[0] = preg_replace("([<][!]DOCTYPE[ ][^>]+[>])", "", $hdr);
 		$ar[1] = preg_replace("([<][!]DOCTYPE[ ][^>]+[>])", "", $ar[1]);
 		$result = implode( "\n", $ar);
@@ -70,7 +72,8 @@ try
 }
 catch ( \Exception $e)
 {
-	echo "<html><head><title>ERROR</title></head><body>" . $e->getMessage() . "</body></html>";
+	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+	echo "<error><class>EXCEPTION</class><message>" . $e->getMessage() . "</message></error>";
 }
 ?>
 

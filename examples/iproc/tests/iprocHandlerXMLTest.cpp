@@ -41,8 +41,9 @@
 #include "config/configurationTree.hpp"
 #include "processor/procProvider.hpp"
 #include "wtest/testHandlerTemplates.hpp"
-#include "testUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
+#include "testUtils.hpp"
 #include "wtest/testModules.hpp"
 #include "wtest/testReport.hpp"
 #include <iostream>
@@ -110,6 +111,7 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const boost::shared_ptr<proc::ProcProviderConfig>& cfg, prgbind::ProgramLibrary* prglib)
 {
 	boost::shared_ptr<proc::ProcessorProvider> rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory, prglib));
+	rt->loadPrograms();
 	return rt;
 }
 

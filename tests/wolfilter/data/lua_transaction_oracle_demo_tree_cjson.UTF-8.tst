@@ -5,33 +5,31 @@
 **requires:ORACLE
 **input
 {
-  "transactions": {
-    "treeAddRoot": { "name": "Albert" },
-    "treeAddNode": [
-      {
-        "parentid": "1",
-        "name": "Bert"
-      },
-      {
-        "parentid": "1",
-        "name": "Chuck"
-      },
-      {
-        "parentid": "3",
-        "name": "Donna"
-      },
-      {
-        "parentid": "3",
-        "name": "Eddie"
-      },
-      {
-        "parentid": "3",
-        "name": "Fred"
-      }
-    ]
-  }
+	"treeAddRoot": { "name": "Albert" },
+	"treeAddNode": [
+		{
+			"parentid": "1",
+			"name": "Bert"
+		},
+		{
+			"parentid": "1",
+			"name": "Chuck"
+		},
+		{
+			"parentid": "3",
+			"name": "Donna"
+		},
+		{
+			"parentid": "3",
+			"name": "Eddie"
+		},
+		{
+			"parentid": "3",
+			"name": "Fred"
+		}
+	]
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json -c wolframe.conf run
 
 **file:wolframe.conf
 LoadModules

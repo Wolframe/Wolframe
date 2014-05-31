@@ -33,7 +33,7 @@
 </btree>
 </root>
 **config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 **requires:TEXTWOLF
 **file:wolframe.conf
 LoadModules
@@ -80,12 +80,10 @@ STRUCT BinTreeNode
 }
 
 FORM trees
+	-root root
 {
-	root
-	{
-		mtree	MulTreeNode
-		btree	BinTreeNode
-	}
+	mtree	MulTreeNode
+	btree	BinTreeNode
 }
 **file:script.lua
 function printTable( tab)

@@ -77,7 +77,7 @@ StructSerializer::StructSerializer( const StructSerializer& o)
 	,m_out(o.m_out)
 	,m_stk(o.m_stk){}
 
-void StructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags_)
+void StructSerializer::init( const langbind::TypedOutputFilterR& out, serialize::Flags::Enum flags_)
 {
 	m_ctx.clear();
 	m_ctx.setFlags(flags_);
@@ -153,13 +153,13 @@ bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, types::
 	return true;
 }
 
-bool StructSerializer::setFlags( Flags f)
+bool StructSerializer::setFlags( FilterBase::Flags f)
 {
 	bool rt = true;
 	rt &= langbind::TypedInputFilter::setFlags( f);
 	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
 	{
-		m_ctx.setFlags( Context::SerializeWithIndices);
+		m_ctx.setFlags( serialize::Flags::SerializeWithIndices);
 	}
 	return rt;
 }

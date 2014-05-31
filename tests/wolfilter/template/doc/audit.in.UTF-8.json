@@ -1,7 +1,5 @@
 {
-  "doctype": "Person",
-  "person": {
+    "-doctype": "Person",
     "name": "Hugi Turbo",
     "address": "Gurkenstrasse 7a 3145 Gumligen"
-  }
 }

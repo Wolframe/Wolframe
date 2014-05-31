@@ -41,8 +41,6 @@ testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolf
 local_all:
 
 local_clean:
-	@-rm -f gtestReport.txt
-	@-rm -f testSimpleFormCompiler*.xml
 
 local_distclean:
 

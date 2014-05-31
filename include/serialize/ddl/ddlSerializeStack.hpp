@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/ddlSerializeStack.hpp
-///\brief Defines the Parsing STM for DDL serialization
+/// \file serialize/ddl/ddlSerializeStack.hpp
+/// \brief Defines the Parsing STM for DDL serialization
 
 #ifndef _Wolframe_SERIALIZE_DDL_SERIALIZE_STACK_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DDL_SERIALIZE_STACK_HPP_INCLUDED
@@ -45,11 +45,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class DDLSerializeState
-///\brief State stack element for an iterator on a DDL structure (serializer of VariantStruct)
+/// \class DDLSerializeState
+/// \brief State stack element for an iterator on a DDL structure (serializer of VariantStruct)
 class DDLSerializeState
 {
 public:
+	/// \brief Copy constructor
 	DDLSerializeState( const DDLSerializeState& o)
 		:m_value(o.m_value)
 		,m_stateidx(o.m_stateidx)
@@ -57,6 +58,7 @@ public:
 		,m_tag(o.m_tag)
 		{}
 
+	/// \brief Constructor
 	DDLSerializeState( const types::VariantStruct* v, const types::VariantConst& t)
 		:m_value(v)
 		,m_stateidx(0)
@@ -66,12 +68,14 @@ public:
 			m_tag.setInitialized();
 		}
 
+	/// \brief Constructor
 	DDLSerializeState( const types::VariantStruct* v)
 		:m_value(v)
 		,m_stateidx(0)
 		,m_elemtype(langbind::FilterBase::Value)
 		{}
 
+	/// \brief Constructor
 	DDLSerializeState( langbind::FilterBase::ElementType typ, const types::VariantConst& elem)
 		:m_value(0)
 		,m_stateidx(0)
@@ -81,26 +85,31 @@ public:
 			m_tag.setInitialized();
 		}
 
+	/// \brief Get the value reference of the current state
 	const types::VariantStruct* value() const
 	{
 		return m_value;
 	}
 
+	/// \brief Get the current internal state
 	std::size_t state() const
 	{
 		return m_stateidx;
 	}
 
+	/// \brief Set the current internal state
 	void state( std::size_t idx)
 	{
 		m_stateidx = idx;
 	}
 
+	/// \brief Set the element type visited in the current state
 	langbind::FilterBase::ElementType type() const
 	{
 		return m_elemtype;
 	}
 
+	/// \brief Get the name of the element visited in the current state
 	const types::VariantConst& tag() const
 	{
 		return m_tag;
@@ -113,7 +122,7 @@ private:
 	types::VariantConst m_tag;
 };
 
-///\brief State stack for an iterator on a DDL structure (serializer of VariantStruct)
+/// \brief State stack for an iterator on a DDL structure (serializer of VariantStruct)
 typedef std::vector<DDLSerializeState> DDLSerializeStateStack;
 
 }}//namespace

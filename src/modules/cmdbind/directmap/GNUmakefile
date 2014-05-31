@@ -23,8 +23,10 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_command_directmap.so
 
 CPP_OBJS = \
+	directmapCommandDescription.o \
 	directmapProgram.o \
 	directmapCommandHandler.o \
+	directmapCommandHandlerUnit.o \
 	directmapCommandHandlerConfig.o \
 	mod_command_directmap.o
 

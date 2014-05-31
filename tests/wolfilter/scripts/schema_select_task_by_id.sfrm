@@ -1,4 +1,4 @@
-FORM Employee
+STRUCT Employee
 {
 	firstname string
 	surname string
@@ -6,20 +6,18 @@ FORM Employee
 }
 
 FORM schema_select_task_by_id
+	-root assignmentlist
 {
-	assignmentlist
+	assignment []
 	{
-		assignment []
+		task []
 		{
-			task []
-			{
-				id int
-				title string
-				customernumber int
-			}
-			employee Employee
-			issuedate string
+			id int
+			title string
+			customernumber int
 		}
+		employee Employee
+		issuedate string
 	}
 }
 

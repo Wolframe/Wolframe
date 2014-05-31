@@ -407,7 +407,7 @@ types::VariantConst TransactionExecStatemachine_sqlite3::get( std::size_t idx)
 	if (restype == SQLITE_INTEGER)
 	{
 		types::VariantConst rt;
-		
+
 		sqlite3_int64 resval = sqlite3_column_int64( m_stm, (int)idx-1);
 		if( dbtype != NULL && strcmp( dbtype, "BOOLEAN" ) == 0 ) {
 			if( resval == 1 ) {
@@ -422,7 +422,7 @@ types::VariantConst TransactionExecStatemachine_sqlite3::get( std::size_t idx)
 		} else {
 			rt = (types::Variant::Data::Int)resval;
 		}
-		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_INTEGER(" << dbtype <<  ") " << rt;
+		LOG_DATA << "[sqlite3 statement] CALL get(" << idx << ") => SQLITE_INTEGER(" << (dbtype?dbtype:"<unknown decl type>") <<  ") " << rt;
 		return rt;
 	}
 	else if (restype == SQLITE_FLOAT)

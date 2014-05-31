@@ -48,8 +48,6 @@ IOFilterCommandHandlerEscDLF::IOFilterCommandHandlerEscDLF()
 	:m_state(Processing)
 	,m_writedata(0)
 	,m_writedatasize(0)
-	,m_writedata_chksum(0)
-	,m_writedata_chkpos(0)
 	,m_itrpos(0)
 {
 	langbind::Filter flt = createNullFilter( "", "");
@@ -89,9 +87,6 @@ void IOFilterCommandHandlerEscDLF::getFilterOutputWriteData()
 	m_writedata = m_output.ptr();
 	m_writedatasize = flt->getPosition()+m_output.pos();
 
-	langbind::OutputFilter::calculateCheckSum( m_writedata_chksum, 0, (const char*)m_writedata, m_writedatasize);
-	m_writedata_chkpos += m_writedatasize;
-
 	m_escapeBuffer.process( m_output.charptr(), m_output.size(), m_writedatasize);
 	m_output.setPos(0);
 	flt->setOutputBuffer( m_output.ptr(), m_output.size());
@@ -125,7 +120,10 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 				if (!m_escapeBuffer.hasData())
 				{
 					m_state = Processing;
-					flt->setState( OutputFilter::Open);
+					if (flt->state() == OutputFilter::EndOfBuffer)
+					{
+						flt->setState( OutputFilter::Open);
+					}
 				}
 				return WRITE;
 
@@ -137,16 +135,6 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 				}
 				if (m_input.gotEoD())
 				{
-#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
-					if (m_writedata_chkpos != m_outputfilter->chkpos())
-					{
-						throw std::runtime_error( "output byte sum check failed");
-					}
-					if (m_writedata_chksum != m_outputfilter->chksum())
-					{
-						throw std::runtime_error( "output checksum check failed");
-					}
-#endif
 					m_outputfilter.reset();
 					m_writedata = "\r\n.\r\n";
 					m_writedatasize = std::strlen("\r\n.\r\n");
@@ -176,6 +164,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 						{
 							switch (m_inputfilter->state())
 							{
+								case InputFilter::Start:
 								case InputFilter::Open:
 									break;
 
@@ -201,6 +190,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 						{
 							switch (m_outputfilter->state())
 							{
+								case OutputFilter::Start:
 								case OutputFilter::Open:
 									m_state = FlushingOutput;
 									continue;
@@ -247,7 +237,10 @@ void IOFilterCommandHandlerEscDLF::putInput( const void *begin, std::size_t byte
 	InputFilter* flt = m_inputfilter.get();
 	if (flt)
 	{
-		flt->setState( InputFilter::Open);
+		if (flt->state() == InputFilter::EndOfMessage)
+		{
+			flt->setState( InputFilter::Open);
+		}
 		flt->putInput( start.ptr(), m_eoD-start, m_input.gotEoD());
 	}
 }

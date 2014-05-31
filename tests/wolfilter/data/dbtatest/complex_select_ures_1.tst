@@ -2,7 +2,7 @@
 **requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<root><item><aa>1</aa></item><item></item><item><bb></bb></item></root>
+<doc><root><item><aa>1</aa></item><item></item><item><bb></bb></item></root></doc>
 **config
 --config wolframe.conf --filter textwolf testcall
 **file:wolframe.conf
@@ -41,7 +41,7 @@ END END
 **outputfile:DBOUT
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result><person><vorname>karin</vorname><name>fischer</name><beruf>beamte</beruf></person><person><vorname>peter</vorname><name>mueller</name><beruf>polizist</beruf></person><age><alter>42</alter></age><age><alter>31</alter></age></result>
+<doc><result><person><vorname>karin</vorname><name>fischer</name><beruf>beamte</beruf></person><person><vorname>peter</vorname><name>mueller</name><beruf>polizist</beruf></person><age><alter>42</alter></age><age><alter>31</alter></age></result></doc>
 Code:
 [0] OUTPUT_OPEN TAG result
 [1] RESULT_SET_INIT

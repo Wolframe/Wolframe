@@ -1,63 +1,61 @@
 {
-  "doctype" : "invoice",
-  "invoice": {
-    "order": {
-      "number": "INS03-62",
-      "reference": "PO#6123",
-      "representative": " happyHamster1 ",
-      "terms": " 45 ",
-      "issuedate": "2013/03/21",
-      "duedate": "2013/05/05",
-      "description": "Ãbliche ZusÃ¤tze und GerÃ¤tschaften fÃ¼r Ã¶ffentliche SchwimmbÃ¤der"
-    },
-    "item": {
-      "name": "Ã¤ÃÃ¶ÃÃ¼ÃÃ¯ÃÃ«ÃÃ¿Å¸Ã Ã©Ã¨",
-      "quantity": "1",
-      "discount": "0",
-      "price": {
-        "unit": "789.00",
-        "total": "789.00",
-        "tax": {
-          "-description": "MWST 3.5%",
-          "#text": "27.60"
-        },
-        "gross": "816.60"
-      }
-    },
-    "bill": {
-      "price": {
-        "total": "789.00",
-        "tax": "27.60",
-        "gross": "781.40"
-      },
-      "payed": "0.00",
-      "open": "781.40"
-    },
-    "address": [
-      {
-        "-id": "supplier",
-        "name": " ZÃ¼liefÃ¤rÃ¤r ",
-        "street": "ÃberlandwÃ¤g",
-        "postalcode": "8008",
-        "city": "ZÃ¼rich",
-        "country": "Switzerland"
-      },
-      {
-        "-id": "customer",
-        "name": "AbnÃ¤hmer",
-        "street": "Ãttestrasse zwÃ¶lf",
-        "postalcode": "8008",
-        "city": "ZÃ¼rich",
-        "country": "Switzerland"
-      },
-      {
-        "-id": "shipping",
-        "name": "Hersteller",
-        "street": "HÃ¶lderlinwÃ¤g 13",
-        "postalcode": "8001",
-        "city": "ZÃ¼rich",
-        "country": "Switzerland"
-      }
-    ]
-  }
+	"-doctype" : "invoice",
+	"order": {
+		"number": "INS03-62",
+		"reference": "PO#6123",
+		"representative": " happyHamster1 ",
+		"terms": " 45 ",
+		"issuedate": "2013/03/21",
+		"duedate": "2013/05/05",
+		"description": "Ãbliche ZusÃ¤tze und GerÃ¤tschaften fÃ¼r Ã¶ffentliche SchwimmbÃ¤der"
+	},
+	"item": {
+		"name": "Ã¤ÃÃ¶ÃÃ¼ÃÃ¯ÃÃ«ÃÃ¿Å¸Ã Ã©Ã¨",
+		"quantity": "1",
+		"discount": "0",
+		"price": {
+			"unit": "789.00",
+			"total": "789.00",
+			"tax": {
+				"-description": "MWST 3.5%",
+				"#text": "27.60"
+			},
+			"gross": "816.60"
+		}
+	},
+	"bill": {
+		"price": {
+			"total": "789.00",
+			"tax": "27.60",
+			"gross": "781.40"
+		},
+		"payed": "0.00",
+		"open": "781.40"
+	},
+	"address": [
+		{
+			"-id": "supplier",
+			"name": " ZÃ¼liefÃ¤rÃ¤r ",
+			"street": "ÃberlandwÃ¤g",
+			"postalcode": "8008",
+			"city": "ZÃ¼rich",
+			"country": "Switzerland"
+		},
+		{
+			"-id": "customer",
+			"name": "AbnÃ¤hmer",
+			"street": "Ãttestrasse zwÃ¶lf",
+			"postalcode": "8008",
+			"city": "ZÃ¼rich",
+			"country": "Switzerland"
+		},
+		{
+			"-id": "shipping",
+			"name": "Hersteller",
+			"street": "HÃ¶lderlinwÃ¤g 13",
+			"postalcode": "8001",
+			"city": "ZÃ¼rich",
+			"country": "Switzerland"
+		}
+	]
 }

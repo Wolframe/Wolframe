@@ -46,6 +46,7 @@
 #include "processor/procProvider.hpp"
 #include "wtest/testHandlerTemplates.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
 #include "wtest/testModules.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -73,6 +74,7 @@ static boost::filesystem::path g_referencePath;
 static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const proc::ProcProviderConfig* cfg, prgbind::ProgramLibrary* prglib)
 {
 	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg, g_modulesDirectory, prglib));
+	rt->loadPrograms();
 	return rt;
 }
 
@@ -218,17 +220,19 @@ TEST_P( TProcHandlerTest, tests)
 		if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
 		EXPECT_EQ( 0, trt);
 
-		if (test.expected() != test.output())
+		std::string expected = boost::erase_all_copy( test.expected(), "\r");
+		std::string output = boost::erase_all_copy( test.output(), "\r");
+		if (expected != output)
 		{
 			boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
 			std::fstream outputf( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
-			outputf.write( test.output().c_str(), test.output().size());
+			outputf.write( output.c_str(), output.size());
 			if (outputf.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
 			outputf.close();
 
 			boost::filesystem::path EXPECT( g_testdir / "temp" / "EXPECT");
 			std::fstream expectedf( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
-			expectedf.write( test.expected().c_str(), test.expected().size());
+			expectedf.write( expected.c_str(), expected.size());
 			if (expectedf.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
 			expectedf.close();
 
@@ -244,7 +248,7 @@ TEST_P( TProcHandlerTest, tests)
 			std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
 			boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
 		}
-		EXPECT_EQ( test.expected(), test.output());
+		EXPECT_EQ( expected, output);
 	}
 }
 
@@ -306,8 +310,8 @@ int main( int argc, char **argv )
 
 	// [3] Execute tests:
 	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
-	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
-	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
+	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV);
+	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO);
 	return RUN_ALL_TESTS();
 	delete g_modulesDirectory;
 }

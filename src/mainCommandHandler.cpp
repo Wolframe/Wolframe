@@ -233,11 +233,14 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 {
 	cmdbind::DoctypeFilterCommandHandler* chnd = dynamic_cast<cmdbind::DoctypeFilterCommandHandler*>( ch);
 	cmdbind::CommandHandlerR chr( ch);
-	std::string doctype = chnd->doctypeid();
-	std::string docformat = chnd->docformatid();
-	const char* docformatptr = docformat.c_str();
 
+	types::DoctypeInfoR info = chnd->info();
+	
 	const char* error = ch->lastError();
+	if (!info.get())
+	{
+		error = "unknown document format (format detection failed)";
+	}
 	if (error)
 	{
 		std::ostringstream msg;
@@ -262,12 +265,10 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 		}
 		return stateidx();
 	}
-	LOG_DEBUG << "Got document type '" << doctype << "' format '" << docformat << "' command prefix '" << m_command << "'";
-	if (!doctype.empty())
-	{
-		m_command.append(doctype);
-	}
-	cmdbind::CommandHandler* execch = m_execContext->provider()->cmdhandler( m_command);
+	LOG_DEBUG << "Got document type '" << info->doctype() << "' format '" << info->docformat() << "' command prefix '" << m_command << "'";
+	m_command.append(info->doctype());
+
+	cmdbind::CommandHandler* execch = m_execContext->provider()->cmdhandler( m_command, info->docformat());
 	if (!execch)
 	{
 		std::ostringstream msg;
@@ -302,6 +303,8 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	}
 	else
 	{
+		const char* docformatptr = info->docformat().c_str();
+
 		execch->setExecContext( m_execContext);
 		execch->passParameters( m_command, 1, &docformatptr);
 		if (m_commandtag.empty())
@@ -367,6 +370,8 @@ int MainCommandHandler::doRequest( int argc, const char** argv, std::ostream& ou
 		}
 	}
 	CommandHandler* ch = (CommandHandler*)new cmdbind::DoctypeFilterCommandHandler();
+	ch->setExecContext( m_execContext);
+
 	delegateProcessing<&MainCommandHandler::endDoctypeDetection>( ch);
 	return stateidx();
 }

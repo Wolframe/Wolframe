@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/customDataType.hpp
-///\brief Custom data type interface for variant
+/// \file types/customDataType.hpp
+/// \brief Custom data type interface for variant
 
 #ifndef _Wolframe_TYPES_CUSTOM_DATA_TYPE_HPP_INCLUDED
 #define _Wolframe_TYPES_CUSTOM_DATA_TYPE_HPP_INCLUDED
@@ -43,25 +43,25 @@ Project Wolframe.
 namespace _Wolframe {
 namespace proc
 {
-	///\brief Forward declaration
+	/// \brief Forward declaration
 	class ProcessorProvider;
 }
 namespace types {
 
-///\brief Forward declaration
+/// \brief Forward declaration
 class Variant;
-///\brief Forward declaration
+/// \brief Forward declaration
 class CustomDataType;
-///\brief Forward declaration
+/// \brief Forward declaration
 class CustomDataInitializer;
-///\brief Forward declaration
+/// \brief Forward declaration
 class DateTime;
-///\brief Forward declaration
+/// \brief Forward declaration
 class BigNumber;
 
 
-///\class CustomDataValue
-///\brief Custom data value
+/// \class CustomDataValue
+/// \brief Custom data value
 class CustomDataValue
 {
 public:
@@ -89,8 +89,8 @@ private:
 typedef boost::shared_ptr<CustomDataValue> CustomDataValueR;
 
 
-///\class CustomDataInitializer
-///\brief Initializer for a custom data value
+/// \class CustomDataInitializer
+/// \brief Initializer for a custom data value
 class CustomDataInitializer
 {
 public:
@@ -100,8 +100,8 @@ public:
 
 typedef boost::shared_ptr<CustomDataInitializer> CustomDataInitializerR;
 
-///\class CustomDataType
-///\brief Custom Data Type Definition
+/// \class CustomDataType
+/// \brief Custom Data Type Definition
 class CustomDataType
 {
 public:
@@ -144,22 +144,22 @@ public:
 	typedef types::Variant (*CustomDataValueMethod)( const CustomDataValue& val, const std::vector<types::Variant>& arg);
 
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	CustomDataType()
 		:m_id(0)
 	{
 		std::memset( &m_vmt, 0, sizeof( m_vmt));
 	}
 
-	///\brief Constructor
-	///\param[in] name_ name of the type
-	///\param[in] constructor_ constructor of a value instance of the type
-	///\param[in] initializerconstructor_ constructor of an initializer object needed to create an instance of the type (0, if not needed)
+	/// \brief Constructor
+	/// \param[in] name_ name of the type
+	/// \param[in] constructor_ constructor of a value instance of the type
+	/// \param[in] initializerconstructor_ constructor of an initializer object needed to create an instance of the type (0, if not needed)
 	CustomDataType( const std::string& name_,
 			CustomDataValueConstructor constructor_,
 			CreateCustomDataInitializer initializerconstructor_=0);
 
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	CustomDataType( const CustomDataType& o);
 
 	void define( UnaryOperatorType type, UnaryOperator op);

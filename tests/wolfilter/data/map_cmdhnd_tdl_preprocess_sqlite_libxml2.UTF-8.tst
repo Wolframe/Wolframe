@@ -3,9 +3,9 @@
 **requires:SQLITE3
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE data SYSTEM "AllDataRequest">
+<!DOCTYPE data SYSTEM "www.blabla.com/AllDataRequest.dtd">
 <data/>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf AllDataRequest
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf AllDataRequest
 
 **file:wolframe.conf
 LoadModules
@@ -270,26 +270,26 @@ function addSuffixToName( inp)
 	return rec
 end
 **file:preprocess.dmap
-COMMAND (AllDataRequest) CALL(run) RETURN(Data);
+COMMAND AllDataRequest CALL run RETURN Data;
 **file:preprocess.sfrm
-FORM PersonRef
+STRUCT PersonRef
 {
 	prename string
 	surname string
 }
 
-FORM AddressRef
+STRUCT AddressRef
 {
 	street string
 	town string
 }
 
-FORM CompanyRef
+STRUCT CompanyRef
 {
 	name string
 }
 
-FORM Person
+STRUCT Person
 {
 	company CompanyRef[]
 	id int
@@ -301,7 +301,7 @@ FORM Person
 	tag ?int
 }
 
-FORM Company
+STRUCT Company
 {
 	id int
 	parent string
@@ -312,18 +312,14 @@ FORM Company
 }
 
 FORM Data
+	-root data
 {
-	data
-	{
-		person Person[]
-	}
+	person Person[]
 }
 
 FORM AllDataRequest
+	-root data
 {
-	data
-	{
-	}
 }
 **file:preprocess.tdl
 
@@ -394,7 +390,7 @@ normname= convdia,lcname;
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE data SYSTEM "Data.simpleform"><data><person><company><name>Baluba Inc.</name></company><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Huratz Inc.</name></company><id>1</id><child><prename>Beno</prename><surname>Beret</surname></child><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Aufru</prename><surname>Alano</surname><location><street>Butterweg 23</street><town>Bendorf</town></location><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Huratz Inc.</name></company><id>2</id><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Beno</prename><surname>Beret</surname><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Figaji Inc.</name></company><company><name>Huratz Inc.</name></company><id>3</id><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Fran</prename><surname>Fuioko</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Carla</prename><surname>Carlson</surname><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Fabelweg 67</street><town>Formkon</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Etungo Inc.</name></company><id>4</id><child><prename>Erik</prename><surname>Ertki</surname></child><prename>Dorothe</prename><surname>Dubi</surname><location><street>Erakimolstrasse 56</street><town>Enden</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>5</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Erik</prename><surname>Ertki</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>6</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Fran</prename><surname>Fuioko</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>7</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Gerd</prename><surname>Golto</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>8</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Hubert</prename><surname>Hauer</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><id>1</id><prename>Aufru1</prename><surname>Alano</surname></person><person><id>2</id><prename>Beno2</prename><surname>Beret</surname></person><person><id>3</id><prename>Carla3</prename><surname>Carlson</surname></person><person><id>4</id><prename>Dorothe4</prename><surname>Dubi</surname></person><person><id>5</id><prename>Erik5</prename><surname>Ertki</surname></person><person><id>6</id><prename>Fran6</prename><surname>Fuioko</surname></person><person><id>7</id><prename>Gerd7</prename><surname>Golto</surname></person><person><id>8</id><prename>Hubert8</prename><surname>Hauer</surname></person></data>
+<!DOCTYPE data SYSTEM "www.blabla.com/Data.dtd"><data><person><company><name>Baluba Inc.</name></company><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Huratz Inc.</name></company><id>1</id><child><prename>Beno</prename><surname>Beret</surname></child><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Aufru</prename><surname>Alano</surname><location><street>Butterweg 23</street><town>Bendorf</town></location><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Carimba Inc.</name></company><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Huratz Inc.</name></company><id>2</id><child><prename>Carla</prename><surname>Carlson</surname></child><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Beno</prename><surname>Beret</surname><location><street>Camelstreet 34</street><town>Carassa</town></location><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Dereno Inc.</name></company><company><name>Etungo Inc.</name></company><company><name>Figaji Inc.</name></company><company><name>Huratz Inc.</name></company><id>3</id><child><prename>Dorothe</prename><surname>Dubi</surname></child><child><prename>Erik</prename><surname>Ertki</surname></child><child><prename>Fran</prename><surname>Fuioko</surname></child><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Carla</prename><surname>Carlson</surname><location><street>Demotastrasse 45</street><town>Durnfo</town></location><location><street>Erakimolstrasse 56</street><town>Enden</town></location><location><street>Fabelweg 67</street><town>Formkon</town></location><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Etungo Inc.</name></company><id>4</id><child><prename>Erik</prename><surname>Ertki</surname></child><prename>Dorothe</prename><surname>Dubi</surname><location><street>Erakimolstrasse 56</street><town>Enden</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>5</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Erik</prename><surname>Ertki</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><company><name>Figaji Inc.</name></company><id>6</id><child><prename>Fran</prename><surname>Fuioko</surname></child><prename>Fran</prename><surname>Fuioko</surname><location><street>Fabelweg 67</street><town>Formkon</town></location><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>7</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Gerd</prename><surname>Golto</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><company><name>Huratz Inc.</name></company><id>8</id><child><prename>Hubert</prename><surname>Hauer</surname></child><prename>Hubert</prename><surname>Hauer</surname><location><street>Hurtika 89</street><town>Hof</town></location><tag>1001</tag></person><person><id>1</id><prename>Aufru1</prename><surname>Alano</surname></person><person><id>2</id><prename>Beno2</prename><surname>Beret</surname></person><person><id>3</id><prename>Carla3</prename><surname>Carlson</surname></person><person><id>4</id><prename>Dorothe4</prename><surname>Dubi</surname></person><person><id>5</id><prename>Erik5</prename><surname>Ertki</surname></person><person><id>6</id><prename>Fran6</prename><surname>Fuioko</surname></person><person><id>7</id><prename>Gerd7</prename><surname>Golto</surname></person><person><id>8</id><prename>Hubert8</prename><surname>Hauer</surname></person></data>
 Person:
 '1', 'Aufru', 'Alano'
 '2', 'Beno', 'Beret'

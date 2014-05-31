@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for describing the authorization procedure for a transaction or command to execute
-///\file langbind/authorization.hpp
+/// \brief Interface for describing the authorization procedure for a transaction or command to execute
+/// \file langbind/authorization.hpp
 //
 #ifndef _LANGBIND_AUTHORIZATION_HPP_INCLUDED
 #define _LANGBIND_AUTHORIZATION_HPP_INCLUDED
@@ -41,28 +41,28 @@
 namespace _Wolframe {
 namespace langbind {
 
-///\class Authorization
-///\brief Structure describing the authorization procedure for a transaction or command to execute
+/// \class Authorization
+/// \brief Structure describing the authorization procedure for a transaction or command to execute
 class Authorization
 {
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	Authorization(){}
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	Authorization( const Authorization& o)
 		:m_function(o.m_function)
 		,m_resource(o.m_resource){}
-	///\brief Constructor
+	/// \brief Constructor
 	Authorization( const std::string& f, const std::string& r)
 		:m_function(f)
 		,m_resource(r){}
 
-	///\brief Get function name
+	/// \brief Get function name
 	const std::string& function() const;
-	///\brief Get resource name
+	/// \brief Get resource name
 	const std::string& resource() const;
 
-	///\brief Set function and resource name
+	/// \brief Set function and resource name
 	void init( const std::string& f, const std::string& r)
 	{
 		m_function = f;

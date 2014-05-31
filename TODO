@@ -1,13 +1,14 @@
 OPEN SOURCE PRODUCT MUSTS:
 Core:
+	- Authentication protocol integration
 	- AAAA stuff to a certain level (MBa, support for protocol PF)
-	- Client UI files from server with protocol support as ordinary wolframe function call - eliminate process specific stuff from core (PF & MBa)
+	- Client UI files from server with protocol support as ordinary wolframe function call (PF & MBa)
 	- For different type of transactions (get UI files, process request, etc..) chose DB in context
 
 Processors:
+	- CSV Filter
 	- Python (ABa, with support PF)
 
 Fixes:
 	- Start SDK and splitting of graphix module and others
-
 

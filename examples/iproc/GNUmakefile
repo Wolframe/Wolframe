@@ -105,9 +105,6 @@ local_all: $(CPP_BINS)
 local_clean:
 	-rm -rf tests/result
 	-rm -rf tests/temp
-	-rm -f tests/gtestReport.txt
-	-rm -f iprocHandlerTest*.xml
-	-rm -f iprocHandlerXMLTest*.xml
 
 local_distclean:
 

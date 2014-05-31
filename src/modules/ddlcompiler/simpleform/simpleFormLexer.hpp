@@ -53,20 +53,22 @@ public:
 	///\brief Token identifier enumeration
 	enum Id
 	{
-		EndOfFile,	//< end of source file
-		INCLUDE,	//< INCLUDE keyword
-		FORM,		//< FORM keyword
-		STRUCT,		//< STRUCT keyword
-		Identifier,	//< identifier
-		String,		//< string
-		OpenStruct,	//< '{'
-		CloseStruct,	//< '}'
-		ArrayTag,	//< '[]'
-		AttributeTag,	//< '@'
-		MandatoryTag,	//< '!'
-		OptionalTag,	//< '?'
-		Indirection,	//< '^'
-		Assign		//< '='
+		EndOfFile,	///< end of source file
+		INCLUDE,	///< INCLUDE keyword
+		FORM,		///< FORM keyword
+		STRUCT,		///< STRUCT keyword
+		Identifier,	///< identifier
+		String,		///< string
+		OpenStruct,	///< '{'
+		CloseStruct,	///< '}'
+		ArrayTag,	///< '[]'
+		AttributeTag,	///< '@'
+		MandatoryTag,	///< '!'
+		OptionalTag,	///< '?'
+		Indirection,	///< '^'
+		Assign,		///< '='
+		MetaDataDef,	///< ':'
+		Semicolon	///< ';'
 	};
 public:
 	///\brief Default constructor
@@ -85,9 +87,9 @@ public:
 	std::string positionLogtext() const;
 
 private:
-	Id m_id;				//< lexem identifier
-	std::string m_value;			//< lexem value
-	utils::SourceLineInfo m_position;	//< lexem position
+	Id m_id;				///< lexem identifier
+	std::string m_value;			///< lexem value
+	utils::SourceLineInfo m_position;	///< lexem position
 };
 
 ///\brief Structure for lexical analysis of one simple form source file
@@ -120,12 +122,12 @@ public:
 	utils::SourceLineInfo position() const	{return m_position;}
 
 private:
-	std::string::const_iterator m_start;		//< source start
-	std::string::const_iterator m_itr;		//< iterator on source
-	std::string::const_iterator m_end;		//< end of source
-	utils::SourceLineInfo m_position;		//< current position in source
-	std::string::const_iterator m_itr_position;	//< iterator from what m_position has been calculated the last time
-	char m_tokch;					//< token character of the current token
+	std::string::const_iterator m_start;		///< source start
+	std::string::const_iterator m_itr;		///< iterator on source
+	std::string::const_iterator m_end;		///< end of source
+	utils::SourceLineInfo m_position;		///< current position in source
+	std::string::const_iterator m_itr_position;	///< iterator from what m_position has been calculated the last time
+	char m_tokch;					///< token character of the current token
 };
 
 }}}//namespace

@@ -1,5 +1,4 @@
 FORM CustomerListRequest
+	-root customer
 {
-	customer {
-	}
 }

@@ -112,30 +112,30 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	}
 	else
 	{
-		m_node = xmlDocGetRootElement( m_doc.get());
-
-		const xmlChar* ec = m_doc.get()->encoding;
-		if (!ec)
-		{
-			m_encoding = "UTF-8";
-		}
-		else
-		{
-			m_encoding.clear();
-			for (int ii=0; ec[ii]!=0; ii++)
-			{
-				m_encoding.push_back((unsigned char)ec[ii]);
-			}
-		}
+		initDocMetaData();
+		LOG_DEBUG << "[libxml2 input] document meta data: {" << getMetaDataRef()->tostring() << "}";
+		setState( Open);
 	}
 }
 
-bool InputFilterImpl::getDocType( types::DocType& doctype)
+void InputFilterImpl::initDocMetaData()
 {
-	if (!m_doc.get())
+	m_node = xmlDocGetRootElement( m_doc.get());
+	const xmlChar* ec = m_doc.get()->encoding;
+	if (!ec)
 	{
-		return false;
+		setAttribute( "encoding", "UTF-8");
 	}
+	else
+	{
+		std::string encoding;
+		for (int ii=0; ec[ii]!=0; ii++)
+		{
+			encoding.push_back((unsigned char)ec[ii]);
+		}
+		setAttribute( "encoding", encoding);
+	}
+	// Inspect !DOCTYPE entity for meta data:
 	xmlNode* nd = m_doc.get()->children;
 	while (nd && nd->type != XML_DTD_NODE)
 	{
@@ -144,23 +144,67 @@ bool InputFilterImpl::getDocType( types::DocType& doctype)
 	if (nd)
 	{
 		xmlDtdPtr dtd = (xmlDtdPtr)nd;
-		std::string systemid = dtd->SystemID?(const char*)dtd->SystemID:"";
-		std::string ext = utils::getFileExtension( systemid);
-		std::string id = utils::getFileStem( systemid);
-		std::string dir;
-		std::size_t namesize = ext.size() + id.size();
-		if (namesize < systemid.size())
+		if (dtd->SystemID)
 		{
-			dir = std::string( systemid.c_str(), systemid.size() - namesize);
+			setAttribute( "SYSTEM", (const char*)dtd->SystemID);
+			setDoctype( types::DocMetaData::extractStem( (const char*)dtd->SystemID));
 		}
-		const char* root = dtd->name?(const char*)dtd->name:"";
-		doctype.init( id, root, types::DocType::SchemaPath( dir, ext));
+		if (dtd->ExternalID)
+		{
+			setAttribute( "PUBLIC", (const char*)dtd->ExternalID);
+		}
 	}
-	else
+	// Inspect root xmlns attributes for meta data:
+	if (m_node && (m_node->type == XML_ELEMENT_NODE || m_node->type == XML_DOCUMENT_NODE))
 	{
-		doctype.clear();
+		if (m_node->name)
+		{
+			setAttribute( "root", (const char*)m_node->name);
+		}
+		if (m_node->nsDef && m_node->nsDef->href)
+		{
+			std::string xmlns( getElementString( m_node->nsDef->href));
+			setAttribute( "xmlns", xmlns);
+		}
+		xmlAttr* rootattr = m_node->properties;
+		while (rootattr)
+		{
+			xmlNode* rootvalues = 0;
+			if (rootattr) rootvalues = rootattr->children;
+			std::string prefix;
+			if (rootattr->ns && rootattr->ns->prefix)
+			{
+				prefix = getElementString( rootattr->ns->prefix);
+				if (rootattr->ns->href)
+				{
+					setAttribute( std::string("xmlns:") + prefix, getElementString( rootattr->ns->href));
+				}
+			}
+			std::string attrname = getElementString( rootattr->name);
+			std::string attrvalue;
+			while (rootvalues)
+			{
+				attrvalue.append( getElementString( rootvalues->content));
+				rootvalues = rootvalues->next;
+			}
+			if (prefix.size())
+			{
+				setAttribute( prefix + ":" + attrname, attrvalue);
+				if (attrname == "schemaLocation")
+				{
+					setDoctype( types::DocMetaData::extractStem( attrvalue));
+				}
+			}
+			else
+			{
+				LOG_WARNING << "unknown XML root element attribute '" << attrname << "'";
+			}
+			rootattr = rootattr->next;
+		}
 	}
-	return true;
+	m_nodestk.push_back( m_node->next);
+	m_node = m_node->children;
+	m_taglevel += 1;
 }
 
 bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
@@ -276,6 +320,16 @@ AGAIN:
 	return rt;
 }
 
+const types::DocMetaData* InputFilterImpl::getMetaData()
+{
+	if (!m_doc.get())
+	{
+		setState( EndOfMessage);
+		return 0;
+	}
+	return getMetaDataRef().get();
+}
+
 std::string InputFilterImpl::getElementString( const xmlChar* str)
 {
 	return str?std::string( (const char*)str, xmlStrlen(str) * sizeof(*str)):std::string();
@@ -308,4 +362,31 @@ bool InputFilterImpl::setFlags( Flags f)
 	}
 	return InputFilter::setFlags( f);
 }
+
+bool InputFilterImpl::checkMetaData( const types::DocMetaData& md)
+{
+	if (state() == Start)
+	{
+		setState( Error, "input filter did not parse its meta data yet - cannot check them therefore");
+	}
+	// Check the XML root element:
+	const char* form_rootelem = md.getAttribute( "root");
+	const char* doc_rootelem = getMetaDataRef()->getAttribute( "root");
+	if (form_rootelem)
+	{
+		if (!doc_rootelem)
+		{
+			setState( Error, "input document has no root element defined");
+			return false;
+		}
+		if (0!=std::strcmp(form_rootelem,doc_rootelem))
+		{
+			std::string msg = std::string("input document root element '") + doc_rootelem + "' does not match the root element '" + form_rootelem + "'' required";
+			setState( Error, msg.c_str());
+			return false;
+		}
+	}
+	return true;
+}
+
 

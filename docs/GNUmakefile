@@ -311,7 +311,8 @@ Tutorial.epub: $(TUTORIAL_SOURCE_FILES)
 	$(XSLT_MAN) $<
 
 local_clean:
-	-rm -rf doxygen/html/* doxygen/man/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
+	-rm -rf doxygen/html/* doxygen/man/*  doxygen/perlmod/*
+	-rm -f WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
 	-rm -f Installation.html Installation.pdf InstallationUnix.html InstallationUnix.txt InstallationWindows.html InstallationWindows.txt
 	-rm -rf html/*.html

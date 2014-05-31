@@ -48,10 +48,11 @@ InputStructure::InputStructure( const InputStructure& o)
 	,m_tagmap(o.m_tagmap)
 	,m_privatetagmap(o.m_privatetagmap)
 	,m_visitor(o.m_visitor)
+	,m_done(o.m_done)
 	{}
 
 InputStructure::InputStructure( const TagTable* tagmap)
-	:m_tagmap(tagmap),m_privatetagmap(tagmap->case_sensitive())
+	:m_tagmap(tagmap),m_privatetagmap(tagmap->case_sensitive()),m_done(false)
 {
 	m_nodemem.alloc( 1);
 	InputNode* nd = m_nodemem.base();
@@ -274,6 +275,10 @@ InputNodeVisitor InputStructure::visitOrOpenUniqTag( const InputNodeVisitor& nv,
 
 InputNodeVisitor InputStructure::openTag( const InputNodeVisitor& nv, const std::string& tag)
 {
+	if (m_done)
+	{
+		throw std::runtime_error( "tags not balanced in input (open tag after final close)");
+	}
 	InputNodeVisitor rt = createChildNode( nv);
 	InputNode*nd = node( rt);
 
@@ -285,6 +290,10 @@ InputNodeVisitor InputStructure::openTag( const InputNodeVisitor& nv, const std:
 
 InputNodeVisitor InputStructure::openTag( const InputNodeVisitor& nv, const types::Variant& tag)
 {
+	if (m_done)
+	{
+		throw std::runtime_error( "tags not balanced in input (open tag after final close)");
+	}
 	InputNodeVisitor rt = createChildNode( nv);
 	InputNode*nd = node( rt);
 
@@ -333,13 +342,15 @@ bool InputStructure::isArrayNode( const InputNodeVisitor& nv) const
 
 InputNodeVisitor InputStructure::closeTag( const InputNodeVisitor& nv)
 {
-	InputNode*nd = node( nv);
-	InputNodeVisitor rt( nd->m_parent);
-
+	InputNode* nd = node( nv);
 	if (nd->m_parent < 0)
 	{
-		throw std::runtime_error( "tags not balanced in input (close tag)");
+		if (m_done) throw std::runtime_error( "tags not balanced in input (close tag)");
+		m_done = true;
+		return nv;
 	}
+	InputNodeVisitor rt( nd->m_parent);
+
 	InputNode*pn = node( nd->m_parent);
 	if (nv.m_nodeidx != pn->m_lastchild)
 	{
@@ -399,6 +410,10 @@ InputNodeVisitor InputStructure::closeTag( const InputNodeVisitor& nv)
 
 void InputStructure::pushValue( const InputNodeVisitor& nv, const types::VariantConst& val)
 {
+	if (m_done)
+	{
+		throw std::runtime_error( "tags not balanced in input (value after final close)");
+	}
 	InputNode*nd = node( nv);
 	if (nd->m_value)
 	{

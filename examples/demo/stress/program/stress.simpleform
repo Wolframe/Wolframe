@@ -1,38 +1,30 @@
 FORM insertNumber
+	-root doc
 {
-	doc
-	{
-		numbr int
-		mul int
-		dup int
-		trip int
-	}
+	numbr int
+	mul int
+	dup int
+	trip int
 }
 
 FORM updateNumber
+	-root doc
 {
-	doc
-	{
-		numbr int
-		mul int
-		dup int
-		trip int
-	}
+	numbr int
+	mul int
+	dup int
+	trip int
 }
 
 FORM deleteNumber
+	-root doc
 {
-	doc
-	{
-		numbr int
-	}
+	numbr int
 }
 
 FORM selectNumber
+	-root doc
 {
-	doc
-	{
-		id int
-	}
+	id int
 }
 

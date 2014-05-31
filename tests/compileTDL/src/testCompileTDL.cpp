@@ -56,6 +56,7 @@ using namespace _Wolframe::db;
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
+static boost::filesystem::path g_outputdir;
 static LanguageDescription g_dblang;
 static std::string g_selectedTestName;
 
@@ -148,7 +149,6 @@ static std::string normalizeOutputCRLF( const std::string& output, const std::st
 	}
 }
 
-static boost::filesystem::path outputdir( g_testdir / ".." / "output");
 
 TEST_P( CompileTDLTest, tests)
 {
@@ -210,7 +210,7 @@ TEST_P( CompileTDLTest, tests)
 
 	if (file_read_exception || expect != output)
 	{
-		boost::filesystem::path outputdumpfile( outputdir / (testname + ".res"));
+		boost::filesystem::path outputdumpfile( g_outputdir / (testname + ".res"));
 		utils::writeFile( outputdumpfile.string(), output);
 	}
 	EXPECT_EQ( expect, output);
@@ -227,6 +227,7 @@ int main( int argc, char **argv)
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
 	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+	g_outputdir = g_testdir / ".." / "output";
 
 	if (argc >= 2)
 	{
@@ -277,7 +278,7 @@ int main( int argc, char **argv)
 		}
 	}
 	std::sort( tests.begin(), tests.end());
-	std::cerr << "Outputs of failed tests are written to '" << outputdir.string() << "'" << std::endl;
+	std::cerr << "Outputs of failed tests are written to '" << g_outputdir.string() << "'" << std::endl;
 
 	// [2] Instantiate test cases with INSTANTIATE_TEST_CASE_P (see above)
 

@@ -35,7 +35,8 @@ Project Wolframe.
 #include "xsltMapper.hpp"
 #include "inputfilterImpl.hpp"
 #include "outputfilterImpl.hpp"
-#include "processor/procProvider.hpp"
+#include "filter/bufferingfilter.hpp"
+#include "prgbind/programLibrary.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/shared_ptr.hpp>
@@ -62,7 +63,7 @@ struct XsltFilter :public Filter
 		XsltMapper xsltmapper( stylesheet_, arg);
 		InputFilterImpl impl( xsltmapper);
 		m_inputfilter.reset( new BufferingInputFilter( &impl, "libxslt"));
-		m_outputfilter.reset( new OutputFilterImpl( xsltmapper));
+		m_outputfilter.reset( new OutputFilterImpl( xsltmapper, m_inputfilter->getMetaDataRef()));
 	}
 };
 
@@ -72,7 +73,7 @@ class XsltFilterType
 {
 public:
 	XsltFilterType( const std::string& sourcefile_)
-		:m_ptr(0)
+		:langbind::FilterType("xslt"),m_ptr(0)
 	{
 		m_ptr = xsltParseStylesheetFile( (const xmlChar *)sourcefile_.c_str());
 		if (!m_ptr)
@@ -93,7 +94,8 @@ public:
 	}
 
 private:
-	XsltFilterType( const XsltFilterType&)
+	XsltFilterType( const XsltFilterType& o)
+		:FilterType(o)
 	{
 		throw std::logic_error( "non copyable XsltFilterConstructor");
 	}

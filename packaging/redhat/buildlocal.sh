@@ -62,8 +62,29 @@ cp packaging/obs/boost1.48/boost_1_48_0-gcc-compile.patch $RPMBUILD/SOURCES/.
 
 cd $RPMBUILD/SPECS
 
-export CC='ccache gcc'
-export CXX='ccache g++'
+# add Intel compiler to the path if we have one (Centos VMs with Intel CC only)
+if test -f /opt/intel/bin/iccvars.sh; then
+	MACHINE_ARCH=`uname -m`
+	if test "$MACHINE_ARCH" = "x86_64"; then
+		ICC_ARCH="intel64"
+	else
+		if test "$MACHINE_ARCH" = "i686"; then
+			ICC_ARCH="ia32"
+		else
+			print "ERROR: Unknown Intel architecture $MACHIN_ARCH!"
+			global_unlock
+			exit 1
+		fi
+	fi
+	. /opt/intel/bin/iccvars.sh $ICC_ARCH
+	export CCACHE_CPP2=1
+	export CC='ccache icc'
+	export CXX='ccache icpc'	
+else
+	export CC='ccache gcc'
+	export CXX='ccache g++'
+fi
+sed -i "s/make test/make testreport/g" wolframe.spec
 rpmbuild -ba --define "$OSB_PLATFORM" wolframe.spec
 
 RET=$?

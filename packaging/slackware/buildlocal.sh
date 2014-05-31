@@ -81,7 +81,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	CC='ccache gcc' CXX='ccache g++' \
 	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules \
-	test
+	testreport
 check_for_errors
 
 make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \

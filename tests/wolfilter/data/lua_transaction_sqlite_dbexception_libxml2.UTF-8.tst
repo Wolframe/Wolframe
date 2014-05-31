@@ -7,7 +7,7 @@ error in transaction 'insertCustomer':*Customers must have a unique name.
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <customers><customer><name>Hugo</name></customer><customer><name>Hugo</name></customer></customers>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf run
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 
 **file:wolframe.conf
 LoadModules

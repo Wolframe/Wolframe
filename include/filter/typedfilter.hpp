@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/typedfilter.hpp
-///\brief Typed interface for input/output filter
+/// \file filter/typedfilter.hpp
+/// \brief Typed interface for input/output filter
 
 #ifndef _Wolframe_FILTER_TYPEDFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_TYPEDFILTER_INTERFACE_HPP_INCLUDED
@@ -44,8 +44,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class TypedInputFilter
-///\brief Input filter with atomic values having a type
+/// \class TypedInputFilter
+/// \brief Input filter with atomic values having a type
 class TypedInputFilter :public FilterBase
 {
 public:
@@ -57,49 +57,49 @@ public:
 		virtual ~Data(){}
 	};
 
-	///\brief Constructor
+	/// \brief Constructor
 	explicit TypedInputFilter( const char* name_)
 		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
 		,FilterBase(name_)
-		,m_state(InputFilter::Open)
+		,m_state(InputFilter::Start)
 		,m_data(0){}
 
-	///\brief Copy constructor
-	///\param[in] o typed output filter to copy
+	/// \brief Copy constructor
+	/// \param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)
 		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
 		,FilterBase(o)
 		,m_state(o.m_state)
 		,m_data(o.m_data?o.m_data->copy():0){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~TypedInputFilter()			{if (m_data) delete m_data;}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual TypedInputFilter* copy() const=0;
 
-	///\brief Get next element
-	///\param [out] type element type parsed
-	///\param [out] element reference to element returned
-	///\return true, if success, false, if not.
-	///\remark Check the state when false is returned
-	///\remark If type is OpenTag then element is either 1) a string (tag) or 2) a number convertible to an uint (array index counted from 1)
+	/// \brief Get next element
+	/// \param [out] type element type parsed
+	/// \param [out] element reference to element returned
+	/// \return true, if success, false, if not.
+	/// \remark Check the state when false is returned
+	/// \remark If type is OpenTag then element is either 1) a string (tag) or 2) a number convertible to an uint (array index counted from 1)
 	virtual bool getNext( ElementType& type, types::VariantConst& element)=0;
 
-	///\brief Get the current state
-	///\return the current state
+	/// \brief Get the current state
+	/// \return the current state
 	State state() const				{return m_state;}
 
-	///\brief Set input filter state with error message
-	///\param [in] s new state
-	///\param [in] msg (optional) error to set
+	/// \brief Set input filter state with error message
+	/// \param [in] s new state
+	/// \param [in] msg (optional) error to set
 	void setState( State s, const char* msg=0)	{m_state=s; setError(msg);}
 
-	///\brief Set the iterator to the start (if implemented)
+	/// \brief Set the iterator to the start (if implemented)
 	virtual void resetIterator(){}
 
-	///\brief Set data that belongs to filter scope
+	/// \brief Set data that belongs to filter scope
 	void setData( Data* data_)			{if (m_data) delete m_data; m_data = data_;}
 
 private:
@@ -107,61 +107,61 @@ private:
 	Data* m_data;
 };
 
-///\typedef TypedInputFilterR
-///\brief Shared input filter reference
+/// \typedef TypedInputFilterR
+/// \brief Shared input filter reference
 typedef types::CountedReference<TypedInputFilter> TypedInputFilterR;
 
 
 
-///\class TypedOutputFilter
-///\brief Output filter with atomic values having a type
+/// \class TypedOutputFilter
+/// \brief Output filter with atomic values having a type
 class TypedOutputFilter :public FilterBase
 {
 public:
 	typedef OutputFilter::State State;
 
-	///\brief Constructor
+	/// \brief Constructor
 	explicit TypedOutputFilter( const char* name_)
 		:utils::TypeSignature("langbind::TypedOutputFilter", __LINE__)
 		,FilterBase(name_)
-		,m_state(OutputFilter::Open) {}
+		,m_state(OutputFilter::Start) {}
 
-	///\brief Copy constructor
-	///\param[in] o typed output filter to copy
+	/// \brief Copy constructor
+	/// \param[in] o typed output filter to copy
 	TypedOutputFilter( const TypedOutputFilter& o)
 		:utils::TypeSignature(o)
 		,FilterBase(o)
 		,m_state(o.m_state){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~TypedOutputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const		{return 0;}
 
-	///\brief Get next element
-	///\param [out] type element type parsed
-	///\param [out] element reference to element returned
-	///\return true, if success, false, if not.
-	///\remark Check the state when false is returned
+	/// \brief Get next element
+	/// \param [out] type element type parsed
+	/// \param [out] element reference to element returned
+	/// \return true, if success, false, if not.
+	/// \remark Check the state when false is returned
 	virtual bool print( ElementType /*type*/, const types::VariantConst& /*element*/){return true;}
 
-	///\brief Get the current state
-	///\return the current state
+	/// \brief Get the current state
+	/// \return the current state
 	State state() const				{return m_state;}
 
-	///\brief Set output filter state with error message
-	///\param [in] s new state
-	///\param [in] msg (optional) error to set
+	/// \brief Set output filter state with error message
+	/// \param [in] s new state
+	/// \param [in] msg (optional) error to set
 	void setState( State s, const char* msg=0)	{m_state=s; setError(msg);}
 
 private:
 	State m_state;				//< state
 };
 
-///\typedef TypedOutputFilterR
-///\brief Shared output filter reference
+/// \typedef TypedOutputFilterR
+/// \brief Shared output filter reference
 typedef types::CountedReference<TypedOutputFilter> TypedOutputFilterR;
 
 

@@ -562,9 +562,19 @@
 					<entry>Returns the document type of the content. For retrieving the document type you have first to define a filter.</entry>
 				</row>
 				<row>
+					<entry>metadata</entry>
+					<entry> - </entry>
+					<entry>Returns the meta data structure of the content. For retrieving the document meta data you have first to define a filter.</entry>
+				</row>
+				<row>
 					<entry>value</entry>
 					<entry> - </entry>
-					<entry>Returns the contents of the document as <application>Lua</application> table or atomic value</entry>
+					<entry>Returns the contents of the document as <application>Lua</application> table or atomic value. The method 'table' does the same but is considered to be deprecated.</entry>
+				</row>
+				<row>
+					<entry>table</entry>
+					<entry> - </entry>
+					<entry>Deprecated. Does return the same as the method 'value'</entry>
 				</row>
 				<row>
 					<entry>form</entry>

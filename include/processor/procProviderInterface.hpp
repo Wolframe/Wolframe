@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file processor/procProviderInterface.hpp
-///\brief Interface to processor provider for language bindings and database
+/// \file processor/procProviderInterface.hpp
+/// \brief Interface to processor provider for language bindings and database
 #ifndef _PROCESSOR_PROVIDER_INTERFACE_HPP_INCLUDED
 #define _PROCESSOR_PROVIDER_INTERFACE_HPP_INCLUDED
 #include "filter/filter.hpp"
@@ -41,80 +41,84 @@
 namespace _Wolframe {
 namespace db
 {
-///\brief Forward declaration
+/// \brief Forward declaration
 class Transaction;
-///\brief Forward declaration
+/// \brief Forward declaration
 class Database;
 }
 namespace types
 {
-///\brief Forward declaration
+/// \brief Forward declaration
 class Form;
-///\brief Forward declaration
+/// \brief Forward declaration
 class FormDescription;
-///\brief Forward declaration
+/// \brief Forward declaration
 class NormalizeFunction;
-///\brief Forward declaration
+/// \brief Forward declaration
 class NormalizeFunctionType;
 }
 namespace cmdbind
 {
-///\brief Forward declaration
+/// \brief Forward declaration
 class CommandHandler;
+/// \brief Forward declaration
+class DoctypeDetector;
 }
 
 namespace proc {
 
-///\class ProcessorProviderInterface
-///\brief Abstract class as processor provider interface
+/// \class ProcessorProviderInterface
+/// \brief Abstract class as processor provider interface
 class ProcessorProviderInterface
 {
 public:
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~ProcessorProviderInterface(){};
-	///\brief Get the command handler for a specific command
-	///\param[in] command name of the command
-	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command) const=0;
-	///\brief Get the database for transactions
-	///\return reference to database
+	/// \brief Create a command handler for a specific command and doc format
+	/// \param[in] command name of the command
+	/// \param[in] docformat document format, e.g. "XML","JSON"
+	/// \return the constructed command handler (owned now by the caller)
+	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command, const std::string& docformat) const=0;
+	/// \brief Find out if there exists a command handler for a specific command without creating it
+	/// \param[in] command name of the command
+	/// \return true, if yes
+	virtual bool existcmd( const std::string& command) const=0;
+	/// \brief Get the database for transactions
+	/// \return reference to database
 	virtual db::Database* transactionDatabase() const=0;
-	///\brief Get a database transaction object for the given name
-	///\param[in] name name of the transaction
-	///\return allocated transaction object now owned by the caller and to destroy by the caller with delete
+	/// \brief Get a database transaction object for the given name
+	/// \param[in] name name of the transaction
+	/// \return allocated transaction object now owned by the caller and to destroy by the caller with delete
 	virtual db::Transaction* transaction( const std::string& name) const=0;
-	///\brief Get a normalization function
-	///\param[in] name name of the function
-	///\return reference to normalization function
+	/// \brief Get a normalization function
+	/// \param[in] name name of the function
+	/// \return reference to normalization function
 	virtual const types::NormalizeFunction* normalizeFunction( const std::string& name) const=0;
-	///\brief Get a normalization function type
-	///\param[in] name name of the function type
-	///\return reference to normalization function type
+	/// \brief Get a normalization function type
+	/// \param[in] name name of the function type
+	/// \return reference to normalization function type
 	virtual const types::NormalizeFunctionType* normalizeFunctionType( const std::string& name) const=0;
-	///\brief Get a form function
-	///\param[in] name name of the function
-	///\return reference to the function
+	/// \brief Get a form function
+	/// \param[in] name name of the function
+	/// \return reference to the function
 	virtual const langbind::FormFunction* formFunction( const std::string& name) const=0;
-	///\brief Get a form description
-	///\param[in] name name of the form
-	///\return reference to the form description
+	/// \brief Get a form description
+	/// \param[in] name name of the form
+	/// \return reference to the form description
 	virtual const types::FormDescription* formDescription( const std::string& name) const=0;
-	///\brief Get a filter
-	///\param[in] name name of the filter
-	///\param[in] arg initializer arguments for the filter instance
-	///\return allocated filter instance now owned by the caller and to destroy by the caller with delete
-	virtual langbind::Filter* filter( const std::string& name, const std::vector<langbind::FilterArgument>& arg=std::vector<langbind::FilterArgument>()) const=0;
-	///\brief Get a custom data type
-	///\param[in] name name of the type
-	///\return reference to the custom data type
+	/// \brief Get a filter type
+	/// \param[in] name name of the filter
+	/// \return constant filter reference
+	virtual const langbind::FilterType* filterType( const std::string& name) const=0;
+	/// \brief Get a custom data type
+	/// \param[in] name name of the type
+	/// \return reference to the custom data type
 	virtual const types::CustomDataType* customDataType( const std::string& name) const=0;
-	///\brief Guess document format ('XML','JSON', etc. based on guesser modules loaded)
-	///\param[in] content pointer to document 
-	///\param[in] contentsize size of content in bytes
-	///\param[out] result document format as string
-	///\return true, if decision was possible, false, if more data is needed
-	virtual bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const=0;
-	///\brief Get the application configuration reference path
-	///\return the reference path
+	/// \brief Create a new document type and format detector (defined in modules)
+	/// \return a document type and format detector reference allocated (owned and deleted by the caller)
+	virtual cmdbind::DoctypeDetector* doctypeDetector() const=0;
+	/// \brief Get the application configuration reference path
+	/// \return the reference path
 	virtual const std::string& referencePath() const=0;
 };
 

@@ -1,8 +1,6 @@
 {
-  "customers": {
-    "customer": [
-      { "name": "Hugo" },
-      { "name": "Hugo" }
-    ]
-  }
+	"customer": [
+		{ "name": "Hugo" },
+		{ "name": "Hugo" }
+	]
 }

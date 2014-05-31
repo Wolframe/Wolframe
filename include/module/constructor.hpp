@@ -55,6 +55,7 @@ public:
 		FORM_FUNCTION_OBJECT		=0x0410,
 		NORMALIZE_FUNCTION_OBJECT	=0x0420,
 		CUSTOM_DATA_TYPE_OBJECT		=0x0430,
+		DOCTYPE_DETECTOR_OBJECT		=0x0510,
 		CMD_HANDLER_OBJECT		=0x0610,
 		PROGRAM_TYPE_OBJECT		=0x0710,
 		DDL_COMPILER_OBJECT		=0x0720,
@@ -75,6 +76,7 @@ public:
 			case FORM_FUNCTION_OBJECT: return "Form Function";
 			case NORMALIZE_FUNCTION_OBJECT: return "Normalize Function";
 			case CUSTOM_DATA_TYPE_OBJECT: return "Custom Data Type";
+			case DOCTYPE_DETECTOR_OBJECT: return "Document Type/Format Detector";
 			case CMD_HANDLER_OBJECT: return "Command Handler";
 			case PROGRAM_TYPE_OBJECT: return "Program Type";
 			case DDL_COMPILER_OBJECT: return "DLL Compiler";

@@ -63,19 +63,6 @@ public:
 	///\brief Get a database transaction object
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
-	///\brief Load the database transaction programs for this database from file
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadProgram( const std::string& filename ) = 0;
-
-	///\brief Load the transaction programs for this database from all
-	//        the program files configured for it
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadAllPrograms() = 0;
-
-	///\brief Add a database program to the list of transaction programs
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void addProgram( const std::string& program) = 0;
-
 	virtual const LanguageDescription* getLanguageDescription() const
 	{
 		static LanguageDescription langdescr;
@@ -105,19 +92,6 @@ public:
 
 	///\brief The actual database object.
 	virtual Database* database() = 0;
-
-	///\brief Load the database transaction programs for this database from file
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadProgram( const std::string& filename ) = 0;
-
-	///\brief Load the transaction programs for this database from all
-	//        the program files configured for it
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadAllPrograms() = 0;
-
-	///\brief add a database program to the list of transaction programs
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void addProgram( const std::string& program ) = 0;
 };
 
 }} // namespace _Wolframe::db

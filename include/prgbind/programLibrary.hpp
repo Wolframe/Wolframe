@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Program library interface
-///\file programLibrary.hpp
+/// \brief Program library interface
+/// \file programLibrary.hpp
 
 #ifndef _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
@@ -46,45 +46,68 @@
 #include "types/customDataType.hpp"
 #include "prgbind/program.hpp"
 #include <string>
-#include <list>
+#include <vector>
 
 
 namespace _Wolframe {
 namespace prgbind {
 
-///\class ProgramLibrary
-///\brief Class representing the program library with all programs loaded
+/// \class ProgramLibrary
+/// \brief Class representing the program library with all programs loaded
 class ProgramLibrary
 {
 public:
+	/// \brief Default constructor
 	ProgramLibrary();
+	/// \brief Copy constructor
 	ProgramLibrary( const ProgramLibrary& o);
 
+	/// \brief Destructor
 	virtual ~ProgramLibrary();
+	/// \brief Define a C++ form function
 	virtual void defineCppFormFunction( const std::string& name, const serialize::CppFormFunction& f);
+	/// \brief Define an ordinary form function
 	virtual void defineFormFunction( const std::string& name, const langbind::FormFunctionR f);
+	/// \brief Define a runtime environment
 	virtual void defineRuntimeEnvironment( const langbind::RuntimeEnvironmentR& env);
+	/// \brief Define a form structure that is referenced as unexpanded indirection
 	virtual void definePrivateForm( const types::FormDescriptionR& f);
+	/// \brief Define a form
 	virtual void defineForm( const std::string& name, const types::FormDescriptionR& f);
+	/// \brief Define a normalization function
 	virtual void defineNormalizeFunction( const std::string& name, const types::NormalizeFunctionR& f) const;
+	/// \brief Define a normalization function type
 	virtual void defineNormalizeFunctionType( const std::string& name, const types::NormalizeFunctionType& ftype);
+	/// \brief Define a custom data type
 	virtual void defineCustomDataType( const std::string& name, const types::CustomDataTypeR& t);
+	/// \brief Define a data definition language
 	virtual void defineFormDDL( const langbind::DDLCompilerR& c);
+	/// \brief Define a filter type
 	virtual void defineFilterType( const std::string& name, const langbind::FilterTypeR& f);
+	/// \brief Define a program type
 	virtual void defineProgramType( const ProgramR& prg);
 
+	/// \brief Get the map for DDLs to map types to normalizer call sequences
 	virtual const types::NormalizeFunctionMap* formtypemap() const;
+	/// \brief Get a custom data type defined by name
 	virtual const types::CustomDataType* getCustomDataType( const std::string& name) const;
+	/// \brief Get a normalization function type defined by name
 	virtual const types::NormalizeFunctionType* getNormalizeFunctionType( const std::string& name) const;
 
+	/// \brief Get a form description
 	virtual const types::FormDescription* getFormDescription( const std::string& name) const;
+	/// \brief Get the list of all forms defined
 	virtual std::vector<std::string> getFormNames() const;
 
+	/// \brief Get a form function by name
 	virtual const langbind::FormFunction* getFormFunction( const std::string& name) const;
+	/// \brief Get a normalizer function by name
 	virtual const types::NormalizeFunction* getNormalizeFunction( const std::string& name) const;
+	/// \brief Get a filter type by name
 	virtual const langbind::FilterType* getFilterType( const std::string& name) const;
 
-	virtual void loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames);
+	/// \brief Load all programs passed in 'filenames'
+	virtual void loadPrograms( db::Database* transactionDB, const std::vector<std::string>& filenames);
 
 private:
 	class Impl;

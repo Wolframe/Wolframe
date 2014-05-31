@@ -30,13 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for executing functions with structure input/output in the language bindings
-///\file langbind/formFunction.hpp
+/// \brief Interface for executing functions with structure input/output in the language bindings
+/// \file langbind/formFunction.hpp
 
 #ifndef _LANGBIND_FORM_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_FORM_FUNCTION_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "serialize/mapContext.hpp"
+#include "serialize/flags.hpp"
 #include <string>
 #include <boost/shared_ptr.hpp>
 
@@ -48,35 +48,41 @@ class ExecContext;
 namespace langbind {
 
 /// \class FormFunctionClosure
-/// \brief Form function execution context
+/// \brief Form function execution context interface
 class FormFunctionClosure
 {
 public:
+	/// \brief Destructor
 	virtual ~FormFunctionClosure(){}
 
-	///\brief Calls the function with the input from the input filter specified
-	///\return true when completed
+	/// \brief Calls the function with the input from the input filter specified
+	/// \return true when completed
 	virtual bool call()=0;
 
-	///\brief Initialization of call context for a new call
-	///\param[in] c execution context reference
-	///\param[in] i call input
-	///\param[in] f serialization flags for validating form functions depending on caller context (directmap "strict",lua relaxed)
-	virtual void init( proc::ExecContext* c, const TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None)=0;
+	/// \brief Initialization of call context for a new call
+	/// \param[in] c execution context reference
+	/// \param[in] i call input
+	/// \param[in] f serialization flags for validating form functions depending on caller context (directmap "strict",lua relaxed)
+	virtual void init( proc::ExecContext* c, const TypedInputFilterR& i, serialize::Flags::Enum f=serialize::Flags::None)=0;
 
-	///\brief Get the iterator for the function result
-	///\remark MUST be standalone (alive after destruction of this 'FormFunctionClosure'!)
+	/// \brief Get the iterator for the function result
+	/// \remark MUST be standalone (alive after destruction of this 'FormFunctionClosure'!)
 	virtual TypedInputFilterR result() const=0;
 };
 
+/// \brief Shared form function execution context
 typedef boost::shared_ptr<FormFunctionClosure> FormFunctionClosureR;
 
+/// \class FormFunction
+/// \brief Form function interface
 struct FormFunction
 {
+public:
 	virtual ~FormFunction(){}
 	virtual FormFunctionClosure* createClosure() const=0;
 };
 
+/// \brief Shared form function interface
 typedef boost::shared_ptr<FormFunction> FormFunctionR;
 
 }}//namespace

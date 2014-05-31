@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/execCommandHandler.hpp
-///\brief Command handler for the selection and execution of commands defined as a list of command handlers. Includes interpreting of commands that belong to the caller and return control to the caller, if any of them is issued. Includes also a 'Capabilities' command for showing the list of available commands
+/// \file cmdbind/execCommandHandler.hpp
+/// \brief Command handler for the selection and execution of commands defined as a list of command handlers. Includes interpreting of commands that belong to the caller and return control to the caller, if any of them is issued. Includes also a 'Capabilities' command for showing the list of available commands
 #ifndef _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
@@ -46,8 +46,8 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class ExecCommandHandler
-///\brief Command handler for a list of predefined protocol commands. Represents one state in the protocol statemachine.
+/// \class ExecCommandHandler
+/// \brief Command handler for a list of predefined protocol commands. Represents one state in the protocol statemachine.
 class ExecCommandHandler :public CommandHandler
 {
 public:
@@ -61,41 +61,41 @@ public:
 		Command( const std::string& c)				:m_cmdname(c),m_procname(c){}
 	};
 public:
-	///\brief Constructor
-	///\param[in] rcmds_ array of commands that should return control to the caller
-	///\param[in] cmds_ array of command handlers with commands executed by this command handler
+	/// \brief Constructor
+	/// \param[in] rcmds_ array of commands that should return control to the caller
+	/// \param[in] cmds_ array of command handlers with commands executed by this command handler
 	ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_);
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~ExecCommandHandler();
 
-	///\brief See Parent::setInputBuffer(void*,std::size_t)
+	/// \brief See Parent::setInputBuffer(void*,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
-	///\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
+	/// \brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos=0);
 
-	///\brief See Parent::nextOperation()
+	/// \brief See Parent::nextOperation()
 	virtual Operation nextOperation();
 
-	///\brief See Parent::putInput(const void*,std::size_t)
+	/// \brief See Parent::putInput(const void*,std::size_t)
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief See Parent::getInputBlock(void*&,std::size_t&)
+	/// \brief See Parent::getInputBlock(void*&,std::size_t&)
 	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
 
-	///\brief See Parent::getOutput(const void*&,std::size_t&)
+	/// \brief See Parent::getOutput(const void*&,std::size_t&)
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
 
-	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
+	/// \brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	///\brief Get the last command that was unknown and led to a CLOSED. If empty the command handler terminated because of an error
+	/// \brief Get the last command that was unknown and led to a CLOSED. If empty the command handler terminated because of an error
 	const char* getCommand( int& argc, const char**& argv);
 
 private:
-	///\enum State
-	///\brief Enumeration of processor states
+	/// \enum State
+	/// \brief Enumeration of processor states
 	enum State
 	{
 		Init,				//< start state, called first time in this session
@@ -107,8 +107,8 @@ private:
 		PrintCapabilities,		//< print capabilities
 		Terminate			//< terminate application processor session (close for network)
 	};
-	///\brief Returns the state as string for logging etc.
-	///\param [in] i state to get as string
+	/// \brief Returns the state as string for logging etc.
+	/// \param [in] i state to get as string
 	static const char* stateName( State i)
 	{
 		static const char* ar[] = {

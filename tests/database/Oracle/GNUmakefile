@@ -49,8 +49,6 @@ LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(ORACLE_LIB_DIR):$(TOPD
 local_all:
 
 local_clean:
-	@-rm -f gtestReport.txt
-	@-rm -f oracleUnit*.xml
 
 local_distclean:
 

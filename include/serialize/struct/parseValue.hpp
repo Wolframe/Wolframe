@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/parseValue.hpp
-///\brief Defines the intrusive parsing of a value in deserialization
+/// \file serialize/struct/parseValue.hpp
+/// \brief Defines the intrusive parsing of a value in deserialization
 #ifndef _Wolframe_SERIALIZE_STRUCT_PARSE_VALUE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_PARSE_VALUE_HPP_INCLUDED
 #include "types/conversions.hpp"
@@ -46,46 +46,46 @@ Project Wolframe.
 
 namespace {
 
-///\class ParseValueType
-///\brief type traits for parse value types
+/// \class ParseValueType
+/// \brief type traits for parse value types
 struct ParseValueType
 {
-	struct String {};		//< atomic type category tag for string value to parse
-	struct Bool {};			//< atomic type category tag for a boolean value to parse
-	struct Arithmetic {};		//< atomic type category tag for arithmetic value to parse
-	struct DateTime {};		//< atomic type category tag for datetime value to parse
-	struct BigNumber {};		//< atomic type category tag for bignumber value to parse
+	struct String {};		///< atomic type category tag for string value to parse
+	struct Bool {};			///< atomic type category tag for a boolean value to parse
+	struct Arithmetic {};		///< atomic type category tag for arithmetic value to parse
+	struct DateTime {};		///< atomic type category tag for datetime value to parse
+	struct BigNumber {};		///< atomic type category tag for bignumber value to parse
 
-	///\brief get category String for a type
-	///\return String if T is a std:string
+	/// \brief get category String for a type
+	/// \return String if T is a std:string
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,std::string>::value
 		,const String&>::type get( const T&) { static String rt; return rt;}
 
-	///\brief get category Bool for a type
-	///\return Bool if T is a bool
+	/// \brief get category Bool for a type
+	/// \return Bool if T is a bool
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,bool>::value
 		,const Bool&>::type get( const T&) { static Bool rt; return rt;}
 
-	///\brief get category Arithmetic for a type
-	///\return Bool if T is a arithmetic but not a bool
+	/// \brief get category Arithmetic for a type
+	/// \return Bool if T is a arithmetic but not a bool
 	template <typename T>
 	static typename boost::enable_if_c<
 		(boost::is_arithmetic<T>::value && !boost::is_same<T,bool>::value && !boost::is_same<T,std::string>::value)
 		,const Arithmetic&>::type get( const T&) { static Arithmetic rt; return rt;}
 
-	///\brief get category DateTime for a type
-	///\return DateTime if T is a datetime
+	/// \brief get category DateTime for a type
+	/// \return DateTime if T is a datetime
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,_Wolframe::types::DateTime>::value
 		,const DateTime&>::type get( const T&) { static DateTime rt; return rt;}
 
-	///\brief get category BigNumber for a type
-	///\return BigNumber if T is a big number
+	/// \brief get category BigNumber for a type
+	/// \return BigNumber if T is a big number
 	template <typename T>
 	static typename boost::enable_if_c<
 		boost::is_same<T,_Wolframe::types::BigNumber>::value

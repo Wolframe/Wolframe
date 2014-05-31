@@ -40,6 +40,7 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 TYP_OBJS = \
+	types/docmetadata.o \
 	types/conversions.o \
 	types/numberBaseConversion.o \
 	types/propertyTree.o \
@@ -53,6 +54,7 @@ TYP_OBJS = \
 	types/form.o
 
 UTIL_OBJS = \
+	utils/asciiCharParser.o \
 	utils/fileLineInfo.o \
 	utils/sourceLineInfo.o \
 	utils/typeSignature.o \

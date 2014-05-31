@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/intrusiveProperty.hpp
-///\brief Defines the intrusive implementation of some parsing element properties
+/// \file serialize/struct/intrusiveProperty.hpp
+/// \brief Defines the intrusive implementation of some parsing element properties
 #ifndef _Wolframe_SERIALIZE_STRUCT_PROPERTY_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_PROPERTY_HPP_INCLUDED
 #include "serialize/struct/traits_getCategory.hpp"
@@ -38,8 +38,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class IntrusiveProperty
-///\brief Maps the traits based on structure element type properties to an enumeration value
+/// \class IntrusiveProperty
+/// \brief Maps the traits based on structure element type properties to an enumeration value
 template <typename T>
 struct IntrusiveProperty
 {

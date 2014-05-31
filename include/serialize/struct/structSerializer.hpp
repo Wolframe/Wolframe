@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/structSerializer.hpp
-///\brief Serialization interface
+/// \file serialize/struct/structSerializer.hpp
+/// \brief Serialization interface
 #ifndef _Wolframe_SERIALIZE_STRUCT_SERIALIZER_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_SERIALIZER_HPP_INCLUDED
 #include "serialize/struct/structDescriptionBase.hpp"
@@ -38,35 +38,46 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class StructSerializer
-///\brief Iterator on elements of structures based on a structure description
+/// \class StructSerializer
+/// \brief Iterator on elements of structures based on a structure description
 class StructSerializer :public langbind::TypedInputFilter
 {
 public:
 	typedef boost::shared_ptr<void> ObjectReference;
 
+	/// \brief Constructor
 	StructSerializer( const ObjectReference& obj, const StructDescriptionBase* descr);
+	/// \brief Constructor
 	StructSerializer( const void* obj, const StructDescriptionBase* descr);
 
+	/// \brief Copy constructor
 	StructSerializer( const StructSerializer& o);
+	/// \brief Destructor
 	virtual ~StructSerializer(){}
 
+	/// \brief Get the current element path defined by the stack 'stk' as string for error messages
 	static std::string getElementPath( const SerializeStateStack& stk);
 
-	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
+	/// \brief Serialize start initialization
+	void init( const langbind::TypedOutputFilterR& out, serialize::Flags::Enum flags=serialize::Flags::None);
 	void reset();
 
+	/// \brief Call of one processing step the serializer
+	/// \remark The processing is finished when the call returns true. In case of false returned you have to inspect the output filter state to determine what is to do next.
+	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,serialize::Flags)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
 	bool call();
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual langbind::TypedInputFilter* copy() const;
 
-	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,types::VariantConst&)
+	/// \brief Get the next element of the serialization, implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,types::VariantConst&)
+	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,serialize::Flags)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
 	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
 
-	///\brief Implements FilterBase::setFlags()
-	virtual bool setFlags( Flags f);
+	/// \brief Set the flags stearing the serialization, implements FilterBase::setFlags(FilterBase::Flags)
+	/// \return false, if not all flags have the behaviour implemented and are accepted 
+	virtual bool setFlags( FilterBase::Flags f);
 
 private:
 	const void* m_ptr;

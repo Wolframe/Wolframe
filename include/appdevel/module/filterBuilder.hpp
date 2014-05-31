@@ -41,7 +41,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-class FilterConstructor :public SimpleObjectConstructor<langbind::Filter>
+class FilterConstructor
+	:public SimpleObjectConstructor<langbind::Filter>
 {
 public:
 	FilterConstructor( const std::string& name_, langbind::CreateFilterType createFilterType_)
@@ -75,7 +76,8 @@ private:
 typedef types::CountedReference<FilterConstructor> FilterConstructorR;
 
 
-class FilterBuilder :public SimpleBuilder
+class FilterBuilder
+	:public SimpleBuilder
 {
 public:
 	FilterBuilder( const char* className_, const char* name_, langbind::CreateFilterType createFilterType_)

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file documentWriter.hpp
-///\brief Document writer abstraction for the libxml2 library
+/// \file documentWriter.hpp
+/// \brief Document writer abstraction for the libxml2 library
 
 #ifndef _Wolframe_LIBXML2_DOCUMENT_WRITER_HPP_INCLUDED
 #define _Wolframe_LIBXML2_DOCUMENT_WRITER_HPP_INCLUDED
@@ -45,29 +45,29 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+/// \class DocumentWriter
+/// \brief Abstraction of libxml2 document writer to a string
 class DocumentWriter
 {
 public:
+	/// \brief Default constructor
 	DocumentWriter(){}
 
+	/// \brief Copy constructor
 	DocumentWriter( const DocumentWriter& o)
 		:m_writerbuf(o.m_writerbuf)
 		,m_writer(o.m_writer){}
 
-	bool init( const char* encoding, bool standalone);
+	/// \brief Constructor
+	DocumentWriter( const char* encoding, const char* root, const char* publicid, const char* systemid, const char* xmlns, const char* xsi, const char* schemaLocation);
 
-	DocumentWriter( const char* encoding, const char* doctype, const char* publicid, const char* systemid);
-
-	DocumentWriter( const char* encoding)
-	{
-		init( encoding, true);
-	}
-
+	/// \brief Writer handle (libxml2)
 	xmlTextWriterPtr get() const
 	{
 		return m_writer.get();
 	}
 
+	/// \brief XML writer content to string (UTF-8) function
 	const std::string getContent()
 	{
 		return std::string(

@@ -49,28 +49,18 @@ using namespace _Wolframe;
 using namespace langbind;
 using namespace cmdbind;
 
-void LuaCommandHandler::initcall( const std::string& docformat)
+void LuaCommandHandler::initcall()
 {
 	if (!execContext()) throw std::logic_error( "execution context is not defined");
-	const proc::ProcessorProviderInterface* provider = execContext()->provider();
 
-	if (!m_ctx->funcmap.getLuaScriptInstance( m_name, m_interp))
-	{
-		throw std::runtime_error( std::string( "unknown lua script '") + m_name + "'");
-	}
-	m_interp->init( Input(m_inputfilter,docformat), Output(m_outputfilter), execContext());
-	std::string defaultfilter = m_ctx->defaultFilter( docformat);
+	m_interp->init( Input(m_inputfilter,m_docformat), Output(m_outputfilter), execContext());
 
-	if (!defaultfilter.empty())
+	if (m_default_filter.filtertype)
 	{
-		types::CountedReference<langbind::Filter> filter( provider->filter( defaultfilter));
-		if (!filter.get())
-		{
-			throw std::runtime_error( std::string( "filter not defined '") + defaultfilter + "'");
-		}
+		types::CountedReference<langbind::Filter> filter( m_default_filter.create());
 		if (!filter->inputfilter().get())
 		{
-			throw std::runtime_error( std::string( "input filter not defined '") + defaultfilter + "'");
+			throw std::runtime_error( std::string( "input filter not defined for '") + m_default_filter.filtertype->name() + "'");
 		}
 		if (m_inputfilter.get())
 		{
@@ -82,7 +72,7 @@ void LuaCommandHandler::initcall( const std::string& docformat)
 		}
 		if (!filter->outputfilter().get())
 		{
-			throw std::runtime_error( std::string( "output filter not defined '") + defaultfilter + "'");
+			throw std::runtime_error( std::string( "output filter not defined '") + m_default_filter.filtertype->name() + "'");
 		}
 		if (m_outputfilter.get())
 		{
@@ -101,11 +91,11 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	errorCode = 0;
 	int nargs = 0;
 
-	if (!m_interp.get())
+	if (!m_called)
 	{
 		try
 		{
-			initcall( m_argBuffer.size()?m_argBuffer.at(0):"");
+			initcall();
 		}
 		catch (const std::exception& e)
 		{
@@ -121,28 +111,45 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 			lua_pushlstring( m_interp->thread(), itr->c_str(), itr->size());
 		}
 		nargs = (int)m_argBuffer.size();
+		m_called = true;
 	}
-	do
+	if (!m_done)
 	{
-		// call the function (subsequently until termination)
-		rt = lua_resume( m_interp->thread(), NULL, nargs);
-		if (rt == LUA_YIELD)
+		do
 		{
-			if ((m_inputfilter.get() && m_inputfilter->state() != InputFilter::Open)
-			||  (m_outputfilter.get() && m_outputfilter->state() != OutputFilter::Open))
+			// call the function (subsequently until termination)
+			rt = lua_resume( m_interp->thread(), NULL, nargs);
+			if (rt == LUA_YIELD)
 			{
-				return Yield;
+				// call the function (subsequently until termination)
+				rt = lua_resume( m_interp->thread(), NULL, nargs);
+				if (rt == LUA_YIELD)
+				{
+					if ((m_inputfilter.get() && m_inputfilter->state() != InputFilter::Open)
+					||  (m_outputfilter.get() && m_outputfilter->state() != OutputFilter::Open))
+					{
+						return Yield;
+					}
+				}
+				nargs = 0;
 			}
 		}
-		nargs = 0;
+		while (rt == LUA_YIELD);
+		m_done = true;
 	}
-	while (rt == LUA_YIELD);
 	if (rt != 0)
 	{
 		m_lasterror.append( m_interp->luaUserErrorMessage( m_interp->thread()));
 		LOG_ERROR << "error calling lua function '" << m_name.c_str() << "':" << m_interp->luaErrorMessage( m_interp->thread());
 		errorCode = m_lasterror.c_str();
 		return Error;
+	}
+	else
+	{
+		if (!m_outputfilter->close())
+		{
+			return Yield;
+		}
 	}
 	return Ok;
 }

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddlFormParser.hpp
-///\brief Interface to DDL form parsing
+/// \file serialize/ddlFormParser.hpp
+/// \brief Interface to DDL form parsing
 #ifndef _Wolframe_serialize_DDL_FORM_PARSER_HPP_INCLUDED
 #define _Wolframe_serialize_DDL_FORM_PARSER_HPP_INCLUDED
 #include "utils/typeSignature.hpp"
@@ -43,28 +43,35 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
+/// \class DDLFormParser
+/// \brief Parser of a form from a serialization defined by a DDL
 class DDLFormParser
 	:public virtual utils::TypeSignature
 	,public serialize::DDLStructParser
 {
 public:
+	/// \brief Constructor
 	explicit DDLFormParser( const types::FormR& form_)
 		:utils::TypeSignature("langbind::DDLFormParser", __LINE__)
 		,DDLStructParser(form_.get())
 		,m_form(form_){}
 
+	/// \brief Constructor
 	DDLFormParser( const types::FormR& form_, types::VariantStruct* substructure)
 		:utils::TypeSignature("langbind::DDLFormParser", __LINE__)
 		,DDLStructParser(substructure)
 		,m_form(form_){}
 
+	/// \brief Copy constructor
 	DDLFormParser( const DDLFormParser& o)
 		:utils::TypeSignature(o)
 		,DDLStructParser(o)
 		,m_form(o.m_form){}
 
+	/// \brief Destructor
 	virtual ~DDLFormParser(){}
 
+	/// \brief Assignment operator
 	DDLFormParser& operator=( const DDLFormParser& o)
 	{
 		utils::TypeSignature::operator=( o);
@@ -73,10 +80,11 @@ public:
 		return *this;
 	}
 
+	/// \brief Get a shared reference to the form structure filled by this parser
 	const types::FormR& form() const	{return m_form;}
 
 private:
-	types::FormR m_form;
+	types::FormR m_form;		///< reference to the form structure of this parser
 };
 
 }}//namespace

@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/structDescription.hpp
-///\brief Defines the bricks for the SDK to describe serialization/deserialization of objects in Wolframe.
-///\remark This module uses intrusive building blocks to build the serialization/deserialization of the objects interfaced as TypedInputFilter/TypedOutputFilter.
+/// \file serialize/struct/structDescription.hpp
+/// \brief Defines the bricks for the SDK to describe serialization/deserialization of objects in Wolframe.
+/// \remark This module uses intrusive building blocks to build the serialization/deserialization of the objects interfaced as TypedInputFilter/TypedOutputFilter.
 #ifndef _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_HPP_INCLUDED
 #include "serialize/struct/structDescriptionBase.hpp"
@@ -46,20 +46,20 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class StructDescription
-///\brief Intrusive description of a filter/form map
-///\tparam Structure structure that is represented by this description
+/// \class StructDescription
+/// \brief Intrusive description of a filter/form map
+/// \tparam Structure structure that is represented by this description
 template <class Structure>
 struct StructDescription :public StructDescriptionBase
 {
-	///\brief Constructor
+	/// \brief Constructor
 	StructDescription()
 		:StructDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), IntrusiveProperty<Structure>::type(), &IntrusiveParser<Structure>::parse, &IntrusiveSerializer<Structure>::fetch, NoRequirement){}
 
-	///\brief Operator to build the structure description element by element
-	///\tparam Element element type
-	///\param[in] tag name of the element
-	///\param[in] eptr pointer to member of the element
+	/// \brief Operator to build the structure description element by element
+	/// \tparam Element element type
+	/// \param[in] tag name of the element
+	/// \param[in] eptr pointer to member of the element
 	template <typename Element>
 	StructDescription& operator()( const char* tag, Element Structure::*eptr)
 	{
@@ -79,6 +79,7 @@ struct StructDescription :public StructDescriptionBase
 		return *this;
 	}
 
+	/// \brief Define the last structure element defined to be mandatory always (independent of validation mode)
 	StructDescription& mandatory()
 	{
 		if (last().optional()) throw std::logic_error( "ambiguous mandatory/optional declaration");
@@ -86,6 +87,7 @@ struct StructDescription :public StructDescriptionBase
 		return *this;
 	}
 
+	/// \brief Define the last structure element defined to be optional always (independent of validation mode)
 	StructDescription& optional()
 	{
 		if (last().mandatory()) throw std::logic_error( "ambiguous mandatory/optional declaration");
@@ -93,15 +95,17 @@ struct StructDescription :public StructDescriptionBase
 		return *this;
 	}
 
+	/// \brief Define the elements defined until now to be attributes and the subsequent elements defined to be content elements (e.g. for XML validation). By default all elements are content elements
 	StructDescription& operator--(int)
 	{
 		defineEndOfAttributes();
 		return *this;
 	}
 
+	/// \brief Construct an object of this kind at an allocated location (with base pointer 'obj')
 	static bool constructor( void* obj)
 	{
-		///\brief create operator new for Structure on an already allocated chunk to call it's constructor
+		/// \brief create operator new for Structure on an already allocated chunk to call it's constructor
 		struct StructureShell :public Structure
 		{
 			void* operator new( std::size_t num_bytes, void* obj) throw (std::bad_alloc)
@@ -121,11 +125,13 @@ struct StructDescription :public StructDescriptionBase
 		}
 	}
 
+	/// \brief Destroy an object of this kind allocated with 'constructor(void*)' at the location 'obj'
 	static void destructor( void* obj)
 	{
 		((Structure*)obj)->~Structure();
 	}
 
+	/// \brief Get the name of the type 'Element' if available
 	template <class Element>
 	static const char* getTypename()
 	{

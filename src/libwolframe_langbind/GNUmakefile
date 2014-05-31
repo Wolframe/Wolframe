@@ -29,6 +29,7 @@ DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
 	protocol_ioblocks.o \
+	filterdef.o \
 	input.o \
 	output.o \
 	null_filter.o \
@@ -40,8 +41,6 @@ CPP_OBJS = \
 	cmdbind_authCommandHandler.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
-	cmdbind_doctypeFilterCommandHandler.o \
-	cmdbind_contentBufferCommandHandlerEscDLF.o \
 	cmdbind_ioFilterCommandHandlerEscDLF.o
 
 

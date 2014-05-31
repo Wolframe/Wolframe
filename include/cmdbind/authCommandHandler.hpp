@@ -60,28 +60,28 @@ public:
 		return usr?*usr:undefined;
 	}
 
-	///\brief See CommandHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
+	/// \brief See CommandHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
-	///\brief See CommandHandler::setOutputBuffer(void*,std::size_t,std::size_t)
+	/// \brief See CommandHandler::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
 
-	///\brief See CommandHandler::nextOperation()
+	/// \brief See CommandHandler::nextOperation()
 	virtual Operation nextOperation();
 
-	///\brief See CommandHandler::putInput(const void*,std::size_t);
+	/// \brief See CommandHandler::putInput(const void*,std::size_t);
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief See CommandHandler::getInputBlock(void*&,std::size_t&)
+	/// \brief See CommandHandler::getInputBlock(void*&,std::size_t&)
 	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
 
-	///\brief See CommandHandler::getOutput(const void*&,std::size_t&)
+	/// \brief See CommandHandler::getOutput(const void*&,std::size_t&)
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
 
-	///\brief See CommandHandler::getDataLeft(const void*&,std::size_t&)
+	/// \brief See CommandHandler::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	///\brief See CommandHandler::interruptDataSessionMarker()
+	/// \brief See CommandHandler::interruptDataSessionMarker()
 	virtual const char* interruptDataSessionMarker() const;
 
 private:

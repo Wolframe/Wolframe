@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/tostringUtils.hpp
-///\brief Defines a configuration structure parser
+/// \file serialize/tostringUtils.hpp
+/// \brief Defines a configuration structure parser
 #ifndef _Wolframe_SERIALIZE_TOSTRING_UTILS_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_TOSTRING_UTILS_HPP_INCLUDED
 #include "filter/typedfilter.hpp"

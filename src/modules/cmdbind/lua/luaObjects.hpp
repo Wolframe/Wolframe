@@ -175,7 +175,7 @@ public:
 	bool getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const;
 
 	///\brief Get the list of commands
-	std::list<std::string> commands() const;
+	std::vector<std::string> commands() const;
 
 private:
 	LuaFunctionMap( const LuaFunctionMap&){}	//non copyable

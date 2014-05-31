@@ -58,26 +58,19 @@ bool DDLProgram::is_mine( const std::string& filename) const
 
 void DDLProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)
 {
-	try
+	const types::NormalizeFunctionMap* typemap = library.formtypemap();
+	std::vector<types::FormDescriptionR> forms = m_constructor->compile( filename, typemap);
+	std::vector<types::FormDescriptionR>::const_iterator fi = forms.begin(), fe = forms.end();
+	for (; fi != fe; ++fi)
 	{
-		const types::NormalizeFunctionMap* typemap = library.formtypemap();
-		std::vector<types::FormDescriptionR> forms = m_constructor->compile( filename, typemap);
-		std::vector<types::FormDescriptionR>::const_iterator fi = forms.begin(), fe = forms.end();
-		for (; fi != fe; ++fi)
+		if ((*fi)->name().empty())
 		{
-			if ((*fi)->name().empty())
-			{
-				library.definePrivateForm( *fi);
-			}
-			else
-			{
-				library.defineForm( (*fi)->name(), *fi);
-			}
+			library.definePrivateForm( *fi);
 		}
-	}
-	catch (const std::runtime_error& e)
-	{
-		throw std::runtime_error( std::string( e.what()) + " loading program '" + filename + "'");
+		else
+		{
+			library.defineForm( (*fi)->name(), *fi);
+		}
 	}
 }
 

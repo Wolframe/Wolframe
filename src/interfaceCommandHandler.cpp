@@ -32,7 +32,6 @@
 ************************************************************************/
 ///\file interfaceCommandHandler.cpp
 #include "interfaceCommandHandler.hpp"
-#include "cmdbind/contentBufferCommandHandlerEscDLF.hpp"
 #include "logger-v1.hpp"
 #include "processor/procProvider.hpp"
 #include <stdexcept>

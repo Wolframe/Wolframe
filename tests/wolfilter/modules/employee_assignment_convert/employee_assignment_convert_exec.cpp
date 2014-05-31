@@ -53,10 +53,10 @@ static void convertString( std::string& res, const std::string& param)
 	}
 }
 
-int test::assignmentListDocConvert( proc::ExecContext*, AssignmentListDoc& res, const AssignmentListDoc& param)
+int test::assignmentListConvert( proc::ExecContext*, AssignmentList& res, const AssignmentList& param)
 {
-	std::vector<Assignment>::const_iterator itr=param.assignmentlist.assignment.begin();
-	while (itr != param.assignmentlist.assignment.end())
+	std::vector<Assignment>::const_iterator itr=param.assignment.begin();
+	while (itr != param.assignment.end())
 	{
 		Assignment aa;
 		convertString( aa.issuedate, itr->issuedate);
@@ -73,7 +73,7 @@ int test::assignmentListDocConvert( proc::ExecContext*, AssignmentListDoc& res, 
 			aa.task.push_back( tt);
 			++taskitr;
 		}
-		res.assignmentlist.assignment.push_back( aa);
+		res.assignment.push_back( aa);
 		++itr;
 	}
 	return 0;

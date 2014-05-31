@@ -23,7 +23,7 @@ Processor
 **file:script.lua
 `cat ../scripts/$luascript`"
 
-csetlist="UCS-2LE UCS-2BE UCS-4BE UCS-4LE"		# character set encodings to test
+csetlist="UTF-8 UCS-2LE UCS-2BE UCS-4BE UCS-4LE"	# character set encodings to test
 . ./output_tst_textwolf.sh
 
 csetlist="UTF-8 UTF-16LE UTF-16BE"			# character set encodings to test

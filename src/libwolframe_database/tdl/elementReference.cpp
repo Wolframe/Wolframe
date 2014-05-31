@@ -44,10 +44,10 @@ using namespace _Wolframe::db::tdl;
 ElementReference ElementReference::parseEmbeddedReference( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	char ch = utils::gotoNextToken( si, se);
-	if (ch == '(')
+	if (ch == '(' || ch == '{')
 	{
 		char sb,eb;
-		sb = '('; eb = ')';
+		sb = ch; eb = ((ch == '(')?')':'}');
 		++si;
 		std::string::const_iterator argstart = si;
 		std::string tok;

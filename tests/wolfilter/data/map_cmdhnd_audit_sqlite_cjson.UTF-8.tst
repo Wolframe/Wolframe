@@ -4,13 +4,11 @@
 **requires:SQLITE3
 **input
 {
-  "doctype": "Person",
-  "person": {
+    "-doctype": "Person",
     "name": "Hugi Turbo",
     "address": "Gurkenstrasse 7a 3145 Gumligen"
-  }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf InsertPerson
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json -c wolframe.conf InsertPerson
 
 **file:wolframe.conf
 LoadModules
@@ -58,7 +56,7 @@ INSERT INTO Person (name,address) VALUES ('Carla','Camelstreet 34 Carassa');
 INSERT INTO Person (name,address) VALUES ('Dorothe','Demotastrasse 45 Durnfo');
 INSERT INTO Person (name,address) VALUES ('Erik','Erakimolstrasse 56 Enden');
 **file:audit.dmap
-COMMAND (Insert Person) SKIP CALL(insertPerson);
+COMMAND (Insert Person) SKIP CALL insertPerson;
 **file:audit.tdl
 
 TRANSACTION insertPerson

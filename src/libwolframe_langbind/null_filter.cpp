@@ -87,16 +87,16 @@ struct InputFilterImpl :public InputFilter
 		end = m_srcend;
 	}
 
-	virtual const char* getEncoding() const
-	{
-		return 0;
-	}
-
 	//\brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType&, const void*&, std::size_t&)
 	{
 		setState( Error, "input filter not defined");
 		return false;
+	}
+
+	virtual const types::DocMetaData* getMetaData()
+	{
+		return getMetaDataRef().get();
 	}
 
 private:
@@ -134,6 +134,7 @@ struct OutputFilterImpl :public OutputFilter
 		setState( Error, "output filter not defined");
 		return false;
 	}
+	virtual bool close(){return true;}
 };
 }//end anonymous namespace
 

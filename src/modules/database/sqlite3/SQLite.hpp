@@ -132,10 +132,6 @@ public:
 	const std::string& ID() const;
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 
-	virtual void loadProgram( const std::string& filename );
-	virtual void loadAllPrograms();
-	virtual void addProgram( const std::string& program );
-
 	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );
 
@@ -165,13 +161,6 @@ public:
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 	Database* database();
-
-	virtual void loadProgram( const std::string& filename );
-	/// MBa: to be defined after some more cleaning...
-	virtual void loadAllPrograms();
-
-	virtual void addProgram( const std::string& program )
-						{ m_program.load( program ); }
 
 	PoolObject<sqlite3*>* newConnection()	{return new PoolObject<sqlite3*>( m_connPool);}
 

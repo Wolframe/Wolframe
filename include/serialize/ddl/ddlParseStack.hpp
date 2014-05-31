@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/ddlParseStack.hpp
-///\brief Defines the Parsing STM for DDL serialization
+/// \file serialize/ddl/ddlParseStack.hpp
+/// \brief Defines the Parsing STM for DDL serialization
 
 #ifndef _Wolframe_SERIALIZE_DDL_PARSE_STACK_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DDL_PARSE_STACK_HPP_INCLUDED
@@ -44,11 +44,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class DDLParseState
-///\brief State stack element for an initializer of a DDL structure from an iterator (serialization)
+/// \class DDLParseState
+/// \brief State stack element for an initializer of a DDL structure from an iterator (serialization)
 class DDLParseState
 {
 public:
+	/// \brief Copy constructor
 	DDLParseState( const DDLParseState& o)
 		:m_size(o.m_size)
 		,m_elemidx(o.m_elemidx)
@@ -58,6 +59,7 @@ public:
 		,m_stateidx(o.m_stateidx)
 		{}
 
+	/// \brief Constructor
 	DDLParseState( const char* name_, types::VariantStruct* v, const types::NormalizeFunction* n)
 		:m_size(0)
 		,m_elemidx(0)
@@ -67,28 +69,34 @@ public:
 		,m_stateidx(0)
 		{}
 
+	/// \brief Destructor
 	~DDLParseState(){}
 
+	/// \brief Reference to the substructure visited in this state
 	types::VariantStruct* value() const
 	{
 		return m_value;
 	}
 
+	/// \brief Reference name of the substructure visited in this state
 	const char* name() const
 	{
 		return m_name;
 	}
 
+	/// \brief Set the internal state
 	void state( std::size_t idx)
 	{
 		m_stateidx = idx;
 	}
 
+	/// \brief Get the internal state
 	std::size_t state() const
 	{
 		return m_stateidx;
 	}
 
+	/// \brief Get the normalizer function of the value node of this state
 	const types::NormalizeFunction* normalizer() const
 	{
 		return m_normalizer;
@@ -103,7 +111,7 @@ private:
 	std::size_t m_stateidx;
 };
 
-///\brief State stack for an initializer of a DDL structure from an iterator (serialization)
+/// \brief State stack for an initializer of a DDL structure from an iterator (serialization)
 typedef std::vector<DDLParseState> DDLParseStateStack;
 
 

@@ -129,7 +129,7 @@ static bool fetchStruct( Context& ctx, std::vector<DDLSerializeState>& stk)
 			}
 			else
 			{
-				if (itr->type() == types::VariantStruct::Array && !ctx.flag( Context::SerializeWithIndices))
+				if (itr->type() == types::VariantStruct::Array && !ctx.flag( serialize::Flags::SerializeWithIndices))
 				{
 					types::VariantConst elem( di->name);
 					stk.back().state( ++idx);
@@ -170,7 +170,7 @@ static bool fetchVector( Context& ctx, std::vector<DDLSerializeState>& stk)
 		return false;
 	}
 	types::VariantStruct::const_iterator itr = obj->begin()+idx;
-	if (ctx.flag( Context::SerializeWithIndices))
+	if (ctx.flag( serialize::Flags::SerializeWithIndices))
 	{
 		ctx.setElem( langbind::FilterBase::OpenTag, types::VariantConst( (unsigned int)idx+1U));
 		stk.back().state( idx+1);
@@ -296,7 +296,7 @@ bool DDLStructSerializer::setFlags( Flags f)
 	rt &= langbind::TypedInputFilter::setFlags( f);
 	if (flag( langbind::TypedInputFilter::SerializeWithIndices))
 	{
-		m_ctx.setFlags( Context::SerializeWithIndices);
+		m_ctx.setFlags( serialize::Flags::SerializeWithIndices);
 	}
 	return rt;
 }
@@ -329,7 +329,7 @@ DDLStructSerializer& DDLStructSerializer::operator =( const DDLStructSerializer&
 	return *this;
 }
 
-void DDLStructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags_ )
+void DDLStructSerializer::init( const langbind::TypedOutputFilterR& out, serialize::Flags::Enum flags_ )
 {
 	m_ctx.clear();
 	m_ctx.setFlags(flags_);

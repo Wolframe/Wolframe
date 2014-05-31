@@ -2,7 +2,7 @@
 **requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<garten>1</garten><wald>3</wald><wiese>2</wiese>
+<doc><garten>1</garten><wald>3</wald><wiese>2</wiese></doc>
 **config
 --config wolframe.conf --filter textwolf testcall
 **file:wolframe.conf

@@ -121,9 +121,9 @@ struct InputFilterImpl :public InputFilter
 		return false;
 	}
 
-	virtual const char* getEncoding() const
+	virtual const types::DocMetaData* getMetaData()
 	{
-		return 0;
+		return getMetaDataRef().get();
 	}
 
 	virtual bool checkSetFlags( Flags f) const
@@ -151,9 +151,9 @@ private:
 struct OutputFilterImpl :public OutputFilter
 {
 	///\brief Constructor
-	OutputFilterImpl()
+	OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData)
 		:utils::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
-		,OutputFilter("blob")
+		,OutputFilter("blob", inheritedMetaData)
 		,m_elemitr(0){}
 
 	///\brief Copy constructor
@@ -214,6 +214,10 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		return true;
 	}
+
+	/// \brief Implementation of OutputFilter::close()
+	virtual bool close(){return true;}
+
 private:
 	std::string m_elembuf;				//< buffer for the currently printed element
 	std::size_t m_elemitr;				//< iterator to pass it to output
@@ -226,14 +230,15 @@ struct BlobFilter :public Filter
 	BlobFilter()
 	{
 		m_inputfilter.reset( new InputFilterImpl());
-		m_outputfilter.reset( new OutputFilterImpl());
+		m_outputfilter.reset( new OutputFilterImpl( m_inputfilter->getMetaDataRef()));
 	}
 };
 
 class BlobFilterType :public FilterType
 {
 public:
-	BlobFilterType(){}
+	BlobFilterType()
+		:FilterType("blob"){}
 	virtual ~BlobFilterType(){}
 
 	virtual Filter* create( const std::vector<FilterArgument>& arg) const

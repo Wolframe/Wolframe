@@ -48,8 +48,6 @@ LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDI
 local_all:
 
 local_clean:
-	@-rm -f gtestReport.txt
-	@-rm -f postgresUnit*.xml
 
 local_distclean:
 

@@ -23,6 +23,7 @@ LIBRARIES = \
 
 CPP_OBJS = \
 	protocol_ioblocks.obj \
+	filterdef.obj \
 	input.obj \
 	output.obj \
 	tostringfilter.obj \
@@ -34,8 +35,6 @@ CPP_OBJS = \
 	cmdbind_authCommandHandler.obj \
 	cmdbind_lineCommandHandler.obj \
 	cmdbind_execCommandHandler.obj \
-	cmdbind_doctypeFilterCommandHandler.obj \
-	cmdbind_contentBufferCommandHandlerEscDLF.obj \
 	cmdbind_IOFilterCommandHandlerEscDLF.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)

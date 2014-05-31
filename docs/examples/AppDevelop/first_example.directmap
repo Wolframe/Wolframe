@@ -1,4 +1,4 @@
 
 COMMAND insert Customer CALL doInsertCustomer;
-COMMAND get Employee SKIP CALL doSelectEmployee( xml ) RETURN Employee;
+COMMAND get Employee SKIP CALL doSelectEmployee RETURN Employee;
 

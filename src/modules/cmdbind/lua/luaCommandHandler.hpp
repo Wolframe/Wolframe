@@ -34,6 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
+#include "filter/filterdef.hpp"
 #include "luaObjects.hpp"
 #include "luaScriptContext.hpp"
 #include <vector>
@@ -51,8 +52,8 @@ public:
 
 public:
 	///\brief Constructor
-	explicit LuaCommandHandler( const langbind::LuaScriptContext* ctx_)
-		:m_ctx(ctx_){}
+	explicit LuaCommandHandler( const langbind::LuaScriptInstanceR& interp_, const std::string& docformat_, const langbind::FilterDef& default_filter_)
+		:m_interp(interp_),m_docformat(docformat_),m_default_filter(default_filter_),m_called(false),m_done(false){}
 
 	///\brief Destructor
 	virtual ~LuaCommandHandler(){}
@@ -69,12 +70,15 @@ public:
 	}
 
 private:
-	void initcall( const std::string& docformat);
+	void initcall();
 
 private:
-	const langbind::LuaScriptContext* m_ctx;
 	langbind::LuaScriptInstanceR m_interp;
+	std::string m_docformat;
+	langbind::FilterDef m_default_filter;
 	std::string m_lasterror;
+	bool m_called;				///< already called once
+	bool m_done;				///< terminated execution, executing output filter close phase
 };
 
 }}//namespace

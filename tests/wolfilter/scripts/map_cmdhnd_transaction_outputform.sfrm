@@ -1,13 +1,11 @@
 FORM map_cmdhnd_transaction_outputform
+	-root doc
 {
-	doc
+	task []
 	{
-		task []
-		{
-			task string
-			start string
-			end string
-			id int
-		}
+		task string
+		start string
+		end string
+		id int
 	}
 }

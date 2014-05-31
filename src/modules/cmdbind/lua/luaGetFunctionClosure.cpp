@@ -68,6 +68,7 @@ AGAIN:
 				throw std::runtime_error( m_inputfilter->getError()?m_inputfilter->getError():"unknown error in input filter");
 
 			case InputFilter::Open:
+			case InputFilter::Start:
 				return EndOfData;
 		}
 		throw std::runtime_error( "illegal state in input filter");
@@ -181,6 +182,7 @@ AGAIN:
 				throw std::runtime_error( m_inputfilter->getError()?m_inputfilter->getError():"unknown error in input filter");
 
 			case InputFilter::Open:
+			case InputFilter::Start:
 				return EndOfData;
 		}
 		throw std::runtime_error( "illegal state in input filter closure");
