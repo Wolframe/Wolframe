@@ -51,9 +51,14 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const std::string AUTHENTICATION_MECH = "WOLFRAME-CRAM";
+
 // Text file authentication - authentication unit
 //***********************************************************************
-TextFileAuthenticator::TextFileAuthenticator( const std::string& Identifier,
+
+const std::string TextFileAuthUnit::m_mechs[] = { AUTHENTICATION_MECH, "" };
+
+TextFileAuthUnit::TextFileAuthUnit( const std::string& Identifier,
 					      const std::string& filename )
 	: AuthenticationUnit( Identifier ), m_pwdFile( filename, false )
 {
@@ -61,21 +66,22 @@ TextFileAuthenticator::TextFileAuthenticator( const std::string& Identifier,
 		      << "' created with file '" << m_pwdFile.filename() << "'";
 }
 
-TextFileAuthenticator::~TextFileAuthenticator()
+TextFileAuthUnit::~TextFileAuthUnit()
 {
 }
 
-AuthenticatorInstance* TextFileAuthenticator::instance()
+AuthenticatorSlice* TextFileAuthUnit::slice( const std::string& /*mech*/,
+					     const net::RemoteEndpoint& /*client*/ )
 {
-	return new TextFileAuthInstance( *this );
+	return new TextFileAuthSlice( *this );
 }
 
 // clang says unused
 //static const std::size_t PWD_LINE_SIZE = 1024;
 
-User* TextFileAuthenticator::authenticatePlain( const std::string& username,
-						const std::string& password,
-						bool caseSensitveUser ) const
+User* TextFileAuthUnit::authenticatePlain( const std::string& username,
+					   const std::string& password,
+					   bool caseSensitveUser ) const
 {
 	PwdFileUser	user;
 
@@ -92,7 +98,7 @@ User* TextFileAuthenticator::authenticatePlain( const std::string& username,
 }
 
 
-PwdFileUser TextFileAuthenticator::getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
+PwdFileUser TextFileAuthUnit::getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
 					    bool caseSensitveUser ) const
 {
 	if ( m_pwdFile.getHMACuser( hash, key, user, caseSensitveUser ))
@@ -105,42 +111,21 @@ PwdFileUser TextFileAuthenticator::getUser( const std::string& hash, const std::
 
 // Text file authentication - authentication slice
 //***********************************************************************
-TextFileAuthInstance::TextFileAuthInstance( const TextFileAuthenticator& backend )
+TextFileAuthSlice::TextFileAuthSlice( const TextFileAuthUnit& backend )
 	: m_backend( backend )
 {
 	m_user = NULL;
 }
 
-TextFileAuthInstance::~TextFileAuthInstance()
+TextFileAuthSlice::~TextFileAuthSlice()
 {
 	if ( m_user != NULL )
 		delete m_user;
 }
 
-void TextFileAuthInstance::receiveData( const void* /*data*/, std::size_t /*size*/ )
+void TextFileAuthSlice::destroy()
 {
-}
-
-const FSM::Operation TextFileAuthInstance::nextOperation()
-{
-	FSM::Operation	op;
-	return op;
-}
-
-void TextFileAuthInstance::signal( FSM::Signal /*event*/ )
-{
-}
-
-std::size_t TextFileAuthInstance::dataLeft( const void*& /*begin*/ )
-{
-	return 0;
-}
-
-User* TextFileAuthInstance::user()
-{
-	User* ret = m_user;
-	m_user = NULL;
-	return ret;
+	delete this;
 }
 
 }} // namespace _Wolframe::AAAA

@@ -32,53 +32,23 @@
 ************************************************************************/
 ///
 /// \file authentication.hpp
-/// \brief top-level header file for authentication interface
+/// \brief top-level header file for authentication unit interface
 ///
 
-#ifndef _AUTHENTICATION_HPP_INCLUDED
-#define _AUTHENTICATION_HPP_INCLUDED
+#ifndef _AUTHENTICATION_UNIT_HPP_INCLUDED
+#define _AUTHENTICATION_UNIT_HPP_INCLUDED
 
 #include <string>
 
-#include "user.hpp"
+#include "AAAA/authSlice.hpp"
 #include "database/DBprovider.hpp"
-#include "system/FSMinterface.hpp"
+#include "system/connectionEndpoint.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-// interface for the authentication global mechanism
-class Authenticator : public _Wolframe::FSM
-{
-public:
-	virtual ~Authenticator()		{}
-
-	// close the authenticator and destroy all sensible data
-	virtual void close()			{}
-};
-
-
-/// AuthenticatorInstance
-/// This is the base class for authenticator slices implementations
-/// An authenticator has (usually) several authenticator instances
-class AuthenticatorInstance : public _Wolframe::FSM
-{
-public:
-	enum AuthProtocol	{
-		PLAIN,			/// Plain text
-		CRAM,			/// Challenge-response
-		SASL			/// SASL dialog
-	};
-
-	virtual ~AuthenticatorInstance()		{}
-	virtual void close()			{}
-
-	virtual AuthProtocol protocolType() const = 0;
-	virtual User* user() = 0;
-};
-
 /// AuthenticationUnit Unit
-/// This is the base class for authentication unit implementations
+/// This is the base class for the authentication unit implementations
 class AuthenticationUnit
 {
 public:
@@ -93,11 +63,20 @@ public:
 						{ return true; }
 	virtual const char* className() const = 0;
 
-	virtual AuthenticatorInstance* instance() = 0;
+	/// The list of mechs implemented by this unit
+	/// \note	The authentication unit returns the mechs as an
+	///		array of strings. The array ends with an empty string.
+	///		Be aware that the other interfaces use a vector instead.
+	virtual const std::string* mechs() const = 0;
+
+	/// An AuthenticatorSlice for the required mech (or NULL)
+	virtual AuthenticatorSlice* slice( const std::string& mech,
+					   const net::RemoteEndpoint& client ) = 0;
+
 private:
 	const std::string	m_identifier;
 };
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUTHENTICATION_HPP_INCLUDED
+#endif // _AUTHENTICATION_UNIT_HPP_INCLUDED

@@ -37,10 +37,11 @@
 #ifndef _AAAA_PROVIDER_HPP_INCLUDED
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
-#include "authentication.hpp"
+#include "authenticator.hpp"
 #include "authorization.hpp"
 #include "audit.hpp"
 #include "config/configurationBase.hpp"
+#include "system/connectionEndpoint.hpp"
 #include <boost/noncopyable.hpp>
 
 namespace _Wolframe {
@@ -78,7 +79,7 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authenticator* authenticator() const;
+	Authenticator* authenticator( const net::RemoteEndpoint& client ) const;
 	Authorizer* authorizer() const;
 	Auditor* auditor() const;
 private:

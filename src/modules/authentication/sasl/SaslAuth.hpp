@@ -37,7 +37,7 @@
 #ifndef _SASL_AUTHENTICATION_HPP_INCLUDED
 #define _SASL_AUTHENTICATION_HPP_INCLUDED
 
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "module/constructor.hpp"
 
 #include <string>
@@ -70,22 +70,26 @@ private:
 };
 
 
-class SaslAuthenticator : public AuthenticationUnit
+class SaslAuthUnit : public AuthenticationUnit
 {
 public:
-	SaslAuthenticator( const std::string& Identifier,
+	SaslAuthUnit( const std::string& Identifier,
 			   const std::string& service, const std::string& confpath );
-	~SaslAuthenticator();
+	~SaslAuthUnit();
 	virtual const char* className() const	{ return SASL_AUTHENTICATION_CLASS_NAME; }
 
-	AuthenticatorInstance* instance()	{ return NULL; }
+	const std::string* mechs() const	{ return m_mechs; }
+
+	AuthenticatorSlice* slice( const std::string& /*mech*/,
+				   const net::RemoteEndpoint& /*client*/ )
+						{ return NULL; }
 
 private:
-	// registered name of the service, should maybe be fixed (or default to) 'wolframe'
-	const std::string	m_service;
-
-	// a SASL configuration path for optional config (overridding system-wide one)
-	const std::string	m_confPath;
+	static const std::string	m_mechs[];	///<	list of mechs for the unit
+	const std::string		m_service;	///<	registered name of the service,
+							///	should maybe be fixed (or default to) 'wolframe'
+	const std::string		m_confPath;	///<	a SASL configuration path for optional config
+							///	(overridding system-wide one)
 };
 
 
@@ -95,7 +99,7 @@ public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
 	virtual const char* objectClassName() const	{ return SASL_AUTHENTICATION_CLASS_NAME; }
-	virtual SaslAuthenticator* object( const config::NamedConfiguration& conf );
+	virtual SaslAuthUnit* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

@@ -103,10 +103,16 @@ public:
 	/// \param [out] nofBytes size of the returned data chunk in bytes
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes)=0;
 
-	/// \brief Get the error code of command execution to be returned to the client
+	/// \brief Get the last error message of command execution to be returned to the client
 	const char* lastError() const
 	{
 		return m_lastError.empty()?0:m_lastError.c_str();
+	}
+
+	/// \brief Set the last error message of command execution to be returned to the client
+	void setLastError( const std::string& msg)
+	{
+		m_lastError = msg;
 	}
 
 	/// \brief Pass the reference to the execution context to the command handler
@@ -137,9 +143,10 @@ public:
 	virtual const char* interruptDataSessionMarker() const	{return "";}
 
 protected:
-	std::string m_lastError;				//< error operation for the client
 	std::string m_name;					//< name of the command to execute
 	std::vector< std::string > m_argBuffer;			//< the command arguments
+private:
+	std::string m_lastError;				//< error operation for the client
 	proc::ExecContext* m_execContext;			//< the reference to the execution context of the connection
 };
 

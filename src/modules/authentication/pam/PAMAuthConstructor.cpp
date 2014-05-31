@@ -40,11 +40,11 @@
 namespace _Wolframe {
 namespace AAAA {
 
-PAMAuthenticator* PAMAuthConstructor::object( const config::NamedConfiguration& conf )
+PAMAuthUnit* PAMAuthConstructor::object( const config::NamedConfiguration& conf )
 {
 	const PAMAuthConfig& cfg = dynamic_cast< const PAMAuthConfig& >( conf );
 
-	PAMAuthenticator* m_auth = new PAMAuthenticator( cfg.m_identifier, cfg.m_service );
+	PAMAuthUnit* m_auth = new PAMAuthUnit( cfg.m_identifier, cfg.m_service );
 	LOG_NOTICE << "PAM authenticator container created";
 	return m_auth;
 }

@@ -78,7 +78,13 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 static MainSTM mainstm;
 
 MainCommandHandler::MainCommandHandler()
-	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>( &mainstm ){}
+	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>(&mainstm)
+	,m_remoteEndpoint(0){}
+
+void MainCommandHandler::setPeer( const net::RemoteEndpoint& remote)
+{
+	m_remoteEndpoint = &remote;
+}
 
 int MainCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
@@ -112,7 +118,11 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
 	if (!m_authenticator.get())
 	{
-		m_authenticator.reset( m_execContext->authenticator());
+		if (!m_remoteEndpoint)
+		{
+			throw std::logic_error("no remote endpoint set, cannot authenticate");
+		}
+		m_authenticator.reset( execContext()->authenticator( *m_remoteEndpoint ));
 		if (!m_authenticator.get())
 		{
 			out << "ERR AUTH denied" << endl();
@@ -126,30 +136,37 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 	}
 	else
 	{
-		out << "MECHS " << "NONE" /*[+] boost::algorithm::join( m_authenticator->mechs(), " ")*/ << endl();
+		out << "MECHS NONE " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
 		return MainSTM::Authentication;
 	}
 }
 
 int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 {
-	//[+] cmdbind::AuthCommandHandler* chnd = dynamic_cast<cmdbind::AuthCommandHandler*>( ch);
 	cmdbind::CommandHandlerR chr( ch);
 	const char* error = ch->lastError();
 	if (error)
 	{
-		out << "ERR authentication " << error << endl();
+		out << "ERR authentication failed: " << error << endl();
 		return -1;
 	}
 	else
 	{
-		out << "OK authorization" << endl();
-		//[+] m_execContext->setUser( chnd->user());
+		AAAA::User* usr = m_authenticator->user();
+		if (usr)
+		{
+			out << "OK authenticated" << endl();
+			execContext()->setUser( usr);
+		}
+		else
+		{
+			out << "ERR authentication failed" << endl();
+		}
 		return MainSTM::Authenticated;
 	}
 }
 
-int MainCommandHandler::doMech( int argc, const char** /*argv*/, std::ostream& out)
+int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 {
 	if (argc == 0)
 	{
@@ -161,15 +178,26 @@ int MainCommandHandler::doMech( int argc, const char** /*argv*/, std::ostream& o
 		out << "ERR to many arguments for MECH" << endl();
 		return stateidx();
 	}
-	//[+] if (!m_authenticator->chooseMech( argv[0]))
-	//[+] {
-	//[+] 	out << "ERR denied" << endl();
-	//[+] 	out << "MECHS " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
-	//[+] 	return MainSTM::Authentication;
-	//[+] }
-	cmdbind::AuthCommandHandler* authch = new cmdbind::AuthCommandHandler( m_authenticator);
-	authch->setExecContext( execContext());
-	delegateProcessing<&MainCommandHandler::endMech>( authch);
+	if (0==std::strcmp(argv[0],"NONE"))
+	{
+		out << "OK no authentication";
+		return MainSTM::Authenticated;
+	}
+	else
+	{
+		if (!m_authenticator->setMech( argv[0] ))
+		{
+			out << "ERR denied" << endl();
+			out << "MECHS NONE " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
+			return MainSTM::Authentication;
+		}
+		else
+		{
+			cmdbind::AuthCommandHandler* authch = new cmdbind::AuthCommandHandler( m_authenticator);
+			authch->setExecContext( execContext());
+			delegateProcessing<&MainCommandHandler::endMech>( authch);
+		}
+	}
 	return stateidx();
 }
 
@@ -268,7 +296,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	{
 		m_command.append(doctype);
 	}
-	cmdbind::CommandHandler* execch = m_execContext->provider()->cmdhandler( m_command, docformat);
+	cmdbind::CommandHandler* execch = execContext()->provider()->cmdhandler( m_command, docformat);
 	if (!execch)
 	{
 		std::ostringstream msg;
@@ -281,7 +309,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 			msg << "no command handler for '" << m_command << "'";
 		}
 		execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
-		execch->setExecContext( m_execContext);
+		execch->setExecContext( execContext());
 		if (m_commandtag.empty())
 		{
 			out << "ANSWER" << endl();
@@ -303,7 +331,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	}
 	else
 	{
-		execch->setExecContext( m_execContext);
+		execch->setExecContext( execContext());
 		execch->passParameters( m_command, 1, &docformatptr);
 		if (m_commandtag.empty())
 		{

@@ -37,7 +37,7 @@
 #ifndef _DB_AUTHENTICATION_HPP_INCLUDED
 #define _DB_AUTHENTICATION_HPP_INCLUDED
 
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "module/constructor.hpp"
 #include "config/configurationTree.hpp"
 
@@ -69,29 +69,33 @@ private:
 };
 
 
-class DBauthenticator : public AuthenticationUnit
+class DBauthUnit : public AuthenticationUnit
 {
 public:
-	DBauthenticator( const std::string& Identifier, const std::string& dbLabel );
-	~DBauthenticator();
+	DBauthUnit( const std::string& Identifier, const std::string& dbLabel );
+	~DBauthUnit();
 
 	const char* className() const			{ return DB_AUTHENTICATION_CLASS_NAME; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	AuthenticatorInstance* instance()		{ return NULL; }
+	const std::string* mechs() const		{ return m_mechs; }
+
+	AuthenticatorSlice* slice( const std::string& mech,
+				   const net::RemoteEndpoint& client );
 private:
-	const std::string	m_dbLabel;
-	const db::Database*	m_db;
+	static const std::string	m_mechs[];
+	const std::string		m_dbLabel;
+	const db::Database*		m_db;
 };
 
 class DBauthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
 {
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
-						{ return AUTHENTICATION_OBJECT; }
-	const char* objectClassName() const			{ return DB_AUTHENTICATION_CLASS_NAME; }
-	DBauthenticator* object( const config::NamedConfiguration& conf );
+							{ return AUTHENTICATION_OBJECT; }
+	const char* objectClassName() const		{ return DB_AUTHENTICATION_CLASS_NAME; }
+	DBauthUnit* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

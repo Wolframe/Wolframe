@@ -221,7 +221,12 @@ error:
 	return PAM_CONV_ERR;
 }
 
-PAMAuthenticator::PAMAuthenticator( const std::string& Identifier,
+//*********   PAM Authentication Unit   *************************************
+
+static const std::string AUTHENTICATION_MECH = "WOLFRAME-PAM";
+const std::string PAMAuthUnit::m_mechs[] = { AUTHENTICATION_MECH, "" };
+
+PAMAuthUnit::PAMAuthUnit( const std::string& Identifier,
 				    const std::string& service )
 	: AuthenticationUnit( Identifier ), m_service( service )
 {
@@ -233,12 +238,11 @@ PAMAuthenticator::PAMAuthenticator( const std::string& Identifier,
 
 	m_state = _Wolframe_PAM_STATE_NEED_LOGIN;
 
-	LOG_DEBUG << "PAM authenticator created with PAM service '" << m_service << "'";
+	LOG_DEBUG << "PAM authentication unit created with PAM service '" << m_service << "'";
 }
 
-PAMAuthenticator::~PAMAuthenticator()
+PAMAuthUnit::~PAMAuthUnit()
 {
 }
 
 }} // namespace _Wolframe::AAAA
-

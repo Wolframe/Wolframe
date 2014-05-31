@@ -83,18 +83,23 @@ void SaslAuthConfig::setCanonicalPathes( const std::string& refPath )
 	}
 }
 
-SaslAuthenticator::SaslAuthenticator( const std::string& Identifier,
+//*********   SASL Authentication Unit   ************************************
+
+static const std::string AUTHENTICATION_MECH = "WOLFRAME-SASL";
+const std::string SaslAuthUnit::m_mechs[] = { AUTHENTICATION_MECH, "" };
+
+SaslAuthUnit::SaslAuthUnit( const std::string& Identifier,
 		   const std::string& service, const std::string& confPath )
 	: AuthenticationUnit( Identifier ),
 	  m_service( service ), m_confPath( confPath )
 {
-	LOG_DEBUG << "SASL authenticator created for service '" << m_service << "'";
+	LOG_DEBUG << "SASL authentication unit created for service '" << m_service << "'";
 	if( !m_confPath.empty( ) ) {
 		LOG_DEBUG << "     and with SASL configuration '" << confPath << "'";
 	}
 }
 
-SaslAuthenticator::~SaslAuthenticator()
+SaslAuthUnit::~SaslAuthUnit()
 {
 }
 
