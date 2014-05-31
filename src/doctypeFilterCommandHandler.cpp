@@ -60,13 +60,13 @@ bool DoctypeFilterCommandHandler::createDoctypeDetector()
 	proc::ExecContext* ctx = execContext();
 	if (!ctx)
 	{
-		m_lastError = "non execution context defined";
+		setLastError( "non execution context defined");
 		return false;
 	}
 	m_doctypeDetector.reset( ctx->provider()->doctypeDetector());
 	if (!m_doctypeDetector.get())
 	{
-		m_lastError = "no document type detector defined";
+		setLastError( "no document type detector defined");
 		return false;
 	}
 	return true;
@@ -87,7 +87,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 		{
 			if (!m_doctypeDetector->info().get())
 			{
-				m_lastError = "document format recongition did not come to a result";
+				setLastError( "document format recongition did not come to a result");
 			}
 			else
 			{
@@ -99,14 +99,14 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 		{
 			if (m_doctypeDetector->lastError())
 			{
-				m_lastError = m_doctypeDetector->lastError();
+				setLastError( m_doctypeDetector->lastError());
 				LOG_ERROR << "document type not recognized: " << m_doctypeDetector->lastError();
 				return CLOSE;
 			}
 			else if (m_inputbuffer.size() > MaxDoctypeDetectionBlockSize)
 			{
 				LOG_ERROR << "document type detection has consumed more than " << MaxDoctypeDetectionBlockSize << " bytes (" << m_inputbuffer.size() << ") without getting a result";
-				m_lastError = "document format not recognized";
+				setLastError( "document format not recognized");
 				return CLOSE;
 			}
 			else
@@ -117,7 +117,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 	}
 	catch (const std::runtime_error& err)
 	{
-		m_lastError = "document format not recognized";
+		setLastError( "document format not recognized");
 		LOG_ERROR << "exception in document type recognition: " << err.what();
 		return CLOSE;
 	}

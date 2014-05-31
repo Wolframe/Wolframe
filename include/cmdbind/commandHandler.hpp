@@ -109,6 +109,12 @@ public:
 		return m_lastError.empty()?0:m_lastError.c_str();
 	}
 
+	/// \brief Set the last error message of command execution to be returned to the client
+	void setLastError( const std::string& msg)
+	{
+		m_lastError = msg;
+	}
+
 	/// \brief Pass the reference to the execution context to the command handler
 	/// \param[in] c the reference to the execution context owned by the caller (connection)
 	void setExecContext( proc::ExecContext* c)
