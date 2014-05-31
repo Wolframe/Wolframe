@@ -6,7 +6,6 @@ Core:
 	- For different type of transactions (get UI files, process request, etc..) chose DB in context
 
 Processors:
-	- Document type recognition module
 	- CSV Filter
 	- Python (ABa, with support PF)
 
