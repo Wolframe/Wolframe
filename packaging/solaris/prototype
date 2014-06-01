@@ -156,10 +156,8 @@ f none opt/csw/include/wolframe/cmdbind/authCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/commandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/commandHandlerUnit.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/commandHandlerConstructor.hpp 0644 root staff
-f none opt/csw/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/doctypeDetector.hpp 0644 root staff
-f none opt/csw/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/execCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/ioFilterCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp 0644 root staff
