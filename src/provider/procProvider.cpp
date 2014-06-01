@@ -63,7 +63,7 @@ class CombinedDoctypeDetector
 {
 public:
 	CombinedDoctypeDetector( const std::vector<cmdbind::DoctypeDetectorType>& dtlist)
-		:m_doctypes(&dtlist),m_nof_finished(0),m_got_eod(false)
+		:m_doctypes(&dtlist),m_nof_finished(0)
 	{
 		std::vector<cmdbind::DoctypeDetectorType>::const_iterator di = dtlist.begin(), de = dtlist.end();
 		for (; di != de; ++di)
@@ -71,19 +71,22 @@ public:
 			m_detectors.push_back( cmdbind::DoctypeDetectorR( di->create()));
 			m_finished.push_back( false);
 		}
+		if (dtlist.empty())
+		{
+			m_lastError = "no module for document type/format detection loaded";
+		}
 	}
 
 	/// \brief Implement cmdbind::DoctypeDetector::putInput( const std::string&,std::size)
-	virtual void putInput( const char* chunk, std::size_t chunksize, bool eof)
+	virtual void putInput( const char* chunk, std::size_t chunksize)
 	{
-		m_got_eod = eof;
 		std::vector<cmdbind::DoctypeDetectorR>::const_iterator di = m_detectors.begin(), de = m_detectors.end();
 		std::size_t idx = 0;
 		for (; di != de; ++di,++idx)
 		{
 			if (!m_finished.at(idx))
 			{
-				(*di)->putInput( chunk, chunksize, eof);
+				(*di)->putInput( chunk, chunksize);
 			}
 		}
 	}
@@ -93,7 +96,8 @@ public:
 	{
 		try
 		{
-			m_lastError.clear();
+			if (!m_lastError.empty()) return false;
+
 			std::size_t idx = 0;
 			std::vector<cmdbind::DoctypeDetectorR>::const_iterator di = m_detectors.begin(), de = m_detectors.end();
 			for (; di != de; ++di,++idx)
@@ -119,7 +123,7 @@ public:
 							if (m_nof_finished == m_finished.size())
 							{
 								//... all results are negative
-								LOG_DEBUG << "no document type/format detection returned a positive result";
+								m_lastError = "document type/format not recognized";
 								return false;
 							}
 						}
@@ -136,23 +140,6 @@ public:
 					}
 				}
 			}
-			if (m_got_eod)
-			{
-				//... no result after we processed the last chunk (after we got end of data)
-				//	we give up and return an error
-
-				di = m_detectors.begin();
-				for (; di != de; ++di,++idx)
-				{
-					if (!m_finished.at(idx))
-					{
-						LOG_DEBUG << "document type/format detection for '" << m_doctypes->at(idx).name() << "' returned negative result";
-					}
-				}
-				LOG_DEBUG << "no document type/format detection returned a positive result";
-
-				return false;
-			}
 		}
 		catch (const std::runtime_error& e)
 		{
@@ -168,7 +155,7 @@ public:
 	}
 
 	/// \brief Implement cmdbind::DoctypeDetector::info()
-	const boost::shared_ptr<types::DoctypeInfo>& info() const
+	const types::DoctypeInfoR& info() const
 	{
 		return m_info;
 	}
@@ -179,8 +166,7 @@ private:
 	std::string m_lastError;					///< last error occurred
 	std::vector<bool> m_finished;					///< bit field marking document type recognition termination
 	std::size_t m_nof_finished;					///< count of finished document type detection processes (number of elements in m_nof_finished set to 'true')
-	bool m_got_eod;							///< true, if we got end of data
-	boost::shared_ptr<types::DoctypeInfo> m_info;			///< info object of the first positive match
+	types::DoctypeInfoR m_info;					///< info object of the first positive match
 };
 
 
@@ -530,30 +516,6 @@ const types::CustomDataType* ProcessorProvider::customDataType( const std::strin
 {
 	LOG_TRACE << "[provider] get custom data type '" << name << "'";
 	return m_programs->getCustomDataType( name);
-}
-
-bool ProcessorProvider::guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const
-{
-	//PF:HACK: Currently very very simple hardcoded guesser
-	//TODO Replace by module based guessers that implement also document type recognition
-	std::size_t ii=0;
-	for (; ii<contentsize && content[ii] == 0; ++ii){}
-	if (ii == contentsize) return false;
-	if (content[ii] == '<')
-	{
-		result = "xml";
-		return true;
-	}
-	else if (content[ii] == '{')
-	{
-		result = "json";
-		return true;
-	}
-	else
-	{
-		result = "text";
-		return false;
-	}
 }
 
 cmdbind::DoctypeDetector* ProcessorProvider::doctypeDetector() const

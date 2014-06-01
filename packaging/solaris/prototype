@@ -56,6 +56,7 @@ f none opt/csw/lib/wolframe/modules/mod_db_sqlite3.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_datatype_datetime.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_datatype_bcdnumber.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_doctype_xml.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_doctype_json.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_filter_blob.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_filter_textwolf.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_filter_token.so 0775 root staff

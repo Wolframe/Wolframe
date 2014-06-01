@@ -49,13 +49,12 @@ public:
 		NONE,UCS1,UCS2BE,UCS2LE,UCS4BE,UCS4LE
 	};
 	AsciiCharParser()
-		:m_src(0),m_itr(0),m_end(0),m_eof(false),m_lastError(0),m_encoding(NONE),m_bufsize(0){}
+		:m_src(0),m_itr(0),m_end(0),m_lastError(0),m_encoding(NONE),m_bufsize(0){}
 
-	void putInput( const char* src, std::size_t srcsize, bool eof_);
+	void putInput( const char* src, std::size_t srcsize);
 
 	unsigned char getNext();
 
-	bool eof() const			{return m_eof;}
 	const char* lastError() const		{return m_lastError;}
 
 private:
@@ -66,7 +65,6 @@ private:
 	const char* m_src;
 	std::size_t m_itr;
 	std::size_t m_end;
-	bool m_eof;
 	const char* m_lastError;
 	Encoding m_encoding;
 	enum {BufSize=8};

@@ -8,7 +8,7 @@
     "name": "Hugi Turbo",
     "address": "Gurkenstrasse 7a 3145 Gumligen"
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf InsertPerson
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json -c wolframe.conf InsertPerson
 
 **file:wolframe.conf
 LoadModules

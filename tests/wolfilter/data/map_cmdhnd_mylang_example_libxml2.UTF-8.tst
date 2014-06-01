@@ -4,7 +4,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE CATALOG SYSTEM 'www.somewhere.com/CDCatalog.dtd'>
 <CATALOG><CD><TITLE>Empire Burlesque</TITLE><ARTIST>Bob Dylan</ARTIST><RELEASE><COUNTRY>USA</COUNTRY><COMPANY>Columbia</COMPANY><PRICE>10.90</PRICE><YEAR>1985</YEAR></RELEASE></CD><CD><TITLE>El Rei el Cantinero</TITLE><ARTIST>Jose Alfredo Jimenez</ARTIST><RELEASE><COUNTRY>Mexico</COUNTRY><COMPANY>RCA</COMPANY><PRICE>15.90</PRICE><YEAR>1958</YEAR></RELEASE></CD><CD><TITLE>Still got the blues</TITLE><ARTIST>Gary Moore</ARTIST><RELEASE><COUNTRY>UK</COUNTRY><COMPANY>Virgin records</COMPANY><PRICE>10.20</PRICE><YEAR>1990</YEAR></RELEASE></CD><CD><TITLE>Eros</TITLE><ARTIST>Eros Ramazzotti</ARTIST><RELEASE><COUNTRY>EU</COUNTRY><COMPANY>BMG</COMPANY><PRICE>9.90</PRICE><YEAR>1997</YEAR></RELEASE></CD><CD><TITLE>One night only</TITLE><ARTIST>Bee Gees</ARTIST><RELEASE><COUNTRY>UK</COUNTRY><COMPANY>Polydor</COMPANY><PRICE>10.90</PRICE><YEAR>1998</YEAR></RELEASE></CD><CD><TITLE>Sylvias Mother</TITLE><ARTIST>Dr.Hook</ARTIST><RELEASE><COUNTRY>UK</COUNTRY><COMPANY>CBS</COMPANY><PRICE>8.10</PRICE><YEAR>1973</YEAR></RELEASE></CD><CD><TITLE>Romanza</TITLE><ARTIST>Andrea Bocelli</ARTIST><RELEASE><COUNTRY>EU</COUNTRY><COMPANY>Polydor</COMPANY><PRICE>10.80</PRICE><YEAR>1996</YEAR></RELEASE></CD></CATALOG>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf getCDCatalog
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf getCDCatalog
 
 **file:wolframe.conf
 LoadModules

@@ -56,7 +56,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf typed_invoice
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf typed_invoice
 **requires:TEXTWOLF
 **file:wolframe.conf
 LoadModules

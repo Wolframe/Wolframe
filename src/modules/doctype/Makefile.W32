@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = xml
+SUBDIRS = xml json
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
