@@ -46,6 +46,7 @@
 #include "appdevel/programTypeModuleMacros.hpp"		//< modules implementing a program type without configuration
 #include "appdevel/ddlCompilerModuleMacros.hpp"		//< modules implementing a DDL compiler for forms
 #include "appdevel/filterModuleMacros.hpp"		//< modules implementing a filer
+#include "appdevel/doctypeModuleMacros.hpp"		//< modules implementing a document type/format detector
 #include "appdevel/moduleFrameMacros.hpp"		//< frame (begin,end) for a wolframe module
 #endif
 

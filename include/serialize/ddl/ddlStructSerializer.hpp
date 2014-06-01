@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_SERIALIZE_DDL_STRUCT_SERIALIZER_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DDL_STRUCT_SERIALIZER_HPP_INCLUDED
+#include "serialize/flags.hpp"
 #include "filter/typedfilter.hpp"
 #include "types/variant.hpp"
 #include "serialize/mapContext.hpp"
@@ -65,11 +66,11 @@ public:
 	DDLStructSerializer& operator =( const DDLStructSerializer& o);
 
 	/// \brief Serialize start initialization
-	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
+	void init( const langbind::TypedOutputFilterR& out, serialize::Flags::Enum flags=serialize::Flags::None);
 
 	/// \brief Call of one processing step the serializer
 	/// \remark The processing is finished when the call returns true. In case of false returned you have to inspect the output filter state to determine what is to do next.
-	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,Context::Flags)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
+	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,Flags::Enum)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
 	bool call();
 
 	/// \brief Get a self copy
@@ -77,7 +78,7 @@ public:
 	virtual TypedInputFilter* copy() const		{return new DDLStructSerializer(*this);}
 
 	/// \brief Get the next element of the serialization
-	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,Context::Flags)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
+	/// \remark Do not mix 'call()' with 'init(const langbind::TypedOutputFilterR&,Flags::Enum)' and 'getNext(langbind::FilterBase::ElementType&,types::VariantConst&)'. Use either one or the other
 	virtual bool getNext( langbind::FilterBase::ElementType& type, types::VariantConst& value);
 	/// \brief Set the flags stearing the serialization
 	/// \return false, if not all flags have the behaviour implemented and are accepted 

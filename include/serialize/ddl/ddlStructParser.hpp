@@ -35,6 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_DDL_STRUCT_PARSER_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DDL_STRUCT_PARSER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "serialize/flags.hpp"
 #include "serialize/mapContext.hpp"
 #include "serialize/ddl/ddlParseStack.hpp"
 #include "types/variantStruct.hpp"
@@ -63,7 +64,7 @@ public:
 	DDLStructParser& operator=( const DDLStructParser& o);
 
 	/// \brief Parser start initialization
-	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
+	void init( const langbind::TypedInputFilterR& i, Flags::Enum flags=Flags::None);
 
 	/// \brief Call of one processing step the parser
 	/// \remark The processing is finished when the call returns true. In case of false returned you have to inspect the input filter state to determine what is to do next. In case of a validation error, the function throws a SerializationErrorException

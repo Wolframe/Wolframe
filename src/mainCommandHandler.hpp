@@ -36,7 +36,8 @@
 #define _Wolframe_MAIN_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
-#include "cmdbind/doctypeFilterCommandHandler.hpp"
+#include "doctypeFilterCommandHandler.hpp"
+#include "interfaceCommandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
 #include "AAAA/authenticator.hpp"
@@ -52,6 +53,8 @@ public:
 	typedef cmdbind::LineCommandHandlerTemplate<MainCommandHandler> Parent;
 	MainCommandHandler();
 	virtual ~MainCommandHandler(){}
+
+	void setPeer( const net::RemoteEndpoint& remote);
 
 public:
 	int doAuth( int argc, const char** argv, std::ostream& out);
@@ -76,6 +79,7 @@ private:
 
 private:
 	boost::shared_ptr<AAAA::Authenticator> m_authenticator;
+	const net::RemoteEndpoint* m_remoteEndpoint;
 	std::string m_command;
 	std::string m_commandtag;
 };

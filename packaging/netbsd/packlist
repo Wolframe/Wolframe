@@ -56,6 +56,7 @@ usr/pkg/lib/wolframe/modules/mod_command_python.so
 usr/pkg/lib/wolframe/modules/mod_job_schedule_db.so
 usr/pkg/lib/wolframe/modules/mod_datatype_datetime.so
 usr/pkg/lib/wolframe/modules/mod_datatype_bcdnumber.so
+usr/pkg/lib/wolframe/modules/mod_doctype_xml.so
 usr/pkg/lib/wolframe/modules/mod_graphix.so
 usr/pkg/lib/wolframe/modules/mod_print_harupdf.so
 @dirrm usr/pkg/lib/wolframe/modules
@@ -126,6 +127,7 @@ usr/pkg/include/wolframe/appProperties.hpp
 usr/pkg/include/wolframe/logger-v1.hpp
 usr/pkg/include/wolframe/standardConfigs.hpp
 usr/pkg/include/wolframe/version.hpp
+usr/pkg/include/wolframe/wolframe.hpp
 usr/pkg/include/wolframe/langbind/authorization.hpp
 usr/pkg/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/pkg/include/wolframe/langbind/formFunction.hpp
@@ -140,8 +142,10 @@ usr/pkg/include/wolframe/protocol/parser.hpp
 @dirrm usr/pkg/include/wolframe/protocol
 usr/pkg/include/wolframe/cmdbind/authCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandler.hpp
+usr/pkg/include/wolframe/cmdbind/commandHandlerUnit.hpp
 usr/pkg/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
+usr/pkg/include/wolframe/cmdbind/doctypeDetector.hpp
 usr/pkg/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/execCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
@@ -174,6 +178,7 @@ usr/pkg/include/wolframe/logger/logLevel.hpp
 usr/pkg/include/wolframe/logger/logObject.hpp
 usr/pkg/include/wolframe/logger/logSyslogFacility.hpp
 @dirrm usr/pkg/include/wolframe/logger
+usr/pkg/include/wolframe/utils/asciiCharParser.hpp
 usr/pkg/include/wolframe/utils/fileLineInfo.hpp
 usr/pkg/include/wolframe/utils/fileUtils.hpp
 usr/pkg/include/wolframe/utils/getPassword.hpp
@@ -193,6 +198,7 @@ usr/pkg/include/wolframe/serialize/serializationErrorException.hpp
 usr/pkg/include/wolframe/serialize/cppFormFunction.hpp
 usr/pkg/include/wolframe/serialize/ddlFormParser.hpp
 usr/pkg/include/wolframe/serialize/ddlFormSerializer.hpp
+usr/pkg/include/wolframe/serialize/flags.hpp
 usr/pkg/include/wolframe/serialize/struct/intrusiveParser.hpp
 usr/pkg/include/wolframe/serialize/struct/intrusiveProperty.hpp
 usr/pkg/include/wolframe/serialize/struct/intrusiveSerializer.hpp
@@ -212,16 +218,18 @@ usr/pkg/include/wolframe/serialize/ddl/ddlStructParser.hpp
 usr/pkg/include/wolframe/serialize/ddl/ddlStructSerializer.hpp
 @dirrm usr/pkg/include/wolframe/serialize/ddl
 @dirrm usr/pkg/include/wolframe/serialize
+usr/pkg/include/wolframe/processor/execContext.hpp
 usr/pkg/include/wolframe/processor/procProviderInterface.hpp
+usr/pkg/include/wolframe/processor/procProviderConfig.hpp
 usr/pkg/include/wolframe/processor/jobSchedule.hpp
 usr/pkg/include/wolframe/module/moduleDirectory.hpp
 usr/pkg/include/wolframe/module/moduleInterface.hpp
 usr/pkg/include/wolframe/processor/procProvider.hpp
 @dirrm usr/pkg/include/wolframe/processor
 usr/pkg/include/wolframe/filter/bufferingfilter.hpp
-usr/pkg/include/wolframe/filter/contentfilterAttributes.hpp
 usr/pkg/include/wolframe/filter/filter.hpp
 usr/pkg/include/wolframe/filter/filterbase.hpp
+usr/pkg/include/wolframe/filter/filterdef.hpp
 usr/pkg/include/wolframe/filter/inputfilter.hpp
 usr/pkg/include/wolframe/filter/inputfilterScope.hpp
 usr/pkg/include/wolframe/filter/null_filter.hpp
@@ -239,11 +247,13 @@ usr/pkg/include/wolframe/types/base64.hpp
 usr/pkg/include/wolframe/types/byte2hex.h
 usr/pkg/include/wolframe/types/conversions.hpp
 usr/pkg/include/wolframe/types/countedReference.hpp
-usr/pkg/include/wolframe/types/doctype.hpp
+usr/pkg/include/wolframe/types/docmetadata.hpp
+usr/pkg/include/wolframe/types/doctypeinfo.hpp
 usr/pkg/include/wolframe/types/form.hpp
 usr/pkg/include/wolframe/types/integer.hpp
 usr/pkg/include/wolframe/types/keymap.hpp
 usr/pkg/include/wolframe/types/normalizeFunction.hpp
+usr/pkg/include/wolframe/types/secureReference.hpp
 usr/pkg/include/wolframe/types/traits.hpp
 usr/pkg/include/wolframe/types/variant.hpp
 usr/pkg/include/wolframe/types/variantStruct.hpp

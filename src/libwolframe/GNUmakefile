@@ -54,6 +54,7 @@ TYP_OBJS = \
 	types/form.o
 
 UTIL_OBJS = \
+	utils/asciiCharParser.o \
 	utils/fileLineInfo.o \
 	utils/sourceLineInfo.o \
 	utils/typeSignature.o \

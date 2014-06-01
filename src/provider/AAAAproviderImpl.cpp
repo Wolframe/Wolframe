@@ -59,9 +59,9 @@ bool AAAAprovider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-Authenticator* AAAAprovider::authenticator() const
+Authenticator* AAAAprovider::authenticator( const _Wolframe::net::RemoteEndpoint &client ) const
 {
-	return m_impl->authenticator();
+	return m_impl->authenticator( client );
 }
 
 Authorizer* AAAAprovider::authorizer() const

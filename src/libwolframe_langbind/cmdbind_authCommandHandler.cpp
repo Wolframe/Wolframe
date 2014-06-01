@@ -89,7 +89,7 @@ void AuthCommandHandler::putInput( const void *begin, std::size_t bytesTransferr
 	m_readbuffer.append( start.ptr(), m_eoD-start);
 	if (m_input.gotEoD())
 	{
-		m_authenticator->messageIn( (const void*)m_readbuffer.c_str(), m_readbuffer.size());
+		m_authenticator->messageIn( m_readbuffer);
 		m_state = ReadConsumed;
 	}
 }
@@ -155,7 +155,7 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 					case AAAA::Authenticator::INITIALIZED:
 						throw std::logic_error("authentication protocol operation in state INITIALIZED");
 					case AAAA::Authenticator::MESSAGE_AVAILABLE:
-						m_writebuffer = protocol::escapeStringDLF( std::string( (const char*)0, 0));
+						m_writebuffer = protocol::escapeStringDLF( m_authenticator->messageOut());
 						m_writebuffer.append( "\r\n.\r\n");
 						m_writepos = 0;
 						m_state = FlushOutput;

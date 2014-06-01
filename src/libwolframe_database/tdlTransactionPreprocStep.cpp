@@ -41,7 +41,7 @@
 #include "types/variant.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
-#include "serialize/mapContext.hpp"
+#include "serialize/flags.hpp"
 #include "logger-v1.hpp"
 #include <string>
 #include <vector>
@@ -292,11 +292,11 @@ void TdlTransactionPreprocStep::call( proc::ExecContext* context, vm::InputStruc
 			{
 				// call form function:
 				langbind::FormFunctionClosureR fc( ff->createClosure());
-				serialize::Context::Flags f = serialize::Context::None;
+				serialize::Flags::Enum f = serialize::Flags::None;
 
 				if (!structure.case_sensitive())
 				{
-					f = (serialize::Context::Flags)((int)f | (int)serialize::Context::CaseInsensitiveCompare);
+					f = (serialize::Flags::Enum)((int)f | (int)serialize::Flags::CaseInsensitiveCompare);
 				}
 				fc->init( context, argfilter, f);
 				if (!fc->call())

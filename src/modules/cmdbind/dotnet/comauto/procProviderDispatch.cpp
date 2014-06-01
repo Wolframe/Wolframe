@@ -65,7 +65,7 @@ static langbind::TypedInputFilterR callProcProvider( proc::ExecContext* context_
 	{
 		throw std::runtime_error( "creation of function execution context failed (processor provider function call)");
 	}
-	serialize::Context::Flags flags = serialize::Context::CaseInsensitiveCompare;
+	serialize::Flags::Enum flags = serialize::Flags::CaseInsensitiveCompare;
 	funcexec->init( context_, input_, flags);
 	if (!funcexec->call())
 	{
@@ -245,8 +245,8 @@ HRESULT comauto::ProcessorProviderDispatch::Invoke( DISPID dispIdMember, REFIID 
 					WRAP (const_cast<ITypeLib*>(m_typelib->typelib())->GetTypeInfoOfGuid( resultUUID, &resultTypeInfo));
 				}
 
-				int fs = (int)(serialize::Context::CaseInsensitiveCompare)|(int)(serialize::Context::ValidateInitialization);
-				serialize::Context::Flags flags = (serialize::Context::Flags)fs;
+				int fs = (int)(serialize::Flags::CaseInsensitiveCompare)|(int)(serialize::Flags::ValidateInitialization);
+				serialize::Flags::Enum flags = (serialize::Flags::Enum)fs;
 
 				langbind::TypedInputFilterR input( new VariantInputFilter( m_typelib, inputTypeInfo, *inputarg, flags));
 				langbind::TypedInputFilterR result = callProcProvider( m_context, funcname, input);

@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_SERIALIZE_MAPCONTEXT_HPP_INCLUDED
 #include <string>
 #include "filter/typedfilter.hpp"
+#include "serialize/flags.hpp"
 
 namespace _Wolframe {
 namespace serialize {
@@ -58,24 +59,16 @@ public:
 			,m_value(o.m_value)
 			{}
 	};
-	enum Flags
-	{
-		None=0x00,
-		ValidateAttributes=0x01,
-		ValidateInitialization=0x02,
-		SerializeWithIndices=0x04,
-		CaseInsensitiveCompare=0x08
-	};
 
-	Context( Flags f=None);
+	Context( Flags::Enum f=Flags::None);
 	Context( const Context& o);
 	~Context(){}
 
 	void clear();
 
-	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
-	void setFlags( Flags f)						{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff;}
-	void unsetFlags( Flags f)					{int ff=(int)m_flags - ((int)m_flags & (int)f); m_flags=(Flags)ff;}
+	bool flag( Flags::Enum f) const					{return ((int)f & (int)m_flags) == (int)f;}
+	void setFlags( Flags::Enum f)					{int ff=(int)m_flags | (int)f; m_flags=(Flags::Enum)ff;}
+	void unsetFlags( Flags::Enum f)					{int ff=(int)m_flags - ((int)m_flags & (int)f); m_flags=(Flags::Enum)ff;}
 
 	void setElem( const ElementBuffer& e)
 	{
@@ -119,7 +112,7 @@ public:
 	}
 
 private:
-	Flags m_flags;
+	Flags::Enum m_flags;
 	ElementBuffer m_elem;
 	bool m_has_elem;
 };

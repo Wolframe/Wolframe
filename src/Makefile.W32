@@ -78,6 +78,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	mainCommandHandler.obj \
 	mainConnectionHandler.obj \
 	interfaceCommandHandler.obj \
+	doctypeFilterCommandHandler.obj \
 	loadModules.obj \
 	moduleDirectory.obj \
 	serviceConfig.obj \

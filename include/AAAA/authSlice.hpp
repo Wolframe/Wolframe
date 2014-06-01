@@ -31,12 +31,12 @@
 
 ************************************************************************/
 ///
-/// \file authInstance.hpp
-/// \brief AuthenticationInstance interface
+/// \file authSlice.hpp
+/// \brief AuthenticationSlice interface
 ///
 
-#ifndef _AUTHENTICATION_INSTANCE_HPP_INCLUDED
-#define _AUTHENTICATION_INSTANCE_HPP_INCLUDED
+#ifndef _AUTHENTICATION_SLICE_HPP_INCLUDED
+#define _AUTHENTICATION_SLICE_HPP_INCLUDED
 
 #include <string>
 #include <vector>
@@ -48,19 +48,14 @@ namespace AAAA {
 
 /// AuthenticatorInstance
 /// This is the base class for authenticator slices implementations
-/// An authenticator has (usually) several authenticator instances
-/// The AuthenticatorInstance(s) are provided by the their respective
+/// An authenticator has (usually) several authenticator slices
+/// The AuthenticatorSlice(s) are provided by the their respective
 /// AuthenticationUnit(s) in the AAAA provider
 ///
-/// \note	For now the AuthenticatorInstance is just like the Authenticator
-///		but this is very likely to change in the future
-///
-class AuthenticatorInstance
+class AuthenticatorSlice
 {
 public:
 	enum Status	{
-		INITIALIZED,		///< the instance is initialized,
-					///  no mech has been selected yet
 		MESSAGE_AVAILABLE,	///< an output message is available
 		AWAITING_MESSAGE,	///< waiting for an input message
 		AUTHENTICATED,		///< a user has been authenticated
@@ -70,7 +65,7 @@ public:
 	};
 
 	/// The virtual destructor
-	virtual ~AuthenticatorInstance()	{}
+	virtual ~AuthenticatorSlice()	{}
 
 	/// Destroy the authenticator
 	///
@@ -80,27 +75,21 @@ public:
 	///		because not all authentication instances are created with new.
 	virtual void destroy() = 0;
 
-	/// The list of available mechs
-	virtual const std::vector<std::string>& mechs() const = 0;
+	/// The class name of the authentication unit / subunit
+	///\note	This is the name of the authentication type / class
+	virtual const char* className() const = 0;
 
-	/// Set the authentication mech
-	/// \param [in]	mech	the name of the mech (case-insensitive)
-	/// \returns		true if the mech could be selected
-	///			false if the mech is not available or a mech
-	///			has already been selected
-	virtual bool setMech( const std::string& mech ) = 0;
+	/// The identifier of the authentication unit / slice
+	///\note	This is the identifier of the authentication unit / slice
+	virtual const std::string& identifier() const = 0;
 
 	/// The input message
-	/// \param [in]	message	pointer to the input message
-	/// \param [in]	size	the size of the input message
-	virtual void messageIn( const void* message, std::size_t size ) = 0;
+	/// \param [in]	message	the input message
+	virtual void messageIn( const std::string& message ) = 0;
 
 	/// The output message
-	/// \param [in]	message	pointer to the buffer for the output message
-	/// \param [in]	size	the size of the output buffer
-	/// \returns		the size of the message in bytes
-	///			or -1 if the buffer is too small
-	virtual int messageOut( const void** message, std::size_t size ) = 0;
+	/// \returns		the output message
+	virtual const std::string& messageOut() = 0;
 
 	/// The current status of the authenticator
 	virtual Status status() const = 0;
@@ -115,4 +104,4 @@ public:
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUTHENTICATION_INSTANCE_HPP_INCLUDED
+#endif // _AUTHENTICATION_SLICE_HPP_INCLUDED

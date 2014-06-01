@@ -1,0 +1,24 @@
+#!/usr/bin/expect
+#
+# Checks an authentication method
+#
+
+package require Expect
+
+set timeout 5
+log_user 0
+
+puts -nonewline "Authentication SASL PLAIN successfull - "
+
+spawn ./authTest SASL
+
+expect "Choose a SASL mech:"
+send "PLAIN\r"
+expect "SASL data: "
+send "test\0test\0xx\r"
+
+expect {
+	"Authentication succeeded!"	{ puts "OK" }
+	"Authentication failed!"	{ puts "ERROR" }
+	timeout 			{ puts "Timeout" }
+}
