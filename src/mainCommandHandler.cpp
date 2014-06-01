@@ -287,7 +287,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	LOG_DEBUG << "Got document type '" << info->doctype() << "' format '" << info->docformat() << "' command prefix '" << m_command << "'";
 	m_command.append(info->doctype());
 
-	cmdbind::CommandHandler* execch = m_execContext->provider()->cmdhandler( m_command, info->docformat());
+	cmdbind::CommandHandler* execch = execContext()->provider()->cmdhandler( m_command, info->docformat());
 	if (!execch)
 	{
 		std::ostringstream msg;
@@ -324,7 +324,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	{
 		const char* docformatptr = info->docformat().c_str();
 
-		execch->setExecContext( m_execContext);
+		execch->setExecContext( execContext());
 		execch->passParameters( m_command, 1, &docformatptr);
 		if (m_commandtag.empty())
 		{
@@ -389,7 +389,7 @@ int MainCommandHandler::doRequest( int argc, const char** argv, std::ostream& ou
 		}
 	}
 	CommandHandler* ch = (CommandHandler*)new cmdbind::DoctypeFilterCommandHandler();
-	ch->setExecContext( m_execContext);
+	ch->setExecContext( execContext());
 
 	delegateProcessing<&MainCommandHandler::endDoctypeDetection>( ch);
 	return stateidx();
