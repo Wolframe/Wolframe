@@ -57,6 +57,7 @@ usr/pkg/lib/wolframe/modules/mod_job_schedule_db.so
 usr/pkg/lib/wolframe/modules/mod_datatype_datetime.so
 usr/pkg/lib/wolframe/modules/mod_datatype_bcdnumber.so
 usr/pkg/lib/wolframe/modules/mod_doctype_xml.so
+usr/pkg/lib/wolframe/modules/mod_doctype_json.so
 usr/pkg/lib/wolframe/modules/mod_graphix.so
 usr/pkg/lib/wolframe/modules/mod_print_harupdf.so
 @dirrm usr/pkg/lib/wolframe/modules

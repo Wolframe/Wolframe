@@ -74,6 +74,7 @@ files:
  /usr/local/lib/wolframe/modules/mod_datatype_datetime.so: 'sha256sum'
  /usr/local/lib/wolframe/modules/mod_datatype_bcdnumber.so: 'sha256sum'
  /usr/local/lib/wolframe/modules/mod_doctype_xml.so: 'sha256sum'
+ /usr/local/lib/wolframe/modules/mod_doctype_json.so: 'sha256sum'
  /usr/local/lib/wolframe/modules/mod_print_harupdf.so: 'sha256sum'
  /usr/local/lib/wolframe/libwolframe_client.a: 'sha256sum'
  /usr/local/lib/wolframe/libwolframe_client.so.0.0.0: 'sha256sum'
