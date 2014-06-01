@@ -1,0 +1,33 @@
+#!/usr/bin/expect
+#
+# Checks an authentication method
+#
+
+package require Expect
+source md5.tcl
+
+set timeout 5
+log_user 0
+
+puts -nonewline "Authentication SASL CRAM MD5 unknown user - "
+
+spawn ./authTest SASL
+
+expect "Choose a SASL mech:"
+send "CRAM-MD5\r"
+expect "SASL data: "
+send "\r"
+expect -re "Got SASL data: (<.*>)"
+
+set user "test2"
+set challenge $expect_out(1,string)
+set password "xx"
+set reply [md5::hmac $password $challenge]
+set answer "$user $reply"
+send "$answer\r"
+
+expect {
+	"Authentication succeeded!"	{ puts "ERROR" }
+	"Authentication failed!"	{ puts "OK" }
+	timeout 			{ puts "Timeout" }
+}
