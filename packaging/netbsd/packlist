@@ -144,10 +144,8 @@ usr/pkg/include/wolframe/protocol/parser.hpp
 usr/pkg/include/wolframe/cmdbind/authCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandlerUnit.hpp
-usr/pkg/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/doctypeDetector.hpp
-usr/pkg/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/execCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp
