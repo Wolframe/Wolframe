@@ -1,0 +1,59 @@
+#!/usr/bin/expect
+#
+# Checks an authentication method
+#
+
+package require Expect
+source md5.tcl
+
+set timeout 5
+log_user 0
+
+puts -nonewline "Authentication SASL DIGEST-MD5 successfull - "
+
+spawn ./authTest SASL
+
+expect "Choose a SASL mech:"
+send "DIGEST-MD5\r"
+
+# no initial client data, server will send us a challenge
+expect "SASL data: "
+send "\r"
+
+# awaiting challenge
+expect -re "Got SASL data: nonce=\"(.*)\",realm=\"(.*)\",qop=\"auth\",charset=utf-8,algorithm=md5-sess"
+set realm $expect_out(2,string)
+set nonce $expect_out(1,string)
+# should actually be longer and more random :-)
+set cnonce "733388383847373838"
+set nc "00000001"
+set digestUri "wolframe/localhost"
+set qop "auth"
+
+# do the response value calculations
+set X "test:$realm:xx"
+set Y [binary format H* [md5::md5 "$X"]]
+set A1 "$Y:$nonce:$cnonce"
+set A2 "AUTHENTICATE:$digestUri"
+set HA1 [md5::md5 $A1]
+set HA2 [md5::md5 $A2]
+set KD "$HA1:$nonce:$nc:$cnonce:$qop:$HA2"
+set Z [md5::md5 $KD]
+set response $Z
+# for debugging the hash calculation
+#puts "\n\nX: $X\nY: $Y\nA1: $A1\nA2: $A2\nHA1: $HA1\nHA2: $HA2\nKD: $KD\nZ: $Z\n"
+
+# compose final answer
+set answer "username=\"test\",realm=\"$realm\",nonce=\"$nonce\",nc=\"$nc\",cnonce=\"$cnonce\",qop=\"$qop\",digest-uri=\"$digestUri\",response=\"$response\""
+send "$answer\r"
+
+# successfull authentication
+expect -re "Got SASL data: rspauth=(.*)"
+send "\r"
+
+expect {
+	"Authentication succeeded!"	{ puts "OK" }
+	"Authentication failed!"	{ puts "ERROR" }
+	"ERROR:"			{ puts "ERROR" }
+	timeout 			{ puts "Timeout" }
+}
