@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty modules database wolfilter simpleFormCompiler compileTDL
+SUBDIRS = 3rdParty modules database wolfilter simpleFormCompiler compileTDL protocol
 #SUBDIRS = 3rdParty modules database AAAA wolfilter simpleFormCompiler compileTDL
 
 
