@@ -30,53 +30,44 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file authentication.hpp
-/// \brief top-level header file for authentication unit interface
-///
+<?php
 
-#ifndef _AUTHENTICATION_UNIT_HPP_INCLUDED
-#define _AUTHENTICATION_UNIT_HPP_INCLUDED
-
-#include <string>
-
-#include "AAAA/authSlice.hpp"
-#include "database/DBprovider.hpp"
-#include "system/connectionEndpoint.hpp"
-
-namespace _Wolframe {
-namespace AAAA {
-
-/// AuthenticationUnit Unit
-/// This is the base class for the authentication unit implementations
-class AuthenticationUnit
+function userHash( $username )
 {
-public:
-	AuthenticationUnit( const std::string& id )
-		: m_identifier( id )		{}
+	$seed = str_repeat( 0, 16 );
+	for ( $i = 0; $i < 16; $i++ )
+		$seed[ $i ] = rand( 0, 255 );
+	$hash = hash_hmac( "sha256", $username, $seed, 'true' );
 
-	virtual ~AuthenticationUnit()		{}
+	return '$' . base64_encode( $seed ) . '$' . base64_encode( $hash );
+}
 
-	const std::string& identifier() const	{ return m_identifier; }
 
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
-						{ return true; }
-	virtual const char* className() const = 0;
+function CRAMresponse( $password, $challenge )
+{
+	if ( $challenge[ 0 ] != '$' )
+		return 'invalid challenge format';
+	$challenge = ltrim( $challenge, '$' );
+	$chlngPart = explode( '$', $challenge );
+	if ( count( $chlngPart ) != 2 )
+		return 'invalid challenge format';
+	$salt = base64_decode( $chlngPart[ 0 ] );
+	$chlng = base64_decode( $chlngPart[ 1 ] );
+	if ( strlen( $chlng ) != 64 )
+		return 'invalid challenge length';
+	$passwd = hash_pbkdf2( "sha1", $password, $salt, 10589, 48, 'true' );
+	if ( strlen( $passwd ) > 64 )	{
+		$response = hash( "sha512", $passwd );
+	}
+	else	{
+		$response = str_repeat( 0x3c, 64 );
+		for ( $i = 0; $i < count( $passwd ); $i++ )
+			$response[ $i ] = $passwd[ $i ];
+	}
+	for ( $i = 0; $i < 64; $i++ )
+		$response[ $i ] = $response[ $i ] ^ $challenge[ $i ];
+	return base64_encode( hash( "sha256", $response ));
+}
 
-	/// The list of mechs implemented by this unit
-	/// \note	The authentication unit returns the mechs as an
-	///		array of strings. The array ends with an empty string.
-	///		Be aware that the other interfaces use a vector instead.
-	virtual const std::string* mechs() const = 0;
+?>
 
-	/// An AuthenticatorSlice for the required mech (or NULL)
-	virtual AuthenticatorSlice* slice( const std::string& mech,
-					   const net::RemoteEndpoint& client ) = 0;
-
-private:
-	const std::string	m_identifier;
-};
-
-}} // namespace _Wolframe::AAAA
-
-#endif // _AUTHENTICATION_UNIT_HPP_INCLUDED

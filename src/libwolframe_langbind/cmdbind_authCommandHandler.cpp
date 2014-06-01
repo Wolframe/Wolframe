@@ -89,7 +89,7 @@ void AuthCommandHandler::putInput( const void *begin, std::size_t bytesTransferr
 	m_readbuffer.append( start.ptr(), m_eoD-start);
 	if (m_input.gotEoD())
 	{
-		m_authenticator->messageIn( (const void*)m_readbuffer.c_str(), m_readbuffer.size());
+		m_authenticator->messageIn( m_readbuffer);
 		m_state = ReadConsumed;
 	}
 }
@@ -152,25 +152,25 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 			case NextOperation:
 				switch (m_authenticator->status())
 				{
-					case INITIALIZED:
+					case AAAA::Authenticator::INITIALIZED:
 						throw std::logic_error("authentication protocol operation in state INITIALIZED");
-					case MESSAGE_AVAILABLE:
-						m_writebuffer = protocol::escapeStringDLF( std::string( (const char*)msg.ptr, msg.size));
+					case AAAA::Authenticator::MESSAGE_AVAILABLE:
+						m_writebuffer = protocol::escapeStringDLF( m_authenticator->messageOut());
 						m_writebuffer.append( "\r\n.\r\n");
 						m_writepos = 0;
 						m_state = FlushOutput;
 						continue;
-					case AWAITING_MESSAGE:
+					case AAAA::Authenticator::AWAITING_MESSAGE:
 						return READ;
-					case AUTHENTICATED:
+					case AAAA::Authenticator::AUTHENTICATED:
 						return CLOSE;
-					case INVALID_CREDENTIALS:
+					case AAAA::Authenticator::INVALID_CREDENTIALS:
 						setLastError( "either the username or the credentials are invalid");
 						return CLOSE;
-					case MECH_UNAVAILABLE:
+					case AAAA::Authenticator::MECH_UNAVAILABLE:
 						setLastError( "the requested authentication mech is not available");
 						return CLOSE;
-					case SYSTEM_FAILURE:
+					case AAAA::Authenticator::SYSTEM_FAILURE:
 						setLastError( "unspecified authentication system error");
 						return CLOSE;
 				}

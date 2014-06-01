@@ -88,8 +88,7 @@ public:
 
 	const std::string* mechs() const		{ return m_mechs; }
 
-	AuthenticatorInstance* instance( const std::string& mech,
-					 const net::RemoteEndpoint& client );
+	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client );
 
 	/// \brief	Authenticate a user with its plain username and password
 	/// \note	This function is supposed to be used only for tests.
@@ -118,25 +117,27 @@ private:
 // (*) --> receive response --> + got user
 //				+ invalid credentials
 //
-class TextFileAuthInstance : public AuthenticatorInstance
+class TextFileAuthSlice : public AuthenticatorSlice
 {
-	enum	State	{
-		INSTANCE_INITIALIZED,		///< Has been initialized, no other data
-		INSTANCE_USER_FOUND,		///< User has been found, will send challenge
-		INSTANCE_USER_NOT_FOUND,	///< User has not been found -> fail
-		INSTANCE_CHALLENGE_SENT,	///< Waiting for the response
-		INSTANCE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
-		INSTANCE_AUTHENTICATED		///< Response was correct -> user available
+	enum	SliceState	{
+		SLICE_INITIALIZED,		///< Has been initialized, no other data
+		SLICE_USER_FOUND,		///< User has been found, will send challenge
+		SLICE_USER_NOT_FOUND,		///< User has not been found -> fail
+		SLICE_CHALLENGE_SENT,		///< Waiting for the response
+		SLICE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
+		SLICE_AUTHENTICATED		///< Response was correct -> user available
 	};
 
 public:
-	TextFileAuthInstance( const TextFileAuthUnit& backend );
+	TextFileAuthSlice( const TextFileAuthUnit& backend );
 
-	~TextFileAuthInstance();
+	~TextFileAuthSlice();
 
 	void destroy();
 
-	const char* typeName() const			{ return m_backend.className(); }
+	virtual const char* className() const		{ return m_backend.className(); }
+
+	virtual const std::string& identifier() const	{ return m_backend.identifier(); }
 
 	/// Get the list of available mechs
 	virtual const std::vector<std::string>& mechs() const;
@@ -144,13 +145,13 @@ public:
 	/// Set the authentication mech
 	virtual bool setMech( const std::string& mech );
 
-	/// Input message
-	virtual void messageIn( const void* message, std::size_t size );
+	/// The input message
+	virtual void messageIn( const std::string& message );
 
-	/// Output message
-	virtual int messageOut( const void** message, std::size_t size );
+	/// The output message
+	virtual const std::string& messageOut();
 
-	/// The current status of the authenticator
+	/// The current status of the authenticator slice
 	virtual Status status() const;
 
 	/// The authenticated user or NULL if not authenticated
@@ -158,8 +159,8 @@ public:
 
 private:
 	const TextFileAuthUnit&	m_backend;
-	struct PwdFileUser		m_usr;
-	User*				m_user;
+	struct PwdFileUser	m_usr;
+	User*			m_user;
 };
 
 

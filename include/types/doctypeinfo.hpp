@@ -29,30 +29,36 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file mapContext.cpp
-///\brief Implements the data structure holding the global serialization state variables (without the stack)
+/// \file cmdbind/doctypeinfo.hpp
+/// \brief Structure for document type and format
 
-#include "serialize/mapContext.hpp"
-#include <cstring>
-#include <stdexcept>
+#ifndef _Wolframe_TYPES_DOCTYPE_INFO_HPP_INCLUDED
+#define _Wolframe_TYPES_DOCTYPE_INFO_HPP_INCLUDED
+#include <string>
 
-using namespace _Wolframe;
-using namespace serialize;
+namespace _Wolframe {
+namespace types {
 
-Context::Context( Flags::Enum f)
-	:m_flags(f)
-	,m_has_elem(false)
-{}
-
-Context::Context( const Context& o)
-	:m_flags(o.m_flags)
-	,m_has_elem(o.m_has_elem)
-{}
-
-void Context::clear()
+/// \class DoctypeInfo
+/// \brief Document type information representation created by a document type recognizer.
+class DoctypeInfo
 {
-	m_has_elem = false;
-}
+public:
+	/// \brief Copy constructor
+	DoctypeInfo( const DoctypeInfo& o)
+		:m_docformat(o.m_docformat),m_doctype(o.m_doctype){}
+	/// \brief Constructor
+	DoctypeInfo( const std::string& docformat_, const std::string& doctype_)
+		:m_docformat(docformat_),m_doctype(doctype_){}
+	/// \brief Default constructor
+	DoctypeInfo(){}
 
+private:
+	std::string m_docformat;
+	std::string m_doctype;
+};
+
+}}//namespace
+#endif
 
 

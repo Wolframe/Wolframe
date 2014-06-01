@@ -30,53 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file authentication.hpp
-/// \brief top-level header file for authentication unit interface
-///
 
-#ifndef _AUTHENTICATION_UNIT_HPP_INCLUDED
-#define _AUTHENTICATION_UNIT_HPP_INCLUDED
+<?php
 
-#include <string>
+include 'authentication.php';
 
-#include "AAAA/authSlice.hpp"
-#include "database/DBprovider.hpp"
-#include "system/connectionEndpoint.hpp"
+echo userHash( 'bla bla' ), "\n";
+echo CRAMresponse( 'bla bla', '$bli bli$' . base64_encode( "A 64 bytes dummy challenge -------------------------------------" ) ), "\n";
 
-namespace _Wolframe {
-namespace AAAA {
+?>
 
-/// AuthenticationUnit Unit
-/// This is the base class for the authentication unit implementations
-class AuthenticationUnit
-{
-public:
-	AuthenticationUnit( const std::string& id )
-		: m_identifier( id )		{}
-
-	virtual ~AuthenticationUnit()		{}
-
-	const std::string& identifier() const	{ return m_identifier; }
-
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
-						{ return true; }
-	virtual const char* className() const = 0;
-
-	/// The list of mechs implemented by this unit
-	/// \note	The authentication unit returns the mechs as an
-	///		array of strings. The array ends with an empty string.
-	///		Be aware that the other interfaces use a vector instead.
-	virtual const std::string* mechs() const = 0;
-
-	/// An AuthenticatorSlice for the required mech (or NULL)
-	virtual AuthenticatorSlice* slice( const std::string& mech,
-					   const net::RemoteEndpoint& client ) = 0;
-
-private:
-	const std::string	m_identifier;
-};
-
-}} // namespace _Wolframe::AAAA
-
-#endif // _AUTHENTICATION_UNIT_HPP_INCLUDED

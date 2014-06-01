@@ -152,9 +152,11 @@ f none opt/csw/include/wolframe/protocol/parser.hpp 0644 root staff
 d none opt/csw/include/wolframe/cmdbind 0755 root root
 f none opt/csw/include/wolframe/cmdbind/authCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/commandHandler.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/commandHandlerUnit.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/commandHandlerConstructor.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/doctypeDetector.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/execCommandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/ioFilterCommandHandler.hpp 0644 root staff
@@ -228,11 +230,12 @@ f none opt/csw/include/wolframe/processor/execContext.hpp 0644 root staff
 f none opt/csw/include/wolframe/processor/jobSchedule.hpp 0644 root staff
 f none opt/csw/include/wolframe/processor/procProvider.hpp 0644 root staff
 f none opt/csw/include/wolframe/processor/procProviderInterface.hpp 0644 root staff
+f none opt/csw/include/wolframe/processor/procProviderConfig.hpp 0644 root staff
 d none opt/csw/include/wolframe/filter 0755 root root
 f none opt/csw/include/wolframe/filter/bufferingfilter.hpp 0644 root staff
-f none opt/csw/include/wolframe/filter/contentfilterAttributes.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filterbase.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/filterdef.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/inputfilter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/inputfilterScope.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/null_filter.hpp 0644 root staff
@@ -251,10 +254,11 @@ f none opt/csw/include/wolframe/types/bignumber.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/byte2hex.h 0644 root staff
 f none opt/csw/include/wolframe/types/conversions.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/countedReference.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/docmetadata.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/doctypeinfo.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/customDataNormalizer.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/customDataType.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/datetime.hpp 0644 root staff
-f none opt/csw/include/wolframe/types/doctype.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/form.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/integer.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/keymap.hpp 0644 root staff
@@ -262,6 +266,7 @@ f none opt/csw/include/wolframe/types/normalizeFunction.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/numberBaseConversion.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/propertyTree.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/string.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/secureReference.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/traits.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/variant.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/variantStruct.hpp 0644 root staff

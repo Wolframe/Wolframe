@@ -8,7 +8,8 @@ PACKAGE_VERSION = 3.15.4
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS = \
-	-DNO_LCMS
+	-DNO_LCMS \
+	$(INCLUDE_FLAGS_LT)
 
 INCLUDE_CFLAGS = \
 	$(INCLUDE_CXXFLAGS)

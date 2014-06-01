@@ -131,13 +131,14 @@ static void computeResponse ( const unsigned char* challenge, const unsigned cha
 {
 	unsigned char buffer[ CRAM_CHALLENGE_SIZE ];
 
-	memset( buffer, 0x3c, CRAM_CHALLENGE_SIZE );
 	if ( hashSize > CRAM_CHALLENGE_SIZE )	{
 		assert( CRAM_CHALLENGE_SIZE == SHA512_DIGEST_SIZE );
 		sha512( hash, hashSize, buffer );
 	}
-	else
+	else	{
+		memset( buffer + hashSize, 0x3c, CRAM_CHALLENGE_SIZE - hashSize );
 		memcpy( buffer, hash, hashSize );
+	}
 
 	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
 		buffer[ i ] ^= challenge[ i ];

@@ -305,7 +305,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					catch (std::exception& e)
 					{
 						LOG_ERROR << "Command handler creation thrown exception: " << e.what();
-						m_lastError = "failed to execute command";
+						setLastError( "failed to execute command");
 						return CLOSE;
 					}
 					continue;
@@ -356,7 +356,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				catch (std::exception& e)
 				{
 					LOG_ERROR << "Command execution thrown exception: " << e.what();
-					m_lastError = "failed to execute command";
+					setLastError( "failed to execute command");
 					return CLOSE;
 				}
 			}

@@ -56,7 +56,9 @@ namespace AAAA {
 class StandardAuthenticator : public Authenticator
 {
 public:
-	StandardAuthenticator( const std::vector<std::string>& mechs_ );
+	StandardAuthenticator( const std::vector<std::string>& mechs_,
+			       const std::list< AuthenticationUnit* >& units_,
+			       const net::RemoteEndpoint& client_ );
 
 	~StandardAuthenticator();
 	void destroy();
@@ -67,19 +69,26 @@ public:
 	/// Set the authentication mech
 	virtual bool setMech( const std::string& mech );
 
-	/// Input message
-	virtual void messageIn( const void* message, std::size_t size );
+	/// The input message
+	virtual void messageIn( const std::string& message );
 
-	/// Output message
-	virtual int messageOut( const void** message, std::size_t size );
+	/// The output message
+	virtual const std::string& messageOut();
 
 	/// The current status of the authenticator
-	virtual Status status() const;
+	virtual Status status() const		{ return m_status; }
 
 	/// The authenticated user or NULL if not authenticated
-	virtual User* user() const;
+	virtual User* user();
 private:
-	const std::vector<std::string>&	m_mechs;
+	const std::vector< std::string >&	m_mechs;
+	const std::list< AuthenticationUnit* >&	m_authUnits;
+	const net::RemoteEndpoint&		m_client;
+
+	Authenticator::Status			m_status;
+	std::vector< AuthenticatorSlice* >	m_slices;
+	int					m_currentSlice;
+	AAAA::User*				m_user;
 };
 
 class AuthenticationFactory
@@ -90,7 +99,7 @@ public:
 	~AuthenticationFactory();
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authenticator* authenticator();
+	Authenticator* authenticator( const net::RemoteEndpoint& client );
 private:
 	std::list< AuthenticationUnit* >	m_authUnits;
 	std::vector< std::string >		m_mechs;
@@ -165,7 +174,8 @@ public:
 	~AAAAprovider_Impl()				{}
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authenticator* authenticator()		{ return m_authenticator.authenticator(); }
+	Authenticator* authenticator( const net::RemoteEndpoint& client )
+						{ return m_authenticator.authenticator( client ); }
 	Authorizer* authorizer()		{ return m_authorizer.authorizer(); }
 	Auditor* auditor()			{ return m_auditor.auditor(); }
 private:

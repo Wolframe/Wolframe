@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file struct/structParser.cpp
-///\brief Implements deserialization parser
+/// \file struct/structParser.cpp
+/// \brief Implements deserialization parser
 #include "serialize/struct/structParser.hpp"
 #include "serialize/struct/serializeStack.hpp"
 #include "serialize/serializationErrorException.hpp"
@@ -80,18 +80,18 @@ std::string StructParser::getElementPath( const ParseStateStack& stk)
 	return rt;
 }
 
-void StructParser::init( const langbind::TypedInputFilterR& i, Context::Flags flags)
+void StructParser::init( const langbind::TypedInputFilterR& i, serialize::Flags::Enum flags)
 {
 	m_inp = i;
 	m_ctx.clear();
 	if (i->flag( langbind::FilterBase::PropagateNoCase))
 	{
-		m_ctx.setFlags( Context::CaseInsensitiveCompare);
+		m_ctx.setFlags( serialize::Flags::CaseInsensitiveCompare);
 	}
 	m_ctx.setFlags(flags);
 	if (i->flag( langbind::FilterBase::PropagateNoAttr))
 	{
-		m_ctx.unsetFlags( Context::ValidateAttributes);
+		m_ctx.unsetFlags( serialize::Flags::ValidateAttributes);
 	}
 	m_stk.clear();
 	m_stk.push_back( ParseState( 0, m_descr->parse(), m_ptr));

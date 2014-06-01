@@ -176,7 +176,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 		case langbind::InputFilter::OpenTag:
 		{
 			int idx;
-			if (ctx.flag( Context::CaseInsensitiveCompare))
+			if (ctx.flag( Flags::CaseInsensitiveCompare))
 			{
 				idx = descr->findidx_cis( element.tostring());
 			}
@@ -193,7 +193,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 
 			if (ei->attribute())
 			{
-				if (ctx.flag( Context::ValidateAttributes))
+				if (ctx.flag( Flags::ValidateAttributes))
 				{
 					throw SerializationErrorException( "attribute element expected for ", element.tostring(), getElementPath( stk));
 				}
@@ -217,7 +217,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 		case langbind::InputFilter::Attribute:
 		{
 			int idx;
-			if (ctx.flag( Context::CaseInsensitiveCompare))
+			if (ctx.flag( Flags::CaseInsensitiveCompare))
 			{
 				idx = descr->findidx_cis( element.tostring());
 			}
@@ -232,7 +232,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 			types::VariantStructDescription::const_iterator ei = descr->begin() + idx;
 			if (!ei->attribute())
 			{
-				if (ctx.flag( Context::ValidateAttributes))
+				if (ctx.flag( Flags::ValidateAttributes))
 				{
 					throw SerializationErrorException( "content element expected", element.tostring(), getElementPath( stk));
 				}
@@ -315,7 +315,7 @@ static bool parseStruct( types::VariantStruct& st, langbind::TypedInputFilter& i
 				{
 					throw SerializationErrorException( "undefined mandatory structure element", di->name, getElementPath( stk));
 				}
-				if (ctx.flag( Context::ValidateInitialization))
+				if (ctx.flag( Flags::ValidateInitialization))
 				{
 					if (!di->optional() && !di->array() && !itr->initialized())
 					{
@@ -402,18 +402,18 @@ DDLStructParser& DDLStructParser::operator=( const DDLStructParser& o)
 	return *this;
 }
 
-void DDLStructParser::init( const langbind::TypedInputFilterR& i, Context::Flags flags)
+void DDLStructParser::init( const langbind::TypedInputFilterR& i, Flags::Enum flags)
 {
 	m_inp = i;
 	m_ctx.clear();
 	if (i->flag( langbind::FilterBase::PropagateNoCase))
 	{
-		m_ctx.setFlags( Context::CaseInsensitiveCompare);
+		m_ctx.setFlags( Flags::CaseInsensitiveCompare);
 	}
 	m_ctx.setFlags(flags);
 	if (i->flag( langbind::FilterBase::PropagateNoAttr))
 	{
-		m_ctx.unsetFlags( Context::ValidateAttributes);
+		m_ctx.unsetFlags( Flags::ValidateAttributes);
 	}
 	m_stk.clear();
 	m_stk.push_back( DDLParseState( 0, m_st, 0));

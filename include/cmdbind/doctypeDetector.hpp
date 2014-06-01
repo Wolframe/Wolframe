@@ -29,30 +29,33 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file mapContext.cpp
-///\brief Implements the data structure holding the global serialization state variables (without the stack)
+/// \file cmdbind/doctypeDetector.hpp
+/// \brief Interface for document type and format recognition
 
-#include "serialize/mapContext.hpp"
-#include <cstring>
-#include <stdexcept>
+#ifndef _Wolframe_CMDBIND_DOCTYPE_DETECTOR_HPP_INCLUDED
+#define _Wolframe_CMDBIND_DOCTYPE_DETECTOR_HPP_INCLUDED
+#include "types/doctypeinfo.hpp"
+#include <string>
+#include <boost/shared_ptr.hpp>
 
-using namespace _Wolframe;
-using namespace serialize;
+namespace _Wolframe {
+namespace cmdbind {
 
-Context::Context( Flags::Enum f)
-	:m_flags(f)
-	,m_has_elem(false)
-{}
-
-Context::Context( const Context& o)
-	:m_flags(o.m_flags)
-	,m_has_elem(o.m_has_elem)
-{}
-
-void Context::clear()
+/// \class DoctypeDetector
+/// \brief Interface to document type and format detection.
+struct DoctypeDetector
 {
-	m_has_elem = false;
-}
+public:
+	/// \brief Try to detect the document type format
+	/// \param[in] data document to process as UTF-8 string
+	/// \return true, if the detection process has come to a result (negative or positive), false if the detection process needs more data
+	virtual bool detect( const std::string& data)=0;
 
+	/// \brief Get the result of document type and format recognition
+	/// \return a doctype info reference in case of successful recognition, null in case of document format not recognized
+	const boost::shared_ptr<types::DoctypeInfo>& info() const=0;
+};
 
+}}//namespace
+#endif
 

@@ -115,6 +115,7 @@ usr/local/include/wolframe/appProperties.hpp
 usr/local/include/wolframe/logger-v1.hpp
 usr/local/include/wolframe/standardConfigs.hpp
 usr/local/include/wolframe/version.hpp
+usr/local/include/wolframe/wolframe.hpp
 usr/local/include/wolframe/langbind/authorization.hpp
 usr/local/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/local/include/wolframe/langbind/formFunction.hpp
@@ -129,8 +130,10 @@ usr/local/include/wolframe/protocol/parser.hpp
 @dirrm usr/local/include/wolframe/protocol
 usr/local/include/wolframe/cmdbind/authCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/commandHandler.hpp
+usr/local/include/wolframe/cmdbind/commandHandlerUnit.hpp
 usr/local/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp
 usr/local/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
+usr/local/include/wolframe/cmdbind/doctypeDetector.hpp
 usr/local/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/execCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
@@ -201,16 +204,18 @@ usr/local/include/wolframe/serialize/ddl/ddlStructParser.hpp
 usr/local/include/wolframe/serialize/ddl/ddlStructSerializer.hpp
 @dirrm usr/local/include/wolframe/serialize/ddl
 @dirrm usr/local/include/wolframe/serialize
+usr/local/include/wolframe/processor/execContext.hpp
 usr/local/include/wolframe/processor/procProviderInterface.hpp
+usr/local/include/wolframe/processor/procProviderConfig.hpp
 usr/local/include/wolframe/processor/jobSchedule.hpp
 usr/local/include/wolframe/module/moduleDirectory.hpp
 usr/local/include/wolframe/module/moduleInterface.hpp
 usr/local/include/wolframe/processor/procProvider.hpp
 @dirrm usr/local/include/wolframe/processor
 usr/local/include/wolframe/filter/bufferingfilter.hpp
-usr/local/include/wolframe/filter/contentfilterAttributes.hpp
 usr/local/include/wolframe/filter/filter.hpp
 usr/local/include/wolframe/filter/filterbase.hpp
+usr/local/include/wolframe/filter/filterdef.hpp
 usr/local/include/wolframe/filter/inputfilter.hpp
 usr/local/include/wolframe/filter/inputfilterScope.hpp
 usr/local/include/wolframe/filter/null_filter.hpp
@@ -228,11 +233,13 @@ usr/local/include/wolframe/types/base64.hpp
 usr/local/include/wolframe/types/byte2hex.h
 usr/local/include/wolframe/types/conversions.hpp
 usr/local/include/wolframe/types/countedReference.hpp
-usr/local/include/wolframe/types/doctype.hpp
+usr/local/include/wolframe/types/docmetadata.hpp
+usr/local/include/wolframe/types/doctypeinfo.hpp
 usr/local/include/wolframe/types/form.hpp
 usr/local/include/wolframe/types/integer.hpp
 usr/local/include/wolframe/types/keymap.hpp
 usr/local/include/wolframe/types/normalizeFunction.hpp
+usr/local/include/wolframe/types/secureReference.hpp
 usr/local/include/wolframe/types/traits.hpp
 usr/local/include/wolframe/types/variant.hpp
 usr/local/include/wolframe/types/variantStruct.hpp

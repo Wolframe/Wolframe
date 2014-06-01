@@ -77,8 +77,8 @@ bool DBauthUnit::resolveDB( const db::DatabaseProvider& db )
 	return true;
 }
 
-AuthenticatorInstance* DBauthUnit::instance( const std::string& /*mech*/,
-					     const net::RemoteEndpoint& /*client*/ )
+AuthenticatorSlice* DBauthUnit::slice( const std::string& /*mech*/,
+				       const net::RemoteEndpoint& /*client*/ )
 {
 	return NULL;
 }
