@@ -2,7 +2,7 @@
 #include "interfaceCommandHandler.cpp"
 #include "moduleDirectory.cpp"
 #include "loadModules.cpp"
-#include "libwolframe_langbind/cmdbind_doctypeFilterCommandHandler.cpp"
+#include "doctypeFilterCommandHandler.cpp"
 #include "provider/Audit.cpp"
 #include "provider/Authentication.cpp"
 #include "provider/Authorization.cpp"

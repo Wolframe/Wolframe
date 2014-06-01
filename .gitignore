@@ -63,6 +63,8 @@ tests/PBKDF2test
 tests/xmlselectHandlerTest
 tests/protocolArgumentParsing
 tests/poolTest
+tests/protocol/src/testProtocol
+tests/protocol/config/test.db
 tests/resolvePathTest
 tests/mtprocHandler
 tests/ptreeGenerator
