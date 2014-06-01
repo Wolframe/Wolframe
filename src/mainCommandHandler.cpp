@@ -126,7 +126,15 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 	}
 	else
 	{
-		out << "MECHS NONE " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
+		std::string mechlist = boost::algorithm::join( m_authenticator->mechs(), " ");
+		if (mechlist.empty())
+		{
+			out << "MECHS NONE" << endl();
+		}
+		else
+		{
+			out << "MECHS NONE " << mechlist << endl();
+		}
 		return MainSTM::Authentication;
 	}
 }
@@ -170,7 +178,7 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 	}
 	if (0==std::strcmp(argv[0],"NONE"))
 	{
-		out << "OK no authentication";
+		out << "OK no authentication" << endl();
 		return MainSTM::Authenticated;
 	}
 	else
@@ -178,7 +186,15 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		if (!m_authenticator->setMech( argv[0]))
 		{
 			out << "ERR denied" << endl();
-			out << "MECHS NONE " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
+			std::string mechlist = boost::algorithm::join( m_authenticator->mechs(), " ");
+			if (mechlist.empty())
+			{
+				out << "MECHS NONE" << endl();
+			}
+			else
+			{
+				out << "MECHS NONE " << mechlist << endl();
+			}
 			return MainSTM::Authentication;
 		}
 		else
