@@ -54,6 +54,8 @@ public:
 	MainCommandHandler();
 	virtual ~MainCommandHandler(){}
 
+	void setPeer( const net::RemoteEndpoint& remote);
+
 public:
 	int doAuth( int argc, const char** argv, std::ostream& out);
 
@@ -77,6 +79,7 @@ private:
 
 private:
 	boost::shared_ptr<AAAA::Authenticator> m_authenticator;
+	const net::RemoteEndpoint* m_remoteEndpoint;
 	std::string m_command;
 	std::string m_commandtag;
 };

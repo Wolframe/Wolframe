@@ -80,8 +80,8 @@ public:
 
 	const std::string* mechs() const	{ return m_mechs; }
 
-	AuthenticatorInstance* instance( const std::string& /*mech*/,
-					 const net::RemoteEndpoint& /*client*/ )
+	AuthenticatorSlice* slice( const std::string& /*mech*/,
+				   const net::RemoteEndpoint& /*client*/ )
 						{ return NULL; }
 
 private:

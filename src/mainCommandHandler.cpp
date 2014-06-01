@@ -78,7 +78,13 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 static MainSTM mainstm;
 
 MainCommandHandler::MainCommandHandler()
-	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>( &mainstm ){}
+	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>(&mainstm)
+	,m_remoteEndpoint(0){}
+
+void MainCommandHandler::setPeer( const net::RemoteEndpoint& remote)
+{
+	m_remoteEndpoint = &remote;
+}
 
 int MainCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
@@ -112,7 +118,11 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
 	if (!m_authenticator.get())
 	{
-		m_authenticator.reset( execContext()->authenticator());
+		if (!m_remoteEndpoint)
+		{
+			throw std::logic_error("no remote endpoint set, cannot authenticate");
+		}
+		m_authenticator.reset( execContext()->authenticator( *m_remoteEndpoint ));
 		if (!m_authenticator.get())
 		{
 			out << "ERR AUTH denied" << endl();
@@ -175,7 +185,7 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 	}
 	else
 	{
-		if (!m_authenticator->setMech( argv[0]))
+		if (!m_authenticator->setMech( argv[0] ))
 		{
 			out << "ERR denied" << endl();
 			out << "MECHS NONE " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
