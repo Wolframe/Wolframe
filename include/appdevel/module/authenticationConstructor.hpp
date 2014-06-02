@@ -37,6 +37,7 @@
 #include "module/constructor.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include "AAAA/authUnit.hpp"
 #include <boost/lexical_cast.hpp>
 #include <string>
 
@@ -47,7 +48,7 @@ namespace module {
 ///\brief Constructor of an authentication unit
 template<class UNIT, class CONFIG>
 class AuthenticationConstructor
-	:public _Wolframe::ConfiguredObjectConstructor<UNIT>
+	:public _Wolframe::ConfiguredObjectConstructor<AAAA::AuthenticationUnit>
 {
 public:
 	AuthenticationConstructor(){}

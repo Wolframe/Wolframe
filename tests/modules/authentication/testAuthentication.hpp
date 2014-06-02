@@ -90,7 +90,7 @@ class TestAuthenticationUnit
 public:
 	TestAuthenticationUnit( const TestAuthenticationConfig& cfg);
 
-	~TestAuthenticationUnit();
+	~TestAuthenticationUnit(){}
 
 	virtual const char* className() const		{return "TestAuthentication";}
 
