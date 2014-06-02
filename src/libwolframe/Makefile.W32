@@ -70,7 +70,7 @@ CPP_OBJS = \
 	base64.obj \
 	HMAC.obj \
 	PBKDF2.obj \
-	password.obj \
+	passwordHash.obj \
 	CRAM.obj
 
 OBJS = \

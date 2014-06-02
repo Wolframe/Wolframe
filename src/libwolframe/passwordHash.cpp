@@ -238,7 +238,7 @@ PasswordHash::PasswordHash( const std::string& str )
 			throw std::runtime_error( errMsg );
 		}
 		m_salt = Salt( s.substr( 1, hashStart - 1 ));
-		m_hash = Hash( s.substr( hashStart ));
+		m_hash = Hash( s.substr( hashStart + 1 ));
 	}
 	else	{
 		m_hash = Hash( str );

@@ -83,14 +83,14 @@ protected:
 
 TEST_F( AuthenticationFixture, typeName )
 {
-	TextFileAuthenticator authenticator( "", "passwd" );
+	TextFileAuthUnit authenticator( "", "passwd" );
 	EXPECT_STREQ( authenticator.className( ), "TextFileAuth" );
 }
 
 TEST_F( AuthenticationFixture, fileWithoutNewLine )
 {
 	User*	user;
-	TextFileAuthenticator authenticator( "", "passwd-noNL" );
+	TextFileAuthUnit authenticator( "", "passwd-noNL" );
 
 	user = authenticator.authenticatePlain( "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
@@ -114,7 +114,7 @@ TEST_F( AuthenticationFixture, fileWithoutNewLine )
 TEST_F( AuthenticationFixture, validUsers )
 {
 	User*	user;
-	TextFileAuthenticator authenticator( "", "passwd" );
+	TextFileAuthUnit authenticator( "", "passwd" );
 
 	user = authenticator.authenticatePlain( "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
@@ -138,7 +138,7 @@ TEST_F( AuthenticationFixture, validUsers )
 TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 {
 	User*	user;
-	TextFileAuthenticator authenticator( "", "passwd" );
+	TextFileAuthUnit authenticator( "", "passwd" );
 
 	user = authenticator.authenticatePlain( "AdMiN", "Good Password", false );
 	ASSERT_TRUE( user != NULL );
@@ -161,7 +161,7 @@ TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 TEST_F( AuthenticationFixture, caseInsensitive_Fail )
 {
 	User*	user;
-	TextFileAuthenticator authenticator( "", "passwd" );
+	TextFileAuthUnit authenticator( "", "passwd" );
 
 	user = authenticator.authenticatePlain( "AdMiN", "Good Password", true );
 	EXPECT_EQ( NULL, user );
@@ -174,7 +174,7 @@ TEST_F( AuthenticationFixture, caseInsensitive_Fail )
 TEST_F( AuthenticationFixture, wrongPasswords )
 {
 	User*	user;
-	TextFileAuthenticator authenticator( "", "passwd" );
+	TextFileAuthUnit authenticator( "", "passwd" );
 
 	user = authenticator.authenticatePlain( "admin", "Goood Password", true );
 	EXPECT_EQ( NULL, user );
@@ -187,7 +187,7 @@ TEST_F( AuthenticationFixture, wrongPasswords )
 TEST_F( AuthenticationFixture, nonExistentUsers )
 {
 	User*	user;
-	TextFileAuthenticator authenticator( "", "passwd" );
+	TextFileAuthUnit authenticator( "", "passwd" );
 
 	user = authenticator.authenticatePlain( "adminn", "xx", true );
 	EXPECT_EQ( NULL, user );
@@ -200,7 +200,7 @@ TEST_F( AuthenticationFixture, nonExistentUsers )
 TEST_F( AuthenticationFixture, invalidPasswordHashes )
 {
 	User*	user;
-	TextFileAuthenticator authenticator( "", "passwd" );
+	TextFileAuthUnit authenticator( "", "passwd" );
 
 
 	user = authenticator.authenticatePlain( "badmin", "Good Password", true );
@@ -214,7 +214,7 @@ TEST_F( AuthenticationFixture, invalidPasswordHashes )
 TEST_F( AuthenticationFixture, nonexistentFile )
 {
 	User*	user;
-	TextFileAuthenticator authenticator( "", "passwds" );
+	TextFileAuthUnit authenticator( "", "passwds" );
 
 	user = authenticator.authenticatePlain( "admin", "xx", true );
 	EXPECT_EQ( NULL, user );
@@ -229,7 +229,7 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 //TEST_F( AuthenticationFixture, CRAM_fileWithoutNewLine )
 //{
 //	User*	user;
-//	TextFileAuthenticator authenticator( "", "passwd-noNL" );
+//	TextFileAuthUnit authenticator( "", "passwd-noNL" );
 
 //	user = CRAMauth( authenticator, "admin", "Good Password", true );
 //	ASSERT_TRUE( user != NULL );
@@ -253,7 +253,7 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 //TEST_F( AuthenticationFixture, CRAM_validUsers )
 //{
 //	User*	user;
-//	TextFileAuthenticator authenticator( "", "passwd" );
+//	TextFileAuthUnit authenticator( "", "passwd" );
 
 //	user = CRAMauth( authenticator, "admin", "Good Password", true );
 //	ASSERT_TRUE( user != NULL );
@@ -277,7 +277,7 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 //TEST_F( AuthenticationFixture, CRAM_caseInsensitive_Pass )
 //{
 //	User*	user;
-//	TextFileAuthenticator authenticator( "", "passwd" );
+//	TextFileAuthUnit authenticator( "", "passwd" );
 
 //	user = CRAMauth( authenticator, "AdMiN", "Good Password", false );
 //	ASSERT_TRUE( user != NULL );
@@ -297,23 +297,23 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 //	delete user;
 //}
 
-////TEST_F( AuthenticationFixture, CRAM_caseInsensitive_Fail )
-////{
-////	User*	user;
-////	TextFileAuthenticator authenticator( "", "passwd" );
+//TEST_F( AuthenticationFixture, CRAM_caseInsensitive_Fail )
+//{
+//	User*	user;
+//	TextFileAuthUnit authenticator( "", "passwd" );
 
-////	user = CRAMauth( authenticator, "AdMiN", "Good Password", true );
-////	EXPECT_EQ( NULL, user );
-////	user = CRAMauth( authenticator, "GoodUsr", "User PassWord", true );
-////	EXPECT_EQ( NULL, user );
-////	user = CRAMauth( authenticator, "BadUsr", "User BadWord", true );
-////	EXPECT_EQ( NULL, user );
-////}
+//	user = CRAMauth( authenticator, "AdMiN", "Good Password", true );
+//	EXPECT_EQ( NULL, user );
+//	user = CRAMauth( authenticator, "GoodUsr", "User PassWord", true );
+//	EXPECT_EQ( NULL, user );
+//	user = CRAMauth( authenticator, "BadUsr", "User BadWord", true );
+//	EXPECT_EQ( NULL, user );
+//}
 
 //TEST_F( AuthenticationFixture, CRAM_wrongPasswords )
 //{
 //	User*	user;
-//	TextFileAuthenticator authenticator( "", "passwd" );
+//	TextFileAuthUnit authenticator( "", "passwd" );
 
 //	user = CRAMauth( authenticator, "admin", "Goood Password", true );
 //	EXPECT_EQ( NULL, user );
@@ -326,7 +326,7 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 //TEST_F( AuthenticationFixture, CRAM_nonExistentUsers )
 //{
 //	User*	user;
-//	TextFileAuthenticator authenticator( "", "passwd" );
+//	TextFileAuthUnit authenticator( "", "passwd" );
 
 //	user = CRAMauth( authenticator, "adminn", "xx", true );
 //	EXPECT_EQ( NULL, user );
@@ -336,24 +336,24 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 //	EXPECT_EQ( NULL, user );
 //}
 
-////TEST_F( AuthenticationFixture, CRAM_invalidPasswordHashes )
-////{
-////	User*	user;
-////	TextFileAuthenticator authenticator( "", "passwd" );
+//TEST_F( AuthenticationFixture, CRAM_invalidPasswordHashes )
+//{
+//	User*	user;
+//	TextFileAuthUnit authenticator( "", "passwd" );
 
 
-////	user = CRAMauth( authenticator, "badmin", "Good Password", true );
-////	EXPECT_EQ( NULL, user );
-////	user = CRAMauth( authenticator, "wrongusr", "User PassWord", true );
-////	EXPECT_EQ( NULL, user );
-////	user = CRAMauth( authenticator, "shortusr", "User BadWord", true );
-////	EXPECT_EQ( NULL, user );
-////}
+//	user = CRAMauth( authenticator, "badmin", "Good Password", true );
+//	EXPECT_EQ( NULL, user );
+//	user = CRAMauth( authenticator, "wrongusr", "User PassWord", true );
+//	EXPECT_EQ( NULL, user );
+//	user = CRAMauth( authenticator, "shortusr", "User BadWord", true );
+//	EXPECT_EQ( NULL, user );
+//}
 
 //TEST_F( AuthenticationFixture, CRAM_nonexistentFile )
 //{
 //	User*	user;
-//	TextFileAuthenticator authenticator( "", "passwds" );
+//	TextFileAuthUnit authenticator( "", "passwds" );
 
 //	user = CRAMauth( authenticator, "admin", "xx", true );
 //	EXPECT_EQ( NULL, user );

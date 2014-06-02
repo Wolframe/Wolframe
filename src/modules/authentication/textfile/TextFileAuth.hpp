@@ -139,12 +139,6 @@ public:
 
 	virtual const std::string& identifier() const	{ return m_backend.identifier(); }
 
-	/// Get the list of available mechs
-	virtual const std::vector<std::string>& mechs() const;
-
-	/// Set the authentication mech
-	virtual bool setMech( const std::string& mech );
-
 	/// The input message
 	virtual void messageIn( const std::string& message );
 

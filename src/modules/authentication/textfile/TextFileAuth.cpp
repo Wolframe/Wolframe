@@ -128,5 +128,27 @@ void TextFileAuthSlice::destroy()
 	delete this;
 }
 
+/// The input message
+void TextFileAuthSlice::messageIn( const std::string& /*message*/ )
+{
+}
+
+/// The output message
+const std::string& TextFileAuthSlice::messageOut()
+{
+	return "";
+}
+
+/// The current status of the authenticator slice
+AuthenticatorSlice::Status TextFileAuthSlice::status() const
+{
+}
+
+/// The authenticated user or NULL if not authenticated
+User* TextFileAuthSlice::user() const
+{
+	return NULL;
+}
+
 }} // namespace _Wolframe::AAAA
 
