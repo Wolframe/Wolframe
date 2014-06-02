@@ -39,7 +39,7 @@
 #include <cstring>
 #include <cassert>
 
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "crypto/PBKDF2.hpp"
 #include "types/byte2hex.h"
 #include "types/base64.hpp"

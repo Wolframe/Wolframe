@@ -51,7 +51,7 @@
 #endif
 
 #include "AAAA/CRAM.hpp"
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
 #include "crypto/sha2.h"

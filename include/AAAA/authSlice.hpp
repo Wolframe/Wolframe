@@ -99,7 +99,7 @@ public:
 	///		As a security precaution, all the instance information regarding
 	///		the current authentication operation should be destroyed after
 	///		calling this function
-	virtual User* user() const = 0;
+	virtual User* user() = 0;
 };
 
 }} // namespace _Wolframe::AAAA

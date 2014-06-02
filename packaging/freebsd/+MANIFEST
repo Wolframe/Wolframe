@@ -266,7 +266,7 @@ files:
  /usr/local/include/wolframe/AAAA/audit.hpp: 'sha256sum'
  /usr/local/include/wolframe/AAAA/authentication.hpp: 'sha256sum'
  /usr/local/include/wolframe/AAAA/authorization.hpp: 'sha256sum'
- /usr/local/include/wolframe/AAAA/password.hpp: 'sha256sum'
+ /usr/local/include/wolframe/AAAA/passwordHash.hpp: 'sha256sum'
  /usr/local/include/wolframe/AAAA/user.hpp: 'sha256sum'
  /usr/local/include/wolframe/module/constructor.hpp: 'sha256sum'
  /usr/local/include/wolframe/prgbind/ddlProgram.hpp: 'sha256sum'

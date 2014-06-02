@@ -42,7 +42,7 @@
 #include "crypto/sha2.h"
 #include "types/byte2hex.h"
 #include "AAAA/CRAM.hpp"
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "passwdFile.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -145,7 +145,7 @@ AuthenticatorSlice::Status TextFileAuthSlice::status() const
 }
 
 /// The authenticated user or NULL if not authenticated
-User* TextFileAuthSlice::user() const
+User* TextFileAuthSlice::user()
 {
 	return NULL;
 }

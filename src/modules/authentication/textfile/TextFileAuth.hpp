@@ -149,7 +149,7 @@ public:
 	virtual Status status() const;
 
 	/// The authenticated user or NULL if not authenticated
-	virtual User* user() const;
+	virtual User* user();
 
 private:
 	const TextFileAuthUnit&	m_backend;

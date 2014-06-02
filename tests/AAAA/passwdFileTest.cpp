@@ -38,7 +38,7 @@
 #include "gtest/gtest.h"
 #include "passwdFile.hpp"
 #include "system/globalRngGen.hpp"
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "crypto/HMAC.hpp"
 
 using namespace _Wolframe::AAAA;
