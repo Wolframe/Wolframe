@@ -32,9 +32,15 @@
 ************************************************************************/
 ///\file testAuthentication.hpp
 ///\brief Interface of a fake authentication mechanism to test the protocol
+#ifndef _Wolframe_MODULE_AUTH_TEST_AUTHENTICATION_HPP_INCLUDED
+#define _Wolframe_MODULE_AUTH_TEST_AUTHENTICATION_HPP_INCLUDED
+
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include "config/configurationTree.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include "AAAA/authenticator.hpp"
+#include "AAAA/authUnit.hpp"
 #include <boost/lexical_cast.hpp>
 
 namespace _Wolframe {
@@ -56,9 +62,25 @@ public:
 	void print( std::ostream& os, size_t indent) const;
 	void setCanonicalPathes( const std::string&){}
 
+public:
+	struct Structure
+	{
+		friend class TestAuthenticationConfigDescription;
+
+		std::string m_identifier;
+		std::string m_pattern;
+
+		Structure(){}
+		Structure( const std::string& i, const std::string& p)
+			:m_identifier(i),m_pattern(p){}
+
+		static const serialize::StructDescriptionBase* getStructDescription();
+	};
+
 private:
-	std::string m_identifier;
-	std::string m_pattern;
+	friend class TestAuthenticationUnit;
+	Structure structure;
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 
@@ -66,7 +88,7 @@ class TestAuthenticationUnit
 	:public AuthenticationUnit
 {
 public:
-	TestAuthenticationUnit( const std::string& Identifier, const std::string& filename);
+	TestAuthenticationUnit( const TestAuthenticationConfig& cfg);
 
 	~TestAuthenticationUnit();
 
@@ -75,6 +97,9 @@ public:
 	const std::string* mechs() const;
 
 	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client);
+	
+private:
+	std::string m_pattern;
 };
 
 
@@ -82,25 +107,24 @@ class TestAuthenticatorSlice
 	:public AuthenticatorSlice
 {
 public:
-	TestAuthenticatorSlice( const std::string& identifier_)
-		:m_identifier(identifier_){}
+	TestAuthenticatorSlice( const std::string& identifier_, const std::string& pattern_);
 
-	~TestAuthenticatorSlice();
+	virtual ~TestAuthenticatorSlice();
 
-	void destroy();
+	virtual void destroy()					{delete this;}
 
-	virtual const char* className() const		{return "Test";}
+	virtual const char* className() const			{return "Test";}
 
-	virtual const std::string& identifier() const	{return m_identifier;}
+	virtual const std::string& identifier() const		{return m_identifier;}
 
 	/// Get the list of available mechs
-	virtual const std::vector<std::string>& mechs() const;
+	virtual const std::vector<std::string>& mechs() const	{return m_mechs;}
 
 	/// Set the authentication mech
 	virtual bool setMech( const std::string& mech);
 
 	/// The input message
-	virtual void messageIn( const std::string& message);
+	virtual void messageIn( const std::string& msg);
 
 	/// The output message
 	virtual const std::string& messageOut();
@@ -112,7 +136,24 @@ public:
 	virtual User* user() const;
 
 private:
+	const std::string& message( const char* cmd, const std::string& content=std::string());
+	void initUser( const std::string& msg);
+
+private:
+	enum State
+	{
+		Init,
+		StartAuth,
+		WaitCredentials,
+		Done
+	};
+
+	State m_state;
+	AuthenticatorSlice::Status m_status;
 	std::string m_identifier;
+	std::string m_pattern;
+	std::string m_message;
+	std::vector<std::string> m_mechs;
 	User* m_user;
 };
 

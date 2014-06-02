@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = tests
+SUBDIRS = tests authentication
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 

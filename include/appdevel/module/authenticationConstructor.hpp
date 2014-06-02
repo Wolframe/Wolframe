@@ -30,53 +30,48 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file authUnit.hpp
-/// \brief top-level header file for authentication unit interface
-///
-
-#ifndef _AUTHENTICATION_UNIT_HPP_INCLUDED
-#define _AUTHENTICATION_UNIT_HPP_INCLUDED
-
+///\file appdevel/module/authenticationConstructor.hpp
+///\brief Interface to constructors of authenticators
+#ifndef _Wolframe_MODULE_AUTHENTICATION_CONSTRUCTOR_HPP_INCLUDED
+#define _Wolframe_MODULE_AUTHENTICATION_CONSTRUCTOR_HPP_INCLUDED
+#include "module/constructor.hpp"
+#include "module/moduleInterface.hpp"
+#include "module/constructor.hpp"
+#include <boost/lexical_cast.hpp>
 #include <string>
 
-#include "AAAA/authSlice.hpp"
-#include "database/DBprovider.hpp"
-#include "system/connectionEndpoint.hpp"
-
 namespace _Wolframe {
-namespace AAAA {
+namespace module {
 
-/// AuthenticationUnit Unit
-/// This is the base class for the authentication unit implementations
-class AuthenticationUnit
+///\class AuthenticationConstructor
+///\brief Constructor of an authentication unit
+template<class UNIT, class CONFIG>
+class AuthenticationConstructor
+	:public _Wolframe::ConfiguredObjectConstructor<UNIT>
 {
 public:
-	AuthenticationUnit( const std::string& id )
-		: m_identifier( id )		{}
+	AuthenticationConstructor(){}
 
-	virtual ~AuthenticationUnit()		{}
+	virtual ~AuthenticationConstructor(){}
+	virtual UNIT* object( const _Wolframe::config::NamedConfiguration& cfgi)
+	{
+		const CONFIG* cfg = dynamic_cast<const CONFIG*>(&cfgi);
+		if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to authentication constructor");
+		UNIT* rt = new UNIT( *cfg);
+		return rt;
+	}
 
-	const std::string& identifier() const	{ return m_identifier; }
-
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
-						{ return true; }
-	virtual const char* className() const = 0;
-
-	/// The list of mechs implemented by this unit
-	/// \note	The authentication unit returns the mechs as an
-	///		array of strings. The array ends with an empty string.
-	///		Be aware that the other interfaces use a vector instead.
-	virtual const std::string* mechs() const = 0;
-
-	/// An AuthenticatorSlice for the required mech (or NULL)
-	virtual AuthenticatorSlice* slice( const std::string& mech,
-					   const net::RemoteEndpoint& client ) = 0;
-
-private:
-	const std::string	m_identifier;
+	virtual ObjectConstructorBase::ObjectType objectType() const
+	{
+		return ObjectConstructorBase::AUTHENTICATION_OBJECT;
+	}
+	
+	virtual const char* objectClassName() const
+	{
+		return "AuthenticationConstructor";
+	}
 };
 
-}} // namespace _Wolframe::AAAA
+}} //namespace
+#endif
 
-#endif // _AUTHENTICATION_UNIT_HPP_INCLUDED

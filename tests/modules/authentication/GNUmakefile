@@ -1,4 +1,4 @@
-TOPDIR = ../../../..
+TOPDIR = ../../..
 
 SUBDIRS =
 
@@ -12,12 +12,14 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lwfsingleton \
 	-lwolframe \
+	-lwolframe_serialize \
 	-lboost_filesystem
 
 DYNAMIC_MODULE = mod_auth_test.so

@@ -32,43 +32,26 @@
 ************************************************************************/
 ///\file appdevel/authenticationModuleMacros.hpp
 ///\brief Macros for a module for defining an authentication mechanism
+#include "appdevel/module/authenticationConstructor.hpp"
 #include "module/moduleInterface.hpp"
+#include "module/constructor.hpp"
 #include <boost/lexical_cast.hpp>
 
 ///\brief Defines a an authentication mechanism
 #define WF_AUTHENTICATOR(NAME) \
 {\
-	class NAME ## AuthenticationConstructor\
-		:public _Wolframe::AAAA::AuthenticationConstructor \
-	{\
-	public:\
-		NAME ## Constructor(){}\
-		virtual ~ NAME ## Constructor(){}\
-		virtual NAME ## AuthenticationUnit* object( const _Wolframe::config::NamedConfiguration& cfgi)\
-		{\
-			typedef NAME ## AuthenticationConfig MyConfig;\
-			const MyConfig* cfg = dynamic_cast<const MyConfig*>(&cfgi);\
-			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to '" #NAME "' authentication constructor");\
-			NAME ## AuthenticationUnit* rt = new NAME ## AuthenticationUnit( cfg);\
-			return rt;\
-		}\
-		virtual const char* objectClassName() const\
-		{\
-			return #NAME "Authentication";\
-		}\
-	};\
-	struct Constructor\
+	struct Builder \
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
 			static _Wolframe::module::ConfiguredBuilderDescription<\
-					_Wolframe::module::AAAA:: NAME ## AuthenticationConstructor,\
-					_Wolframe::module::AAAA:: NAME ## AuthenticationConfig >\
+					_Wolframe::module::AuthenticationConstructor<_Wolframe::AAAA:: NAME ## AuthenticationUnit, _Wolframe::AAAA:: NAME ## AuthenticationConfig>,\
+					_Wolframe::AAAA:: NAME ## AuthenticationConfig >\
 				mod( "Authentication " #NAME, "Authentication", #NAME, #NAME "Authentication");\
 			return &mod;\
 		}\
 	};\
-	(*this)(&Constructor ::impl);\
+	(*this)(&Builder::impl);\
 }
 
 

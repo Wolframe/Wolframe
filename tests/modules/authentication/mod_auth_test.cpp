@@ -33,6 +33,7 @@
 ///\file mod_auth_test.cpp
 ///\brief Module for dummy (test) authentication mechanism
 #include "appdevel/authenticationModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "testAuthentication.hpp"
 
 WF_MODULE_BEGIN( "testAuthentication", "fake authentication to test the protocol")
