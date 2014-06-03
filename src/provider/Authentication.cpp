@@ -73,7 +73,7 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 						ait != m_authUnits.end(); ait ++ )	{
 		// add unit mechs to the list
 		const char** p_mech = (*ait)->mechs();
-		if ( **p_mech == 0 )	{
+		if ( *p_mech == NULL )	{
 			LOG_WARNING << "'" << (*ait)->className() << "' has no authentication mechanisms";
 		}
 		while ( *p_mech )	{
