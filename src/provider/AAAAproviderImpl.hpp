@@ -61,7 +61,7 @@ public:
 			       const net::RemoteEndpoint& client_ );
 
 	~StandardAuthenticator();
-	void destroy();
+	void dispose();
 
 	/// Get the list of available mechs
 	virtual const std::vector<std::string>& mechs() const;

@@ -86,7 +86,7 @@ public:
 
 	virtual const char* className() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
 
-	const std::string* mechs() const		{ return m_mechs; }
+	const char** mechs() const;
 
 	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client );
 
@@ -133,7 +133,7 @@ public:
 
 	~TextFileAuthSlice();
 
-	void destroy();
+	void dispose();
 
 	virtual const char* className() const		{ return m_backend.className(); }
 

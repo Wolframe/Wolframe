@@ -51,12 +51,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-static const std::string AUTHENTICATION_MECH = "WOLFRAME-CRAM";
-
 // Text file authentication - authentication unit
 //***********************************************************************
-
-const std::string TextFileAuthUnit::m_mechs[] = { AUTHENTICATION_MECH, "" };
 
 TextFileAuthUnit::TextFileAuthUnit( const std::string& Identifier,
 					      const std::string& filename )
@@ -69,6 +65,13 @@ TextFileAuthUnit::TextFileAuthUnit( const std::string& Identifier,
 TextFileAuthUnit::~TextFileAuthUnit()
 {
 }
+
+const char** TextFileAuthUnit::mechs() const
+{
+	static const char* mechs[] = { "WOLFRAME-CRAM", "" };
+	return mechs;
+}
+
 
 AuthenticatorSlice* TextFileAuthUnit::slice( const std::string& /*mech*/,
 					     const net::RemoteEndpoint& /*client*/ )
@@ -123,7 +126,7 @@ TextFileAuthSlice::~TextFileAuthSlice()
 		delete m_user;
 }
 
-void TextFileAuthSlice::destroy()
+void TextFileAuthSlice::dispose()
 {
 	delete this;
 }

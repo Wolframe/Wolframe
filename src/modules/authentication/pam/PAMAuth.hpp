@@ -85,7 +85,7 @@ public:
 	~PAMAuthUnit();
 	virtual const char* className() const	{ return PAM_AUTHENTICATION_CLASS_NAME; }
 
-	const std::string* mechs() const	{ return m_mechs; }
+	const char** mechs() const;
 
 	AuthenticatorSlice* slice( const std::string& /*mech*/,
 				   const net::RemoteEndpoint& /*client*/ )

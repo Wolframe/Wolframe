@@ -79,12 +79,11 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	const std::string* mechs() const		{ return m_mechs; }
+	const char** mechs() const;
 
 	AuthenticatorSlice* slice( const std::string& mech,
 				   const net::RemoteEndpoint& client );
 private:
-	static const std::string	m_mechs[];
 	const std::string		m_dbLabel;
 	const db::Database*		m_db;
 };

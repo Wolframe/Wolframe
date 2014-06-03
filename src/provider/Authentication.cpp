@@ -72,12 +72,12 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 	for ( std::list< AuthenticationUnit* >::const_iterator ait = m_authUnits.begin();
 						ait != m_authUnits.end(); ait ++ )	{
 		// add unit mechs to the list
-		const std::string* p_mech = (*ait)->mechs();
-		if ( p_mech->empty() )	{
+		const char** p_mech = (*ait)->mechs();
+		if ( **p_mech == 0 )	{
 			LOG_WARNING << "'" << (*ait)->className() << "' has no authentication mechanisms";
 		}
-		while ( ! p_mech->empty() )	{
-			std::string mech = boost::to_upper_copy( *p_mech );
+		while ( *p_mech )	{
+			std::string mech( *p_mech ); boost::to_upper( mech );
 			bool exists = false;
 			for( std::vector< std::string >::const_iterator mit = m_mechs.begin();
 						mit != m_mechs.end(); mit++ )	{
@@ -134,7 +134,7 @@ StandardAuthenticator::~StandardAuthenticator()
 		delete m_user, m_user = NULL;
 }
 
-void StandardAuthenticator::destroy()
+void StandardAuthenticator::dispose()
 {
 	delete this;
 }

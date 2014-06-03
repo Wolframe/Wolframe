@@ -85,9 +85,6 @@ void SaslAuthConfig::setCanonicalPathes( const std::string& refPath )
 
 //*********   SASL Authentication Unit   ************************************
 
-static const std::string AUTHENTICATION_MECH = "WOLFRAME-SASL";
-const std::string SaslAuthUnit::m_mechs[] = { AUTHENTICATION_MECH, "" };
-
 SaslAuthUnit::SaslAuthUnit( const std::string& Identifier,
 		   const std::string& service, const std::string& confPath )
 	: AuthenticationUnit( Identifier ),
@@ -101,6 +98,12 @@ SaslAuthUnit::SaslAuthUnit( const std::string& Identifier,
 
 SaslAuthUnit::~SaslAuthUnit()
 {
+}
+
+const char** SaslAuthUnit::mechs() const
+{
+	static const char* mechs[] = { "WOLFRAME-SASL", "" };
+	return mechs;
 }
 
 }} // namespace _Wolframe::AAAA

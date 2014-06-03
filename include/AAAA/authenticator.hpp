@@ -78,7 +78,7 @@ public:
 	///		so you should be very careful how you use it.
 	///		You should use this function instead of delete
 	///		because not all authentication instances are created with new.
-	virtual void destroy() = 0;
+	virtual void dispose() = 0;
 
 	/// The list of available mechs
 	virtual const std::vector<std::string>& mechs() const = 0;

@@ -223,9 +223,6 @@ error:
 
 //*********   PAM Authentication Unit   *************************************
 
-static const std::string AUTHENTICATION_MECH = "WOLFRAME-PAM";
-const std::string PAMAuthUnit::m_mechs[] = { AUTHENTICATION_MECH, "" };
-
 PAMAuthUnit::PAMAuthUnit( const std::string& Identifier,
 				    const std::string& service )
 	: AuthenticationUnit( Identifier ), m_service( service )
@@ -243,6 +240,12 @@ PAMAuthUnit::PAMAuthUnit( const std::string& Identifier,
 
 PAMAuthUnit::~PAMAuthUnit()
 {
+}
+
+const char** PAMAuthUnit::mechs() const
+{
+	static const char* mechs[] = { "WOLFRAME-PAM", "" };
+	return mechs;
 }
 
 }} // namespace _Wolframe::AAAA
