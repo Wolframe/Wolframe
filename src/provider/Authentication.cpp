@@ -239,7 +239,7 @@ bool StandardAuthenticator::setMech( const std::string& mech )
 // The input message
 void StandardAuthenticator::messageIn( const std::string& message )
 {
-	// Missing a lot here ....
+	// Sill missing a lot here ....
 
 	if ( m_status != AWAITING_MESSAGE )
 		throw std::logic_error( "StandardAuthenticator: unexpected message received" );
@@ -250,12 +250,35 @@ void StandardAuthenticator::messageIn( const std::string& message )
 	assert( m_slices[ m_currentSlice ]->status() == AuthenticatorSlice::AWAITING_MESSAGE );
 
 	m_slices[ m_currentSlice ]->messageIn( message );
+
+	switch( m_slices[ m_currentSlice ]->status() )	{
+		case AuthenticatorSlice::MESSAGE_AVAILABLE:
+			m_status = MESSAGE_AVAILABLE;
+			LOG_TRACE << "StandardAuthenticator: status is MESSAGE_AVAILABLE";
+			break;
+		case AuthenticatorSlice::AWAITING_MESSAGE:
+			m_status = AWAITING_MESSAGE;
+			LOG_TRACE << "StandardAuthenticator: status is AWAITING_MESSAGE";
+			break;
+		case AuthenticatorSlice::AUTHENTICATED:
+			m_status = AUTHENTICATED;
+			LOG_TRACE << "StandardAuthenticator: status is AUTHENTICATED";
+			break;
+		case AuthenticatorSlice::INVALID_CREDENTIALS:
+			m_status = SYSTEM_FAILURE;
+			LOG_TRACE << "StandardAuthenticator: status is INVALID_CREDENTIALS";
+			break;
+		case AuthenticatorSlice::SYSTEM_FAILURE:
+			m_status = SYSTEM_FAILURE;
+			LOG_WARNING << "StandardAuthenticator: status is SYSTEM_FAILURE";
+			break;
+	}
 }
 
 // The output message
 std::string StandardAuthenticator::messageOut()
 {
-	// Missing a lot here ....
+	// Still missing a lot here ....
 
 	if ( m_status != MESSAGE_AVAILABLE )
 		throw std::logic_error( "StandardAuthenticator: unexpected request for output message" );
@@ -265,7 +288,32 @@ std::string StandardAuthenticator::messageOut()
 	assert( (std::size_t)m_currentSlice < m_slices.size() );
 	assert( m_slices[ m_currentSlice ]->status() == AuthenticatorSlice::MESSAGE_AVAILABLE );
 
-	return m_slices[ m_currentSlice ]->messageOut();
+	std::string msgOut = m_slices[ m_currentSlice ]->messageOut();
+
+	switch( m_slices[ m_currentSlice ]->status() )	{
+		case AuthenticatorSlice::MESSAGE_AVAILABLE:
+			m_status = MESSAGE_AVAILABLE;
+			LOG_TRACE << "StandardAuthenticator: status is MESSAGE_AVAILABLE";
+			break;
+		case AuthenticatorSlice::AWAITING_MESSAGE:
+			m_status = AWAITING_MESSAGE;
+			LOG_TRACE << "StandardAuthenticator: status is AWAITING_MESSAGE";
+			break;
+		case AuthenticatorSlice::AUTHENTICATED:
+			m_status = AUTHENTICATED;
+			LOG_TRACE << "StandardAuthenticator: status is AUTHENTICATED";
+			break;
+		case AuthenticatorSlice::INVALID_CREDENTIALS:
+			m_status = SYSTEM_FAILURE;
+			LOG_TRACE << "StandardAuthenticator: status is INVALID_CREDENTIALS";
+			break;
+		case AuthenticatorSlice::SYSTEM_FAILURE:
+			m_status = SYSTEM_FAILURE;
+			LOG_WARNING << "StandardAuthenticator: status is SYSTEM_FAILURE";
+			break;
+	}
+
+	return msgOut;
 }
 
 // The authenticated user or NULL if not authenticated
