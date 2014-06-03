@@ -57,6 +57,7 @@ usr/pkg/lib/wolframe/modules/mod_job_schedule_db.so
 usr/pkg/lib/wolframe/modules/mod_datatype_datetime.so
 usr/pkg/lib/wolframe/modules/mod_datatype_bcdnumber.so
 usr/pkg/lib/wolframe/modules/mod_doctype_xml.so
+usr/pkg/lib/wolframe/modules/mod_doctype_json.so
 usr/pkg/lib/wolframe/modules/mod_graphix.so
 usr/pkg/lib/wolframe/modules/mod_print_harupdf.so
 @dirrm usr/pkg/lib/wolframe/modules
@@ -143,10 +144,8 @@ usr/pkg/include/wolframe/protocol/parser.hpp
 usr/pkg/include/wolframe/cmdbind/authCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandlerUnit.hpp
-usr/pkg/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/doctypeDetector.hpp
-usr/pkg/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/execCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp
@@ -272,7 +271,7 @@ usr/pkg/include/wolframe/AAAA/CRAM.hpp
 usr/pkg/include/wolframe/AAAA/audit.hpp
 usr/pkg/include/wolframe/AAAA/authentication.hpp
 usr/pkg/include/wolframe/AAAA/authorization.hpp
-usr/pkg/include/wolframe/AAAA/password.hpp
+usr/pkg/include/wolframe/AAAA/passwordHash.hpp
 usr/pkg/include/wolframe/AAAA/user.hpp
 @dirrm usr/pkg/include/wolframe/AAAA
 usr/pkg/include/wolframe/module/constructor.hpp

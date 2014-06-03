@@ -38,7 +38,7 @@
 #include "gtest/gtest.h"
 #include "passwdFile.hpp"
 #include "system/globalRngGen.hpp"
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "crypto/HMAC.hpp"
 
 using namespace _Wolframe::AAAA;
@@ -91,7 +91,7 @@ TEST_F( PasswdFileFixture, PasswordSaltTest )
 
 TEST_F( PasswdFileFixture, PasswordHashTest )
 {
-	PasswordHash	hash0( "$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAA");
+	PasswordHash	hash0( "$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
 	EXPECT_STREQ( "00000000000000000000000000000000", hash0.salt().toBCD().c_str() );
 	EXPECT_EQ( 0, hash0.hash().hash()[0] );

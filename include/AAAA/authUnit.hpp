@@ -67,7 +67,7 @@ public:
 	/// \note	The authentication unit returns the mechs as an
 	///		array of strings. The array ends with an empty string.
 	///		Be aware that the other interfaces use a vector instead.
-	virtual const std::string* mechs() const = 0;
+	virtual const char** mechs() const = 0;
 
 	/// An AuthenticatorSlice for the required mech (or NULL)
 	virtual AuthenticatorSlice* slice( const std::string& mech,

@@ -1,3 +1,5 @@
+<?php
+
 /************************************************************************
 
  Copyright (C) 2011 - 2014 Project Wolframe.
@@ -30,60 +32,15 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-//
-//
 
-#include <stdexcept>
-#include <boost/algorithm/string.hpp>
-#include "logger-v1.hpp"
-#include "DBauth.hpp"
+include 'authentication.php';
 
-namespace _Wolframe {
-namespace AAAA {
-
-DBauthUnit::DBauthUnit( const std::string& Identifier, const std::string& dbLabel )
-	: AuthenticationUnit( Identifier ), m_dbLabel( dbLabel )
-{
-	m_db = NULL;
-	if ( m_dbLabel.empty() )
-		throw std::logic_error( "Empty database reference in DBauthContainer" );
-
-	LOG_DEBUG << "Database authentication unit '" << identifier()
-		  << "' created with database reference '" << m_dbLabel << "'";
+if ( $argc != 2 )	{
+	echo "Usage: $argv[0] <username>\n\n";
+	exit( 1 );
 }
 
-DBauthUnit::~DBauthUnit()
-{
-}
+echo userHash( 'testUser' ), "\n";
 
-const char** DBauthUnit::mechs() const
-{
-	static const char* mechs[] = { "WOLFRAME-CRAM", "" };
-	return mechs;
-}
-
-bool DBauthUnit::resolveDB( const db::DatabaseProvider& db )
-{
-	if ( m_db == NULL && ! m_dbLabel.empty() )	{
-		m_db = db.database( m_dbLabel );
-		if ( m_db )	{
-			LOG_TRACE << "Database authentication unit: database reference '" << m_dbLabel << "' resolved";
-			return true;
-		}
-		else	{
-			LOG_ERROR << "Database authentication unit: database labeled '" << m_dbLabel << "' not found !";
-			return false;
-		}
-	}
-	return true;
-}
-
-AuthenticatorSlice* DBauthUnit::slice( const std::string& /*mech*/,
-				       const net::RemoteEndpoint& /*client*/ )
-{
-	return NULL;
-}
-
-}} // namespace _Wolframe::AAAA
+?>
 

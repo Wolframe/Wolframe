@@ -123,6 +123,7 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 			throw std::logic_error("no remote endpoint set, cannot authenticate");
 		}
 		m_authenticator.reset( execContext()->authenticator( *m_remoteEndpoint ));
+
 		if (!m_authenticator.get())
 		{
 			out << "ERR AUTH denied" << endl();
@@ -280,7 +281,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	cmdbind::CommandHandlerR chr( ch);
 
 	types::DoctypeInfoR info = chnd->info();
-	
+
 	const char* error = ch->lastError();
 	if (!info.get())
 	{

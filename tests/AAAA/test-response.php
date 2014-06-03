@@ -1,3 +1,5 @@
+<?php
+
 /************************************************************************
 
  Copyright (C) 2011 - 2014 Project Wolframe.
@@ -31,12 +33,19 @@
 
 ************************************************************************/
 
-<?php
-
 include 'authentication.php';
 
-echo userHash( 'bla bla' ), "\n";
-echo CRAMresponse( 'bla bla', '$bli bli$' . base64_encode( "A 64 bytes dummy challenge -------------------------------------" ) ), "\n";
+if ( $argc != 2 )	{
+	echo "Usage: $argv[0] <challenge>\n\n";
+	exit( 1 );
+}
+
+echo $argv[1], "\n";
+
+// '$blibli$' . base64_encode( "A 64 bytes dummy challenge -------------------------------------" );
+// value:
+// \$blibli\$QSA2NCBieXRlcyBkdW1teSBjaGFsbGVuZ2UgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ==
+
+echo CRAMresponse( 'bla bla password', $argv[1] ), "\n";
 
 ?>
-

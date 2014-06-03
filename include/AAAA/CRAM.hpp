@@ -44,7 +44,7 @@
 
 #include <string>
 #include <system/randomGenerator.hpp>
-#include <AAAA/password.hpp>
+#include <AAAA/passwordHash.hpp>
 
 namespace _Wolframe {
 namespace AAAA {

@@ -41,7 +41,7 @@
 #include "utils/getPassword.hpp"
 #include "utils/fileUtils.hpp"
 #include "passwdFile.hpp"
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "types/base64.hpp"
 #include "system/globalRngGen.hpp"
 #define BOOST_FILESYSTEM_VERSION 3

@@ -67,13 +67,13 @@ public:
 	/// The virtual destructor
 	virtual ~AuthenticatorSlice()	{}
 
-	/// Destroy the authenticator
+	/// Dispose of the authenticator
 	///
 	/// \note	In many cases this is a suicidal function (delete this),
 	///		so you should be very careful how you use it.
 	///		You should use this function instead of delete
 	///		because not all authentication instances are created with new.
-	virtual void destroy() = 0;
+	virtual void dispose() = 0;
 
 	/// The class name of the authentication unit / subunit
 	///\note	This is the name of the authentication type / class
@@ -99,7 +99,7 @@ public:
 	///		As a security precaution, all the instance information regarding
 	///		the current authentication operation should be destroyed after
 	///		calling this function
-	virtual User* user() const = 0;
+	virtual User* user() = 0;
 };
 
 }} // namespace _Wolframe::AAAA
