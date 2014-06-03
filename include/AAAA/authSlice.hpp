@@ -89,7 +89,7 @@ public:
 
 	/// The output message
 	/// \returns		the output message
-	virtual const std::string& messageOut() = 0;
+	virtual std::string messageOut() = 0;
 
 	/// The current status of the authenticator
 	virtual Status status() const = 0;

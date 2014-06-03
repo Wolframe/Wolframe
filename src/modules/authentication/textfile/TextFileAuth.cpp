@@ -137,7 +137,7 @@ void TextFileAuthSlice::messageIn( const std::string& /*message*/ )
 }
 
 /// The output message
-const std::string& TextFileAuthSlice::messageOut()
+std::string TextFileAuthSlice::messageOut()
 {
 	return "";
 }

@@ -35,6 +35,7 @@
 //
 
 #include <stdexcept>
+#include <cassert>
 
 #include "AAAAproviderImpl.hpp"
 #include "logger-v1.hpp"
@@ -245,11 +246,14 @@ void StandardAuthenticator::messageIn( const std::string& message )
 	if ( m_currentSlice < 0 )
 		throw std::logic_error( "StandardAuthenticator: message received but no authentication slice selected" );
 
+	assert( (std::size_t)m_currentSlice < m_slices.size() );
+	assert( m_slices[ m_currentSlice ]->status() == AuthenticatorSlice::AWAITING_MESSAGE );
+
 	m_slices[ m_currentSlice ]->messageIn( message );
 }
 
 // The output message
-const std::string& StandardAuthenticator::messageOut()
+std::string StandardAuthenticator::messageOut()
 {
 	// Missing a lot here ....
 
@@ -257,6 +261,9 @@ const std::string& StandardAuthenticator::messageOut()
 		throw std::logic_error( "StandardAuthenticator: unexpected request for output message" );
 	if ( m_currentSlice < 0 )
 		throw std::logic_error( "StandardAuthenticator: message requested but no authentication slice selected" );
+
+	assert( (std::size_t)m_currentSlice < m_slices.size() );
+	assert( m_slices[ m_currentSlice ]->status() == AuthenticatorSlice::MESSAGE_AVAILABLE );
 
 	return m_slices[ m_currentSlice ]->messageOut();
 }
