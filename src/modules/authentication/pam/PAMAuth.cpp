@@ -244,7 +244,7 @@ PAMAuthUnit::~PAMAuthUnit()
 
 const char** PAMAuthUnit::mechs() const
 {
-	static const char* mechs[] = { "WOLFRAME-PAM", "" };
+	static const char* mechs[] = { "WOLFRAME-PAM", NULL };
 	return mechs;
 }
 

@@ -68,7 +68,7 @@ TextFileAuthUnit::~TextFileAuthUnit()
 
 const char** TextFileAuthUnit::mechs() const
 {
-	static const char* mechs[] = { "WOLFRAME-CRAM", "" };
+	static const char* mechs[] = { "WOLFRAME-CRAM", NULL };
 	return mechs;
 }
 

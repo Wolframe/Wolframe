@@ -102,7 +102,7 @@ SaslAuthUnit::~SaslAuthUnit()
 
 const char** SaslAuthUnit::mechs() const
 {
-	static const char* mechs[] = { "WOLFRAME-SASL", "" };
+	static const char* mechs[] = { "WOLFRAME-SASL", NULL };
 	return mechs;
 }
 

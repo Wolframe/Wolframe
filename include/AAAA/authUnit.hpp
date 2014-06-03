@@ -65,7 +65,7 @@ public:
 
 	/// The list of mechs implemented by this unit
 	/// \note	The authentication unit returns the mechs as an
-	///		array of strings. The array ends with an empty string.
+	///		array of strings. The array ends with a NULL
 	///		Be aware that the other interfaces use a vector instead.
 	virtual const char** mechs() const = 0;
 
