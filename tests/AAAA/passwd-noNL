@@ -1,12 +1,18 @@
 # Wolframe password file
 #
-# This is only for exemplification purposes.
 # Format is:
 # <username>:<password hash>:<user info (eg. name)>:<expiry>
+# This is the same as the passwd, but lacking the newline at the end of the file
 
-# admin password: 'Good Password'
-admin:1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6:Wolframe Administrator:0
+# Admin password: 'Good Password'
+Admin:$w5Ca0wRXmJfcFYaliE3fiw$XXTPhJft4BbeutZWdkFNPpLTVMxUHtMgY7jBooRprk8GNPmP3iROT+X5KhKByQBp:Just a test user:0
 # goodusr password: 'User PassWord'
-goodusr:e58d04cb313e8b5d4831e002d25ee15f1c5cebbe18508fb7617016a6:Good User:0
-# badusr password: 'User BadWord'
-badusr:ebd90de8523ab4011211032ad885548a2194dd323ce40e2f95332660:Bad User:0
+goodusr:$8Kbj86imB3Brv2GbtGzwoA$SXdFVEYoTmAt0yttyWXgbN4MrnbOjSq1h1/uYk0ctV2L/IT+9YEXCm153Zxoo/Bd:Another test user:0
+# testusr password: 'UserPassWord'
+testusr:$XLYaTL8xv/ujUU2pNqHKow$aUHCt0oZUVFg3wfjTzrjL2JzvzE71vlEVrXy7OOMfNqx6ly2ujNSENIiuaD5BoUy:Good test user:0
+
+# This users have wrong digests. Password was 'User Password'
+# 1 digit more
+longusr:$fcobaU8YipucDMGdubWk4w$hZSZNfkj5W+EnnXaoaLDJwAqp8lNr0k9dO99/5/shsHSK7w/qzGOUNbY5KkYfTM3AA:Wrong hash format (too long):0
+# 2 digits less
+shortusr:$WvFfygARMp7n+jj2L8NbqQ$GgvZUzCwXUTehasWLnnpVQdkUg9/Qt55L1c+PaKDX53GUwv2Y3KXGAr09M56/o:Wrong hash format (too short):0

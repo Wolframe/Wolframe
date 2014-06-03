@@ -1149,6 +1149,7 @@ makefiles/nmake/top.mk
 .Attic/SSLtest.c
 .Attic/testLeak.cpp
 .Attic/testPGleak.cpp
+.Attic/textFileTest.cpp
 .Attic/threadLeakTest.cpp
 .Attic/types/BCDarithmeticOwnIncrement.c
 .Attic/types/bignum.hpp

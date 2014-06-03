@@ -242,10 +242,10 @@ void StandardAuthenticator::messageIn( const std::string& message )
 
 	if ( m_status != AWAITING_MESSAGE )
 		throw std::logic_error( "StandardAuthenticator: unexpected message received" );
-	if ( m_currentSlice >= 0 )
-		m_slices[ m_currentSlice ]->messageIn( message );
-	else
+	if ( m_currentSlice < 0 )
 		throw std::logic_error( "StandardAuthenticator: message received but no authentication slice selected" );
+
+	m_slices[ m_currentSlice ]->messageIn( message );
 }
 
 // The output message
@@ -257,6 +257,7 @@ const std::string& StandardAuthenticator::messageOut()
 		throw std::logic_error( "StandardAuthenticator: unexpected request for output message" );
 	if ( m_currentSlice < 0 )
 		throw std::logic_error( "StandardAuthenticator: message requested but no authentication slice selected" );
+
 	return m_slices[ m_currentSlice ]->messageOut();
 }
 
