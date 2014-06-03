@@ -90,9 +90,9 @@ TestAuthenticationUnit::TestAuthenticationUnit( const TestAuthenticationConfig& 
 	:AuthenticationUnit(cfg.structure.m_identifier),m_pattern(cfg.structure.m_pattern)
 {}
 
-const std::string* TestAuthenticationUnit::mechs() const
+const char** TestAuthenticationUnit::mechs() const
 {
-	static const std::string ar[2] = {"TEST",""};
+	static const char* ar[2] = {"TEST",""};
 	return ar;
 }
 
@@ -107,6 +107,25 @@ AuthenticatorSlice* TestAuthenticationUnit::slice( const std::string& mech, cons
 		LOG_ERROR << "Mech not available '" << mech << "'";
 		return 0;
 	}
+}
+
+struct MemBlockHdr
+{
+	int chk;
+};
+
+void* TestAuthenticatorSlice::operator new( std::size_t n)
+{
+	MemBlockHdr* blk = (MemBlockHdr*)std::malloc( sizeof(MemBlockHdr) + n);
+	blk->chk = 123;
+	return blk+1;
+}
+
+void TestAuthenticatorSlice::operator delete( void* ptr)
+{
+	MemBlockHdr* hdr = (MemBlockHdr*)ptr - 1;
+	if (hdr->chk != 123) throw std::logic_error( "illegal free");
+	std::free( hdr);
 }
 
 
@@ -125,7 +144,7 @@ bool TestAuthenticatorSlice::setMech( const std::string& mech)
 {
 	if (boost::algorithm::iequals( mech, "TEST"))
 	{
-		m_state = StartAuth;
+		m_state = AskUsername;
 		LOG_DEBUG << "Authentication mech set to TEST";
 		return true;
 	}
@@ -134,20 +153,6 @@ bool TestAuthenticatorSlice::setMech( const std::string& mech)
 		LOG_ERROR << "Mech not available '" << mech << "'";
 		return false;
 	}
-}
-
-void TestAuthenticatorSlice::initUser( const std::string& msg)
-{
-	if (m_user)
-	{
-		delete m_user;
-		m_user = 0;
-	}
-	const char* cc = std::strchr( msg.c_str(), ' ');
-	if (cc == 0) cc = msg.c_str()+msg.size();
-	std::string rn( msg.c_str(), cc-msg.c_str());
-	std::string un( boost::algorithm::to_lower_copy( un));
-	m_user = new User( "Test", un, rn);
 }
 
 static int alphaIdx( char ch)
@@ -185,15 +190,15 @@ void TestAuthenticatorSlice::messageIn( const std::string& msg)
 			m_status = AuthenticatorSlice::SYSTEM_FAILURE;
 			m_state = Done;
 			break;
-		case StartAuth:
-			LOG_ERROR << "test authentication protocol error: Got message in state 'StartAuth'";
+		case AskUsername:
+			LOG_ERROR << "test authentication protocol error: Got message in state 'AskUsername'";
 			m_status = AuthenticatorSlice::SYSTEM_FAILURE;
 			m_state = Done;
 			break;
-		case WaitCredentials:
+		case WaitUsername:
 			if (m_pattern.empty())
 			{
-				initUser( msg);
+				m_username = msg;
 			}
 			else
 			{
@@ -202,11 +207,29 @@ void TestAuthenticatorSlice::messageIn( const std::string& msg)
 				std::string::const_iterator mi = msg.begin(), me = msg.end();
 				for (; mi != me; ++mi,idx=(idx+1)%m_pattern.size())
 				{
-					decoded_msg.push_back( decode(*mi, m_pattern[idx]));
+					m_username.push_back( decode(*mi, m_pattern[idx]));
 				}
-				initUser( decoded_msg);
 			}
-			m_status = AuthenticatorSlice::AUTHENTICATED;
+			m_state = AskPassword;
+			break;
+		case AskPassword:
+			LOG_ERROR << "test authentication protocol error: Got message in state 'AskPassword'";
+			m_status = AuthenticatorSlice::SYSTEM_FAILURE;
+			m_state = Done;
+			break;
+		case WaitPassword:
+			if (msg.size() && msg[0] >= 'A' && msg[0] <= 'Z')
+			{
+				m_status = AuthenticatorSlice::AUTHENTICATED;
+				if (m_user) delete m_user;
+				m_user = 0;
+				m_user = new User( "Test", boost::algorithm::to_lower_copy(m_username), m_username);
+			}
+			else
+			{
+				LOG_ERROR << "authentication with mech 'Test' failed: invalid credentials";
+				m_status = AuthenticatorSlice::INVALID_CREDENTIALS;
+			}
 			m_state = Done;
 			break;
 		case Done:
@@ -238,11 +261,21 @@ const std::string& TestAuthenticatorSlice::messageOut()
 			m_state = Done;
 			return message( "ERR", "protocol");
 
-		case StartAuth:
-			m_state = WaitCredentials;
-			return message( "CRE", m_pattern);
+		case AskUsername:
+			m_state = WaitUsername;
+			return message( "UN", m_pattern);
 
-		case WaitCredentials:
+		case WaitUsername:
+			LOG_ERROR << "Protocol error";
+			m_status = AuthenticatorSlice::SYSTEM_FAILURE;
+			m_state = Done;
+			return message( "ERR", "protocol");
+
+		case AskPassword:
+			m_state = WaitPassword;
+			return message( "PW", m_pattern);
+
+		case WaitPassword:
 			LOG_ERROR << "Protocol error";
 			m_status = AuthenticatorSlice::SYSTEM_FAILURE;
 			m_state = Done;
@@ -268,9 +301,13 @@ AuthenticatorSlice::Status TestAuthenticatorSlice::status() const
 	{
 		case Init:
 			return AuthenticatorSlice::MESSAGE_AVAILABLE;
-		case StartAuth:
+		case AskUsername:
 			return AuthenticatorSlice::MESSAGE_AVAILABLE;
-		case WaitCredentials:
+		case AskPassword:
+			return AuthenticatorSlice::MESSAGE_AVAILABLE;
+		case WaitUsername:
+			return AuthenticatorSlice::AWAITING_MESSAGE;
+		case WaitPassword:
 			return AuthenticatorSlice::AWAITING_MESSAGE;
 		case Done:
 			return m_status;
@@ -278,20 +315,24 @@ AuthenticatorSlice::Status TestAuthenticatorSlice::status() const
 	throw std::logic_error("bad state in test authenticator");
 }
 
-User* TestAuthenticatorSlice::user() const
+User* TestAuthenticatorSlice::user()
 {
-	User* rt = 0;
 	switch (m_state)
 	{
 		case Init:
-		case StartAuth:
-		case WaitCredentials:
+		case AskUsername:
+		case AskPassword:
+		case WaitUsername:
+		case WaitPassword:
 			break;
 		case Done:
-			rt = m_user;
-			break;
+		{
+			User* rt = m_user;
+			m_user = 0;
+			return rt;
+		}
 	}
-	return rt;
+	return 0;
 }
 
 

@@ -94,7 +94,7 @@ public:
 
 	virtual const char* className() const		{return "TestAuthentication";}
 
-	const std::string* mechs() const;
+	const char** mechs() const;
 
 	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client);
 	
@@ -107,11 +107,15 @@ class TestAuthenticatorSlice
 	:public AuthenticatorSlice
 {
 public:
+	void* operator new(size_t);
+	void operator delete(void*);
+
+public:
 	TestAuthenticatorSlice( const std::string& identifier_, const std::string& pattern_);
 
 	virtual ~TestAuthenticatorSlice();
 
-	virtual void destroy()					{delete this;}
+	virtual void dispose()					{delete this;}
 
 	virtual const char* className() const			{return "Test";}
 
@@ -133,7 +137,7 @@ public:
 	virtual Status status() const;
 
 	/// The authenticated user or NULL if not authenticated
-	virtual User* user() const;
+	virtual User* user();
 
 private:
 	const std::string& message( const char* cmd, const std::string& content=std::string());
@@ -143,8 +147,10 @@ private:
 	enum State
 	{
 		Init,
-		StartAuth,
-		WaitCredentials,
+		AskUsername,
+		WaitUsername,
+		AskPassword,
+		WaitPassword,
 		Done
 	};
 
@@ -153,6 +159,7 @@ private:
 	std::string m_identifier;
 	std::string m_pattern;
 	std::string m_message;
+	std::string m_username;
 	std::vector<std::string> m_mechs;
 	User* m_user;
 };
