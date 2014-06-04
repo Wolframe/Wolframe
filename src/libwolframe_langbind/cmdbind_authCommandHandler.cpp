@@ -41,6 +41,7 @@ using namespace _Wolframe::cmdbind;
 AuthCommandHandler::AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_)
 	:m_authenticator(authenticator_)
 	,m_itrpos(0)
+	,m_msgstart(0)
 	,m_outputbuf(0)
 	,m_outputbufsize(0)
 	,m_outputbufpos(0)
@@ -70,28 +71,44 @@ void AuthCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size
 	if (pos > size) throw std::logic_error("illegal parameter (setOutputBuffer)");
 }
 
+bool AuthCommandHandler::consumeNextMessage()
+{
+	protocol::InputBlock::iterator start = m_input.at( m_msgstart);
+	m_eoD = m_input.getEoD( start);
+
+	m_readbuffer.append( start.ptr(), m_eoD-start);
+	if (m_input.gotEoD())
+	{
+		// We got end of data, so we expect the read buffer to contain the next complete message:
+		m_authenticator->messageIn( m_readbuffer);
+		m_readbuffer.clear();
+
+		// Skip to the start of the next message:
+		m_msgstart = m_input.skipEoD();
+
+		// We have a new complete message consumed:
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void AuthCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
+	/*[-]*/LOG_DATA2 << "[authentication handler] message (" << std::string((const char*)begin, bytesTransferred) << ")";
+
 	std::size_t startidx = (const char*)begin - m_input.charptr();
 	if (bytesTransferred + startidx > m_input.size())
 	{
 		throw std::logic_error( "illegal input range passed to AuthCommandHandler");
 	}
 	m_input.setPos( bytesTransferred + startidx);
-	if (m_itrpos != 0)
-	{
-		if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
-		startidx = 0; //... start of buffer is end last message (part of eoD marker)
-	}
-	protocol::InputBlock::iterator start = m_input.at( startidx);
-	m_eoD = m_input.getEoD( start);
+	if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
 
-	m_readbuffer.append( start.ptr(), m_eoD-start);
-	if (m_input.gotEoD())
-	{
-		m_authenticator->messageIn( m_readbuffer);
-		m_state = ReadConsumed;
-	}
+	m_msgstart = 0;
+	m_state = NextOperation;
 }
 
 void AuthCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
@@ -120,29 +137,15 @@ void AuthCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTran
 
 void AuthCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	if (m_input.gotEoD())
-	{
-		std::size_t pos = m_eoD - m_input.begin();
-		begin = (const void*)(m_input.charptr() + pos);
-		nofBytes = m_input.pos() - pos;
-	}
-	else
-	{
-		if (m_readbuffer.size() > m_input.size())
-		{
-			throw std::logic_error("data requested but EoD not consumed in authentication commmand handler");
-		}
-		std::memcpy( m_input.charptr(), m_readbuffer.c_str(), m_readbuffer.size());
-		m_input.setPos( nofBytes = m_readbuffer.size());
-		begin = (const void*)m_input.charptr();
-	}
+	begin = (const void*)(m_input.charptr() + m_msgstart);
+	nofBytes = m_input.pos() - m_msgstart;
 }
 
 CommandHandler::Operation AuthCommandHandler::nextOperation()
 {
 	for (;;)
 	{
-		LOG_TRACE << "STATE AuthCommandHandler " << stateName( m_state);
+		LOG_TRACE << "STATE AuthCommandHandler " << stateName( m_state) << " " << m_authenticator->statusName( m_authenticator->status());
 		switch (m_state)
 		{
 			case Init:
@@ -161,7 +164,11 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 						m_state = FlushOutput;
 						continue;
 					case AAAA::Authenticator::AWAITING_MESSAGE:
-						return READ;
+						if (!consumeNextMessage())
+						{
+							return READ;
+						}
+						continue;
 					case AAAA::Authenticator::AUTHENTICATED:
 						return CLOSE;
 					case AAAA::Authenticator::INVALID_CREDENTIALS:
@@ -176,11 +183,6 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 				}
 				setLastError( "internal: unhandled authenticator status");
 				return CLOSE;
-
-			case ReadConsumed:
-				m_readbuffer.clear();
-				m_state = NextOperation;
-				continue;
 
 			case FlushOutput:
 				if (m_writepos == m_writebuffer.size())

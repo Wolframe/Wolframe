@@ -37,6 +37,7 @@
 
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include "types/secureString.hpp"
 #include "config/configurationTree.hpp"
 #include "serialize/struct/structDescriptionBase.hpp"
 #include "AAAA/authenticator.hpp"
@@ -60,7 +61,7 @@ public:
 	bool parse( const config::ConfigurationNode& pt, const std::string& node, const module::ModulesDirectory* modules);
 	bool check() const;
 	void print( std::ostream& os, size_t indent) const;
-	void setCanonicalPathes( const std::string&){}
+	void setCanonicalPathes( const std::string& refPath);
 
 public:
 	struct Structure
@@ -68,11 +69,11 @@ public:
 		friend class TestAuthenticationConfigDescription;
 
 		std::string m_identifier;
-		std::string m_pattern;
+		std::string m_filename;
 
 		Structure(){}
-		Structure( const std::string& i, const std::string& p)
-			:m_identifier(i),m_pattern(p){}
+		Structure( const std::string& i, const std::string& f)
+			:m_identifier(i),m_filename(f){}
 
 		static const serialize::StructDescriptionBase* getStructDescription();
 	};
@@ -99,7 +100,7 @@ public:
 	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client);
 	
 private:
-	std::string m_pattern;
+	std::map<std::string,std::string> m_usrpwdmap;	///< map user name to password (not very secure :-)
 };
 
 
@@ -107,11 +108,7 @@ class TestAuthenticatorSlice
 	:public AuthenticatorSlice
 {
 public:
-	void* operator new(size_t);
-	void operator delete(void*);
-
-public:
-	TestAuthenticatorSlice( const std::string& identifier_, const std::string& pattern_);
+	TestAuthenticatorSlice( const std::string& identifier_, const std::map<std::string,std::string>* usrpwdmap_);
 
 	virtual ~TestAuthenticatorSlice();
 
@@ -120,12 +117,6 @@ public:
 	virtual const char* className() const			{return "Test";}
 
 	virtual const std::string& identifier() const		{return m_identifier;}
-
-	/// Get the list of available mechs
-	virtual const std::vector<std::string>& mechs() const	{return m_mechs;}
-
-	/// Set the authentication mech
-	virtual bool setMech( const std::string& mech);
 
 	/// The input message
 	virtual void messageIn( const std::string& msg);
@@ -140,28 +131,40 @@ public:
 	virtual User* user();
 
 private:
-	const std::string& message( const char* cmd, const std::string& content=std::string());
-	void initUser( const std::string& msg);
+	bool checkCredentials( const types::SecureString& username, const types::SecureString& password) const;
 
-private:
+public:
 	enum State
 	{
-		Init,
 		AskUsername,
 		WaitUsername,
 		AskPassword,
 		WaitPassword,
 		Done
 	};
+	static const char* stateName( State i)
+	{
+		static const char* ar[] = {"AskUsername","WaitUsername","AskPassword","WaitPassword","Done"};
+		return ar[i];
+	}
+
+	State state() const
+		{return m_state;}
+private:
+	const std::string& message( const char* cmd, const std::string& content=std::string());
+	void initUser( const std::string& msg);
+
+
+private:
+	void setState( State st);
 
 	State m_state;
 	AuthenticatorSlice::Status m_status;
 	std::string m_identifier;
-	std::string m_pattern;
 	std::string m_message;
-	std::string m_username;
-	std::vector<std::string> m_mechs;
+	types::SecureString m_username;
 	User* m_user;
+	const std::map<std::string,std::string>* m_usrpwdmap;
 };
 
 }}//namespace

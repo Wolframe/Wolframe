@@ -159,23 +159,23 @@ public:
 	};
 
 	/// \brief Constructor
-	InputBlock()						:m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
+	InputBlock()						:m_nextpos(0),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
 
 	/// \brief Constructor
 	/// \param [in] p_size size of the memory block in bytes to allocate
-	InputBlock( std::size_t p_size)				:MemBlock(p_size),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
+	InputBlock( std::size_t p_size)				:MemBlock(p_size),m_nextpos(0),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
 
 	/// \brief Constructor
 	/// \param [in] p pointer to the memory block to use
 	/// \param [in] n allocation size of the memory block in bytes
 	/// \param [in] i fill size of the block in bytes
-	InputBlock( void* p, std::size_t n, std::size_t i=0)	:MemBlock(p,n,i),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
+	InputBlock( void* p, std::size_t n, std::size_t i=0)	:MemBlock(p,n,i),m_nextpos(0),m_eodState(EoD::SRC),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)){}
 
 	/// \brief Copy constructor
 	/// \param [in] o InputBlock to copy
-	InputBlock( const InputBlock& o)			:MemBlock(o),m_eodState(o.m_eodState),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)) {m_eodcharbuf=o.m_eodcharbuf;}
+	InputBlock( const InputBlock& o)			:MemBlock(o),m_nextpos(o.m_nextpos),m_eodState(o.m_eodState),m_eodcharbuf(m_eodcharbufc,sizeof(m_eodcharbufc)) {m_eodcharbuf=o.m_eodcharbuf;}
 
-	InputBlock& operator=( const InputBlock& o)		{MemBlock::operator=(o); m_eodState=o.m_eodState; m_eodcharbuf=o.m_eodcharbuf; return *this;}
+	InputBlock& operator=( const InputBlock& o)		{MemBlock::operator=(o); m_nextpos=o.m_nextpos; m_eodState=o.m_eodState; m_eodcharbuf=o.m_eodcharbuf; return *this;}
 
 	/// \brief Random access const iterator
 	typedef iterator_t<const InputBlock,std::size_t,char,char,const char*> const_iterator;
@@ -212,7 +212,7 @@ public:
 	}
 
 	/// \brief Reset end of data state machine
-	void resetEoD()						{m_eodState=EoD::SRC;}
+	int skipEoD()						{if (m_eodState>=EoD::CR_LF_DOT_CR_LF) {m_eodState=EoD::SRC; return m_nextpos;} else return -1;}
 
 	/// \brief Return true if end of data was recognized with the last call of getEoD(iterator)
 	bool gotEoD() const					{return m_eodState>=EoD::CR_LF_DOT_CR_LF;}
@@ -233,6 +233,8 @@ public:
 	}
 
 private:
+	std::size_t m_nextpos;		///< follow position after EoD marker
+
 	/// \brief Implementation of the end of data recognition and linefeed,dot escaping state machine
 	int getEoDpos( std::size_t offset);
 

@@ -46,6 +46,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
+#include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -58,6 +59,8 @@ static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
 static std::string g_selectedTestName;
 static wtest::Random g_random;
+unsigned int g_random_seed = 0;
+bool g_random_seed_set = false;
 
 struct BufferStruct
 {
@@ -75,9 +78,15 @@ struct BufferStruct
 	}
 };
 
-static void readInput( cmdbind::CommandHandler& cmdhandler, char* buf, unsigned int bufsize, std::istream& is)
+static void readInput( cmdbind::CommandHandler& cmdhandler, std::istream& is)
 {
-	unsigned int readsize = g_random.get( 1, bufsize);
+	char* buf;
+	std::size_t bufsize;
+	void* buf_void;
+	cmdhandler.getInputBlock( buf_void, bufsize);
+	buf = (char*)buf_void;
+	
+	std::size_t readsize = g_random.get( 1, bufsize);
 	std::size_t pp = 0;
 	while (pp < readsize && !is.eof())
 	{
@@ -150,7 +159,7 @@ static void processCommandHandlerSTM( cmdbind::CommandHandler& cmdhandler, Buffe
 	for (;;) switch (cmdhandler.nextOperation())
 	{
 		case cmdbind::CommandHandler::READ:
-			readInput( cmdhandler, buf.inbuf, buf.insize, is);
+			readInput( cmdhandler, is);
 			continue;
 
 		case cmdbind::CommandHandler::WRITE:
@@ -185,7 +194,14 @@ static void processCommandHandler( cmdbind::CommandHandler& cmdhandler, const st
 		is.read( &ch, sizeof(char));
 		if ((unsigned char)ch > 32)
 		{
-			throw std::runtime_error( "unconsumed input left");
+			std::string input_left;
+			input_left.push_back(ch);
+			while (!is.eof())
+			{
+				is.read( &ch, sizeof(char));
+				input_left.push_back(ch);
+			}
+			throw std::runtime_error( std::string("unconsumed input left: [") + input_left + "]");
 		}
 		end = is.eof();
 	}
@@ -363,6 +379,10 @@ TEST_F( MainProtocolTest, tests)
 		std::string expectfile = testdir + "/" + testname + ".res";
 
 		// [2.1] Process test:
+		if (g_random_seed_set)
+		{
+			g_random.setSeed( g_random_seed);
+		}
 		unsigned int seed = g_random.seed();
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 
@@ -408,7 +428,18 @@ TEST_F( MainProtocolTest, tests)
 				cmdhandler.setExecContext( processingContext.execContext());
 
 				std::string output;
-				processCommandHandler( cmdhandler, input, ibar[ii], output, obar[oo]);
+				try
+				{
+					processCommandHandler( cmdhandler, input, ibar[ii], output, obar[oo]);
+				}
+				catch (const std::runtime_error& e)
+				{
+					std::cerr << "test got exception (seed = " << seed << ", input buffer size = " << ibar[ii] << ", output buffer size = " << obar[oo] << "): " << e.what() << std::endl;
+				}
+				catch (const std::logic_error& e)
+				{
+					std::cerr << "logic error (seed = " << seed << ", input buffer size = " << ibar[ii] << ", output buffer size = " << obar[oo] << "): " << e.what() << std::endl;
+				}
 				output = normalizeOutputCRLF( output, expected);
 
 				if (expected != output)
@@ -419,8 +450,10 @@ TEST_F( MainProtocolTest, tests)
 					boost::this_thread::sleep( boost::posix_time::seconds( 3));
 				}
 				EXPECT_EQ( expected, output);
+				LOG_TRACE << "Finished test case " << testname << " [" << ibar[ii] << ":" << obar[oo] << "]";
 			}
 		}
+		LOG_TRACE << "Finished test " << testname;
 	}
 }
 
@@ -441,6 +474,7 @@ int main( int argc, char **argv)
 			{
 				std::cerr << argv[0] << " [options]" << std::endl;
 				std::cerr << "\toption -t :(repeated) increment debug log level" << std::endl;
+				std::cout << "\toption -s :specify the pseudo random number generator seed as uint" << std::endl;
 				std::cerr << "\toption -h :print (this) help message and exit" << std::endl;
 				return 0;
 			}
@@ -455,6 +489,35 @@ int main( int argc, char **argv)
 				if (argv[argi][ii+1] != '\0')
 				{
 					throw std::runtime_error( std::string("unknown option '") + argv[argi] + "' (use -h for getting the usage)");
+				}
+			}
+			else if (argv[argi][1] == 's')
+			{
+				g_random_seed_set = true;
+				const char* is;
+				if (argv[argi][2])
+				{
+					is = argv[argi]+2;
+				}
+				else
+				{
+					argi++;
+					is = argv[argi];
+				}
+				argi += 1;
+				if (!is)
+				{
+					std::cerr << "missing argument for option -s (random seed), expected non negative integer" << std::endl;
+					return 4;
+				}
+				try
+				{
+					g_random_seed = boost::lexical_cast<unsigned int>( std::string(is));
+				}
+				catch (const boost::bad_lexical_cast& e)
+				{
+					std::cerr << "illegal argument for option -s (random seed), expected non negative integer, error: " << e.what() << std::endl;
+					return 4;
 				}
 			}
 			else

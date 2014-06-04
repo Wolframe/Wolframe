@@ -64,6 +64,12 @@ public:
 		SYSTEM_FAILURE		///< some other error occurred
 	};
 
+	static const char* statusName( Status i)
+	{
+		static const char* ar[] = {"MESSAGE_AVAILABLE","AWAITING_MESSAGE","AUTHENTICATED","INVALID_CREDENTIALS","SYSTEM_FAILURE"};
+		return ar[i];
+	}
+
 	/// The virtual destructor
 	virtual ~AuthenticatorSlice()	{}
 

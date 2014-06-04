@@ -324,9 +324,9 @@ struct Connection::Private
 				case StartProcessing:
 				{
 					//read the rest of the line and reject more arguments than expected.
-					//go on with processing, if this is clear. do not cosnsume the first end of line because it could be
+					//go on with processing, if this is clear. do not consume the first end of line because it could be
 					//the first character of the EOF sequence.
-					input.resetEoD();
+					(void)input.skipEoD();
 					if (!ProtocolParser::skipSpaces( itr, eoM))
 					{
 						return readDataOp();;

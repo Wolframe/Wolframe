@@ -69,6 +69,12 @@ public:
 		SYSTEM_FAILURE		///< some other error occurred
 	};
 
+	static const char* statusName( Status i)
+	{
+		static const char* ar[] = {"INITIALIZED","MESSAGE_AVAILABLE","AWAITING_MESSAGE","AUTHENTICATED","INVALID_CREDENTIALS","MECH_UNAVAILABLE","SYSTEM_FAILURE"};
+		return ar[i];
+	}
+
 	/// The virtual destructor
 	virtual ~Authenticator()	{}
 
