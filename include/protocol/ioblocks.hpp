@@ -208,7 +208,7 @@ public:
 	iterator getEoD( iterator start)
 	{
 		int eodpos = getEoDpos( start-begin());
-		return (eodpos>=0)?(start+eodpos):end();
+		return (eodpos>=0)?(begin()+eodpos):end();
 	}
 
 	/// \brief Reset end of data state machine

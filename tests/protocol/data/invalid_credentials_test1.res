@@ -1,6 +1,6 @@
 MECHS NONE TEST
-UN ABCabc
+USERNAME
 .
-PW ABCabc
+PASSWORD
 .
 ERR authentication failed: either the username or the credentials are invalid

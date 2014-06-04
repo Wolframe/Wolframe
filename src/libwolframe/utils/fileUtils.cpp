@@ -54,7 +54,7 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::utils;
 
-#define _Wolframe_LOWLEVEL_DEBUG
+#undef _Wolframe_LOWLEVEL_DEBUG
 
 std::string utils::joinPath( const std::string& path, const std::string& item)
 {

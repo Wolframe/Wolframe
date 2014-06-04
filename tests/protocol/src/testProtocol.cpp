@@ -100,9 +100,9 @@ static void readInput( cmdbind::CommandHandler& cmdhandler, std::istream& is)
 	cmdhandler.putInput( buf, pp);
 }
 
-static std::string normalizeOutputCRLF( const std::string& output, const std::string& expected_)
+static std::string normalizeOutputCRLF( const std::string& output, const std::string& expected)
 {
-	std::string::const_iterator ei = expected_.begin(), ee = expected_.end();
+	std::string::const_iterator ei = expected.begin(), ee = expected.end();
 	std::string::const_iterator oi = output.begin(), oe = output.end();
 	std::string resultstr;
 
@@ -136,6 +136,11 @@ static std::string normalizeOutputCRLF( const std::string& output, const std::st
 			{
 				break;
 			}
+		}
+		else
+		{
+			resultstr.append( std::string( oi, oe));
+			return resultstr;
 		}
 	}
 	if (oi == oe && ei == ee)
@@ -220,7 +225,7 @@ struct GlobalContext
 		{
 			if (boost::algorithm::iequals( mi->first, "module"))
 			{
-				rt.push_back( utils::getCanonicalPath( mi->second.data().string(), refpath));
+				rt.push_back( utils::getCanonicalPath( mi->second.data(), refpath));
 			}
 		}
 		return rt;

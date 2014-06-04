@@ -97,8 +97,6 @@ bool AuthCommandHandler::consumeNextMessage()
 
 void AuthCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	/*[-]*/LOG_DATA2 << "[authentication handler] message (" << std::string((const char*)begin, bytesTransferred) << ")";
-
 	std::size_t startidx = (const char*)begin - m_input.charptr();
 	if (bytesTransferred + startidx > m_input.size())
 	{

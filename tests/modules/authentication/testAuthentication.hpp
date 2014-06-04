@@ -122,7 +122,7 @@ public:
 	virtual void messageIn( const std::string& msg);
 
 	/// The output message
-	virtual const std::string& messageOut();
+	virtual std::string messageOut();
 
 	/// The current status of the authenticator slice
 	virtual Status status() const;
@@ -131,7 +131,7 @@ public:
 	virtual User* user();
 
 private:
-	bool checkCredentials( const types::SecureString& username, const types::SecureString& password) const;
+	bool checkCredentials( const types::SecureString& username, const types::SecureString& password);
 
 public:
 	enum State
@@ -151,7 +151,7 @@ public:
 	State state() const
 		{return m_state;}
 private:
-	const std::string& message( const char* cmd, const std::string& content=std::string());
+	std::string message( const char* cmd, const std::string& content=std::string());
 	void initUser( const std::string& msg);
 
 
@@ -161,7 +161,6 @@ private:
 	State m_state;
 	AuthenticatorSlice::Status m_status;
 	std::string m_identifier;
-	std::string m_message;
 	types::SecureString m_username;
 	User* m_user;
 	const std::map<std::string,std::string>* m_usrpwdmap;

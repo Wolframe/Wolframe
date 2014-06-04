@@ -71,7 +71,7 @@ bool TestAuthenticationConfig::parse( const config::ConfigurationNode& pt, const
 	try
 	{
 		config::parseConfigStructure( structure, pt);
-		m_config_pos = pt.data().position;
+		m_config_pos = pt.position();
 		return true;
 	}
 	catch (const std::runtime_error& e)
@@ -145,10 +145,26 @@ TestAuthenticatorSlice::~TestAuthenticatorSlice()
 	if (m_user) delete m_user;
 }
 
-bool TestAuthenticatorSlice::checkCredentials( const types::SecureString& username, const types::SecureString& password) const
+bool TestAuthenticatorSlice::checkCredentials( const types::SecureString& username, const types::SecureString& password)
 {
 	std::map<std::string,std::string>::const_iterator ui = m_usrpwdmap->find( username);
-	return (ui != m_usrpwdmap->end() && password == ui->second);
+	if (ui == m_usrpwdmap->end())
+	{
+		LOG_ERROR << "authentication with mech 'Test' failed: user not found";
+		m_status = AuthenticatorSlice::USER_NOT_FOUND;
+		return false;
+	}
+	else if (password != ui->second)
+	{
+		LOG_ERROR << "authentication with mech 'Test' failed: invalid credentials";
+		m_status = AuthenticatorSlice::INVALID_CREDENTIALS;
+		return false;
+	}
+	else
+	{
+		m_status = AuthenticatorSlice::AUTHENTICATED;
+		return true;
+	}
 }
 
 void TestAuthenticatorSlice::setState( State st)
@@ -180,35 +196,29 @@ void TestAuthenticatorSlice::messageIn( const std::string& msg)
 		case WaitPassword:
 			if (checkCredentials( m_username, msg))
 			{
-				m_status = AuthenticatorSlice::AUTHENTICATED;
 				if (m_user) delete m_user;
 				m_user = 0;
 				m_user = new User( "Test", m_username, m_username);
 				m_username.clear();
-			}
-			else
-			{
-				LOG_ERROR << "authentication with mech 'Test' failed: invalid credentials";
-				m_status = AuthenticatorSlice::INVALID_CREDENTIALS;
 			}
 			setState( Done);
 			break;
 	}
 }
 
-const std::string& TestAuthenticatorSlice::message( const char* cmd, const std::string& content)
+std::string TestAuthenticatorSlice::message( const char* cmd, const std::string& content)
 {
-	m_message = cmd;
+	std::string msgstr = cmd;
 	if (content.size())
 	{
-		m_message.push_back( ' ');
-		m_message.append( content);
+		msgstr.push_back( ' ');
+		msgstr.append( content);
 	}
-	LOG_DATA << "[test authentication] message out (" << m_message << ")";
-	return m_message;
+	LOG_DATA << "[test authentication] message out (" << msgstr << ")";
+	return msgstr;
 }
 
-const std::string& TestAuthenticatorSlice::messageOut()
+std::string TestAuthenticatorSlice::messageOut()
 {
 	switch (m_state)
 	{

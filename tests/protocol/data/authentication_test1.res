@@ -1,7 +1,7 @@
 MECHS NONE TEST
-UN ABCabc
+USERNAME
 .
-PW ABCabc
+PASSWORD
 .
 OK authenticated
 BYE

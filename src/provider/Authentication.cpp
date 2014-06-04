@@ -214,6 +214,12 @@ bool StandardAuthenticator::setMech( const std::string& mech )
 				m_status = SYSTEM_FAILURE;
 				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is AUTHENTICATED" );
 				break;
+			case AuthenticatorSlice::USER_NOT_FOUND:
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is USER_NOT_FOUND at initialization";
+				m_status = SYSTEM_FAILURE;
+				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is USER_NOT_FOUND" );
+				break;
 			case AuthenticatorSlice::INVALID_CREDENTIALS:
 				LOG_ERROR << "StandardAuthenticator: authentication slice '"
 					  << m_slices[ m_currentSlice ]->identifier() << "' status is INVALID_CREDENTIALS at initialization";
@@ -262,10 +268,15 @@ void StandardAuthenticator::messageIn( const std::string& message )
 			break;
 		case AuthenticatorSlice::AUTHENTICATED:
 			m_status = AUTHENTICATED;
+			if (!m_user) m_user = m_slices[ m_currentSlice ]->user();
 			LOG_TRACE << "StandardAuthenticator: status is AUTHENTICATED";
 			break;
+		case AuthenticatorSlice::USER_NOT_FOUND:
+			m_status = INVALID_CREDENTIALS;
+			LOG_TRACE << "StandardAuthenticator: status is USER_NOT_FOUND";
+			break;
 		case AuthenticatorSlice::INVALID_CREDENTIALS:
-			m_status = SYSTEM_FAILURE;
+			m_status = INVALID_CREDENTIALS;
 			LOG_TRACE << "StandardAuthenticator: status is INVALID_CREDENTIALS";
 			break;
 		case AuthenticatorSlice::SYSTEM_FAILURE:
@@ -301,10 +312,15 @@ std::string StandardAuthenticator::messageOut()
 			break;
 		case AuthenticatorSlice::AUTHENTICATED:
 			m_status = AUTHENTICATED;
+			if (!m_user) m_user = m_slices[ m_currentSlice ]->user();
 			LOG_TRACE << "StandardAuthenticator: status is AUTHENTICATED";
 			break;
+		case AuthenticatorSlice::USER_NOT_FOUND:
+			m_status = INVALID_CREDENTIALS;
+			LOG_TRACE << "StandardAuthenticator: status is USER_NOT_FOUND";
+			break;
 		case AuthenticatorSlice::INVALID_CREDENTIALS:
-			m_status = SYSTEM_FAILURE;
+			m_status = INVALID_CREDENTIALS;
 			LOG_TRACE << "StandardAuthenticator: status is INVALID_CREDENTIALS";
 			break;
 		case AuthenticatorSlice::SYSTEM_FAILURE:
