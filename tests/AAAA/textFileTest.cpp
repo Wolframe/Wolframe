@@ -40,7 +40,13 @@
 #include "TextFileAuth.hpp"
 #include "crypto/sha2.h"
 #include "types/byte2hex.h"
+#include "types/base64.hpp"
+#include "crypto/HMAC.hpp"
 #include "system/globalRngGen.hpp"
+#include "AAAA/passwordHash.hpp"
+#include "AAAA/authSlice.hpp"
+#include "AAAA/CRAM.hpp"
+
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe::AAAA;
@@ -208,6 +214,49 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 		      std::runtime_error );
 	EXPECT_THROW( user = authenticator.authenticatePlain( "testusr", "xx", true ),
 		      std::runtime_error );
+}
+
+TEST_F( AuthenticationFixture, AuthenticationSlice )
+{
+	User*	user = NULL;
+	TextFileAuthUnit authUnit( "test", "passwd" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
+
+	ASSERT_TRUE( slice != NULL );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
+	unsigned char salt[ PASSWORD_SALT_SIZE ];
+	rnd.generate( salt, PASSWORD_SALT_SIZE );
+	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, "Admin" );
+	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
+	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
+	std::string usernameHash = "$" + std::string( saltStr ) + "$" + hmac0.toString();
+
+	slice->messageIn( usernameHash );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
+
+	std::string challenge = slice->messageOut();
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	AAAA::CRAMresponse response( challenge, "Good Password" );
+
+	slice->messageIn( response.toString() );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AUTHENTICATED );
+
+	user = slice->user();
+	EXPECT_EQ( user->uname(), "Admin" );
+	EXPECT_EQ( user->name(), "Just a test user" );
+
+	if ( user )
+		delete user;
+
+	user = slice->user();
+	ASSERT_TRUE( user == NULL );
+
+	if ( slice )
+		delete slice;
 }
 
 //****************************************************************************
