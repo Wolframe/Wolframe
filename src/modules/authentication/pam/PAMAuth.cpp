@@ -244,8 +244,8 @@ PAMAuthUnit::~PAMAuthUnit()
 
 const char** PAMAuthUnit::mechs() const
 {
-	static const char* mechs[] = { "WOLFRAME-PAM", "" };
-	return mechs;
+	static const char* m[] = { "WOLFRAME-PAM", NULL };
+	return m;
 }
 
 }} // namespace _Wolframe::AAAA

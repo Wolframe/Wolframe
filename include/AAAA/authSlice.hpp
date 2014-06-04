@@ -58,6 +58,8 @@ public:
 	enum Status	{
 		MESSAGE_AVAILABLE,	///< an output message is available
 		AWAITING_MESSAGE,	///< waiting for an input message
+		USER_NOT_FOUND,		///< this slice doesn't handle the credentials
+					///  for the requested user
 		AUTHENTICATED,		///< a user has been authenticated
 		INVALID_CREDENTIALS,	///< the user authentication failed,
 					///  either the username or the credentials are invalid
@@ -95,7 +97,7 @@ public:
 
 	/// The output message
 	/// \returns		the output message
-	virtual const std::string& messageOut() = 0;
+	virtual std::string messageOut() = 0;
 
 	/// The current status of the authenticator
 	virtual Status status() const = 0;

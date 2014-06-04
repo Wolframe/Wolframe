@@ -146,7 +146,7 @@ bool OracleConfig::parse( const config::ConfigurationNode& pt, const std::string
 	try
 	{
 		config::parseConfigStructure( *static_cast<OracleConfigStruct*>(this), pt);
-		m_config_pos = pt.data().position;
+		m_config_pos = pt.position();
 		return mapValueDomains();
 	}
 	catch (const std::runtime_error& e)

@@ -67,7 +67,7 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 				bool isDefined = ( !user.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, user, &isDefined ))
 				{
-					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.position().logtext();
 					retVal = false;
 				}
 			}
@@ -75,7 +75,7 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 				bool isDefined = ( !group.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, group, &isDefined ))
 				{
-					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.position().logtext();
 					retVal = false;
 				}
 			}
@@ -83,7 +83,7 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 				bool isDefined = ( !pidFile.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, pidFile, &isDefined ))
 				{
-					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.position().logtext();
 					retVal = false;
 				}
 			}
@@ -91,13 +91,13 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 				bool isDefined = ( !serviceName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
 				{
-					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.position().logtext();
 					retVal = false;
 				}
 			}
 			else	{
 				LOG_WARNING << logPrefix() << "unknown configuration option: '"
-					    << L1it->first << "' (" << L1it->second.data().position.logtext() << ")";
+					    << L1it->first << "' (" << L1it->second.position().logtext() << ")";
 			}
 		}
 		if ( serviceName.empty() )
@@ -115,7 +115,7 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 				bool isDefined = ( !serviceName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
 				{
-					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.position().logtext();
 					retVal = false;
 				}
 			}
@@ -123,7 +123,7 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 				bool isDefined = ( !serviceDisplayName.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDisplayName, &isDefined ))
 				{
-					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.position().logtext();
 					retVal = false;
 				}
 			}
@@ -131,7 +131,7 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 				bool isDefined = ( !serviceDescription.empty());
 				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceDescription, &isDefined ))
 				{
-					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.data().position.logtext();
+					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.position().logtext();
 					retVal = false;
 				}
 			}

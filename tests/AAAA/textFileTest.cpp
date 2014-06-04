@@ -40,7 +40,13 @@
 #include "TextFileAuth.hpp"
 #include "crypto/sha2.h"
 #include "types/byte2hex.h"
+#include "types/base64.hpp"
+#include "crypto/HMAC.hpp"
 #include "system/globalRngGen.hpp"
+#include "AAAA/passwordHash.hpp"
+#include "AAAA/authSlice.hpp"
+#include "AAAA/CRAM.hpp"
+
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe::AAAA;
@@ -66,21 +72,6 @@ protected:
 };
 
 
-//static User* CRAMauth( TextFileAuthenticator& auth, const std::string& /*user*/,
-//		       const std::string& passwd, bool caseSensitive )
-//{
-
-//	CRAMchallenge	challenge;
-
-//	unsigned char digest[ SHA224_DIGEST_SIZE ];
-//	sha224((const unsigned char *)passwd.c_str(), passwd.length(), digest );
-
-//	CRAMresponse	response( challenge, digest, SHA224_DIGEST_SIZE );
-
-//	return auth.authenticate( challenge, response, caseSensitive );
-//}
-
-
 TEST_F( AuthenticationFixture, typeName )
 {
 	TextFileAuthUnit authenticator( "", "passwd" );
@@ -92,22 +83,22 @@ TEST_F( AuthenticationFixture, fileWithoutNewLine )
 	User*	user;
 	TextFileAuthUnit authenticator( "", "passwd-noNL" );
 
-	user = authenticator.authenticatePlain( "admin", "Good Password", true );
+	user = authenticator.authenticatePlain( "Admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
-	EXPECT_STREQ( "admin", user->uname().c_str() );
-	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	EXPECT_STREQ( "Admin", user->uname().c_str() );
+	EXPECT_STREQ( "Just a test user", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticatePlain( "goodusr", "User PassWord", true );
 	ASSERT_TRUE( user != NULL );
 	EXPECT_STREQ( "goodusr", user->uname().c_str() );
-	EXPECT_STREQ( "Good User", user->name().c_str() );
+	EXPECT_STREQ( "Another test user", user->name().c_str() );
 	delete user;
 
-	user = authenticator.authenticatePlain( "badusr", "User BadWord", true );
+	user = authenticator.authenticatePlain( "testusr", "UserPassWord", true );
 	ASSERT_TRUE( user != NULL );
-	EXPECT_STREQ( "badusr", user->uname().c_str() );
-	EXPECT_STREQ( "Bad User", user->name().c_str() );
+	EXPECT_STREQ( "testusr", user->uname().c_str() );
+	EXPECT_STREQ( "Good test user", user->name().c_str() );
 	delete user;
 }
 
@@ -116,21 +107,22 @@ TEST_F( AuthenticationFixture, validUsers )
 	User*	user;
 	TextFileAuthUnit authenticator( "", "passwd" );
 
-	user = authenticator.authenticatePlain( "admin", "Good Password", true );
+	user = authenticator.authenticatePlain( "Admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
-	EXPECT_STREQ( "admin", user->uname().c_str() );
-	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	EXPECT_STREQ( "Admin", user->uname().c_str() );
+	EXPECT_STREQ( "Just a test user", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticatePlain( "goodusr", "User PassWord", true );
 	ASSERT_TRUE( user != NULL );
 	EXPECT_STREQ( "goodusr", user->uname().c_str() );
+	EXPECT_STREQ( "Another test user", user->name().c_str() );
 	delete user;
 
-	user = authenticator.authenticatePlain( "badusr", "User BadWord", true );
+	user = authenticator.authenticatePlain( "testusr", "UserPassWord", true );
 	ASSERT_TRUE( user != NULL );
-	EXPECT_STREQ( "badusr", user->uname().c_str() );
-	EXPECT_STREQ( "Bad User", user->name().c_str() );
+	EXPECT_STREQ( "testusr", user->uname().c_str() );
+	EXPECT_STREQ( "Good test user", user->name().c_str() );
 	delete user;
 }
 
@@ -142,19 +134,20 @@ TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 
 	user = authenticator.authenticatePlain( "AdMiN", "Good Password", false );
 	ASSERT_TRUE( user != NULL );
-	EXPECT_STREQ( "admin", user->uname().c_str() );
-	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	EXPECT_STREQ( "Admin", user->uname().c_str() );
+	EXPECT_STREQ( "Just a test user", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticatePlain( "GoodUsr", "User PassWord", false );
 	ASSERT_TRUE( user != NULL );
 	EXPECT_STREQ( "goodusr", user->uname().c_str() );
+	EXPECT_STREQ( "Another test user", user->name().c_str() );
 	delete user;
 
-	user = authenticator.authenticatePlain( "BadUsr", "User BadWord", false );
+	user = authenticator.authenticatePlain( "TestUsr", "UserPassWord", false );
 	ASSERT_TRUE( user != NULL );
-	EXPECT_STREQ( "badusr", user->uname().c_str() );
-	EXPECT_STREQ( "Bad User", user->name().c_str() );
+	EXPECT_STREQ( "testusr", user->uname().c_str() );
+	EXPECT_STREQ( "Good test user", user->name().c_str() );
 	delete user;
 }
 
@@ -167,7 +160,7 @@ TEST_F( AuthenticationFixture, caseInsensitive_Fail )
 	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "GoodUsr", "User PassWord", true );
 	EXPECT_EQ( NULL, user );
-	user = authenticator.authenticatePlain( "BadUsr", "User BadWord", true );
+	user = authenticator.authenticatePlain( "BadUsr", "UserPassWord", true );
 	EXPECT_EQ( NULL, user );
 }
 
@@ -176,11 +169,11 @@ TEST_F( AuthenticationFixture, wrongPasswords )
 	User*	user;
 	TextFileAuthUnit authenticator( "", "passwd" );
 
-	user = authenticator.authenticatePlain( "admin", "Goood Password", true );
+	user = authenticator.authenticatePlain( "Admin", "Goood Password", true );
 	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "goodusr", "User Password", true );
 	EXPECT_EQ( NULL, user );
-	user = authenticator.authenticatePlain( "badusr", "user BadWord", true );
+	user = authenticator.authenticatePlain( "badusr", "userPassWord", true );
 	EXPECT_EQ( NULL, user );
 }
 
@@ -202,13 +195,12 @@ TEST_F( AuthenticationFixture, invalidPasswordHashes )
 	User*	user;
 	TextFileAuthUnit authenticator( "", "passwd" );
 
+	EXPECT_THROW( user = authenticator.authenticatePlain( "shortusr", "User Password", true ),
+		      std::runtime_error );
 
-	user = authenticator.authenticatePlain( "badmin", "Good Password", true );
-	EXPECT_EQ( NULL, user );
-	user = authenticator.authenticatePlain( "wrongusr", "User PassWord", true );
-	EXPECT_EQ( NULL, user );
-	user = authenticator.authenticatePlain( "shortusr", "User BadWord", true );
-	EXPECT_EQ( NULL, user );
+	EXPECT_THROW( user = authenticator.authenticatePlain( "longusr", "User Password", true ),
+		      std::runtime_error );
+
 }
 
 TEST_F( AuthenticationFixture, nonexistentFile )
@@ -216,152 +208,122 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 	User*	user;
 	TextFileAuthUnit authenticator( "", "passwds" );
 
-	user = authenticator.authenticatePlain( "admin", "xx", true );
-	EXPECT_EQ( NULL, user );
-	user = authenticator.authenticatePlain( "goodusr", "xx", true );
-	EXPECT_EQ( NULL, user );
-	user = authenticator.authenticatePlain( "badusr", "xx", true );
-	EXPECT_EQ( NULL, user );
+	EXPECT_THROW( user = authenticator.authenticatePlain( "admin", "xx", true ),
+		      std::runtime_error );
+	EXPECT_THROW( user = authenticator.authenticatePlain( "goodusr", "xx", true ),
+		      std::runtime_error );
+	EXPECT_THROW( user = authenticator.authenticatePlain( "testusr", "xx", true ),
+		      std::runtime_error );
 }
 
-//******  CRAM  **************************************************************
+TEST_F( AuthenticationFixture, AuthenticationSliceSuccess )
+{
+	User* user = NULL;
+	TextFileAuthUnit authUnit( "test", "passwd" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
 
-//TEST_F( AuthenticationFixture, CRAM_fileWithoutNewLine )
-//{
-//	User*	user;
-//	TextFileAuthUnit authenticator( "", "passwd-noNL" );
+	ASSERT_TRUE( slice != NULL );
 
-//	user = CRAMauth( authenticator, "admin", "Good Password", true );
-//	ASSERT_TRUE( user != NULL );
-//	EXPECT_STREQ( "admin", user->uname().c_str() );
-//	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
-//	delete user;
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
-//	user = CRAMauth( authenticator, "goodusr", "User PassWord", true );
-//	ASSERT_TRUE( user != NULL );
-//	EXPECT_STREQ( "goodusr", user->uname().c_str() );
-//	EXPECT_STREQ( "Good User", user->name().c_str() );
-//	delete user;
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
+	unsigned char salt[ PASSWORD_SALT_SIZE ];
+	rnd.generate( salt, PASSWORD_SALT_SIZE );
+	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, "Admin" );
+	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
+	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
+	std::string usernameHash = "$" + std::string( saltStr ) + "$" + hmac0.toString();
 
-//	user = CRAMauth( authenticator, "badusr", "User BadWord", true );
-//	ASSERT_TRUE( user != NULL );
-//	EXPECT_STREQ( "badusr", user->uname().c_str() );
-//	EXPECT_STREQ( "Bad User", user->name().c_str() );
-//	delete user;
-//}
+	slice->messageIn( usernameHash );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
 
-//TEST_F( AuthenticationFixture, CRAM_validUsers )
-//{
-//	User*	user;
-//	TextFileAuthUnit authenticator( "", "passwd" );
+	std::string challenge = slice->messageOut();
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
-//	user = CRAMauth( authenticator, "admin", "Good Password", true );
-//	ASSERT_TRUE( user != NULL );
-//	EXPECT_STREQ( "admin", user->uname().c_str() );
-//	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
-//	delete user;
+	AAAA::CRAMresponse response( challenge, "Good Password" );
 
-//	user = CRAMauth( authenticator, "goodusr", "User PassWord", true );
-//	ASSERT_TRUE( user != NULL );
-//	EXPECT_STREQ( "goodusr", user->uname().c_str() );
-//	delete user;
+	slice->messageIn( response.toString() );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AUTHENTICATED );
 
-//	user = CRAMauth( authenticator, "badusr", "User BadWord", true );
-//	ASSERT_TRUE( user != NULL );
-//	EXPECT_STREQ( "badusr", user->uname().c_str() );
-//	EXPECT_STREQ( "Bad User", user->name().c_str() );
-//	delete user;
-//}
+	user = slice->user();
+	ASSERT_TRUE( user != NULL );
 
+	EXPECT_EQ( user->uname(), "Admin" );
+	EXPECT_EQ( user->name(), "Just a test user" );
 
-//TEST_F( AuthenticationFixture, CRAM_caseInsensitive_Pass )
-//{
-//	User*	user;
-//	TextFileAuthUnit authenticator( "", "passwd" );
+	if ( user )
+		delete user;
 
-//	user = CRAMauth( authenticator, "AdMiN", "Good Password", false );
-//	ASSERT_TRUE( user != NULL );
-//	EXPECT_STREQ( "admin", user->uname().c_str() );
-//	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
-//	delete user;
+	user = slice->user();
+	ASSERT_TRUE( user == NULL );
 
-//	user = CRAMauth( authenticator, "GoodUsr", "User PassWord", false );
-//	ASSERT_TRUE( user != NULL );
-//	EXPECT_STREQ( "goodusr", user->uname().c_str() );
-//	delete user;
+	if ( slice )
+		delete slice;
+}
 
-//	user = CRAMauth( authenticator, "BadUsr", "User BadWord", false );
-//	ASSERT_TRUE( user != NULL );
-//	EXPECT_STREQ( "badusr", user->uname().c_str() );
-//	EXPECT_STREQ( "Bad User", user->name().c_str() );
-//	delete user;
-//}
+TEST_F( AuthenticationFixture, AuthenticationSliceWrongPassword )
+{
+	User* user = NULL;
+	TextFileAuthUnit authUnit( "test", "passwd" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
 
-//TEST_F( AuthenticationFixture, CRAM_caseInsensitive_Fail )
-//{
-//	User*	user;
-//	TextFileAuthUnit authenticator( "", "passwd" );
+	ASSERT_TRUE( slice != NULL );
 
-//	user = CRAMauth( authenticator, "AdMiN", "Good Password", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "GoodUsr", "User PassWord", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "BadUsr", "User BadWord", true );
-//	EXPECT_EQ( NULL, user );
-//}
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
-//TEST_F( AuthenticationFixture, CRAM_wrongPasswords )
-//{
-//	User*	user;
-//	TextFileAuthUnit authenticator( "", "passwd" );
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
+	unsigned char salt[ PASSWORD_SALT_SIZE ];
+	rnd.generate( salt, PASSWORD_SALT_SIZE );
+	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, "Admin" );
+	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
+	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
+	std::string usernameHash = "$" + std::string( saltStr ) + "$" + hmac0.toString();
 
-//	user = CRAMauth( authenticator, "admin", "Goood Password", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "goodusr", "User Password", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "badusr", "user BadWord", true );
-//	EXPECT_EQ( NULL, user );
-//}
+	slice->messageIn( usernameHash );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
 
-//TEST_F( AuthenticationFixture, CRAM_nonExistentUsers )
-//{
-//	User*	user;
-//	TextFileAuthUnit authenticator( "", "passwd" );
+	std::string challenge = slice->messageOut();
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
-//	user = CRAMauth( authenticator, "adminn", "xx", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "gooduser", "xx", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "baduser", "xx", true );
-//	EXPECT_EQ( NULL, user );
-//}
+	AAAA::CRAMresponse response( challenge, "Bad Password" );
 
-//TEST_F( AuthenticationFixture, CRAM_invalidPasswordHashes )
-//{
-//	User*	user;
-//	TextFileAuthUnit authenticator( "", "passwd" );
+	slice->messageIn( response.toString() );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::INVALID_CREDENTIALS );
 
+	user = slice->user();
+	ASSERT_TRUE( user == NULL );
 
-//	user = CRAMauth( authenticator, "badmin", "Good Password", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "wrongusr", "User PassWord", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "shortusr", "User BadWord", true );
-//	EXPECT_EQ( NULL, user );
-//}
+	if ( slice )
+		delete slice;
+}
 
-//TEST_F( AuthenticationFixture, CRAM_nonexistentFile )
-//{
-//	User*	user;
-//	TextFileAuthUnit authenticator( "", "passwds" );
+TEST_F( AuthenticationFixture, AuthenticationSliceWrongUser )
+{
+	User* user = NULL;
+	TextFileAuthUnit authUnit( "test", "passwd" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
 
-//	user = CRAMauth( authenticator, "admin", "xx", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "goodusr", "xx", true );
-//	EXPECT_EQ( NULL, user );
-//	user = CRAMauth( authenticator, "badusr", "xx", true );
-//	EXPECT_EQ( NULL, user );
-//}
+	ASSERT_TRUE( slice != NULL );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
+	unsigned char salt[ PASSWORD_SALT_SIZE ];
+	rnd.generate( salt, PASSWORD_SALT_SIZE );
+	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, "admin" );
+	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
+	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
+	std::string usernameHash = "$" + std::string( saltStr ) + "$" + hmac0.toString();
+
+	slice->messageIn( usernameHash );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::USER_NOT_FOUND );
+
+	user = slice->user();
+	ASSERT_TRUE( user == NULL );
+
+	if ( slice )
+		delete slice;
+}
 
 //****************************************************************************
 

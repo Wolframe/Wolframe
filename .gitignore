@@ -156,6 +156,7 @@ setenv.sh
 valgrind.sh
 wtest/cleanInput
 tests/simpleFormCompiler/src/testSimpleFormCompiler
+tests/AAAA/passwdHashTest
 tests/AAAA/passwdFileTest
 tests/testSimpleFormCompiler
 tests/stringNormalizationTest

@@ -73,7 +73,7 @@ public:
 	virtual void messageIn( const std::string& message );
 
 	/// The output message
-	virtual const std::string& messageOut();
+	virtual std::string messageOut();
 
 	/// The current status of the authenticator
 	virtual Status status() const		{ return m_status; }

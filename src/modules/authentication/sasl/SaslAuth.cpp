@@ -102,8 +102,8 @@ SaslAuthUnit::~SaslAuthUnit()
 
 const char** SaslAuthUnit::mechs() const
 {
-	static const char* mechs[] = { "WOLFRAME-SASL", "" };
-	return mechs;
+	static const char* m[] = { "WOLFRAME-SASL", NULL };
+	return m;
 }
 
 }} // namespace _Wolframe::AAAA

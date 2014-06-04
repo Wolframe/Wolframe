@@ -178,8 +178,8 @@ CRAMresponse::CRAMresponse( const std::string& challenge, const std::string& pas
 			std::string errMsg = "'" + s + "' is not a valid challenge string (salt error)";
 			throw std::runtime_error( errMsg );
 		}
-		if (( chlngSize = base64::decode( s.substr( chlngStart ),
-						 salt, CRAM_CHALLENGE_SIZE )) < 0 )	{
+		if (( chlngSize = base64::decode( s.substr( chlngStart + 1 ),
+						 chlng, CRAM_CHALLENGE_SIZE )) < 0 )	{
 			std::string errMsg = "'" + s + "' is not a valid challenge string (random data error)";
 			throw std::runtime_error( errMsg );
 		}

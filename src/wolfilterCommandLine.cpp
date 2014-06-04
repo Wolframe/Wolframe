@@ -95,7 +95,7 @@ std::vector<std::string> WolfilterCommandLine::configModules( const std::string&
 	{
 		if (boost::algorithm::iequals( mi->first, "module"))
 		{
-			rt.push_back( utils::getCanonicalPath( mi->second.data().string(), refpath));
+			rt.push_back( utils::getCanonicalPath( mi->second.data(), refpath));
 		}
 	}
 	return rt;

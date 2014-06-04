@@ -84,42 +84,32 @@ public:
 	/// \class Node
 	/// \brief Property tree node
 	class Node
-		:public boost::property_tree::basic_ptree<std::string, Value>
 	{
-		typedef boost::property_tree::basic_ptree<std::string, Value> Parent;
+	public:
+		typedef std::pair<std::string,Node> Assignment;
 
 	public:
 		/// \brief Constructor
 		explicit Node( const Position& pos=Position())
 		{
-			data().position = pos;
-		}
-
-		/// \brief Constructor
-		Node( const Parent& o, const Position& pos=Position())
-			:Parent(o)
-		{
-			data().position = pos;
+			m_position = pos;
 		}
 
 		/// \brief Constructor
 		explicit Node( const std::string& val, const Position& pos=Position())
-			:Parent( Value( val, pos)){}
+			:m_position(pos),m_data(val){}
 
 		/// \brief Constructor
 		explicit Node( const boost::property_tree::ptree& pt);
 
+		/// \brief Copy constructor
+		Node( const Node& o);
+
 		/// \brief Set the value of the node
-		void setValue( const std::string& val)
-		{
-			Parent::put_value( Value( val));
-		}
+		void setValue( const std::string& val)		{m_data = val;}
 
 		/// \brief Set the position of the node in source
-		void setPosition( const Position& p)
-		{
-			data().position = p;
-		}
+		void setPosition( const Position& p)		{m_position = p;}
 
 		/// \brief Set the file name of the definition of this node in source recursively for all sub nodes where the file name of definition has not yet been defined
 		void recursiveSetFileName( const FileName& filename)
@@ -130,34 +120,56 @@ public:
 		/// \brief Get the property sub tree of this node as string
 		std::string tostring( const utils::PrintFormat* pformat=0) const;
 
-		/// \brief Access a child node by name (no path expression as in boost::property_tree)
-		Node getChild( const std::string& nodename) const;
+		/// \brief Get a child node by name
+		/// \remark no path expression argument allowed as in boost::property_tree
+		const Node& getChild( const std::string& nodename) const;
+
+		/// \brief Add child reference
+		void add_child( const std::string& name_, const Node& node_)
+		{
+			m_subnodes.push_back( Assignment( name_, node_));
+		}
+
+		bool empty() const					{return m_subnodes.empty();}
+		const std::string& data() const				{return m_data;}
+		const Position& position() const			{return m_position;}
+
+		typedef std::vector<Assignment>::const_iterator const_iterator;
+		typedef std::vector<Assignment>::iterator iterator;
+
+		std::vector<Assignment>::const_iterator begin() const	{return m_subnodes.begin();}
+		std::vector<Assignment>::const_iterator end() const	{return m_subnodes.end();}
+		std::vector<Assignment>::iterator begin()		{return m_subnodes.begin();}
+		std::vector<Assignment>::iterator end()			{return m_subnodes.end();}
 
 	private:
 		/// \brief Print the property sub tree of this node to a stream
 		static void print( std::ostringstream& out, const Node& nd, int indent, const utils::PrintFormat* pformat=0);
 
 		/// \brief Set the file name of the definition of the node 'pt' in source recursively for all sub nodes where the file name of definition has not yet been defined
-		static void recursiveSetFileName( Parent& pt, const FileName& filename);
+		static void recursiveSetFileName( Node& pt, const FileName& filename);
+
+	private:
+		std::vector<Assignment> m_subnodes;			///< child node list
+		Position m_position;					///< position of node definition start in source
+		std::string m_data;					///< node value
 	};
 
-	typedef boost::property_tree::ptree_bad_data BadDataException;
-
 public:
-	/// \brief Consructor
+	/// \brief Constructor
 	PropertyTree(){}
-	/// \brief Copy consructor
+	/// \brief Copy constructor
 	PropertyTree( const PropertyTree& o)
 		:m_root(o.m_root){}
 
-	/// \brief Consructor
+	/// \brief Constructor
 	PropertyTree( const boost::property_tree::ptree& o, const std::string& filename_)
 		:m_root(o)
 	{
 		m_root.recursiveSetFileName( utils::FileLineInfo::getFileName( filename_));
 	}
 
-	/// \brief Consructor
+	/// \brief Constructor
 	PropertyTree( const Node& root_)
 		:m_root(root_){}
 
@@ -167,6 +179,10 @@ public:
 	Node::const_iterator begin() const	{return m_root.begin();}
 	/// \brief Get the end iterator of the root node children
 	Node::const_iterator end() const	{return m_root.end();}
+	/// \brief Get the start iterator of the root node children
+	Node::iterator begin()			{return m_root.begin();}
+	/// \brief Get the end iterator of the root node children
+	Node::iterator end()			{return m_root.end();}
 
 	/// \brief Get this property tree as string
 	std::string tostring( const utils::PrintFormat* pformat=0) const
@@ -175,7 +191,7 @@ public:
 	}
 
 private:
-	Node m_root;			///< root node of the property tree
+	Node m_root;				///< root node of the property tree
 };
 
 }}//namespace

@@ -77,6 +77,7 @@ endif
 
 TEST_CPP_BINS = \
 	authenticationTest$(EXE) \
+	passwdHashTest$(EXE) \
 	passwdFileTest$(EXE) \
 	textFileTest$(EXE)
 
@@ -84,6 +85,7 @@ TEST_CPP_BINS = \
 
 
 authenticationTest$(EXE): $(CPP_OBJS)
+passwdHashTest$(EXE): $(CPP_OBJS)
 passwdFileTest$(EXE): $(CPP_OBJS)
 textFileTest$(EXE): $(CPP_OBJS)
 
@@ -110,6 +112,8 @@ endif
 local_test: sasl.db $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./authenticationTest
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./passwdHashTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./passwdFileTest
 	@echo
