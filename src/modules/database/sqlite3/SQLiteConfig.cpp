@@ -82,7 +82,7 @@ bool SQLiteConfig::parse( const config::ConfigurationNode& pt, const std::string
 	try
 	{
 		config::parseConfigStructure( *static_cast<SQLiteConfigStruct*>(this), pt);
-		m_config_pos = pt.data().position;
+		m_config_pos = pt.position();
 		return true;
 	}
 	catch (const std::runtime_error& e)
