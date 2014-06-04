@@ -216,9 +216,9 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 		      std::runtime_error );
 }
 
-TEST_F( AuthenticationFixture, AuthenticationSlice )
+TEST_F( AuthenticationFixture, AuthenticationSliceSuccess )
 {
-	User*	user = NULL;
+	User* user = NULL;
 	TextFileAuthUnit authUnit( "test", "passwd" );
 	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
 
@@ -253,6 +253,70 @@ TEST_F( AuthenticationFixture, AuthenticationSlice )
 
 	if ( user )
 		delete user;
+
+	user = slice->user();
+	ASSERT_TRUE( user == NULL );
+
+	if ( slice )
+		delete slice;
+}
+
+TEST_F( AuthenticationFixture, AuthenticationSliceWrongPassword )
+{
+	User* user = NULL;
+	TextFileAuthUnit authUnit( "test", "passwd" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
+
+	ASSERT_TRUE( slice != NULL );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
+	unsigned char salt[ PASSWORD_SALT_SIZE ];
+	rnd.generate( salt, PASSWORD_SALT_SIZE );
+	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, "Admin" );
+	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
+	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
+	std::string usernameHash = "$" + std::string( saltStr ) + "$" + hmac0.toString();
+
+	slice->messageIn( usernameHash );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
+
+	std::string challenge = slice->messageOut();
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	AAAA::CRAMresponse response( challenge, "Bad Password" );
+
+	slice->messageIn( response.toString() );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::INVALID_CREDENTIALS );
+
+	user = slice->user();
+	ASSERT_TRUE( user == NULL );
+
+	if ( slice )
+		delete slice;
+}
+
+TEST_F( AuthenticationFixture, AuthenticationSliceWrongUser )
+{
+	User* user = NULL;
+	TextFileAuthUnit authUnit( "test", "passwd" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
+
+	ASSERT_TRUE( slice != NULL );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
+	unsigned char salt[ PASSWORD_SALT_SIZE ];
+	rnd.generate( salt, PASSWORD_SALT_SIZE );
+	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, "admin" );
+	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
+	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
+	std::string usernameHash = "$" + std::string( saltStr ) + "$" + hmac0.toString();
+
+	slice->messageIn( usernameHash );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::USER_NOT_FOUND );
 
 	user = slice->user();
 	ASSERT_TRUE( user == NULL );
