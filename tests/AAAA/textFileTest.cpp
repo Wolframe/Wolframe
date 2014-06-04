@@ -246,6 +246,8 @@ TEST_F( AuthenticationFixture, AuthenticationSlice )
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AUTHENTICATED );
 
 	user = slice->user();
+	ASSERT_TRUE( user != NULL );
+
 	EXPECT_EQ( user->uname(), "Admin" );
 	EXPECT_EQ( user->name(), "Just a test user" );
 

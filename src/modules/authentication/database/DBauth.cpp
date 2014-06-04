@@ -59,8 +59,8 @@ DBauthUnit::~DBauthUnit()
 
 const char** DBauthUnit::mechs() const
 {
-	static const char* mechs[] = { "WOLFRAME-CRAM", NULL };
-	return mechs;
+	static const char* m[] = { "WOLFRAME-CRAM", NULL };
+	return m;
 }
 
 bool DBauthUnit::resolveDB( const db::DatabaseProvider& db )

@@ -69,8 +69,8 @@ TextFileAuthUnit::~TextFileAuthUnit()
 
 const char** TextFileAuthUnit::mechs() const
 {
-	static const char* mechs[] = { "WOLFRAME-CRAM", NULL };
-	return mechs;
+	static const char* m[] = { "WOLFRAME-CRAM", NULL };
+	return m;
 }
 
 
@@ -256,6 +256,7 @@ AuthenticatorSlice::Status TextFileAuthSlice::status() const
 		case SLICE_SYSTEM_FAILURE:
 			return SYSTEM_FAILURE;
 	}
+	return SYSTEM_FAILURE;		// just to silence compilers
 }
 
 /// The authenticated user or NULL if not authenticated
