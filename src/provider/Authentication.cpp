@@ -131,7 +131,8 @@ StandardAuthenticator::~StandardAuthenticator()
 {
 	for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
 							it != m_slices.end(); it++ )
-		delete *it;
+		(*it)->dispose();
+	m_slices.clear();
 	if ( m_user )
 		delete m_user, m_user = NULL;
 }
@@ -155,7 +156,8 @@ bool StandardAuthenticator::setMech( const std::string& mech )
 		delete m_user, m_user = NULL;
 	for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
 							it != m_slices.end(); it++ )
-		delete *it;
+		(*it)->dispose();
+	m_slices.clear();
 	m_currentSlice = -1;
 
 	bool	mechAvailable = false;

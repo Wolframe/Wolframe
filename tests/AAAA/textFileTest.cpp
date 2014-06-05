@@ -216,7 +216,23 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 		      std::runtime_error );
 }
 
-TEST_F( AuthenticationFixture, AuthenticationSliceSuccess )
+
+static std::string usernameHash( const std::string& username )
+{
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
+	unsigned char salt[ PASSWORD_SALT_SIZE ];
+
+	rnd.generate( salt, PASSWORD_SALT_SIZE );
+
+	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, username );
+
+	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
+	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
+
+	return "$" + std::string( saltStr ) + "$" + hmac0.toString();
+}
+
+TEST_F( AuthenticationFixture, AuthenticationSuccess )
 {
 	User* user = NULL;
 	TextFileAuthUnit authUnit( "test", "passwd" );
@@ -226,15 +242,8 @@ TEST_F( AuthenticationFixture, AuthenticationSliceSuccess )
 
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
-	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
-	unsigned char salt[ PASSWORD_SALT_SIZE ];
-	rnd.generate( salt, PASSWORD_SALT_SIZE );
-	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, "Admin" );
-	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
-	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
-	std::string usernameHash = "$" + std::string( saltStr ) + "$" + hmac0.toString();
-
-	slice->messageIn( usernameHash );
+	std::string userHash = usernameHash( "Admin" );
+	slice->messageIn( userHash );
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
 
 	std::string challenge = slice->messageOut();
@@ -261,7 +270,7 @@ TEST_F( AuthenticationFixture, AuthenticationSliceSuccess )
 		delete slice;
 }
 
-TEST_F( AuthenticationFixture, AuthenticationSliceWrongPassword )
+TEST_F( AuthenticationFixture, AuthenticationWrongPassword )
 {
 	User* user = NULL;
 	TextFileAuthUnit authUnit( "test", "passwd" );
@@ -271,21 +280,14 @@ TEST_F( AuthenticationFixture, AuthenticationSliceWrongPassword )
 
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
-	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
-	unsigned char salt[ PASSWORD_SALT_SIZE ];
-	rnd.generate( salt, PASSWORD_SALT_SIZE );
-	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, "Admin" );
-	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
-	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
-	std::string usernameHash = "$" + std::string( saltStr ) + "$" + hmac0.toString();
-
-	slice->messageIn( usernameHash );
+	std::string userHash = usernameHash( "Admin" );
+	slice->messageIn( userHash );
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
 
 	std::string challenge = slice->messageOut();
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
-	AAAA::CRAMresponse response( challenge, "Bad Password" );
+	AAAA::CRAMresponse response( challenge, "Good Password " );
 
 	slice->messageIn( response.toString() );
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::INVALID_CREDENTIALS );
@@ -297,7 +299,7 @@ TEST_F( AuthenticationFixture, AuthenticationSliceWrongPassword )
 		delete slice;
 }
 
-TEST_F( AuthenticationFixture, AuthenticationSliceWrongUser )
+TEST_F( AuthenticationFixture, AuthenticationWrongUser )
 {
 	User* user = NULL;
 	TextFileAuthUnit authUnit( "test", "passwd" );
@@ -307,15 +309,9 @@ TEST_F( AuthenticationFixture, AuthenticationSliceWrongUser )
 
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
-	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
-	unsigned char salt[ PASSWORD_SALT_SIZE ];
-	rnd.generate( salt, PASSWORD_SALT_SIZE );
-	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, "admin" );
-	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
-	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
-	std::string usernameHash = "$" + std::string( saltStr ) + "$" + hmac0.toString();
+	std::string userHash = usernameHash( "admin" );
 
-	slice->messageIn( usernameHash );
+	slice->messageIn( userHash );
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::USER_NOT_FOUND );
 
 	user = slice->user();
