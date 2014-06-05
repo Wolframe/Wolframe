@@ -150,10 +150,10 @@ public:
 
 	State state() const
 		{return m_state;}
+
 private:
 	std::string message( const char* cmd, const std::string& content=std::string());
 	void initUser( const std::string& msg);
-
 
 private:
 	void setState( State st);
