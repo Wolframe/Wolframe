@@ -157,7 +157,7 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 	if (error)
 	{
 		out << "ERR authentication failed: " << error << endl();
-		return -1;
+		return MainSTM::Unauthenticated;
 	}
 	else
 	{
@@ -166,12 +166,13 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 		{
 			out << "OK authenticated" << endl();
 			execContext()->setUser( usr);
+			return MainSTM::Authenticated;
 		}
 		else
 		{
-			out << "ERR authentication failed" << endl();
+			out << "ERR authentication refused" << endl();
+			return MainSTM::Unauthenticated;
 		}
-		return MainSTM::Authenticated;
 	}
 }
 

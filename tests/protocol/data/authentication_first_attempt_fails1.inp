@@ -2,7 +2,12 @@ AUTH
 MECH TEST
 Huber
 .
-das
+hbr1234
+.
+AUTH
+MECH TEST
+Huber
+.
 hbr123
 .
 QUIT

@@ -156,6 +156,7 @@ bool StandardAuthenticator::setMech( const std::string& mech )
 	for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
 							it != m_slices.end(); it++ )
 		delete *it;
+	m_slices.clear();
 	m_currentSlice = -1;
 
 	bool	mechAvailable = false;

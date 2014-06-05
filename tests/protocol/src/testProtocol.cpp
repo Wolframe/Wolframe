@@ -400,7 +400,7 @@ TEST_F( MainProtocolTest, tests)
 		}
 		catch (const std::runtime_error& e)
 		{
-			std::cerr << "failed to read expect file '" << expectfile << "': " << e.what() << std::endl; 
+			LOG_ERROR << "failed to read expect file '" << expectfile << "': " << e.what(); 
 		}
 
 		// [2.1.2] Define buffer sizes:
@@ -439,17 +439,19 @@ TEST_F( MainProtocolTest, tests)
 				}
 				catch (const std::runtime_error& e)
 				{
-					std::cerr << "test got exception (seed = " << seed << ", input buffer size = " << ibar[ii] << ", output buffer size = " << obar[oo] << "): " << e.what() << std::endl;
+					LOG_ERROR << "test got exception (seed = " << seed << ", input buffer size = " << ibar[ii] << ", output buffer size = " << obar[oo] << "): " << e.what();
+					output = "RUNTIME ERROR EXCEPTION";
 				}
 				catch (const std::logic_error& e)
 				{
-					std::cerr << "logic error (seed = " << seed << ", input buffer size = " << ibar[ii] << ", output buffer size = " << obar[oo] << "): " << e.what() << std::endl;
+					LOG_ERROR << "logic error (seed = " << seed << ", input buffer size = " << ibar[ii] << ", output buffer size = " << obar[oo] << "): " << e.what();
+					output = "LOGIC ERROR EXCEPTION";
 				}
 				output = normalizeOutputCRLF( output, expected);
 
 				if (expected != output)
 				{
-					std::cerr << "test failed (seed = " << seed << ", input buffer size = " << ibar[ii] << ", output buffer size = " << obar[oo] << ")" << std::endl;
+					LOG_ERROR << "test failed (seed = " << seed << ", input buffer size = " << ibar[ii] << ", output buffer size = " << obar[oo] << ")";
 					boost::filesystem::path outputdumpfile( outputdir / (testname + ".res"));
 					utils::writeFile( outputdumpfile.string(), output);
 					boost::this_thread::sleep( boost::posix_time::seconds( 3));
