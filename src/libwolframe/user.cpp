@@ -46,20 +46,18 @@ namespace AAAA	{
 User::~User()
 {
 	std::size_t i;
-	char* cptr;
 	time_t* tptr;
 
-	for ( i = 0, cptr = const_cast< char* >( m_authenticator.c_str() );
-	      i < m_authenticator.length(); i++, cptr++ )
-		*cptr = 'x';
+	for ( i = 0; i < m_authenticator.length(); i++ )
+		const_cast< char& >( m_authenticator[ i ] ) = 'x';
+
 	tptr = const_cast< time_t* >( &m_loginTime ); *tptr = 0;
 
-	for ( i = 0, cptr = const_cast< char* >( m_uname.c_str() );
-	      i < m_uname.length(); i++, cptr++ )
-		*cptr = 'x';
-	for ( i = 0, cptr = const_cast< char* >( m_name.c_str() );
-	      i < m_name.length(); i++, cptr++ )
-		*cptr = 'x';
+	for ( i = 0; i < m_uname.length(); i++ )
+		const_cast< char& >( m_uname[ i ] ) = 'x';
+
+	for ( i = 0; i < m_name.length(); i++ )
+		const_cast< char& >( m_name[ i ] ) = 'x';
 }
 
 }} // namespace _Wolframe::AAAA

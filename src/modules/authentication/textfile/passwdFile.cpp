@@ -56,9 +56,14 @@ static const std::size_t MAX_HMAC_KEY_SIZE = 1024;
 
 void PwdFileUser::clear()
 {
-	user.clear();
-	hash.clear();
-	info.clear();
+	std::size_t i;
+
+	for ( i = 0; i < user.length(); i++ )
+		user[ i ] = 'x';
+	for ( i = 0; i < hash.length(); i++ )
+		hash[ i ] = 'x';
+	for ( i = 0; i < info.length(); i++ )
+		info[ i ] = 'x';
 	expiry = 0;
 }
 

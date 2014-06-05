@@ -48,6 +48,7 @@ struct PwdFileUser	{
 	std::string	info;
 	unsigned long	expiry;
 public:
+	~PwdFileUser()		{ clear(); }
 	void clear();
 };
 

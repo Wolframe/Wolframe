@@ -94,6 +94,11 @@ CRAMchallenge::CRAMchallenge( const crypto::RandomGenerator& rndGen )
 			 CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
 }
 
+CRAMchallenge::~CRAMchallenge()
+{
+	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
+}
+
 std::string CRAMchallenge::toBCD() const
 {
 	char	buffer[ CRAM_CHALLENGE_BCD_SIZE ];
@@ -145,6 +150,9 @@ static void computeResponse ( const unsigned char* challenge, const unsigned cha
 
 	assert( CRAM_RESPONSE_SIZE == SHA256_DIGEST_SIZE );
 	sha256( buffer, CRAM_CHALLENGE_SIZE, response );
+
+	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
+		buffer[ i ] = 0;
 }
 //***** End of CRAM response computation ************************************
 
@@ -199,6 +207,14 @@ CRAMresponse::CRAMresponse( const std::string& challenge, const std::string& pas
 	PasswordHash pwd( salt, saltSize, password );
 
 	computeResponse( chlng, pwd.hash().hash(), pwd.hash().size(), m_response );
+
+	memset( chlng, 0, CRAM_CHALLENGE_SIZE );
+	memset( salt, 0, PASSWORD_SALT_SIZE );
+}
+
+CRAMresponse::~CRAMresponse()
+{
+	memset( m_response, 0, CRAM_RESPONSE_SIZE );
 }
 
 

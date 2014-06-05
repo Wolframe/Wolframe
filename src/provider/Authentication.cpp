@@ -263,7 +263,20 @@ void StandardAuthenticator::messageIn( const std::string& message )
 			LOG_TRACE << "StandardAuthenticator: status is AWAITING_MESSAGE";
 			break;
 		case AuthenticatorSlice::AUTHENTICATED:
+			m_user = m_slices[ m_currentSlice ]->user();
+			if ( ! m_user )	{
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is AUTHENTICATED but user is not available";
+				break;
+			}
 			m_status = AUTHENTICATED;
+			// destroy everything that was used for authentication
+			for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+									it != m_slices.end(); it++ )
+				(*it)->dispose();
+			m_slices.clear();
+			m_currentSlice = -1;
+
 			LOG_TRACE << "StandardAuthenticator: status is AUTHENTICATED";
 			break;
 		case AuthenticatorSlice::INVALID_CREDENTIALS:
@@ -302,6 +315,19 @@ std::string StandardAuthenticator::messageOut()
 			LOG_TRACE << "StandardAuthenticator: status is AWAITING_MESSAGE";
 			break;
 		case AuthenticatorSlice::AUTHENTICATED:
+			m_user = m_slices[ m_currentSlice ]->user();
+			if ( ! m_user )	{
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is AUTHENTICATED but user is not available";
+				break;
+			}
+			m_status = AUTHENTICATED;
+			// destroy everything that was used for authentication
+			for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+									it != m_slices.end(); it++ )
+				(*it)->dispose();
+			m_slices.clear();
+			m_currentSlice = -1;
 			m_status = AUTHENTICATED;
 			LOG_TRACE << "StandardAuthenticator: status is AUTHENTICATED";
 			break;
@@ -322,8 +348,10 @@ std::string StandardAuthenticator::messageOut()
 User* StandardAuthenticator::user()
 {
 	AAAA::User* retUser = m_user;
-	if ( m_user )
+	if ( m_user )	{
 		m_user = NULL;
+		assert( m_slices.empty() );
+	}
 	return retUser;
 }
 
