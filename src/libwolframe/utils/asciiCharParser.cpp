@@ -34,7 +34,6 @@
 /// \brief Utility functions for guessing encoding and parsing ascii character in different encodings 
 #include "utils/asciiCharParser.hpp"
 #include <cstring>
-/*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::utils;

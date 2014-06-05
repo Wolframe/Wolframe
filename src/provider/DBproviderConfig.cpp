@@ -64,9 +64,9 @@ bool DBproviderConfig::parse( const config::ConfigurationNode& pt,
 			module::ConfiguredBuilder* builder = modules->getBuilder( "database", L1it->first );
 			if ( builder )	{
 				config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
-				if ( conf->parse( L1it->second, L1it->first, modules ))
+				if ( conf->parse( L1it->second, L1it->first, modules ))	{
 					m_config.push_back( conf );
-				else	{
+				} else	{
 					delete conf;
 					retVal = false;
 				}

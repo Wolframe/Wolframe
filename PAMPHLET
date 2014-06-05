@@ -1,0 +1,43 @@
+Principles of a Wolframe Application:
+
+
+Document meta data and reflection
+- In Wolframe you define document validation and processing on data and not on document formats only.
+	For processing documents of different format there exists the concept of filters.
+	Filters provide for a specific document format a uniform serialization that is equal for
+	all document formats and document meta data that is specific to the document format and type.
+	Document meta data and the filter used are using a concept of reflection of the input in
+	the output as default behaviour. You can anytime and easily specify an alternative
+	behaviour explicitely if you want, but you do not have to. You define processing on content
+	- the uniform serialization - and what document format is returned depends on the input.
+	If your client for example sends an XML document in UTF-16 encoding where the document
+	type is specified as xsd schema reference in the XML header, it will get an UTF-16
+	XML document with the document type specified in the same way with a different document
+	type or schema id as result. The same function can process a request as CSV or JSON document,
+	if a document type recognition module and a filter module for the document format is defined
+	and configured. How meta data are used in processing and for additional validation is defined
+	by the filter (respectively the document format that triggers the use of a filter type to get
+	your content to process).
+
+
+Separating languages to help separating processes and roles:
+- In Wolframe you have different languages for different aspects of your project.
+	This looks like a disadvantage but it is from the project management point of view a big advantage.
+	For controlling a universal "does it all" language you have to do a lot on the project management
+	side to prevent developers to care about what they must not care about. You may for example not want
+	an application developer to care about data normalization and the definition of the document
+	structure because this is a matter of industry standards and higher level organizational
+	concepts. Development there is mainly to know your data and not about programming.
+	One the other hand you want a database administrator to define the data base schemas and the
+	transaction definitions in a language that is close to his domain and familiar for him
+	to formulate the solution.
+	One important goal of Wolframe is to make you able to separate different aspects of a project
+	according to your organization. But we do not want to educate you. If your setup is simple,
+	you can also manage the problems in a simple way, for example using your prefered programming
+	language for the whole processing chain.
+	Important is that such decisions are defined by your processes and taken by management.
+	One thing left to mention is that Wolframe does not force you to use a specific language
+	for an aspect. Language bindings are loaded by modules and therefore replaceable.
+
+
+
