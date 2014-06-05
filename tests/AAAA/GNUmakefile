@@ -31,10 +31,19 @@ CPP_OBJS = \
 	$(TOPDIR)/src/modules/authentication/database/DBauth.o \
 	$(TOPDIR)/src/modules/authentication/textfile/passwdFile.o
 
+TEST_CPP_BINS = \
+	authenticationTest$(EXE) \
+	passwdHashTest$(EXE) \
+	passwdFileTest$(EXE) \
+	textFileTest$(EXE)
+
 # PAM
 
 ifeq ($(WITH_PAM),1)
 
+TEST_CPP_BINS += \
+	pamTest$(EXE)
+	
 INCLUDE_CXXFLAGS = \
 	-DWITH_PAM
 
@@ -74,12 +83,6 @@ CPP_OBJS += \
 	$(TOPDIR)/src/modules/authentication/sasl/SaslAuth.o
 
 endif
-
-TEST_CPP_BINS = \
-	authenticationTest$(EXE) \
-	passwdHashTest$(EXE) \
-	passwdFileTest$(EXE) \
-	textFileTest$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-// text file authentication
+// PAM authentication
 //
 
 #ifndef _PAM_AUTHENTICATION_HPP_INCLUDED
@@ -88,25 +88,14 @@ public:
 	const char** mechs() const;
 
 	AuthenticatorSlice* slice( const std::string& /*mech*/,
-				   const net::RemoteEndpoint& /*client*/ )
-						{ return NULL; }
+				   const net::RemoteEndpoint& /*client*/ );
+
+	User* authenticatePlain( const std::string& username, const std::string& password ) const;
 
 private:
-	static const std::string	m_mechs[];	///< list of mechs for the unit
+	friend class PAMAuthSlice;
 	const std::string		m_service;	///< name of the PAM service
-	struct pam_conv			m_conv;		///< PAM internal data structure
-	pam_appdata			m_appdata;	///< our void * for PAM data
-
-	// states of the authenticator state machine
-	enum {
-		_Wolframe_PAM_STATE_NEED_LOGIN,
-		_Wolframe_PAM_STATE_HAS_LOGIN,
-		_Wolframe_PAM_STATE_NEED_PASS,
-		_Wolframe_PAM_STATE_HAS_PASS,
-		_Wolframe_PAM_STATE_ERROR
-	} m_state;
 };
-
 
 class PAMAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
 {
@@ -115,6 +104,48 @@ public:
 						{ return AUTHENTICATION_OBJECT; }
 	const char* objectClassName() const		{ return PAM_AUTHENTICATION_CLASS_NAME; }
 	PAMAuthUnit* object( const config::NamedConfiguration& conf );
+};
+
+class PAMAuthSlice : public AuthenticatorSlice
+{
+	enum	SliceState	{
+		SLICE_INITIALIZED,		///< Has been initialized, no other data
+		SLICE_HAS_LOGIN_NEED_PASS,	///< Need the login of the user
+		SLICE_USER_FOUND,		///< User has been found, will send challenge
+		SLICE_USER_NOT_FOUND,		///< User has not been found -> fail
+		SLICE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
+		SLICE_AUTHENTICATED,		///< Response was correct -> user available
+		SLICE_SYSTEM_FAILURE		///< Something is wrong
+	};
+
+public:
+	PAMAuthSlice( const PAMAuthUnit& backend );
+
+	~PAMAuthSlice();
+
+	void dispose();
+
+	virtual const char* className() const		{ return m_backend.className(); }
+
+	virtual const std::string& identifier() const	{ return m_backend.identifier(); }
+
+	/// The input message
+	virtual void messageIn( const std::string& message );
+
+	/// The output message
+	virtual std::string messageOut();
+
+	/// The current status of the authenticator slice
+	virtual Status status() const;
+
+	/// The authenticated user or NULL if not authenticated
+	virtual User* user();
+
+private:
+	const PAMAuthUnit&	m_backend;
+	SliceState		m_state;
+	struct pam_conv		m_conv;		///< PAM internal data structure
+	pam_appdata		m_appdata;	///< our void * for PAM data
 };
 
 }} // namespace _Wolframe::AAAA
