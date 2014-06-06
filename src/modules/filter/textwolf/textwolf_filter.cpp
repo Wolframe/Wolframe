@@ -289,7 +289,8 @@ struct InputFilterImpl
 							}
 							else
 							{
-								setState( Error, "root element expected");
+								std::string msg = std::string("root element expected instead of ") + textwolf::XMLScannerBase::getElementTypeName( et) + " '" + std::string(ee, eesize) + "'";
+								setState( Error, msg.c_str());
 								return 0;
 							}
 							/*no break here!*/
@@ -327,7 +328,7 @@ struct InputFilterImpl
 								else if (0==std::memcmp( m_elembuffer.c_str(), "xsi:", 4/*strlen("xsi:")*/))
 								{
 									getMetaDataRef()->setAttribute( m_elembuffer.c_str(), std::string( ee, eesize));
-									if (m_elembuffer == "xsi:schemaLocation")
+									if (m_elembuffer == "xsi:schemaLocation" || m_elembuffer == "xsi:noNamespaceSchemaLocation")
 									{
 										getMetaDataRef()->setDoctype( types::DocMetaData::extractStem( std::string( ee, eesize)));
 									}
@@ -513,6 +514,7 @@ struct OutputFilterImpl :public OutputFilter
 			const char* xmlns = md.getAttribute( "xmlns");
 			const char* xsi = md.getAttribute( "xmlns:xsi");
 			const char* schemaLocation = md.getAttribute( "xsi:schemaLocation");
+			if (!schemaLocation) schemaLocation = md.getAttribute( "xsi:noNamespaceSchemaLocation");
 			std::string schemaLocation_buf;
 			if (schemaLocation && !md.doctype().empty())
 			{

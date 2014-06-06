@@ -72,7 +72,7 @@ bool ServiceBanner::parse( const config::ConfigurationNode& pt, const std::strin
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
 		bool tokensDefined = ( m_tokens != ServiceBanner::UNDEFINED );
 		std::string	val;
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.data().string(),
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.data(),
 					val, &tokensDefined ))
 			return false;
 		m_tokens = strToToken( val );
@@ -83,7 +83,7 @@ bool ServiceBanner::parse( const config::ConfigurationNode& pt, const std::strin
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
 		bool isDefined = ( !m_serverSignature.empty());
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.data().string(),
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.data(),
 					m_serverSignature, &isDefined ))
 			return false;
 	}

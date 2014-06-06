@@ -156,7 +156,7 @@ class DoctypeDetectorXml
 {
 public:
 	DoctypeDetectorXml()
-		:m_state(ParseStart),m_lastchar(0){}
+		:m_state(ParseStart),m_isDoctypeAttrib(false),m_lastchar(0){}
 
 	/// \brief Destructor
 	virtual ~DoctypeDetectorXml(){}
@@ -363,8 +363,12 @@ public:
 						{
 							m_lasterror = "No document type or schema definition found and document is not standalone";
 							setState( Done);
+							break;
 						}
-						setState( SearchXMLRootAttrib);
+						else
+						{
+							setState( SearchXMLRootAttrib);
+						}
 					}
 					break;
 
@@ -378,11 +382,12 @@ public:
 					{
 						setState( ParseXMLRootAttrib);
 						m_itembuf.clear();
+						m_itembuf.push_back(ch);
 					}
 					break;
 
 				case ParseXMLRootAttrib:
-					if (ch != '>' && ch > ' ')
+					if (ch != '>' && ch != '=')
 					{
 						m_itembuf.push_back( ch);
 						if (m_itembuf.size() > 128)
@@ -393,18 +398,15 @@ public:
 					}
 					else
 					{
-						if (m_itembuf == "xsi:schemaLocation")
-						{
-							setState( SearchXMLRootAttribAssign);
-						}
-						else if (ch == '>')
+						if (ch == '>')
 						{
 							m_lasterror = "No document type or schema definition found and document is not standalone";
 							setState( Done);
 						}
 						else
 						{
-							setState( SearchXMLRootAttrib);
+							m_isDoctypeAttrib = (m_itembuf == "xsi:schemaLocation" || m_itembuf == "xsi:noNamespaceSchemaLocation");
+							setState( ch <= '='?SearchXMLRootAttribQuote:SearchXMLRootAttribAssign);
 						}
 					}
 					break;
@@ -441,8 +443,15 @@ public:
 				case ParseXMLRootAttribValueSQ:
 					if (ch == '\'')
 					{
-						m_info.reset( new types::DoctypeInfo("XML", utils::getFileStem( m_itembuf)));
-						setState( Done);
+						if (m_isDoctypeAttrib)
+						{
+							m_info.reset( new types::DoctypeInfo("XML", utils::getFileStem( m_itembuf)));
+							setState( Done);
+						}
+						else
+						{
+							setState( SearchXMLRootAttrib);
+						}
 					}
 					else
 					{
@@ -465,8 +474,15 @@ public:
 				case ParseXMLRootAttribValueDQ:
 					if (ch == '\"')
 					{
-						m_info.reset( new types::DoctypeInfo("XML", utils::getFileStem( m_itembuf)));
-						setState( Done);
+						if (m_isDoctypeAttrib)
+						{
+							m_info.reset( new types::DoctypeInfo("XML", utils::getFileStem( m_itembuf)));
+							setState( Done);
+						}
+						else
+						{
+							setState( SearchXMLRootAttrib);
+						}
 					}
 					else
 					{
@@ -515,6 +531,7 @@ private:
 	types::DoctypeInfoR m_info;			///< the result of doctype detection
 	std::string m_lasterror;			///< the last error occurred
 	State m_state;					///< processing state machine state
+	bool m_isDoctypeAttrib;				///< true, if the attribute found is a doctype attrib
 	utils::AsciiCharParser m_charparser;		///< character by caracter parser for source
 	std::string m_itembuf;				///< value item parsed (value depending on state)
 	unsigned char m_lastchar;			///< the last character parsed

@@ -105,7 +105,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 			}
 			else if (m_inputbuffer.size() > MaxDoctypeDetectionBlockSize)
 			{
-				LOG_ERROR << "document type detection has consumed more than " << MaxDoctypeDetectionBlockSize << " bytes (" << m_inputbuffer.size() << ") without getting a result";
+				LOG_ERROR << "document type detection has consumed more than " << (int)MaxDoctypeDetectionBlockSize << " bytes (" << m_inputbuffer.size() << ") without getting a result";
 				setLastError( "document format not recognized");
 				return CLOSE;
 			}

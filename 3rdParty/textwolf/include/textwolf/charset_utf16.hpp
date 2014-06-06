@@ -123,6 +123,7 @@ public:
 	static UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		unsigned int bufsize = size( buf, bufpos, itr);
+
 		UChar rt = (unsigned char)buf[ MSB];
 		rt = (rt << 8) + (unsigned char)buf[ LSB];
 

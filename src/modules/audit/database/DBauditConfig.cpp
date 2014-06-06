@@ -49,7 +49,7 @@ bool DBauditConfig::parse( const config::ConfigurationNode& pt, const std::strin
 
 	bool retVal = true;
 	bool reqDefined = false;
-	m_config_pos = pt.data().position;
+	m_config_pos = pt.position();
 
 	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "required" ))	{
@@ -63,7 +63,7 @@ bool DBauditConfig::parse( const config::ConfigurationNode& pt, const std::strin
 		}
 		else	{
 			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-					<< L1it->first << "' " << L1it->second.data().position.logtext();
+					<< L1it->first << "' " << L1it->second.position().logtext();
 		}
 	}
 	return retVal;

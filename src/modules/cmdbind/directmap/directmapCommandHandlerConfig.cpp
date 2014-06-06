@@ -53,7 +53,7 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationNode& pt, 
 				++filterDefied;
 
 				std::vector<std::string> filterdef;
-				utils::splitString( filterdef, pi->second.data().string(), "=");
+				utils::splitString( filterdef, pi->second.data(), "=");
 				if (filterdef.size() == 1)
 				{
 					m_filtermap.insert( "", filterdef.at(0));
@@ -64,21 +64,21 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationNode& pt, 
 				}
 				else
 				{
-					throw std::runtime_error( std::string("illegal value for filter declaration. expected two items separated by a '=' ") + pi->second.data().position.logtext());
+					throw std::runtime_error( std::string("illegal value for filter declaration. expected two items separated by a '=' ") + pi->second.position().logtext());
 				}
 			}
 			else if (boost::iequals( pi->first, "program"))
 			{
-				m_programfiles.push_back( pi->second.data().string());
+				m_programfiles.push_back( pi->second.data());
 			}
 			else
 			{
-				throw std::runtime_error( std::string("expected 'program' or 'filter' definition instead of '") + pi->first + "' " + pi->second.data().position.logtext());
+				throw std::runtime_error( std::string("expected 'program' or 'filter' definition instead of '") + pi->first + "' " + pi->second.position().logtext());
 			}
 		}
 		if (!filterDefied)
 		{
-			LOG_WARNING << "no filter defined in directmap command handler. cannot process anything (" << pi->second.data().position.logtext() << ")";
+			LOG_WARNING << "no filter defined in directmap command handler. cannot process anything (" << pi->second.position().logtext() << ")";
 		}
 	}
 	catch (std::runtime_error& e)

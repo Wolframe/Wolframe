@@ -73,7 +73,7 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& e
 			case 0:
 				if (m_stk.back().itr != m_stk.back().end)
 				{
-					m_position = m_stk.back().itr->second.data().position;
+					m_position = m_stk.back().itr->second.position();
 				}
 				element.init( m_stk.back().itr->first);
 				type = FilterBase::OpenTag;
@@ -82,7 +82,7 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& e
 			case 1:
 				if (m_stk.back().itr->second.data().size())
 				{
-					m_position = m_stk.back().itr->second.data().position;
+					m_position = m_stk.back().itr->second.position();
 					element.init( m_stk.back().itr->second.data());
 					type = FilterBase::Value;
 					m_state = 2;
@@ -93,7 +93,7 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& e
 				st.end = m_stk.back().itr->second.end();
 				if (st.itr != st.end)
 				{
-					m_position = m_stk.back().itr->second.data().position;
+					m_position = m_stk.back().itr->second.position();
 				}
 				++m_stk.back().itr;
 				m_stk.push_back( st);
