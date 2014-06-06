@@ -240,7 +240,7 @@ bool IOFilterCommandHandlerEscDLF::consumeInput()
 			}
 			if (m_state != DiscardInput)
 			{
-				flt->putInput( m_input.charptr(), m_eoD-m_input.at(0), m_input.gotEoD());
+				flt->putInput( m_input.charptr()+m_itrpos, m_eoD-m_input.at(m_itrpos), m_input.gotEoD());
 			}
 		}
 		m_unconsumedInput = false;
@@ -262,6 +262,7 @@ void IOFilterCommandHandlerEscDLF::putInput( const void *begin, std::size_t byte
 		if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
 		startidx = 0; //... start of buffer is end last message (part of eoD marker)
 	}
+	m_itrpos = startidx;
 	protocol::InputBlock::iterator start = m_input.at( startidx);
 	m_eoD = m_input.getEoD( start);
 	m_nextmsg = m_eoD - m_input.at(0);
