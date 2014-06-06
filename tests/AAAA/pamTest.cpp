@@ -83,8 +83,6 @@ TEST_F( AuthenticationFixture, AuthenticationSliceUserPassword )
 
 	ASSERT_TRUE( slice != NULL );
 
-	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
-
 	// send user
 	slice->messageIn( "wolfusr" );
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );

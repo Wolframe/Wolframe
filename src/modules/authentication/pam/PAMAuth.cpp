@@ -34,12 +34,14 @@
 //
 //
 
-#include <string>
-#include <cstring>
-#include <ostream>
+#include "PAMAuth.hpp"
 
 #include "logger-v1.hpp"
-#include "PAMAuth.hpp"
+
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <sstream>
 
 namespace _Wolframe {
 namespace AAAA {
@@ -249,8 +251,60 @@ AuthenticatorSlice* PAMAuthUnit::slice( const std::string& /*mech*/,
 User* PAMAuthUnit::authenticatePlain(	const std::string& username,
 					const std::string& password ) const
 {
-	return new User( "PAM", username, "" );
+	int rc;
+	pam_appdata appdata;
+	const struct pam_conv conv = { pam_conv_func, &appdata };
+	
+	appdata.login = username;
+	appdata.h = NULL;
+	appdata.has_pass = false;
+	appdata.pass = "";
+	
+	rc = pam_start( m_service.c_str( ), appdata.login.c_str( ), &conv, &appdata.h );
+	if( rc != PAM_SUCCESS ) {
+		LOG_ERROR << "pam_start failed with service '" << m_service << "': "
+			<< pam_strerror( appdata.h, rc );
+		return NULL;
+	}
+
+	rc = pam_authenticate( appdata.h, 0 );
+	if( rc == PAM_INCOMPLETE ) {
+		// we need a password
+		appdata.has_pass = true;
+		appdata.pass = password;
+		rc = pam_authenticate( appdata.h, 0 );
+	}
+	if( rc != PAM_SUCCESS ) {
+		LOG_ERROR << "pam_authenticate failed with service '" << m_service << "': "
+			<< pam_strerror( appdata.h, rc );
+		return NULL;
+	}
+
+	// is access to the account permitted?
+	rc = pam_acct_mgmt( appdata.h, 0 );
+	if( rc != PAM_SUCCESS ) {
+		LOG_ERROR << "pam_acct_mgmt failed with service '" << m_service << "': "
+			<< pam_strerror( appdata.h, rc );
+		return NULL;
+	}
+
+	// terminate PAM session with last exit code
+	if( pam_end( appdata.h, rc ) != PAM_SUCCESS ) {
+		LOG_ERROR << "pam_end failed with service '" << m_service << "': "
+			<< pam_strerror( appdata.h, rc );
+	}
+
+	return new User( "PAM", appdata.login, "" );
 }
+
+#define STRINGIFY( name ) # name
+static const char *m_sliceStateToString[] = {
+	STRINGIFY( PAMAuthSlice::SLICE_INITIALIZED ),
+	STRINGIFY( PAMAuthSlice::SLICE_HAS_LOGIN_NEED_PASS ),
+	STRINGIFY( PAMAuthSlice::PAMAuthSliceSLICE_INVALID_CREDENTIALS ),
+	STRINGIFY( PAMAuthSlice::SLICE_AUTHENTICATED ),
+	STRINGIFY( PAMAuthSlice::SLICE_SYSTEM_FAILURE )
+};
 
 PAMAuthSlice::PAMAuthSlice( const PAMAuthUnit& backend )
 	: m_backend( backend )
@@ -283,13 +337,28 @@ void PAMAuthSlice::messageIn( const std::string& message )
 			m_appdata.login = message.c_str( );
 			// TODO: the service name must be a CONSTANT due to security reasons!
 			rc = pam_start( m_backend.m_service.c_str( ), m_appdata.login.c_str( ), &m_conv, &m_appdata.h );
+			if( rc != PAM_SUCCESS ) {
+				LOG_ERROR << "PAM auth slice: "
+					<< "pam_start failed with service " << m_backend.m_service << ": "
+					<< pam_strerror( m_appdata.h, rc ) << " in state '"
+					<< m_sliceStateToString[m_state] << "'";
+				m_state = SLICE_SYSTEM_FAILURE;
+			}
 
-			m_state = SLICE_HAS_LOGIN_NEED_PASS;
+			rc = pam_authenticate( m_appdata.h, 0 );
+			
 			break;
 
 		case SLICE_HAS_LOGIN_NEED_PASS:
 			m_appdata.has_pass = true;
 			m_appdata.pass = message.c_str( );
+			break;
+
+		case SLICE_INVALID_CREDENTIALS:
+		case SLICE_AUTHENTICATED:
+		case SLICE_SYSTEM_FAILURE:
+			LOG_ERROR << "PAM auth slice: receiving unexpected message in state '"
+				<< m_sliceStateToString[m_state] << "', this is illegal!";
 			break;
 	}
 
@@ -346,50 +415,57 @@ void PAMAuthSlice::messageIn( const std::string& message )
 /// The output message
 std::string PAMAuthSlice::messageOut()
 {
-/*
-	switch ( m_state )	{
+	switch( m_state ) {
+		case SLICE_HAS_LOGIN_NEED_PASS:
+			return "$password";
+		
 		case SLICE_INITIALIZED:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") message requested in SLICE_INITIALIZED state";
-			m_state = SLICE_SYSTEM_FAILURE;
-			break;
-		case SLICE_USER_FOUND:	{
-			m_challenge = new CRAMchallenge( GlobalRandomGenerator::instance( "" ) );
-			m_state = SLICE_CHALLENGE_SENT;
-			PasswordHash hash( m_usr.hash );
-			return m_challenge->toString( hash.salt() );
-		}
-		case SLICE_USER_NOT_FOUND:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") message requested in SLICE_USER_NOT_FOUND state";
-			break;
-		case SLICE_CHALLENGE_SENT:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") message requested in SLICE_CHALLENGE_SENT state";
-			m_state = SLICE_SYSTEM_FAILURE;
-			break;
 		case SLICE_INVALID_CREDENTIALS:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") message requested in SLICE_INVALID_CREDENTIALS state";
-			break;
 		case SLICE_AUTHENTICATED:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") message requested in SLICE_AUTHENTICATED state";
-			break;
 		case SLICE_SYSTEM_FAILURE:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") message requested in SLICE_SYSTEM_FAILURE state";
+			LOG_ERROR << "PAM auth slice: receiving unexpected message in state '"
+				<< m_sliceStateToString[m_state] << "', this is illegal!";
 			break;
+		
+		default:
+			LOG_FATAL << "PAM auth slice: receiving unexpected message in illegal state "
+				<< m_state << "!";
 	}
-	return std::string();
-*/
-	return std::string();
+	
+	return std::string( );
 }
 
 /// The current status of the authenticator slice
 AuthenticatorSlice::Status PAMAuthSlice::status() const
 {
+	switch( m_state ) {
+		case SLICE_HAS_LOGIN_NEED_PASS:
+			return MESSAGE_AVAILABLE;
+
+		case SLICE_INITIALIZED:
+		case SLICE_INVALID_CREDENTIALS:
+		case SLICE_AUTHENTICATED:
+		case SLICE_SYSTEM_FAILURE:
+			LOG_ERROR << "PAM auth slice: called status( ) in illegal state '"
+				<< m_sliceStateToString[m_state] << "', this is illegal!";
+			break;
+		
+		default:
+			LOG_FATAL << "PAM auth slice: called status( ) in illegal state "
+				<< m_state << "!";
+			return SYSTEM_FAILURE;
+	}
+	return SYSTEM_FAILURE;
+}
+	
+/*		AuthenticatorSlice::Status rt = m_status;
+	switch (m_state)
+	{
+		case AskUsername:
+			rt = AuthenticatorSlice::MESSAGE_AVAILABLE;
+
 /*
+
 	switch ( m_state )	{
 		case SLICE_INITIALIZED:
 			return AWAITING_MESSAGE;
@@ -407,8 +483,6 @@ AuthenticatorSlice::Status PAMAuthSlice::status() const
 			return SYSTEM_FAILURE;
 	}
 */
-	return SYSTEM_FAILURE;		// just to silence compilers
-}
 
 /// The authenticated user or NULL if not authenticated
 User* PAMAuthSlice::user()

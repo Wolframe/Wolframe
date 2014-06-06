@@ -109,15 +109,13 @@ public:
 class PAMAuthSlice : public AuthenticatorSlice
 {
 	enum	SliceState	{
-		SLICE_INITIALIZED,		///< Has been initialized, no other data
-		SLICE_HAS_LOGIN_NEED_PASS,	///< Need the login of the user
-		SLICE_USER_FOUND,		///< User has been found, will send challenge
-		SLICE_USER_NOT_FOUND,		///< User has not been found -> fail
+		SLICE_INITIALIZED = 0,		///< Has been initialized, no other data
+		SLICE_HAS_LOGIN_NEED_PASS,	///< Also need the password of the user
 		SLICE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
 		SLICE_AUTHENTICATED,		///< Response was correct -> user available
 		SLICE_SYSTEM_FAILURE		///< Something is wrong
 	};
-
+	
 public:
 	PAMAuthSlice( const PAMAuthUnit& backend );
 
