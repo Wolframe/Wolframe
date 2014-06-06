@@ -17,11 +17,15 @@ namespace WolframeClient
         {
             public string banner { get; set; }
             public string authmethod { get; set; }
+            public string schemadir { get; set; }
+            public string schemaext { get; set; }
 
             public Configuration()
             {
                 banner = null;
                 authmethod = null;
+                schemadir = "www.wolframe.net";
+                schemaext = "xsd";
             }
         };
 
@@ -34,6 +38,7 @@ namespace WolframeClient
             public Type answertype { get; set; }
         };
         private Configuration m_config;
+        private Serializer m_serializer;
         private Connection m_connection;
         private volatile string m_lasterror;
         public enum State { Init, Running, Shutdown, Terminated };
@@ -116,7 +121,7 @@ namespace WolframeClient
                 }
                 else if (Protocol.IsCommand("OK", ln))
                 {
-                    object answerobj = Serializer.getResult(msg, rq.answertype);
+                    object answerobj = m_serializer.getResult(msg, rq.answertype);
                     m_answerCallback(new Answer { msgtype = Answer.MsgType.Result, id = rq.id, number = rq.number, obj = answerobj });
                 }
                 else if (Protocol.IsCommand("ERR", ln))
@@ -134,7 +139,7 @@ namespace WolframeClient
 
         private void HandleRequest(Request rq)
         {
-            byte[] rqdata = Serializer.getRequestContent(rq.doctype, rq.root, rq.objtype, rq.obj);
+            byte[] rqdata = m_serializer.getRequestContent(rq.doctype, rq.root, rq.objtype, rq.obj);
             m_pendingqueue.Enqueue(new PendingRequest { id = rq.id, number = rq.number, answertype = rq.answertype });
             m_connection.WriteRequest(rq.command, rqdata);
             m_pendingqueue_signal.Set();
@@ -229,6 +234,7 @@ namespace WolframeClient
         public Session( Configuration config_, AnswerCallback answerCallback_)
         {
             m_config = config_;
+            m_serializer = new Serializer(m_config.schemadir, m_config.schemaext);
             m_connection = new Connection( m_config);
 
             m_lasterror = null;
@@ -360,6 +366,12 @@ namespace WolframeClient
         {
             m_requestqueue.Enqueue( request);
             m_requestqueue_signal.Set();
+        }
+
+        public void HACK_LOST_SIGNALS()
+        {
+            m_requestqueue_signal.Set();
+            m_pendingqueue_signal.Set();
         }
 
         public int NofOpenRequests()

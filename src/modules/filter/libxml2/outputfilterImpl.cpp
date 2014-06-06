@@ -145,6 +145,8 @@ bool OutputFilterImpl::printHeader()
 		const char* xmlns = md.getAttribute( "xmlns");
 		const char* xsi = md.getAttribute( "xmlns:xsi");
 		const char* schemaLocation = md.getAttribute( "xsi:schemaLocation");
+		if (!schemaLocation) schemaLocation = md.getAttribute( "xsi:noNamespaceSchemaLocation");
+
 		std::string schemaLocation_buf;
 		if (schemaLocation && !md.doctype().empty())
 		{

@@ -218,7 +218,6 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 	}
 }
 
-
 void IOFilterCommandHandlerEscDLF::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	std::size_t startidx = (const char*)begin - m_input.charptr();
