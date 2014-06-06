@@ -1,0 +1,16 @@
+
+DOCUMENT PROCESSING
+
+Wolframe is not enveloping requests. The decision what to do with a processing request is defined only
+by the document metadata and an action identifier you optionally specify with the request.
+
+A command processed is defined by a action prefix that can be empty and the document type idenfifier.
+The document type identifier is extracted from the document meta data.
+
+The rules how to get to one document type identifier are currently either extracted from the
+!DOCTYPE definition if present or derived from the xsi:schemaLocation root element attribute.
+Schema definition namespaces are currently not respected, but will be in the future.
+
+At the end of the document type recognition the system knows what function to call.
+
+
