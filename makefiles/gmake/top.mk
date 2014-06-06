@@ -61,7 +61,7 @@ depend:
 	  (set -e; $(MAKE) -r -C $$d depend || exit 1); done)
 
 .PHONY: test
-test: all
+test:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -r -C $$d test || exit 1); done)
 

@@ -20,7 +20,7 @@ $(SUBDIRS):
 	$(MAKE) -r -C $@ all
 
 .PHONY: test local_test
-test: all local_test
+test: local_test
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -r -C $$d test || exit 1); done)
 
