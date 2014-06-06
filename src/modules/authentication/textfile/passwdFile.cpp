@@ -60,10 +60,13 @@ void PwdFileUser::clear()
 
 	for ( i = 0; i < user.length(); i++ )
 		user[ i ] = 'x';
+	user.clear();
 	for ( i = 0; i < hash.length(); i++ )
 		hash[ i ] = 'x';
+	hash.clear();
 	for ( i = 0; i < info.length(); i++ )
 		info[ i ] = 'x';
+	info.clear();
 	expiry = 0;
 }
 

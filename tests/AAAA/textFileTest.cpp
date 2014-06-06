@@ -192,27 +192,25 @@ TEST_F( AuthenticationFixture, nonExistentUsers )
 
 TEST_F( AuthenticationFixture, invalidPasswordHashes )
 {
-	User*	user;
 	TextFileAuthUnit authenticator( "", "passwd" );
 
-	EXPECT_THROW( user = authenticator.authenticatePlain( "shortusr", "User Password", true ),
+	EXPECT_THROW( authenticator.authenticatePlain( "shortusr", "User Password", true ),
 		      std::runtime_error );
 
-	EXPECT_THROW( user = authenticator.authenticatePlain( "longusr", "User Password", true ),
+	EXPECT_THROW( authenticator.authenticatePlain( "longusr", "User Password", true ),
 		      std::runtime_error );
 
 }
 
 TEST_F( AuthenticationFixture, nonexistentFile )
 {
-	User*	user;
 	TextFileAuthUnit authenticator( "", "passwds" );
 
-	EXPECT_THROW( user = authenticator.authenticatePlain( "admin", "xx", true ),
+	EXPECT_THROW( authenticator.authenticatePlain( "admin", "xx", true ),
 		      std::runtime_error );
-	EXPECT_THROW( user = authenticator.authenticatePlain( "goodusr", "xx", true ),
+	EXPECT_THROW( authenticator.authenticatePlain( "goodusr", "xx", true ),
 		      std::runtime_error );
-	EXPECT_THROW( user = authenticator.authenticatePlain( "testusr", "xx", true ),
+	EXPECT_THROW( authenticator.authenticatePlain( "testusr", "xx", true ),
 		      std::runtime_error );
 }
 
