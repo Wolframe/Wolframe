@@ -187,6 +187,7 @@ provider
 		lua
 		{
 			program echo.lua
+			filter char
 		}
 	}
 }

@@ -100,7 +100,7 @@ namespace WolframeClient
                     int answerid = (int)AnswerId.CustomerInsertedObj;
 
                     int ii = 0;
-                    for (ii = 0; ii < 100; ++ii)
+                    for (ii = 0; ii < 2; ++ii)
                     {
                         Request request = new Request { id = answerid, command = "Insert", number = ii, doctype = "Customer", root = "customer", obj = customer, objtype = typeof(Customer), answertype = typeof(CustomerInserted) };
                         session.IssueRequest(request);
@@ -108,6 +108,7 @@ namespace WolframeClient
                     while (session.NofOpenRequests() > 0)
                     {
                         Thread.Sleep(200);
+                        session.HACK_LOST_SIGNALS();
                     }
                     Console.WriteLine("All done");
                     session.Shutdown();

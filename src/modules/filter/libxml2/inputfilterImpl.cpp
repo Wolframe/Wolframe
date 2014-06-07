@@ -190,7 +190,7 @@ void InputFilterImpl::initDocMetaData()
 			if (prefix.size())
 			{
 				setAttribute( prefix + ":" + attrname, attrvalue);
-				if (attrname == "schemaLocation")
+				if (attrname == "schemaLocation" || attrname == "noNamespaceSchemaLocation")
 				{
 					setDoctype( types::DocMetaData::extractStem( attrvalue));
 				}

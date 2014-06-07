@@ -132,12 +132,15 @@ TEST_P( WolfilterTest, tests)
 	boost::filesystem::path refpath( g_testdir / "temp");
 	std::string outstr;
 	{
+		LOG_DATA2 << "wolfilter parses its command line to get the test execution options";
 		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), false);
 
 		// [2.5] Call iostreamfilter
 		if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;
 		if (cmdline.printversion()) std::cerr << "ignored option --version" << std::endl;
 		if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
+
+		LOG_DATA2 << "wolfilter creates its execution context";
 
 		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
 		prgbind::ProgramLibrary prglib;

@@ -9,41 +9,65 @@ namespace WolframeClient
 {
     public class Serializer
     {
-        public static byte[] getRequestContent(string doctype, string root, Type type, object obj)
+        private string m_schemadir;
+        private string m_schemaext;
+
+        public Serializer(string schemadir_, string schemaext_)
         {
-            var xattribs = new XmlAttributes();
-            var xroot = new XmlRootAttribute(root);
-            xattribs.XmlRoot = xroot;
-            var xoverrides = new XmlAttributeOverrides();
-            //... have to use XmlAttributeOverrides because .NET insists on the object name as root element name otherwise ([XmlRoot(..)] has no effect)
-            xoverrides.Add(type, xattribs);
-
-            XmlSerializer serializer = new XmlSerializer(type, xoverrides);
-            StringWriter sw = new StringWriter();
-            XmlWriterSettings wsettings = new XmlWriterSettings();
-            wsettings.OmitXmlDeclaration = false;
-            wsettings.Encoding = new UTF8Encoding(false/*no BOM*/, true/*throw if input illegal*/);
-            XmlWriter xw = XmlWriter.Create(sw, wsettings);
-            xw.WriteProcessingInstruction("xml", "version='1.0' standalone='no'");
-            //... have to write header by hand (OmitXmlDeclaration=false has no effect)
-            xw.WriteDocType(root, null, doctype + ".sfrm", null);
-
-            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-            ns.Add("", "");
-            //... trick to avoid printing of xmlns:xsi xmlns:xsd attributes of the root element
-
-            serializer.Serialize(xw, obj, ns);
-            return wsettings.Encoding.GetBytes( sw.ToString());
+            m_schemadir = schemadir_;
+            m_schemaext = schemaext_;
         }
 
-        public static object getResult(byte[] content, Type type)
+        public byte[] getRequestContent( string doctype, string root, Type type, object obj)
         {
-            string stringContent = System.Text.UTF8Encoding.UTF8.GetString(content);
-            Regex doctypeDeclaration = new Regex("<!DOCTYPE[ ]*[^>]*[>]");
-            string saveContent = doctypeDeclaration.Replace(stringContent, "");
-            // ... !DOCTYPE is prohibited for security reasons by .NET, if not 
-            //      explicitely enabled. We cut it out, because we do not need it.
-            StringReader sr = new StringReader(saveContent);
+            XmlSerializer serializer = null;
+            if (root == null)
+            {
+                //... root element will be the object type name
+                serializer = new XmlSerializer(type);
+            }
+            else
+            {
+                //... root element set explicitely
+                var xattribs = new XmlAttributes();
+                var xroot = new XmlRootAttribute(root);
+                xattribs.XmlRoot = xroot;
+                var xoverrides = new XmlAttributeOverrides();
+                xoverrides.Add(type, xattribs);
+                serializer = new XmlSerializer(type, xoverrides);
+            }
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Encoding = new UnicodeEncoding(true, false); 
+            //... 1) true -> big endian (not respected) and 2) false -> no BOM in a .NET string
+            settings.Indent = false;
+            settings.OmitXmlDeclaration = false;
+
+            XmlSerializerNamespaces xmlNameSpace = new XmlSerializerNamespaces();
+            xmlNameSpace.Add("xsi", "http://www.w3.org/2001/XMLSchema-instance");    
+            xmlNameSpace.Add("schemaLocation", m_schemadir + "/" + doctype + "." + m_schemaext);    
+
+            using (StringWriter textWriter = new StringWriter())
+            {
+                using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, settings))
+                {
+                    serializer.Serialize(xmlWriter, obj, xmlNameSpace);
+                }
+                string str = textWriter.ToString().Replace("xmlns:schemaLocation", "xsi:schemaLocation").Replace("encoding=\"utf-16\"", "encoding=\"utf-16le\"");
+                //... PF:HACK: Sorry for this hack. Could not help myself. Tagging redundantly all structures is no option. Schmema collection locations should be a different aspect
+                Console.WriteLine("XML serialized: {0}", str);
+                byte[] bytes = new byte[str.Length * sizeof(char)];
+                System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+                return bytes;
+            }
+        }
+
+        public object getResult(byte[] content, Type type)
+        {
+            char[] chars = new char[content.Length / sizeof(char) + 1];
+            System.Buffer.BlockCopy(content, 0, chars, 0, content.Length);
+            string str = new string(chars);
+
+            StringReader sr = new StringReader(str);
             XmlReader xr = XmlReader.Create(sr);
             XmlSerializer xs = new XmlSerializer(type);
             return xs.Deserialize(xr);

@@ -55,7 +55,12 @@ public:
 	ProcessorProvider(){}
 	virtual ~ProcessorProvider(){}
 
-	virtual cmdbind::CommandHandler* cmdhandler( const std::string& ) const
+	virtual cmdbind::CommandHandler* cmdhandler( const std::string& /*command*/, const std::string& /*docformat*/) const
+	{
+		throw std::logic_error( "Assertion failed: Called undefined function");
+	}
+
+	virtual bool existcmd( const std::string& /*command*/) const
 	{
 		throw std::logic_error( "Assertion failed: Called undefined function");
 	}
@@ -65,9 +70,14 @@ public:
 		throw std::logic_error( "Assertion failed: Called undefined function");
 	}
 
-	virtual db::Transaction* transaction( const std::string& ) const
+	virtual db::Transaction* transaction( const std::string& /*name*/) const
 	{
 		throw std::logic_error( "Assertion failed: Called undefined function");
+	}
+
+	virtual const types::NormalizeFunction* normalizeFunction( const std::string& /*name*/) const
+	{
+		return 0;
 	}
 
 	virtual const types::NormalizeFunctionType* normalizeFunctionType( const std::string& ) const
@@ -78,11 +88,6 @@ public:
 	virtual const types::CustomDataType* customDataType( const std::string& ) const
 	{
 		throw std::logic_error( "Assertion failed: Called undefined function");
-	}
-
-	virtual const types::NormalizeFunction* normalizeFunction( const std::string&) const
-	{
-		return 0;
 	}
 
 	virtual const langbind::FormFunction* formFunction( const std::string& name) const
@@ -102,12 +107,7 @@ public:
 		return 0;
 	}
 
-	virtual langbind::Filter* filter( const std::string& , const std::vector<langbind::FilterArgument>&) const
-	{
-		return 0;
-	}
-
-	virtual langbind::Filter* filter( const std::string&) const
+	virtual const langbind::FilterType* filterType( const std::string& /*name*/) const
 	{
 		return 0;
 	}

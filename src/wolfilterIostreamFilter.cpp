@@ -604,6 +604,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		
 	if (proc.size() == 0 || proc == "-")
 	{
+		LOG_TRACE << "Start executing filter";
 		Filter flt = getFilter( provider, ifl, ofl);
 		if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
 		if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
@@ -655,6 +656,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 	{
 		if (proc[ proc.size()-1] == '~' || provider->existcmd( proc))
 		{
+			LOG_TRACE << "Start executing command '" << proc << "'";
 			// ... command is handled by a command handler
 			//	-> detect document type with the doctype detection,
 			//	evaluate the command to execute (substitute '~' with doctype id)
@@ -781,6 +783,8 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		const FormFunction* func = provider->formFunction( proc);
 		if (func)
 		{
+			LOG_TRACE << "Start executing form function '" << proc << "'";
+
 			// ... command is the name of a form function we call directly
 			//	with the filter specified:
 			Filter flt = getFilter( provider, ifl, ofl);
@@ -809,7 +813,9 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		const types::FormDescription* st = provider->formDescription( proc);
 		if (st)
 		{
-			// ... command is the name a form description -> we simply map 
+			LOG_TRACE << "Start mapping through form '" << proc << "'";
+
+			// ... command is the name a form description -> we simply map
 			//	the input with the input/output filters specified 
 			//	through the form:
 			Filter flt = getFilter( provider, ifl, ofl);

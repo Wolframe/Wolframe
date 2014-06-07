@@ -86,10 +86,12 @@ public:
 
 private:
 	void getFilterOutputWriteData();
+	bool consumeInput();
 
 private:
 	enum State
 	{
+		StartProcessing,
 		Processing,
 		FlushingOutput,
 		DiscardInput,
@@ -97,19 +99,21 @@ private:
 	};
 	static const char* stateName( State st)
 	{
-		static const char* ar[] = {"Processing","FlushingOutput","DiscardInput","Terminated"};
+		static const char* ar[] = {"StartProcessing","Processing","FlushingOutput","DiscardInput","Terminated"};
 		return ar[ (int)st];
 	}
 
 	protocol::EscapeBuffer m_escapeBuffer;
 
 	State m_state;					///< processing state machine state
+	bool m_unconsumedInput;				///< true, if there is unconsumed input waiting to be consumed before the next read
 	const void* m_writedata;			///< bytes to write next (WRITE)
 	std::size_t m_writedatasize;			///< number of bytes to write next (WRITE)
 
 	protocol::InputBlock m_input;			///< input buffer
 	protocol::OutputBlock m_output;			///< output buffer
 	protocol::InputBlock::iterator m_eoD;		///< input end of data marker
+	std::size_t m_nextmsg;				///< start of the follow message after end of data (eoD)
 	std::size_t m_itrpos;				///< read start position in buffer for the command handler
 };
 }}

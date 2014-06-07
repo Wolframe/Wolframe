@@ -570,7 +570,14 @@ public:
 		}
 		if (schemaLocation)
 		{
-			m_mt.m_printAttribute( m_obj, "xsi:schemaLocation", 18, buf);
+			if (xsi)
+			{
+				m_mt.m_printAttribute( m_obj, "xsi:schemaLocation", 18, buf);
+			}
+			else
+			{
+				m_mt.m_printAttribute( m_obj, "xsi:noNamespaceSchemaLocation", 29, buf);
+			}
 			m_mt.m_printValue( m_obj, schemaLocation, std::strlen(schemaLocation), buf);
 		}
 	}
