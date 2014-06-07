@@ -241,14 +241,16 @@ TEST_F( AuthenticationFixture, AuthenticationSuccess )
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
 	std::string userHash = usernameHash( "Admin" );
+	std::cout << "User hash: " << userHash << std::endl;
 	slice->messageIn( userHash );
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
 
 	std::string challenge = slice->messageOut();
+	std::cout << "Challenge: " << challenge << std::endl;
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 
 	AAAA::CRAMresponse response( challenge, "Good Password" );
-
+	std::cout << "Response:  " << response.toString() << std::endl;
 	slice->messageIn( response.toString() );
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AUTHENTICATED );
 

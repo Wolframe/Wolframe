@@ -35,12 +35,14 @@
 
 include 'authentication.php';
 
-if ( $argc != 2 )	{
-	echo "Usage: $argv[0] <username>\n\n";
+if ( $argc == 2 )
+	echo userHash( $argv[ 1 ] ), "\n";
+else if ( $argc == 3 )
+	echo seededUserHash( $argv[ 1 ], $argv[ 2 ] ), "\n";
+else {
+	echo "Usage: $argv[0] <username>\n   or  $argv[0] <seed (base64)> <username>\n\n";
 	exit( 1 );
 }
-
-echo userHash( 'testUser' ), "\n";
 
 ?>
 
