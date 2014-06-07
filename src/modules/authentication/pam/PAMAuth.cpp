@@ -155,14 +155,14 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // Usually we get prompted for a password, this is not always true though.
 			case PAM_PROMPT_ECHO_OFF:
 // thank you very much, come again (but with a password)
-				if( !appdata->has_pass )
+				if( !appdata->has_pass ) {
 // Solaris and NetBSD have no PAM_CONV_AGAIN, returning an error instead
 #if defined SUNOS || NETBSD
 					return PAM_CONV_ERR;
 #else
 					return PAM_CONV_AGAIN;
 #endif
-
+				}
 				r->resp = strdup( appdata->pass.c_str( ) );
 				if( r->resp == NULL ) {
 					appdata->errmsg = "Unable to allocate memory for password answer";
@@ -276,7 +276,8 @@ User* PAMAuthUnit::authenticatePlain(	const std::string& username,
 	}
 	if( rc != PAM_SUCCESS ) {
 		LOG_ERROR << "pam_authenticate failed with service '" << m_service << "': "
-			<< pam_strerror( appdata.h, rc );
+			<< pam_strerror( appdata.h, rc ) << ", "
+			<< appdata.errmsg;
 		return NULL;
 	}
 
