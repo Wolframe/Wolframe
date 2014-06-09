@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implemtation of document writer abstraction for the libxml2 library
 #include "documentWriter.hpp"
 #include <stdexcept>
+#include <cstring>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -76,12 +77,15 @@ DocumentWriter::DocumentWriter( const char* encoding, const char* standalone, co
 	{
 		throw std::runtime_error( errorMessage( "failed to write document header (XML header)"));
 	}
-	if (systemid)
+	if (standalone && 0==std::strcmp( standalone, "no"))
 	{
-		if (0>xmlTextWriterStartDTD( ww, (const xmlChar*)root, (const xmlChar*)publicid, (const xmlChar*)systemid)
-		||  0>xmlTextWriterEndDTD(ww))
+		if (systemid)
 		{
-			throw std::runtime_error( errorMessage( "failed to write document header (DTD)"));
+			if (0>xmlTextWriterStartDTD( ww, (const xmlChar*)root, (const xmlChar*)publicid, (const xmlChar*)systemid)
+			||  0>xmlTextWriterEndDTD(ww))
+			{
+				throw std::runtime_error( errorMessage( "failed to write document header (DTD)"));
+			}
 		}
 	}
 	if (!root)
