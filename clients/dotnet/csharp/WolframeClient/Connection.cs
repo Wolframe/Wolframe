@@ -41,116 +41,132 @@ namespace WolframeClient
         private TcpClient m_client;
         private NetworkStream m_stream;
         private SslStream m_sslstream;
-        private object m_streamLock;
-        private Protocol.Buffer m_buffer;
-        private ConcurrentQueue<byte[]> m_writequeue;
-        private volatile bool m_waitwrite;
-        private object m_waitwriteLock;
-        private volatile bool m_waitread;
-        private object m_waitreadLock;
-        private volatile bool m_eofread;
+        private byte[] m_readbuffer;
+        private string m_lasterror;
 
-        private void EndWrite(IAsyncResult ev)
+        private void Write(byte[] msg_, int offset_, int size_)
         {
-            lock (m_streamLock)
+            if (m_sslstream != null)
             {
-                if (m_sslstream != null)
+                if (m_sslstream.CanWrite)
                 {
-                    if (m_sslstream.CanWrite)
-                    {
-                        m_sslstream.EndWrite(ev);
-                    }
+                    m_sslstream.Write( msg_, offset_, size_);
                 }
-                else
+            }
+            else if (m_stream != null)
+            {
+                if (m_stream.CanWrite)
                 {
-                    if (m_stream.CanWrite)
-                    {
-                        m_stream.EndWrite(ev);
-                    }
+                    m_stream.Write( msg_, offset_, size_);
                 }
             }
         }
 
-        private int EndRead(IAsyncResult ev)
+        enum DetectEoD { NeedMoreData, Yes, No };
+        private DetectEoD doDetectEoD(ref byte[] ar, int ofs, int size, out int next)
         {
-            lock (m_streamLock)
+            next = ofs;
+            if (ofs < size && ar[ofs] == (byte)'\n')
             {
-                if (m_sslstream != null)
+                if (ofs + 1 >= size) return DetectEoD.NeedMoreData;
+                if (ar[ofs + 1] == (byte)'.')
                 {
-                    if (m_sslstream.CanRead)
+                    if (ofs + 2 >= size) return DetectEoD.NeedMoreData;
+                    if (ar[ofs + 2] == (byte)'\r')
                     {
-                        return m_sslstream.EndRead(ev);
+                        if (ofs + 3 >= size) return DetectEoD.NeedMoreData;
+                        if (ar[ofs + 3] == (byte)'\n')
+                        {
+                            next = ofs + 4;
+                            return DetectEoD.Yes;
+                        }
+                        else
+                        {
+                            return DetectEoD.No;
+                        }
+                    }
+                    else if (ar[ofs + 2] == (byte)'\n')
+                    {
+                        next = ofs + 3;
+                        return DetectEoD.Yes;
+                    }
+                    else
+                    {
+                        return DetectEoD.No;
                     }
                 }
                 else
                 {
-                    if (m_stream.CanRead)
-                    {
-                        return m_stream.EndRead(ev);
-                    }
+                    return DetectEoD.No;
+                }
+            }
+            return DetectEoD.No;
+        }
+
+        private void CopyToReadBuffer( byte[] ar_, int offset_, int size_)
+        {
+            int readbuffer_size = 0;
+            if (m_readbuffer != null) readbuffer_size = m_readbuffer.Length;
+            byte[] new_readbuffer = new byte[ readbuffer_size + size_];
+            if (m_readbuffer != null) Array.Copy( m_readbuffer, new_readbuffer, readbuffer_size);
+            Array.Copy( ar_, offset_, new_readbuffer, readbuffer_size, size_);
+            m_readbuffer = new_readbuffer;
+        }
+
+        private int ConsumeReadbuffer(byte[] msg_, int offset_, int size_)
+        {
+            if (m_readbuffer != null)
+            {
+                int bufsize = m_readbuffer.Length;
+                if (bufsize > size_)
+                {
+                    Array.Copy(m_readbuffer, msg_, size_);
+                    byte[] new_readbuffer = new byte[bufsize - size_];
+                    Array.Copy(m_readbuffer, size_, new_readbuffer, 0, bufsize - size_);
+                    m_readbuffer = new_readbuffer;
+                    return size_;
+                }
+                else
+                {
+                    Array.Copy(m_readbuffer, msg_, bufsize);
+                    m_readbuffer = null;
+                    return bufsize;
                 }
             }
             return 0;
         }
 
-        private void BeginWrite(byte[] msg_, int offset_, int size_, AsyncCallback callback_, object state_)
+        private int Read(byte[] msg_, int offset_, int size_)
         {
-            lock (m_streamLock)
-            {
-                if (m_sslstream != null)
-                {
-                    if (m_sslstream.CanWrite)
-                    {
-                        m_sslstream.BeginWrite(msg_, offset_, msg_.Length, callback_, state_);
-                    }
-                }
-                else
-                {
-                    if (m_stream.CanWrite)
-                    {
-                        m_stream.BeginWrite(msg_, offset_, msg_.Length, callback_, state_);
-                    }
-                }
-            }
-        }
+            int rt = ConsumeReadbuffer(msg_, offset_, size_);
+            if (rt != 0) return rt;
 
-        private void BeginRead(byte[] msg_, int offset_, int size_, AsyncCallback callback_, object state_)
-        {
-            lock (m_streamLock)
+            if (m_sslstream != null)
             {
-                if (m_sslstream != null)
+                if (m_sslstream.CanRead)
                 {
-                    if (m_sslstream.CanRead)
-                    {
-                        m_sslstream.BeginRead(msg_, offset_, msg_.Length, callback_, state_);
-                    }
-                }
-                else
-                {
-                    if (m_stream.CanRead)
-                    {
-                        m_stream.BeginRead(msg_, offset_, msg_.Length, callback_, state_);
-                    }
+                    return m_sslstream.Read(msg_, offset_, size_);
                 }
             }
+            else
+            {
+                if (m_stream.CanRead)
+                {
+                    return m_stream.Read(msg_, offset_, size_);
+                }
+            }
+            return 0;
         }
 
         private void CloseStream()
         {
-            lock (m_streamLock)
+            if (m_sslstream != null)
             {
-                if (m_sslstream != null)
-                {
-                    Console.WriteLine("+++ Closing SSL connection");
-                    Thread.Sleep(10000);
-                    m_sslstream.Close();
-                    Console.WriteLine("+++ Closed SSL connection");
-                    Thread.Sleep(10000);
-                }
-                else
-                {
-                    m_stream.Close();
-                }
+                m_sslstream.Close();
+            }
+            else if (m_stream != null)
+            {
+                m_stream.Close();
             }
         }
 
@@ -160,11 +176,11 @@ namespace WolframeClient
               X509Chain chain,
               SslPolicyErrors sslPolicyErrors)
         {
-            Console.WriteLine("Validate certificate");
+            // DEBUG: Console.WriteLine("Validate certificate");
             if (sslPolicyErrors == SslPolicyErrors.None)
                 return true;
 
-            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+            // DEBUG: Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
             return false;
         }
 
@@ -206,83 +222,6 @@ namespace WolframeClient
             }
         }
 
-        private void EndWriteCallback(IAsyncResult ev)
-        {
-            EndWrite(ev);
-            byte[] msg = null;
-            bool doBeginWrite = false;
-
-            lock (m_waitwriteLock)
-            {
-                doBeginWrite = m_writequeue.TryDequeue(out msg);
-                m_waitwrite = doBeginWrite;
-            }
-            if (doBeginWrite)
-            {
-                BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
-            }
-        }
-
-        private void FlushWriteQueue()
-        {
-            byte[] msg = null;
-            bool doBeginWrite = false;
-            lock (m_waitwriteLock)
-            {
-                if (!m_waitwrite)
-                {
-                    doBeginWrite = m_writequeue.TryDequeue(out msg);
-                    m_waitwrite = doBeginWrite;
-                }
-            }
-            if (doBeginWrite)
-            {
-                BeginWrite(msg, 0, msg.Length, EndWriteCallback, null);
-            }
-        }
-
-        private void EndReadCallback(IAsyncResult ev)
-        {
-            int nof_bytes_read = EndRead(ev);
-            lock (m_waitreadLock)
-            {
-                m_waitread = false;
-            }
-            if (nof_bytes_read == 0)
-            {
-                m_eofread = true;
-                m_buffer.PushReadChunk(new Protocol.ReadChunk { ar = null, size = 0 } /*EOF*/);
-            }
-            else
-            {
-                m_buffer.PushReadChunk(new Protocol.ReadChunk { ar = ev.AsyncState as byte[], size = nof_bytes_read });
-            }
-        }
-
-        public void IssueReadRequest()
-        {
-            int readsize = 2048;
-            int available = m_client.Available;
-            if (available > readsize)
-            {
-                readsize = available;
-            }
-            bool doRead = false;
-            lock (m_waitreadLock)
-            {
-                if (!m_waitread && !m_eofread)
-                {
-                    doRead = true;
-                    m_waitread = true;
-                }
-            }
-            if (doRead)
-            {
-                byte[] buf = new byte[readsize];
-                BeginRead(buf, 0, buf.Length, EndReadCallback, buf);
-            }
-        }
-
 
 /* PUBLIC METHODS: */
         public Connection( Configuration config_)
@@ -292,17 +231,16 @@ namespace WolframeClient
             m_client = new TcpClient();
             m_stream = null;
             m_sslstream = null;
-            m_streamLock = new object();
-            m_buffer = null;
-            m_writequeue = new ConcurrentQueue<byte[]>();
-            m_waitwrite = false;
-            m_waitwriteLock = new object();
-            m_waitread = false;
-            m_waitreadLock = new object();
-            m_eofread = false;
+            m_readbuffer = null;
+            m_lasterror = null;
         }
 
-        public void Connect()
+        public string lasterror()
+        {
+            return m_lasterror;
+        }
+
+        public bool Connect()
         {
             m_addresses = Dns.GetHostAddresses( m_config.host);
             string err = null;
@@ -331,77 +269,145 @@ namespace WolframeClient
             {
                 if (err == null)
                 {
-                    err = "Could not resolve address";
+                    m_lasterror = "Could not resolve address";
                 }
-                throw new Exception(err);
+                else
+                {
+                    m_lasterror = err;
+                }
+                return false;
             }
             OpenStream();
-            m_buffer = new Protocol.Buffer( 4096, IssueReadRequest);
-            IssueReadRequest();
+            return true;
         }
 
         public void Close()
         {
-            m_buffer.Close();
             CloseStream();
             m_client.Close();
         }
 
-        public bool HasReadData()
-        {
-            return (m_buffer.HasData() || m_client.Available > 0);
-        }
-
         public byte[] ReadLine()
         {
-            byte[] ln = m_buffer.FetchLine();
-            return ln;
+            int bufsize = 64;
+            byte[] ar = new byte[ bufsize];
+            int offset = 0;
+            while (true)
+            {
+                int chunksize = Read(ar, offset, bufsize - offset);
+                int totsize = offset + chunksize;
+                if (chunksize == 0)
+                {
+                    m_readbuffer = ar;
+                    Array.Resize( ref m_readbuffer, totsize);
+                    return null;
+                }
+                else
+                {
+                    for (; offset < totsize; offset++)
+                    {
+                        if (ar[ offset] == (byte)'\n')
+                        {
+                            if (offset +1 <= totsize)
+                            {
+                                CopyToReadBuffer( ar, offset+1, totsize - offset-1);
+                            }
+                            if (offset > 0 && ar[offset-1] == '\r')
+                            {
+                                offset--;
+                            }
+                            Array.Resize( ref ar, offset); 
+                            return ar;
+                        }
+                    }
+                    byte[] new_ar = new byte[ bufsize * 2];
+                    Array.Copy( ar, new_ar, bufsize);
+                    bufsize *= 2;
+                    ar = new_ar;
+                }
+            }
         }
 
         public byte[] ReadContent()
         {
-            byte[] msg = m_buffer.FetchContent();
-            return msg;
+            int bufsize = 64;
+            byte[] ar = new byte[ bufsize];
+            int offset = 0;
+            bool needMore = false;
+            while (true)
+            {
+                needMore = false;
+                int chunksize = Read(ar, offset, bufsize - offset);
+                int totsize = offset + chunksize;
+                if (chunksize == 0)
+                {
+                    m_readbuffer = ar;
+                    Array.Resize( ref m_readbuffer, totsize);
+                    return null;
+                }
+                else
+                {
+                    for (; offset < totsize && !needMore; offset++)
+                    {
+                        if (ar[ offset] == (byte)'\n')
+                        {
+                            int nextidx;
+                            DetectEoD eod = doDetectEoD( ref ar, offset, totsize, out nextidx);
+                            switch (eod)
+                            {
+                                case DetectEoD.NeedMoreData:
+                                    offset -= 1;    //... compensate loop increment, we try again
+                                    needMore = true;
+                                    break;
+                                case DetectEoD.No:
+                                    continue;
+                                case DetectEoD.Yes:
+                                    if (nextidx < totsize)
+                                    {
+                                        CopyToReadBuffer( ar, nextidx, totsize - nextidx);
+                                    }
+                                    if (offset > 0 && ar[offset-1] == '\r')
+                                    {
+                                        offset--;
+                                    }
+                                    Array.Resize( ref ar, offset);
+                                    return Protocol.UnescapeLFdot( ar);
+                            }
+                        }
+                    }
+                    byte[] new_ar = new byte[ bufsize * 2];
+                    Array.Copy( ar, new_ar, bufsize);
+                    bufsize *= 2;
+                    ar = new_ar;
+                }
+            }
         }
 
         public void WriteLine(string ln)
         {
             UTF8Encoding utf8 = new UTF8Encoding(false/*no BOM*/, true/*throw if input illegal*/);
-
             Byte[] msg = utf8.GetBytes(ln);
             byte[] msg_with_EoLn = new byte[msg.Length + 2];
             Array.Copy( msg, msg_with_EoLn, msg.Length);
             msg_with_EoLn[msg.Length + 0] = (byte)'\r';
             msg_with_EoLn[msg.Length + 1] = (byte)'\n';
-            m_writequeue.Enqueue(msg_with_EoLn);
-            FlushWriteQueue();
+            Write(msg_with_EoLn, 0, msg_with_EoLn.Length);
         }
 
-        public void WriteRequest(string command, byte[] content)
+        public void WriteContent( byte[] content)
         {
             UTF8Encoding utf8 = new UTF8Encoding(false/*no BOM*/, true/*throw if input illegal*/);
-            byte[] hdr;
-            if (command == null)
-            {
-                hdr = utf8.GetBytes("REQUEST\r\n");
-            }
-            else
-            {
-                hdr = utf8.GetBytes("REQUEST " + command + "\r\n");
-            }
             byte[] content_encoded = Protocol.EscapeLFdot( content);
-            int msglen = hdr.Length + content_encoded.Length + 5/*EoD marker*/;
+            int msglen = content_encoded.Length + 5/*EoD marker*/;
             byte[] msg = new byte[msglen];
-            Array.Copy(hdr, 0, msg, 0, hdr.Length);
-            Array.Copy(content_encoded, 0, msg, hdr.Length, content_encoded.Length);
-            int EoDidx = content_encoded.Length + hdr.Length;
+            Array.Copy(content_encoded, 0, msg, 0, content_encoded.Length);
+            int EoDidx = content_encoded.Length;
             msg[EoDidx + 0] = (byte)'\r';
             msg[EoDidx + 1] = (byte)'\n';
             msg[EoDidx + 2] = (byte)'.';
             msg[EoDidx + 3] = (byte)'\r';
             msg[EoDidx + 4] = (byte)'\n';
-            m_writequeue.Enqueue(msg);
-            FlushWriteQueue();
+            Write(msg, 0, msg.Length);
         }
     };
 }

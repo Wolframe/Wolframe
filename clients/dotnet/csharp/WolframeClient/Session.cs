@@ -24,7 +24,7 @@ namespace WolframeClient
             {
                 banner = null;
                 authmethod = null;
-                schemadir = "www.wolframe.net";
+                schemadir = "http://www.wolframe.net";
                 schemaext = "xsd";
             }
         };
@@ -44,10 +44,8 @@ namespace WolframeClient
         public enum State { Init, Running, Shutdown, Terminated };
         private volatile State m_state;
         private object m_stateLock;
-        private AutoResetEvent m_requestqueue_signal;
-        private ConcurrentQueue<Request> m_requestqueue;
-        private AutoResetEvent m_pendingqueue_signal;
-        private ConcurrentQueue<PendingRequest> m_pendingqueue;
+        private WorkQueue<Request> m_requestqueue;
+        private WorkQueue<PendingRequest> m_pendingqueue;
         private AnswerCallback m_answerCallback;
         private Thread m_request_thread;
         private Thread m_answer_thread;
@@ -141,24 +139,24 @@ namespace WolframeClient
         {
             byte[] rqdata = m_serializer.getRequestContent(rq.doctype, rq.root, rq.objtype, rq.obj);
             m_pendingqueue.Enqueue(new PendingRequest { id = rq.id, number = rq.number, answertype = rq.answertype });
-            m_connection.WriteRequest(rq.command, rqdata);
-            m_pendingqueue_signal.Set();
+            if (rq.command != null && rq.command.Length > 0)
+            {
+                m_connection.WriteLine("REQUEST " + rq.command);
+            }
+            else
+            {
+                m_connection.WriteLine("REQUEST");
+            }
+            m_connection.WriteContent( rqdata);
         }
 
         private void RunRequests()
         {
             // This method is called by Connect in an own thread and processes the write of requests to the server
-            while (GetState() == State.Running)
+            Request rq = null;
+            while (m_requestqueue.Dequeue(out rq))
             {
-                Request rq = null;
-                if (m_requestqueue.TryDequeue(out rq))
-                {
-                    HandleRequest( rq);
-                }
-                else
-                {
-                    m_requestqueue_signal.WaitOne();
-                }
+                HandleRequest(rq);
             }
             ClearRequestQueue();
         }
@@ -166,18 +164,10 @@ namespace WolframeClient
         private void RunAnswers()
         {
             // This method is called by Connect in an own thread and processes the reading of answers from the server
-            SetState( State.Running, null);
-            while (GetState() == State.Running)
+            PendingRequest rq = null;
+            while (m_pendingqueue.Dequeue(out rq))
             {
-                PendingRequest rq = null;
-                if (m_pendingqueue.TryDequeue( out rq))
-                {
-                    HandleAnswer( rq);
-                }
-                else
-                {
-                    m_pendingqueue_signal.WaitOne();
-                }
+                HandleAnswer(rq);
             }
             if (GetState() == State.Shutdown)
             {
@@ -187,45 +177,27 @@ namespace WolframeClient
 
         private void ProcessPendingRequests()
         {
-            bool empty = false;
-            while (!empty && GetState() != State.Terminated)
+            PendingRequest rq = null;
+            while (m_pendingqueue.DequeueUnblocking(out rq))
             {
-                PendingRequest rq = null;
-                if (m_pendingqueue.TryDequeue(out rq))
-                {
-                    HandleAnswer(rq);
-                }
-                else
-                {
-                    //... done
-                    empty = true;
-                }
+                HandleAnswer(rq);
             }
         }
 
         private void ClearRequestQueue()
         {
-            bool empty = false;
-            while (!empty)
+            Request rq = null;
+            while (m_requestqueue.DequeueUnblocking(out rq))
             {
-                Request rq = null;
-                if (m_requestqueue.TryDequeue(out rq))
+                if (m_lasterror != null)
                 {
-                    if (m_lasterror != null)
-                    {
-                        string msg = "session terminated: " + m_lasterror;
-                        m_answerCallback(new Answer { msgtype = Answer.MsgType.Error, id = rq.id, number = rq.number, obj = msg });
-                    }
-                    else
-                    {
-                        string msg = "session terminated";
-                        m_answerCallback(new Answer { msgtype = Answer.MsgType.Error, id = rq.id, number = rq.number, obj = msg });
-                    }
+                    string msg = "session terminated: " + m_lasterror;
+                    m_answerCallback(new Answer { msgtype = Answer.MsgType.Error, id = rq.id, number = rq.number, obj = msg });
                 }
                 else
                 {
-                    //... done
-                    empty = true;
+                    string msg = "session terminated";
+                    m_answerCallback(new Answer { msgtype = Answer.MsgType.Error, id = rq.id, number = rq.number, obj = msg });
                 }
             }
         }
@@ -241,10 +213,8 @@ namespace WolframeClient
             m_state = State.Init;
             m_stateLock = new object();
 
-            m_requestqueue_signal = new AutoResetEvent(false);
-            m_requestqueue = new ConcurrentQueue<Request>();
-            m_pendingqueue_signal = new AutoResetEvent(false);
-            m_pendingqueue = new ConcurrentQueue<PendingRequest>();
+            m_requestqueue = new WorkQueue<Request>('R');
+            m_pendingqueue = new WorkQueue<PendingRequest>('A');
 
             m_answerCallback = answerCallback_;
             m_request_thread = null;
@@ -256,8 +226,8 @@ namespace WolframeClient
             if (GetState() == State.Running)
             {
                 SetState( State.Shutdown, null);
-                m_requestqueue_signal.Set();
-                m_pendingqueue_signal.Set();
+                m_requestqueue.Terminate();
+                m_pendingqueue.Terminate();
             }
         }
 
@@ -276,7 +246,10 @@ namespace WolframeClient
         {
             try
             {
-                m_connection.Connect();
+                if (!m_connection.Connect())
+                {
+                    SetState(State.Terminated, m_connection.lasterror());
+                }
                 byte[] ln = m_connection.ReadLine();
                 if (ln == null) 
                 {
@@ -365,18 +338,11 @@ namespace WolframeClient
         public void IssueRequest( Request request)
         {
             m_requestqueue.Enqueue( request);
-            m_requestqueue_signal.Set();
-        }
-
-        public void HACK_LOST_SIGNALS()
-        {
-            m_requestqueue_signal.Set();
-            m_pendingqueue_signal.Set();
         }
 
         public int NofOpenRequests()
         {
-            return m_requestqueue.Count + m_pendingqueue.Count;
+            return m_requestqueue.Count() + m_pendingqueue.Count();
         }
 
         public string GetLastError()

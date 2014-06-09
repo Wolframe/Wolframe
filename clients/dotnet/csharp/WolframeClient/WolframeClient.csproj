@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ObjectQueue.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="ConnectionInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
