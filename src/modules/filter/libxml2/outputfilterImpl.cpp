@@ -161,7 +161,6 @@ bool OutputFilterImpl::printHeader()
 			std::vector<types::DocMetaData::Attribute>::const_iterator ai = md.attributes().begin(), ae = md.attributes().end();
 			for (; ai != ae; ++ai)
 			{
-				bool doPrint = false;
 				std::string value;
 				const char* valueptr = ai->value.c_str();
 
@@ -183,7 +182,8 @@ bool OutputFilterImpl::printHeader()
 				{
 					if (0>xmlTextWriterWriteAttribute( xmlout, getXmlString(ai->name.c_str()), getXmlString(valueptr)))
 					{
-						throw std::runtime_error( errorMessage( "libxml2 filter: write XML header attribute error"));
+						setXmlError( "libxml2 filter: write XML header attribute error");
+						return false;
 					}
 				}
 			 }

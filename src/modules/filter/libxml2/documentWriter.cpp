@@ -59,8 +59,7 @@ static std::string errorMessage( const char* msg)
 	{
 		rt.append( msg?msg:"unknown error");
 	}
-	return rt;
-	
+	return rt;	
 }
 
 DocumentWriter::DocumentWriter( const char* encoding, const char* standalone, const char* root, const char* publicid, const char* systemid)
