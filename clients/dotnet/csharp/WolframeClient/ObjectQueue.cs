@@ -11,10 +11,8 @@ namespace WolframeClient
         public enum State { Active, Done };
         private Queue<T> m_impl;
         private object m_mutex;
-        private AutoResetEvent m_signal;
         private State m_state;
         private char m_objtype;
-        private volatile bool m_hasElement;
 
         public int Count()
         {
@@ -28,10 +26,8 @@ namespace WolframeClient
         {
             m_impl = new Queue<T>();
             m_mutex = new object();
-            m_signal = new AutoResetEvent(true);
             m_state = State.Active;
             m_objtype = objtype;
-            m_hasElement = true;
         }
 
         public bool Enqueue(T obj)
@@ -39,7 +35,6 @@ namespace WolframeClient
             lock (m_mutex)
             {
                 if (m_state == State.Done) return false;
-                m_hasElement = true;
                 m_impl.Enqueue(obj);
                 Monitor.Pulse( m_mutex);
             }
@@ -52,7 +47,6 @@ namespace WolframeClient
             {
                 lock (m_mutex)
                 {
-                    m_hasElement = (m_impl.Count > 1);
                     if (m_state == State.Done)
                     {
                         result = default(T);

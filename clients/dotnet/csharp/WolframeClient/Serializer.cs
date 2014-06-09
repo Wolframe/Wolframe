@@ -51,14 +51,12 @@ namespace WolframeClient
 
             serializer.Serialize(xw, obj, xmlNameSpace);
 
-            Console.WriteLine("REQUEST DOCUMENT ({0})", sw.ToString());
             return settings.Encoding.GetBytes( sw.ToString());
         }
 
         public object getResult(byte[] content, Type type)
         {
             string str = System.Text.UTF8Encoding.UTF8.GetString(content);
-            Console.WriteLine("RESULT DOCUMENT ({0})", str);
 
             StringReader sr = new StringReader(str);
             XmlReader xr = XmlReader.Create(sr);
@@ -69,7 +67,6 @@ namespace WolframeClient
             }
             catch (System.InvalidOperationException e)
             {
-                Console.WriteLine("Exception ({0})", e.Message);
                 return null;
             }
         }
