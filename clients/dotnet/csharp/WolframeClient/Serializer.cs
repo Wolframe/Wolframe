@@ -37,40 +37,38 @@ namespace WolframeClient
                 serializer = new XmlSerializer(type, xoverrides);
             }
             XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Encoding = new UnicodeEncoding(true, false); 
-            //... 1) true -> big endian (not respected) and 2) false -> no BOM in a .NET string
             settings.Indent = false;
             settings.OmitXmlDeclaration = false;
+            settings.Encoding = new UTF8Encoding(false/*no BOM*/, true/*throw if input illegal*/);
 
             XmlSerializerNamespaces xmlNameSpace = new XmlSerializerNamespaces();
             xmlNameSpace.Add("xsi", "http://www.w3.org/2001/XMLSchema-instance");    
-            xmlNameSpace.Add("schemaLocation", m_schemadir + "/" + doctype + "." + m_schemaext);    
+            xmlNameSpace.Add("noNamespaceSchemaLocation", m_schemadir + "/" + doctype + "." + m_schemaext);
 
-            using (StringWriter textWriter = new StringWriter())
-            {
-                using (XmlWriter xmlWriter = XmlWriter.Create(textWriter, settings))
-                {
-                    serializer.Serialize(xmlWriter, obj, xmlNameSpace);
-                }
-                string str = textWriter.ToString().Replace("xmlns:schemaLocation", "xsi:schemaLocation").Replace("encoding=\"utf-16\"", "encoding=\"utf-16le\"");
-                //... PF:HACK: Sorry for this hack. Could not help myself. Tagging redundantly all structures is no option. Schmema collection locations should be a different aspect
-                Console.WriteLine("XML serialized: {0}", str);
-                byte[] bytes = new byte[str.Length * sizeof(char)];
-                System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-                return bytes;
-            }
+            StringWriter sw = new StringWriter();
+            XmlWriter xw = XmlWriter.Create( sw, settings);
+            xw.WriteProcessingInstruction("xml", "version='1.0' encoding='UTF-8'");
+
+            serializer.Serialize(xw, obj, xmlNameSpace);
+
+            return settings.Encoding.GetBytes( sw.ToString());
         }
 
         public object getResult(byte[] content, Type type)
         {
-            char[] chars = new char[content.Length / sizeof(char) + 1];
-            System.Buffer.BlockCopy(content, 0, chars, 0, content.Length);
-            string str = new string(chars);
+            string str = System.Text.UTF8Encoding.UTF8.GetString(content);
 
             StringReader sr = new StringReader(str);
             XmlReader xr = XmlReader.Create(sr);
             XmlSerializer xs = new XmlSerializer(type);
-            return xs.Deserialize(xr);
+            try
+            {
+                return xs.Deserialize(xr);
+            }
+            catch (System.InvalidOperationException e)
+            {
+                return null;
+            }
         }
     }
 }

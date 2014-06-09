@@ -90,16 +90,16 @@ CPP_BINS = \
 
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/wtest"
 
+ifeq ($(WITH_LIBXML2),1)
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBXML2_LIB_DIR)"
+endif
+
 ifeq ($(WITH_PGSQL),1)
 LD_LIBRARY_PATH:= "$(LD_LIBRARY_PATH):$(PGSQL_LIB_DIR)"
 endif
 
 ifeq ($(WITH_ORACLE),1)
 LD_LIBRARY_PATH:= "$(LD_LIBRARY_PATH):$(ORACLE_LIB_DIR)"
-endif
-
-ifeq ($(WITH_LIBXML2),1)
-LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBXML2_LIB_DIR)"
 endif
 
 ifeq ($(WITH_PYTHON),1)
