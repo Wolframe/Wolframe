@@ -59,7 +59,7 @@ public:
 		,m_writer(o.m_writer){}
 
 	/// \brief Constructor
-	DocumentWriter( const char* encoding, const char* root, const char* publicid, const char* systemid, const char* xmlns, const char* xsi, const char* schemaLocation);
+	DocumentWriter( const char* encoding, const char* standalone, const char* root, const char* publicid, const char* systemid);
 
 	/// \brief Writer handle (libxml2)
 	xmlTextWriterPtr get() const

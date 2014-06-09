@@ -48,18 +48,11 @@
 ///\brief Toplevel namespace of the library
 namespace textwolf {
 
-enum StandaloneDef
-{
-	Standalone_Yes,
-	Standalone_No,
-	Standalone_Unspecified
-};
-
 template <class BufferType>
 struct XMLPrinterBase
 {
-	typedef void (*PrintDoctype)( void* obj, StandaloneDef standalone, const char* rootid, const char* publicid, const char* systemid, BufferType& buf);
-	typedef void (*PrintHeader)( void* obj, const char* encoding, StandaloneDef standalone, BufferType& buf);
+	typedef void (*PrintDoctype)( void* obj, const char* rootid, const char* publicid, const char* systemid, BufferType& buf);
+	typedef void (*PrintHeader)( void* obj, const char* encoding, const char* standalone, BufferType& buf);
 	typedef bool (*PrintProc)( void* obj, const char* elemptr, std::size_t elemsize, BufferType& buf);
 	typedef bool (*PrintProcEmpty)( void* obj, BufferType& buf);
 	typedef void* (*CopyObj)( void* obj);
@@ -215,62 +208,53 @@ private:
 			m_output.print( (textwolf::UChar)(unsigned char)ch, buf);
 		}
 
-		void printHeader( const char* encoding, StandaloneDef standalone, BufferType& buf)
+		void printHeader( const char* encoding, const char* standalone, BufferType& buf)
 		{
 			if (m_state != Init) throw std::logic_error( "printing document not starting with xml header");
 			std::string enc = encoding?encoding:"UTF-8";
 			printToBuffer( "<?xml version=\"1.0\" encoding=\"", 30, buf);
 			printToBuffer( enc.c_str(), enc.size(), buf);
-			switch (standalone)
+			if (standalone)
 			{
-				case Standalone_Yes:
-					printToBuffer( "\" standalone=\"yes\"?>\n", 21, buf);
-					break;
-				case Standalone_No:
-					printToBuffer( "\" standalone=\"no\"?>\n", 20, buf);
-					break;
-				case Standalone_Unspecified:
-					printToBuffer( "\"?>\n", 4, buf);
-					break;
+				printToBuffer( "\" standalone=\"", 14, buf);
+				printToBuffer( standalone, std::strlen(standalone), buf);
+				printToBuffer( "\"?>\n", 4, buf);
+			}
+			else
+			{
+				printToBuffer( "\"?>\n", 4, buf);
 			}
 			m_state = Content;
 		}
 
-		void printDoctype( StandaloneDef standalone, const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
+		void printDoctype( const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
 		{
 			if (rootid)
 			{
-				switch (standalone)
+				if (publicid)
 				{
-				case Standalone_Yes:
-					break;
-				case Standalone_No:
-				case Standalone_Unspecified:
-					if (publicid)
-					{
-						if (!systemid) throw std::logic_error("defined DOCTYPE with PUBLIC id but no SYSTEM id");
-						printToBuffer( "<!DOCTYPE ", 10, buf);
-						printToBuffer( rootid, std::strlen( rootid), buf);
-						printToBuffer( " PUBLIC \"", 9, buf);
-						printToBuffer( publicid, std::strlen( publicid), buf);
-						printToBuffer( "\" \"", 3, buf);
-						printToBuffer( systemid, std::strlen( systemid), buf);
-						printToBuffer( "\">", 2, buf);
-					}
-					else if (systemid)
-					{
-						printToBuffer( "<!DOCTYPE ", 10, buf);
-						printToBuffer( rootid, std::strlen( rootid), buf);
-						printToBuffer( " SYSTEM \"", 9, buf);
-						printToBuffer( systemid, std::strlen( systemid), buf);
-						printToBuffer( "\">", 2, buf);
-					}
-					else if (standalone == Standalone_No)
-					{
-						printToBuffer( "<!DOCTYPE ", 11, buf);
-						printToBuffer( rootid, std::strlen( rootid), buf);
-						printToBuffer( ">", 2, buf);
-					}
+					if (!systemid) throw std::logic_error("defined DOCTYPE with PUBLIC id but no SYSTEM id");
+					printToBuffer( "<!DOCTYPE ", 10, buf);
+					printToBuffer( rootid, std::strlen( rootid), buf);
+					printToBuffer( " PUBLIC \"", 9, buf);
+					printToBuffer( publicid, std::strlen( publicid), buf);
+					printToBuffer( "\" \"", 3, buf);
+					printToBuffer( systemid, std::strlen( systemid), buf);
+					printToBuffer( "\">", 2, buf);
+				}
+				else if (systemid)
+				{
+					printToBuffer( "<!DOCTYPE ", 10, buf);
+					printToBuffer( rootid, std::strlen( rootid), buf);
+					printToBuffer( " SYSTEM \"", 9, buf);
+					printToBuffer( systemid, std::strlen( systemid), buf);
+					printToBuffer( "\">", 2, buf);
+				}
+				else
+				{
+					printToBuffer( "<!DOCTYPE ", 11, buf);
+					printToBuffer( rootid, std::strlen( rootid), buf);
+					printToBuffer( ">", 2, buf);
 				}
 			}
 		}
@@ -390,16 +374,16 @@ public:
 		return rt;
 	}
 
-	static void printHeader( void* obj_, const char* encoding, StandaloneDef standalone, BufferType& buf)
+	static void printHeader( void* obj_, const char* encoding, const char* standalone, BufferType& buf)
 	{
 		This* obj = (This*)obj_;
 		obj->printHeader( encoding, standalone, buf);
 	}
 
-	static void printDoctype( void* obj_, StandaloneDef standalone, const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
+	static void printDoctype( void* obj_, const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
 	{
 		This* obj = (This*)obj_;
-		obj->printDoctype( standalone, rootid, publicid, systemid, buf);
+		obj->printDoctype( rootid, publicid, systemid, buf);
 	}
 
 	static bool printOpenTag( void* obj_, const char* src, std::size_t srcsize, BufferType& buf)
@@ -556,54 +540,25 @@ public:
 		return m_obj;
 	}
 
-	void printRootAttributes( const char* xmlns, const char* xsi, const char* schemaLocation, BufferType& buf)
+	bool printAttributeValue( const char* name, const char* value, BufferType& buf)
 	{
-		if (xmlns)
-		{
-			m_mt.m_printAttribute( m_obj, "xmlns", 5, buf);
-			m_mt.m_printValue( m_obj, xmlns, std::strlen(xmlns), buf);
-		}
-		if (xsi)
-		{
-			m_mt.m_printAttribute( m_obj, "xmlns:xsi", 9, buf);
-			m_mt.m_printValue( m_obj, xsi, std::strlen(xsi), buf);
-		}
-		if (schemaLocation)
-		{
-			if (xsi)
-			{
-				m_mt.m_printAttribute( m_obj, "xsi:schemaLocation", 18, buf);
-			}
-			else
-			{
-				m_mt.m_printAttribute( m_obj, "xsi:noNamespaceSchemaLocation", 29, buf);
-			}
-			m_mt.m_printValue( m_obj, schemaLocation, std::strlen(schemaLocation), buf);
-		}
+		if (!m_obj) return false;
+		m_mt.m_printAttribute( m_obj, name, std::strlen(name), buf);
+		m_mt.m_printValue( m_obj, value, std::strlen(value), buf);
+		return true;
 	}
 
-	bool printDocumentStart( const char* rootelem, const char* doctype_public, const char* doctype_system, const char* xmlns, const char* xsi, const char* schemaLocation, BufferType& buf)
+	bool printHeader( const char* standalone, BufferType& buf)
+	{
+		if (!m_obj) return false;
+		m_mt.m_printHeader( m_obj, m_encoding.c_str(), standalone, buf);
+		return true;
+	}
+
+	bool printDoctype( const char* rootelem, const char* doctype_public, const char* doctype_system, BufferType& buf)
 	{
 		if (!m_obj || !rootelem) return false;
-		if (doctype_system)
-		{
-			m_mt.m_printHeader( m_obj, m_encoding.c_str(), Standalone_No, buf);
-			m_mt.m_printDoctype( m_obj, Standalone_No, rootelem, doctype_public, doctype_system, buf);
-			m_mt.m_printOpenTag( m_obj, rootelem, std::strlen(rootelem), buf);
-			printRootAttributes( xmlns, xsi, schemaLocation, buf);
-		}
-		else if (schemaLocation)
-		{
-			m_mt.m_printHeader( m_obj, m_encoding.c_str(), Standalone_Unspecified, buf);
-			m_mt.m_printDoctype( m_obj, Standalone_Unspecified, rootelem, doctype_public, doctype_system, buf);
-			m_mt.m_printOpenTag( m_obj, rootelem, std::strlen(rootelem), buf);
-			printRootAttributes( xmlns, xsi, schemaLocation, buf);
-		}
-		else
-		{
-			m_mt.m_printHeader( m_obj, m_encoding.c_str(), Standalone_Yes, buf);
-			m_mt.m_printOpenTag( m_obj, rootelem, std::strlen(rootelem), buf);
-		}
+		m_mt.m_printDoctype( m_obj, rootelem, doctype_public, doctype_system, buf);
 		return true;
 	}
 

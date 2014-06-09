@@ -474,12 +474,41 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
+	static bool metadataContainSchemaReference( const types::DocMetaData& md)
+	{
+		std::vector<types::DocMetaData::Attribute>::const_iterator ai = md.attributes().begin(), ae = md.attributes().end();
+		for (; ai != ae; ++ai)
+		{
+			if (0==std::memcmp( ai->name.c_str(), "xmlns", 5)
+			||  0==std::memcmp( ai->name.c_str(), "xsi:", 4))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	bool printHeader()
 	{
 		types::DocMetaData md( getMetaData());
 		LOG_DEBUG << "[textwolf output] document meta data: {" << md.tostring() << "}";
 		const char* standalone = md.getAttribute( "standalone");
+		const char* doctype_public = md.getAttribute( "PUBLIC");
+		const char* doctype_system = md.getAttribute( "SYSTEM");
 		const char* root = md.getAttribute( "root");
+
+		if (!standalone)
+		{
+			if (doctype_system)
+			{
+				standalone = "no";
+			}
+			else if (!metadataContainSchemaReference( md))
+			{
+				standalone = "yes";
+			}
+		}
+
 		if (!root)
 		{
 			setState( Error, "no XML root element defined");
@@ -488,48 +517,80 @@ struct OutputFilterImpl :public OutputFilter
 		const char* encoding = md.getAttribute( "encoding");
 		if (!encoding) encoding = "UTF-8";
 
+		if (!m_printer.createPrinter( encoding))
+		{
+			setState( Error, "failed to create XML serializer for this encoding");
+			return false;
+		}
+		if (!m_printer.printHeader( standalone, m_elembuf))
+		{
+			setState( Error, "failed to output XML header");
+		}
 		if (standalone && 0==std::strcmp( standalone, "yes"))
 		{
-			if (!m_printer.createPrinter( encoding))
+			if (!m_printer.printOpenTag( root, std::strlen(root), m_elembuf))
 			{
-				setState( Error, "failed to create XML serializer for this encoding");
-				return false;
-			}
-			if (!m_printer.printDocumentStart( root, 0/*public*/, 0/*system*/, 0/*xmlns*/, 0/*xsi*/, 0/*schemaLocation*/, m_elembuf))
-			{
-				setState( Error, "failed to print XML document header");
-				return false;
+				setState( Error, "failed to output XML root element");
 			}
 		}
-		else
+		else if (standalone && 0==std::strcmp( standalone, "no"))
 		{
-			const char* doctype_public = md.getAttribute( "PUBLIC");
-			const char* doctype_system = md.getAttribute( "SYSTEM");
 			std::string doctype_system_buf;
 			if (doctype_system && !md.doctype().empty())
 			{
 				doctype_system_buf = types::DocMetaData::replaceStem( doctype_system, md.doctype());
 				doctype_system = doctype_system_buf.c_str();
 			}
-			const char* xmlns = md.getAttribute( "xmlns");
-			const char* xsi = md.getAttribute( "xmlns:xsi");
-			const char* schemaLocation = md.getAttribute( "xsi:schemaLocation");
-			if (!schemaLocation) schemaLocation = md.getAttribute( "xsi:noNamespaceSchemaLocation");
-			std::string schemaLocation_buf;
-			if (schemaLocation && !md.doctype().empty())
+			if (doctype_system)
 			{
-				schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
-				schemaLocation = schemaLocation_buf.c_str();
+				if (!m_printer.printDoctype( root, doctype_public, doctype_system, m_elembuf))
+				{
+					setState( Error, "failed to output XML DOCTYPE");
+				}
 			}
-			if (!m_printer.createPrinter( encoding))
+			if (!m_printer.printOpenTag( root, std::strlen(root), m_elembuf))
 			{
-				setState( Error, "failed to create XML serializer for this encoding");
-				return false;
+				setState( Error, "failed to output XML root element");
 			}
-			if (!m_printer.printDocumentStart( root, doctype_public, doctype_system, xmlns, xsi, schemaLocation, m_elembuf))
+		}
+		else
+		{
+			if (!m_printer.printOpenTag( root, std::strlen(root), m_elembuf))
 			{
-				setState( Error, "failed to print XML document header");
-				return false;
+				setState( Error, "failed to output XML root element");
+			}
+			std::vector<types::DocMetaData::Attribute>::const_iterator ai = md.attributes().begin(), ae = md.attributes().end();
+			for (; ai != ae; ++ai)
+			{
+				bool doPrint = false;
+				std::string value;
+				const char* valueptr = ai->value.c_str();
+
+				if (0==std::memcmp( ai->name.c_str(), "xmlns", 5)
+				||  0==std::memcmp( ai->name.c_str(), "xsi:", 4))
+				{
+					doPrint = true;
+				}
+				const char* cc = std::strchr( ai->name.c_str(), ':');
+				if (cc != 0)
+				{
+					if (0==std::strcmp(cc+1,"schemaLocation")
+					||  0==std::strcmp(cc+1,"noNamespaceSchemaLocation"))
+					{
+						if (!md.doctype().empty())
+						{
+							value = types::DocMetaData::replaceStem( ai->value, md.doctype());
+							valueptr = value.c_str();
+						}
+					}
+				}
+				if (doPrint)
+				{
+					if (!m_printer.printAttributeValue( ai->name.c_str(), valueptr, m_elembuf))
+					{
+						setState( Error, "failed to output XML root attribute value");
+					}
+				}
 			}
 		}
 		return true;
