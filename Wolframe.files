@@ -1834,6 +1834,7 @@ packaging/solaris/wolframe.conf
 packaging/windows/Makefile.W32
 packaging/windows/Readme.txt
 packaging/windows/wolframe.xml
+PAMPHLET
 po/README
 po/updtTranslations.sh
 README
