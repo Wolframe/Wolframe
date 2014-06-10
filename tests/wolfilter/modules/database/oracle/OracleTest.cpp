@@ -138,7 +138,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 	
 	sword status;
 
-	status = OCIEnvCreate( &envhp, OCI_DEFAULT, (dvoid *)0,
+	status = OCIEnvCreate( &envhp, OCI_THREADED, (dvoid *)0,
 		0, 0, 0, 0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
 	
@@ -411,7 +411,7 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 	
 	sword status;
 
-	status = OCIEnvCreate( &envhp, OCI_DEFAULT, (dvoid *)0,
+	status = OCIEnvCreate( &envhp, OCI_THREADED, (dvoid *)0,
 		0, 0, 0, 0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
 	
