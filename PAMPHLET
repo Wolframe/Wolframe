@@ -4,10 +4,10 @@
 When we nowadays talk about applications, we talk about distributed applications.
 The times of a program running on a single workstation not communicating over a network with
 its peers are over since more than 20 years, except for very, very exotic applications
-(e.g. the isolated conputer in a special room in a bank) that have no relevant market anymore.
+(e.g. the isolated computer in a special room in a bank) that have no relevant market anymore.
 There has also be a big consolidation in the ways how different systems interact, how they
 communicate and how they exchange data. One important idea for implementing a service in a
-heterogenous environment like the internet is separation of processing and the data formats
+heterogeneous environment like the internet is separation of processing and the data formats
 used for exchanging data. Processing should be independent from the data format in order
 to be able to process various data formats in the same way. Most programming languages with
 introspection have a native way of serializing and deserializing objects from a message in
@@ -17,7 +17,7 @@ to declare introspection information, so that serialization and deserialization 
 be added. Usable implementations are sparse or hard to find, because nearly every student
 seems to post his serialization implementation on the net, but they exist.
 Some systems have a global definition of object introspection base on an IDL (interface definition
-language) that goes farer than marshalling and demarshalling of objects from and to a data stream.
+language) that goes further than marshalling and demarshalling of objects from and to a data stream.
 These systems became popular in the start of the 90s together with OOP languages. The idea is to model
 an application as a universe of objects that interact with each other through method calls.
 Objects do not have to be physically located on a defined machine. They can be represented by a
@@ -33,17 +33,17 @@ It is another class of systems that the vast majority of companies chose to impl
 Web services as RPC over HTTP. Unlike proxy systems they do not translate object requests
 but send complete objects as requests and get a complete answer (We will discuss the need of a
 session context that these complete objects refer to in another section).
-Web services became so popular because it is possible to integrate very heterogenous systems
+Web services became so popular because it is possible to integrate very heterogeneous systems
 without much effort, also services that already exist with another interface. This is the
-case since the beginning of the internet. The fact is that the vast majority of systems alredy
-exist. You want to use them. Also legacy sofware.
+case since the beginning of the internet. The fact is that the vast majority of systems already
+exist. You want to use them. Also legacy software.
 
 --- Integration of Wolframe services
 Wolframe tries to combining some of the interoperabilty of proxy systems without forcing
 the peers to have a contract based on an IDL with the power that web services brought to us.
 The success story of web services we try to follow with the capability of easy integration as
-callee and caller into the nowadays heterogenous landscape of systems, also of exsting solutions.
-The interoperability of different type of languages is archieved in the way how Wolframe defines
+callee and caller into the nowadays heterogeneous landscape of systems, also of existing solutions.
+The interoperability of different type of languages is achieved in the way how Wolframe defines
 its interfaces.
 
 --- How Wolframe defines its interfaces
@@ -77,14 +77,14 @@ that can be passed to a function. The return value of the function is passed to 
 create the output wished.
 
 --- Document filters and meta data and their reflection in Wolframe
-The standard behaviour or Wolframe in handling input and output is reflecting the properties
+The standard behavior or Wolframe in handling input and output is reflecting the properties
 of the input in the output. If you for example pass an XML to a Wolframe service as document
 to process you get an XML back. If this XML is encoded as "UTF-16BE" you get an XML as result
 encoded in the same way. If you specify the document type as !DOCTYPE attribute, you get
 a document back where the document type is defined as !DOCTYPE attribute. If your document
 type is passed a XSD schema reference, the document type of the result will be specified
 as a XSD schema reference in the same namespace as the request.
-Of course you allways can change this behaviour.
+Of course you always can change this behavior.
 
 --- Document validation
 .... TO BE CONTINUED
@@ -94,7 +94,7 @@ Of course you allways can change this behaviour.
 .... TO BE CONTINUED filters are easy to write
 
 
---- Bridgeing of languages of differen class with iterators
+--- Bridging of languages of different class with iterators
 .... TO BE CONTINUED  how we handle different properties
 
 
@@ -117,7 +117,7 @@ Separating languages to help separating processes and roles:
 	to formulate the solution.
 	One important goal of Wolframe is to make you able to separate different aspects of a project
 	according to your organization. But we do not want to educate you. If your setup is simple,
-	you can also manage the problems in a simple way, for example using your prefered programming
+	you can also manage the problems in a simple way, for example using your preferred programming
 	language for the whole processing chain.
 	Important is that such decisions are defined by your processes and taken by management.
 	One thing left to mention is that Wolframe does not force you to use a specific language
