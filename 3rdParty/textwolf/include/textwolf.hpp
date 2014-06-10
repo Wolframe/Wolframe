@@ -49,6 +49,7 @@
 #include "textwolf/xmltagstack.hpp"
 #include "textwolf/xmlprinter.hpp"
 #include "textwolf/xmlparser.hpp"
+#include "textwolf/xmlhdrparser.hpp"
 #include "textwolf/xmlpathselect.hpp"
 
 #endif
