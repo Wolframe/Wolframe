@@ -52,129 +52,338 @@ public:
 	///\brief Constructor
 	XmlHdrParser()
 		:m_state(Init)
-		,m_idx(0){}
+		,m_attributetype(Encoding)
+		,m_idx(0)
+		,m_charsConsumed(0)
+		,m_zeroCount(0){}
 
 	///\brief Copy constructor
 	///\brief param[in] o object to copy
 	XmlHdrParser( const XmlHdrParser& o)
 		:m_state(o.m_state)
+		,m_attributetype(o.m_attributetype)
 		,m_idx(o.m_idx)
+		,m_charsConsumed(o.m_charsConsumed)
+		,m_zeroCount(o.m_zeroCount)
 		,m_item(o.m_item)
 		,m_src(o.m_src){}
 
 
-	void feedData( const char* src_, std::size_t srcsize_)
+	void putInput( const char* src_, std::size_t srcsize_)
 	{
 		m_src.append( src_, srcsize_);
 	}
 
+	const std::string& consumedData() const
+	{
+		return m_src;
+	}
+
 	bool parse()
 	{
-		for (;;)
+		unsigned char ch = nextChar();
+		for (;ch != 0; ch = nextChar())
 		{
-			unsigned char ch = nextChar();
-			if (ch == 0) return false;
-
 			switch (m_state)
 			{
 				case Init:
 					if (ch == '<')
 					{
-						m_state = 
-						return ch;
+						m_state = ParseXmlOpen;
+					}
+					else if (ch <= 32)
+					{
+						continue;
 					}
 					else
 					{
-						skip();
-						++m_cnt0;
-						continue;
+						setError( "expected open tag angle bracket '>'");
+						return false;
 					}
+					break;
 
-				case Right0:
-					if (ch)
+				case ParseXmlOpen:
+					if (ch == '?')
 					{
-						m_state = Src;
-						return ch;
+						m_state = ParseXmlHdr;
+					}
+					else if (ch <= 32)
+					{
+						break;
+					}
+					else if (((ch|32) >= 'a' && (ch|32) <= 'z') || ch == '_')
+					{
+						return true;
 					}
 					else
 					{
-						skip();
-						++m_cnt0;
+						setError( "expected xml header question mark '?' after open tag angle bracket '<'");
+						return false;
+					}
+					break;
+
+				case ParseXmlHdr:
+					if (ch <= 32 || ch == '?')
+					{
+						if (m_item != "xml")
+						{
+							setError( "expected '<?xml' as xml header start");
+							return false;
+						}
+						m_item.clear();
+						if (ch == '?') return true; /*...."<?xml?>"*/
+
+						m_state = FindAttributeName;
+					}
+					else if (((ch|32) >= 'a' && (ch|32) <= 'z') || ch == '_')
+					{
+						m_item.push_back(ch);
 						continue;
 					}
+					else if (ch == '>')
+					{
+						setError( "unexpected close angle bracket '>' in xml header after '<?xml'");
+						return false;
+					}
+					else
+					{
+						setError( "expected '<?xml' as xml header start (invalid character)");
+						return false;
+					}
+					break;
 
-				case Src:
-					if (ch)
+				case FindAttributeName:
+					if (ch <= 32)
+					{
+						continue;
+					}
+					else if (ch == '>' || ch == '?')
 					{
 						if (ch == '>')
 						{
-							skip();
-							m_state = Rest;
-							continue;
+							setError( "unexpected close angle bracket '>' in xml header (missing '?')");
+							return false;
 						}
-						return ch;
+						return true;
+					}
+					else if (((ch|32) >= 'a' && (ch|32) <= 'z') || ch == '_')
+					{
+						m_item.push_back(ch);
+						m_state = ParseAttributeName;
 					}
 					else
 					{
-						skip();
+						setError( "invalid character in xml header attribute name");
+						return false;
+					}
+					break;
+				case ParseAttributeName:
+					if (ch <= 32 || ch == '=')
+					{
+						if (m_item == "encoding")
+						{
+							m_attributetype = Encoding;
+						}
+						else if (m_item == "version")
+						{
+							m_attributetype = Version;
+						}
+						else if (m_item == "standalone")
+						{
+							m_attributetype = Standalone;
+						}
+						else
+						{
+							setError( "unknown xml header attribute name");
+							return false;
+						}
+						m_item.clear();
+						if (ch == '=')
+						{
+							m_state = FindAttributeValue;
+							continue;
+						}
+						m_state = FindAttributeAssign;
+					}
+					else if (((ch|32) >= 'a' && (ch|32) <= 'z') || ch == '_')
+					{
+						m_item.push_back(ch);
 						continue;
 					}
-
-				case Rest:
-					while (m_cnt0 > 0)
+					else
 					{
-						if (cur()) throw std::runtime_error( "illegal xml header");
-						skip();
-						--m_cnt0;
+						setError( "invalid character in xml header attribute name");
+						return false;
 					}
-					m_state = End;
-					return '>';
+					break;
+				case FindAttributeAssign:
+					if (ch == '=')
+					{
+						m_state = FindAttributeValue;
+					}
+					else if (ch <= 32)
+					{
+						continue;
+					}
+					else
+					{
+						setError( "expected '=' after xml header attribute name");
+						return false;
+					}
+					break;
+				case FindAttributeValue:
+					if (ch == '"')
+					{
+						m_state = ParseAttributeValueDq;
+						continue;
+					}
+					else if (ch == '\'')
+					{
+						m_state = ParseAttributeValueSq;
+						continue;
+					}
+					else if (ch <= 32)
+					{
+						continue;
+					}
+					else
+					{
+						setError( "expected single or double quote string as xml header attribute value");
+						return false;
+					}
+					break;
+				case ParseAttributeValueSq:
+					if (ch == '\'')
+					{
+						switch (m_attributetype)
+						{
+							case Encoding:
+								m_encoding = m_item;
+								break;
+							case Version:
+							case Standalone:
+								break;
+						}
+						m_item.clear();
+						m_state = FindAttributeName;
+						continue;
+					}
+					else
+					{
+						m_item.push_back( ch);
+					}
+					break;
+				case ParseAttributeValueDq:
+					if (ch == '\"')
+					{
+						switch (m_attributetype)
+						{
+							case Encoding:
+								m_encoding = m_item;
+								break;
+							case Version:
+							case Standalone:
+								break;
+						}
+						m_item.clear();
+						m_state = FindAttributeName;
+						continue;
+					}
+					else
+					{
+						m_item.push_back( ch);
+					}
+					break;
+			}/*switch(..)*/
+		}/*for(;..;..)*/
+		return false;
+	}
 
-				case End:
-					return 0;
-			}
-		}
+	const char* lasterror() const
+	{
+		return m_lasterror.empty()?0:m_lasterror.c_str();
+	}
+
+	const char* encoding() const
+	{
+		return m_encoding.empty()?0:m_encoding.c_str();
+	}
+
+	std::size_t charsConsumed() const
+	{
+		return m_charsConsumed;
+	}
+
+	void clear()
+	{
+		m_item.clear();
+		m_src.clear();
+		m_encoding.clear();
+		m_lasterror.clear();
 	}
 
 private:
-	unsigned char nextChar() const
+	void setError( const std::string& m)
 	{
-		for (std::size_t ofs=0; ofs<4; ofs++)
+		m_lasterror = m;
+	}
+
+	unsigned char nextChar()
+	{
+		for (; m_zeroCount<4; m_zeroCount++)
 		{
 			if (m_idx >= m_src.size()) return 0;
 			unsigned char ch = m_src[m_idx];
-			if (ch <= 127 && ch != 0)
+			++m_idx;
+			if (ch != 0)
 			{
+				m_zeroCount = 0;
+				if (ch > 32)
+				{
+					++m_charsConsumed;
+				}
 				return ch;
 			}
 		}
-		throw std::runtime_error( "illegal XML header");
+		throw std::runtime_error( "illegal XML header (more than 4 null bytes in a row)");
 	}
 
 	enum State
 	{
 		Init,
 		ParseXmlOpen,
-		ParseXmlQuestionMark,
 		ParseXmlHdr,
 		FindAttributeName,
 		ParseAttributeName,
 		FindAttributeAssign,
 		FindAttributeValue,
-		ParseAttributeValueId,
 		ParseAttributeValueSq,
 		ParseAttributeValueDq
 	};
 
+	enum AttributeType
+	{
+		Encoding,
+		Version,
+		Standalone
+	};
+
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Left0","Right0","Src","Rest","End"};
+		static const char* ar[] = {"Init","ParseXmlOpen","ParseXmlHdr","FindAttributeName","ParseAttributeName","FindAttributeAssign","FindAttributeValue","ParseAttributeValueSq","ParseAttributeValueDq"};
 		return ar[ (int)i];
 	}
+
+private:
 	State m_state;			//< header parsing state
+	AttributeType m_attributetype;	//< currently parsed attribute type
 	std::size_t m_idx;		//< source index (index in m_src)
+	std::size_t m_charsConsumed;	//< number of characters consumed
+	std::size_t m_zeroCount;	//< counter of subsequent null bytes
 	std::string m_item;		//< parsed item
 	std::string m_src;		//< source buffered
+	std::string m_encoding;		//< character set encoding parsed
+	std::string m_lasterror;	//< last error
 };
 
 }//namespace
