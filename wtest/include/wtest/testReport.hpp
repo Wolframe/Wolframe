@@ -91,6 +91,9 @@ private:
 	virtual void OnTestProgramStart(const ::testing::UnitTest& /*unit_test*/)
 	{
 		m_state = Init;
+		m_count_total = 0;
+		m_count_success = 0;
+		m_count_failure = 0;
 	}
 
 	// Called after all test activities have ended.
@@ -103,13 +106,24 @@ private:
 	virtual void OnTestStart( const ::testing::TestInfo& /*test_info*/)
 	{
 		m_state = Start;
+		m_has_errors = false;
 		m_count_total += 1;
-	}
+   	}
 
 	// Called after a failed assertion or a SUCCEED() invocation.
+	// Note: One test can have many invocations of SUCCEED() and also loops
 	virtual void OnTestPartResult( const ::testing::TestPartResult& test_part_result)
 	{
 		if (test_part_result.failed())
+		{
+			m_has_errors = true;
+		}
+	}
+
+	// Called after a test ends.
+	virtual void OnTestEnd( const ::testing::TestInfo& /*test_info*/)
+	{
+		if (m_has_errors)
 		{
 			m_count_failure += 1;
 		}
@@ -117,11 +131,6 @@ private:
 		{
 			m_count_success += 1;
 		}
-	}
-
-	// Called after a test ends.
-	virtual void OnTestEnd( const ::testing::TestInfo& /*test_info*/)
-	{
 		m_state = End;
 	}
 
@@ -129,6 +138,7 @@ private:
 	boost::shared_ptr<FILE> m_outfile;
 	unsigned int m_count_failure;
 	unsigned int m_count_success;
+	bool m_has_errors;
 	unsigned int m_count_total;
 	enum State {Init,Start,End,Terminated};
 	State m_state;

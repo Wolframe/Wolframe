@@ -38,11 +38,19 @@ function userHash( $username )
 	$seed = str_repeat( 0, 16 );
 	for ( $i = 0; $i < 16; $i++ )
 		$seed[ $i ] = rand( 0, 255 );
-	$hash = hash_hmac( "sha256", $username, $seed, 'true' );
+	$hash = hash_hmac( "sha256", $username, $seed, true );
 
 	return '$' . base64_encode( $seed ) . '$' . base64_encode( $hash );
 }
 
+function seededUserHash( $seed, $username )
+{
+	$seed = base64_decode( $seed );
+
+	$hash = hash_hmac( "sha256", $username, $seed, true );
+
+	return '$' . base64_encode( $seed ) . '$' . base64_encode( $hash );
+}
 
 function CRAMresponse( $password, $challenge )
 {
@@ -56,18 +64,21 @@ function CRAMresponse( $password, $challenge )
 	$chlng = base64_decode( $chlngPart[ 1 ] );
 	if ( strlen( $chlng ) != 64 )
 		return 'invalid challenge length';
+
 	$passwd = hash_pbkdf2( "sha1", $password, $salt, 10589, 48, 'true' );
-	if ( strlen( $passwd ) > 64 )	{
-		$response = hash( "sha512", $passwd );
+	if ( count( $passwd ) > 64 )	{
+		$response = hash( "sha512", $passwd, true );
 	}
 	else	{
-		$response = str_repeat( 0x3c, 64 );
-		for ( $i = 0; $i < count( $passwd ); $i++ )
+		$respArray = array_fill( 0, 64, 0x3c );
+		$response = implode( array_map( "chr", $respArray ));
+		for ( $i = 0; $i < strlen( $passwd ); $i++ )
 			$response[ $i ] = $passwd[ $i ];
 	}
 	for ( $i = 0; $i < 64; $i++ )
-		$response[ $i ] = $response[ $i ] ^ $challenge[ $i ];
-	return base64_encode( hash( "sha256", $response ));
+		$response[ $i ] = $response[ $i ] ^ $chlng[ $i ];
+
+	return base64_encode( hash( "sha256", $response, true ));
 }
 
 ?>

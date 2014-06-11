@@ -27,6 +27,7 @@ provider
 		lua
 		{
 			program example_3.lua
+			filter char
 		}
 	}
 }

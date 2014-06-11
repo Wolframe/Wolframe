@@ -1,6 +1,6 @@
-/*  
+/*
 *   Byte-oriented AES-256 implementation.
-*   All lookup tables replaced with 'on the fly' calculations. 
+*   All lookup tables replaced with 'on the fly' calculations.
 *
 *   Copyright (c) 2007 Ilya O. Levin, http://www.literatecode.com
 *
@@ -27,7 +27,7 @@
 
 int main (int argc, char *argv[])
 {
-    aes256_context ctx; 
+    aes256_context ctx;
     uint8_t key[32];
     uint8_t buf[16], i;
 

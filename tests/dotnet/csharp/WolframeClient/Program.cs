@@ -109,6 +109,7 @@ namespace WolframeClient
                     {
                         Thread.Sleep(200);
                     }
+                    Thread.Sleep(2000);
                     Console.WriteLine("All done");
                     session.Shutdown();
                     session.Close();

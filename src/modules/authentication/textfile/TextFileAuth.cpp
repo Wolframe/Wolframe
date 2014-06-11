@@ -133,10 +133,12 @@ TextFileAuthSlice::TextFileAuthSlice( const TextFileAuthUnit& backend )
 {
 	m_challenge = NULL;
 	m_state = SLICE_INITIALIZED;
+	m_inputReusable = false;
 }
 
 TextFileAuthSlice::~TextFileAuthSlice()
 {
+	m_usr.clear();
 	if ( m_challenge != NULL )
 		delete m_challenge;
 }
@@ -152,6 +154,7 @@ void TextFileAuthSlice::messageIn( const std::string& message )
 	switch ( m_state )	{
 		case SLICE_INITIALIZED:	{
 			try	{
+				m_inputReusable = true;
 				if ( m_backend.getUser( message, m_usr ))
 					m_state = SLICE_USER_FOUND;
 				else
@@ -161,19 +164,23 @@ void TextFileAuthSlice::messageIn( const std::string& message )
 				LOG_ERROR << "Text file auth slice: ("
 					  << ") exception: " << e.what();
 				m_state = SLICE_SYSTEM_FAILURE;
+				m_inputReusable = false;
 			}
 			break;
 		}
 		case SLICE_USER_FOUND:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") received message in SLICE_USER_FOUND state";
 			m_state = SLICE_SYSTEM_FAILURE;
+			m_inputReusable = false;
 			break;
 		case SLICE_USER_NOT_FOUND:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") received message in SLICE_USER_NOT_FOUND state";
+			m_inputReusable = false;
 			break;
 		case SLICE_CHALLENGE_SENT:	{
+			m_inputReusable = false;
 			PasswordHash hash( m_usr.hash );
 			CRAMresponse response( *m_challenge, hash );
 			if ( response == message )
@@ -183,16 +190,19 @@ void TextFileAuthSlice::messageIn( const std::string& message )
 			break;
 		}
 		case SLICE_INVALID_CREDENTIALS:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") received message in SLICE_INVALID_CREDENTIALS state";
+			m_inputReusable = false;
 			break;
 		case SLICE_AUTHENTICATED:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") received message in SLICE_AUTHENTICATED state";
+			m_inputReusable = false;
 			break;
 		case SLICE_SYSTEM_FAILURE:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") received message in SLICE_SYSTEM_FAILURE state";
+			m_inputReusable = false;
 			break;
 	}
 }
@@ -202,7 +212,7 @@ std::string TextFileAuthSlice::messageOut()
 {
 	switch ( m_state )	{
 		case SLICE_INITIALIZED:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") message requested in SLICE_INITIALIZED state";
 			m_state = SLICE_SYSTEM_FAILURE;
 			break;
@@ -213,24 +223,24 @@ std::string TextFileAuthSlice::messageOut()
 			return m_challenge->toString( hash.salt() );
 		}
 		case SLICE_USER_NOT_FOUND:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") message requested in SLICE_USER_NOT_FOUND state";
 			break;
 		case SLICE_CHALLENGE_SENT:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") message requested in SLICE_CHALLENGE_SENT state";
 			m_state = SLICE_SYSTEM_FAILURE;
 			break;
 		case SLICE_INVALID_CREDENTIALS:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") message requested in SLICE_INVALID_CREDENTIALS state";
 			break;
 		case SLICE_AUTHENTICATED:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") message requested in SLICE_AUTHENTICATED state";
 			break;
 		case SLICE_SYSTEM_FAILURE:
-			LOG_ERROR << "Text file auth slice: ("
+			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") message requested in SLICE_SYSTEM_FAILURE state";
 			break;
 	}

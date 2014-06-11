@@ -26,7 +26,7 @@ cat $MAIN/lua_script_$example.lua >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **config
 !TEST
-./output_provider_cfg.sh example_$example.lua >> $output
+./output_provider_cfg.sh example_$example.lua char >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **output
 OK enter cmd

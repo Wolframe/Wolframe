@@ -102,6 +102,12 @@ public:
 	/// The current status of the authenticator
 	virtual Status status() const = 0;
 
+	/// Is the last input message reusable for this mech ?
+	/// If true then the last input message will be used also
+	/// for the next slice in case of an USER_NOT_FOUND status
+	/// otherwise a CLIENT_RESET will be issued
+	virtual bool inputReusable() const = 0;
+
 	/// The authenticated user or NULL if not authenticated
 	/// \note	It is intended that this function can be called only once
 	///		As a security precaution, all the instance information regarding

@@ -462,7 +462,7 @@ bool TransactionExecStatemachine_oracle::execute()
 				<< ", type: " << descrRef->dataType
 				<< ", sizeInChars: " << sizeInChars
 				<< ", precision: " << precision
-				<< ", scale: " << scale
+				<< ", scale: " << static_cast<int>( scale )
 				<< ", size: " << descrRef->bufsize
 				<< ", len: " << descrRef->len;
 

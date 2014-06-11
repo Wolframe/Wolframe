@@ -151,6 +151,9 @@ public:
 	/// The current status of the authenticator slice
 	virtual Status status() const;
 
+	/// Is the last input message reusable for this mech ?
+	virtual bool inputReusable() const		{ return m_inputReusable; }
+
 	/// The authenticated user or NULL if not authenticated
 	virtual User* user();
 
@@ -159,6 +162,7 @@ private:
 	struct PwdFileUser	m_usr;
 	SliceState		m_state;
 	CRAMchallenge*		m_challenge;
+	bool			m_inputReusable;
 };
 
 

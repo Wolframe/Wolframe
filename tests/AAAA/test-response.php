@@ -35,17 +35,11 @@
 
 include 'authentication.php';
 
-if ( $argc != 2 )	{
-	echo "Usage: $argv[0] <challenge>\n\n";
+if ( $argc != 3 )	{
+	echo "Usage: $argv[0] <password> <challenge>\n\n";
 	exit( 1 );
 }
 
-echo $argv[1], "\n";
-
-// '$blibli$' . base64_encode( "A 64 bytes dummy challenge -------------------------------------" );
-// value:
-// \$blibli\$QSA2NCBieXRlcyBkdW1teSBjaGFsbGVuZ2UgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ==
-
-echo CRAMresponse( 'bla bla password', $argv[1] ), "\n";
+echo CRAMresponse( $argv[1], $argv[2] ), "\n";
 
 ?>

@@ -59,6 +59,8 @@ class CRAMchallenge
 public:
 	CRAMchallenge( const crypto::RandomGenerator& rndGen );
 
+	~CRAMchallenge();
+
 	const unsigned char* challenge() const		{ return m_challenge; }
 	std::size_t size() const			{ return CRAM_CHALLENGE_SIZE; }
 
@@ -86,6 +88,8 @@ public:
 	///	  with or without end padding.
 	///	  The password string is in plain text.
 	CRAMresponse( const std::string& challenge, const std::string& password );
+
+	~CRAMresponse();
 
 	const unsigned char* response() const		{ return m_response; }
 	std::size_t size() const			{ return CRAM_RESPONSE_SIZE; }

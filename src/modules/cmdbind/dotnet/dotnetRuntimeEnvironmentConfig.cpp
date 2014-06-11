@@ -50,7 +50,7 @@ DotnetRuntimeEnvironmentConfig::AssemblyDescription::AssemblyDescription( const 
 
 bool DotnetRuntimeEnvironmentConfig::parse( const config::ConfigurationNode& pt, const std::string&, const ModulesDirectory*)
 {
-	m_config_pos = pt.data().position.logtext();
+	m_config_pos = pt.position().logtext();
 	config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 	for (; pi != pe; ++pi)
 	{
@@ -68,7 +68,7 @@ bool DotnetRuntimeEnvironmentConfig::parse( const config::ConfigurationNode& pt,
 		}
 		else
 		{
-			LOG_ERROR << "expected 'program' or 'filter' definition instead of '" << pi->first << "' " << pi->second.data().position.logtext();
+			LOG_ERROR << "expected 'program' or 'filter' definition instead of '" << pi->first << "' " << pi->second.position().logtext();
 			return false;
 		}
 	}
