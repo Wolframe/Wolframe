@@ -133,6 +133,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // allocate return messages
 	if( ( *reply = r = (struct pam_response *)calloc( nmsg, sizeof( struct pam_response ) ) ) == NULL ) {
 		appdata->errmsg = "Unable to allocate memory for replies";
+		*reply = NULL;
 		return PAM_BUF_ERR;
 	}
 
@@ -156,6 +157,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 			case PAM_PROMPT_ECHO_OFF:
 // thank you very much, come again (but with a password)
 				if( !appdata->has_pass ) {
+					*reply = NULL;
 // Solaris and NetBSD have no PAM_CONV_AGAIN, returning an error instead
 #if defined SUNOS || NETBSD
 					return PAM_CONV_ERR;
@@ -188,10 +190,21 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 					goto error;
 				}
 				if( strcmp( m->msg, login_prompt ) == 0 ) {
-					r->resp = strdup( appdata->login.c_str( ) );
-					if( r->resp == NULL ) {
-						appdata->errmsg = "Unable to allocate memory for login answer";
-						goto error;
+// thank you very much, come again (but with a username)
+					if( !appdata->has_login ) {
+						*reply = NULL;
+// Solaris and NetBSD have no PAM_CONV_AGAIN, returning an error instead
+#if defined SUNOS || NETBSD
+						return PAM_CONV_ERR;
+#else
+						return PAM_CONV_AGAIN;
+#endif
+					} else {
+						r->resp = strdup( appdata->login.c_str( ) );
+						if( r->resp == NULL ) {
+							appdata->errmsg = "Unable to allocate memory for login answer";
+							goto error;
+						}
 					}
 				}
 				break;
@@ -199,6 +212,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // internal pam errors, infos (TODO: log later)
 			case PAM_ERROR_MSG:
 			case PAM_TEXT_INFO:
+				appdata->errmsg = m->msg;
 				break;
 
 			default: {
@@ -255,10 +269,11 @@ User* PAMAuthUnit::authenticatePlain(	const std::string& username,
 	pam_appdata appdata;
 	const struct pam_conv conv = { pam_conv_func, &appdata };
 	
+	appdata.has_login = true;
 	appdata.login = username;
 	appdata.h = NULL;
-	appdata.has_pass = false;
-	appdata.pass = "";
+	appdata.has_pass = true;
+	appdata.pass = password;
 	
 	rc = pam_start( m_service.c_str( ), appdata.login.c_str( ), &conv, &appdata.h );
 	if( rc != PAM_SUCCESS ) {
@@ -266,14 +281,21 @@ User* PAMAuthUnit::authenticatePlain(	const std::string& username,
 			<< pam_strerror( appdata.h, rc );
 		return NULL;
 	}
-
-	rc = pam_authenticate( appdata.h, 0 );
-	if( rc == PAM_INCOMPLETE ) {
-		// we need a password
-		appdata.has_pass = true;
-		appdata.pass = password;
+	
+	for( int i = 0; i < 10; i++ ) {
 		rc = pam_authenticate( appdata.h, 0 );
+#ifdef PAM_INCOMPLETE
+		if( rc != PAM_INCOMPLETE )
+#endif
+			break;
+			
+		sleep( 1 );
+
+		// we need a password
+		//~ appdata.has_pass = true;
+		//~ appdata.pass = password;
 	}
+
 	if( rc != PAM_SUCCESS ) {
 		LOG_ERROR << "pam_authenticate failed with service '" << m_service << "': "
 			<< pam_strerror( appdata.h, rc ) << ", "
@@ -344,15 +366,18 @@ void PAMAuthSlice::messageIn( const std::string& message )
 					<< pam_strerror( m_appdata.h, rc ) << " in state '"
 					<< m_sliceStateToString[m_state] << "'";
 				m_state = SLICE_SYSTEM_FAILURE;
+			} else {
+				m_state = SLICE_HAS_LOGIN_NEED_PASS;
 			}
 
-			rc = pam_authenticate( m_appdata.h, 0 );
-			
 			break;
 
 		case SLICE_HAS_LOGIN_NEED_PASS:
 			m_appdata.has_pass = true;
 			m_appdata.pass = message.c_str( );
+
+			rc = pam_authenticate( m_appdata.h, 0 );
+
 			break;
 
 		case SLICE_INVALID_CREDENTIALS:
@@ -362,55 +387,6 @@ void PAMAuthSlice::messageIn( const std::string& message )
 				<< m_sliceStateToString[m_state] << "', this is illegal!";
 			break;
 	}
-
-/*
-	switch ( m_state )	{
-		case SLICE_INITIALIZED:	{
-			try	{
-				if ( m_backend.getUser( message, m_usr ))
-					m_state = SLICE_USER_FOUND;
-				else
-					m_state = SLICE_USER_NOT_FOUND;
-			}
-			catch( std::exception& e )	{
-				LOG_ERROR << "Text file auth slice: ("
-					  << ") exception: " << e.what();
-				m_state = SLICE_SYSTEM_FAILURE;
-			}
-			break;
-		}
-		case SLICE_USER_FOUND:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") received message in SLICE_USER_FOUND state";
-			m_state = SLICE_SYSTEM_FAILURE;
-			break;
-		case SLICE_USER_NOT_FOUND:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") received message in SLICE_USER_NOT_FOUND state";
-			break;
-		case SLICE_CHALLENGE_SENT:	{
-			PasswordHash hash( m_usr.hash );
-			CRAMresponse response( *m_challenge, hash );
-			if ( response == message )
-				m_state = SLICE_AUTHENTICATED;
-			else
-				m_state = SLICE_INVALID_CREDENTIALS;
-			break;
-		}
-		case SLICE_INVALID_CREDENTIALS:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") received message in SLICE_INVALID_CREDENTIALS state";
-			break;
-		case SLICE_AUTHENTICATED:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") received message in SLICE_AUTHENTICATED state";
-			break;
-		case SLICE_SYSTEM_FAILURE:
-			LOG_ERROR << "Text file auth slice: ("
-				  << ") received message in SLICE_SYSTEM_FAILURE state";
-			break;
-	}
-*/
 }
 
 /// The output message
@@ -418,7 +394,7 @@ std::string PAMAuthSlice::messageOut()
 {
 	switch( m_state ) {
 		case SLICE_HAS_LOGIN_NEED_PASS:
-			return "$password";
+			return "password?";
 		
 		case SLICE_INITIALIZED:
 		case SLICE_INVALID_CREDENTIALS:
@@ -440,10 +416,12 @@ std::string PAMAuthSlice::messageOut()
 AuthenticatorSlice::Status PAMAuthSlice::status() const
 {
 	switch( m_state ) {
-		case SLICE_HAS_LOGIN_NEED_PASS:
+		case SLICE_INITIALIZED:
 			return MESSAGE_AVAILABLE;
 
-		case SLICE_INITIALIZED:
+		case SLICE_HAS_LOGIN_NEED_PASS:
+			return AWAITING_MESSAGE;
+
 		case SLICE_INVALID_CREDENTIALS:
 		case SLICE_AUTHENTICATED:
 		case SLICE_SYSTEM_FAILURE:
@@ -459,47 +437,16 @@ AuthenticatorSlice::Status PAMAuthSlice::status() const
 	return SYSTEM_FAILURE;
 }
 	
-/*		AuthenticatorSlice::Status rt = m_status;
-	switch (m_state)
-	{
-		case AskUsername:
-			rt = AuthenticatorSlice::MESSAGE_AVAILABLE;
-
-/*
-
-	switch ( m_state )	{
-		case SLICE_INITIALIZED:
-			return AWAITING_MESSAGE;
-		case SLICE_USER_FOUND:
-			return MESSAGE_AVAILABLE;
-		case SLICE_USER_NOT_FOUND:
-			return USER_NOT_FOUND;
-		case SLICE_CHALLENGE_SENT:
-			return AWAITING_MESSAGE;
-		case SLICE_INVALID_CREDENTIALS:
-			return INVALID_CREDENTIALS;
-		case SLICE_AUTHENTICATED:
-			return AUTHENTICATED;
-		case SLICE_SYSTEM_FAILURE:
-			return SYSTEM_FAILURE;
-	}
-*/
-
 /// The authenticated user or NULL if not authenticated
 User* PAMAuthSlice::user()
 {
-	return NULL;
-/*
 	if ( m_state == SLICE_AUTHENTICATED )	{
-		if ( m_usr.user.empty() )
-			return NULL;
-		User* usr = new User( identifier(), m_usr.user, m_usr.info );
-		m_usr.clear();
-		return usr;
-	}
-	else
+		User *user = new User( identifier(), m_user, "" );
+		m_user.clear();
+		return user;
+	} else {
 		return NULL;
-*/
+	}
 }
 
 }} // namespace _Wolframe::AAAA

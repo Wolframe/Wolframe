@@ -70,6 +70,7 @@ private:
 // the structure with data we have to pass to the
 // PAM callback function (a transport wagon)
 typedef struct {
+	bool has_login;
 	std::string login;
 	bool has_pass;
 	std::string pass;
@@ -144,6 +145,7 @@ private:
 	SliceState		m_state;
 	struct pam_conv		m_conv;		///< PAM internal data structure
 	pam_appdata		m_appdata;	///< our void * for PAM data
+	std::string		m_user;		///< usename when authenticated
 };
 
 }} // namespace _Wolframe::AAAA

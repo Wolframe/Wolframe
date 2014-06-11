@@ -75,6 +75,24 @@ TEST_F( AuthenticationFixture, validUserAndPassword )
 	delete user;
 }
 
+TEST_F( AuthenticationFixture, validUserAndWrongPassword )
+{
+	User*	user;
+	PAMAuthUnit authenticator( "test", "wolframe" );
+
+	user = authenticator.authenticatePlain( "wolfusr", "xx" );
+	ASSERT_TRUE( user == NULL );
+}
+
+TEST_F( AuthenticationFixture, unknownUser )
+{
+	User*	user;
+	PAMAuthUnit authenticator( "test", "wolframe" );
+
+	user = authenticator.authenticatePlain( "wolfusr2", "xx" );
+	ASSERT_TRUE( user == NULL );
+}
+
 TEST_F( AuthenticationFixture, AuthenticationSliceUserPassword )
 {
 	User* user = NULL;
@@ -83,16 +101,20 @@ TEST_F( AuthenticationFixture, AuthenticationSliceUserPassword )
 
 	ASSERT_TRUE( slice != NULL );
 
+	// server waits for us to send a message (username)
+
 	// send user
-	slice->messageIn( "wolfusr" );
-	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
-
-	std::string challenge = slice->messageOut();
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+	slice->messageIn( "wolfusr" );
 
+	// currently the server sends always 'password?'
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
+	std::string passwordRequired = slice->messageOut();
+	EXPECT_EQ( passwordRequired, "password?" );
 	
 	// send password immediately (TODO: this step is optional if
 	// PAM doesn't require a password, how is this modelled?)	
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 	slice->messageIn( "wolfpwd" );
 
 	// check status now
