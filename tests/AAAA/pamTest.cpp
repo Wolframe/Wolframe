@@ -101,23 +101,17 @@ TEST_F( AuthenticationFixture, AuthenticationSliceUserPassword )
 
 	ASSERT_TRUE( slice != NULL );
 
-	// server waits for us to send a message (username)
-
-	// send user
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
 	slice->messageIn( "wolfusr" );
 
-	// currently the server sends always 'password?'
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
 	std::string passwordRequired = slice->messageOut();
 	EXPECT_EQ( passwordRequired, "password?" );
 	
-	// send password immediately (TODO: this step is optional if
-	// PAM doesn't require a password, how is this modelled?)	
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
 	slice->messageIn( "wolfpwd" );
 
-	// check status now
 	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AUTHENTICATED );
 	
 	user = slice->user();
@@ -134,6 +128,65 @@ TEST_F( AuthenticationFixture, AuthenticationSliceUserPassword )
 	if ( slice )
 		delete slice;
 }
+
+TEST_F( AuthenticationFixture, AuthenticationWrongPassword )
+{
+	User* user = NULL;
+	PAMAuthUnit authUnit( "test", "wolframe" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-PAM", net::RemoteTCPendpoint( "localhost", 2222 ));
+
+	ASSERT_TRUE( slice != NULL );
+	ASSERT_TRUE( slice != NULL );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	slice->messageIn( "wolfusr" );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
+	std::string passwordRequired = slice->messageOut();
+	EXPECT_EQ( passwordRequired, "password?" );
+	
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+	slice->messageIn( "xx" );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::INVALID_CREDENTIALS );
+	
+	user = slice->user();
+	ASSERT_TRUE( user == NULL );
+
+	if ( slice )
+		delete slice;
+}
+
+TEST_F( AuthenticationFixture, AuthenticationWrongUser )
+{
+	User* user = NULL;
+	PAMAuthUnit authUnit( "test", "wolframe" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-PAM", net::RemoteTCPendpoint( "localhost", 2222 ));
+
+	ASSERT_TRUE( slice != NULL );
+	ASSERT_TRUE( slice != NULL );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	slice->messageIn( "wolfusr2" );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
+	std::string passwordRequired = slice->messageOut();
+	EXPECT_EQ( passwordRequired, "password?" );
+	
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+	slice->messageIn( "xx" );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::USER_NOT_FOUND );
+	
+	user = slice->user();
+	ASSERT_TRUE( user == NULL );
+
+	if ( slice )
+		delete slice;
+}
+
 
 //****************************************************************************
 

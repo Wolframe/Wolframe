@@ -111,7 +111,9 @@ class PAMAuthSlice : public AuthenticatorSlice
 {
 	enum	SliceState	{
 		SLICE_INITIALIZED = 0,		///< Has been initialized, no other data
-		SLICE_HAS_LOGIN_NEED_PASS,	///< Also need the password of the user
+		SLICE_ASK_FOR_PASSWORD,		///< Ask for password, send 'password?' to the client
+		SLICE_WAITING_FOR_PWD,		///< We have sent 'password?' and wait for an answer
+		SLICE_USER_NOT_FOUND,		///< User has not been found -> fail
 		SLICE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
 		SLICE_AUTHENTICATED,		///< Response was correct -> user available
 		SLICE_SYSTEM_FAILURE		///< Something is wrong
@@ -148,8 +150,8 @@ private:
 	SliceState		m_state;
 	struct pam_conv		m_conv;		///< PAM internal data structure
 	pam_appdata		m_appdata;	///< our void * for PAM data
-	std::string		m_user;		///< usename when authenticated
 	bool			m_inputReusable;
+	std::string		m_user;
 };
 
 }} // namespace _Wolframe::AAAA

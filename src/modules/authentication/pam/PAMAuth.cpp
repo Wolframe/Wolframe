@@ -189,7 +189,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 					appdata->errmsg = ss.str( );
 					goto error;
 				}
-				if( strcmp( m->msg, login_prompt ) == 0 ) {
+				if( login_prompt == NULL || strcmp( m->msg, login_prompt ) == 0 ) {
 // thank you very much, come again (but with a username)
 					if( !appdata->has_login ) {
 						*reply = NULL;
@@ -275,7 +275,7 @@ User* PAMAuthUnit::authenticatePlain(	const std::string& username,
 	appdata.has_pass = true;
 	appdata.pass = password;
 	
-	rc = pam_start( m_service.c_str( ), appdata.login.c_str( ), &conv, &appdata.h );
+	rc = pam_start( m_service.c_str( ), NULL, &conv, &appdata.h );
 	if( rc != PAM_SUCCESS ) {
 		LOG_ERROR << "pam_start failed with service '" << m_service << "': "
 			<< pam_strerror( appdata.h, rc );
@@ -323,8 +323,9 @@ User* PAMAuthUnit::authenticatePlain(	const std::string& username,
 #define STRINGIFY( name ) # name
 static const char *m_sliceStateToString[] = {
 	STRINGIFY( PAMAuthSlice::SLICE_INITIALIZED ),
-	STRINGIFY( PAMAuthSlice::SLICE_HAS_LOGIN_NEED_PASS ),
-	STRINGIFY( PAMAuthSlice::PAMAuthSliceSLICE_INVALID_CREDENTIALS ),
+	STRINGIFY( PAMAuthSlice::SLICE_WAITING_FOR_PWD ),
+	STRINGIFY( PAMAuthSlice::SLICE_USER_NOT_FOUND ),
+	STRINGIFY( PAMAuthSlice::INVALID_CREDENTIALS ),
 	STRINGIFY( PAMAuthSlice::SLICE_AUTHENTICATED ),
 	STRINGIFY( PAMAuthSlice::SLICE_SYSTEM_FAILURE )
 };
@@ -368,19 +369,67 @@ void PAMAuthSlice::messageIn( const std::string& message )
 					<< m_sliceStateToString[m_state] << "'";
 				m_state = SLICE_SYSTEM_FAILURE;
 			} else {
-				m_state = SLICE_HAS_LOGIN_NEED_PASS;
+				m_state = SLICE_ASK_FOR_PASSWORD;
 			}
-
 			break;
 
-		case SLICE_HAS_LOGIN_NEED_PASS:
+		case SLICE_WAITING_FOR_PWD:
 			m_appdata.has_pass = true;
 			m_appdata.pass = message.c_str( );
 
 			rc = pam_authenticate( m_appdata.h, 0 );
+			if( rc == PAM_SUCCESS ) {
+				m_state = SLICE_AUTHENTICATED;
+			} else if( rc == PAM_USER_UNKNOWN ) {
+				m_state = SLICE_USER_NOT_FOUND;
+			} else if( rc == PAM_AUTH_ERR ) {
+				m_state = SLICE_INVALID_CREDENTIALS;
+			} else if( rc != PAM_SUCCESS ) {
+				LOG_ERROR << "pam_authenticate failed with service '" << m_backend.m_service << "': "
+					<< pam_strerror( m_appdata.h, rc ) << ", "
+					<< m_appdata.errmsg;
+				m_state = SLICE_SYSTEM_FAILURE;
+			}
+
+			if( rc == PAM_SUCCESS ) {
+				rc = pam_acct_mgmt( m_appdata.h, 0 );
+				if( rc != PAM_SUCCESS ) {
+					LOG_ERROR << "pam_acct_mgmt failed with service '" << m_backend.m_service << "': "
+						<< pam_strerror( m_appdata.h, rc ) << ", "
+						<< m_appdata.errmsg;
+					m_state = SLICE_SYSTEM_FAILURE;
+				}
+			}
+
+			// get the name of the user as reported by PAM
+			if( rc == PAM_SUCCESS ) {
+				union { const char *s; const void *v; } user_union;			
+#ifdef SUNOS
+				rc = pam_get_item( m_appdata.h, PAM_USER, (void **)&user_union.v );
+#else
+				rc = pam_get_item( m_appdata.h, PAM_USER, &user_union.v );
+#endif
+				if( rc != PAM_SUCCESS || user_union.v == NULL ) {
+					LOG_WARNING << "PAM auth slice: can't get name of user (PAM_USER) using login instead";
+					user_union.s = m_appdata.login.c_str( );
+				}
+
+				m_user = std::string( user_union.s );
+			}
+
+			// terminate PAM session with last exit code
+			if( pam_end( m_appdata.h, rc ) != PAM_SUCCESS ) {
+				LOG_ERROR << "pam_end failed with service '" << m_backend.m_service << "': "
+					<< pam_strerror( m_appdata.h, rc ) << ", "
+					<< m_appdata.errmsg;
+				m_state = SLICE_SYSTEM_FAILURE;
+			}
+			m_appdata.h = NULL;
 
 			break;
 
+		case SLICE_ASK_FOR_PASSWORD:
+		case SLICE_USER_NOT_FOUND:
 		case SLICE_INVALID_CREDENTIALS:
 		case SLICE_AUTHENTICATED:
 		case SLICE_SYSTEM_FAILURE:
@@ -394,10 +443,13 @@ void PAMAuthSlice::messageIn( const std::string& message )
 std::string PAMAuthSlice::messageOut()
 {
 	switch( m_state ) {
-		case SLICE_HAS_LOGIN_NEED_PASS:
+		case SLICE_ASK_FOR_PASSWORD:
+			m_state = SLICE_WAITING_FOR_PWD;
 			return "password?";
-		
+
 		case SLICE_INITIALIZED:
+		case SLICE_WAITING_FOR_PWD:
+		case SLICE_USER_NOT_FOUND:
 		case SLICE_INVALID_CREDENTIALS:
 		case SLICE_AUTHENTICATED:
 		case SLICE_SYSTEM_FAILURE:
@@ -418,17 +470,25 @@ AuthenticatorSlice::Status PAMAuthSlice::status() const
 {
 	switch( m_state ) {
 		case SLICE_INITIALIZED:
-			return MESSAGE_AVAILABLE;
-
-		case SLICE_HAS_LOGIN_NEED_PASS:
 			return AWAITING_MESSAGE;
 
+		case SLICE_ASK_FOR_PASSWORD:
+			return MESSAGE_AVAILABLE;
+
+		case SLICE_WAITING_FOR_PWD:
+			return AWAITING_MESSAGE;		
+		
+		case SLICE_USER_NOT_FOUND:
+			return USER_NOT_FOUND;
+		
 		case SLICE_INVALID_CREDENTIALS:
+			return INVALID_CREDENTIALS;
+
 		case SLICE_AUTHENTICATED:
+			return AUTHENTICATED;
+			
 		case SLICE_SYSTEM_FAILURE:
-			LOG_ERROR << "PAM auth slice: called status( ) in illegal state '"
-				<< m_sliceStateToString[m_state] << "', this is illegal!";
-			break;
+			return SYSTEM_FAILURE;
 		
 		default:
 			LOG_FATAL << "PAM auth slice: called status( ) in illegal state "
@@ -441,9 +501,15 @@ AuthenticatorSlice::Status PAMAuthSlice::status() const
 /// The authenticated user or NULL if not authenticated
 User* PAMAuthSlice::user()
 {
-	if ( m_state == SLICE_AUTHENTICATED )	{
+	if ( m_state == SLICE_AUTHENTICATED )	{		
+		if( m_user.empty( ) ) {
+			return NULL;
+		}
+		
 		User *usr = new User( identifier(), m_user, "" );
-		m_user.clear();
+		
+		m_user.clear( );
+			
 		return usr;
 	} else {
 		return NULL;
