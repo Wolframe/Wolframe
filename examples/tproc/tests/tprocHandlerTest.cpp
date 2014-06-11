@@ -252,6 +252,15 @@ TEST_P( TProcHandlerTest, tests)
 	}
 }
 
+static void printUsage( const char *prgname)
+{
+	std::cout << "Usage " << prgname << " [OPTION] [<test name substring>]" << std::endl;
+	std::cout << "Description:" << std::endl;
+	std::cout << "\tRun tproc hander tests" << std::endl;
+	std::cout << "\t-h:" << " Print usage" << std::endl;
+	std::cout << "\t-t:" << " Raise verbosity level (-t,-tt,-ttt,..)" << std::endl;
+}
+
 int main( int argc, char **argv )
 {
 	g_gtest_ARGC = 1;
@@ -259,22 +268,75 @@ int main( int argc, char **argv )
 	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
 	std::string topdir = g_testdir.parent_path().parent_path().parent_path().string();
 	g_modulesDirectory = new module::ModulesDirectory();
+	int argstart = 1;
+	int tracelevel = 0;
 
+	while (argc >= argstart+1 && argv[argstart][0] == '-')
+	{
+		char optionname = argv[argstart][1];
+		if (optionname == 't')
+		{
+			tracelevel = 1;
+			while (argv[argstart][tracelevel+1] == 't') ++tracelevel;
+			if (argv[argstart][tracelevel+1])
+			{
+				std::cerr << "unknown option " << argv[argstart][tracelevel+1] << std::endl;
+				printUsage( argv[0]);
+				return 1;
+			}
+			argstart += 1;
+		}
+		else if (optionname == 'h')
+		{
+			printUsage( argv[0]);
+			return 0;
+		}
+		else if (optionname == '-')
+		{
+			if (0==std::strcmp( argv[argstart], "--help"))
+			{
+				printUsage( argv[0]);
+				return 0;
+			}
+			else
+			{
+				std::cerr << "unknown option -" << argv[argstart] << std::endl;
+				printUsage( argv[0]);
+				return 5;
+			}
+		}
+		else
+		{
+			std::cerr << "unknown option -" << optionname << std::endl;
+			printUsage( argv[0]);
+			return 6;
+		}
+	}
 	if (!LoadModules( *g_modulesDirectory, wtest::getTestModuleList( topdir)))
 	{
 		std::cerr << "failed to load modules" << std::endl;
 		return 2;
 	}
-	if (argc > 2)
+	if (argc > argstart)
 	{
-		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
-		return 1;
+		if (argc - argstart > 1)
+		{
+			std::cerr << "too many arguments passed to " << argv[0] << std::endl;
+			return 1;
+		}
+		selectedTestName = argv[argstart];
 	}
-	else if (argc == 2)
+	if (tracelevel != 0)
 	{
-		selectedTestName = argv[1];
-	}
+		_Wolframe::log::LogLevel::Level loglevel;
+		if (tracelevel == 1) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_INFO;
+		if (tracelevel == 2) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG;
+		if (tracelevel == 3) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_TRACE;
+		if (tracelevel == 4) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA;
+		if (tracelevel >= 5) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA2;
 
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( loglevel);
+	}
 	// [1] Selecting tests to execute:
 	boost::filesystem::recursive_directory_iterator ditr( g_testdir / "data"), dend;
 	if (selectedTestName.size())
@@ -311,7 +373,6 @@ int main( int argc, char **argv )
 	// [3] Execute tests:
 	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV);
-	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO);
 	return RUN_ALL_TESTS();
 	delete g_modulesDirectory;
 }

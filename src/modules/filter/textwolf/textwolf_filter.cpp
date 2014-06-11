@@ -551,7 +551,7 @@ struct InputFilterImpl
 					if (et == textwolf::XMLScannerBase::Content && !m_withEmpty)
 					{
 						std::size_t ii=0;
-						for (;ii<elementsize && ee[ii] <= ' '; ++ii);
+						for (;ii<elementsize && (unsigned char)ee[ii] <= 32; ++ii);
 						if (ii<elementsize)
 						{
 							return true;
@@ -586,7 +586,7 @@ struct InputFilterImpl
 				if (et == textwolf::XMLScannerBase::Content && !m_withEmpty)
 				{
 					std::size_t ii=0;
-					for (;ii<elementsize && ee[ii] <= ' '; ++ii);
+					for (;ii<elementsize && (unsigned char)ee[ii] <= 32; ++ii);
 					if (ii==elementsize) continue;
 				}
 #ifdef _Wolframe_LOWLEVEL_DEBUG
@@ -1209,6 +1209,9 @@ struct OutputFilterImpl :public OutputFilter
 			m_headerPrinted = true;
 		}
 		bool res;
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+		LOG_DATA2 << "[textwolf filter] print element " << FilterBase::elementTypeName(type) << " '" << std::string((const char*)element, elementsize) << "'";
+#endif
 		switch (type)
 		{
 			case FilterBase::OpenTag:
