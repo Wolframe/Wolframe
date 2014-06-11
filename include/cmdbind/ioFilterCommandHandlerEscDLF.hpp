@@ -107,6 +107,7 @@ private:
 
 	State m_state;					///< processing state machine state
 	bool m_unconsumedInput;				///< true, if there is unconsumed input waiting to be consumed before the next read
+	bool m_gotEoD;					///< true if we got EoD and consumed all input
 	const void* m_writedata;			///< bytes to write next (WRITE)
 	std::size_t m_writedatasize;			///< number of bytes to write next (WRITE)
 

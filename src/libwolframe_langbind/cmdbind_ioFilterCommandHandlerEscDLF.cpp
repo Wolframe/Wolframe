@@ -47,6 +47,7 @@ using namespace _Wolframe::langbind;
 IOFilterCommandHandlerEscDLF::IOFilterCommandHandlerEscDLF()
 	:m_state(StartProcessing)
 	,m_unconsumedInput(false)
+	,m_gotEoD(false)
 	,m_writedata(0)
 	,m_writedatasize(0)
 	,m_nextmsg(0)
@@ -136,13 +137,17 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 					getFilterOutputWriteData();
 					if (m_writedatasize) return WRITE;
 				}
-				if (m_input.gotEoD())
+				if (m_gotEoD)
 				{
 					m_outputfilter.reset();
 					m_writedata = "\r\n.\r\n";
 					m_writedatasize = std::strlen("\r\n.\r\n");
 					m_state = Terminated;
 					return WRITE;
+				}
+				if (consumeInput())
+				{
+					continue;
 				}
 				return READ;
 
@@ -178,7 +183,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 									{
 										continue;
 									}
-									if (m_input.gotEoD())
+									if (m_gotEoD)
 									{
 										LOG_ERROR << "error in input filter: unexpected end of input";
 										setLastError( "unexpected end of input");
@@ -241,6 +246,11 @@ bool IOFilterCommandHandlerEscDLF::consumeInput()
 			if (m_state != DiscardInput)
 			{
 				flt->putInput( m_input.charptr()+m_itrpos, m_eoD-m_input.at(m_itrpos), m_input.gotEoD());
+			}
+			if (m_input.gotEoD())
+			{
+				m_gotEoD = true;
+				m_nextmsg = m_input.skipEoD();
 			}
 		}
 		m_unconsumedInput = false;
