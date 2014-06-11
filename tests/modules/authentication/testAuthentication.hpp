@@ -127,6 +127,9 @@ public:
 	/// The current status of the authenticator slice
 	virtual Status status() const;
 
+	/// Is the last input message reusable for this mech ?
+	virtual bool inputReusable() const		{ return m_inputReusable; }
+
 	/// The authenticated user or NULL if not authenticated
 	virtual User* user();
 
@@ -164,6 +167,7 @@ private:
 	types::SecureString m_username;
 	User* m_user;
 	const std::map<std::string,std::string>* m_usrpwdmap;
+	bool m_inputReusable;
 };
 
 }}//namespace

@@ -137,6 +137,9 @@ public:
 	/// The current status of the authenticator slice
 	virtual Status status() const;
 
+	/// Is the last input message reusable for this mech ?
+	virtual bool inputReusable() const		{ return m_inputReusable; }
+
 	/// The authenticated user or NULL if not authenticated
 	virtual User* user();
 
@@ -146,6 +149,7 @@ private:
 	struct pam_conv		m_conv;		///< PAM internal data structure
 	pam_appdata		m_appdata;	///< our void * for PAM data
 	std::string		m_user;		///< usename when authenticated
+	bool			m_inputReusable;
 };
 
 }} // namespace _Wolframe::AAAA

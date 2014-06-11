@@ -231,3 +231,4 @@ tests/dotnet/csharp/Functions/bin/
 tests/dotnet/csharp/WolframeClient/Properties/
 tests/dotnet/csharp/WolframeClient/obj/
 tests/dotnet/interop/WolfCLR/WolfCLR/ipch/
+tests/AAAA/pamTest

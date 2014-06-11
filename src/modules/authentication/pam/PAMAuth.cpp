@@ -337,6 +337,7 @@ PAMAuthSlice::PAMAuthSlice( const PAMAuthUnit& backend )
 	m_appdata.pass = "";
 	m_conv.conv = pam_conv_func;
 	m_conv.appdata_ptr = &m_appdata;
+	m_inputReusable = false;
 
 	m_state = SLICE_INITIALIZED;
 }
@@ -441,9 +442,9 @@ AuthenticatorSlice::Status PAMAuthSlice::status() const
 User* PAMAuthSlice::user()
 {
 	if ( m_state == SLICE_AUTHENTICATED )	{
-		User *user = new User( identifier(), m_user, "" );
+		User *usr = new User( identifier(), m_user, "" );
 		m_user.clear();
-		return user;
+		return usr;
 	} else {
 		return NULL;
 	}

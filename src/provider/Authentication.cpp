@@ -214,28 +214,26 @@ bool StandardAuthenticator::setMech( const std::string& mech )
 				LOG_ERROR << "StandardAuthenticator: authentication slice '"
 					  << m_slices[ m_currentSlice ]->identifier() << "' status is AUTHENTICATED at initialization";
 				m_status = SYSTEM_FAILURE;
+// Aba??
 				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is AUTHENTICATED" );
 				break;
 			case AuthenticatorSlice::USER_NOT_FOUND:
 				LOG_ERROR << "StandardAuthenticator: authentication slice '"
 					  << m_slices[ m_currentSlice ]->identifier() << "' status is USER_NOT_FOUND at initialization";
 				m_status = SYSTEM_FAILURE;
+// Aba??
 				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is USER_NOT_FOUND" );
 				break;
 			case AuthenticatorSlice::INVALID_CREDENTIALS:
 				LOG_ERROR << "StandardAuthenticator: authentication slice '"
 					  << m_slices[ m_currentSlice ]->identifier() << "' status is INVALID_CREDENTIALS at initialization";
 				m_status = SYSTEM_FAILURE;
+// Aba??
 				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is INVALID_CREDENTIALS" );
 				break;
 			case AuthenticatorSlice::SYSTEM_FAILURE:
 				LOG_WARNING << "StandardAuthenticator: authentication slice '"
 					    << m_slices[ m_currentSlice ]->identifier() << "' status is SYSTEM_FAILURE";
-				m_status = SYSTEM_FAILURE;
-				break;
-			case AuthenticatorSlice::USER_NOT_FOUND:
-				LOG_WARNING << "StandardAuthenticator: authentication slice '"
-					    << m_slices[ m_currentSlice ]->identifier() << "' status is USER_NOT_FOUND";
 				m_status = SYSTEM_FAILURE;
 				break;
 		}

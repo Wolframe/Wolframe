@@ -122,8 +122,9 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileTest
 	@echo
-ifeq ($(WITH_PAM),1)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./pamTest
-	@echo
-endif
+# Aba: running PAM tests needs to much from the system, can't test automatically currently
+#ifeq ($(WITH_PAM),1)
+#	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./pamTest
+#	@echo
+#endif
 endif

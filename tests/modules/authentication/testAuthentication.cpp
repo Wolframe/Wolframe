@@ -137,7 +137,8 @@ AuthenticatorSlice* TestAuthenticationUnit::slice( const std::string& mech, cons
 }
 
 TestAuthenticatorSlice::TestAuthenticatorSlice( const std::string& identifier_, const std::map<std::string,std::string>* usrpwdmap_)
-	:m_state(AskUsername),m_status(AuthenticatorSlice::MESSAGE_AVAILABLE),m_identifier(identifier_),m_user(0),m_usrpwdmap(usrpwdmap_)
+	:m_state(AskUsername),m_status(AuthenticatorSlice::MESSAGE_AVAILABLE),m_identifier(identifier_),m_user(0),m_usrpwdmap(usrpwdmap_),
+	m_inputReusable(false)
 {}
 
 TestAuthenticatorSlice::~TestAuthenticatorSlice()
