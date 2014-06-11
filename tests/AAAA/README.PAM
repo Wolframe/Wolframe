@@ -1,7 +1,24 @@
-https://github.com/tiwe-de/libpam-pwdfile
-genpwd to generate salt and password for above file
+1) Install and configure the PAM backend
 
-/etc/pam.d/wolframe
+A very simple backend is a plain password file like
+
+https://github.com/tiwe-de/libpam-pwdfile
+
+Note: Do not try to test with pam_unix or a similar module, you
+can't access /etc/shadow as normal user!
+
+2) Create user
+
+create a user 'wolfusr' with password 'wolfpwd' in this file
+
+Use 'genpwd.c' to generate a hash for a file called
+'/etc/wolframeusers':
+
+wolfusr:$1$3glYHJaH$n2HsIXJg9dRW7vbegCC2B/
+
+3) Configure PAM system
+
+Create a '/etc/pam.d/wolframe' and add:
 
 #%PAM-1.0
 
@@ -10,3 +27,9 @@ account         required        pam_permit.so
 session         required        pam_permit.so
 password        required        pam_deny.so
 
+This way debugging the PAM requests is quite easy.
+
+4) PAM test
+
+'pamTest' is currently not executed automatically due to those system
+requirements. Jailing/fakeroot could be an option..
