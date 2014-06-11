@@ -389,11 +389,18 @@ public:
 				case ParseXMLRootAttrib:
 					if (ch != '>' && ch != '=')
 					{
-						m_itembuf.push_back( ch);
-						if (m_itembuf.size() > 128)
+						if (ch == ':')
 						{
-							m_lasterror = "XML root attribute name too big";
-							setState( Done);
+							m_itembuf.clear();
+						}
+						else
+						{
+							m_itembuf.push_back( ch);
+							if (m_itembuf.size() > 128)
+							{
+								m_lasterror = "XML root attribute name too big";
+								setState( Done);
+							}
 						}
 					}
 					else
@@ -405,7 +412,7 @@ public:
 						}
 						else
 						{
-							m_isDoctypeAttrib = (m_itembuf == "xsi:schemaLocation" || m_itembuf == "xsi:noNamespaceSchemaLocation");
+							m_isDoctypeAttrib = (m_itembuf == "schemaLocation" || m_itembuf == "noNamespaceSchemaLocation");
 							setState( ch <= '='?SearchXMLRootAttribQuote:SearchXMLRootAttribAssign);
 						}
 					}
@@ -464,7 +471,7 @@ public:
 							m_itembuf.push_back( ch);
 							if (m_itembuf.size() > 256)
 							{
-								m_lasterror = "XML xmlns:schemaLocation attribute (schema definition) is too big";
+								m_lasterror = "XML schemaLocation attribute (schema definition) is too big";
 								setState( Done);
 							}
 						}
@@ -495,7 +502,7 @@ public:
 							m_itembuf.push_back( ch);
 							if (m_itembuf.size() > 256)
 							{
-								m_lasterror = "XML xmlns:schemaLocation attribute (schema definition) is too big";
+								m_lasterror = "XML schemaLocation attribute (schema definition) is too big";
 								setState( Done);
 							}
 						}

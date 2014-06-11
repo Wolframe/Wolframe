@@ -43,12 +43,11 @@
 #include "textwolf/charset.hpp"
 #include "textwolf/textscanner.hpp"
 #include "textwolf/xmlscanner.hpp"
-#include "textwolf/xmlhdriterator.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/xmltagstack.hpp"
 #include "textwolf/xmlprinter.hpp"
-#include "textwolf/xmlparser.hpp"
+#include "textwolf/xmlhdrparser.hpp"
 #include "textwolf/xmlpathselect.hpp"
 
 #endif

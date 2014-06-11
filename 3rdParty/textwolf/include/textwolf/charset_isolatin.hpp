@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -47,6 +47,8 @@ namespace charset {
 ///\brief Character set IsoLatin-1,..IsoLatin-9 (ISO-8859-1,...ISO-8859-9)
 struct IsoLatin :public IsoLatinCodePage
 {
+	enum {MaxChar=0xFF};
+
 	IsoLatin( const IsoLatin& o)
 		:IsoLatinCodePage(o){}
 	IsoLatin( unsigned int codePageIdx=1)
