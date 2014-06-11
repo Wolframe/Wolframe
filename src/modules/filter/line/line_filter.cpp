@@ -166,6 +166,7 @@ struct InputFilterImpl :public InputFilter
 	{
 		setAttribute( "encoding", encoding_?encoding_:"UTF-8");
 		setState( Open);
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
 	}
 
 	/// \brief Constructor
@@ -183,6 +184,7 @@ struct InputFilterImpl :public InputFilter
 		,m_linecomplete(false)
 	{
 		setState( Open);
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
 	}
 
 	/// \brief Copy constructor
@@ -238,12 +240,12 @@ struct InputFilterImpl :public InputFilter
 			m_elembuf.clear();
 			m_linecomplete = false;
 		}
+		setState( Open);
 		if (!m_srcend && setjmp(m_eom) != 0)
 		{
 			setState( EndOfMessage);
 			return 0;
 		}
-		setState( Open);
 		type = Value;
 
 		textwolf::UChar ch;

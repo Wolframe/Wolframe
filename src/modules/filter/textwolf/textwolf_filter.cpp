@@ -48,7 +48,7 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace langbind;
 
-#define _Wolframe_LOWLEVEL_DEBUG
+#undef _Wolframe_LOWLEVEL_DEBUG
 
 #define TYPEDEF_XMLScanner(ENCODING)\
 	typedef textwolf::XMLScanner<textwolf::SrcIterator,textwolf::charset::ENCODING,textwolf::charset::UTF8,std::string> XMLScanner;

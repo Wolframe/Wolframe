@@ -202,6 +202,7 @@ struct InputFilterImpl :public InputFilter
 	{
 		setAttribute( "encoding", encoding_?encoding_:"UTF-8");
 		setState( Open);
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
 	}
 
 	/// \brief Constructor
@@ -222,6 +223,7 @@ struct InputFilterImpl :public InputFilter
 		,m_eolnread(false)
 	{
 		setState( Open);
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
 	}
 
 	/// \brief Copy constructor
@@ -275,11 +277,6 @@ struct InputFilterImpl :public InputFilter
 	/// \brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
-		if (!m_srcend && setjmp(m_eom) != 0)
-		{
-			setState( EndOfMessage);
-			return 0;
-		}
 		if (m_linecomplete)
 		{
 			m_elembuf.clear();
@@ -287,6 +284,11 @@ struct InputFilterImpl :public InputFilter
 			if (m_taglevel == -1) return false;
 		}
 		setState( Open);
+		if (!m_srcend && setjmp(m_eom) != 0)
+		{
+			setState( EndOfMessage);
+			return 0;
+		}
 		type = Value;
 		if (!m_tag)
 		{
