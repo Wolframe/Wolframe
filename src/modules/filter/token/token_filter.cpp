@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file token_filter.cpp
-///\brief Filter implementation of a filter for debug input/output
+/// \file token_filter.cpp
+/// \brief Filter implementation of a filter for debug input/output
 
 #include "token_filter.hpp"
 #include "textwolf/charset.hpp"
@@ -73,19 +73,19 @@ static char getElementTag( OutputFilter::ElementType tp)
 }
 
 
-///\class OutputFilterImpl
+/// \class OutputFilterImpl
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct OutputFilterImpl :public OutputFilter
 {
-	///\brief Constructor
+	/// \brief Constructor
 	OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
 		,OutputFilter("token",inheritedMetaData)
 		,m_elemitr(0)
 		,m_output(iocharset_){}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:utils::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
 		,OutputFilter(o)
@@ -93,17 +93,17 @@ struct OutputFilterImpl :public OutputFilter
 		,m_elemitr(o.m_elemitr)
 		,m_output(o.m_output){}
 
-	///\brief self copy
-	///\return copy of this
+	/// \brief self copy
+	/// \return copy of this
 	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief print a value with EOL escaped
-	///\param [in] src pointer to attribute value string to print
-	///\param [in] srcsize size of src in bytes
-	///\param [in,out] buf buffer to print to
+	/// \brief print a value with EOL escaped
+	/// \param [in] src pointer to attribute value string to print
+	/// \param [in] srcsize size of src in bytes
+	/// \param [in,out] buf buffer to print to
 	void printToBufferEscEOL( const char* src, std::size_t srcsize, std::string& buf) const
 	{
 		textwolf::CStringIterator itr( src, srcsize);
@@ -138,11 +138,11 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	///\brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
-	///\param [in] type type of the element to print
-	///\param [in] element pointer to the element to print
-	///\param [in] elementsize size of the element to print in bytes
-	///\return true, if success, false else
+	/// \brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
+	/// \param [in] type type of the element to print
+	/// \param [in] element pointer to the element to print
+	/// \param [in] elementsize size of the element to print in bytes
+	/// \return true, if success, false else
 	virtual bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
@@ -177,13 +177,13 @@ private:
 	IOCharset m_output;
 };
 
-///\class InputFilterImpl
+/// \class InputFilterImpl
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct InputFilterImpl :public InputFilter
 {
 	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
 
-	///\brief Constructor
+	/// \brief Constructor
 	InputFilterImpl( const char* encoding_, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
 		,InputFilter("token")
@@ -204,7 +204,7 @@ struct InputFilterImpl :public InputFilter
 		setState( Open);
 	}
 
-	///\brief Constructor
+	/// \brief Constructor
 	InputFilterImpl( const types::DocMetaData& md, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
 		,InputFilter("token", md)
@@ -224,14 +224,14 @@ struct InputFilterImpl :public InputFilter
 		setState( Open);
 	}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
 		,InputFilter(o)
 		,m_charset(o.m_charset)
 		,m_itr(o.m_itr)
-		,m_eom()
+		,m_eom()	//... ! by intention (non copyable, only used during getNext, where no copy is possible)
 		,m_output(o.m_output)
 		,m_tag(o.m_tag)
 		,m_taglevel(o.m_taglevel)
@@ -255,13 +255,13 @@ struct InputFilterImpl :public InputFilter
 		return new InputFilterImpl( *getMetaDataRef(), m_charset);
 	}
 
-	///\brief Implement InputFilterImpl::putInput(const void*,std::size_t,bool)
+	/// \brief Implement InputFilterImpl::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_src = (const char*)ptr;
 		m_srcend = end;
 		m_srcsize = size;
-		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, m_srcend));
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
 	}
 
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
@@ -272,9 +272,14 @@ struct InputFilterImpl :public InputFilter
 		end = m_srcend;
 	}
 
-	///\brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	/// \brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
+		if (!m_srcend && m_eom.set())
+		{
+			setState( EndOfMessage);
+			return 0;
+		}
 		if (m_linecomplete)
 		{
 			m_elembuf.clear();
@@ -283,98 +288,91 @@ struct InputFilterImpl :public InputFilter
 		}
 		setState( Open);
 		type = Value;
-		try
+		if (!m_tag)
 		{
-			if (!m_tag)
+			char tg;
+			do
 			{
-				char tg;
-				do
+				tg = m_itr.ascii();
+				++m_itr;
+			}
+			while (tg == '\n' || tg == '\r');
+			if (!tg)
+			{
+				if (!m_srcend)
 				{
-					tg = m_itr.ascii();
-					++m_itr;
-				}
-				while (tg == '\n' || tg == '\r');
-				if (!tg)
-				{
-					if (!m_srcend)
-					{
-						setState( EndOfMessage);
-						return false;
-					}
-					if (m_taglevel != 0)
-					{
-						setState( InputFilter::Error, "token filter - tags not balanced");
-						return false;
-					}
-					m_taglevel = -1;
-					type = CloseTag;
-					element = "";
-					elementsize = 0;
-					return true;
-				}
-				if (!getElementType( m_elemtype, tg))
-				{
-					setState( InputFilter::Error, "token filter - unknown token tag");
+					setState( EndOfMessage);
 					return false;
 				}
-				m_tag = tg;
+				if (m_taglevel != 0)
+				{
+					setState( InputFilter::Error, "token filter - tags not balanced");
+					return false;
+				}
+				m_taglevel = -1;
+				type = CloseTag;
+				element = "";
+				elementsize = 0;
+				return true;
 			}
-			textwolf::UChar ch;
-			while ((ch = *m_itr) != 0)
+			if (!getElementType( m_elemtype, tg))
 			{
-				if (m_eolnread)
+				setState( InputFilter::Error, "token filter - unknown token tag");
+				return false;
+			}
+			m_tag = tg;
+		}
+		textwolf::UChar ch;
+		while ((ch = *m_itr) != 0)
+		{
+			if (m_eolnread)
+			{
+				if (ch == (char)TokenNextLine)
 				{
-					if (ch == (char)TokenNextLine)
-					{
-						m_output.print( '\n', m_elembuf);
-						++m_itr;
-						m_eolnread = false;
-						continue;
-					}
-					else
-					{
-						break;
-					}
-				}
-				else if (ch == '\r')
-				{
+					m_output.print( '\n', m_elembuf);
 					++m_itr;
-					continue;
-				}
-				else if (ch == '\n')
-				{
-					++m_itr;
-					m_eolnread = true;
+					m_eolnread = false;
 					continue;
 				}
 				else
 				{
-					m_output.print( ch, m_elembuf);
-					++m_itr;
+					break;
 				}
 			}
-			if (m_eolnread)
+			else if (ch == '\r')
 			{
-				type = m_elemtype;
-				element = m_elembuf.c_str();
-				elementsize = m_elembuf.size();
-				if (m_elemtype == OpenTag)
-				{
-					++m_taglevel;
-				}
-				else if (m_elemtype == CloseTag)
-				{
-					--m_taglevel;
-				}
-				m_tag = '\0';
-				m_linecomplete = true;
-				m_eolnread = false;
-				return true;
+				++m_itr;
+				continue;
+			}
+			else if (ch == '\n')
+			{
+				++m_itr;
+				m_eolnread = true;
+				continue;
+			}
+			else
+			{
+				m_output.print( ch, m_elembuf);
+				++m_itr;
 			}
 		}
-		catch (textwolf::SrcIterator::EoM)
+		if (m_eolnread)
 		{
-			setState( EndOfMessage);
+			type = m_elemtype;
+			element = m_elembuf.c_str();
+			elementsize = m_elembuf.size();
+			if (m_elemtype == OpenTag)
+			{
+				++m_taglevel;
+			}
+			else if (m_elemtype == CloseTag)
+			{
+				--m_taglevel;
+			}
+			m_tag = '\0';
+			m_linecomplete = true;
+			m_eolnread = false;
+			return true;
 		}
 		return false;
 	}

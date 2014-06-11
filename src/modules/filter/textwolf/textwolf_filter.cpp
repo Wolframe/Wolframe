@@ -411,7 +411,7 @@ struct InputFilterImpl
 				m_srcend = end;
 				DOWITH_XMLScanner( 
 					m_parser = new XMLScanner();
-					((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
+					((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
 					((XMLScanner*)m_parser)->doTokenize( m_doTokenize);
 				);
 				setState( Open);
@@ -431,7 +431,7 @@ struct InputFilterImpl
 			m_srcsize = size;
 			m_srcend = end;
 			DOWITH_XMLScanner( 
-				((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom))
+				((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom))
 			);
 			setState( Open);
 		}
@@ -571,7 +571,7 @@ struct InputFilterImpl
 				}
 			}
 		}
-		if (m_eom.set())
+		if (!m_srcend && m_eom.set())
 		{
 			setState( EndOfMessage);
 			return 0;

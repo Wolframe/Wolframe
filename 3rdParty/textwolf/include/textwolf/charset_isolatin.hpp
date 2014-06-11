@@ -47,6 +47,8 @@ namespace charset {
 ///\brief Character set IsoLatin-1,..IsoLatin-9 (ISO-8859-1,...ISO-8859-9)
 struct IsoLatin :public IsoLatinCodePage
 {
+	enum {MaxChar=0xFF};
+
 	IsoLatin( const IsoLatin& o)
 		:IsoLatinCodePage(o){}
 	IsoLatin( unsigned int codePageIdx=1)

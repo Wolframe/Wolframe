@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file line_filter.cpp
-///\brief Implementation of a filter reading/writing line by line
+/// \file line_filter.cpp
+/// \brief Implementation of a filter reading/writing line by line
 
 #include "line_filter.hpp"
 #include "textwolf/charset.hpp"
@@ -47,19 +47,19 @@ using namespace langbind;
 
 namespace {
 
-///\class OutputFilterImpl
+/// \class OutputFilterImpl
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct OutputFilterImpl :public OutputFilter
 {
-	///\brief Constructor
+	/// \brief Constructor
 	OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::OutputFilterImpl (line)", __LINE__)
 		,OutputFilter("line", inheritedMetaData)
 		,m_elemitr(0)
 		,m_output(iocharset_){}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:utils::TypeSignature("langbind::OutputFilterImpl (line)", __LINE__)
 		,OutputFilter(o)
@@ -67,16 +67,16 @@ struct OutputFilterImpl :public OutputFilter
 		,m_elemitr(o.m_elemitr)
 		,m_output(o.m_output){}
 
-	///\brief self copy
-	///\return copy of this
+	/// \brief self copy
+	/// \return copy of this
 	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
-	///\param [in] src pointer to string to print
-	///\param [in] srcsize size of src in bytes
+	/// \brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
+	/// \param [in] src pointer to string to print
+	/// \param [in] srcsize size of src in bytes
 	void printToBuffer( const char* src, std::size_t srcsize, std::string& buf) const
 	{
 		textwolf::CStringIterator itr( src, srcsize);
@@ -103,11 +103,11 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	///\brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
-	///\param [in] type type of the element to print
-	///\param [in] element pointer to the element to print
-	///\param [in] elementsize size of the element to print in bytes
-	///\return true, if success, false else
+	/// \brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
+	/// \param [in] type type of the element to print
+	/// \param [in] element pointer to the element to print
+	/// \param [in] elementsize size of the element to print in bytes
+	/// \return true, if success, false else
 	virtual bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
@@ -139,23 +139,24 @@ struct OutputFilterImpl :public OutputFilter
 	virtual bool close(){return true;}
 
 private:
-	std::string m_elembuf;				//< buffer for the currently printed element
-	std::size_t m_elemitr;				//< iterator to pass it to output
+	std::string m_elembuf;				///< buffer for the currently printed element
+	std::size_t m_elemitr;				///< iterator to pass it to output
 	IOCharset m_output;
 };
 
-///\class InputFilterImpl
+/// \class InputFilterImpl
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct InputFilterImpl :public InputFilter
 {
 	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
 
-	///\brief Constructor
+	/// \brief Constructor
 	InputFilterImpl( const char* encoding_, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::InputFilterImpl (line)", __LINE__)
 		,InputFilter("line")
 		,m_charset(iocharset_)
 		,m_itr(iocharset_)
+		,m_eom()
 		,m_output(AppCharset())
 		,m_src(0)
 		,m_srcsize(0)
@@ -167,12 +168,13 @@ struct InputFilterImpl :public InputFilter
 		setState( Open);
 	}
 
-	///\brief Constructor
+	/// \brief Constructor
 	InputFilterImpl( const types::DocMetaData& md, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::InputFilterImpl (line)", __LINE__)
 		,InputFilter("line", md)
 		,m_charset(iocharset_)
 		,m_itr(iocharset_)
+		,m_eom()
 		,m_output(AppCharset())
 		,m_src(0)
 		,m_srcsize(0)
@@ -183,13 +185,14 @@ struct InputFilterImpl :public InputFilter
 		setState( Open);
 	}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:utils::TypeSignature("langbind::InputFilterImpl (line)", __LINE__)
 		,InputFilter( o)
 		,m_charset(o.m_charset)
 		,m_itr(o.m_itr)
+		,m_eom()	//... ! by intention (non copyable, only used during getNext, where no copy is possible)
 		,m_output(o.m_output)
 		,m_elembuf(o.m_elembuf)
 		,m_src(o.m_src)
@@ -199,24 +202,24 @@ struct InputFilterImpl :public InputFilter
 		,m_linecomplete(o.m_linecomplete)
 		{}
 
-	//\brief Implement InputFilter::copy()
+	/// \brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
-	//\brief Implement InputFilter::initcopy()
+	/// \brief Implement InputFilter::initcopy()
 	virtual InputFilter* initcopy() const
 	{
 		return new InputFilterImpl( *getMetaDataRef(), m_charset);
 	}
 
-	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
+	/// \brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_src = (const char*)ptr;
 		m_srcend = end;
 		m_srcsize = size;
-		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, m_srcend));
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
 	}
 
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
@@ -227,7 +230,7 @@ struct InputFilterImpl :public InputFilter
 		end = m_srcend;
 	}
 
-	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	/// \brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (m_linecomplete)
@@ -235,51 +238,50 @@ struct InputFilterImpl :public InputFilter
 			m_elembuf.clear();
 			m_linecomplete = false;
 		}
+		if (!m_srcend && m_eom.set())
+		{
+			setState( EndOfMessage);
+			return 0;
+		}
 		setState( Open);
 		type = Value;
-		try
+
+		textwolf::UChar ch;
+		while ((ch = *m_itr) != 0)
 		{
-			textwolf::UChar ch;
-			while ((ch = *m_itr) != 0)
+			if (ch == '\r')
 			{
-				if (ch == '\r')
-				{
-					++m_itr;
-					continue;
-				}
-				if (ch == '\n')
-				{
-					element = m_elembuf.c_str();
-					elementsize = m_elembuf.size();
-					++m_itr;
-					m_linecomplete = true;
-					return true;
-				}
-				else
-				{
-					m_output.print( ch, m_elembuf);
-					++m_itr;
-				}
+				++m_itr;
+				continue;
 			}
-			if (m_elembuf.size() != 0)
+			if (ch == '\n')
 			{
 				element = m_elembuf.c_str();
 				elementsize = m_elembuf.size();
+				++m_itr;
 				m_linecomplete = true;
 				return true;
 			}
-			else if (!m_srcclosed)
+			else
 			{
-				type = InputFilter::CloseTag;
-				element = 0;
-				elementsize = 0;
-				m_srcclosed = true;
-				return true;
+				m_output.print( ch, m_elembuf);
+				++m_itr;
 			}
 		}
-		catch (textwolf::SrcIterator::EoM)
+		if (m_elembuf.size() != 0)
 		{
-			setState( EndOfMessage);
+			element = m_elembuf.c_str();
+			elementsize = m_elembuf.size();
+			m_linecomplete = true;
+			return true;
+		}
+		else if (!m_srcclosed)
+		{
+			type = InputFilter::CloseTag;
+			element = 0;
+			elementsize = 0;
+			m_srcclosed = true;
+			return true;
 		}
 		return false;
 	}
@@ -304,15 +306,16 @@ struct InputFilterImpl :public InputFilter
 	}
 
 private:
-	IOCharset m_charset;		//< character set encoding
-	TextScanner m_itr;		//< iterator on source
-	AppCharset m_output;		//< output
-	std::string m_elembuf;		//< buffer for current line
-	const char* m_src;		//< pointer to current chunk parsed
-	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes
-	bool m_srcend;			//< true if end of message is in current chunk parsed
-	bool m_srcclosed;		//< true if the finishing close tag has been returned
-	bool m_linecomplete;		//< true if the last getNext could complete a line
+	IOCharset m_charset;			///< character set encoding
+	TextScanner m_itr;			///< iterator on source
+	textwolf::EndOfChunkTrigger m_eom;	///< end of message trigger
+	AppCharset m_output;			///< output
+	std::string m_elembuf;			///< buffer for current line
+	const char* m_src;			///< pointer to current chunk parsed
+	std::size_t m_srcsize;			///< size of the current chunk parsed in bytes
+	bool m_srcend;				///< true if end of message is in current chunk parsed
+	bool m_srcclosed;			///< true if the finishing close tag has been returned
+	bool m_linecomplete;			///< true if the last getNext could complete a line
 };
 
 }//end anonymous namespace

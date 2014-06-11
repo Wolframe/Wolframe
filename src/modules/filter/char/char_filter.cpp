@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file char_filter.cpp
-//\brief Filter implementation reading/writing character by character
+/// \file char_filter.cpp
+/// \brief Filter implementation reading/writing character by character
 
 #include "char_filter.hpp"
 #include "textwolf/charset.hpp"
@@ -47,14 +47,14 @@ using namespace langbind;
 
 namespace {
 
-//\class InputFilterImpl
-//\brief input filter for single characters
+/// \class InputFilterImpl
+/// \brief input filter for single characters
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct InputFilterImpl :public InputFilter
 {
 	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
 
-	//\brief Constructor
+	/// \brief Constructor
 	explicit InputFilterImpl( const char* encoding, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
 		,InputFilter("char")
@@ -70,12 +70,13 @@ struct InputFilterImpl :public InputFilter
 		setState( Open);
 	}
 
-	//\brief Constructor
+	/// \brief Constructor
 	explicit InputFilterImpl( const types::DocMetaData& md, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
 		,InputFilter("char",md)
 		,m_charset(iocharset_)
 		,m_itr(iocharset_)
+		,m_eom()
 		,m_output(AppCharset())
 		,m_elembuf( m_elembufmem, sizeof(m_elembufmem))
 		,m_src(0)
@@ -85,13 +86,14 @@ struct InputFilterImpl :public InputFilter
 		setState( Open);
 	}
 
-	//\brief Copy constructor
-	//\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
 		,InputFilter( o)
 		,m_charset(o.m_charset)
 		,m_itr(o.m_itr)
+		,m_eom()	//... ! by intention (non copyable, only used during getNext, where no copy is possible)
 		,m_output(o.m_output)
 		,m_elembuf( m_elembufmem, sizeof(m_elembufmem))
 		,m_src(o.m_src)
@@ -102,27 +104,27 @@ struct InputFilterImpl :public InputFilter
 		std::memcpy( m_elembufmem, o.m_elembufmem, o.m_elembuf.size());
 	}
 
-	//\brief Implement InputFilter::copy()
+	/// \brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
-	//\brief Implement InputFilter::initcopy()
+	/// \brief Implement InputFilter::initcopy()
 	virtual InputFilter* initcopy() const
 	{
 		return new InputFilterImpl( *getMetaDataRef(), m_charset);
 	}
 
-	//\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
+	/// \brief Implement InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_src = (const char*)ptr;
 		m_srcend = end;
 		m_srcsize = size;
-		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, m_srcend));
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
 	}
 
-	//\brief Implement InputFilter::getRest(const void*&,std::size_t&,bool&)
+	/// \brief Implement InputFilter::getRest(const void*&,std::size_t&,bool&)
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
 	{
 		std::size_t pos = m_itr.getPosition();
@@ -131,27 +133,25 @@ struct InputFilterImpl :public InputFilter
 		end = m_srcend;
 	}
 
-	//\brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	/// \brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
-		setState( Open);
-		type = Value;
-		try
-		{
-			textwolf::UChar ch;
-			if ((ch = *m_itr) != 0)
-			{
-				++m_itr;
-				m_output.print( ch, m_elembuf);
-				element = m_elembuf.ptr();
-				elementsize = m_elembuf.size();
-				m_elembuf.clear();
-				return true;
-			}
-		}
-		catch (textwolf::SrcIterator::EoM)
+		if (!m_srcend && m_eom.set())
 		{
 			setState( EndOfMessage);
+			return 0;
+		}
+		setState( Open);
+		type = Value;
+		textwolf::UChar ch;
+		if ((ch = *m_itr) != 0)
+		{
+			++m_itr;
+			m_output.print( ch, m_elembuf);
+			element = m_elembuf.ptr();
+			elementsize = m_elembuf.size();
+			m_elembuf.clear();
+			return true;
 		}
 		return false;
 	}
@@ -176,30 +176,31 @@ struct InputFilterImpl :public InputFilter
 	}
 
 private:
-	IOCharset m_charset;			//< character set encoding
-	TextScanner m_itr;			//< iterator on input
-	AppCharset m_output;			//< output
+	IOCharset m_charset;			///< character set encoding
+	TextScanner m_itr;			///< iterator on input
+	textwolf::EndOfChunkTrigger m_eom;	///< end of message trigger
+	AppCharset m_output;			///< output
 	char m_elembufmem[16];
 	textwolf::StaticBuffer m_elembuf;
-	const char* m_src;			//< pointer to current chunk parsed
-	std::size_t m_srcsize;			//< size of the current chunk parsed in bytes
-	bool m_srcend;				//< true if end of message is in current chunk parsed
+	const char* m_src;			///< pointer to current chunk parsed
+	std::size_t m_srcsize;			///< size of the current chunk parsed in bytes
+	bool m_srcend;				///< true if end of message is in current chunk parsed
 };
 
-//\class OutputFilterImpl
-//\brief output filter filter for single characters
+/// \class OutputFilterImpl
+/// \brief output filter filter for single characters
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct OutputFilterImpl :public OutputFilter
 {
-	//\brief Constructor
+	/// \brief Constructor
 	OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData, const IOCharset& iocharset_=IOCharset())
 		:utils::TypeSignature("langbind::OutputFilterImpl (char)", __LINE__)
 		,OutputFilter("char", inheritedMetaData)
 		,m_elemitr(0)
 		,m_output(iocharset_){}
 
-	//\brief Copy constructor
-	//\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:utils::TypeSignature("langbind::OutputFilterImpl (char)", __LINE__)
 		,OutputFilter(o)
@@ -207,16 +208,16 @@ struct OutputFilterImpl :public OutputFilter
 		,m_elemitr(o.m_elemitr)
 		,m_output(o.m_output){}
 
-	//\brief self copy
-	//\return copy of this
+	/// \brief self copy
+	/// \return copy of this
 	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	//\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
-	//\param [in] src pointer to string to print
-	//\param [in] srcsize size of src in bytes
+	/// \brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
+	/// \param [in] src pointer to string to print
+	/// \param [in] srcsize size of src in bytes
 	void printToBuffer( const char* src, std::size_t srcsize, std::string& buf) const
 	{
 		textwolf::CStringIterator itr( src, srcsize);
@@ -243,11 +244,11 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	//\brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
-	//\param [in] type type of the element to print
-	//\param [in] element pointer to the element to print
-	//\param [in] elementsize size of the element to print in bytes
-	//\return true, if success, false else
+	/// \brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
+	/// \param [in] type type of the element to print
+	/// \param [in] element pointer to the element to print
+	/// \param [in] elementsize size of the element to print in bytes
+	/// \return true, if success, false else
 	bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
@@ -278,8 +279,8 @@ struct OutputFilterImpl :public OutputFilter
 	virtual bool close(){return true;}
 
 private:
-	std::string m_elembuf;				//< buffer for the currently printed element
-	std::size_t m_elemitr;				//< iterator to pass it to output
+	std::string m_elembuf;				///< buffer for the currently printed element
+	std::size_t m_elemitr;				///< iterator to pass it to output
 	IOCharset m_output;
 };
 }//end anonymous namespace
