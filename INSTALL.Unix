@@ -1947,6 +1947,19 @@ can force the computation of depencies in a special make step as follows:
         make -j 4
 
 
+Additionally the make system understands 'MAKEDEPS', so you can provide you own
+dependency generator at need.
+
+Especially useful is
+
+        make MAKEPEDS=/bin/true depend
+        make -j 4
+
+
+to avoid dependency management at all, for instance for one-time builds in
+continuous integration, where the generation of working dependencies can take a
+long time and is of no use.
+
 1.30. Creating source tarballs
 
 Wolframe supports the standard targets 'dist', 'dist-Z', 'dist-gz' and
