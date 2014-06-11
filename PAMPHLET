@@ -1,0 +1,130 @@
+
+
+== Processing Data in Distributed Applications
+When we nowadays talk about applications, we talk about distributed applications.
+The times of a program running on a single workstation not communicating over a network with
+its peers are over since more than 20 years, except for very, very exotic applications
+(e.g. the isolated computer in a special room in a bank) that have no relevant market anymore.
+There has also be a big consolidation in the ways how different systems interact, how they
+communicate and how they exchange data. One important idea for implementing a service in a
+heterogeneous environment like the internet is separation of processing and the data formats
+used for exchanging data. Processing should be independent from the data format in order
+to be able to process various data formats in the same way. Most programming languages with
+introspection have a native way of serializing and deserializing objects from a message in
+various standardized text based data formats (XML,JSON,CSV,etc.) and binary data formats.
+For programming languages without introspection there exist libraries that allow you
+to declare introspection information, so that serialization and deserialization of data can
+be added. Usable implementations are sparse or hard to find, because nearly every student
+seems to post his serialization implementation on the net, but they exist.
+Some systems have a global definition of object introspection base on an IDL (interface definition
+language) that goes further than marshalling and demarshalling of objects from and to a data stream.
+These systems became popular in the start of the 90s together with OOP languages. The idea is to model
+an application as a universe of objects that interact with each other through method calls.
+Objects do not have to be physically located on a defined machine. They can be represented by a
+proxy that translate method calls into network messages that get reinstantiated and executed on
+the peer machine where the real instance of the object is. The caller of the method does not have
+to know where the peer object physically relies. These systems had a great success story because
+the global interface definition language allows systems to be composed of components written in
+different languages. The drawback of these kind of systems are that the standards are quite
+complicated and mostly politically driven. Small companies have not the power to handle such complex
+systems in a correct way with their resources. Furthermore such proxy systems lead in many cases to
+a vendor lock.
+It is another class of systems that the vast majority of companies chose to implement services:
+Web services as RPC over HTTP. Unlike proxy systems they do not translate object requests
+but send complete objects as requests and get a complete answer (We will discuss the need of a
+session context that these complete objects refer to in another section).
+Web services became so popular because it is possible to integrate very heterogeneous systems
+without much effort, also services that already exist with another interface. This is the
+case since the beginning of the internet. The fact is that the vast majority of systems already
+exist. You want to use them. Also legacy software.
+
+--- Integration of Wolframe services
+Wolframe tries to combining some of the interoperabilty of proxy systems without forcing
+the peers to have a contract based on an IDL with the power that web services brought to us.
+The success story of web services we try to follow with the capability of easy integration as
+callee and caller into the nowadays heterogeneous landscape of systems, also of existing solutions.
+The interoperability of different type of languages is achieved in the way how Wolframe defines
+its interfaces.
+
+--- How Wolframe defines its interfaces
+In Wolframe the aspect of separating the content to process from the message format is done similar
+to classical marshalling and demarshalling concepts as they exist elsewhere. The main difference is
+that serialization/deserialization of documents to process is solved as an own aspect and not
+in the programming language that implements the function to call. A good reason to do so is that
+many programming languages do implement serialization in their way. They select what they need
+from serialization and implement the subset they need. This leads especially in the handling of
+meta data and in the handling of atomic data types to problems. The industry standards you have
+to follow may not be on the list of the programming language authors, even with their best will
+and competence. Another drawback is that the use of many programming languages as service
+implementations lead to various solutions of serialization/deserialization. Of course these problems
+can also be solved in one or the other way. It is a matter of organization and costs.
+In Wolframe all functions are called with an iterator function closure as input and they return
+an iterator function closure as output. We introduce the concept of content filters creating
+such an iterator from a document along with its meta data as separate solution.
+The strong principle here is that the incarnation of this iterator as data is native in the
+language that implements the function. If you do not want, you do not see that there is an
+iterator behind. You for example write a function in C++ with a class as input and output,
+in Lua with a table as input, in Python with an object as input. In .NET you define a class
+implementing an interface you define that implements the function as method call with native
+named C# parameters as input. And so on....
+If such a function on the other hand calls another function implemented in another language, it
+simply passes a native object as parameter to the function. What happens internally is the
+creation of an iterator on this object that is passed to the callee.
+The content filters you define on document formats to process or, if you need transformations
+of big industry standard documents to your needs, you can also use programmable filters,
+for example with XSLT, that do an initial transformation. The output of a filter is an iterator
+that can be passed to a function. The return value of the function is passed to the filter to
+create the output wished.
+
+--- Document filters and meta data and their reflection in Wolframe
+The standard behavior or Wolframe in handling input and output is reflecting the properties
+of the input in the output. If you for example pass an XML to a Wolframe service as document
+to process you get an XML back. If this XML is encoded as "UTF-16BE" you get an XML as result
+encoded in the same way. If you specify the document type as !DOCTYPE attribute, you get
+a document back where the document type is defined as !DOCTYPE attribute. If your document
+type is passed a XSD schema reference, the document type of the result will be specified
+as a XSD schema reference in the same namespace as the request.
+Of course you always can change this behavior.
+
+--- Document validation
+.... TO BE CONTINUED
+
+
+--- Implementation effort for new core components like filters
+.... TO BE CONTINUED filters are easy to write
+
+
+--- Bridging of languages of different class with iterators
+.... TO BE CONTINUED  how we handle different properties
+
+
+--- Wolframe does not use code generation
+.... TO BE CONTINUED
+
+
+
+OLD VERSION TO BE REVISITED
+Separating languages to help separating processes and roles:
+- In Wolframe you have different languages for different aspects of your project.
+	This looks like a disadvantage but it is from the project management point of view a big advantage.
+	For controlling a universal "does it all" language you have to do a lot on the project management
+	side to prevent developers to care about what they must not care about. You may for example not want
+	an application developer to care about data normalization and the definition of the document
+	structure because this is a matter of industry standards and higher level organizational
+	concepts. Development there is mainly to know your data and not about programming.
+	One the other hand you want a database administrator to define the data base schemas and the
+	transaction definitions in a language that is close to his domain and familiar for him
+	to formulate the solution.
+	One important goal of Wolframe is to make you able to separate different aspects of a project
+	according to your organization. But we do not want to educate you. If your setup is simple,
+	you can also manage the problems in a simple way, for example using your preferred programming
+	language for the whole processing chain.
+	Important is that such decisions are defined by your processes and taken by management.
+	One thing left to mention is that Wolframe does not force you to use a specific language
+	for an aspect. Language bindings are loaded by modules and therefore replaceable.
+
+
+
+
+
+

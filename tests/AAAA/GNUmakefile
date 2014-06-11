@@ -31,10 +31,19 @@ CPP_OBJS = \
 	$(TOPDIR)/src/modules/authentication/database/DBauth.o \
 	$(TOPDIR)/src/modules/authentication/textfile/passwdFile.o
 
+TEST_CPP_BINS = \
+	authenticationTest$(EXE) \
+	passwdHashTest$(EXE) \
+	passwdFileTest$(EXE) \
+	textFileTest$(EXE)
+
 # PAM
 
 ifeq ($(WITH_PAM),1)
 
+TEST_CPP_BINS += \
+	pamTest$(EXE)
+	
 INCLUDE_CXXFLAGS = \
 	-DWITH_PAM
 
@@ -75,15 +84,11 @@ CPP_OBJS += \
 
 endif
 
-TEST_CPP_BINS = \
-	authenticationTest$(EXE) \
-	passwdFileTest$(EXE) \
-	textFileTest$(EXE)
-
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 
 authenticationTest$(EXE): $(CPP_OBJS)
+passwdHashTest$(EXE): $(CPP_OBJS)
 passwdFileTest$(EXE): $(CPP_OBJS)
 textFileTest$(EXE): $(CPP_OBJS)
 
@@ -111,8 +116,15 @@ local_test: sasl.db $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./authenticationTest
 	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./passwdHashTest
+	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./passwdFileTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileTest
 	@echo
+# Aba: running PAM tests needs to much from the system, can't test automatically currently
+#ifeq ($(WITH_PAM),1)
+#	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./pamTest
+#	@echo
+#endif
 endif

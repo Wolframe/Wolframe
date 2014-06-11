@@ -5,7 +5,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE data SYSTEM "www.blabla.com/AllDataRequest.dtd">
 <data/>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf AllDataRequest
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf AllDataRequest
 
 **file:wolframe.conf
 LoadModules

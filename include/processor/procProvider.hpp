@@ -41,6 +41,7 @@
 #include "processor/procProviderConfig.hpp"
 #include "database/database.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
+#include "cmdbind/doctypeDetector.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "types/keymap.hpp"
 #include <list>
@@ -98,9 +99,9 @@ public:
 	/// \brief Get a reference to a custom data type identified by name
 	virtual const types::CustomDataType* customDataType( const std::string& name) const;
 
-	/// \brief PF:HACK: Function to guess the document format of a content defined as string
-	///	This method is here because document format recognition may be dependent on modules loaded
-	virtual bool guessDocumentFormat( std::string& result, const char* content, std::size_t contentsize) const;
+	/// \brief Create a new document type and format detector (defined in modules)
+	/// \return a document type and format detector reference allocated (owned and deleted by the caller)
+	virtual cmdbind::DoctypeDetector* doctypeDetector() const;
 
 	/// \brief Get the application reference path for local path expansion
 	virtual const std::string& referencePath() const;
@@ -114,7 +115,7 @@ private:
 	class CommandHandlerDef
 	{
 	public:
-		/// \brief Constructor
+		/// \brief Default constructor
 		CommandHandlerDef()
 			:configuration(0){}
 		/// \brief Copy constructor
@@ -133,7 +134,8 @@ private:
 	std::vector<CommandHandlerDef> m_cmd;				///< list of defined command handlers
 	types::keymap<std::size_t> m_cmdMap;				///< map of command names to indices in 'm_cmd'
 
-	std::list<std::string> m_programfiles;				///< list of all programs to load
+	std::vector<cmdbind::DoctypeDetectorType> m_doctypes;		///< list of document type detectors loaded from modules
+	std::vector<std::string> m_programfiles;			///< list of all programs to load
 	prgbind::ProgramLibrary* m_programs;				///< program library
 	std::string m_referencePath;					///< application reference path
 };

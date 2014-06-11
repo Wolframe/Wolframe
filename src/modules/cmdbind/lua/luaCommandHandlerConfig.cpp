@@ -51,7 +51,7 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const 
 			if (boost::iequals( pi->first, "filter"))
 			{
 				std::vector<std::string> filterdef;
-				utils::splitString( filterdef, pi->second.data().string(), "=");
+				utils::splitString( filterdef, pi->second.data(), "=");
 				if (filterdef.size() == 1)
 				{
 					m_filtermap.insert( "", filterdef.at(0));
@@ -77,7 +77,7 @@ bool LuaCommandHandlerConfig::parse( const config::ConfigurationNode& pt, const 
 	}
 	catch (std::runtime_error& e)
 	{
-		LOG_ERROR << "lua command handler configuration error " << pi->second.data().position.logtext() << ":" << e.what();
+		LOG_ERROR << "lua command handler configuration error " << pi->second.position().logtext() << ":" << e.what();
 		return false;
 	}
 	return true;

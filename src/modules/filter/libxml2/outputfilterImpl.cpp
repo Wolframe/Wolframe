@@ -106,6 +106,20 @@ void OutputFilterImpl::setXmlError( const char* msg)
 	}
 }
 
+static bool metadataContainSchemaReference( const types::DocMetaData& md)
+{
+	std::vector<types::DocMetaData::Attribute>::const_iterator ai = md.attributes().begin(), ae = md.attributes().end();
+	for (; ai != ae; ++ai)
+	{
+		if (0==std::memcmp( ai->name.c_str(), "xmlns", 5)
+		||  0==std::memcmp( ai->name.c_str(), "xsi:", 4))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool OutputFilterImpl::printHeader()
 {
 	types::DocMetaData md( getMetaData());
@@ -119,47 +133,66 @@ bool OutputFilterImpl::printHeader()
 		setState( Error, "no XML root element defined");
 		return false;
 	}
-
-	if (standalone && 0==std::strcmp( standalone, "yes"))
+	const char* doctype_public = md.getAttribute( "PUBLIC");
+	const char* doctype_system = md.getAttribute( "SYSTEM");
+	std::string doctype_system_buf;
+	if (doctype_system && !md.doctype().empty())
 	{
-		try
+		doctype_system_buf = types::DocMetaData::replaceStem( doctype_system, md.doctype());
+		doctype_system = doctype_system_buf.c_str();
+	}
+	if (!standalone)
+	{
+		if (doctype_system)
 		{
-			m_doc = DocumentWriter( encoding, root, 0/*public*/, 0/*system*/, 0/*xmlns*/, 0/*xsi*/, 0/*schemaLocation*/);
+			standalone = "no";
 		}
-		catch (const std::runtime_error& e)
+		else if (!metadataContainSchemaReference( md))
 		{
-			setState( Error, e.what());
-			return false;
+			standalone = "yes";
 		}
 	}
-	else
+	try
 	{
-		const char* doctype_public = md.getAttribute( "PUBLIC");
-		const char* doctype_system = md.getAttribute( "SYSTEM");
-		std::string doctype_system_buf;
-		if (doctype_system && !md.doctype().empty())
+		m_doc = DocumentWriter( encoding, standalone, root, doctype_public, doctype_system);
+		xmlTextWriterPtr xmlout = m_doc.get();
+		if (xmlout)
 		{
-			doctype_system_buf = types::DocMetaData::replaceStem( doctype_system, md.doctype());
-			doctype_system = doctype_system_buf.c_str();
+			std::vector<types::DocMetaData::Attribute>::const_iterator ai = md.attributes().begin(), ae = md.attributes().end();
+			for (; ai != ae; ++ai)
+			{
+				std::string value;
+				const char* valueptr = ai->value.c_str();
+
+				const char* cc = std::strchr( ai->name.c_str(), ':');
+				if (cc != 0)
+				{
+					if (0==std::strcmp(cc+1,"schemaLocation")
+					||  0==std::strcmp(cc+1,"noNamespaceSchemaLocation"))
+					{
+						if (!md.doctype().empty())
+						{
+							value = types::DocMetaData::replaceStem( ai->value, md.doctype());
+							valueptr = value.c_str();
+						}
+					}
+				}
+				if (0==std::memcmp( ai->name.c_str(), "xmlns", 5)
+				||  0==std::memcmp( ai->name.c_str(), "xsi:", 4))
+				{
+					if (0>xmlTextWriterWriteAttribute( xmlout, getXmlString(ai->name.c_str()), getXmlString(valueptr)))
+					{
+						setXmlError( "libxml2 filter: write XML header attribute error");
+						return false;
+					}
+				}
+			 }
 		}
-		const char* xmlns = md.getAttribute( "xmlns");
-		const char* xsi = md.getAttribute( "xmlns:xsi");
-		const char* schemaLocation = md.getAttribute( "xsi:schemaLocation");
-		std::string schemaLocation_buf;
-		if (schemaLocation && !md.doctype().empty())
-		{
-			schemaLocation_buf = types::DocMetaData::replaceStem( schemaLocation, md.doctype());
-			schemaLocation = schemaLocation_buf.c_str();
-		}
-		try
-		{
-			m_doc = DocumentWriter( encoding, root, doctype_public, doctype_system, xmlns, xsi, schemaLocation);
-		}
-		catch (const std::runtime_error& e)
-		{
-			setState( Error, e.what());
-			return false;
-		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		setState( Error, e.what());
+		return false;
 	}
 	setState( Open);
 	m_taglevel = 1;

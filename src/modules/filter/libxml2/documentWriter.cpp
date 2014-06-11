@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implemtation of document writer abstraction for the libxml2 library
 #include "documentWriter.hpp"
 #include <stdexcept>
+#include <cstring>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -59,21 +60,11 @@ static std::string errorMessage( const char* msg)
 	{
 		rt.append( msg?msg:"unknown error");
 	}
-	return rt;
-	
+	return rt;	
 }
 
-DocumentWriter::DocumentWriter( const char* encoding, const char* root, const char* publicid, const char* systemid, const char* xmlns, const char* xsi, const char* schemaLocation)
+DocumentWriter::DocumentWriter( const char* encoding, const char* standalone, const char* root, const char* publicid, const char* systemid)
 {
-	const char* standalone = "yes";
-	if (systemid)
-	{
-		standalone = "no";
-	}
-	else if (schemaLocation)
-	{
-		standalone = 0;
-	}
 	xmlBufferPtr bb = xmlBufferCreate();
 	if (!bb) throw std::runtime_error( errorMessage( "failed to create libxml2 buffer"));
 
@@ -86,12 +77,15 @@ DocumentWriter::DocumentWriter( const char* encoding, const char* root, const ch
 	{
 		throw std::runtime_error( errorMessage( "failed to write document header (XML header)"));
 	}
-	if (systemid)
+	if (standalone && 0==std::strcmp( standalone, "no"))
 	{
-		if (0>xmlTextWriterStartDTD( ww, (const xmlChar*)root, (const xmlChar*)publicid, (const xmlChar*)systemid)
-		||  0>xmlTextWriterEndDTD(ww))
+		if (systemid)
 		{
-			throw std::runtime_error( errorMessage( "failed to write document header (DTD)"));
+			if (0>xmlTextWriterStartDTD( ww, (const xmlChar*)root, (const xmlChar*)publicid, (const xmlChar*)systemid)
+			||  0>xmlTextWriterEndDTD(ww))
+			{
+				throw std::runtime_error( errorMessage( "failed to write document header (DTD)"));
+			}
 		}
 	}
 	if (!root)
@@ -101,27 +95,6 @@ DocumentWriter::DocumentWriter( const char* encoding, const char* root, const ch
 	if (0>xmlTextWriterStartElement( ww, getXmlString( root)))
 	{
 		throw std::runtime_error( errorMessage( "libxml2 filter: write root element error"));
-	}
-	if (xmlns)
-	{
-		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xmlns"), getXmlString(xmlns)))
-		{
-			throw std::runtime_error( errorMessage( "libxml2 filter: write XML header attribute error"));
-		}
-	}
-	if (xsi)
-	{
-		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xmlns:xsi"), getXmlString(xsi)))
-		{
-			throw std::runtime_error( errorMessage( "libxml2 filter: write XML header attribute error"));
-		}
-	}
-	if (xmlns)
-	{
-		if (0>xmlTextWriterWriteAttribute( ww, getXmlString("xsi:schemaLocation"), getXmlString(schemaLocation)))
-		{
-			throw std::runtime_error( errorMessage( "libxml2 filter: write XML header attribute error"));
-		}
 	}
 }
 

@@ -1,0 +1,61 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I$(TOPDIR)\include /I. \
+	/I$(TOPDIR)\src \
+	/I$(TOPDIR)\sqlite3 \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I"$(PLATFORM_SDK_DIR)\Include"
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Advapi32.lib Ws2_32.lib
+
+# sqlite3
+
+!IFDEF WITH_SQLITE3
+
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_SQLITE3
+
+!ENDIF
+
+TEST_CPP_BINS = \
+	authTest.exe
+
+OBJS =
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+authTest.exe: authTest.obj $(TOPDIR)\src\wolframe.lib
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+
+local_distclean:
+
+local_test:
+!IFDEF WITH_EXPECT
+	@-"$(EXPECT)" checkAuthTextFileUnknownUser
+	@-"$(EXPECT)" checkAuthTextFileWrongPass
+	@-"$(EXPECT)" checkAuthTextFileOk
+!IFDEF WITH_SQLITE3
+	@-"$(EXPECT)" checkAuthDbSqlite3UnknownUser
+	@-"$(EXPECT)" checkAuthDbSqlite3WrongPass
+	@-"$(EXPECT)" checkAuthDbSqlite3Ok
+!ENDIF
+!ENDIF

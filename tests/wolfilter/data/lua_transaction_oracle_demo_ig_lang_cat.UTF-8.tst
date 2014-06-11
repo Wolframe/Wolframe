@@ -154,7 +154,7 @@
 	</class>
 </class>
 </tree>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 **requires:TEXTWOLF
 **file:wolframe.conf
 LoadModules

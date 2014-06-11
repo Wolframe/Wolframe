@@ -1,0 +1,7 @@
+MECHS NONE TEST
+USERNAME
+.
+PASSWORD
+.
+OK authenticated
+BYE

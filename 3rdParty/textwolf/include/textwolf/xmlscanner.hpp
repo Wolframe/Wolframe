@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -278,7 +278,7 @@ public:
 	enum STMState
 	{
 		START, STARTTAG, XTAG, PITAG, PITAGEND, XTAGEND, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
-		CONTENT, TOKEN, SEEKTOK, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
+		DOCSTART, CONTENT, TOKEN, SEEKTOK, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
 		TAGCLIM, ENTITYSL, ENTITY, ENTITYE, ENTITYID, ENTITYSQ, ENTITYDQ, ENTITYLC, 
 		COMDASH2, COMSEEKE, COMENDD2, COMENDCL, CDATA, CDATA1, CDATA2, CDATA3, EXIT
 	};
@@ -288,13 +288,13 @@ public:
 	///\return the state as string
 	static const char* getStateString( STMState s)
 	{
-		enum Constant {NofStates=47};
+		enum Constant {NofStates=48};
 		static const char* sState[NofStates]
 		= {
 			"START", "STARTTAG", "XTAG", "PITAG", "PITAGEND",
 			"XTAGEND", "XTAGDONE", "XTAGAISK", "XTAGANAM",
 			"XTAGAESK", "XTAGAVSK", "XTAGAVID", "XTAGAVSQ", "XTAGAVDQ",
-			"XTAGAVQE", "CONTENT", "TOKEN", "SEEKTOK", "XMLTAG",
+			"XTAGAVQE", "DOCSTART", "CONTENT", "TOKEN", "SEEKTOK", "XMLTAG",
 			"OPENTAG", "CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM",
 			"TAGAESK", "TAGAVSK", "TAGAVID", "TAGAVSQ", "TAGAVDQ",
 			"TAGAVQE", "TAGCLIM", "ENTITYSL", "ENTITY", "ENTITYE",
@@ -336,7 +336,7 @@ public:
 			[ PITAG    ](Questm,PITAGEND).other(PITAG)
 			[ PITAGEND ](Gt,CONTENT).miss(ErrExpectedTagEnd)
 			[ XTAGEND  ](Gt,XTAGDONE)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
-			[ XTAGDONE ].action(Return,HeaderEnd).fallback(CONTENT)
+			[ XTAGDONE ].action(Return,HeaderEnd).fallback(DOCSTART)
 			[ XTAGAISK ](EndOfLine)(Cntrl)(Space)(Questm,XTAGEND).fallback(XTAGANAM)
 			[ XTAGANAM ].action(ReturnIdentifier,HeaderAttribName)(EndOfLine,Cntrl,Space,XTAGAESK)(Equal,XTAGAVSK).miss(ErrExpectedEqual)
 			[ XTAGAESK ](EndOfLine)(Cntrl)(Space)(Equal,XTAGAVSK).miss(ErrExpectedEqual)
@@ -344,7 +344,8 @@ public:
 			[ XTAGAVID ].action(ReturnIdentifier,HeaderAttribValue)(EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedTagAttribute)
 			[ XTAGAVSQ ].action(ReturnSQString,HeaderAttribValue)(Sq,XTAGAVQE).miss(ErrStringNotTerminated)
 			[ XTAGAVDQ ].action(ReturnDQString,HeaderAttribValue)(Dq,XTAGAVQE).miss(ErrStringNotTerminated)
-			[ XTAGAVQE ](EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedTagAttribute);
+			[ XTAGAVQE ](EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedTagAttribute)
+			[ DOCSTART ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,XMLTAG).fallback(TOKEN);
 			if (doTokenize)
 			{
 				(*this)

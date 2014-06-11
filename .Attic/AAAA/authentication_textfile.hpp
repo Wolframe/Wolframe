@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2014 Project Wolframe.
+ Copyright (C) 2011 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -30,13 +30,44 @@
  Project Wolframe.
 
 ************************************************************************/
+//
+// authentication_textfile.hpp
+//
 
-<?php
+#ifndef _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
+#define _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
 
-include 'authentication.php';
+#include "AAAA/authentication.hpp"
 
-echo userHash( 'bla bla' ), "\n";
-echo CRAMresponse( 'bla bla', '$bli bli$' . base64_encode( "A 64 bytes dummy challenge -------------------------------------" ) ), "\n";
+#include <map>
+#include <string>
 
-?>
+namespace _Wolframe {
+namespace AAAA {
 
+class TextFileAuthenticator : public Authenticator {
+	private:
+		std::map< std::string, std::string > m_creds;
+
+		enum {
+			_Wolframe_TEXTFILE_STATE_NEED_LOGIN,
+			_Wolframe_TEXTFILE_STATE_NEED_PASS,
+			_Wolframe_TEXTFILE_STATE_COMPUTE
+		} m_state;
+
+		std::string m_token;
+		std::string m_login;
+		std::string m_pass;
+
+	public:
+		TextFileAuthenticator( const std::string _filename );
+		virtual Step::AuthStep nextStep( );
+		virtual std::string sendData( );
+		virtual std::string token( );
+		virtual void receiveData( const std::string data );
+		virtual std::string getError( );
+};
+
+}} // namespace _Wolframe::AAAA
+
+#endif // _AUTHENTICATION_TEXTFILE_HPP_INCLUDED

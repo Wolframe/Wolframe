@@ -38,7 +38,7 @@
 #include "langbind/formFunction.hpp"
 #include "serialize/ddl/ddlStructParser.hpp"
 #include "serialize/ddl/ddlStructSerializer.hpp"
-#include "cmdbind/doctypeFilterCommandHandler.hpp"
+#include "doctypeFilterCommandHandler.hpp"
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "processor/execContext.hpp"
 #include "filter/typingfilter.hpp"
@@ -540,7 +540,7 @@ static bool redirectInput( BufferStruct& buf, int& stateEscOut, const void* data
 	}
 }
 
-static void processCommandHandler( BufferStruct& buf, int& stateEscIn, int& stateEscOut, cmdbind::CommandHandler* cmdh, std::istream& is, std::ostream& os, bool doEscapeLFdot)
+static bool processCommandHandler( BufferStruct& buf, int& stateEscIn, int& stateEscOut, cmdbind::CommandHandler* cmdh, std::istream& is, std::ostream& os, bool doEscapeLFdot, std::string& lasterr)
 {
 	const void* cmdh_output;
 	std::size_t cmdh_outputsize;
@@ -560,7 +560,8 @@ static void processCommandHandler( BufferStruct& buf, int& stateEscIn, int& stat
 				{
 					if (++eofCnt > 2)
 					{
-						throw std::runtime_error("got READ after processing EoD");
+						lasterr = "got READ after processing EoD";
+						return false;
 					}
 				}
 			}
@@ -588,9 +589,10 @@ static void processCommandHandler( BufferStruct& buf, int& stateEscIn, int& stat
 			{ 
 				std::ostringstream msg;
 				msg << "error process command handler: " << error;
-				throw std::runtime_error( msg.str());
+				lasterr = msg.str();
+				return false;
 			}
-			return;
+			return true;
 	}
 }
 
@@ -602,6 +604,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		
 	if (proc.size() == 0 || proc == "-")
 	{
+		LOG_TRACE << "Start executing filter";
 		Filter flt = getFilter( provider, ifl, ofl);
 		if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
 		if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
@@ -651,121 +654,76 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		return;
 	}
 	{
-		if (proc[ proc.size()-1] == '~')
+		if (proc[ proc.size()-1] == '~' || provider->existcmd( proc))
 		{
+			LOG_TRACE << "Start executing command '" << proc << "'";
 			// ... command is handled by a command handler
 			//	-> detect document type with the doctype detection,
 			//	evaluate the command to execute (substitute '~' with doctype id)
 			//	and initialize the command handler with the docformat
 			//	as first parameter as the main protocol does.
 
+			bool standaloneCommand = (proc[ proc.size()-1] != '~');
 			cmdbind::DoctypeFilterCommandHandler* dtfh = new cmdbind::DoctypeFilterCommandHandler();
 			cmdbind::CommandHandlerR dtfh_scoped( dtfh);
 			dtfh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
+			dtfh->setExecContext( execContext);
 
 			// Detect document format:
 			int stateEscIn = 0;
 			int stateEscOut = 0;
-			processCommandHandler( buf, stateEscIn, stateEscOut, dtfh, is, os, true);
-
-			std::string docformat = dtfh->docformatid();
-			std::string doctype = dtfh->doctypeid();
-			std::string cmdname = std::string( proc.c_str(), proc.size()-1) + doctype;
-
+			std::string lasterr;
+			if (!processCommandHandler( buf, stateEscIn, stateEscOut, dtfh, is, os, true, lasterr))
+			{
+				if (!standaloneCommand)
+				{
+					throw std::runtime_error( lasterr);
+				}
+			}
+			std::string docformat;
+			std::string doctype;
+			types::DoctypeInfoR info = dtfh->info();
+			if (info.get())
+			{
+				docformat = info->docformat();
+				doctype = info->doctype();
+			}
+			else
+			{
+				std::string explain;
+				if (dtfh->lastError())
+				{
+					explain.append( ": ");
+					explain.append( dtfh->lastError());
+				}
+				if (standaloneCommand)
+				{
+					LOG_WARNING << "document format not detected and assumed to be 'text'" << explain;
+					docformat = "text";
+				}
+				else
+				{
+					throw std::runtime_error( std::string("document format not recognigzed") + explain);
+				}
+			}
+			std::string cmdname;
+			if (standaloneCommand)
+			{
+				cmdname = proc;
+			}
+			else
+			{
+				cmdname = std::string( proc.c_str(), proc.size()-1) + doctype;
+			}
 			cmdbind::CommandHandler* cmdh = provider->cmdhandler( cmdname, docformat);
 			if (!cmdh)
 			{
 				throw std::runtime_error( std::string("no command handler defined for '") + proc + " processing '" + docformat + "'");
 			}
 			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
-			if (cmdh)
-			{
-				Filter flt = getFilter( provider, ifl, ofl);
-
-				cmdh->setExecContext( execContext);
-				cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
-				if (!ifch) 
-				{
-					throw std::runtime_error( "expected command handler processing CRLFdot escaped content");
-				}
-				if (ifl.size() && flt.inputfilter().get())
-				{
-					ifch->setFilter( flt.inputfilter());
-				}
-				if (ofl.size() && flt.outputfilter().get())
-				{
-					ifch->setFilter( flt.outputfilter());
-					flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
-				}
-				const char* cmd_argv = docformat.c_str();
-				cmdh->passParameters( cmdname, 1, &cmd_argv);
-				cmdh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
-
-				// Get data (consumed and rest = not processed) from 
-				//	the doc type detection command handler 
-				//	to redirect to the executing command handler:
-				std::string databuf;
-				void* comsumed_buffer;
-				std::size_t comsumed_size;
-				dtfh->getInputBuffer( comsumed_buffer, comsumed_size);
-				const void* rest_buffer;
-				std::size_t rest_size;
-				dtfh->getDataLeft( rest_buffer, rest_size);
-				databuf.append( (const char*)comsumed_buffer, comsumed_size);
-				databuf.append( (const char*)rest_buffer, rest_size);
-	
-				// Redirect input processed and call command handler 
-				//	to process if there is still input left:
-				if (redirectInput( buf, stateEscOut, databuf.c_str(), databuf.size(), cmdh, os))
-				{
-					processCommandHandler( buf, stateEscIn, stateEscOut, cmdh, is, os, true);
-				}
-				// Check if there is unconsumed input left (must not happen):
-				bool end = false;
-				while (!end)
-				{
-					char ch = 0;
-					is.read( &ch, sizeof(char));
-					if ((unsigned char)ch > 32)
-					{
-						throw std::runtime_error( "unconsumed input left");
-					}
-					end = is.eof();
-				}
-				return;
-			}
-			else
-			{
-				throw std::runtime_error( std::string("cannot find command handler for '") + cmdname + "' (" + proc + ")");
-			}
-		}
-	}
-	{
-		if (provider->existcmd( proc))
-		{
-			// ... command is handled by a command handler
-			//	-> detect document format with the doctype detection
-			//	and initialize the command handler with the docformat
-			//	as first parameter as the main protocol does.
-			cmdbind::DoctypeFilterCommandHandler* dtfh = new cmdbind::DoctypeFilterCommandHandler();
-			cmdbind::CommandHandlerR dtfh_scoped( dtfh);
-			dtfh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
-
-			// Detect document format:
-			int stateEscIn = 0;
-			int stateEscOut = 0;
-			processCommandHandler( buf, stateEscIn, stateEscOut, dtfh, is, os, true);
-
-			std::string docformat = dtfh->docformatid();
-			cmdbind::CommandHandler* cmdh = provider->cmdhandler( proc, docformat);
-			if (!cmdh)
-			{
-				throw std::runtime_error( std::string("no command handler defined for '") + proc + " processing '" + docformat + "'");
-			}
 			cmdh->setExecContext( execContext);
-			Filter flt = getFilter( provider, ifl, ofl);
 
-			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
+			Filter flt = getFilter( provider, ifl, ofl);
 			cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
 			if (!ifch) 
 			{
@@ -780,9 +738,8 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 				ifch->setFilter( flt.outputfilter());
 				flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
 			}
-
 			const char* cmd_argv = docformat.c_str();
-			cmdh->passParameters( proc, 1, &cmd_argv);
+			cmdh->passParameters( cmdname, 1, &cmd_argv);
 			cmdh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
 
 			// Get data (consumed and rest = not processed) from 
@@ -802,7 +759,10 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			//	to process if there is still input left:
 			if (redirectInput( buf, stateEscOut, databuf.c_str(), databuf.size(), cmdh, os))
 			{
-				processCommandHandler( buf, stateEscIn, stateEscOut, cmdh, is, os, true);
+				if (!processCommandHandler( buf, stateEscIn, stateEscOut, cmdh, is, os, true, lasterr))
+				{
+					throw std::runtime_error( lasterr);
+				}
 			}
 			// Check if there is unconsumed input left (must not happen):
 			bool end = false;
@@ -823,6 +783,8 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		const FormFunction* func = provider->formFunction( proc);
 		if (func)
 		{
+			LOG_TRACE << "Start executing form function '" << proc << "'";
+
 			// ... command is the name of a form function we call directly
 			//	with the filter specified:
 			Filter flt = getFilter( provider, ifl, ofl);
@@ -851,7 +813,9 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		const types::FormDescription* st = provider->formDescription( proc);
 		if (st)
 		{
-			// ... command is the name a form description -> we simply map 
+			LOG_TRACE << "Start mapping through form '" << proc << "'";
+
+			// ... command is the name a form description -> we simply map
 			//	the input with the input/output filters specified 
 			//	through the form:
 			Filter flt = getFilter( provider, ifl, ofl);

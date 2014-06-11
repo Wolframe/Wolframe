@@ -43,7 +43,7 @@
 #include <vector>
 #include <boost/scoped_ptr.hpp>
 
-#undef LOWLEVEL_DEBUG
+#undef _Wolframe_LOWLEVEL_DEBUG
 
 
 using namespace _Wolframe;
@@ -337,7 +337,7 @@ void TdlTransactionFunction::print( std::ostream& out) const
 		out << "AUDIT " << ((ai->level() == TdlAuditStep::Critical)?"CRITICAL ":"") << ai->function() << std::endl;
 	}
 
-#ifdef LOWLEVEL_DEBUG
+#ifdef _Wolframe_LOWLEVEL_DEBUG
 	// Print code without symbols:
 	out << "BEGIN RAW" << std::endl;
 	m_program->code.printRaw( out);

@@ -81,7 +81,7 @@ MemBlock& MemBlock::operator=( const MemBlock& o)
 	return *this;
 }
 
-static void remove_chars_from_buf( char* buf, std::size_t& bufsize, const std::vector<std::size_t>& delchrs)
+static void remove_chars_from_buf( char* buf, std::size_t bufsize, const std::vector<std::size_t>& delchrs)
 {
 	if (!delchrs.empty())
 	{
@@ -104,7 +104,6 @@ static void remove_chars_from_buf( char* buf, std::size_t& bufsize, const std::v
 		{
 			throw std::logic_error( "illegal state in getEoDpos (consistency remove_chars_from_buf)");
 		}
-		bufsize -= delchrs.size();
 	}
 }
 
@@ -112,10 +111,10 @@ int InputBlock::getEoDpos( std::size_t offset)
 {
 	if (pos()<=offset) return -1;
 
-	std::size_t bufsize = pos()-offset;
-	char* buf = charptr()+offset;
+	std::size_t bufsize = pos();
+	char* buf = charptr();
 	std::vector<std::size_t> delchrs;
-	std::size_t bufpos = 0;
+	std::size_t bufpos = offset;
 	std::size_t srcendpos = bufsize;
 	char ecb[8];
 	unsigned int eci=0;
@@ -200,7 +199,8 @@ int InputBlock::getEoDpos( std::size_t offset)
 				{
 					m_eodState = EoD::CR_LF_DOT_CR_LF;
 					remove_chars_from_buf( buf, bufsize, delchrs);
-					setPos( bufsize + offset);
+					m_nextpos = bufpos - delchrs.size() + 1;
+					setPos( bufsize - delchrs.size());
 					return srcendpos;
 				}
 				else
@@ -215,7 +215,8 @@ int InputBlock::getEoDpos( std::size_t offset)
 				{
 					m_eodState = EoD::CR_LF_DOT_CR_LF;
 					remove_chars_from_buf( buf, bufsize, delchrs);
-					setPos( bufsize + offset);
+					m_nextpos = bufpos - delchrs.size() + 1;
+					setPos( bufsize - delchrs.size());
 					return srcendpos;
 				}
 				else if (buf[bufpos] == '\r')
@@ -249,17 +250,17 @@ int InputBlock::getEoDpos( std::size_t offset)
 	remove_chars_from_buf( buf, bufsize, delchrs);
 	if (delchrs.empty())
 	{
-		setPos( srcendpos + offset);
+		setPos( srcendpos);
 	}
 	else
 	{
 		if (delchrs.back() >= srcendpos)
 		{
-			setPos( srcendpos + offset - delchrs.size() + 1);
+			setPos( srcendpos - delchrs.size() + 1);
 		}
 		else
 		{
-			setPos( srcendpos + offset - delchrs.size());
+			setPos( srcendpos - delchrs.size());
 		}
 	}
 	return -1;

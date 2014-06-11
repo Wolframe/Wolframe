@@ -1384,6 +1384,9 @@ fi
 %{_libdir}/wolframe/modules/mod_datatype_datetime.so
 %{_libdir}/wolframe/modules/mod_datatype_bcdnumber.so
 
+%{_libdir}/wolframe/modules/mod_doctype_xml.so
+%{_libdir}/wolframe/modules/mod_doctype_json.so
+
 %if %{with_icu}
 %{_libdir}/wolframe/modules/mod_normalize_locale.so
 %endif

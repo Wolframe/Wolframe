@@ -73,7 +73,7 @@ bool LoggerConfiguration::parse( const types::PropertyTree::Node& pt, const std:
 			for ( types::PropertyTree::Node::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					std::string s = boost::algorithm::to_upper_copy( L2it->second.data().string());
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.data());
 					boost::algorithm::trim( s );
 					log::LogLevel::Level lvl = log::LogLevel::strToLogLevel( s );
 					if ( lvl ==  log::LogLevel::LOGLEVEL_UNDEFINED )	{
@@ -104,17 +104,17 @@ bool LoggerConfiguration::parse( const types::PropertyTree::Node& pt, const std:
 			for ( types::PropertyTree::Node::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					std::string s = boost::algorithm::to_upper_copy( L2it->second.data().string() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.data());
 					boost::algorithm::trim( s );
 					log::LogLevel::Level lvl = log::LogLevel::strToLogLevel( s );
 					if ( lvl == log::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << logPrefix() << "logfile: unknown log level: "
-							  << L2it->second.data().string();
+							  << L2it->second.data();
 						return false;
 					}
 					if ( logFileLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << logPrefix() << "logfile: log level already defined. Second value: "
-							  << L2it->second.data().string();
+							  << L2it->second.data();
 						return false;
 					}
 					logFileLogLevel = lvl;
@@ -140,33 +140,33 @@ bool LoggerConfiguration::parse( const types::PropertyTree::Node& pt, const std:
 			for ( types::PropertyTree::Node::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					std::string s = boost::algorithm::to_upper_copy( L2it->second.data().string() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.data());
 					boost::algorithm::trim( s );
 					log::LogLevel::Level lvl = log::LogLevel::strToLogLevel( s );
 					if ( lvl == log::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << logPrefix() << "syslog: unknown log level: "
-							  << L2it->second.data().string();
+							  << L2it->second.data();
 						return false;
 					}
 					if ( syslogLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << logPrefix() << "syslog: log level already defined. Second value: "
-							  << L2it->second.data().string();
+							  << L2it->second.data();
 						return false;
 					}
 					syslogLogLevel = lvl;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "facility" ))	{
-					std::string s = boost::algorithm::to_upper_copy( L2it->second.data().string() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.data());
 					boost::algorithm::trim( s );
 					log::SyslogFacility::Facility fclt = log::SyslogFacility::strToSyslogFacility( s );
 					if ( fclt == log::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED )	{
 						LOG_ERROR << logPrefix() << "syslog: unknown facility: "
-							  << L2it->second.data().string();
+							  << L2it->second.data();
 						return false;
 					}
 					if ( syslogFacility != log::SyslogFacility::WOLFRAME_SYSLOG_FACILITY_UNDEFINED )	{
 						LOG_ERROR << logPrefix() << "syslog: facility already defined. Second value: "
-							  << L2it->second.data().string();
+							  << L2it->second.data();
 						return false;
 					}
 					syslogFacility = fclt;
@@ -198,17 +198,17 @@ bool LoggerConfiguration::parse( const types::PropertyTree::Node& pt, const std:
 			for ( types::PropertyTree::Node::const_iterator L2it = L1it->second.begin();
 			L2it != L1it->second.end(); L2it++ )	{
 				if ( boost::algorithm::iequals( L2it->first, "level" ))	{
-					std::string s = boost::algorithm::to_upper_copy( L2it->second.data().string() );
+					std::string s = boost::algorithm::to_upper_copy( L2it->second.data());
 					boost::algorithm::trim( s );
 					log::LogLevel::Level lvl = log::LogLevel::strToLogLevel( s );
 					if ( lvl == log::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << logPrefix() << "eventlog: unknown log level: "
-							  << L2it->second.data().string();
+							  << L2it->second.data();
 						return false;
 					}
 					if ( eventlogLogLevel != log::LogLevel::LOGLEVEL_UNDEFINED )	{
 						LOG_ERROR << logPrefix() << "eventlog: log level already defined. Second value: "
-							  << L2it->second.data().string();
+							  << L2it->second.data();
 						return false;
 					}
 					eventlogLogLevel = lvl;

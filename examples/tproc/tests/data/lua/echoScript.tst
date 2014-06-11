@@ -13,8 +13,9 @@ QUIT
 function run( )
 	input:as( provider.filter( "char"))
 	for ch,t in input:get() do
+		logger.printc( "OUTPUT [", ch, "]")
 		output:print( ch,t)
-		output:print( 'X')
+		output:print( '_')
 	end
 end
 --output
@@ -37,6 +38,7 @@ provider
 		lua
 		{
 			program echo.lua
+			filter char
 		}
 	}
 }

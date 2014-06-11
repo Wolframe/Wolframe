@@ -9,44 +9,66 @@ namespace WolframeClient
 {
     public class Serializer
     {
-        public static byte[] getRequestContent(string doctype, string root, Type type, object obj)
+        private string m_schemadir;
+        private string m_schemaext;
+
+        public Serializer(string schemadir_, string schemaext_)
         {
-            var xattribs = new XmlAttributes();
-            var xroot = new XmlRootAttribute(root);
-            xattribs.XmlRoot = xroot;
-            var xoverrides = new XmlAttributeOverrides();
-            //... have to use XmlAttributeOverrides because .NET insists on the object name as root element name otherwise ([XmlRoot(..)] has no effect)
-            xoverrides.Add(type, xattribs);
-
-            XmlSerializer serializer = new XmlSerializer(type, xoverrides);
-            StringWriter sw = new StringWriter();
-            XmlWriterSettings wsettings = new XmlWriterSettings();
-            wsettings.OmitXmlDeclaration = false;
-            wsettings.Encoding = new UTF8Encoding(false/*no BOM*/, true/*throw if input illegal*/);
-            XmlWriter xw = XmlWriter.Create(sw, wsettings);
-            xw.WriteProcessingInstruction("xml", "version='1.0' standalone='no'");
-            //... have to write header by hand (OmitXmlDeclaration=false has no effect)
-            xw.WriteDocType(root, null, doctype + ".sfrm", null);
-
-            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
-            ns.Add("", "");
-            //... trick to avoid printing of xmlns:xsi xmlns:xsd attributes of the root element
-
-            serializer.Serialize(xw, obj, ns);
-            return wsettings.Encoding.GetBytes( sw.ToString());
+            m_schemadir = schemadir_;
+            m_schemaext = schemaext_;
         }
 
-        public static object getResult(byte[] content, Type type)
+        public byte[] getRequestContent( string doctype, string root, Type type, object obj)
         {
-            string stringContent = System.Text.UTF8Encoding.UTF8.GetString(content);
-            Regex doctypeDeclaration = new Regex("<!DOCTYPE[ ]*[^>]*[>]");
-            string saveContent = doctypeDeclaration.Replace(stringContent, "");
-            // ... !DOCTYPE is prohibited for security reasons by .NET, if not 
-            //      explicitely enabled. We cut it out, because we do not need it.
-            StringReader sr = new StringReader(saveContent);
+            XmlSerializer serializer = null;
+            if (root == null)
+            {
+                //... root element will be the object type name
+                serializer = new XmlSerializer(type);
+            }
+            else
+            {
+                //... root element set explicitely
+                var xattribs = new XmlAttributes();
+                var xroot = new XmlRootAttribute(root);
+                xattribs.XmlRoot = xroot;
+                var xoverrides = new XmlAttributeOverrides();
+                xoverrides.Add(type, xattribs);
+                serializer = new XmlSerializer(type, xoverrides);
+            }
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = false;
+            settings.OmitXmlDeclaration = false;
+            settings.Encoding = new UTF8Encoding(false/*no BOM*/, true/*throw if input illegal*/);
+
+            XmlSerializerNamespaces xmlNameSpace = new XmlSerializerNamespaces();
+            xmlNameSpace.Add("xsi", "http://www.w3.org/2001/XMLSchema-instance");    
+            xmlNameSpace.Add("noNamespaceSchemaLocation", m_schemadir + "/" + doctype + "." + m_schemaext);
+
+            StringWriter sw = new StringWriter();
+            XmlWriter xw = XmlWriter.Create( sw, settings);
+            xw.WriteProcessingInstruction("xml", "version='1.0' encoding='UTF-8'");
+
+            serializer.Serialize(xw, obj, xmlNameSpace);
+
+            return settings.Encoding.GetBytes( sw.ToString());
+        }
+
+        public object getResult(byte[] content, Type type)
+        {
+            string str = System.Text.UTF8Encoding.UTF8.GetString(content);
+
+            StringReader sr = new StringReader(str);
             XmlReader xr = XmlReader.Create(sr);
             XmlSerializer xs = new XmlSerializer(type);
-            return xs.Deserialize(xr);
+            try
+            {
+                return xs.Deserialize(xr);
+            }
+            catch (System.InvalidOperationException e)
+            {
+                return null;
+            }
         }
     }
 }

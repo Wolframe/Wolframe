@@ -201,7 +201,7 @@ public:
 		return ((int)a.first->category()) < ((int)b.first->category());
 	}
 
-	void loadPrograms( ProgramLibrary& library, db::Database* transactionDB, const std::list<std::string>& filenames)
+	void loadPrograms( ProgramLibrary& library, db::Database* transactionDB, const std::vector<std::string>& filenames)
 	{
 		LOG_DEBUG << "Loading programs";
 
@@ -221,7 +221,7 @@ public:
 		// Loading scripts
 		std::vector< std::pair<Program*, std::string> > typed_filenames;
 
-		std::list<std::string>::const_iterator fi = filenames.begin(), fe = filenames.end();
+		std::vector<std::string>::const_iterator fi = filenames.begin(), fe = filenames.end();
 		for (; fi != fe; ++fi)
 		{
 			std::vector<ProgramR>::const_iterator pi = m_programTypes.begin(), pe = m_programTypes.end();
@@ -357,7 +357,7 @@ const langbind::FilterType* ProgramLibrary::getFilterType( const std::string& na
 	return m_impl->getFilterType( name);
 }
 
-void ProgramLibrary::loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames)
+void ProgramLibrary::loadPrograms( db::Database* transactionDB, const std::vector<std::string>& filenames)
 {
 	m_impl->loadPrograms( *this, transactionDB, filenames);
 }

@@ -58,22 +58,30 @@ public:
 	enum Status	{
 		MESSAGE_AVAILABLE,	///< an output message is available
 		AWAITING_MESSAGE,	///< waiting for an input message
+		USER_NOT_FOUND,		///< this slice doesn't handle the credentials
+					///  for the requested user
 		AUTHENTICATED,		///< a user has been authenticated
 		INVALID_CREDENTIALS,	///< the user authentication failed,
 					///  either the username or the credentials are invalid
 		SYSTEM_FAILURE		///< some other error occurred
 	};
 
+	static const char* statusName( Status i)
+	{
+		static const char* ar[] = {"MESSAGE_AVAILABLE","AWAITING_MESSAGE","AUTHENTICATED","INVALID_CREDENTIALS","SYSTEM_FAILURE"};
+		return ar[i];
+	}
+
 	/// The virtual destructor
 	virtual ~AuthenticatorSlice()	{}
 
-	/// Destroy the authenticator
+	/// Dispose of the authenticator
 	///
 	/// \note	In many cases this is a suicidal function (delete this),
 	///		so you should be very careful how you use it.
 	///		You should use this function instead of delete
 	///		because not all authentication instances are created with new.
-	virtual void destroy() = 0;
+	virtual void dispose() = 0;
 
 	/// The class name of the authentication unit / subunit
 	///\note	This is the name of the authentication type / class
@@ -89,17 +97,23 @@ public:
 
 	/// The output message
 	/// \returns		the output message
-	virtual const std::string& messageOut() = 0;
+	virtual std::string messageOut() = 0;
 
 	/// The current status of the authenticator
 	virtual Status status() const = 0;
+
+	/// Is the last input message reusable for this mech ?
+	/// If true then the last input message will be used also
+	/// for the next slice in case of an USER_NOT_FOUND status
+	/// otherwise a CLIENT_RESET will be issued
+	virtual bool inputReusable() const = 0;
 
 	/// The authenticated user or NULL if not authenticated
 	/// \note	It is intended that this function can be called only once
 	///		As a security precaution, all the instance information regarding
 	///		the current authentication operation should be destroyed after
 	///		calling this function
-	virtual User* user() const = 0;
+	virtual User* user() = 0;
 };
 
 }} // namespace _Wolframe::AAAA

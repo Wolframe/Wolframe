@@ -45,9 +45,12 @@ using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::langbind;
 
 IOFilterCommandHandlerEscDLF::IOFilterCommandHandlerEscDLF()
-	:m_state(Processing)
+	:m_state(StartProcessing)
+	,m_unconsumedInput(false)
+	,m_gotEoD(false)
 	,m_writedata(0)
 	,m_writedatasize(0)
+	,m_nextmsg(0)
 	,m_itrpos(0)
 {
 	langbind::Filter flt = createNullFilter( "", "");
@@ -62,6 +65,7 @@ const char* IOFilterCommandHandlerEscDLF::interruptDataSessionMarker() const
 {
 	switch (m_state)
 	{
+		case StartProcessing:
 		case Processing:
 		case FlushingOutput:
 		case DiscardInput: return "\r\n.\r\n";
@@ -133,7 +137,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 					getFilterOutputWriteData();
 					if (m_writedatasize) return WRITE;
 				}
-				if (m_input.gotEoD())
+				if (m_gotEoD)
 				{
 					m_outputfilter.reset();
 					m_writedata = "\r\n.\r\n";
@@ -141,8 +145,13 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 					m_state = Terminated;
 					return WRITE;
 				}
+				if (consumeInput())
+				{
+					continue;
+				}
 				return READ;
 
+			case StartProcessing:
 			case Processing:
 				switch (call( errmsg))
 				{
@@ -160,6 +169,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 						continue;
 
 					case Yield:
+						m_state = Processing;
 						if (m_inputfilter.get())
 						{
 							switch (m_inputfilter->state())
@@ -169,7 +179,11 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 									break;
 
 								case InputFilter::EndOfMessage:
-									if (m_input.gotEoD())
+									if (consumeInput())
+									{
+										continue;
+									}
+									if (m_gotEoD)
 									{
 										LOG_ERROR << "error in input filter: unexpected end of input";
 										setLastError( "unexpected end of input");
@@ -218,6 +232,32 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 	}
 }
 
+bool IOFilterCommandHandlerEscDLF::consumeInput()
+{
+	if (m_unconsumedInput)
+	{
+		InputFilter* flt = m_inputfilter.get();
+		if (flt)
+		{
+			if (flt->state() == InputFilter::EndOfMessage)
+			{
+				flt->setState( InputFilter::Open);
+			}
+			if (m_state != DiscardInput)
+			{
+				flt->putInput( m_input.charptr()+m_itrpos, m_eoD-m_input.at(m_itrpos), m_input.gotEoD());
+			}
+			if (m_input.gotEoD())
+			{
+				m_gotEoD = true;
+				m_nextmsg = m_input.skipEoD();
+			}
+		}
+		m_unconsumedInput = false;
+		return true;
+	}
+	return false;
+}
 
 void IOFilterCommandHandlerEscDLF::putInput( const void *begin, std::size_t bytesTransferred)
 {
@@ -232,16 +272,14 @@ void IOFilterCommandHandlerEscDLF::putInput( const void *begin, std::size_t byte
 		if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
 		startidx = 0; //... start of buffer is end last message (part of eoD marker)
 	}
+	m_itrpos = startidx;
 	protocol::InputBlock::iterator start = m_input.at( startidx);
 	m_eoD = m_input.getEoD( start);
-	InputFilter* flt = m_inputfilter.get();
-	if (flt)
+	m_nextmsg = m_eoD - m_input.at(0);
+	m_unconsumedInput = true;
+	if (m_state != StartProcessing)
 	{
-		if (flt->state() == InputFilter::EndOfMessage)
-		{
-			flt->setState( InputFilter::Open);
-		}
-		flt->putInput( start.ptr(), m_eoD-start, m_input.gotEoD());
+		(void)consumeInput();
 	}
 }
 
@@ -262,7 +300,7 @@ void IOFilterCommandHandlerEscDLF::getOutput( const void*& begin, std::size_t& b
 
 void IOFilterCommandHandlerEscDLF::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	std::size_t pos = m_eoD - m_input.begin();
+	std::size_t pos = m_nextmsg;
 	begin = (const void*)(m_input.charptr() + pos);
 	nofBytes = m_input.pos() - pos;
 }

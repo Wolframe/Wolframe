@@ -43,6 +43,7 @@ Project Wolframe.
 #include "filter/inputfilterScope.hpp"
 #include "filter/tostringfilter.hpp"
 #include "utils/fileUtils.hpp"
+#include "cmdbind/doctypeDetector.hpp"
 #include <limits>
 #include <fstream>
 #include <iostream>
@@ -1144,8 +1145,27 @@ LUA_FUNCTION_THROWS( "provider.document(..)", function_document)
 
 	proc::ExecContext* ctx = getExecContext( ls);
 	std::string docformat;
-	(void)ctx->provider()->guessDocumentFormat( docformat, content, contentlen);
-	//... if we cannot decide we define docformat as empty
+	cmdbind::DoctypeDetectorR dt( ctx->provider()->doctypeDetector());
+
+	dt->putInput( content, contentlen);
+	if (dt->run())
+	{
+		if (dt->info().get())
+		{
+			//... if we cannot decide we define docformat as empty
+			docformat = dt->info()->docformat();
+		}
+	}
+	else
+	{
+		std::string msg( "document format not recognized");
+		if (dt->lastError())
+		{
+			msg.append(": ");
+			msg.append( dt->lastError());
+		}
+		throw std::runtime_error( msg);
+	}
 	LuaObject<Input>::push_luastack( ls, Input( docformat, std::string( content, contentlen)));
 	return 1;
 }

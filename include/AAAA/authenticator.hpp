@@ -69,6 +69,12 @@ public:
 		SYSTEM_FAILURE		///< some other error occurred
 	};
 
+	static const char* statusName( Status i)
+	{
+		static const char* ar[] = {"INITIALIZED","MESSAGE_AVAILABLE","AWAITING_MESSAGE","AUTHENTICATED","INVALID_CREDENTIALS","MECH_UNAVAILABLE","SYSTEM_FAILURE"};
+		return ar[i];
+	}
+
 	/// The virtual destructor
 	virtual ~Authenticator()	{}
 
@@ -78,7 +84,7 @@ public:
 	///		so you should be very careful how you use it.
 	///		You should use this function instead of delete
 	///		because not all authentication instances are created with new.
-	virtual void destroy() = 0;
+	virtual void dispose() = 0;
 
 	/// The list of available mechs
 	virtual const std::vector<std::string>& mechs() const = 0;
@@ -99,7 +105,7 @@ public:
 
 	/// The output message
 	/// \returns		the output message
-	virtual const std::string& messageOut() = 0;
+	virtual std::string messageOut() = 0;
 
 	/// The current status of the authenticator
 	virtual Status status() const = 0;

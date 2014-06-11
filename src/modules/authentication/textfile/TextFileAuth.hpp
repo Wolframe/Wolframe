@@ -86,7 +86,7 @@ public:
 
 	virtual const char* className() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
 
-	const std::string* mechs() const		{ return m_mechs; }
+	const char** mechs() const;
 
 	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client );
 
@@ -101,8 +101,10 @@ public:
 				 bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 
 	/// \brief
-	PwdFileUser getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
-			     bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+	bool getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
+		      bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+	bool getUser( const std::string& userHash, PwdFileUser& user,
+		      bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 
 private:
 	static const std::string	m_mechs[];
@@ -125,7 +127,8 @@ class TextFileAuthSlice : public AuthenticatorSlice
 		SLICE_USER_NOT_FOUND,		///< User has not been found -> fail
 		SLICE_CHALLENGE_SENT,		///< Waiting for the response
 		SLICE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
-		SLICE_AUTHENTICATED		///< Response was correct -> user available
+		SLICE_AUTHENTICATED,		///< Response was correct -> user available
+		SLICE_SYSTEM_FAILURE		///< Something is wrong
 	};
 
 public:
@@ -133,34 +136,33 @@ public:
 
 	~TextFileAuthSlice();
 
-	void destroy();
+	void dispose();
 
 	virtual const char* className() const		{ return m_backend.className(); }
 
 	virtual const std::string& identifier() const	{ return m_backend.identifier(); }
 
-	/// Get the list of available mechs
-	virtual const std::vector<std::string>& mechs() const;
-
-	/// Set the authentication mech
-	virtual bool setMech( const std::string& mech );
-
 	/// The input message
 	virtual void messageIn( const std::string& message );
 
 	/// The output message
-	virtual const std::string& messageOut();
+	virtual std::string messageOut();
 
 	/// The current status of the authenticator slice
 	virtual Status status() const;
 
+	/// Is the last input message reusable for this mech ?
+	virtual bool inputReusable() const		{ return m_inputReusable; }
+
 	/// The authenticated user or NULL if not authenticated
-	virtual User* user() const;
+	virtual User* user();
 
 private:
 	const TextFileAuthUnit&	m_backend;
 	struct PwdFileUser	m_usr;
-	User*			m_user;
+	SliceState		m_state;
+	CRAMchallenge*		m_challenge;
+	bool			m_inputReusable;
 };
 
 

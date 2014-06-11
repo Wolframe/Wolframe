@@ -1,1 +1,1 @@
-COMMAND CustomerListRequest CALL SelectCustomerList RETURN STANDALONE list;
+COMMAND CustomerListRequest CALL SelectCustomerList RETURN SKIP {standalone='yes', root='list'};

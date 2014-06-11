@@ -42,8 +42,9 @@
 #include "crypto/sha2.h"
 #include "types/byte2hex.h"
 #include "AAAA/CRAM.hpp"
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "passwdFile.hpp"
+#include "system/globalRngGen.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -51,12 +52,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-static const std::string AUTHENTICATION_MECH = "WOLFRAME-CRAM";
-
 // Text file authentication - authentication unit
 //***********************************************************************
-
-const std::string TextFileAuthUnit::m_mechs[] = { AUTHENTICATION_MECH, "" };
 
 TextFileAuthUnit::TextFileAuthUnit( const std::string& Identifier,
 					      const std::string& filename )
@@ -69,6 +66,13 @@ TextFileAuthUnit::TextFileAuthUnit( const std::string& Identifier,
 TextFileAuthUnit::~TextFileAuthUnit()
 {
 }
+
+const char** TextFileAuthUnit::mechs() const
+{
+	static const char* m[] = { "WOLFRAME-CRAM", NULL };
+	return m;
+}
+
 
 AuthenticatorSlice* TextFileAuthUnit::slice( const std::string& /*mech*/,
 					     const net::RemoteEndpoint& /*client*/ )
@@ -98,34 +102,185 @@ User* TextFileAuthUnit::authenticatePlain( const std::string& username,
 }
 
 
-PwdFileUser TextFileAuthUnit::getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
-					    bool caseSensitveUser ) const
+bool TextFileAuthUnit::getUser( const std::string& hash, const std::string& key,
+				       PwdFileUser& user, bool caseSensitveUser ) const
 {
-	if ( m_pwdFile.getHMACuser( hash, key, user, caseSensitveUser ))
+	if ( m_pwdFile.getHMACuser( hash, key, user, caseSensitveUser ))	{
 		assert( !user.user.empty() );
+		return true;
+	}
 	else
-		user.user.clear();
-	return user;
+		user.clear();
+	return false;
 }
 
+bool TextFileAuthUnit::getUser( const std::string& userHash, PwdFileUser& user,
+				       bool caseSensitveUser ) const
+{
+	if ( m_pwdFile.getHMACuser( userHash, user, caseSensitveUser ))	{
+		assert( !user.user.empty() );
+		return true;
+	}
+	else
+		user.clear();
+	return false;
+}
 
 // Text file authentication - authentication slice
 //***********************************************************************
 TextFileAuthSlice::TextFileAuthSlice( const TextFileAuthUnit& backend )
 	: m_backend( backend )
 {
-	m_user = NULL;
+	m_challenge = NULL;
+	m_state = SLICE_INITIALIZED;
+	m_inputReusable = false;
 }
 
 TextFileAuthSlice::~TextFileAuthSlice()
 {
-	if ( m_user != NULL )
-		delete m_user;
+	m_usr.clear();
+	if ( m_challenge != NULL )
+		delete m_challenge;
 }
 
-void TextFileAuthSlice::destroy()
+void TextFileAuthSlice::dispose()
 {
 	delete this;
+}
+
+/// The input message
+void TextFileAuthSlice::messageIn( const std::string& message )
+{
+	switch ( m_state )	{
+		case SLICE_INITIALIZED:	{
+			try	{
+				m_inputReusable = true;
+				if ( m_backend.getUser( message, m_usr ))
+					m_state = SLICE_USER_FOUND;
+				else
+					m_state = SLICE_USER_NOT_FOUND;
+			}
+			catch( std::exception& e )	{
+				LOG_ERROR << "Text file auth slice: ("
+					  << ") exception: " << e.what();
+				m_state = SLICE_SYSTEM_FAILURE;
+				m_inputReusable = false;
+			}
+			break;
+		}
+		case SLICE_USER_FOUND:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") received message in SLICE_USER_FOUND state";
+			m_state = SLICE_SYSTEM_FAILURE;
+			m_inputReusable = false;
+			break;
+		case SLICE_USER_NOT_FOUND:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") received message in SLICE_USER_NOT_FOUND state";
+			m_inputReusable = false;
+			break;
+		case SLICE_CHALLENGE_SENT:	{
+			m_inputReusable = false;
+			PasswordHash hash( m_usr.hash );
+			CRAMresponse response( *m_challenge, hash );
+			if ( response == message )
+				m_state = SLICE_AUTHENTICATED;
+			else
+				m_state = SLICE_INVALID_CREDENTIALS;
+			break;
+		}
+		case SLICE_INVALID_CREDENTIALS:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") received message in SLICE_INVALID_CREDENTIALS state";
+			m_inputReusable = false;
+			break;
+		case SLICE_AUTHENTICATED:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") received message in SLICE_AUTHENTICATED state";
+			m_inputReusable = false;
+			break;
+		case SLICE_SYSTEM_FAILURE:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") received message in SLICE_SYSTEM_FAILURE state";
+			m_inputReusable = false;
+			break;
+	}
+}
+
+/// The output message
+std::string TextFileAuthSlice::messageOut()
+{
+	switch ( m_state )	{
+		case SLICE_INITIALIZED:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") message requested in SLICE_INITIALIZED state";
+			m_state = SLICE_SYSTEM_FAILURE;
+			break;
+		case SLICE_USER_FOUND:	{
+			m_challenge = new CRAMchallenge( GlobalRandomGenerator::instance( "" ) );
+			m_state = SLICE_CHALLENGE_SENT;
+			PasswordHash hash( m_usr.hash );
+			return m_challenge->toString( hash.salt() );
+		}
+		case SLICE_USER_NOT_FOUND:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") message requested in SLICE_USER_NOT_FOUND state";
+			break;
+		case SLICE_CHALLENGE_SENT:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") message requested in SLICE_CHALLENGE_SENT state";
+			m_state = SLICE_SYSTEM_FAILURE;
+			break;
+		case SLICE_INVALID_CREDENTIALS:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") message requested in SLICE_INVALID_CREDENTIALS state";
+			break;
+		case SLICE_AUTHENTICATED:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") message requested in SLICE_AUTHENTICATED state";
+			break;
+		case SLICE_SYSTEM_FAILURE:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") message requested in SLICE_SYSTEM_FAILURE state";
+			break;
+	}
+	return std::string();
+}
+
+/// The current status of the authenticator slice
+AuthenticatorSlice::Status TextFileAuthSlice::status() const
+{
+	switch ( m_state )	{
+		case SLICE_INITIALIZED:
+			return AWAITING_MESSAGE;
+		case SLICE_USER_FOUND:
+			return MESSAGE_AVAILABLE;
+		case SLICE_USER_NOT_FOUND:
+			return USER_NOT_FOUND;
+		case SLICE_CHALLENGE_SENT:
+			return AWAITING_MESSAGE;
+		case SLICE_INVALID_CREDENTIALS:
+			return INVALID_CREDENTIALS;
+		case SLICE_AUTHENTICATED:
+			return AUTHENTICATED;
+		case SLICE_SYSTEM_FAILURE:
+			return SYSTEM_FAILURE;
+	}
+	return SYSTEM_FAILURE;		// just to silence compilers
+}
+
+/// The authenticated user or NULL if not authenticated
+User* TextFileAuthSlice::user()
+{
+	if ( m_state == SLICE_AUTHENTICATED )	{
+		if ( m_usr.user.empty() )
+			return NULL;
+		User* usr = new User( identifier(), m_usr.user, m_usr.info );
+		m_usr.clear();
+		return usr;
+	}
+	else
+		return NULL;
 }
 
 }} // namespace _Wolframe::AAAA

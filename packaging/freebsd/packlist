@@ -56,6 +56,8 @@ usr/local/lib/wolframe/modules/mod_command_python.so
 usr/local/lib/wolframe/modules/mod_job_schedule_db.so
 usr/local/lib/wolframe/modules/mod_datatype_datetime.so
 usr/local/lib/wolframe/modules/mod_datatype_bcdnumber.so
+usr/local/lib/wolframe/modules/mod_doctype_xml.so
+usr/local/lib/wolframe/modules/mod_doctype_json.so
 usr/local/lib/wolframe/modules/mod_print_harupdf.so
 usr/local/lib/wolframe/libwolframe_client.a
 usr/local/lib/wolframe/libwolframe_client.so.0.0.0
@@ -131,10 +133,8 @@ usr/local/include/wolframe/protocol/parser.hpp
 usr/local/include/wolframe/cmdbind/authCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/commandHandler.hpp
 usr/local/include/wolframe/cmdbind/commandHandlerUnit.hpp
-usr/local/include/wolframe/cmdbind/contentBufferCommandHandlerEscDLF.hpp
 usr/local/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
 usr/local/include/wolframe/cmdbind/doctypeDetector.hpp
-usr/local/include/wolframe/cmdbind/doctypeFilterCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/execCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp
@@ -166,6 +166,7 @@ usr/local/include/wolframe/logger/logLevel.hpp
 usr/local/include/wolframe/logger/logObject.hpp
 usr/local/include/wolframe/logger/logSyslogFacility.hpp
 @dirrm usr/local/include/wolframe/logger
+usr/local/include/wolframe/utils/asciiCharParser.hpp
 usr/local/include/wolframe/utils/fileLineInfo.hpp
 usr/local/include/wolframe/utils/fileUtils.hpp
 usr/local/include/wolframe/utils/getPassword.hpp
@@ -185,6 +186,7 @@ usr/local/include/wolframe/serialize/serializationErrorException.hpp
 usr/local/include/wolframe/serialize/cppFormFunction.hpp
 usr/local/include/wolframe/serialize/ddlFormParser.hpp
 usr/local/include/wolframe/serialize/ddlFormSerializer.hpp
+usr/local/include/wolframe/serialize/flags.hpp
 usr/local/include/wolframe/serialize/struct/intrusiveParser.hpp
 usr/local/include/wolframe/serialize/struct/intrusiveProperty.hpp
 usr/local/include/wolframe/serialize/struct/intrusiveSerializer.hpp
@@ -258,7 +260,7 @@ usr/local/include/wolframe/AAAA/CRAM.hpp
 usr/local/include/wolframe/AAAA/audit.hpp
 usr/local/include/wolframe/AAAA/authentication.hpp
 usr/local/include/wolframe/AAAA/authorization.hpp
-usr/local/include/wolframe/AAAA/password.hpp
+usr/local/include/wolframe/AAAA/passwordHash.hpp
 usr/local/include/wolframe/AAAA/user.hpp
 @dirrm usr/local/include/wolframe/AAAA
 usr/local/include/wolframe/module/constructor.hpp

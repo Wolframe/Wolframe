@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -123,6 +123,7 @@ public:
 	static UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		unsigned int bufsize = size( buf, bufpos, itr);
+
 		UChar rt = (unsigned char)buf[ MSB];
 		rt = (rt << 8) + (unsigned char)buf[ LSB];
 

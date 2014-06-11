@@ -351,11 +351,6 @@ public:
 			}
 			return getValue( module, decl.first.c_str(), decl.second.data(), value, domain, isDefined);
 		}
-		catch (types::PropertyTree::BadDataException&)
-		{
-			LOG_ERROR << loggingScope(module) << "illegal value for configuration element '" << decl.first.c_str() << "'";
-			return false;
-		}
 		catch (std::bad_alloc&)
 		{
 			LOG_ERROR << loggingScope(module) << "out of memory when parsing configuration element '" << decl.first.c_str() << "'";

@@ -42,9 +42,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-static const std::string AUTHENTICATION_MECH = "WOLFRAME-CRAM";
-const std::string DBauthUnit::m_mechs[] = { AUTHENTICATION_MECH, "" };
-
 DBauthUnit::DBauthUnit( const std::string& Identifier, const std::string& dbLabel )
 	: AuthenticationUnit( Identifier ), m_dbLabel( dbLabel )
 {
@@ -60,6 +57,11 @@ DBauthUnit::~DBauthUnit()
 {
 }
 
+const char** DBauthUnit::mechs() const
+{
+	static const char* m[] = { "WOLFRAME-CRAM", NULL };
+	return m;
+}
 
 bool DBauthUnit::resolveDB( const db::DatabaseProvider& db )
 {

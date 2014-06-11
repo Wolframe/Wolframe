@@ -54,6 +54,7 @@ TYP_OBJS = \
 	types/form.o
 
 UTIL_OBJS = \
+	utils/asciiCharParser.o \
 	utils/fileLineInfo.o \
 	utils/sourceLineInfo.o \
 	utils/typeSignature.o \
@@ -75,7 +76,7 @@ CPP_OBJS = \
 	base64.o \
 	HMAC.o \
 	PBKDF2.o \
-	password.o \
+	passwordHash.o \
 	CRAM.o
 
 OBJS = \

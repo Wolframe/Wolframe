@@ -77,13 +77,16 @@ public:
 	virtual const char* interruptDataSessionMarker() const;
 
 private:
+	/// \brief Comsume next complete message from input
+	bool consumeNextMessage();
+
+private:
 	/// \enum State
 	/// \brief Enumeration of processor states
 	enum State
 	{
-		Init,				///< start state, called first time in this session
-		NextOperation,			///< running a command
-		ReadConsumed,			///< state set by putInput for guarantee that pusInput message is valid till net call of AAAA::Authenticator::nextOperation()
+		Init,				///< start state
+		NextOperation,			///< get the next operation from the authenticator
 		FlushOutput			///< flush network output
 	};
 	/// \brief Returns the state as string for logging etc.
@@ -93,7 +96,6 @@ private:
 		static const char* ar[] = {
 			"Init",
 			"NextOperation",
-			"ReadConsumed",
 			"FlushOutput"
 		};
 		return ar[i];
@@ -102,6 +104,7 @@ private:
 	protocol::InputBlock m_input;				///< protocol input buffer
 	protocol::InputBlock::iterator m_eoD;			///< input end of data marker
 	std::size_t m_itrpos;					///< read start position in buffer for the command handler
+	std::size_t m_msgstart;					///< start of the next message
 
 	char* m_outputbuf;					///< protocol output buffer
 	std::size_t m_outputbufsize;				///< protocol output buffer allocation size

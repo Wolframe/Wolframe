@@ -141,8 +141,8 @@ copy_prereq:
 !ENDIF
 
 local_test: $(TEST_CPP_BINS) copy_prereq
-	@-if not exist temp mkdir temp 
-	@-erase /q temp 2>NUL
+	@-if not exist tests\temp mkdir tests\temp 
+	@-erase /q tests\temp 2>NUL
 	@-cd tests & tprocHandlerTest.exe
 
 run: copy_prereq

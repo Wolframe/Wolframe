@@ -51,7 +51,7 @@
 #endif
 
 #include "AAAA/CRAM.hpp"
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
 #include "crypto/sha2.h"
@@ -92,6 +92,11 @@ CRAMchallenge::CRAMchallenge( const crypto::RandomGenerator& rndGen )
 
 	rndGen.generate( m_challenge + SHA256_DIGEST_SIZE,
 			 CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
+}
+
+CRAMchallenge::~CRAMchallenge()
+{
+	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
 }
 
 std::string CRAMchallenge::toBCD() const
@@ -145,6 +150,9 @@ static void computeResponse ( const unsigned char* challenge, const unsigned cha
 
 	assert( CRAM_RESPONSE_SIZE == SHA256_DIGEST_SIZE );
 	sha256( buffer, CRAM_CHALLENGE_SIZE, response );
+
+	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
+		buffer[ i ] = 0;
 }
 //***** End of CRAM response computation ************************************
 
@@ -178,8 +186,8 @@ CRAMresponse::CRAMresponse( const std::string& challenge, const std::string& pas
 			std::string errMsg = "'" + s + "' is not a valid challenge string (salt error)";
 			throw std::runtime_error( errMsg );
 		}
-		if (( chlngSize = base64::decode( s.substr( chlngStart ),
-						 salt, CRAM_CHALLENGE_SIZE )) < 0 )	{
+		if (( chlngSize = base64::decode( s.substr( chlngStart + 1 ),
+						 chlng, CRAM_CHALLENGE_SIZE )) < 0 )	{
 			std::string errMsg = "'" + s + "' is not a valid challenge string (random data error)";
 			throw std::runtime_error( errMsg );
 		}
@@ -199,6 +207,14 @@ CRAMresponse::CRAMresponse( const std::string& challenge, const std::string& pas
 	PasswordHash pwd( salt, saltSize, password );
 
 	computeResponse( chlng, pwd.hash().hash(), pwd.hash().size(), m_response );
+
+	memset( chlng, 0, CRAM_CHALLENGE_SIZE );
+	memset( salt, 0, PASSWORD_SALT_SIZE );
+}
+
+CRAMresponse::~CRAMresponse()
+{
+	memset( m_response, 0, CRAM_RESPONSE_SIZE );
 }
 
 

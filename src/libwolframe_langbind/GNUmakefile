@@ -41,8 +41,6 @@ CPP_OBJS = \
 	cmdbind_authCommandHandler.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
-	cmdbind_doctypeFilterCommandHandler.o \
-	cmdbind_contentBufferCommandHandlerEscDLF.o \
 	cmdbind_ioFilterCommandHandlerEscDLF.o
 
 

@@ -539,10 +539,10 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 	std::string content( readSourceFileContent( filename));
 	typedef std::pair<std::string,types::PropertyTree::Node> StackElem;
 	std::vector<StackElem> stk;
-	stk.push_back( StackElem( "", types::PropertyTree::Node()));
 	std::string id;
 	std::string tok;
 	FileLineInfo posinfo( filename);
+	stk.push_back( StackElem( "", types::PropertyTree::Node(posinfo)));
 
 	std::string includepath( boost::filesystem::system_complete( filename).parent_path().string());
 

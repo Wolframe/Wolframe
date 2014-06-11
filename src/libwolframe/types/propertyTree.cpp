@@ -44,22 +44,23 @@ PropertyTree::Node::Node( const boost::property_tree::ptree& pt)
 	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
 	for (; pi != pe; ++pi)
 	{
-		Parent::add_child( pi->first, Node( pi->second));
+		add_child( pi->first, Node( pi->second));
 	}
-	if (!pt.data().empty())
-	{
-		Parent::put_value( Value( pt.data()));
-	}
+	m_data = pt.data();
 }
 
-void PropertyTree::Node::recursiveSetFileName( Parent& pt, const FileName& filename)
+PropertyTree::Node::Node( const Node& o)
+	:m_subnodes(o.m_subnodes),m_position(o.m_position),m_data(o.m_data)
+{}
+
+void PropertyTree::Node::recursiveSetFileName( PropertyTree::Node& pt, const FileName& filename)
 {
-	Parent::iterator pi = pt.begin(), pe = pt.end();
+	Node::iterator pi = pt.begin(), pe = pt.end();
 	for (; pi != pe; ++pi)
 	{
 		recursiveSetFileName( pi->second, filename);
 	}
-	pt.data().position.setFileName( filename);
+	pt.m_position.setFileName( filename);
 }
 
 std::string PropertyTree::Node::tostring( const utils::PrintFormat* pformat) const
@@ -80,7 +81,7 @@ void PropertyTree::Node::print( std::ostringstream& out, const Node& nd, int ind
 		{
 			out << pformat->newitem << indentstr
 				<< ni->first << pformat->assign
-				<< pformat->startvalue << ni->second.data().string() << pformat->endvalue; 
+				<< pformat->startvalue << ni->second.data() << pformat->endvalue; 
 		}
 		else
 		{
@@ -98,20 +99,21 @@ void PropertyTree::Node::print( std::ostringstream& out, const Node& nd, int ind
 	}
 }
 
-PropertyTree::Node PropertyTree::Node::getChild( const std::string& nodename) const
+const PropertyTree::Node& PropertyTree::Node::getChild( const std::string& nodename) const
 {
+	static const Node emptynode;
 	bool found = false;
-	types::PropertyTree::Node rt;
+	const types::PropertyTree::Node* rt = &emptynode;
 	types::PropertyTree::Node::const_iterator gi = begin(), ge = end();
 	for (; gi != ge; ++gi)
 	{
 		if (boost::algorithm::iequals( gi->first, nodename))
 		{
 			if (found) throw std::runtime_error( std::string("duplicate '") + nodename + "' node in configuration");
-			rt = gi->second;
+			rt = &gi->second;
 			found = true;
 		}
 	}
-	return rt;
+	return *rt;
 }
 

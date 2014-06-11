@@ -1969,7 +1969,9 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-LIBXML2_DIR ?= /usr
+ifndef LIBXML2_DIR
+$(warning no recent enough libxml2 package on RHEL 5, compile your own one and set LIBXML2_DIR accordingly)
+endif
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
 LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
@@ -2213,7 +2215,9 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-LIBXSLT_DIR ?= /usr
+ifndef WITH_LIBXSLT
+$(warning libxslt depends on a not recent enough version of libxml2 on RHEL 5, compile your own ones and set LIBXSLT_DIR and LIBXML2_DIR accordingly)
+endif
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
 LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
 LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
