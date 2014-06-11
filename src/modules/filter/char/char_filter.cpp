@@ -136,7 +136,7 @@ struct InputFilterImpl :public InputFilter
 	/// \brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
-		if (!m_srcend && m_eom.set())
+		if (!m_srcend && setjmp(m_eom) != 0)
 		{
 			setState( EndOfMessage);
 			return 0;
@@ -178,7 +178,7 @@ struct InputFilterImpl :public InputFilter
 private:
 	IOCharset m_charset;			///< character set encoding
 	TextScanner m_itr;			///< iterator on input
-	textwolf::EndOfChunkTrigger m_eom;	///< end of message trigger
+	jmp_buf m_eom;				///< end of message trigger
 	AppCharset m_output;			///< output
 	char m_elembufmem[16];
 	textwolf::StaticBuffer m_elembuf;

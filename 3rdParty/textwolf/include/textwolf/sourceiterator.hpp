@@ -37,9 +37,9 @@
 
 #ifndef __TEXTWOLF_SOURCE_ITERATOR_HPP__
 #define __TEXTWOLF_SOURCE_ITERATOR_HPP__
-#include "textwolf/endofchunk.hpp"
 #include <cstdlib>
 #include <stdexcept>
+#include <setjmp.h>
 
 ///\namespace textwolf
 ///\brief Toplevel namespace of the library
@@ -67,7 +67,7 @@ public:
 	///\param [in] buf source chunk to iterate on
 	///\param [in] size size of source chunk to iterate on in bytes
 	///\param [in] eom_ trigger to activate if end of data has been reached (no next chunk anymore)
-	SrcIterator( const char* buf, std::size_t size, EndOfChunkTrigger* eom_=0)
+	SrcIterator( const char* buf, std::size_t size, jmp_buf* eom_=0)
 		:m_itr(const_cast<char*>(buf))
 		,m_end(m_itr+size)
 		,m_eom(eom_){}
@@ -85,7 +85,7 @@ public:
 	{
 		if (m_itr >= m_end)
 		{
-			if (m_eom) m_eom->go();
+			if (m_eom) longjmp(*m_eom,1);
 			return 0;
 		}
 		return *m_itr;
@@ -104,7 +104,7 @@ public:
 		return m_itr - b.m_itr;
 	}
 
-	void putInput( const char* buf, std::size_t size, EndOfChunkTrigger* eom_)
+	void putInput( const char* buf, std::size_t size, jmp_buf* eom_)
 	{
 		m_itr = const_cast<char*>(buf);
 		m_end = m_itr+size;
@@ -119,7 +119,7 @@ public:
 private:
 	char* m_itr;
 	char* m_end;
-	EndOfChunkTrigger* m_eom;
+	jmp_buf* m_eom;
 };
 
 }//namespace

@@ -35,7 +35,6 @@ Project Wolframe.
 #include "types/docmetadata.hpp"
 #include "utils/fileUtils.hpp"
 #include "textwolf/sourceiterator.hpp"
-#include "textwolf/endofchunk.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/xmlhdrparser.hpp"
 #include "textwolf/xmlprinter.hpp"
@@ -571,7 +570,7 @@ struct InputFilterImpl
 				}
 			}
 		}
-		if (!m_srcend && m_eom.set())
+		if (setjmp(m_eom) != 0)
 		{
 			setState( EndOfMessage);
 			return 0;
@@ -717,7 +716,7 @@ struct InputFilterImpl
 			}
 			return 0;
 		}
-		if (m_eom.set())
+		if (setjmp(m_eom) != 0)
 		{
 			setState( EndOfMessage);
 			return 0;
@@ -875,7 +874,7 @@ private:
 	bool m_withEmpty;			///< true, if empty tokens are returned too (default)
 	bool m_doTokenize;			///< true, if content chunks are tokenized by spaces
 	textwolf::XMLScannerBase* m_parser;	///< variant of XML scanner, one of them selected by m_encoding (type textwolf::XMLScanner<..>)
-	textwolf::EndOfChunkTrigger m_eom;	///< end of message trigger
+	jmp_buf m_eom;				///< end of message fallback jump
 	const char* m_src;			///< pointer to current chunk parsed
 	std::size_t m_srcsize;			///< size of the current chunk parsed in bytes
 	bool m_srcend;				///< true if end of message is in current chunk parsed

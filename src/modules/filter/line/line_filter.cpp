@@ -238,7 +238,7 @@ struct InputFilterImpl :public InputFilter
 			m_elembuf.clear();
 			m_linecomplete = false;
 		}
-		if (!m_srcend && m_eom.set())
+		if (!m_srcend && setjmp(m_eom) != 0)
 		{
 			setState( EndOfMessage);
 			return 0;
@@ -308,7 +308,7 @@ struct InputFilterImpl :public InputFilter
 private:
 	IOCharset m_charset;			///< character set encoding
 	TextScanner m_itr;			///< iterator on source
-	textwolf::EndOfChunkTrigger m_eom;	///< end of message trigger
+	jmp_buf m_eom;				///< end of message trigger
 	AppCharset m_output;			///< output
 	std::string m_elembuf;			///< buffer for current line
 	const char* m_src;			///< pointer to current chunk parsed
