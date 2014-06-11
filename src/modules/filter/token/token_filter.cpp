@@ -172,8 +172,8 @@ struct OutputFilterImpl :public OutputFilter
 	virtual bool close(){return true;}
 
 private:
-	std::string m_elembuf;				//< buffer for the currently printed element
-	std::size_t m_elemitr;				//< iterator to pass it to output
+	std::string m_elembuf;				///< buffer for the currently printed element
+	std::size_t m_elemitr;				///< iterator to pass it to output
 	IOCharset m_output;
 };
 
@@ -189,6 +189,7 @@ struct InputFilterImpl :public InputFilter
 		,InputFilter("token")
 		,m_charset(iocharset_)
 		,m_itr(iocharset_)
+		,m_eom()
 		,m_output(AppCharset())
 		,m_tag(0)
 		,m_taglevel(0)
@@ -209,6 +210,7 @@ struct InputFilterImpl :public InputFilter
 		,InputFilter("token", md)
 		,m_charset(iocharset_)
 		,m_itr(iocharset_)
+		,m_eom()
 		,m_output(AppCharset())
 		,m_tag(0)
 		,m_taglevel(0)
@@ -229,6 +231,7 @@ struct InputFilterImpl :public InputFilter
 		,InputFilter(o)
 		,m_charset(o.m_charset)
 		,m_itr(o.m_itr)
+		,m_eom()
 		,m_output(o.m_output)
 		,m_tag(o.m_tag)
 		,m_taglevel(o.m_taglevel)
@@ -396,18 +399,19 @@ struct InputFilterImpl :public InputFilter
 	}
 
 private:
-	IOCharset m_charset;		//< character set encoding
-	TextScanner m_itr;		//< src iterator
-	AppCharset m_output;		//< output
-	char m_tag;			//< tag defining the currently parsed element type
-	int m_taglevel;			//< tag level
-	ElementType m_elemtype;		//< current element type
-	std::string m_elembuf;		//< buffer for current line => current token
-	const char* m_src;		//< pointer to current chunk parsed
-	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes
-	bool m_srcend;			//< true if end of message is in current chunk parsed
-	bool m_linecomplete;		//< true if the last getNext could complete a line
-	bool m_eolnread;		//< true if the end of line has been read
+	IOCharset m_charset;			///< character set encoding
+	TextScanner m_itr;			///< src iterator
+	textwolf::EndOfChunkTrigger m_eom;	///< end of message trigger
+	AppCharset m_output;			///< output
+	char m_tag;				///< tag defining the currently parsed element type
+	int m_taglevel;				///< tag level
+	ElementType m_elemtype;			///< current element type
+	std::string m_elembuf;			///< buffer for current line => current token
+	const char* m_src;			///< pointer to current chunk parsed
+	std::size_t m_srcsize;			///< size of the current chunk parsed in bytes
+	bool m_srcend;				///< true if end of message is in current chunk parsed
+	bool m_linecomplete;			///< true if the last getNext could complete a line
+	bool m_eolnread;			///< true if the end of line has been read
 };
 
 }//end anonymous namespace

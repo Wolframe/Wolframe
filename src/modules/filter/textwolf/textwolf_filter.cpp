@@ -35,6 +35,7 @@ Project Wolframe.
 #include "types/docmetadata.hpp"
 #include "utils/fileUtils.hpp"
 #include "textwolf/sourceiterator.hpp"
+#include "textwolf/endofchunk.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/xmlhdrparser.hpp"
 #include "textwolf/xmlprinter.hpp"
@@ -264,6 +265,7 @@ struct InputFilterImpl
 		,m_withEmpty(true)
 		,m_doTokenize(false)
 		,m_parser(0)
+		,m_eom()
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
@@ -281,6 +283,7 @@ struct InputFilterImpl
 		,m_withEmpty(o.m_withEmpty)
 		,m_doTokenize(o.m_doTokenize)
 		,m_parser(0)
+		,m_eom()	//... ! by intention (non copyable, only used during getNext, where no copy is possible)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend)
@@ -408,7 +411,7 @@ struct InputFilterImpl
 				m_srcend = end;
 				DOWITH_XMLScanner( 
 					m_parser = new XMLScanner();
-					((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, m_srcend));
+					((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
 					((XMLScanner*)m_parser)->doTokenize( m_doTokenize);
 				);
 				setState( Open);
@@ -428,7 +431,7 @@ struct InputFilterImpl
 			m_srcsize = size;
 			m_srcend = end;
 			DOWITH_XMLScanner( 
-				((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, m_srcend))
+				((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom))
 			);
 			setState( Open);
 		}
@@ -568,38 +571,35 @@ struct InputFilterImpl
 				}
 			}
 		}
-		try
-		{
-			for (;;)
-			{
-				const char* ee;
-				textwolf::XMLScannerBase::ElementType et = getNextItem( ee, elementsize);
-				element = (const void*)ee;
-				if (!mapElementType( type, et, ee))
-				{
-					if (state() == Error)
-					{
-						return false;
-					}
-					continue;
-				}
-				if (et == textwolf::XMLScannerBase::Content && !m_withEmpty)
-				{
-					std::size_t ii=0;
-					for (;ii<elementsize && (unsigned char)ee[ii] <= 32; ++ii);
-					if (ii==elementsize) continue;
-				}
-#ifdef _Wolframe_LOWLEVEL_DEBUG
-				LOG_DATA2 << "[textwolf filter] " << metadataStateName() << " fetch element " << textwolf::XMLScannerBase::getElementTypeName(et) << " '" << std::string(ee,elementsize) << "'";
-#endif
-				return true;
-			}
-		}
-		catch (textwolf::SrcIterator::EoM)
+		if (m_eom.set())
 		{
 			setState( EndOfMessage);
-			return false;
-		};
+			return 0;
+		}
+		for (;;)
+		{
+			const char* ee;
+			textwolf::XMLScannerBase::ElementType et = getNextItem( ee, elementsize);
+			element = (const void*)ee;
+			if (!mapElementType( type, et, ee))
+			{
+				if (state() == Error)
+				{
+					return false;
+				}
+				continue;
+			}
+			if (et == textwolf::XMLScannerBase::Content && !m_withEmpty)
+			{
+				std::size_t ii=0;
+				for (;ii<elementsize && (unsigned char)ee[ii] <= 32; ++ii);
+				if (ii==elementsize) continue;
+			}
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+			LOG_DATA2 << "[textwolf filter] " << metadataStateName() << " fetch element " << textwolf::XMLScannerBase::getElementTypeName(et) << " '" << std::string(ee,elementsize) << "'";
+#endif
+			return true;
+		}
 		return false;
 	}
 
@@ -717,97 +717,94 @@ struct InputFilterImpl
 			}
 			return 0;
 		}
-		try
-		{
-			while (m_metadatastate != MS_Done && m_metadatastate != MS_DoneElemCached)
-			{
-				const char* ee;
-				std::size_t eesize;
-				textwolf::XMLScannerBase::ElementType et = getNextItem( ee, eesize);
-#ifdef _Wolframe_LOWLEVEL_DEBUG
-				LOG_DATA2 << "[textwolf filter] " << metadataStateName() << " fetch element " << textwolf::XMLScannerBase::getElementTypeName(et) << " '" << std::string(ee,eesize) << "'";
-#endif
-				switch (et)
-				{
-					case textwolf::XMLScannerBase::None:
-						setState( Error, "unexpected end of document");
-						return 0;
-					case textwolf::XMLScannerBase::ErrorOccurred:
-						setParserError();
-						return 0;
-					case textwolf::XMLScannerBase::HeaderStart:
-					case textwolf::XMLScannerBase::HeaderAttribName:
-						break;
-					case textwolf::XMLScannerBase::HeaderAttribValue:
-					case textwolf::XMLScannerBase::HeaderEnd:
-						m_metadatastate = MS_Root;
-						break;
-					case textwolf::XMLScannerBase::DocAttribValue:
-						if (m_metadatastate == MS_Root)
-						{
-							m_metadatastate = MS_DocEntityDef;
-						}
-						setDocAttributeValue( ee, eesize);
-						break;
-					case textwolf::XMLScannerBase::DocAttribEnd:
-						m_metadatastate = MS_Root;
-						break;
-					case textwolf::XMLScannerBase::TagAttribName:
-						if (m_metadatastate == MS_AttribName)
-						{
-							m_metadatastate = MS_AttribValue;
-							m_elembuffer = std::string( ee, eesize);
-						}
-						else
-						{
-							setState( Error, "unexpected tag attribute in meta data parsing");
-							return 0;
-						}
-						break;
-					case textwolf::XMLScannerBase::TagAttribValue:
-						if (m_metadatastate == MS_AttribValue)
-						{
-							if (!setRootAttributeValue( m_elembuffer, ee, eesize))
-							{
-								return 0;
-							}
-							m_metadatastate = MS_AttribName;
-						}
-						else
-						{
-							setState( Error, "unexpected tag attribute value in meta data parsing");
-							return 0;
-						}
-						break;
-					case textwolf::XMLScannerBase::OpenTag:
-						if (m_metadatastate == MS_Root || m_metadatastate == MS_Init)
-						{
-							getMetaDataRef()->setAttribute( "root", std::string( ee, eesize));
-							m_metadatastate = MS_AttribName;
-						}
-						else
-						{
-							m_metadatastate = MS_DoneElemCached;
-							break;
-						}
-						break;
-					case textwolf::XMLScannerBase::CloseTagIm:
-					case textwolf::XMLScannerBase::CloseTag:
-					case textwolf::XMLScannerBase::Content:
-						m_metadatastate = MS_DoneElemCached;
-						break;
-
-					case textwolf::XMLScannerBase::Exit:
-						setState( Error, "unexpected end of document in meta data section");
-						return 0;
-				}
-			}
-		}
-		catch (textwolf::SrcIterator::EoM)
+		if (m_eom.set())
 		{
 			setState( EndOfMessage);
 			return 0;
-		};
+		}
+		while (m_metadatastate != MS_Done && m_metadatastate != MS_DoneElemCached)
+		{
+			const char* ee;
+			std::size_t eesize;
+			textwolf::XMLScannerBase::ElementType et = getNextItem( ee, eesize);
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+			LOG_DATA2 << "[textwolf filter] " << metadataStateName() << " fetch element " << textwolf::XMLScannerBase::getElementTypeName(et) << " '" << std::string(ee,eesize) << "'";
+#endif
+			switch (et)
+			{
+				case textwolf::XMLScannerBase::None:
+					setState( Error, "unexpected end of document");
+					return 0;
+				case textwolf::XMLScannerBase::ErrorOccurred:
+					setParserError();
+					return 0;
+				case textwolf::XMLScannerBase::HeaderStart:
+				case textwolf::XMLScannerBase::HeaderAttribName:
+					break;
+				case textwolf::XMLScannerBase::HeaderAttribValue:
+				case textwolf::XMLScannerBase::HeaderEnd:
+					m_metadatastate = MS_Root;
+					break;
+				case textwolf::XMLScannerBase::DocAttribValue:
+					if (m_metadatastate == MS_Root)
+					{
+						m_metadatastate = MS_DocEntityDef;
+					}
+					setDocAttributeValue( ee, eesize);
+					break;
+				case textwolf::XMLScannerBase::DocAttribEnd:
+					m_metadatastate = MS_Root;
+					break;
+				case textwolf::XMLScannerBase::TagAttribName:
+					if (m_metadatastate == MS_AttribName)
+					{
+						m_metadatastate = MS_AttribValue;
+						m_elembuffer = std::string( ee, eesize);
+					}
+					else
+					{
+						setState( Error, "unexpected tag attribute in meta data parsing");
+						return 0;
+					}
+					break;
+				case textwolf::XMLScannerBase::TagAttribValue:
+					if (m_metadatastate == MS_AttribValue)
+					{
+						if (!setRootAttributeValue( m_elembuffer, ee, eesize))
+						{
+							return 0;
+						}
+						m_metadatastate = MS_AttribName;
+					}
+					else
+					{
+						setState( Error, "unexpected tag attribute value in meta data parsing");
+						return 0;
+					}
+					break;
+				case textwolf::XMLScannerBase::OpenTag:
+					if (m_metadatastate == MS_Root || m_metadatastate == MS_Init)
+					{
+						getMetaDataRef()->setAttribute( "root", std::string( ee, eesize));
+						m_metadatastate = MS_AttribName;
+					}
+					else
+					{
+						m_metadatastate = MS_DoneElemCached;
+						break;
+					}
+					break;
+				case textwolf::XMLScannerBase::CloseTagIm:
+				case textwolf::XMLScannerBase::CloseTag:
+				case textwolf::XMLScannerBase::Content:
+					m_metadatastate = MS_DoneElemCached;
+					break;
+
+				case textwolf::XMLScannerBase::Exit:
+					setState( Error, "unexpected end of document in meta data section");
+					return 0;
+			}
+		}
 		return getMetaDataRef().get();
 	}
 
@@ -878,20 +875,21 @@ private:
 	bool m_withEmpty;			///< true, if empty tokens are returned too (default)
 	bool m_doTokenize;			///< true, if content chunks are tokenized by spaces
 	textwolf::XMLScannerBase* m_parser;	///< variant of XML scanner, one of them selected by m_encoding (type textwolf::XMLScanner<..>)
+	textwolf::EndOfChunkTrigger m_eom;	///< end of message trigger
 	const char* m_src;			///< pointer to current chunk parsed
 	std::size_t m_srcsize;			///< size of the current chunk parsed in bytes
 	bool m_srcend;				///< true if end of message is in current chunk parsed
 	enum MetadataState
 	{
 		MS_Init,			///< parsing document header
-		MS_DocEntityDef,
-		MS_DocEntitySkip,
-		MS_DocType,
-		MS_DocType_ROOT,
-		MS_DocType_DefType,
-		MS_DocType_SYSTEM,
-		MS_DocType_PUBLIC,
-		MS_DocTypeDone,
+		MS_DocEntityDef,		///< starting parsing an XML entity definition
+		MS_DocEntitySkip,		///< parsing an entity definition to be ignored
+		MS_DocType,			///< parsing a !DOCTYPE entity definition
+		MS_DocType_ROOT,		///< parsing the root element in a !DOCTYPE entity definition
+		MS_DocType_DefType,		///< parsing the identifier SYSTEM or PUBLIC of a !DOCTYPE entity definition
+		MS_DocType_SYSTEM,		///< parsing the identifier SYSTEM attribute value of a !DOCTYPE entity definition
+		MS_DocType_PUBLIC,		///< parsing the identifier PUBLIC attribute value of a !DOCTYPE entity definition
+		MS_DocTypeDone,			///< finished the parsing of a !DOCTYPE entity definition
 		MS_Root,			///< scanning header for document root
 		MS_AttribName,			///< scanning header for meta data document attribute name or end of meta data
 		MS_AttribValue,			///< scanning header for meta data document attribute value
