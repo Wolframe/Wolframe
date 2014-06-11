@@ -36,7 +36,7 @@
 #define _Wolframe_TPROC_HANDLER_CONFIGURATION_HPP_INCLUDED
 #include <vector>
 #include <string>
-#include "cmdbind/execCommandHandler.hpp"
+#include "execCommandHandler.hpp"
 #include "config/configurationBase.hpp"
 #include "standardConfigs.hpp"
 

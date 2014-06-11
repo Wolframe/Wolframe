@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "cmdbind/execCommandHandler.hpp"
+#include "execCommandHandler.hpp"
 #include "processor/execContext.hpp"
 #include "protocol/ioblocks.hpp"
 #include "logger-v1.hpp"

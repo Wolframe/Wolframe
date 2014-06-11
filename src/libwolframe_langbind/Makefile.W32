@@ -32,9 +32,7 @@ CPP_OBJS = \
 	typedfilterScope.obj \
 	inputfilterScope.obj \
 	null_filter.obj \
-	cmdbind_authCommandHandler.obj \
 	cmdbind_lineCommandHandler.obj \
-	cmdbind_execCommandHandler.obj \
 	cmdbind_IOFilterCommandHandlerEscDLF.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)

@@ -33,8 +33,8 @@
 ///\file mainCommandHandler.cpp
 #include "mainCommandHandler.hpp"
 #include "interfaceCommandHandler.hpp"
+#include "authCommandHandler.hpp"
 #include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
-#include "cmdbind/authCommandHandler.hpp"
 #include "processor/execContext.hpp"
 #include "interfaceCommandHandler.hpp"
 #include "handlerConfig.hpp"

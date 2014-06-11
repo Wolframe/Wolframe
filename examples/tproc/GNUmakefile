@@ -78,6 +78,7 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
+	execCommandHandler.o \
 	tprocHandler.o \
 	tprocHandlerConfig.o \
 	$(TOPDIR)/src/posixMain.o

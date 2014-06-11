@@ -73,6 +73,7 @@ INCLUDE_LIBS = \
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
+	execCommandHandler.obj \
 	tprocHandler.obj \
 	tprocHandlerConfig.obj \
 	$(TOPDIR)\src\winMain.obj

@@ -67,17 +67,21 @@ PROGRAM_OBJS = \
 	prgbind/ddlProgram.o \
 	prgbind/programLibrary.o
 
+CMDHANDLER_OBJS =\
+	mainCommandHandler.o \
+	interfaceCommandHandler.o \
+	doctypeFilterCommandHandler.o \
+	authCommandHandler.o
+
 LOCAL_STATIC_LIB_OBJS = \
 	$(PROVIDER_OBJS) \
 	$(PROGRAM_OBJS) \
+	$(CMDHANDLER_OBJS) \
 	wolframedCommandLine.o \
 	wolfilterCommandLine.o \
 	wolfilterIostreamFilter.o \
 	wolfwizardCommandLine.o \
-	mainCommandHandler.o \
 	mainConnectionHandler.o \
-	interfaceCommandHandler.o \
-	doctypeFilterCommandHandler.o \
 	loadModules.o \
 	moduleDirectory.o \
 	serviceConfig.o \

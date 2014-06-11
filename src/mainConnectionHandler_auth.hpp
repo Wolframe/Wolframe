@@ -35,7 +35,7 @@
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_AUTH_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_AUTH_HPP_INCLUDED
 #include "cmdbind/lineCommandHandler.hpp"
-#include "cmdbind/authCommandHandler.hpp"
+#include "authCommandHandler.hpp"
 #include <vector>
 #include <string>
 
