@@ -1,0 +1,13 @@
+AUTH
+MECH TEST
+Huber
+.
+hbr1234
+.
+AUTH
+MECH TEST
+Huber
+.
+hbr123
+.
+QUIT

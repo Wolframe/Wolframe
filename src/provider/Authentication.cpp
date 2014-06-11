@@ -35,6 +35,7 @@
 //
 
 #include <stdexcept>
+#include <cassert>
 
 #include "AAAAproviderImpl.hpp"
 #include "logger-v1.hpp"
@@ -45,7 +46,7 @@ namespace _Wolframe {
 namespace AAAA {
 
 AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConfiguration* >& confs,
-					  const module::ModulesDirectory* modules )
+					      const module::ModulesDirectory* modules )
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
@@ -58,7 +59,7 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 					  << "' is not an Authentication Unit builder";
 				throw std::logic_error( "object is not an AuthenticationUnit builder" );
 			}
-			m_authenticators.push_back( auth->object( **it ));
+			m_authUnits.push_back( auth->object( **it ));
 			LOG_TRACE << "'" << auth->objectClassName() << "' authentication unit registered";
 		}
 		else	{
@@ -66,68 +67,337 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor. See log" );
 		}
 	}
+
+	// Iterate through the list of authenticators (built at this point)
+	// and build the vector of available mechs
+	for ( std::list< AuthenticationUnit* >::const_iterator ait = m_authUnits.begin();
+						ait != m_authUnits.end(); ait ++ )	{
+		// add unit mechs to the list
+		const char** p_mech = (*ait)->mechs();
+		if ( *p_mech == NULL )	{
+			LOG_WARNING << "'" << (*ait)->className() << "' has no authentication mechanisms";
+		}
+		while ( *p_mech )	{
+			std::string mech( *p_mech ); boost::to_upper( mech );
+			bool exists = false;
+			for( std::vector< std::string >::const_iterator mit = m_mechs.begin();
+						mit != m_mechs.end(); mit++ )	{
+				if ( *mit == mech )
+					exists = true;
+			}
+			if ( ! exists )	{
+				m_mechs.push_back( mech );
+				LOG_TRACE << "'" << mech << "' authentication mechanism registered";
+			}
+			p_mech++;
+		}
+	}
 }
 
 AuthenticationFactory::~AuthenticationFactory()
 {
-	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authenticators.begin();
-								it != m_authenticators.end(); it++ )
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authUnits.begin();
+								it != m_authUnits.end(); it++ )
 		delete *it;
 }
 
 bool AuthenticationFactory::resolveDB( const db::DatabaseProvider& db )
 {
-	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authenticators.begin();
-								it != m_authenticators.end(); it++ )
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authUnits.begin();
+								it != m_authUnits.end(); it++ )
 		if ( ! (*it)->resolveDB( db ) )
 			return false;
 	return true;
 }
 
 
-Authenticator* AuthenticationFactory::authenticator()
+Authenticator* AuthenticationFactory::authenticator( const net::RemoteEndpoint& client )
 {
-	return new StandardAuthenticator();
+	return new StandardAuthenticator( m_mechs, m_authUnits, client );
 }
 
 
 //*********************************************************************************
 // Standard authenticator
-StandardAuthenticator::StandardAuthenticator()
+StandardAuthenticator::StandardAuthenticator( const std::vector<std::string>& mechs_,
+					      const std::list<AuthenticationUnit *> &units_,
+					      const net::RemoteEndpoint &client_ )
+	: m_mechs( mechs_ ), m_authUnits( units_ ), m_client( client_ ),
+	  m_status( INITIALIZED ), m_currentSlice( -1 ), m_user( NULL )
 {
 }
 
 StandardAuthenticator::~StandardAuthenticator()
 {
+	for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+							it != m_slices.end(); it++ )
+		(*it)->dispose();
+	m_slices.clear();
+	if ( m_user )
+		delete m_user, m_user = NULL;
 }
 
-void StandardAuthenticator::close()
+void StandardAuthenticator::dispose()
 {
-	//[PF:REMARK 'delete this' prevents use in different context] delete this;
+	delete this;
 }
 
-// The FSM interface functions
-// The input data.
-void StandardAuthenticator::receiveData( const void* /*data*/, std::size_t /*size*/ )
+// Get the list of available mechs
+const std::vector< std::string >& StandardAuthenticator::mechs() const
 {
+	return m_mechs;
 }
 
-// What should be done next.
-const FSM::Operation StandardAuthenticator::nextOperation()
+// Set the authentication mech
+bool StandardAuthenticator::setMech( const std::string& mech )
 {
-	FSM::Operation	op;
-	return op;
+	// Reset all data
+	if ( m_user )
+		delete m_user, m_user = NULL;
+	for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+							it != m_slices.end(); it++ )
+		(*it)->dispose();
+	m_slices.clear();
+	m_currentSlice = -1;
+
+	bool	mechAvailable = false;
+
+	LOG_TRACE << "StandardAuthenticator: set the authentication mechanism to '"
+		  << mech << "'";
+	if ( mech.empty() )	{
+		LOG_WARNING << "StandardAuthenticator: request for an empty authentication mechanism";
+		m_status = MECH_UNAVAILABLE;
+		return false;
+	}
+	// First check if the requested mech is in the list
+	for ( std::vector< std::string >::const_iterator it = m_mechs.begin();
+						it != m_mechs.end(); it ++ )	{
+		if ( boost::iequals( mech, *it ) )	{
+			LOG_TRACE << "StandardAuthenticator: authentication mechanism '"
+				  << mech << "' found";
+			mechAvailable = true;
+			break;
+		}
+	}
+	if ( ! mechAvailable )	{
+		m_status = MECH_UNAVAILABLE;
+		LOG_DEBUG << "StandardAuthenticator: authentication mechanism '"
+			  << mech << "' not found";
+		return false;
+	}
+
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authUnits.begin();
+							it != m_authUnits.end(); it++ )	{
+		AuthenticatorSlice* slice = (*it)->slice( mech, m_client );
+		if ( slice != NULL )	{
+			LOG_TRACE << "StandardAuthenticator: authentication mechanism '"
+				  << mech << "' provided by '" << (*it)->className();
+			m_slices.push_back( slice );
+		}
+	}
+	// Note the the following logic is badly flawed. A lot more knowledge is needed
+	// in order to do this reasonably correct
+	if ( ! m_slices.empty() )	{
+		m_currentSlice = 0;
+		LOG_TRACE << "StandardAuthenticator: authentication slice set to '"
+			  << m_slices[ m_currentSlice ]->identifier() << "'";
+		switch ( m_slices[ m_currentSlice ]->status() )	{
+			case AuthenticatorSlice::MESSAGE_AVAILABLE:
+				m_status = MESSAGE_AVAILABLE;
+				LOG_TRACE << "StandardAuthenticator: status is MESSAGE_AVAILABLE";
+				break;
+			case AuthenticatorSlice::AWAITING_MESSAGE:
+				m_status = AWAITING_MESSAGE;
+				LOG_TRACE << "StandardAuthenticator: status is AWAITING_MESSAGE";
+				break;
+			case AuthenticatorSlice::AUTHENTICATED:
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is AUTHENTICATED at initialization";
+				m_status = SYSTEM_FAILURE;
+				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is AUTHENTICATED" );
+				break;
+			case AuthenticatorSlice::USER_NOT_FOUND:
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is USER_NOT_FOUND at initialization";
+				m_status = SYSTEM_FAILURE;
+				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is USER_NOT_FOUND" );
+				break;
+			case AuthenticatorSlice::INVALID_CREDENTIALS:
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is INVALID_CREDENTIALS at initialization";
+				m_status = SYSTEM_FAILURE;
+				throw std::logic_error( "StandardAuthenticator (setMech): authentication slice status is INVALID_CREDENTIALS" );
+				break;
+			case AuthenticatorSlice::SYSTEM_FAILURE:
+				LOG_WARNING << "StandardAuthenticator: authentication slice '"
+					    << m_slices[ m_currentSlice ]->identifier() << "' status is SYSTEM_FAILURE";
+				m_status = SYSTEM_FAILURE;
+				break;
+		}
+		return true;
+	}
+	else	{
+		m_status = MECH_UNAVAILABLE;
+		LOG_DEBUG << "StandardAuthenticator: authentication mechanism '"
+			  << mech << "' is not available for this client";
+		return false;
+	}
 }
 
-// signal the FSM
-void StandardAuthenticator::signal( FSM::Signal /*event*/ )
+// The input message
+void StandardAuthenticator::messageIn( const std::string& message )
 {
+	// Sill missing a lot here ....
+
+	if ( m_status != AWAITING_MESSAGE )
+		throw std::logic_error( "StandardAuthenticator: unexpected message received" );
+	if ( m_currentSlice < 0 )
+		throw std::logic_error( "StandardAuthenticator: message received but no authentication slice selected" );
+
+	assert( (std::size_t)m_currentSlice < m_slices.size() );
+	assert( m_slices[ m_currentSlice ]->status() == AuthenticatorSlice::AWAITING_MESSAGE );
+
+	m_slices[ m_currentSlice ]->messageIn( message );
+
+	switch( m_slices[ m_currentSlice ]->status() )	{
+		case AuthenticatorSlice::MESSAGE_AVAILABLE:
+			m_status = MESSAGE_AVAILABLE;
+			LOG_TRACE << "StandardAuthenticator: status is MESSAGE_AVAILABLE";
+			break;
+		case AuthenticatorSlice::AWAITING_MESSAGE:
+			m_status = AWAITING_MESSAGE;
+			LOG_TRACE << "StandardAuthenticator: status is AWAITING_MESSAGE";
+			break;
+		case AuthenticatorSlice::AUTHENTICATED:
+			m_user = m_slices[ m_currentSlice ]->user();
+			if ( ! m_user )	{
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is AUTHENTICATED but user is not available";
+				break;
+			}
+			// destroy everything that was used for authentication
+			for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+									it != m_slices.end(); it++ )
+				(*it)->dispose();
+			m_slices.clear();
+			m_currentSlice = -1;
+
+			m_status = AUTHENTICATED;
+			LOG_TRACE << "StandardAuthenticator: status is AUTHENTICATED";
+			break;
+// This has to be changed
+		case AuthenticatorSlice::USER_NOT_FOUND:
+			// destroy everything that was used for authentication
+			for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+									it != m_slices.end(); it++ )
+				(*it)->dispose();
+			m_slices.clear();
+			m_currentSlice = -1;
+
+			m_status = INVALID_CREDENTIALS;
+			LOG_TRACE << "StandardAuthenticator: status is INVALID_CREDENTIALS";
+			break;
+
+		case AuthenticatorSlice::INVALID_CREDENTIALS:
+			// destroy everything that was used for authentication
+			for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+									it != m_slices.end(); it++ )
+				(*it)->dispose();
+			m_slices.clear();
+			m_currentSlice = -1;
+
+			m_status = INVALID_CREDENTIALS;
+			LOG_TRACE << "StandardAuthenticator: status is INVALID_CREDENTIALS";
+			break;
+		case AuthenticatorSlice::SYSTEM_FAILURE:
+			m_status = SYSTEM_FAILURE;
+			LOG_WARNING << "StandardAuthenticator: status is SYSTEM_FAILURE";
+			break;
+	}
 }
 
-// Data not consumed.
-std::size_t StandardAuthenticator::dataLeft( const void*& /*begin*/ )
+// The output message
+std::string StandardAuthenticator::messageOut()
 {
-	return 0;
+	// Still missing a lot here ....
+
+	if ( m_status != MESSAGE_AVAILABLE )
+		throw std::logic_error( "StandardAuthenticator: unexpected request for output message" );
+	if ( m_currentSlice < 0 )
+		throw std::logic_error( "StandardAuthenticator: message requested but no authentication slice selected" );
+
+	assert( (std::size_t)m_currentSlice < m_slices.size() );
+	assert( m_slices[ m_currentSlice ]->status() == AuthenticatorSlice::MESSAGE_AVAILABLE );
+
+	std::string msgOut = m_slices[ m_currentSlice ]->messageOut();
+
+	switch( m_slices[ m_currentSlice ]->status() )	{
+		case AuthenticatorSlice::MESSAGE_AVAILABLE:
+			m_status = MESSAGE_AVAILABLE;
+			LOG_TRACE << "StandardAuthenticator: status is MESSAGE_AVAILABLE";
+			break;
+		case AuthenticatorSlice::AWAITING_MESSAGE:
+			m_status = AWAITING_MESSAGE;
+			LOG_TRACE << "StandardAuthenticator: status is AWAITING_MESSAGE";
+			break;
+		case AuthenticatorSlice::AUTHENTICATED:
+			m_user = m_slices[ m_currentSlice ]->user();
+			if ( ! m_user )	{
+				LOG_ERROR << "StandardAuthenticator: authentication slice '"
+					  << m_slices[ m_currentSlice ]->identifier() << "' status is AUTHENTICATED but user is not available";
+				break;
+			}
+			// destroy everything that was used for authentication
+			for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+									it != m_slices.end(); it++ )
+				(*it)->dispose();
+			m_slices.clear();
+			m_currentSlice = -1;
+
+			m_status = AUTHENTICATED;
+			LOG_TRACE << "StandardAuthenticator: status is AUTHENTICATED";
+			break;
+// This has to be changed
+		case AuthenticatorSlice::USER_NOT_FOUND:
+			// destroy everything that was used for authentication
+			for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+									it != m_slices.end(); it++ )
+				(*it)->dispose();
+			m_slices.clear();
+			m_currentSlice = -1;
+
+			m_status = INVALID_CREDENTIALS;
+			LOG_TRACE << "StandardAuthenticator: status is INVALID_CREDENTIALS";
+			break;
+		case AuthenticatorSlice::INVALID_CREDENTIALS:
+			// destroy everything that was used for authentication
+			for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();
+									it != m_slices.end(); it++ )
+				(*it)->dispose();
+			m_slices.clear();
+			m_currentSlice = -1;
+
+			m_status = INVALID_CREDENTIALS;
+			LOG_TRACE << "StandardAuthenticator: status is INVALID_CREDENTIALS";
+			break;
+		case AuthenticatorSlice::SYSTEM_FAILURE:
+			m_status = SYSTEM_FAILURE;
+			LOG_WARNING << "StandardAuthenticator: status is SYSTEM_FAILURE";
+			break;
+	}
+
+	return msgOut;
+}
+
+// The authenticated user or NULL if not authenticated
+User* StandardAuthenticator::user()
+{
+	AAAA::User* retUser = m_user;
+	if ( m_user )	{
+		m_user = NULL;
+		assert( m_slices.empty() );
+	}
+	return retUser;
 }
 
 }} // namespace _Wolframe::AAAA

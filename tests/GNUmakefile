@@ -1,7 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty modules database simpleFormCompiler wolfilter compileTDL
-#SUBDIRS = 3rdParty modules database AAAA simpleFormCompiler wolfilter compileTDL
+SUBDIRS = 3rdParty modules database AAAA simpleFormCompiler wolfilter compileTDL protocol
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 

@@ -280,7 +280,7 @@ f none opt/csw/include/wolframe/AAAA/CRAM.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/audit.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/authentication.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/authorization.hpp 0644 root staff
-f none opt/csw/include/wolframe/AAAA/password.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/passwordHash.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/user.hpp 0644 root staff
 d none opt/csw/include/wolframe/module 0755 root root
 f none opt/csw/include/wolframe/module/constructor.hpp 0644 root staff

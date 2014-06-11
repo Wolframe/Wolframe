@@ -34,12 +34,14 @@
 //
 //
 
-#include <string>
-#include <cstring>
-#include <ostream>
+#include "PAMAuth.hpp"
 
 #include "logger-v1.hpp"
-#include "PAMAuth.hpp"
+
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <sstream>
 
 namespace _Wolframe {
 namespace AAAA {
@@ -131,6 +133,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // allocate return messages
 	if( ( *reply = r = (struct pam_response *)calloc( nmsg, sizeof( struct pam_response ) ) ) == NULL ) {
 		appdata->errmsg = "Unable to allocate memory for replies";
+		*reply = NULL;
 		return PAM_BUF_ERR;
 	}
 
@@ -153,14 +156,15 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // Usually we get prompted for a password, this is not always true though.
 			case PAM_PROMPT_ECHO_OFF:
 // thank you very much, come again (but with a password)
-				if( !appdata->has_pass )
+				if( !appdata->has_pass ) {
+					*reply = NULL;
 // Solaris and NetBSD have no PAM_CONV_AGAIN, returning an error instead
 #if defined SUNOS || NETBSD
 					return PAM_CONV_ERR;
 #else
 					return PAM_CONV_AGAIN;
 #endif
-
+				}
 				r->resp = strdup( appdata->pass.c_str( ) );
 				if( r->resp == NULL ) {
 					appdata->errmsg = "Unable to allocate memory for password answer";
@@ -171,7 +175,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // Check against the PAM_USER_PROMPT to be sure we have a login request.
 // Always recheck because the library could change the prompt any time
 			case PAM_PROMPT_ECHO_ON:
-// Solaris hat different API in pam_get_item
+// Solaris has a different API in pam_get_item
 #ifdef SUNOS
 				rc = pam_get_item( appdata->h, PAM_USER_PROMPT, (void **)&login_prompt_union.v );
 #else
@@ -186,10 +190,21 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 					goto error;
 				}
 				if( strcmp( m->msg, login_prompt ) == 0 ) {
-					r->resp = strdup( appdata->login.c_str( ) );
-					if( r->resp == NULL ) {
-						appdata->errmsg = "Unable to allocate memory for login answer";
-						goto error;
+// thank you very much, come again (but with a username)
+					if( !appdata->has_login ) {
+						*reply = NULL;
+// Solaris and NetBSD have no PAM_CONV_AGAIN, returning an error instead
+#if defined SUNOS || NETBSD
+						return PAM_CONV_ERR;
+#else
+						return PAM_CONV_AGAIN;
+#endif
+					} else {
+						r->resp = strdup( appdata->login.c_str( ) );
+						if( r->resp == NULL ) {
+							appdata->errmsg = "Unable to allocate memory for login answer";
+							goto error;
+						}
 					}
 				}
 				break;
@@ -197,6 +212,7 @@ static int pam_conv_func(	int nmsg, const struct pam_message **msg,
 // internal pam errors, infos (TODO: log later)
 			case PAM_ERROR_MSG:
 			case PAM_TEXT_INFO:
+				appdata->errmsg = m->msg;
 				break;
 
 			default: {
@@ -221,24 +237,217 @@ error:
 	return PAM_CONV_ERR;
 }
 
-PAMAuthenticator::PAMAuthenticator( const std::string& Identifier,
+//*********   PAM Authentication Unit   *************************************
+
+PAMAuthUnit::PAMAuthUnit( const std::string& Identifier,
 				    const std::string& service )
 	: AuthenticationUnit( Identifier ), m_service( service )
+{
+	LOG_DEBUG << "PAM authentication unit created with PAM service '" << m_service << "'";
+}
+
+PAMAuthUnit::~PAMAuthUnit()
+{
+}
+
+const char** PAMAuthUnit::mechs() const
+{
+	static const char* m[] = { "WOLFRAME-PAM", NULL };
+	return m;
+}
+
+AuthenticatorSlice* PAMAuthUnit::slice( const std::string& /*mech*/,
+					const net::RemoteEndpoint& /*client*/ )
+{
+	return new PAMAuthSlice( *this );
+}
+
+User* PAMAuthUnit::authenticatePlain(	const std::string& username,
+					const std::string& password ) const
+{
+	int rc;
+	pam_appdata appdata;
+	const struct pam_conv conv = { pam_conv_func, &appdata };
+	
+	appdata.has_login = true;
+	appdata.login = username;
+	appdata.h = NULL;
+	appdata.has_pass = true;
+	appdata.pass = password;
+	
+	rc = pam_start( m_service.c_str( ), appdata.login.c_str( ), &conv, &appdata.h );
+	if( rc != PAM_SUCCESS ) {
+		LOG_ERROR << "pam_start failed with service '" << m_service << "': "
+			<< pam_strerror( appdata.h, rc );
+		return NULL;
+	}
+	
+	for( int i = 0; i < 10; i++ ) {
+		rc = pam_authenticate( appdata.h, 0 );
+#ifdef PAM_INCOMPLETE
+		if( rc != PAM_INCOMPLETE )
+#endif
+			break;
+			
+		sleep( 1 );
+
+		// we need a password
+		//~ appdata.has_pass = true;
+		//~ appdata.pass = password;
+	}
+
+	if( rc != PAM_SUCCESS ) {
+		LOG_ERROR << "pam_authenticate failed with service '" << m_service << "': "
+			<< pam_strerror( appdata.h, rc ) << ", "
+			<< appdata.errmsg;
+		return NULL;
+	}
+
+	// is access to the account permitted?
+	rc = pam_acct_mgmt( appdata.h, 0 );
+	if( rc != PAM_SUCCESS ) {
+		LOG_ERROR << "pam_acct_mgmt failed with service '" << m_service << "': "
+			<< pam_strerror( appdata.h, rc );
+		return NULL;
+	}
+
+	// terminate PAM session with last exit code
+	if( pam_end( appdata.h, rc ) != PAM_SUCCESS ) {
+		LOG_ERROR << "pam_end failed with service '" << m_service << "': "
+			<< pam_strerror( appdata.h, rc );
+	}
+
+	return new User( "PAM", appdata.login, "" );
+}
+
+#define STRINGIFY( name ) # name
+static const char *m_sliceStateToString[] = {
+	STRINGIFY( PAMAuthSlice::SLICE_INITIALIZED ),
+	STRINGIFY( PAMAuthSlice::SLICE_HAS_LOGIN_NEED_PASS ),
+	STRINGIFY( PAMAuthSlice::PAMAuthSliceSLICE_INVALID_CREDENTIALS ),
+	STRINGIFY( PAMAuthSlice::SLICE_AUTHENTICATED ),
+	STRINGIFY( PAMAuthSlice::SLICE_SYSTEM_FAILURE )
+};
+
+PAMAuthSlice::PAMAuthSlice( const PAMAuthUnit& backend )
+	: m_backend( backend )
 {
 	m_appdata.h = NULL;
 	m_appdata.has_pass = false;
 	m_appdata.pass = "";
 	m_conv.conv = pam_conv_func;
 	m_conv.appdata_ptr = &m_appdata;
+	m_inputReusable = false;
 
-	m_state = _Wolframe_PAM_STATE_NEED_LOGIN;
-
-	LOG_DEBUG << "PAM authenticator created with PAM service '" << m_service << "'";
+	m_state = SLICE_INITIALIZED;
 }
 
-PAMAuthenticator::~PAMAuthenticator()
+PAMAuthSlice::~PAMAuthSlice()
 {
 }
 
-}} // namespace _Wolframe::AAAA
+void PAMAuthSlice::dispose()
+{
+	delete this;
+}
 
+/// The input message
+void PAMAuthSlice::messageIn( const std::string& message )
+{
+	int rc = 0;
+
+	switch( m_state ) {
+		case SLICE_INITIALIZED:
+			m_appdata.login = message.c_str( );
+			// TODO: the service name must be a CONSTANT due to security reasons!
+			rc = pam_start( m_backend.m_service.c_str( ), m_appdata.login.c_str( ), &m_conv, &m_appdata.h );
+			if( rc != PAM_SUCCESS ) {
+				LOG_ERROR << "PAM auth slice: "
+					<< "pam_start failed with service " << m_backend.m_service << ": "
+					<< pam_strerror( m_appdata.h, rc ) << " in state '"
+					<< m_sliceStateToString[m_state] << "'";
+				m_state = SLICE_SYSTEM_FAILURE;
+			} else {
+				m_state = SLICE_HAS_LOGIN_NEED_PASS;
+			}
+
+			break;
+
+		case SLICE_HAS_LOGIN_NEED_PASS:
+			m_appdata.has_pass = true;
+			m_appdata.pass = message.c_str( );
+
+			rc = pam_authenticate( m_appdata.h, 0 );
+
+			break;
+
+		case SLICE_INVALID_CREDENTIALS:
+		case SLICE_AUTHENTICATED:
+		case SLICE_SYSTEM_FAILURE:
+			LOG_ERROR << "PAM auth slice: receiving unexpected message in state '"
+				<< m_sliceStateToString[m_state] << "', this is illegal!";
+			break;
+	}
+}
+
+/// The output message
+std::string PAMAuthSlice::messageOut()
+{
+	switch( m_state ) {
+		case SLICE_HAS_LOGIN_NEED_PASS:
+			return "password?";
+		
+		case SLICE_INITIALIZED:
+		case SLICE_INVALID_CREDENTIALS:
+		case SLICE_AUTHENTICATED:
+		case SLICE_SYSTEM_FAILURE:
+			LOG_ERROR << "PAM auth slice: receiving unexpected message in state '"
+				<< m_sliceStateToString[m_state] << "', this is illegal!";
+			break;
+		
+		default:
+			LOG_FATAL << "PAM auth slice: receiving unexpected message in illegal state "
+				<< m_state << "!";
+	}
+	
+	return std::string( );
+}
+
+/// The current status of the authenticator slice
+AuthenticatorSlice::Status PAMAuthSlice::status() const
+{
+	switch( m_state ) {
+		case SLICE_INITIALIZED:
+			return MESSAGE_AVAILABLE;
+
+		case SLICE_HAS_LOGIN_NEED_PASS:
+			return AWAITING_MESSAGE;
+
+		case SLICE_INVALID_CREDENTIALS:
+		case SLICE_AUTHENTICATED:
+		case SLICE_SYSTEM_FAILURE:
+			LOG_ERROR << "PAM auth slice: called status( ) in illegal state '"
+				<< m_sliceStateToString[m_state] << "', this is illegal!";
+			break;
+		
+		default:
+			LOG_FATAL << "PAM auth slice: called status( ) in illegal state "
+				<< m_state << "!";
+			return SYSTEM_FAILURE;
+	}
+	return SYSTEM_FAILURE;
+}
+	
+/// The authenticated user or NULL if not authenticated
+User* PAMAuthSlice::user()
+{
+	if ( m_state == SLICE_AUTHENTICATED )	{
+		User *usr = new User( identifier(), m_user, "" );
+		m_user.clear();
+		return usr;
+	} else {
+		return NULL;
+	}
+}
+
+}} // namespace _Wolframe::AAAA

@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-/// \file password.hpp
+/// \file passwordHash.hpp
 /// Wolframe password hashes
 ///
 

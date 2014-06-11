@@ -1,0 +1,6 @@
+<!-- Using SSL (for Wolframe) Guide -->
+
+<!ENTITY UsingSSLPreface		SYSTEM "Preface.xml">
+<!ENTITY UsingSSLIntroduction		SYSTEM "Introduction.xml">
+<!ENTITY UsingSSLOpenSSL		SYSTEM "OpenSSL.xml">
+<!ENTITY UsingSSLWindows		SYSTEM "Windows.xml">

@@ -260,7 +260,7 @@ usr/local/include/wolframe/AAAA/CRAM.hpp
 usr/local/include/wolframe/AAAA/audit.hpp
 usr/local/include/wolframe/AAAA/authentication.hpp
 usr/local/include/wolframe/AAAA/authorization.hpp
-usr/local/include/wolframe/AAAA/password.hpp
+usr/local/include/wolframe/AAAA/passwordHash.hpp
 usr/local/include/wolframe/AAAA/user.hpp
 @dirrm usr/local/include/wolframe/AAAA
 usr/local/include/wolframe/module/constructor.hpp

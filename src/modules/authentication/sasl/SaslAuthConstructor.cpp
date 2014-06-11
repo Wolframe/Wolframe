@@ -40,11 +40,11 @@
 namespace _Wolframe {
 namespace AAAA {
 
-SaslAuthenticator* SaslAuthConstructor::object( const config::NamedConfiguration& conf )
+SaslAuthUnit* SaslAuthConstructor::object( const config::NamedConfiguration& conf )
 {
 	const SaslAuthConfig& cfg = dynamic_cast< const SaslAuthConfig& >( conf );
 
-	SaslAuthenticator* m_auth = new SaslAuthenticator( cfg.m_identifier,
+	SaslAuthUnit* m_auth = new SaslAuthUnit( cfg.m_identifier,
 							   cfg.m_service, cfg.m_confPath );
 	LOG_NOTICE << "SASL authenticator container created";
 	return m_auth;

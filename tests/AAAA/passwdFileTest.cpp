@@ -38,7 +38,7 @@
 #include "gtest/gtest.h"
 #include "passwdFile.hpp"
 #include "system/globalRngGen.hpp"
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "crypto/HMAC.hpp"
 
 using namespace _Wolframe::AAAA;
@@ -56,63 +56,24 @@ protected:
 };
 
 
-TEST_F( PasswdFileFixture, PasswordSaltTest )
-{
-	unsigned char		salt[ PASSWORD_SALT_SIZE ];
-	PasswordHash::Salt	salt0;
-
-	EXPECT_EQ( salt0.size(), 0 );
-	EXPECT_STREQ( "", salt0.toBCD().c_str() );
-	EXPECT_STREQ( "", salt0.toString().c_str() );
-
-	for ( size_t i = 0; i < PASSWORD_SALT_SIZE; i++ )
-		salt[ i ] = 0;
-	PasswordHash::Salt	salt1( salt, PASSWORD_SALT_SIZE );
-	PasswordHash::Salt	salt1_0( "AAAAAAAAAAAAAAAAAAAAAA" );
-	EXPECT_EQ( salt1.size(), 16 );
-	EXPECT_STRCASEEQ( "00000000000000000000000000000000", salt1.toBCD().c_str() );
-	EXPECT_STRCASEEQ( "AAAAAAAAAAAAAAAAAAAAAA", salt1.toString().c_str() );
-	EXPECT_TRUE( salt1 == salt1_0 );
-
-	for ( size_t i = 0; i < PASSWORD_SALT_SIZE; i++ )
-		salt[ i ] = i;
-	PasswordHash::Salt	salt2( salt, PASSWORD_SALT_SIZE );
-	EXPECT_EQ( salt2.size(), PASSWORD_SALT_SIZE );
-	EXPECT_STRCASEEQ( "000102030405060708090a0b0c0d0e0f", salt2.toBCD().c_str() );
-	EXPECT_STRCASEEQ( "AAECAwQFBgcICQoLDA0ODw", salt2.toString().c_str() );
-
-	for ( size_t i = 0; i < PASSWORD_SALT_SIZE; i++ )
-		salt[ i ] = 0xff;
-	PasswordHash::Salt	salt3( salt, PASSWORD_SALT_SIZE );
-	EXPECT_EQ( salt3.size(), PASSWORD_SALT_SIZE );
-	EXPECT_STRCASEEQ( "ffffffffffffffffffffffffffffffff", salt3.toBCD().c_str() );
-	EXPECT_STRCASEEQ( "/////////////////////w", salt3.toString().c_str() );
-}
-
-TEST_F( PasswdFileFixture, PasswordHashTest )
-{
-	PasswordHash	hash0( "$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAA");
-
-	EXPECT_STREQ( "00000000000000000000000000000000", hash0.salt().toBCD().c_str() );
-	EXPECT_EQ( 0, hash0.hash().hash()[0] );
-	std::cout << hash0.toString();
-}
-
-
 TEST_F( PasswdFileFixture, getUser )
 {
 	PasswordFile	pwdFile( "passwd", false );
 	PwdFileUser	user;
 	bool result;
 
-	result = pwdFile.getUser( "Admin", user );
+	result = pwdFile.getUser( "admin", user );
 	EXPECT_FALSE( result );
 
-	result = pwdFile.getUser( "admin", user );
+	result = pwdFile.getUser( "admin", user, false );
 	ASSERT_TRUE( result );
-	EXPECT_STREQ( "admin", user.user.c_str() );
-	EXPECT_STREQ( "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6", user.hash.c_str() );
-	EXPECT_STREQ( "Wolframe Administrator", user.info.c_str() );
+	EXPECT_STREQ( "Admin", user.user.c_str() );
+	EXPECT_STREQ( "Just a test user", user.info.c_str() );
+
+	result = pwdFile.getUser( "Admin", user );
+	ASSERT_TRUE( result );
+	EXPECT_STREQ( "Admin", user.user.c_str() );
+	EXPECT_STREQ( "Just a test user", user.info.c_str() );
 }
 
 TEST_F( PasswdFileFixture, getHMACuser )
@@ -126,29 +87,22 @@ TEST_F( PasswdFileFixture, getHMACuser )
 	rnd.generate( saltData, PASSWORD_SALT_SIZE );
 	PasswordHash::Salt	salt( saltData, PASSWORD_SALT_SIZE );
 
-	HMAC_SHA256	hmac0( salt.salt(), salt.size(), "Admin" );
+	HMAC_SHA256	hmac0( salt.salt(), salt.size(), "admin" );
+	result = pwdFile.getHMACuser( hmac0.toString(), salt.toString(), user, false );
+	ASSERT_TRUE( result );
+	EXPECT_STREQ( "Admin", user.user.c_str() );
+	EXPECT_STREQ( "Just a test user", user.info.c_str() );
+
 	result = pwdFile.getHMACuser( hmac0.toString(), salt.toString(), user, true );
 	EXPECT_FALSE( result );
 
-	HMAC_SHA256	hmac1( salt.salt(), salt.size(), "admin" );
-	result = pwdFile.getHMACuser( hmac1.toString(), salt.toString(), user, false );
-	ASSERT_TRUE( result );
-	EXPECT_STREQ( "admin", user.user.c_str() );
-	EXPECT_STREQ( "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6", user.hash.c_str() );
-	EXPECT_STREQ( "Wolframe Administrator", user.info.c_str() );
-
+	HMAC_SHA256	hmac1( salt.salt(), salt.size(), "Admin" );
 	result = pwdFile.getHMACuser( hmac1.toString(), salt.toString(), user, true );
 	ASSERT_TRUE( result );
-	EXPECT_STREQ( "admin", user.user.c_str() );
-	EXPECT_STREQ( "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6", user.hash.c_str() );
-	EXPECT_STREQ( "Wolframe Administrator", user.info.c_str() );
-
-	result = pwdFile.getHMACuser( hmac1.toString(), salt.toString(), user, false );
-	ASSERT_TRUE( result );
-	EXPECT_STREQ( "admin", user.user.c_str() );
-	EXPECT_STREQ( "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6", user.hash.c_str() );
-	EXPECT_STREQ( "Wolframe Administrator", user.info.c_str() );
+	EXPECT_STREQ( "Admin", user.user.c_str() );
+	EXPECT_STREQ( "Just a test user", user.info.c_str() );
 }
+
 //****************************************************************************
 
 int main( int argc, char **argv )

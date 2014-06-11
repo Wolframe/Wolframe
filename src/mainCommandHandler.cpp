@@ -78,7 +78,13 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 static MainSTM mainstm;
 
 MainCommandHandler::MainCommandHandler()
-	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>( &mainstm ){}
+	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>(&mainstm)
+	,m_remoteEndpoint(0){}
+
+void MainCommandHandler::setPeer( const net::RemoteEndpoint& remote)
+{
+	m_remoteEndpoint = &remote;
+}
 
 int MainCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
@@ -112,7 +118,12 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
 	if (!m_authenticator.get())
 	{
-		m_authenticator.reset( execContext()->authenticator());
+		if (!m_remoteEndpoint)
+		{
+			throw std::logic_error("no remote endpoint set, cannot authenticate");
+		}
+		m_authenticator.reset( execContext()->authenticator( *m_remoteEndpoint ));
+
 		if (!m_authenticator.get())
 		{
 			out << "ERR AUTH denied" << endl();
@@ -126,30 +137,46 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 	}
 	else
 	{
-		out << "MECHS " << "NONE" /*[+] boost::algorithm::join( m_authenticator->mechs(), " ")*/ << endl();
+		std::string mechlist = boost::algorithm::join( m_authenticator->mechs(), " ");
+		if (mechlist.empty())
+		{
+			out << "MECHS NONE" << endl();
+		}
+		else
+		{
+			out << "MECHS NONE " << mechlist << endl();
+		}
 		return MainSTM::Authentication;
 	}
 }
 
 int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 {
-	//[+] cmdbind::AuthCommandHandler* chnd = dynamic_cast<cmdbind::AuthCommandHandler*>( ch);
 	cmdbind::CommandHandlerR chr( ch);
 	const char* error = ch->lastError();
 	if (error)
 	{
-		out << "ERR authentication " << error << endl();
-		return -1;
+		out << "ERR authentication failed: " << error << endl();
+		return MainSTM::Unauthenticated;
 	}
 	else
 	{
-		out << "OK authorization" << endl();
-		//[+] m_execContext->setUser( chnd->user());
-		return MainSTM::Authenticated;
+		AAAA::User* usr = m_authenticator->user();
+		if (usr)
+		{
+			out << "OK authenticated" << endl();
+			execContext()->setUser( usr);
+			return MainSTM::Authenticated;
+		}
+		else
+		{
+			out << "ERR authentication refused" << endl();
+			return MainSTM::Unauthenticated;
+		}
 	}
 }
 
-int MainCommandHandler::doMech( int argc, const char** /*argv*/, std::ostream& out)
+int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 {
 	if (argc == 0)
 	{
@@ -161,15 +188,34 @@ int MainCommandHandler::doMech( int argc, const char** /*argv*/, std::ostream& o
 		out << "ERR to many arguments for MECH" << endl();
 		return stateidx();
 	}
-	//[+] if (!m_authenticator->chooseMech( argv[0]))
-	//[+] {
-	//[+] 	out << "ERR denied" << endl();
-	//[+] 	out << "MECHS " << boost::algorithm::join( m_authenticator->mechs(), " ") << endl();
-	//[+] 	return MainSTM::Authentication;
-	//[+] }
-	cmdbind::AuthCommandHandler* authch = new cmdbind::AuthCommandHandler( m_authenticator);
-	authch->setExecContext( execContext());
-	delegateProcessing<&MainCommandHandler::endMech>( authch);
+	if (0==std::strcmp(argv[0],"NONE"))
+	{
+		out << "OK no authentication" << endl();
+		return MainSTM::Authenticated;
+	}
+	else
+	{
+		if (!m_authenticator->setMech( argv[0] ))
+		{
+			out << "ERR denied" << endl();
+			std::string mechlist = boost::algorithm::join( m_authenticator->mechs(), " ");
+			if (mechlist.empty())
+			{
+				out << "MECHS NONE" << endl();
+			}
+			else
+			{
+				out << "MECHS NONE " << mechlist << endl();
+			}
+			return MainSTM::Authentication;
+		}
+		else
+		{
+			cmdbind::AuthCommandHandler* authch = new cmdbind::AuthCommandHandler( m_authenticator);
+			authch->setExecContext( execContext());
+			delegateProcessing<&MainCommandHandler::endMech>( authch);
+		}
+	}
 	return stateidx();
 }
 
@@ -236,7 +282,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	cmdbind::CommandHandlerR chr( ch);
 
 	types::DoctypeInfoR info = chnd->info();
-	
+
 	const char* error = ch->lastError();
 	if (!info.get())
 	{

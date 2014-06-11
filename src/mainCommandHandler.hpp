@@ -40,7 +40,7 @@
 #include "interfaceCommandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
-#include "AAAA/authentication.hpp"
+#include "AAAA/authenticator.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -53,6 +53,8 @@ public:
 	typedef cmdbind::LineCommandHandlerTemplate<MainCommandHandler> Parent;
 	MainCommandHandler();
 	virtual ~MainCommandHandler(){}
+
+	void setPeer( const net::RemoteEndpoint& remote);
 
 public:
 	int doAuth( int argc, const char** argv, std::ostream& out);
@@ -77,6 +79,7 @@ private:
 
 private:
 	boost::shared_ptr<AAAA::Authenticator> m_authenticator;
+	const net::RemoteEndpoint* m_remoteEndpoint;
 	std::string m_command;
 	std::string m_commandtag;
 };

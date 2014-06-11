@@ -271,7 +271,7 @@ usr/pkg/include/wolframe/AAAA/CRAM.hpp
 usr/pkg/include/wolframe/AAAA/audit.hpp
 usr/pkg/include/wolframe/AAAA/authentication.hpp
 usr/pkg/include/wolframe/AAAA/authorization.hpp
-usr/pkg/include/wolframe/AAAA/password.hpp
+usr/pkg/include/wolframe/AAAA/passwordHash.hpp
 usr/pkg/include/wolframe/AAAA/user.hpp
 @dirrm usr/pkg/include/wolframe/AAAA
 usr/pkg/include/wolframe/module/constructor.hpp

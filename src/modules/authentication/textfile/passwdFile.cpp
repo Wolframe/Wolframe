@@ -54,6 +54,23 @@ namespace AAAA {
 static const std::size_t PWD_FILE_LINE_SIZE = 1024 + 1;
 static const std::size_t MAX_HMAC_KEY_SIZE = 1024;
 
+void PwdFileUser::clear()
+{
+	std::size_t i;
+
+	for ( i = 0; i < user.length(); i++ )
+		user[ i ] = 'x';
+	user.clear();
+	for ( i = 0; i < hash.length(); i++ )
+		hash[ i ] = 'x';
+	hash.clear();
+	for ( i = 0; i < info.length(); i++ )
+		info[ i ] = 'x';
+	info.clear();
+	expiry = 0;
+}
+
+
 std::string PasswordFile::passwdLine( const PwdFileUser& user )
 {
 	std::stringstream ss;
@@ -279,6 +296,28 @@ bool PasswordFile::getHMACuser( const std::string& hash, const std::string& key,
 		}
 	}
 	return false;
+}
+
+bool PasswordFile::getHMACuser( const std::string& userHash,
+				PwdFileUser& user, bool caseSensitive ) const
+{
+	std::string	key;
+	std::string	hash;
+
+	std::string s = boost::algorithm::trim_copy( userHash );
+	if ( s[ 0 ] == '$' )	{
+		size_t hashStart = s.find( "$", 1 );
+		if ( hashStart == s.npos )	{
+			std::string errMsg = "'" + s + "' is not a valid username hash";
+			throw std::runtime_error( errMsg );
+		}
+		key = s.substr( 1, hashStart - 1 );
+		hash = s.substr( hashStart + 1 );
+	}
+	else	{
+		hash = userHash;
+	}
+	return getHMACuser( hash, key, user, caseSensitive );
 }
 
 }} // namepspace _Wolframe::AAAA

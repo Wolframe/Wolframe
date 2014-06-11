@@ -39,7 +39,7 @@
 
 #include "AAAA/AAAAprovider.hpp"
 #include "config/configurationBase.hpp"
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "AAAA/authorization.hpp"
 #include "AAAA/audit.hpp"
 
@@ -47,6 +47,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 
 namespace _Wolframe {
 namespace AAAA {
@@ -55,16 +56,39 @@ namespace AAAA {
 class StandardAuthenticator : public Authenticator
 {
 public:
-	StandardAuthenticator();
-	~StandardAuthenticator();
-	void close();
+	StandardAuthenticator( const std::vector<std::string>& mechs_,
+			       const std::list< AuthenticationUnit* >& units_,
+			       const net::RemoteEndpoint& client_ );
 
-	// From the FSM interface
-	void receiveData( const void* data, std::size_t size );
-	const Operation nextOperation();
-	void signal( Signal event );
-	std::size_t dataLeft( const void*& begin );
+	~StandardAuthenticator();
+	void dispose();
+
+	/// Get the list of available mechs
+	virtual const std::vector<std::string>& mechs() const;
+
+	/// Set the authentication mech
+	virtual bool setMech( const std::string& mech );
+
+	/// The input message
+	virtual void messageIn( const std::string& message );
+
+	/// The output message
+	virtual std::string messageOut();
+
+	/// The current status of the authenticator
+	virtual Status status() const		{ return m_status; }
+
+	/// The authenticated user or NULL if not authenticated
+	virtual User* user();
 private:
+	const std::vector< std::string >&	m_mechs;
+	const std::list< AuthenticationUnit* >&	m_authUnits;
+	const net::RemoteEndpoint&		m_client;
+
+	Authenticator::Status			m_status;
+	std::vector< AuthenticatorSlice* >	m_slices;
+	int					m_currentSlice;
+	AAAA::User*				m_user;
 };
 
 class AuthenticationFactory
@@ -75,9 +99,10 @@ public:
 	~AuthenticationFactory();
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authenticator* authenticator();
+	Authenticator* authenticator( const net::RemoteEndpoint& client );
 private:
-	std::list< AuthenticationUnit* > m_authenticators;
+	std::list< AuthenticationUnit* >	m_authUnits;
+	std::vector< std::string >		m_mechs;
 };
 
 
@@ -149,7 +174,8 @@ public:
 	~AAAAprovider_Impl()				{}
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authenticator* authenticator()		{ return m_authenticator.authenticator(); }
+	Authenticator* authenticator( const net::RemoteEndpoint& client )
+						{ return m_authenticator.authenticator( client ); }
 	Authorizer* authorizer()		{ return m_authorizer.authorizer(); }
 	Auditor* auditor()			{ return m_auditor.auditor(); }
 private:

@@ -47,6 +47,9 @@ struct PwdFileUser	{
 	std::string	hash;
 	std::string	info;
 	unsigned long	expiry;
+public:
+	~PwdFileUser()		{ clear(); }
+	void clear();
 };
 
 ///\brief Password file
@@ -102,14 +105,28 @@ public:
 	///\brief Get an user from the password file defined by an username hash
 	///\param [in] hash	The HMAC-SHA256 hash of the username (base64)
 	///\param [in] key	The HMAC-SHA256 key (base64 string)
+	///\param [out] user	A filled PwdFileUser structure
 	///\param [in] caseSensitive The username should be treated as case sensitive
 	///			if this flag is set (converted to lower case)
-	///\param [out] user	A filled PwdFileUser structure
 	///\return		true if the user has been found or false
 	///			if the user doesn't exist in the password file
 	///\note Throws in case of file operation error or if the hash cannot
 	///			be converted to a HMAC-SHA256
 	bool getHMACuser( const std::string& hash, const std::string& key,
+			  PwdFileUser& user, bool caseSensitive = true ) const;
+
+	///\brief Get an user from the password file defined by an username hash
+	///\param [in] userHash	The HMAC-SHA256 hash of the username (base64)
+	///			combined with the HMAC-SHA256 key (base64)
+	///			in the form $key$hash
+	///\param [out] user	A filled PwdFileUser structure
+	///\param [in] caseSensitive The username should be treated as case sensitive
+	///			if this flag is set (converted to lower case)
+	///\return		true if the user has been found or false
+	///			if the user doesn't exist in the password file
+	///\note Throws in case of file operation error or if the hash cannot
+	///			be converted to a HMAC-SHA256
+	bool getHMACuser( const std::string& userHash,
 			  PwdFileUser& user, bool caseSensitive = true ) const;
 private:
 	const std::string	m_filename;

@@ -38,20 +38,20 @@ class AuthenticationFixture : public ::testing::Test
 
 TEST_F( AuthenticationFixture, TextFileAuthenticator )
 {
-	TextFileAuthenticator authenticator( "", "passwd" );
+	TextFileAuthUnit authenticator( "", "passwd" );
 	ASSERT_STREQ( authenticator.className( ), "TextFileAuth" );
 }
 
 TEST_F( AuthenticationFixture, DatabaseAuthenticator )
 {
-	DBauthenticator authenticator( "", "sqlitedb" );
+	DBauthUnit authenticator( "", "sqlitedb" );
 	ASSERT_STREQ( authenticator.className( ), "DBAuth" );
 }
 
 #ifdef WITH_PAM
 TEST_F( AuthenticationFixture, PamAuthenticator )
 {
-	PAMAuthenticator authenticator( "", "wolframe" );
+	PAMAuthUnit authenticator( "", "wolframe" );
 	ASSERT_STREQ( authenticator.className( ), "PAMAuth" );
 }
 #endif // WITH_PATH
@@ -59,7 +59,7 @@ TEST_F( AuthenticationFixture, PamAuthenticator )
 #ifdef WITH_SASL
 TEST_F( AuthenticationFixture, SaslAuthenticator )
 {
-	SaslAuthenticator authenticator( "", "wolframe", "sasl.conf" );
+	SaslAuthUnit authenticator( "", "wolframe", "sasl.conf" );
 	ASSERT_STREQ( authenticator.className( ), "SASLAuth" );
 }
 #endif // WITH_SASL

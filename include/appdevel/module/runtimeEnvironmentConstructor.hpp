@@ -62,6 +62,11 @@ public:
 	{
 		return ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;
 	}
+
+	virtual const char* objectClassName() const
+	{
+		return "RuntimeEnvironment";
+	}
 };
 
 typedef boost::shared_ptr<RuntimeEnvironmentConstructor> RuntimeEnvironmentConstructorR;

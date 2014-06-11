@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 - 2014 Project Wolframe.
+ Copyright (C) 2011 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -30,59 +30,44 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file system/FSMinterface.hpp
-/// Finite State Machine interface
-///
+//
+// authentication_textfile.hpp
+//
 
-#ifndef _FSM_INTERFACE_HPP_INCLUDED
-#define _FSM_INTERFACE_HPP_INCLUDED
+#ifndef _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
+#define _AUTHENTICATION_TEXTFILE_HPP_INCLUDED
 
-#include <cstddef>		// for std::size_t
+#include "AAAA/authentication.hpp"
+
+#include <map>
+#include <string>
 
 namespace _Wolframe {
+namespace AAAA {
 
-/// Finite State Machine interface
-class FSM
-{
-public:
-	/// Finite State Machine operation
-	class Operation
-	{
-	public:
-		enum FSMoperation	{
-			READ,
-			WRITE,
-			CLOSE
-		};
+class TextFileAuthenticator : public Authenticator {
 	private:
-//		FSMoperation	m_op;
-//		const void*	m_data;
-//		std::size_t	m_dataSize;
-	};
+		std::map< std::string, std::string > m_creds;
 
-	/// Finite State Machine signals
-	enum Signal	{
-		TIMEOUT,
-		TERMINATE,
-		END_OF_FILE,
-		CANCELLED,
-		BROKEN_PIPE,
-		UNKNOWN_ERROR
-	};
+		enum {
+			_Wolframe_TEXTFILE_STATE_NEED_LOGIN,
+			_Wolframe_TEXTFILE_STATE_NEED_PASS,
+			_Wolframe_TEXTFILE_STATE_COMPUTE
+		} m_state;
 
-	/// The input data.
-	virtual void receiveData( const void* data, std::size_t size ) = 0;
+		std::string m_token;
+		std::string m_login;
+		std::string m_pass;
 
-	/// What oeration the FSM expects next from the outside.
-	virtual const Operation nextOperation() = 0;
-
-	/// Signal the FSM.
-	virtual void signal( Signal /*event*/ )	{}
-
-	/// Data that has not been consumed by the FSM.
-	virtual std::size_t dataLeft( const void*& begin ) = 0;
+	public:
+		TextFileAuthenticator( const std::string _filename );
+		virtual Step::AuthStep nextStep( );
+		virtual std::string sendData( );
+		virtual std::string token( );
+		virtual void receiveData( const std::string data );
+		virtual std::string getError( );
 };
 
-} // namespace _Wolframe
+}} // namespace _Wolframe::AAAA
 
-#endif // _FSM_INTERFACE_HPP_INCLUDED
+#endif // _AUTHENTICATION_TEXTFILE_HPP_INCLUDED

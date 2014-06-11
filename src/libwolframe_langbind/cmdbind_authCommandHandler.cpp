@@ -41,20 +41,16 @@ using namespace _Wolframe::cmdbind;
 AuthCommandHandler::AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_)
 	:m_authenticator(authenticator_)
 	,m_itrpos(0)
+	,m_msgstart(0)
 	,m_outputbuf(0)
 	,m_outputbufsize(0)
 	,m_outputbufpos(0)
 	,m_state(Init)
-//	,m_readpos(0)	-> see authCommandHandler.hpp
 	,m_writepos(0)
 {}
 
 AuthCommandHandler::~AuthCommandHandler()
 {
-	if (m_authenticator.get())
-	{
-		m_authenticator->close();
-	}
 }
 
 const char* AuthCommandHandler::interruptDataSessionMarker() const
@@ -75,6 +71,30 @@ void AuthCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size
 	if (pos > size) throw std::logic_error("illegal parameter (setOutputBuffer)");
 }
 
+bool AuthCommandHandler::consumeNextMessage()
+{
+	protocol::InputBlock::iterator start = m_input.at( m_msgstart);
+	m_eoD = m_input.getEoD( start);
+
+	m_readbuffer.append( start.ptr(), m_eoD-start);
+	if (m_input.gotEoD())
+	{
+		// We got end of data, so we expect the read buffer to contain the next complete message:
+		m_authenticator->messageIn( m_readbuffer);
+		m_readbuffer.clear();
+
+		// Skip to the start of the next message:
+		m_msgstart = m_input.skipEoD();
+
+		// We have a new complete message consumed:
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void AuthCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	std::size_t startidx = (const char*)begin - m_input.charptr();
@@ -83,20 +103,10 @@ void AuthCommandHandler::putInput( const void *begin, std::size_t bytesTransferr
 		throw std::logic_error( "illegal input range passed to AuthCommandHandler");
 	}
 	m_input.setPos( bytesTransferred + startidx);
-	if (m_itrpos != 0)
-	{
-		if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
-		startidx = 0; //... start of buffer is end last message (part of eoD marker)
-	}
-	protocol::InputBlock::iterator start = m_input.at( startidx);
-	m_eoD = m_input.getEoD( start);
+	if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
 
-	m_readbuffer.append( start.ptr(), m_eoD-start);
-	if (m_input.gotEoD())
-	{
-		//[+] m_authenticator->putReadMessage( AAAA::Authenticator::Message( (const void*)m_readbuffer.c_str(), m_readbuffer.size()));
-		m_state = ReadConsumed;
-	}
+	m_msgstart = 0;
+	m_state = NextOperation;
 }
 
 void AuthCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
@@ -115,7 +125,7 @@ void AuthCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTran
 	{
 		bytesToTransfer = m_writebuffer.size() - m_writepos;
 	}
-	if (bytesToTransfer == 0) throw std::logic_error( "protocol error: empty write in authorization command handler");
+	if (bytesToTransfer == 0) throw std::logic_error( "protocol error: empty write in authentication command handler");
 
 	std::memcpy( m_outputbuf + m_outputbufpos, m_writebuffer.c_str() + m_writepos, bytesToTransfer);
 	begin = m_outputbuf + m_outputbufpos;
@@ -125,60 +135,52 @@ void AuthCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTran
 
 void AuthCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	if (m_input.gotEoD())
-	{
-		std::size_t pos = m_eoD - m_input.begin();
-		begin = (const void*)(m_input.charptr() + pos);
-		nofBytes = m_input.pos() - pos;
-	}
-	else
-	{
-		if (m_readbuffer.size() > m_input.size())
-		{
-			throw std::logic_error("data requested but EoD not consumed in authorization commmand handler");
-		}
-		std::memcpy( m_input.charptr(), m_readbuffer.c_str(), m_readbuffer.size());
-		m_input.setPos( nofBytes = m_readbuffer.size());
-		begin = (const void*)m_input.charptr();
-	}
+	begin = (const void*)(m_input.charptr() + m_msgstart);
+	nofBytes = m_input.pos() - m_msgstart;
 }
 
 CommandHandler::Operation AuthCommandHandler::nextOperation()
 {
 	for (;;)
 	{
-		LOG_TRACE << "STATE AuthCommandHandler " << stateName( m_state);
+		LOG_TRACE << "STATE AuthCommandHandler " << stateName( m_state) << " " << m_authenticator->statusName( m_authenticator->status());
 		switch (m_state)
 		{
 			case Init:
-				//[+] m_authenticator->init();
 				m_state = NextOperation;
 				/*no break here!*/
 
 			case NextOperation:
+				switch (m_authenticator->status())
+				{
+					case AAAA::Authenticator::INITIALIZED:
+						throw std::logic_error("authentication protocol operation in state INITIALIZED");
+					case AAAA::Authenticator::MESSAGE_AVAILABLE:
+						m_writebuffer = protocol::escapeStringDLF( m_authenticator->messageOut());
+						m_writebuffer.append( "\r\n.\r\n");
+						m_writepos = 0;
+						m_state = FlushOutput;
+						continue;
+					case AAAA::Authenticator::AWAITING_MESSAGE:
+						if (!consumeNextMessage())
+						{
+							return READ;
+						}
+						continue;
+					case AAAA::Authenticator::AUTHENTICATED:
+						return CLOSE;
+					case AAAA::Authenticator::INVALID_CREDENTIALS:
+						setLastError( "either the username or the credentials are invalid");
+						return CLOSE;
+					case AAAA::Authenticator::MECH_UNAVAILABLE:
+						setLastError( "the requested authentication mech is not available");
+						return CLOSE;
+					case AAAA::Authenticator::SYSTEM_FAILURE:
+						setLastError( "unspecified authentication system error");
+						return CLOSE;
+				}
+				setLastError( "internal: unhandled authenticator status");
 				return CLOSE;
-				//[+] switch (m_authenticator->nextOperation())
-				//[+] {
-				//[+] 	case READ:
-				//[+] 		return READ;
-				//[+]
-				//[+] 	case WRITE:
-				//[+] 	{
-				//[+] 		AAAA::Authenticator::Message msg = m_authenticator->getWriteMessage();
-				//[+] 		m_writebuffer = protocol::escapeStringDLF( std::string( (const char*)msg.ptr, msg.size));
-				//[+] 		m_writebuffer.append( "\r\n.\r\n");
-				//[+] 		m_writepos = 0;
-				//[+] 		m_state = FlushOutput;
-				//[+] 		continue;
-				//[+] 	}
-				//[+] 	case CLOSE:
-				//[+] 		return CLOSE;
-				//[+] }
-
-			case ReadConsumed:
-				m_readbuffer.clear();
-				m_state = NextOperation;
-				continue;
 
 			case FlushOutput:
 				if (m_writepos == m_writebuffer.size())
@@ -191,6 +193,7 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 				return WRITE;
 		}
 	}//for(;;)
+	setLastError( "internal: unhandled state in authentication protocol");
 	return CLOSE;
 }
 

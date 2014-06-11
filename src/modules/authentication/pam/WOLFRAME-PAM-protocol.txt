@@ -1,0 +1,21 @@
+WOLFRAME-PAM authentication protocol
+
+Client and server agreed on the 'WOLFRAME-PAM' mech.
+
+1.  The client immediately sends the username in plain
+
+2.a If the PAM system accepts the user without password the server
+    authenticates the user (SLICE_AUTHENTICATED) and the protocol
+    terminates
+   
+2.b If the PAM system doesn't accept the user the server doesn't
+    authenticate the user (SLICE_INVALID_CREDENTIALS) and the protocol
+    terminates
+
+3.  If the PAM system requires a password from the user it sends the
+    message 'password?' to the client
+
+4.  The client sends the password (in plain)
+
+5.  The server authenticates the user now (SLICE_AUTHENTICATED) or
+    not (SLICE_INVALID_CREDENTIALS)

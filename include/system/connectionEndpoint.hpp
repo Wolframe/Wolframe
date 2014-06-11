@@ -77,10 +77,10 @@ public:
 	}
 
 private:
-	void operator=( const ConnectionEndpoint&){}
+	void operator=( const ConnectionEndpoint& )	{}
 private:
 	std::string	m_host;
-	unsigned short m_port;
+	unsigned short	m_port;
 };
 
 

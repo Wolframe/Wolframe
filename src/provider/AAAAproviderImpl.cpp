@@ -59,9 +59,9 @@ bool AAAAprovider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-Authenticator* AAAAprovider::authenticator() const
+Authenticator* AAAAprovider::authenticator( const _Wolframe::net::RemoteEndpoint &client ) const
 {
-	return m_impl->authenticator();
+	return m_impl->authenticator( client );
 }
 
 Authorizer* AAAAprovider::authorizer() const
@@ -97,7 +97,7 @@ bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db 
 	LOG_DATA << "Resolving audit databases";
 	if ( !m_auditor.resolveDB( db ))
 		return false;
-	LOG_DEBUG << "AAAA database references resolved";
+	LOG_TRACE << "AAAA database references resolved";
 	return true;
 }
 

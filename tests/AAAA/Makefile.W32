@@ -41,6 +41,7 @@ TEST_CPP_BINS = \
 
 authenticationTest.exe: authenticationTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
 textFileTest.exe: textFileTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
+passwdHashTest.exe: passwdHashTest.obj $(CPP_OBJS)
 passwdFileTest.exe: passwdFileTest.obj $(CPP_OBJS)
 
 
@@ -52,5 +53,6 @@ local_distclean:
 
 local_test:
 	@-authenticationTest
+	@-passwdHashTest
 	@-passwdFileTest
 	@-textFileTest
