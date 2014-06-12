@@ -67,7 +67,7 @@ struct throws_exception
 
 /// \class exception
 /// \brief textwolf exception class
-struct exception	:public std::exception
+struct exception	:public std::runtime_error
 {
 	typedef throws_exception::Cause Cause;
 	Cause cause;					//< exception cause tag

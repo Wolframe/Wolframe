@@ -488,15 +488,15 @@ public:
 		bool operator!=( const iterator& iter) const	{return !compare( iter);}
 	};
 
-	///\brief Get the start iterator
+	///\brief Feed the path selector with the next token and get the start iterator for the results
 	///\return iterator pointing to the first of the selected XML path elements
-	iterator find( XMLScannerBase::ElementType type, const char* key, int keysize)
+	iterator push( XMLScannerBase::ElementType type, const char* key, int keysize)
 	{
 		return iterator( *this, type, key, keysize);
 	}
 
-	///\brief Get the end of content marker
-	///\return iterator as end of content marker
+	///\brief Get the end of results returned by 'push(XMLScannerBase::ElementType,const char*, int)'
+	///\return the end iterator
 	iterator end()
 	{
 		return iterator();

@@ -32,7 +32,7 @@
 
 --------------------------------------------------------------------
 */
-/// \file textwolf/charset_isolatin.hpp
+/// \file textwolf/charset_ucs.hpp
 /// \brief Definition of UCS-2/UCS-4 encodings
 
 #ifndef __TEXTWOLF_CHARSET_UCS_HPP__
