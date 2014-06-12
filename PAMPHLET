@@ -1,50 +1,41 @@
 
 
-== Processing Data in Distributed Applications
-When we nowadays talk about applications, we talk about distributed applications.
-The times of a program running on a single workstation not communicating over a network with
-its peers are over since more than 20 years, except for very, very exotic applications
-(e.g. the isolated computer in a special room in a bank) that have no relevant market anymore.
-There has also be a big consolidation in the ways how different systems interact, how they
-communicate and how they exchange data. One important idea for implementing a service in a
-heterogeneous environment like the internet is separation of processing and the data formats
-used for exchanging data. Processing should be independent from the data format in order
-to be able to process various data formats in the same way. Most programming languages with
-introspection have a native way of serializing and deserializing objects from a message in
-various standardized text based data formats (XML,JSON,CSV,etc.) and binary data formats.
-For programming languages without introspection there exist libraries that allow you
-to declare introspection information, so that serialization and deserialization of data can
-be added. Usable implementations are sparse or hard to find, because nearly every student
-seems to post his serialization implementation on the net, but they exist.
-Some systems have a global definition of object introspection base on an IDL (interface definition
-language) that goes further than marshalling and demarshalling of objects from and to a data stream.
-These systems became popular in the start of the 90s together with OOP languages. The idea is to model
-an application as a universe of objects that interact with each other through method calls.
-Objects do not have to be physically located on a defined machine. They can be represented by a
-proxy that translate method calls into network messages that get reinstantiated and executed on
-the peer machine where the real instance of the object is. The caller of the method does not have
-to know where the peer object physically relies. These systems had a great success story because
-the global interface definition language allows systems to be composed of components written in
-different languages. The drawback of these kind of systems are that the standards are quite
-complicated and mostly politically driven. Small companies have not the power to handle such complex
-systems in a correct way with their resources. Furthermore such proxy systems lead in many cases to
-a vendor lock.
-It is another class of systems that the vast majority of companies chose to implement services:
-Web services as RPC over HTTP. Unlike proxy systems they do not translate object requests
-but send complete objects as requests and get a complete answer (We will discuss the need of a
-session context that these complete objects refer to in another section).
-Web services became so popular because it is possible to integrate very heterogeneous systems
-without much effort, also services that already exist with another interface. This is the
-case since the beginning of the internet. The fact is that the vast majority of systems already
-exist. You want to use them. Also legacy software.
+== Data Processing in Wolframe
+=== Data Formats Processed
+	The data formats processed are extensible by loadable modules. There are standard modules
+	defined to process XML and JSON. Modules for other widespread data formats are planned,
+	questions for not so widespread data formats can be asked for.
+	Unlike most application servers do, Wolframe does not delegate the parsing of content to
+	the functions doing the processing of the request. The marshalling and demarshalling
+	(serialization/deserialization) of data is handled as an aspect on its own.
+	We define data formats, data validation and normalization for all language bindings
+	attached. We neither rely on the capability of a programming language to enforce our
+	rules, nor do we implement our rules for all languages used for processing.
 
---- Integration of Wolframe services
-Wolframe tries to combining some of the interoperabilty of proxy systems without forcing
-the peers to have a contract based on an IDL with the power that web services brought to us.
-The success story of web services we try to follow with the capability of easy integration as
-callee and caller into the nowadays heterogeneous landscape of systems, also of existing solutions.
-The interoperability of different type of languages is achieved in the way how Wolframe defines
-its interfaces.
+=== Combining selected aspects of the success stories of the last decades
+==== Integration capabilities of web services
+	- Able to integrate existing software, even legacy systems
+	- Solving problems isolated and finishing projects
+
+==== Interconnectivity of IDL based systems
+	Any language binding is able to call any other function written in any other language
+	where a language binding exists for Wolframe. But on contrary to IDL based systems, 
+	Wolframe does not need a global interface description for that.
+	Each function has internally the same interface defined as an iterator on the input
+	and an iterator on the output plus a contract to level out language differences. 
+	This loosely coupled mechanism of communication enables for example a .NET method 
+	to call a Lua function or a Python function to call a function written in C++ 
+	and so on. The internal interface with an iterator and input and output is not 
+	visible to the outside. You specify your functions in the native way of the 
+	programming language used.
+	The mapping of the internal interface to the native data structures of the 
+	programming language used happens behind the scenes. 
+	In contrary to other systems offering this level of interconnectivity there 
+	is no code generation involved in Wolframe at all.
+
+==== Domain specific languages
+	--
+
 
 --- How Wolframe defines its interfaces
 In Wolframe the aspect of separating the content to process from the message format is done similar

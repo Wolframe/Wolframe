@@ -34,8 +34,8 @@
 */
 #ifndef __TEXTWOLF_TEXT_SCANNER_HPP__
 #define __TEXTWOLF_TEXT_SCANNER_HPP__
-/// \file textwolf/sourceiterator.hpp
-/// \brief textwolf byte source iterator template
+/// \file textwolf/textscanner.hpp
+/// \brief Implementation of iterator for character-wise parsing of input
 
 #include "textwolf/char.hpp"
 #include "textwolf/charset_interface.hpp"

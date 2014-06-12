@@ -141,12 +141,10 @@ usr/pkg/include/wolframe/protocol/ioblocks.hpp
 usr/pkg/include/wolframe/protocol/iterators.hpp
 usr/pkg/include/wolframe/protocol/parser.hpp
 @dirrm usr/pkg/include/wolframe/protocol
-usr/pkg/include/wolframe/cmdbind/authCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandlerUnit.hpp
 usr/pkg/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/doctypeDetector.hpp
-usr/pkg/include/wolframe/cmdbind/execCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp
 usr/pkg/include/wolframe/cmdbind/lineCommandHandler.hpp
@@ -262,14 +260,17 @@ usr/pkg/include/wolframe/types/datetime.hpp
 usr/pkg/include/wolframe/types/bignumber.hpp
 usr/pkg/include/wolframe/types/customDataNormalizer.hpp
 usr/pkg/include/wolframe/types/string.hpp
+usr/pkg/include/wolframe/types/secureString.hpp
 usr/pkg/include/wolframe/types/numberBaseConversion.hpp
 usr/pkg/include/wolframe/types/propertyTree.hpp
 @dirrm usr/pkg/include/wolframe/types
+usr/pkg/include/wolframe/AAAA/authSlice.hpp
+usr/pkg/include/wolframe/AAAA/authUnit.hpp
+usr/pkg/include/wolframe/AAAA/authenticator.hpp
 usr/pkg/include/wolframe/AAAA/AAAAinformation.hpp
 usr/pkg/include/wolframe/AAAA/AAAAprovider.hpp
 usr/pkg/include/wolframe/AAAA/CRAM.hpp
 usr/pkg/include/wolframe/AAAA/audit.hpp
-usr/pkg/include/wolframe/AAAA/authentication.hpp
 usr/pkg/include/wolframe/AAAA/authorization.hpp
 usr/pkg/include/wolframe/AAAA/passwordHash.hpp
 usr/pkg/include/wolframe/AAAA/user.hpp

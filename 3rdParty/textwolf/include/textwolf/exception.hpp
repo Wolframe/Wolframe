@@ -67,7 +67,7 @@ struct throws_exception
 
 /// \class exception
 /// \brief textwolf exception class
-struct exception	:public std::exception
+struct exception	:public std::runtime_error
 {
 	typedef throws_exception::Cause Cause;
 	Cause cause;					//< exception cause tag
@@ -75,10 +75,10 @@ struct exception	:public std::exception
 	/// \brief Constructor
 	/// \return exception object
 	exception (Cause p_cause) throw()
-			:std::exception( ), cause(p_cause) {}
+		:std::runtime_error("textwolf error in XML"), cause(p_cause) {}
 	/// \brief Copy constructor
 	exception (const exception& orig) throw()
-			:std::exception( ), cause(orig.cause) {}
+		:std::runtime_error("textwolf error in XML"), cause(orig.cause) {}
 	/// \brief Destructor
 	virtual ~exception() throw() {}
 

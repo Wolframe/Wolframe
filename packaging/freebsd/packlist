@@ -130,12 +130,10 @@ usr/local/include/wolframe/protocol/ioblocks.hpp
 usr/local/include/wolframe/protocol/iterators.hpp
 usr/local/include/wolframe/protocol/parser.hpp
 @dirrm usr/local/include/wolframe/protocol
-usr/local/include/wolframe/cmdbind/authCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/commandHandler.hpp
 usr/local/include/wolframe/cmdbind/commandHandlerUnit.hpp
 usr/local/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
 usr/local/include/wolframe/cmdbind/doctypeDetector.hpp
-usr/local/include/wolframe/cmdbind/execCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
 usr/local/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp
 usr/local/include/wolframe/cmdbind/lineCommandHandler.hpp
@@ -251,14 +249,17 @@ usr/local/include/wolframe/types/datetime.hpp
 usr/local/include/wolframe/types/bignumber.hpp
 usr/local/include/wolframe/types/customDataNormalizer.hpp
 usr/local/include/wolframe/types/string.hpp
+usr/local/include/wolframe/types/secureString.hpp
 usr/local/include/wolframe/types/numberBaseConversion.hpp
 usr/local/include/wolframe/types/propertyTree.hpp
 @dirrm usr/local/include/wolframe/types
+usr/local/include/wolframe/AAAA/authSlice.hpp
+usr/local/include/wolframe/AAAA/authUnit.hpp
+usr/local/include/wolframe/AAAA/authenticator.hpp
 usr/local/include/wolframe/AAAA/AAAAinformation.hpp
 usr/local/include/wolframe/AAAA/AAAAprovider.hpp
 usr/local/include/wolframe/AAAA/CRAM.hpp
 usr/local/include/wolframe/AAAA/audit.hpp
-usr/local/include/wolframe/AAAA/authentication.hpp
 usr/local/include/wolframe/AAAA/authorization.hpp
 usr/local/include/wolframe/AAAA/passwordHash.hpp
 usr/local/include/wolframe/AAAA/user.hpp
