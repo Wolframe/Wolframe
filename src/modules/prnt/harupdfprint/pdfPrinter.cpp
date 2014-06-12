@@ -230,7 +230,7 @@ public:
 		m_lasttype = type;
 
 		// Execute methods triggered:
-		XMLPathSelect::iterator itr = m_selectState.find( xtype, elemstr.c_str(), elemstr.size());
+		XMLPathSelect::iterator itr = m_selectState.push( xtype, elemstr.c_str(), elemstr.size());
 		XMLPathSelect::iterator end = m_selectState.end();
 		for (; itr!=end; itr++)
 		{
