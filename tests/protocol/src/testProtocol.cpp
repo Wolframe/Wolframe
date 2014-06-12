@@ -410,9 +410,9 @@ TEST_F( MainProtocolTest, tests)
 		unsigned int ii = 0;
 		for (; ii+1<ibarsize; ii++)
 		{
-			ibar[ii] = g_random.get( 4, 4 + (ii+1) * 4);
+			ibar[ii] = g_random.get( 5, 4 + (ii+1) * 4);
 		}
-		ibar[ii] = g_random.get( 4, 16000);
+		ibar[ii] = g_random.get( 5, 16000);
 
 		unsigned int oo = 0;
 		for (; oo+1<obarsize; oo++)
