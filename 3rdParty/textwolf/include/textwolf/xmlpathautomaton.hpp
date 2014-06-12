@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/xmlpathautomaton.hpp
+/// \brief Automaton to select path expressions from an XML iterator
+
 #ifndef __TEXTWOLF_XML_PATH_AUTOMATON_HPP__
 #define __TEXTWOLF_XML_PATH_AUTOMATON_HPP__
 #include "textwolf/char.hpp"

@@ -34,6 +34,9 @@
 */
 #ifndef __TEXTWOLF_TEXT_SCANNER_HPP__
 #define __TEXTWOLF_TEXT_SCANNER_HPP__
+/// \file textwolf/sourceiterator.hpp
+/// \brief textwolf byte source iterator template
+
 #include "textwolf/char.hpp"
 #include "textwolf/charset_interface.hpp"
 #include "textwolf/exception.hpp"
@@ -41,25 +44,25 @@
 
 namespace textwolf {
 
-///\class TextScanner
-///\brief Reader for scanning the input character by character
-///\tparam Iterator source iterator type (implements preincrement and '*' input byte access indirection)
-///\tparam CharSet character set of the source stream
+/// \class TextScanner
+/// \brief Reader for scanning the input character by character
+/// \tparam Iterator source iterator type (implements preincrement and '*' input byte access indirection)
+/// \tparam CharSet character set of the source stream
 template <class Iterator, class CharSet>
 class TextScanner
 {
 private:
-	Iterator start;			//< source iterator start of current chunk
-	Iterator input;			//< source iterator
-	char buf[8];			//< buffer for one character (the current character parsed)
-	UChar val;			//< Unicode character representation of the current character parsed
-	signed char cur;		//< ASCII character representation of the current character parsed or -1 if not in ASCII range
-	unsigned int state;		//< current state of the text scanner
+	Iterator start;			///< source iterator start of current chunk
+	Iterator input;			///< source iterator
+	char buf[8];			///< buffer for one character (the current character parsed)
+	UChar val;			///< Unicode character representation of the current character parsed
+	signed char cur;		///< ASCII character representation of the current character parsed or -1 if not in ASCII range
+	unsigned int state;		///< current state of the text scanner
 	CharSet charset;
 
 public:
-	///\class ControlCharMap
-	///\brief Map of ASCII characters to control character identifiers used in the XML scanner automaton
+	/// \class ControlCharMap
+	/// \brief Map of ASCII characters to control character identifiers used in the XML scanner automaton
 	struct ControlCharMap  :public CharMap<ControlCharacter,Undef>
 	{
 		ControlCharMap()
@@ -89,7 +92,7 @@ public:
 		};
 	};
 
-	///\brief Constructor
+	/// \brief Constructor
 	TextScanner( const CharSet& charset_)
 		:val(0),cur(0),state(0),charset(charset_)
 	{
@@ -108,8 +111,8 @@ public:
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii] = 0;
 	}
 
-	///\brief Copy constructor
-	///\param [in] orig textscanner to copy
+	/// \brief Copy constructor
+	/// \param [in] orig textscanner to copy
 	TextScanner( const TextScanner& orig)
 		:start(orig.start)
 		,input(orig.input)
@@ -121,8 +124,8 @@ public:
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii]=orig.buf[ii];
 	}
 
-	///\brief Assign something to the iterator while keeping the state
-	///\param [in] a source iterator assignment
+	/// \brief Assign something to the iterator while keeping the state
+	/// \param [in] a source iterator assignment
 	template <class IteratorAssignment>
 	void setSource( const IteratorAssignment& a)
 	{
@@ -130,15 +133,15 @@ public:
 		start = a;
 	}
 
-	///\brief Get the current source iterator position
-	///\return source iterator position in character words (usually bytes)
+	/// \brief Get the current source iterator position
+	/// \return source iterator position in character words (usually bytes)
 	std::size_t getPosition() const
 	{
 		return input - start;
 	}
 
-	///\brief Get the unicode character of the current character
-	///\return the unicode character
+	/// \brief Get the unicode character of the current character
+	/// \return the unicode character
 	UChar chr()
 	{
 		if (val == 0)
@@ -148,14 +151,14 @@ public:
 		return val;
 	}
 
-	///\brief Fill the internal buffer with as many current character bytes needed for reading the ASCII representation
+	/// \brief Fill the internal buffer with as many current character bytes needed for reading the ASCII representation
 	void getcur()
 	{
 		cur = CharSet::asciichar( buf, state, input);
 	}
 
-	///\brief Get the control character representation of the current character
-	///\return the control character
+	/// \brief Get the control character representation of the current character
+	/// \return the control character
 	ControlCharacter control()
 	{
 		static ControlCharMap controlCharMap;
@@ -163,16 +166,16 @@ public:
 		return controlCharMap[ (unsigned char)cur];
 	}
 
-	///\brief Get the ASCII character representation of the current character
-	///\return the ASCII character or 0 if not defined
+	/// \brief Get the ASCII character representation of the current character
+	/// \return the ASCII character or 0 if not defined
 	unsigned char ascii()
 	{
 		getcur();
 		return cur>=0?(unsigned char)cur:0;
 	}
 
-	///\brief Skip to the next character of the source
-	///\return *this
+	/// \brief Skip to the next character of the source
+	/// \return *this
 	TextScanner& skip()
 	{
 		CharSet::skip( buf, state, input);
@@ -182,18 +185,18 @@ public:
 		return *this;
 	}
 
-	///\brief see TextScanner::chr()
+	/// \brief see TextScanner::chr()
 	UChar operator*()
 	{
 		return chr();
 	}
 
-	///\brief Preincrement: Skip to the next character of the source
-	///\return *this
+	/// \brief Preincrement: Skip to the next character of the source
+	/// \return *this
 	TextScanner& operator ++()	{return skip();}
 
-	///\brief Postincrement: Skip to the next character of the source
-	///\return *this
+	/// \brief Postincrement: Skip to the next character of the source
+	/// \return *this
 	TextScanner operator ++(int)	{TextScanner tmp(*this); skip(); return tmp;}
 };
 

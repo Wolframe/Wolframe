@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/codepages.hpp
+/// \brief Definition of IsoLatin code pages
+
 #ifndef __TEXTWOLF_CODE_PAGES_HPP__
 #define __TEXTWOLF_CODE_PAGES_HPP__
 #include "textwolf/char.hpp"
@@ -40,6 +43,8 @@
 namespace textwolf {
 namespace charset {
 
+/// \class IsoLatinCodePage
+/// \brief IsoLatin code page
 class IsoLatinCodePage
 {
 private:
@@ -88,11 +93,14 @@ private:
 	};
 
 public:
+	/// \brief Copy constructor
 	IsoLatinCodePage( const IsoLatinCodePage& o)
 		:m_cd(o.m_cd)
 		,m_invcd(o.m_invcd)
 		,m_invovlcd(o.m_invovlcd){}
 
+	/// \brief Constructor
+	/// \param[in] IsoLatin code page index, 1 for "IsoLatin-1"
 	IsoLatinCodePage( unsigned int idx)
 	{
 		enum {NofCodePages=9};
@@ -130,12 +138,18 @@ public:
 		m_invovlcd = invOvlCodeMap.get( idx-1);
 	}
 
+	/// \brief Get the unicode character representation of the character ch in this codepage
+	/// \param[in] ch character in this codepage
+	/// \return the unicode representation of the passed character
 	UChar ucharcode( char ch) const
 	{
 		if ((signed char)ch >= 0) return ch;
 		return m_cd[ (unsigned int)(unsigned char)ch - 128];
 	}
 
+	/// \brief Get the character representation of a unicode character in this codepage
+	/// \param[in] ch unicode character
+	/// \return the representation of the passed unicode character in this codepage
 	char invcode( UChar ch) const
 	{
 		char rt = 0;

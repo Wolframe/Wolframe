@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/charset_utf16.hpp
+/// \brief Definition of UTF-16 encodings
+
 #ifndef __TEXTWOLF_CHARSET_UTF16_HPP__
 #define __TEXTWOLF_CHARSET_UTF16_HPP__
 #include "textwolf/char.hpp"
@@ -42,16 +45,16 @@
 namespace textwolf {
 namespace charset {
 
-///\class UTF16
-///\brief Character set UTF16 (little/big endian)
-///\tparam encoding ByteOrder::LE or ByteOrder::BE
-///\remark BOM character sequences are not interpreted as such and byte swapping is not done implicitely
-//	It is left to the caller to detect BOM or its inverse and to switch the iterator.
-///\remark See http://en.wikipedia.org/wiki/UTF-16/UCS-2: ... If the endian architecture of the decoder
-//	matches that of the encoder, the decoder detects the 0xFEFF value, but an opposite-endian decoder
-//	interprets the BOM as the non-character value U+FFFE reserved for this purpose. This incorrect
-//	result provides a hint to perform byte-swapping for the remaining values. If the BOM is missing,
-//	the standard says that big-endian encoding should be assumed....
+/// \class UTF16
+/// \brief Character set UTF16 (little/big endian)
+/// \tparam encoding ByteOrder::LE or ByteOrder::BE
+/// \remark BOM character sequences are not interpreted as such and byte swapping is not done implicitely
+///	It is left to the caller to detect BOM or its inverse and to switch the iterator.
+/// \remark See http://en.wikipedia.org/wiki/UTF-16/UCS-2: ... If the endian architecture of the decoder
+///	matches that of the encoder, the decoder detects the 0xFEFF value, but an opposite-endian decoder
+///	interprets the BOM as the non-character value U+FFFE reserved for this purpose. This incorrect
+///	result provides a hint to perform byte-swapping for the remaining values. If the BOM is missing,
+///	the standard says that big-endian encoding should be assumed....
 template <int encoding=ByteOrder::BE>
 class UTF16
 {
@@ -69,10 +72,10 @@ public:
 		MaxChar=0x10FFFF				//< maximum character in alphabet
 	};
 public:
-	///\brief Get the size of the current character in bytes (variable length encoding)
-	///\param [in] buf buffer for the character data
-	///\param [in,out] bufpos position in 'buf'
-	///\param [in,out] itr iterator to skip
+	/// \brief Get the size of the current character in bytes (variable length encoding)
+	/// \param [in] buf buffer for the character data
+	/// \param [in,out] bufpos position in 'buf'
+	/// \param [in,out] itr iterator to skip
 	template <class Iterator>
 	static unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
@@ -99,7 +102,7 @@ public:
 		}
 	}
 
-	///\brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	static void skip( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
@@ -110,7 +113,7 @@ public:
 		}
 	}
 
-	///\brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
@@ -118,7 +121,7 @@ public:
 		return (ch > 127)?-1:(char)ch;
 	}
 
-	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	static UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
@@ -152,7 +155,7 @@ public:
 		return value_impl( buf, bufpos, itr);
 	}
 
-	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
+	/// \brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
 	void print( UChar ch, Buffer_& buf) const
 	{
@@ -192,11 +195,11 @@ public:
 	}
 };
 
-///\class UTF16LE
-///\brief UTF-16 little endian character set encoding
+/// \class UTF16LE
+/// \brief UTF-16 little endian character set encoding
 struct UTF16LE :public UTF16<ByteOrder::LE> {};
-///\class UTF16BE
-///\brief UTF-16 big endian character set encoding
+/// \class UTF16BE
+/// \brief UTF-16 big endian character set encoding
 struct UTF16BE :public UTF16<ByteOrder::BE> {};
 
 }//namespace

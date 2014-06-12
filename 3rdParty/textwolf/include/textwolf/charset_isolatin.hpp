@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/charset_isolatin.hpp
+/// \brief Definition of IsoLatin encodings
+
 #ifndef __TEXTWOLF_CHARSET_ISOLATIN_HPP__
 #define __TEXTWOLF_CHARSET_ISOLATIN_HPP__
 #include "textwolf/char.hpp"
@@ -43,8 +46,8 @@
 namespace textwolf {
 namespace charset {
 
-///\class IsoLatin
-///\brief Character set IsoLatin-1,..IsoLatin-9 (ISO-8859-1,...ISO-8859-9)
+/// \class IsoLatin
+/// \brief Character set IsoLatin-1,..IsoLatin-9 (ISO-8859-1,...ISO-8859-9)
 struct IsoLatin :public IsoLatinCodePage
 {
 	enum {MaxChar=0xFF};
@@ -54,7 +57,7 @@ struct IsoLatin :public IsoLatinCodePage
 	IsoLatin( unsigned int codePageIdx=1)
 		:IsoLatinCodePage(codePageIdx){}
 
-	///\brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	static void skip( char*, unsigned int& bufpos, Iterator& itr)
 	{
@@ -65,7 +68,7 @@ struct IsoLatin :public IsoLatinCodePage
 		}
 	}
 
-	///\brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
@@ -78,7 +81,7 @@ struct IsoLatin :public IsoLatinCodePage
 		return ((unsigned char)(buf[0])>127)?-1:buf[0];
 	}
 
-	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
@@ -91,7 +94,7 @@ struct IsoLatin :public IsoLatinCodePage
 		return ucharcode( buf[0]);
 	}
 
-	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
+	/// \brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
 	void print( UChar chr, Buffer_& buf) const
 	{
