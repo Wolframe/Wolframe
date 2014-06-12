@@ -44,6 +44,10 @@ local_clean:
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
+
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/wtest"
+
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(PAM_LIB_DIR)"
 ifeq ($(RUN_TESTS),1)
 # Aba: running PAM tests needs to much from the system, can't test automatically currently
 #ifeq ($(WITH_PAM),1)
@@ -51,3 +55,6 @@ ifeq ($(RUN_TESTS),1)
 #	@echo
 #endif
 endif
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
