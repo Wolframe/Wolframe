@@ -503,7 +503,7 @@ struct InputFilterImpl
 
 	textwolf::XMLScannerBase::ElementType getNextItem( const char*& element, std::size_t& elementsize)
 	{
-		textwolf::XMLScannerBase::ElementType et;
+		textwolf::XMLScannerBase::ElementType et = textwolf::XMLScannerBase::ErrorOccurred;
 		DOWITH_XMLScanner(
 			et = ((XMLScanner*)m_parser)->nextItem();
 			element = ((XMLScanner*)m_parser)->getItem().c_str();
@@ -515,7 +515,7 @@ struct InputFilterImpl
 
 	void setParserError()
 	{
-		const char* ee;
+		const char* ee = 0;
 		DOWITH_XMLScanner(
 			((XMLScanner*)m_parser)->getError( &ee);
 		);
@@ -532,7 +532,7 @@ struct InputFilterImpl
 
 			while (m_metadatastate == MS_DoneElemCached)
 			{
-				const char* ee;
+				const char* ee = 0;
 				textwolf::XMLScannerBase::ElementType et = getLastItem( ee, elementsize);
 				element = (const void*)ee;
 
@@ -1059,7 +1059,7 @@ struct OutputFilterImpl :public OutputFilter
 		)
 		if (standalone && 0==std::strcmp( standalone, "yes"))
 		{
-			bool res;
+			bool res = false;
 			DOWITH_XMLPrinter(
 				res = ((XMLPrinter*)m_printer)->printOpenTag( root, std::strlen(root), m_elembuf);
 			);
@@ -1070,7 +1070,7 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		else if (standalone && 0==std::strcmp( standalone, "no"))
 		{
-			bool res;
+			bool res = false;
 			std::string doctype_system_buf;
 			if (doctype_system && !md.doctype().empty())
 			{
@@ -1097,7 +1097,7 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		else
 		{
-			bool res;
+			bool res = false;
 			DOWITH_XMLPrinter(
 				res = ((XMLPrinter*)m_printer)->printOpenTag( root, std::strlen(root), m_elembuf);
 			);
@@ -1203,7 +1203,7 @@ struct OutputFilterImpl :public OutputFilter
 			}
 			m_headerPrinted = true;
 		}
-		bool res;
+		bool res = false;
 #ifdef _Wolframe_LOWLEVEL_DEBUG
 		LOG_DATA2 << "[textwolf filter] print element " << FilterBase::elementTypeName(type) << " '" << std::string((const char*)element, elementsize) << "'";
 #endif
