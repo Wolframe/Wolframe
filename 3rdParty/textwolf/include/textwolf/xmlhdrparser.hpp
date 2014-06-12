@@ -32,24 +32,24 @@
 
 --------------------------------------------------------------------
 */
-///\file textwolf/xmlhdrparser.hpp
-///\brief Class for parsing the header to get the character set encoding
+/// \file textwolf/xmlhdrparser.hpp
+/// \brief Class for parsing the header to get the character set encoding
 
 #ifndef __TEXTWOLF_XML_HEADER_PARSER_HPP__
 #define __TEXTWOLF_XML_HEADER_PARSER_HPP__
 #include <cstdlib>
 #include "textwolf/sourceiterator.hpp"
 
-///\namespace textwolf
-///\brief Toplevel namespace of the library
+/// \namespace textwolf
+/// \brief Toplevel namespace of the library
 namespace textwolf {
 
-///\class XmlHdrParser
-///\brief Class for parsing the header to get the character set encoding
+/// \class XmlHdrParser
+/// \brief Class for parsing the header to get the character set encoding
 class XmlHdrParser
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	XmlHdrParser()
 		:m_state(Init)
 		,m_attributetype(Encoding)
@@ -57,8 +57,8 @@ public:
 		,m_charsConsumed(0)
 		,m_zeroCount(0){}
 
-	///\brief Copy constructor
-	///\brief param[in] o object to copy
+	/// \brief Copy constructor
+	/// \brief param[in] o object to copy
 	XmlHdrParser( const XmlHdrParser& o)
 		:m_state(o.m_state)
 		,m_attributetype(o.m_attributetype)

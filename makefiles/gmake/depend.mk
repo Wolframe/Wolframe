@@ -12,6 +12,18 @@
 #
 # author: Andreas Baumann, abaumann at yahoo dot com
 
+ifdef MAKEDEPS
+
+%.d : %.c
+	@echo Generating dependencies for $<
+	@$(MAKEDEPS) $(@:.d=.o) $(ALL_CFLAGS) $< > $@
+
+%.d : %.cpp
+	@echo Generating dependencies for $<
+	@$(MAKEDEPS) $(@:.d=.o) $(ALL_CFLAGS) $< > $@
+
+else
+
 ifeq "$(COMPILER)" "gcc"
 
 %.d : %.c
@@ -64,6 +76,8 @@ ifeq "$(COMPILER)" "icc"
 		sed 's,\($*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\&\&\&\1 : \2,g' | \
 		tr -s '&' "\n" > $@
 	  
+endif
+
 endif
 
 ifneq ($(MAKECMDGOALS),clean)

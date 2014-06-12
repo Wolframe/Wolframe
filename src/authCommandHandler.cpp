@@ -33,7 +33,7 @@
 /// \file authCommandHandler.cpp
 /// \brief Implementation of the authentication command handler
 
-#include "cmdbind/authCommandHandler.hpp"
+#include "authCommandHandler.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;

@@ -32,62 +32,62 @@
 
 --------------------------------------------------------------------
 */
-///\file textwolf/cstringiterator.hpp
-///\brief textwolf iterator on strings
+/// \file textwolf/cstringiterator.hpp
+/// \brief textwolf iterator on strings
 
 #ifndef __TEXTWOLF_CSTRING_ITERATOR_HPP__
 #define __TEXTWOLF_CSTRING_ITERATOR_HPP__
 #include <cstring>
 #include <cstdlib>
 
-///\namespace textwolf
-///\brief Toplevel namespace of the library
+/// \namespace textwolf
+/// \brief Toplevel namespace of the library
 namespace textwolf {
 
-///\class CStringIterator
-///\brief Input iterator on a constant string returning null characters after EOF as required by textwolf scanners
+/// \class CStringIterator
+/// \brief Input iterator on a constant string returning null characters after EOF as required by textwolf scanners
 class CStringIterator
 {
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	CStringIterator()
 		:m_src(0)
 		,m_size(0)
 		,m_pos(0){}
 
-	///\brief Constructor
-	///\param [in] src string to iterate on
-	///\param [in] size number of char in the string to iterate on
+	/// \brief Constructor
+	/// \param [in] src string to iterate on
+	/// \param [in] size number of char in the string to iterate on
 	CStringIterator( const char* src, unsigned int size)
 		:m_src(src)
 		,m_size(size)
 		,m_pos(0){}
 
-	///\brief Copy constructor
-	///\param [in] o iterator to copy
+	/// \brief Copy constructor
+	/// \param [in] o iterator to copy
 	CStringIterator( const CStringIterator& o)
 		:m_src(o.m_src)
 		,m_size(o.m_size)
 		,m_pos(o.m_pos){}
 
-	///\brief Element access
-	///\return current character
+	/// \brief Element access
+	/// \return current character
 	char operator* ()
 	{
 		return (m_pos < m_size)?m_src[m_pos]:0;
 	}
 
-	///\brief Preincrement
+	/// \brief Preincrement
 	CStringIterator& operator++()
 	{
 		m_pos++;
 		return *this;
 	}
 
-	///\brief Return current char position
+	/// \brief Return current char position
 	unsigned int pos() const	{return m_pos;}
 
-	///\brief Set current char position
+	/// \brief Set current char position
 	void pos( unsigned int i)	{m_pos=(i<m_size)?i:m_size;}
 
 	int operator - (const CStringIterator& o) const

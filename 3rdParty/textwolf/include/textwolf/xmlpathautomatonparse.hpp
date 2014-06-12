@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/xmlpathautomatonparse.hpp
+/// \brief Parser to create a path expression selector automaton from a source (list of path expression in abbreviated syntax of xpath)
+
 #ifndef __TEXTWOLF_XML_PATH_AUTOMATON_PARSE_HPP__
 #define __TEXTWOLF_XML_PATH_AUTOMATON_PARSE_HPP__
 #include "textwolf/xmlpathautomaton.hpp"

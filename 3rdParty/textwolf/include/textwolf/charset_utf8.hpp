@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/charset_utf8.hpp
+/// \brief Definition of UTF-8 encoding
+
 #ifndef __TEXTWOLF_CHARSET_UTF8_HPP__
 #define __TEXTWOLF_CHARSET_UTF8_HPP__
 #include "textwolf/char.hpp"
@@ -42,10 +45,11 @@
 namespace textwolf {
 namespace charset {
 
-///\class UTF8
-///\brief character set encoding UTF-8
+/// \class UTF8
+/// \brief character set encoding UTF-8
 struct UTF8
 {
+	/// \brief Maximum character that can be represented by this encoding implementation
 	enum {MaxChar=0x7FFFFFFF};
 	enum {
 		B11111111=0xFF,
@@ -72,6 +76,8 @@ struct UTF8
 		B11111101=B11111100|B00000001
 	};
 
+	/// \class CharLengthTab
+	/// \brief Table that maps the first UTF-8 character byte to the length of the character in bytes
 	struct CharLengthTab	:public CharMap<unsigned char, 0>
 	{
 		CharLengthTab()
@@ -88,10 +94,10 @@ struct UTF8
 		};
 	};
 
-	///\brief Get the size of the current character in bytes (variable length encoding)
-	///\param [in] buf buffer for the character data
-	///\param [in,out] bufpos position in 'buf'
-	///\param [in,out] itr iterator to skip
+	/// \brief Get the size of the current character in bytes (variable length encoding)
+	/// \param [in] buf buffer for the character data
+	/// \param [in,out] bufpos position in 'buf'
+	/// \param [in,out] itr iterator to skip
 	template <class Iterator>
 	static unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
@@ -105,7 +111,7 @@ struct UTF8
 		return charLengthTab[ (unsigned char)buf[ 0]];
 	}
 
-	///\brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	static void skip( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
@@ -116,7 +122,7 @@ struct UTF8
 		}
 	}
 
-	///\brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
@@ -129,7 +135,7 @@ struct UTF8
 		return ((unsigned char)(buf[0])>127)?-1:buf[0];
 	}
 
-	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
@@ -165,7 +171,7 @@ struct UTF8
 		return res;
 	}
 
-	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
+	/// \brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
 	void print( UChar chr, Buffer_& buf) const
 	{

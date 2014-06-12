@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/charset_isolatin.hpp
+/// \brief Definition of UCS-2/UCS-4 encodings
+
 #ifndef __TEXTWOLF_CHARSET_UCS_HPP__
 #define __TEXTWOLF_CHARSET_UCS_HPP__
 #include "textwolf/char.hpp"
@@ -197,7 +200,7 @@ struct UCS2LE :public UCS2<ByteOrder::LE> {};
 ///\class UCS2BE
 ///\brief UCS-2 big endian character set encoding
 struct UCS2BE :public UCS2<ByteOrder::BE> {};
-///\class UCS4BE
+///\class UCS4LE
 ///\brief UCS-4 little endian character set encoding
 struct UCS4LE :public UCS4<ByteOrder::LE> {};
 ///\class UCS4BE

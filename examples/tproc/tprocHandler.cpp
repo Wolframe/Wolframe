@@ -33,7 +33,7 @@
 ///\file tprocHandler.cpp
 
 #include "tprocHandler.hpp"
-#include "cmdbind/execCommandHandler.hpp"
+#include "execCommandHandler.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 

@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/sourceiterator.hpp
+/// \brief textwolf byte source iterator template
+
 #ifndef __TEXTWOLF_STATIC_BUFFER_HPP__
 #define __TEXTWOLF_STATIC_BUFFER_HPP__
 #include "textwolf/exception.hpp"
@@ -42,12 +45,12 @@
 
 namespace textwolf {
 
-///\class StaticBuffer
-///\brief Simple back insertion sequence for storing the outputs of textwolf in a contant size buffer
+/// \class StaticBuffer
+/// \brief Simple back insertion sequence for storing the outputs of textwolf in a contant size buffer
 class StaticBuffer :public throws_exception
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	explicit StaticBuffer( std::size_t n)
 		:m_pos(0),m_size(n),m_ar(0),m_allocated(true)
 	{
@@ -55,7 +58,7 @@ public:
 		if (!m_ar) throw std::bad_alloc();
 	}
 
-	///\brief Constructor
+	/// \brief Constructor
 	StaticBuffer( char* p, std::size_t n, std::size_t i=0)
 		:m_pos(i)
 		,m_size(n)
@@ -63,7 +66,7 @@ public:
 		,m_allocated(false)
 		,m_overflow(false) {}
 
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	StaticBuffer( const StaticBuffer& o)
 		:m_pos(o.m_pos)
 		,m_size(o.m_size)
@@ -76,21 +79,21 @@ public:
 		std::memcpy( m_ar, o.m_ar, m_size);
 	}
 
-	///\brief Destructor
+	/// \brief Destructor
 	~StaticBuffer()
 	{
 		if (m_allocated && m_ar) std::free(m_ar);
 	}
 
-	///\brief Clear the buffer content
+	/// \brief Clear the buffer content
 	void clear()
 	{
 		m_pos = 0;
 		m_overflow = false;
 	}
 
-	///\brief Append one character
-	///\param[in] ch the character to append
+	/// \brief Append one character
+	/// \param[in] ch the character to append
 	void push_back( char ch)
 	{
 		if (m_pos < m_size)
@@ -103,9 +106,9 @@ public:
 		}
 	}
 
-	///\brief Append an array of characters
-	///\param[in] cc the characters to append
-	///\param[in] ccsize the number of characters to append
+	/// \brief Append an array of characters
+	/// \param[in] cc the characters to append
+	/// \param[in] ccsize the number of characters to append
 	void append( const char* cc, std::size_t ccsize)
 	{
 		if (m_pos+ccsize > m_size)
@@ -117,17 +120,17 @@ public:
 		m_pos += ccsize;
 	}
 
-	///\brief Return the number of characters in the buffer
-	///\return the number of characters (bytes)
+	/// \brief Return the number of characters in the buffer
+	/// \return the number of characters (bytes)
 	std::size_t size() const		{return m_pos;}
 
-	///\brief Return the buffer content as 0-terminated string
-	///\return the C-string
+	/// \brief Return the buffer content as 0-terminated string
+	/// \return the C-string
 	const char* ptr() const			{return m_ar;}
 
-	///\brief Shrinks the size of the buffer or expands it with c
-	///\param [in] n new size of the buffer
-	///\param [in] c fill character if n bigger than the current fill size
+	/// \brief Shrinks the size of the buffer or expands it with c
+	/// \param [in] n new size of the buffer
+	/// \param [in] c fill character if n bigger than the current fill size
 	void resize( std::size_t n, char c=0)
 	{
 		if (m_pos>n)
@@ -141,35 +144,35 @@ public:
 		}
 	}
 
-	///\brief random access of element
-	///\param [in] ii
-	///\return the character at this position
+	/// \brief random access of element
+	/// \param [in] ii
+	/// \return the character at this position
 	char operator []( std::size_t ii) const
 	{
 		if (ii > m_pos) throw exception( DimOutOfRange);
 		return m_ar[ii];
 	}
 
-	///\brief random access of element reference
-	///\param [in] ii
-	///\return the reference to the character at this position
+	/// \brief random access of element reference
+	/// \param [in] ii
+	/// \return the reference to the character at this position
 	char& at( std::size_t ii) const
 	{
 		if (ii > m_pos) throw exception( DimOutOfRange);
 		return m_ar[ii];
 	}
 
-	///\brief check for array bounds write
-	///\return true if a push_back would have caused an array bounds write
+	/// \brief check for array bounds write
+	/// \return true if a push_back would have caused an array bounds write
 	bool overflow() const			{return m_overflow;}
 private:
-	StaticBuffer(){}
+	StaticBuffer(){}			///< non copyable
 private:
-	std::size_t m_pos;			//< current cursor position of the buffer (number of added characters)
-	std::size_t m_size;			//< allocation size of the buffer in bytes
-	char* m_ar;				//< buffer content
-	bool m_allocated;			//< true, if the buffer is allocated by this class and not passed by constructor
-	bool m_overflow;			//< true, if an array bounds write would have happened with push_back
+	std::size_t m_pos;			///< current cursor position of the buffer (number of added characters)
+	std::size_t m_size;			///< allocation size of the buffer in bytes
+	char* m_ar;				///< buffer content
+	bool m_allocated;			///< true, if the buffer is allocated by this class and not passed by constructor
+	bool m_overflow;			///< true, if an array bounds write would have happened with push_back
 };
 
 }//namespace

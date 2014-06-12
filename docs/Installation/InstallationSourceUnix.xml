@@ -3372,6 +3372,23 @@ make check-po           check sanity of gettext files
 				</programlisting>
 
 		        </para>
+		        
+		        <para>
+				Additionally the make system understands 'MAKEDEPS',
+				so you can provide you own dependency generator at need.
+		        </para>
+		        
+		        <para>
+				Especially useful is
+				<programlisting language='shell'>
+	make MAKEPEDS=/bin/true depend
+	make -j 4
+				</programlisting>
+				to avoid dependency management at all, for instance
+				for one-time builds in continuous integration, where
+				the generation of working dependencies can take a long
+				time and is of no use.
+			</para>
 			
 		</sect2>
 		
