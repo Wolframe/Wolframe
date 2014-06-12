@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/xmlscanner.hpp
+/// \brief XML parser iterator interface for processing the XML elements one by one
+
 #ifndef __TEXTWOLF_XML_SCANNER_HPP__
 #define __TEXTWOLF_XML_SCANNER_HPP__
 #include "textwolf/char.hpp"
@@ -43,34 +46,34 @@
 
 namespace textwolf {
 
-///\class ScannerStatemachine
-///\brief Class to build up the XML element scanner state machine in a descriptive way
+/// \class ScannerStatemachine
+/// \brief Class to build up the XML element scanner state machine in a descriptive way
 class ScannerStatemachine :public throws_exception
 {
 public:
 	enum
 	{
-		MaxNofStates=64				//< maximum number of states (fixed allocated array for state machine)
+		MaxNofStates=64				///< maximum number of states (fixed allocated array for state machine)
 	};
-	///\class Element
-	///\brief One state in the state machine
+	/// \class Element
+	/// \brief One state in the state machine
 	struct Element
 	{
-		int fallbackState;			//< state transition if the event does not match (it belongs to the next state = fallbackState)
-		int missError;				//< error code in case of an event that does not match and there is no fallback
+		int fallbackState;			///< state transition if the event does not match (it belongs to the next state = fallbackState)
+		int missError;				///< error code in case of an event that does not match and there is no fallback
 
-		///\class Action
-		///\brief Definition of action fired by the state machine
+		/// \class Action
+		/// \brief Definition of action fired by the state machine
 		struct Action
 		{
-			int op;				//< action operand
-			int arg;			//< action argument
+			int op;				///< action operand
+			int arg;			///< action argument
 		};
-		Action action;				//< action executed after entering this state
-		unsigned char nofnext;			//< number of follow states defined
-		signed char next[ NofControlCharacter];	//< follow state fired by an event (control character type parsed)
+		Action action;				///< action executed after entering this state
+		unsigned char nofnext;			///< number of follow states defined
+		signed char next[ NofControlCharacter];	///< follow state fired by an event (control character type parsed)
 
-		///\brief Constructor
+		/// \brief Constructor
 		Element() :fallbackState(-1),missError(-1),nofnext(0)
 		{
 			action.op = -1;
@@ -78,9 +81,9 @@ public:
 			for (unsigned int ii=0; ii<NofControlCharacter; ii++) next[ii] = -1;
 		}
 	};
-	///\brief Get state addressed by its index
-	///\param [in] stateIdx index of the state
-	///\return state defintion reference
+	/// \brief Get state addressed by its index
+	/// \param [in] stateIdx index of the state
+	/// \return state defintion reference
 	Element* get( int stateIdx) throw(exception)
 	{
 		if ((unsigned int)stateIdx>size) throw exception(InvalidState);
@@ -88,11 +91,11 @@ public:
 	}
 
 private:
-	Element tab[ MaxNofStates];	//< states of the STM
-	unsigned int size;		//< number of states defined in the STM
+	Element tab[ MaxNofStates];	///< states of the STM
+	unsigned int size;		///< number of states defined in the STM
 
-	///\brief Create a new state
-	///\param [in] stateIdx index of the state (must be the size of the STM array, so that state identifiers can be named by enumeration constants for better readability)
+	/// \brief Create a new state
+	/// \param [in] stateIdx index of the state (must be the size of the STM array, so that state identifiers can be named by enumeration constants for better readability)
 	void newState( int stateIdx) throw(exception)
 	{
 		if (size != (unsigned int)stateIdx) throw exception( StateNumbersNotAscending);
@@ -100,8 +103,8 @@ private:
 		size++;
 	}
 
-	///\brief Define a transition for all control character types not firing yet in the last state defined
-	///\param [in] nextState the follow state index defined for these transitions
+	/// \brief Define a transition for all control character types not firing yet in the last state defined
+	/// \param [in] nextState the follow state index defined for these transitions
 	void addOtherTransition( int nextState) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
@@ -113,9 +116,9 @@ private:
 		tab[ size-1].nofnext = NofControlCharacter;
 	}
 
-	///\brief Define a transition for inputchr in the last state defined
-	///\param [in] inputchr the firing input control character type
-	///\param [in] nextState the follow state index defined for this transition
+	/// \brief Define a transition for inputchr in the last state defined
+	/// \param [in] inputchr the firing input control character type
+	/// \param [in] nextState the follow state index defined for this transition
 	void addTransition( ControlCharacter inputchr, int nextState) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
@@ -126,16 +129,16 @@ private:
 		tab[ size-1].nofnext += 1;
 	}
 
-	///\brief Define a self directing transition for inputchr in the last state defined (the state remains the same for this input)
-	///\param [in] inputchr the firing input control character type
+	/// \brief Define a self directing transition for inputchr in the last state defined (the state remains the same for this input)
+	/// \param [in] inputchr the firing input control character type
 	void addTransition( ControlCharacter inputchr) throw(exception)
 	{
 		addTransition( inputchr, size-1);
 	}
 
-	///\brief Define an action in the last state defined (to be executed when entering the state)
-	///\param [in] action_op action operand
-	///\param [in] action_arg action argument
+	/// \brief Define an action in the last state defined (to be executed when entering the state)
+	/// \param [in] action_op action operand
+	/// \param [in] action_arg action argument
 	void addAction( int action_op, int action_arg=0) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
@@ -144,8 +147,8 @@ private:
 		tab[ size-1].action.arg = action_arg;
 	}
 
-	///\brief Define an error in the last state defined to be reported when no fallback is defined and no firing input character parsed
-	///\param [in] error code to be reported
+	/// \brief Define an error in the last state defined to be reported when no fallback is defined and no firing input character parsed
+	/// \param [in] error code to be reported
 	void addMiss( int error) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
@@ -153,8 +156,8 @@ private:
 		tab[ size-1].missError = error;
 	}
 
-	///\brief Define in the last state defined a fallback state transition that is fired when no firing input character parsed
-	///\param [in] stateIdx follow state index
+	/// \brief Define in the last state defined a fallback state transition that is fired when no firing input character parsed
+	/// \param [in] stateIdx follow state index
 	void addFallback( int stateIdx) throw(exception)
 	{
 		if (size == 0) throw exception( InvalidState);
@@ -163,93 +166,93 @@ private:
 		tab[ size-1].fallbackState = stateIdx;
 	}
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	ScannerStatemachine() :size(0){}
 
-	///\brief See ScannerStatemachine::newState(int)
+	/// \brief See ScannerStatemachine::newState(int)
 	ScannerStatemachine& operator[]( int stateIdx)									{newState(stateIdx); return *this;}
-	///\brief See ScannerStatemachine::addTransition(ControlCharacter,int)
+	/// \brief See ScannerStatemachine::addTransition(ControlCharacter,int)
 	ScannerStatemachine& operator()( ControlCharacter inputchr, int ns)						{addTransition(inputchr,ns); return *this;}
-	///\brief See ScannerStatemachine::addTransition(ControlCharacter,int)
+	/// \brief See ScannerStatemachine::addTransition(ControlCharacter,int)
 	ScannerStatemachine& operator()( ControlCharacter i1, ControlCharacter i2, int ns)				{addTransition(i1,ns); addTransition(i2,ns); return *this;}
-	///\brief See ScannerStatemachine::addTransition(ControlCharacter,int)
+	/// \brief See ScannerStatemachine::addTransition(ControlCharacter,int)
 	ScannerStatemachine& operator()( ControlCharacter i1, ControlCharacter i2, ControlCharacter i3, int ns)		{addTransition(i1,ns); addTransition(i2,ns); addTransition(i3,ns); return *this;}
-	///\brief See ScannerStatemachine::addTransition(ControlCharacter)
+	/// \brief See ScannerStatemachine::addTransition(ControlCharacter)
 	ScannerStatemachine& operator()( ControlCharacter inputchr)							{addTransition(inputchr); return *this;}
-	///\brief See ScannerStatemachine::addAction(int,int)
+	/// \brief See ScannerStatemachine::addAction(int,int)
 	ScannerStatemachine& action( int aa, int arg=0)									{addAction(aa,arg); return *this;}
-	///\brief See ScannerStatemachine::addMiss(int)
+	/// \brief See ScannerStatemachine::addMiss(int)
 	ScannerStatemachine& miss( int ee)										{addMiss(ee); return *this;}
-	///\brief See ScannerStatemachine::addFallback(int)
+	/// \brief See ScannerStatemachine::addFallback(int)
 	ScannerStatemachine& fallback( int stateIdx)									{addFallback(stateIdx); return *this;}
-	///\brief See ScannerStatemachine::addOtherTransition(int)
+	/// \brief See ScannerStatemachine::addOtherTransition(int)
 	ScannerStatemachine& other( int stateIdx)									{addOtherTransition(stateIdx); return *this;}
 };
 
-///\class XMLScannerBase
-///\brief XML scanner base class for things common for all XML scanners
+/// \class XMLScannerBase
+/// \brief XML scanner base class for things common for all XML scanners
 class XMLScannerBase
 {
 public:
-	///\enum ElementType
-	///\brief Enumeration of XML element types returned by an XML scanner
+	/// \enum ElementType
+	/// \brief Enumeration of XML element types returned by an XML scanner
 	enum ElementType
 	{
-		None,					//< empty (NULL)
-		ErrorOccurred,				//< XML scanning error error reported
-		HeaderStart,				//< open XML header tag
-		HeaderAttribName,			//< tag attribute name in the XML header
-		HeaderAttribValue,			//< tag attribute value in the XML header
-		HeaderEnd,				//< end of XML header event (after parsing '?&gt;')
-		DocAttribValue,				//< document attribute value in a DOCTYPE or ENTITY definition
-		DocAttribEnd,				//< end of a document attribute definition <! .. !>
-		TagAttribName,				//< tag attribute name (e.g. "id" in &lt;person id='5'&gt;
-		TagAttribValue,				//< tag attribute value (e.g. "5" in &lt;person id='5'&gt;
-		OpenTag,				//< open tag (e.g. "bla" for "&lt;bla...")
-		CloseTag,				//< close tag (e.g. "bla" for "&lt;/bla&gt;")
-		CloseTagIm,				//< immediate close tag (e.g. "bla" for "&lt;bla /&gt;")
-		Content,				//< content element string (separated by spaces or end of line)
-		Exit					//< end of document
+		None,					///< empty (NULL)
+		ErrorOccurred,				///< XML scanning error error reported
+		HeaderStart,				///< open XML header tag
+		HeaderAttribName,			///< tag attribute name in the XML header
+		HeaderAttribValue,			///< tag attribute value in the XML header
+		HeaderEnd,				///< end of XML header event (after parsing '?&gt;')
+		DocAttribValue,				///< document attribute value in a DOCTYPE or ENTITY definition
+		DocAttribEnd,				///< end of a document attribute definition <! .. !>
+		TagAttribName,				///< tag attribute name (e.g. "id" in &lt;person id='5'&gt;
+		TagAttribValue,				///< tag attribute value (e.g. "5" in &lt;person id='5'&gt;
+		OpenTag,				///< open tag (e.g. "bla" for "&lt;bla...")
+		CloseTag,				///< close tag (e.g. "bla" for "&lt;/bla&gt;")
+		CloseTagIm,				///< immediate close tag (e.g. "bla" for "&lt;bla /&gt;")
+		Content,				///< content element string (separated by spaces or end of line)
+		Exit					///< end of document
 	};
 	enum
 	{
-		NofElementTypes=Exit+1		//< number of XML element types defined
+		NofElementTypes=Exit+1			///< number of XML element types defined
 	};
 
-	///\brief Get the XML element type as string
-	///\param [in] ee XML element type
-	///\return XML element type as string
+	/// \brief Get the XML element type as string
+	/// \param [in] ee XML element type
+	/// \return XML element type as string
 	static const char* getElementTypeName( ElementType ee)
 	{
 		static const char* names[ NofElementTypes] = {"None","ErrorOccurred","HeaderStart","HeaderAttribName","HeaderAttribValue","HeaderEnd", "DocAttribValue", "DocAttribEnd", "TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
 		return names[ (unsigned int)ee];
 	}
 
-	///\enum Error
-	///\brief Enumeration of XML scanner error codes
+	/// \enum Error
+	/// \brief Enumeration of XML scanner error codes
 	enum Error
 	{
-		Ok,					//< no error, everything is OK
-		ErrIllegalDocumentAttributeDef,		//< error in document attribute or entity definition
-		ErrExpectedOpenTag,			//< expected an open tag in this state
-		ErrExpectedXMLTag,			//< expected an <?xml tag in this state
-		ErrUnexpectedEndOfText,			//< unexpected end of text in the middle of the XML definition
-		ErrSyntaxToken,				//< a specific string expected as token in XML but does not match
-		ErrStringNotTerminated,			//< attribute string in XML not terminated on the same line
-		ErrUndefinedCharacterEntity,		//< named entity is not defined in the entity map
-		ErrExpectedTagEnd,			//< expected end of tag
-		ErrExpectedEqual,			//< expected equal in tag attribute definition
-		ErrExpectedTagAttribute,		//< expected tag attribute
-		ErrExpectedCDATATag,			//< expected CDATA tag definition
-		ErrInternal,				//< internal error (textwolf implementation error)
-		ErrUnexpectedEndOfInput,		//< unexpected end of input stream
-		ErrExpectedEndOfLine,			//< expected mandatory end of line (after XML header)
-		ErrExpectedDash2			//< expected second '-' after '<!-' to start an XML comment as '<!-- ... -->'
+		Ok,					///< no error, everything is OK
+		ErrIllegalDocumentAttributeDef,		///< error in document attribute or entity definition
+		ErrExpectedOpenTag,			///< expected an open tag in this state
+		ErrExpectedXMLTag,			///< expected an <?xml tag in this state
+		ErrUnexpectedEndOfText,			///< unexpected end of text in the middle of the XML definition
+		ErrSyntaxToken,				///< a specific string expected as token in XML but does not match
+		ErrStringNotTerminated,			///< attribute string in XML not terminated on the same line
+		ErrUndefinedCharacterEntity,		///< named entity is not defined in the entity map
+		ErrExpectedTagEnd,			///< expected end of tag
+		ErrExpectedEqual,			///< expected equal in tag attribute definition
+		ErrExpectedTagAttribute,		///< expected tag attribute
+		ErrExpectedCDATATag,			///< expected CDATA tag definition
+		ErrInternal,				///< internal error (textwolf implementation error)
+		ErrUnexpectedEndOfInput,		///< unexpected end of input stream
+		ErrExpectedEndOfLine,			///< expected mandatory end of line (after XML header)
+		ErrExpectedDash2			///< expected second '-' after '<!-' to start an XML comment as '<!-- ... -->'
 	};
 
-	///\brief Get the error code as string
-	///\param [in] ee error code
-	///\return the error code as string
+	/// \brief Get the error code as string
+	/// \param [in] ee error code
+	/// \return the error code as string
 	static const char* getErrorString( Error ee)
 	{
 		enum {NofErrors=16};
@@ -273,8 +276,8 @@ public:
 		return sError[(unsigned int)ee];
 	}
 
-	///\enum STMState
-	///\brief Enumeration of states of the XML scanner state machine
+	/// \enum STMState
+	/// \brief Enumeration of states of the XML scanner state machine
 	enum STMState
 	{
 		START, STARTTAG, XTAG, PITAG, PITAGEND, XTAGEND, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
@@ -283,9 +286,9 @@ public:
 		COMDASH2, COMSEEKE, COMENDD2, COMENDCL, CDATA, CDATA1, CDATA2, CDATA3, EXIT
 	};
 
-	///\brief Get the scanner state machine state as string
-	///\param [in] s the state
-	///\return the state as string
+	/// \brief Get the scanner state machine state as string
+	/// \param [in] s the state
+	/// \return the state as string
 	static const char* getStateString( STMState s)
 	{
 		enum Constant {NofStates=48};
@@ -305,28 +308,28 @@ public:
 		return sState[(unsigned int)s];
 	}
 
-	///\enum STMAction
-	///\brief Enumeration of actions in the XML scanner state machine
+	/// \enum STMAction
+	/// \brief Enumeration of actions in the XML scanner state machine
 	enum STMAction
 	{
 		Return, ReturnWord, ReturnContent, ReturnIdentifier, ReturnSQString, ReturnDQString, ExpectIdentifierXML, ExpectIdentifierCDATA, ReturnEOF,
 		NofSTMActions = 9
 	};
 
-	///\brief Get the scanner state machine action as string
-	///\param [in] a the action
-	///\return the action as string
+	/// \brief Get the scanner state machine action as string
+	/// \param [in] a the action
+	/// \return the action as string
 	static const char* getActionString( STMAction a)
 	{
 		static const char* name[ NofSTMActions] = {"Return", "ReturnWord", "ReturnContent", "ReturnIdentifier", "ReturnSQString", "ReturnDQString", "ExpectIdentifierXML", "ExpectIdentifierCDATA", "ReturnEOF"};
 		return name[ (unsigned int)a];
 	};
 
-	///\class Statemachine
-	///\brief XML scanner state machine implementation
+	/// \class Statemachine
+	/// \brief XML scanner state machine implementation
 	struct Statemachine :public ScannerStatemachine
 	{
-		///\brief Constructor (defines the state machine completely)
+		/// \brief Constructor (defines the state machine completely)
 		Statemachine( bool doTokenize)
 		{
 			(*this)
@@ -392,12 +395,12 @@ public:
 		}
 	};
 
-	///\typedef IsTokenCharMap
-	///\brief Forms a set of characters by assigning (true/false) to the whole domain
+	/// \typedef IsTokenCharMap
+	/// \brief Forms a set of characters by assigning (true/false) to the whole domain
 	typedef CharMap<bool,false,NofControlCharacter> IsTokenCharMap;
 
-	///\class IsTagCharMap
-	///\brief Defines the set of tag characters
+	/// \class IsTagCharMap
+	/// \brief Defines the set of tag characters
 	struct IsTagCharMap :public IsTokenCharMap
 	{
 		IsTagCharMap()
@@ -406,8 +409,8 @@ public:
 		}
 	};
 
-	///\class IsWordCharMap
-	///\brief Defines the set of content word characters (tokenization switched on)
+	/// \class IsWordCharMap
+	/// \brief Defines the set of content word characters (tokenization switched on)
 	struct IsWordCharMap :public IsTokenCharMap
 	{
 		IsWordCharMap()
@@ -416,8 +419,8 @@ public:
 		}
 	};
 
-	///\class IsContentCharMap
-	///\brief Defines the set of content token characters
+	/// \class IsContentCharMap
+	/// \brief Defines the set of content token characters
 	struct IsContentCharMap :public IsTokenCharMap
 	{
 		IsContentCharMap()
@@ -426,8 +429,8 @@ public:
 		}
 	};
 
-	///\class IsSQStringCharMap
-	///\brief Defines the set characters belonging to a single quoted string
+	/// \class IsSQStringCharMap
+	/// \brief Defines the set characters belonging to a single quoted string
 	struct IsSQStringCharMap :public IsContentCharMap
 	{
 		IsSQStringCharMap()
@@ -436,8 +439,8 @@ public:
 		}
 	};
 
-	///\class IsDQStringCharMap
-	///\brief Defines the set characters belonging to a double quoted string
+	/// \class IsDQStringCharMap
+	/// \brief Defines the set characters belonging to a double quoted string
 	struct IsDQStringCharMap :public IsContentCharMap
 	{
 		IsDQStringCharMap()
@@ -448,12 +451,12 @@ public:
 };
 
 
-///\class XMLScanner
-///\brief XML scanner template that adds the functionality to the statemachine base definition
-///\tparam InputIterator input iterator with ++ and read only * returning 0 als last character of the input
-///\tparam InputCharSet_ character set encoding of the input, read as stream of bytes
-///\tparam OutputCharSet_ character set encoding of the output, printed as string of the item type of the character set,
-///\tparam OutputBuffer_ buffer for output with STL back insertion sequence interface (e.g. std::string,std::vector<char>,textwolf::StaticBuffer)
+/// \class XMLScanner
+/// \brief XML scanner template that adds the functionality to the statemachine base definition
+/// \tparam InputIterator input iterator with ++ and read only * returning 0 als last character of the input
+/// \tparam InputCharSet_ character set encoding of the input, read as stream of bytes
+/// \tparam OutputCharSet_ character set encoding of the output, printed as string of the item type of the character set,
+/// \tparam OutputBuffer_ buffer for output with STL back insertion sequence interface (e.g. std::string,std::vector<char>,textwolf::StaticBuffer)
 template
 <
 		class InputIterator,
@@ -464,50 +467,50 @@ template
 class XMLScanner :public XMLScannerBase
 {
 private:
-	///\class TokState
-	///\brief Token state variables
+	/// \class TokState
+	/// \brief Token state variables
 	struct TokState
 	{
-		///\enum Id
-		///\brief Enumeration of token parser states.
-		///\remark These states define where the scanner has to continue parsing when it was interrupted by an EoD exception and reentered again with more input to process.
+		/// \enum Id
+		/// \brief Enumeration of token parser states.
+		/// \remark These states define where the scanner has to continue parsing when it was interrupted by an EoD exception and reentered again with more input to process.
 		enum Id
 		{
-			Start,				//< start state (no parsing action performed at the moment)
-			ParsingDone,			//< scanner war interrupted after parsing something when accessing the follow character
-			ParsingKey,			//< scanner was interrupted when parsing a key
-			ParsingEntity,			//< scanner was interrupted when parsing an XML character entity
-			ParsingNumericEntity,		//< scanner was interrupted when parsing an XML numeric character entity
-			ParsingNumericBaseEntity,	//< scanner was interrupted when parsing an XML basic character entity (apos,amp,etc..)
-			ParsingNamedEntity,		//< scanner was interrupted when parsing an XML named character entity
-			ParsingToken			//< scanner was interrupted when parsing a token (not in entity cotext)
+			Start,				///< start state (no parsing action performed at the moment)
+			ParsingDone,			///< scanner war interrupted after parsing something when accessing the follow character
+			ParsingKey,			///< scanner was interrupted when parsing a key
+			ParsingEntity,			///< scanner was interrupted when parsing an XML character entity
+			ParsingNumericEntity,		///< scanner was interrupted when parsing an XML numeric character entity
+			ParsingNumericBaseEntity,	///< scanner was interrupted when parsing an XML basic character entity (apos,amp,etc..)
+			ParsingNamedEntity,		///< scanner was interrupted when parsing an XML named character entity
+			ParsingToken			///< scanner was interrupted when parsing a token (not in entity cotext)
 		};
-		Id id;					//< the scanner token parser state
+		Id id;					///< the scanner token parser state
 
-		enum EolnState				//< end of line state to fulfill the W3C requirements for end of line mapping (see http://www.w3.org/TR/xml/: 2.11 End-of-Line Handling)
+		enum EolnState				///< end of line state to fulfill the W3C requirements for end of line mapping (see http://www.w3.org/TR/xml/: 2.11 End-of-Line Handling)
 		{
 			SRC,CR
 		};
-		EolnState eolnState;			//< the scanner end of line state
+		EolnState eolnState;			///< the scanner end of line state
 
-		unsigned int pos;			//< entity buffer position (buf)
-		unsigned int base;			//< numeric entity base (10 for decimal/16 for hexadecimal)
-		EChar value;				//< parsed entity value
-		char buf[ 16];				//< parsed entity buffer
-		UChar curchr_saved;			//< save current character parsed for the case we cannot print it (output buffer too small)
+		unsigned int pos;			///< entity buffer position (buf)
+		unsigned int base;			///< numeric entity base (10 for decimal/16 for hexadecimal)
+		EChar value;				///< parsed entity value
+		char buf[ 16];				///< parsed entity buffer
+		UChar curchr_saved;			///< save current character parsed for the case we cannot print it (output buffer too small)
 
-		///\brief Constructor
+		/// \brief Constructor
 		TokState()				:id(Start),eolnState(SRC),pos(0),base(0),value(0),curchr_saved(0) {}
 
-		///\brief Reset this state variables (after succesful exit with a new token parsed)
-		///\param [in] id_ the new entity parse state
-		///\param [in] eolnState_ the end of line mapping state
+		/// \brief Reset this state variables (after succesful exit with a new token parsed)
+		/// \param [in] id_ the new entity parse state
+		/// \param [in] eolnState_ the end of line mapping state
 		void init(Id id_=Start, EolnState eolnState_=SRC)
 		{
 			id=id_;eolnState=eolnState_;pos=0;base=0;value=0;curchr_saved=0;
 		}
 	};
-	TokState tokstate;								//< the entity parsing state of this XML scanner
+	TokState tokstate;				///< the entity parsing state of this XML scanner
 
 public:
 	typedef InputCharSet_ InputCharSet;
@@ -520,15 +523,16 @@ public:
 	typedef std::map<const char*,UChar> EntityMap;
 	typedef OutputBuffer_ OutputBuffer;
 
-	///\brief Print a character to the output token buffer
-	///\param [in] ch unicode character to print
+private:
+	/// \brief Print a character to the output token buffer
+	/// \param [in] ch unicode character to print
 	void push( UChar ch)
 	{
 		m_output.print( ch, m_outputBuf);
 	}
 
-	///\brief Map a hexadecimal digit to its value
-	///\param [in] ch hexadecimal digit to map to its decimal value
+	/// \brief Map a hexadecimal digit to its value
+	/// \param [in] ch hexadecimal digit to map to its decimal value
 	static unsigned char HEX( unsigned char ch)
 	{
 		struct HexCharMap :public CharMap<unsigned char, 0xFF>
@@ -544,9 +548,9 @@ public:
 		return hexCharMap[ch];
 	}
 
-	///\brief Parse a numeric entity value for a table definition (map it to the target character set)
-	///\param [in] ir input reader
-	///\return the value of the entity parsed
+	/// \brief Parse a numeric entity value for a table definition (map it to the target character set)
+	/// \param [in] ir input reader
+	/// \return the value of the entity parsed
 	static UChar parseStaticNumericEntityValue( InputReader& ir)
 	{
 		EChar value = 0;
@@ -577,8 +581,8 @@ public:
 		return (UChar)value;
 	}
 
-	///\brief Print the characters of a sequence that was thought to form an entity but did not
-	///\return true on success
+	/// \brief Print the characters of a sequence that was thought to form an entity but did not
+	/// \return true on success
 	void fallbackEntity()
 	{
 		switch (tokstate.id)
@@ -607,8 +611,8 @@ public:
 		}
 	}
 
-	///\brief Try to parse an entity (we got '&')
-	///\return true on success
+	/// \brief Try to parse an entity (we got '&')
+	/// \return true on success
 	bool parseEntity()
 	{
 		unsigned char ch;
@@ -625,8 +629,8 @@ public:
 		}
 	}
 
-	///\brief Try to parse a numeric entity (we got '&#')
-	///\return true on success
+	/// \brief Try to parse a numeric entity (we got '&#')
+	/// \return true on success
 	bool parseNumericEntity()
 	{
 		unsigned char ch;
@@ -645,8 +649,8 @@ public:
 		}
 	}
 
-	///\brief Try to parse a numeric entity with known base (we got '&#' and we know the base 10/16 of it)
-	///\return true on success
+	/// \brief Try to parse a numeric entity with known base (we got '&#' and we know the base 10/16 of it)
+	/// \return true on success
 	bool parseNumericBaseEntity()
 	{
 		unsigned char ch;
@@ -685,8 +689,8 @@ public:
 		return true;
 	}
 
-	///\brief Try to parse a named entity
-	///\return true on success
+	/// \brief Try to parse a named entity
+	/// \return true on success
 	bool parseNamedEntity()
 	{
 		unsigned char ch;
@@ -714,8 +718,8 @@ public:
 		}
 	}
 
-	///\brief Try to recover from an interrupted token parsing state (end of input exception)
-	///\return true on success
+	/// \brief Try to recover from an interrupted token parsing state (end of input exception)
+	/// \return true on success
 	bool parseTokenRecover()
 	{
 		bool rt = false;
@@ -741,9 +745,9 @@ public:
 		return rt;
 	}
 
-	///\brief Parse a token defined by the set of valid token characters
-	///\param [in] isTok set of valid token characters
-	///\return true on success
+	/// \brief Parse a token defined by the set of valid token characters
+	/// \param [in] isTok set of valid token characters
+	/// \return true on success
 	bool parseToken( const IsTokenCharMap& isTok)
 	{
 		if (tokstate.id == TokState::Start)
@@ -812,12 +816,13 @@ public:
 		return false;
 	}
 
-	///\brief Static version of parse a token for parsing table definition elements
-	///\tparam OutputBufferType type buffer for output
-	///\param [in] isTok set of valid token characters
-	///\param [in] ir input reader iterator
-	///\param [out] buf buffer where to write the result to
-	///\return true on success
+public:
+	/// \brief Static version of parse a token for parsing table definition elements
+	/// \tparam OutputBufferType type buffer for output
+	/// \param [in] isTok set of valid token characters
+	/// \param [in] ir input reader iterator
+	/// \param [out] buf buffer where to write the result to
+	/// \return true on success
 	template <class OutputBufferType>
 	static bool parseStaticToken( const IsTokenCharMap& isTok, InputReader ir, OutputBufferType& buf)
 	{
@@ -847,9 +852,10 @@ public:
 		}
 	}
 
-	///\brief Skip a token defined by the set of valid token characters (same as parseToken but nothing written to the output buffer)
-	///\param [in] isTok set of valid token characters
-	///\return true on success
+private:
+	/// \brief Skip a token defined by the set of valid token characters (same as parseToken but nothing written to the output buffer)
+	/// \param [in] isTok set of valid token characters
+	/// \return true on success
 	bool skipToken( const IsTokenCharMap& isTok)
 	{
 		do
@@ -864,9 +870,9 @@ public:
 		return true;
 	}
 
-	///\brief Parse a token that must be the same as a given string
-	///\param [in] str string expected
-	///\return true on success
+	/// \brief Parse a token that must be the same as a given string
+	/// \param [in] str string expected
+	/// \return true on success
 	bool expectStr( const char* str)
 	{
 		bool rt = true;
@@ -890,9 +896,9 @@ public:
 		return rt;
 	}
 
-	///\brief Parse an entity defined by name (predefined)
-	///\param [in] str pointer to the buffer with the entity name
-	///\return true on success
+	/// \brief Parse an entity defined by name (predefined)
+	/// \param [in] str pointer to the buffer with the entity name
+	/// \return true on success
 	bool pushPredefinedEntity( const char* str)
 	{
 		switch (str[0])
@@ -951,9 +957,9 @@ public:
 		return false;
 	}
 
-	///\brief Parse an entity defined by name (predefined or in defined in entity table)
-	///\param [in] str pointer to the buffer with the entity name
-	///\return true on success
+	/// \brief Parse an entity defined by name (predefined or in defined in entity table)
+	/// \param [in] str pointer to the buffer with the entity name
+	/// \return true on success
 	bool pushEntity( const char* str)
 	{
 		if (pushPredefinedEntity( str))
@@ -983,19 +989,19 @@ public:
 	}
 
 private:
-	STMState state;			//< current state of the XML scanner
-	bool m_doTokenize;		//< true, if we do tokenize the input, false if we get the content according the W3C default (see http://www.w3.org/TR/xml: 2.10 White Space Handling)
-	Error error;			//< last error code
-	InputReader m_src;		//< source input iterator
-	const EntityMap* m_entityMap;	//< map with entities defined by the caller
-	OutputBuffer m_outputBuf;	//< buffer to use for output
+	STMState state;			///< current state of the XML scanner
+	bool m_doTokenize;		///< true, if we do tokenize the input, false if we get the content according the W3C default (see http://www.w3.org/TR/xml: 2.10 White Space Handling)
+	Error error;			///< last error code
+	InputReader m_src;		///< source input iterator
+	const EntityMap* m_entityMap;	///< map with entities defined by the caller
+	OutputBuffer m_outputBuf;	///< buffer to use for output
 	OutputCharSet m_output;
 
 public:
-	///\brief Constructor
-	///\param [in] p_src source iterator
-	///\param [in] p_outputBuf buffer to use for output
-	///\param [in] p_entityMap read only map of named entities defined by the user
+	/// \brief Constructor
+	/// \param [in] p_src source iterator
+	/// \param [in] p_outputBuf buffer to use for output
+	/// \param [in] p_entityMap read only map of named entities defined by the user
 	XMLScanner( const InputIterator& p_src, const EntityMap& p_entityMap)
 			:state(START),m_doTokenize(false),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
 	{}
@@ -1015,8 +1021,8 @@ public:
 			:state(START),m_doTokenize(false),error(Ok),m_src(InputCharSet()),m_entityMap(0)
 	{}
 
-	///\brief Copy constructor
-	///\param [in] o scanner to copy
+	/// \brief Copy constructor
+	/// \param [in] o scanner to copy
 	XMLScanner( const XMLScanner& o)
 		:state(o.state)
 		,m_doTokenize(o.m_doTokenize)
@@ -1026,31 +1032,38 @@ public:
 		,m_outputBuf(o.m_outputBuf)
 	{}
 
-	///\brief Assign something to the source iterator while keeping the state
-	///\param [in] a source iterator assignment
+	/// \brief Assign something to the source iterator while keeping the state
+	/// \param [in] a source iterator assignment
 	template <class IteratorAssignment>
 	void setSource( const IteratorAssignment& a)
 	{
 		m_src.setSource( a);
 	}
 
-	///\brief Get the current source iterator position
-	///\return source iterator position in character words (usually bytes)
+	/// \brief Get the current source iterator position
+	/// \return source iterator position in character words (usually bytes)
 	std::size_t getPosition() const
 	{
 		return m_src.getPosition();
 	}
 
-	///\brief Get the current parsed XML element string, if it was not masked out, see nextItem(unsigned short)
-	///\return the item string
-	const char* getItem() const {return m_outputBuf.size()?&m_outputBuf.at(0):"\0\0\0\0";}
+	/// \brief Get the current parsed XML element pointer, if it was not masked out, see nextItem(unsigned short)
+	/// \return the item string
+	const char* getItemPtr() const {return m_outputBuf.size()?&m_outputBuf.at(0):"\0\0\0\0";}
 
-	///\brief Get the size of the current parsed YML element string in bytes
-	///\return the item string
+	/// \brief Get the size of the current parsed XML element in bytes
+	/// \return the item string
 	std::size_t getItemSize() const {return m_outputBuf.size();}
 
-	///\brief Get the current XML scanner state machine state
-	///\return pointer to the state variables
+	/// \brief Get the current parsed XML element, if it was not masked out, see nextItem(unsigned short)
+	/// \return the item string
+	const OutputBuffer& getItem() const
+	{
+		return m_outputBuf;
+	}
+
+	/// \brief Get the current XML scanner state machine state
+	/// \return pointer to the state variables
 	ScannerStatemachine::Element* getState()
 	{
 		static Statemachine STMtok(true);
@@ -1059,16 +1072,16 @@ public:
 		return stm[ m_doTokenize]->get( state);
 	}
 
-	///\brief Set the tokenization behaviour
-	///\param [out] v the tokenization behaviour flag
+	/// \brief Set the tokenization behaviour
+	/// \param [out] v the tokenization behaviour flag
 	void doTokenize( bool v)
 	{
 		m_doTokenize = v;
 	}
 
-	///\brief Get the last error
-	///\param [out] str the error as string
-	///\return the error code
+	/// \brief Get the last error
+	/// \param [out] str the error as string
+	/// \return the error code
 	Error getError( const char** str=0)
 	{
 		Error rt = error;
@@ -1077,9 +1090,9 @@ public:
 		return rt;
 	}
 
-	///\brief Scan the next XML element
-	///\param [in] mask element types that should be printed to the output buffer (1 -> print, 0 -> mask out, just return the element as event)
-	///\return the type of the XML element
+	/// \brief Scan the next XML element
+	/// \param [in] mask element types that should be printed to the output buffer (1 -> print, 0 -> mask out, just return the element as event)
+	/// \return the type of the XML element
 	ElementType nextItem( unsigned short mask=0xFFFF)
 	{
 		static const IsWordCharMap wordC;
@@ -1178,39 +1191,39 @@ public:
 		return rt;
 	}
 
-	///\class End
-	///\brief end of input tag
+	/// \class End
+	/// \brief end of input tag
 	struct End {};
 
-	///\class iterator
-	///\brief input iterator for iterating on the output of an XML scanner
+	/// \class iterator
+	/// \brief input iterator for iterating on the output of an XML scanner
 	class iterator
 	{
 	public:
-		///\class Element
-		///\brief Iterator element visited
+		/// \class Element
+		/// \brief Iterator element visited
 		class Element
 		{
 		private:
 			friend class iterator;
-			ElementType m_type;		//< type of the element
-			const char* m_content;		//< value string of the element
-			std::size_t m_size;		//< size of the value string in bytes
+			ElementType m_type;		///< type of the element
+			const char* m_content;		///< value string of the element
+			std::size_t m_size;		///< size of the value string in bytes
 		public:
-			///\brief Type of the current element as string
+			/// \brief Type of the current element as string
 			const char* name() const	{return getElementTypeName( m_type);}
-			///\brief Type of the current element
+			/// \brief Type of the current element
 			ElementType type() const	{return m_type;}
-			///\brief Value of the current element
+			/// \brief Value of the current element
 			const char* content() const	{return m_content;}
-			///\brief Size of the value of the current element in bytes
+			/// \brief Size of the value of the current element in bytes
 			std::size_t size() const	{return m_size;}
-			///\brief Constructor
+			/// \brief Constructor
 			Element()			:m_type(None),m_content(0),m_size(0) {}
-			///\brief Constructor
+			/// \brief Constructor
 			Element( const End&)		:m_type(Exit),m_content(0),m_size(0) {}
-			///\brief Copy constructor
-			///\param [in] orig element to copy
+			/// \brief Copy constructor
+			/// \param [in] orig element to copy
 			Element( const Element& orig)	:m_type(orig.m_type),m_content(orig.m_content),m_size(orig.m_size) {}
 		};
 		// input iterator traits
@@ -1222,26 +1235,26 @@ public:
 		typedef std::input_iterator_tag iterator_category;
 
 	private:
-		Element element;				//< currently visited element
-		ThisXMLScanner* input;				//< XML scanner
+		Element element;				///< currently visited element
+		ThisXMLScanner* input;				///< XML scanner
 
-		///\brief Skip to the next element
-		///\param [in] mask element types that should be printed to the output buffer (1 -> print, 0 -> mask out, just return the element as event)
-		///\return iterator pointing to the next element
+		/// \brief Skip to the next element
+		/// \param [in] mask element types that should be printed to the output buffer (1 -> print, 0 -> mask out, just return the element as event)
+		/// \return iterator pointing to the next element
 		iterator& skip( unsigned short mask=0xFFFF)
 		{
 			if (input != 0)
 			{
 				element.m_type = input->nextItem(mask);
-				element.m_content = input->getItem();
+				element.m_content = input->getItemPtr();
 				element.m_size = input->getItemSize();
 			}
 			return *this;
 		}
 
-		///\brief Compare iterator with another
-		///\param [in] iter iterator to compare with
-		///\return true if they are equal
+		/// \brief Compare iterator with another
+		/// \param [in] iter iterator to compare with
+		/// \return true if they are equal
 		bool compare( const iterator& iter) const
 		{
 			if (element.type() == iter.element.type())
@@ -1251,77 +1264,77 @@ public:
 			return false;
 		}
 	public:
-		///\brief Assign an iterator to another
-		///\param [in] orig iterator to copy
+		/// \brief Assign an iterator to another
+		/// \param [in] orig iterator to copy
 		void assign( const iterator& orig)
 		{
 			input = orig.input;
 			element = orig.element;
 		}
-		///\brief Copy constructor
-		///\param [in] orig iterator to copy
+		/// \brief Copy constructor
+		/// \param [in] orig iterator to copy
 		iterator( const iterator& orig)
 		{
 			assign( orig);
 		}
-		///\brief Constructor
-		///\param [in] p_input XML scanner to use for iteration
-		///\param [in] doSkipToFirst true, if the iterator should skip to the first character of the input (default behaviour of STL conform iterators but maybe not exception save)
+		/// \brief Constructor
+		/// \param [in] p_input XML scanner to use for iteration
+		/// \param [in] doSkipToFirst true, if the iterator should skip to the first character of the input (default behaviour of STL conform iterators but maybe not exception save)
 		iterator( ThisXMLScanner& p_input, bool doSkipToFirst=true)
 				:input( &p_input)
 		{
 			if (doSkipToFirst)
 			{
 				element.m_type = input->nextItem();
-				element.m_content = input->getItem();
+				element.m_content = input->getItemPtr();
 				element.m_size = input->getItemSize();
 			}
 		}
-		///\brief Constructor
+		/// \brief Constructor
 		iterator( const End& et)  :element(et),input(0) {}
-		///\brief Constructor
+		/// \brief Constructor
 		iterator()  :input(0) {}
-		///\brief Assignement operator
-		///\param [in] orig iterator to assign to this
+		/// \brief Assignement operator
+		/// \param [in] orig iterator to assign to this
 		iterator& operator = (const iterator& orig)
 		{
 			assign( orig);
 			return *this;
 		}
-		///\brief Element dereference operator
+		/// \brief Element dereference operator
 		const Element& operator*() const
 		{
 			return element;
 		}
-		///\brief Element dereference operator
+		/// \brief Element dereference operator
 		const Element* operator->() const
 		{
 			return &element;
 		}
-		///\brief Preincrement
-		///\return *this
+		/// \brief Preincrement
+		/// \return *this
 		iterator& operator++()				{return skip();}
-		///\brief Postincrement
-		///\return *this
+		/// \brief Postincrement
+		/// \return *this
 		iterator operator++(int)			{iterator tmp(*this); skip(); return tmp;}
 
-		///\brief Compare to check for equality
-		///\return true, if equal
+		/// \brief Compare to check for equality
+		/// \return true, if equal
 		bool operator==( const iterator& iter) const	{return compare( iter);}
-		///\brief Compare to check for unequality
-		///\return true, if not equal
+		/// \brief Compare to check for unequality
+		/// \return true, if not equal
 		bool operator!=( const iterator& iter) const	{return !compare( iter);}
 	};
 
-	///\brief Get begin iterator
-	///\return iterator
-	///\param [in] doSkipToFirst true, if the iterator should skip to the first character of the input (default behaviour of STL conform iterators but maybe not exception save)
+	/// \brief Get begin iterator
+	/// \return iterator
+	/// \param [in] doSkipToFirst true, if the iterator should skip to the first character of the input (default behaviour of STL conform iterators but maybe not exception save)
 	iterator begin( bool doSkipToFirst=true)
 	{
 		return iterator( *this, doSkipToFirst);
 	}
-	///\brief Get the pointer to the end of content
-	///\return iterator
+	/// \brief Get the pointer to the end of content
+	/// \return iterator
 	iterator end()
 	{
 		return iterator( End());

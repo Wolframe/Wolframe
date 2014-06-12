@@ -32,8 +32,8 @@
 
 --------------------------------------------------------------------
 */
-///\file textwolf/xmlprinter.hpp
-///\brief textwolf XML printer interface hiding character encoding properties
+/// \file textwolf/xmlprinter.hpp
+/// \brief XML printer interface hiding character encoding properties
 
 #ifndef __TEXTWOLF_XML_PRINTER_HPP__
 #define __TEXTWOLF_XML_PRINTER_HPP__
@@ -45,22 +45,22 @@
 #include <cstring>
 #include <cstdlib>
 
-///\namespace textwolf
-///\brief Toplevel namespace of the library
+/// \namespace textwolf
+/// \brief Toplevel namespace of the library
 namespace textwolf {
 
-///\class XMLPrinter
-///\brief Character encoding dependent XML printer
-///\tparam IOCharset Character set encoding of input and output
-///\tparam AppCharset Character set encoding of the application processor
-///\tparam BufferType STL back insertion sequence to use for printing output
+/// \class XMLPrinter
+/// \brief Character encoding dependent XML printer
+/// \tparam IOCharset Character set encoding of input and output
+/// \tparam AppCharset Character set encoding of the application processor
+/// \tparam BufferType STL back insertion sequence to use for printing output
 template <class IOCharset, class AppCharset,class BufferType>
 class XMLPrinter
 {
 private:
-	///\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
-	///\param [in] src pointer to string to print
-	///\param [in] srcsize size of src in bytes
+	/// \brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
+	/// \param [in] src pointer to string to print
+	/// \param [in] srcsize size of src in bytes
 	void printToBuffer( const char* src, std::size_t srcsize, BufferType& buf) const
 	{
 		CStringIterator itr( src, srcsize);
@@ -74,11 +74,11 @@ private:
 		}
 	}
 
-	///\brief print a character substitute or the character itself
-	///\param [in,out] buf buffer to print to
-	///\param [in] nof_echr number of elements in echr and estr
-	///\param [in] echr ASCII characters to substitute
-	///\param [in] estr ASCII strings to substitute with (array parallel to echr)
+	/// \brief print a character substitute or the character itself
+	/// \param [in,out] buf buffer to print to
+	/// \param [in] nof_echr number of elements in echr and estr
+	/// \param [in] echr ASCII characters to substitute
+	/// \param [in] estr ASCII strings to substitute with (array parallel to echr)
 	void printEsc( char ch, BufferType& buf, unsigned int nof_echr, const char* echr, const char** estr) const
 	{
 		const char* cc = (const char*)memchr( echr, ch, nof_echr);
@@ -94,13 +94,13 @@ private:
 		}
 	}
 
-	///\brief print a value with some characters replaced by a string
-	///\param [in] src pointer to attribute value string to print
-	///\param [in] srcsize size of src in bytes
-	///\param [in,out] buf buffer to print to
-	///\param [in] nof_echr number of elements in echr and estr
-	///\param [in] echr ASCII characters to substitute
-	///\param [in] estr ASCII strings to substitute with (array parallel to echr)
+	/// \brief print a value with some characters replaced by a string
+	/// \param [in] src pointer to attribute value string to print
+	/// \param [in] srcsize size of src in bytes
+	/// \param [in,out] buf buffer to print to
+	/// \param [in] nof_echr number of elements in echr and estr
+	/// \param [in] echr ASCII characters to substitute
+	/// \param [in] estr ASCII strings to substitute with (array parallel to echr)
 	void printToBufferSubstChr( const char* src, std::size_t srcsize, BufferType& buf, unsigned int nof_echr, const char* echr, const char** estr) const
 	{
 		CStringIterator itr( src, srcsize);
@@ -121,10 +121,10 @@ private:
 		}
 	}
 
-	///\brief print attribute value string
-	///\param [in] src pointer to attribute value string to print
-	///\param [in] srcsize size of src in bytes
-	///\param [in,out] buf buffer to print to
+	/// \brief print attribute value string
+	/// \param [in] src pointer to attribute value string to print
+	/// \param [in] srcsize size of src in bytes
+	/// \param [in,out] buf buffer to print to
 	void printToBufferAttributeValue( const char* src, std::size_t srcsize, BufferType& buf) const
 	{
 		enum {nof_echr = 12};
@@ -135,10 +135,10 @@ private:
 		m_output.print( '"', buf);
 	}
 
-	///\brief print content value string
-	///\param [in] src pointer to content string to print
-	///\param [in] srcsize size of src in bytes
-	///\param [in,out] buf buffer to print to
+	/// \brief print content value string
+	/// \param [in] src pointer to content string to print
+	/// \param [in] srcsize size of src in bytes
+	/// \param [in,out] buf buffer to print to
 	void printToBufferContent( const char* src, std::size_t srcsize, BufferType& buf) const
 	{
 		enum {nof_echr = 6};
@@ -147,25 +147,33 @@ private:
 		printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);
 	}
 
-	///\brief Prints a character to an STL back insertion sequence buffer in the IO character set encoding
-	///\param [in] ch character to print
-	///\param [in,out] buf buffer to print to
+	/// \brief Prints a character to an STL back insertion sequence buffer in the IO character set encoding
+	/// \param [in] ch character to print
+	/// \param [in,out] buf buffer to print to
 	void printToBuffer( char ch, BufferType& buf) const
 	{
 		m_output.print( (textwolf::UChar)(unsigned char)ch, buf);
 	}
 
 public:
+	/// \brief Default constructor
 	XMLPrinter()
 		:m_state(Init){}
 
+	/// \brief Constructor
 	explicit XMLPrinter( const IOCharset& output_)
 		:m_state(Init),m_output(output_){}
 
+	/// \brief Copy constructor
 	XMLPrinter( const XMLPrinter& o)
 		:m_state(o.m_state),m_buf(o.m_buf),m_tagstack(o.m_tagstack),m_output(o.m_output)
 	{}
 
+	/// \brief Prints an XML header (version "1.0")
+	/// \param [in] encoding character set encoding name
+	/// \param [in] standalone standalone attribute ("yes","no" or NULL for undefined)
+	/// \param [out] buf buffer to print to
+	/// \return true on success, false if failed (check lasterror())
 	bool printHeader( const char* encoding, const char* standalone, BufferType& buf)
 	{
 		if (m_state != Init)
@@ -190,6 +198,12 @@ public:
 		return true;
 	}
 
+	/// \brief Prints an XML <!DOCTYPE ...> declaration
+	/// \param [in] rootid root element name
+	/// \param [in] publicid PUBLIC attribute
+	/// \param [in] systemid SYSTEM attribute
+	/// \param [out] buf buffer to print to
+	/// \return true on success, false if failed (check lasterror())
 	bool printDoctype( const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
 	{
 		if (rootid)
@@ -227,6 +241,9 @@ public:
 		return true;
 	}
 
+	/// \brief Close the current tag attribute context opened
+	/// \param [out] buf buffer to print to
+	/// \return true on success, false if failed (check lasterror())
 	bool exitTagContext( BufferType& buf)
 	{
 		if (m_state != Content)
@@ -242,6 +259,11 @@ public:
 		return true;
 	}
 
+	/// \brief Print the start of an open tag
+	/// \param [in] src start of the tag name
+	/// \param [in] srcsize length of the tag name in bytes
+	/// \param [out] buf buffer to print to
+	/// \return true on success, false if failed (check lasterror())
 	bool printOpenTag( const char* src, std::size_t srcsize, BufferType& buf)
 	{
 		if (!exitTagContext( buf)) return false;
@@ -253,6 +275,11 @@ public:
 		return true;
 	}
 
+	/// \brief Print the start of an attribute name
+	/// \param [in] src start of the attribute name
+	/// \param [in] srcsize length of the attribute name in bytes
+	/// \param [out] buf buffer to print to
+	/// \return true on success, false if failed (check lasterror())
 	bool printAttribute( const char* src, std::size_t srcsize, BufferType& buf)
 	{
 		if (m_state == TagElement)
@@ -266,6 +293,11 @@ public:
 		return false;
 	}
 
+	/// \brief Print a content or attribute value depending on context
+	/// \param [in] src start of the value
+	/// \param [in] srcsize length of the value in bytes
+	/// \param [out] buf buffer to print to
+	/// \return true on success, false if failed (check lasterror())
 	bool printValue( const char* src, std::size_t srcsize, BufferType& buf)
 	{
 		if (m_state == TagAttribute)
@@ -281,6 +313,9 @@ public:
 		return true;
 	}
 
+	/// \brief Print the close of the current tag open
+	/// \param [out] buf buffer to print to
+	/// \return true on success, false if failed (check lasterror())
 	bool printCloseTag( BufferType& buf)
 	{
 		const void* cltag;
@@ -315,6 +350,7 @@ public:
 		return true;
 	}
 
+	/// \brief Internal state
 	enum State
 	{
 		Init,
@@ -323,22 +359,26 @@ public:
 		TagElement
 	};
 
+	/// \brief Get the current internal state
+	/// \return the current state
 	State state() const
 	{
 		return m_state;
 	}
 
+	/// \brief Get the last error occurred
+	/// \return the last error string
 	const char* lasterror() const
 	{
 		return m_lasterror.empty()?0:m_lasterror.c_str();
 	}
 
 private:
-	State m_state;					//< output state
-	BufferType m_buf;				//< element output  buffer
-	TagStack m_tagstack;				//< tag name stack of open tags
-	IOCharset m_output;				//< output character set encoding
-	std::string m_lasterror;
+	State m_state;					///< internal state
+	BufferType m_buf;				///< element output buffer
+	TagStack m_tagstack;				///< tag name stack of open tags
+	IOCharset m_output;				///< output character set encoding
+	std::string m_lasterror;			///< the last error occurred
 };
 
 } //namespace

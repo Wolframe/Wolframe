@@ -264,7 +264,6 @@ struct InputFilterImpl
 		,m_withEmpty(true)
 		,m_doTokenize(false)
 		,m_parser(0)
-		,m_eom()
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
@@ -282,7 +281,6 @@ struct InputFilterImpl
 		,m_withEmpty(o.m_withEmpty)
 		,m_doTokenize(o.m_doTokenize)
 		,m_parser(0)
-		,m_eom()	//... ! by intention (non copyable, only used during getNext, where no copy is possible)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend)
@@ -497,8 +495,8 @@ struct InputFilterImpl
 	{
 		textwolf::XMLScannerBase::ElementType et = m_lasttype;
 		DOWITH_XMLScanner(
-			element = ((XMLScanner*)m_parser)->getItem();
-			elementsize = ((XMLScanner*)m_parser)->getItemSize();
+			element = ((XMLScanner*)m_parser)->getItem().c_str();
+			elementsize = ((XMLScanner*)m_parser)->getItem().size();
 		);
 		return et;
 	}
@@ -508,8 +506,8 @@ struct InputFilterImpl
 		textwolf::XMLScannerBase::ElementType et;
 		DOWITH_XMLScanner(
 			et = ((XMLScanner*)m_parser)->nextItem();
-			element = ((XMLScanner*)m_parser)->getItem();
-			elementsize = ((XMLScanner*)m_parser)->getItemSize();
+			element = ((XMLScanner*)m_parser)->getItem().c_str();
+			elementsize = ((XMLScanner*)m_parser)->getItem().size()
 		);
 		m_lasttype = et;
 		return et;

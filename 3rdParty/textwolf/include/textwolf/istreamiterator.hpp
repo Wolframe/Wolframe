@@ -32,48 +32,48 @@
 
 --------------------------------------------------------------------
 */
-///\file textwolf/istreamiterator.hpp
-///\brief textwolf iterator for std::istream
+/// \file textwolf/istreamiterator.hpp
+/// \brief Definition of iterators for textwolf on STL input streams (std::istream)
 
 #ifndef __TEXTWOLF_ISTREAM_ITERATOR_HPP__
 #define __TEXTWOLF_ISTREAM_ITERATOR_HPP__
 #include <iostream>
 #include <iterator>
 
-///\namespace textwolf
-///\brief Toplevel namespace of the library
+/// \namespace textwolf
+/// \brief Toplevel namespace of the library
 namespace textwolf {
 
-///\class CStringIterator
-///\brief Input iterator on an STL input stream
+/// \class IStreamIterator
+/// \brief Input iterator on an STL input stream
 class IStreamIterator
 {
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	IStreamIterator(){}
 
-	///\brief Constructor
-	///\param [in] input input to iterate on
+	/// \brief Constructor
+	/// \param [in] input input to iterate on
 	IStreamIterator( std::istream& input)
 		:m_itr(input)
 	{
 		input.unsetf( std::ios::skipws);
 	}
 
-	///\brief Copy constructor
-	///\param [in] o iterator to copy
+	/// \brief Copy constructor
+	/// \param [in] o iterator to copy
 	IStreamIterator( const IStreamIterator& o)
 		:m_itr(o.m_itr)
 		,m_end(o.m_end){}
 
-	///\brief Element access
-	///\return current character
+	/// \brief Element access
+	/// \return current character
 	char operator* ()
 	{
 		return (m_itr != m_end)?*m_itr:0;
 	}
 
-	///\brief Pre increment
+	/// \brief Pre increment
 	IStreamIterator& operator++()
 	{
 		++m_itr;

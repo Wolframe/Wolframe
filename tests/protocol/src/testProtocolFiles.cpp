@@ -1,4 +1,5 @@
 #include "mainCommandHandler.cpp"
+#include "authCommandHandler.cpp"
 #include "interfaceCommandHandler.cpp"
 #include "moduleDirectory.cpp"
 #include "loadModules.cpp"
