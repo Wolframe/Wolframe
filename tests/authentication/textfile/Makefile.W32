@@ -1,4 +1,4 @@
-TOPDIR = ..\..
+TOPDIR = ..\..\..
 
 SUBDIRS =
 
@@ -13,8 +13,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\3rdParty\gtest\include \
-	/I$(TOPDIR)\src\modules\authentication\textfile \
-	/I$(TOPDIR)\src\modules\authentication\database
+	/I$(TOPDIR)\src\modules\authentication\textfile
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
@@ -28,22 +27,18 @@ INCLUDE_LIBS = \
 
 CPP_OBJS = \
 	$(TOPDIR)\src\modules\authentication\textfile\TextFileAuth.obj \
-	$(TOPDIR)\src\modules\authentication\database\DBauth.obj \
 	$(TOPDIR)\src\modules\authentication\textfile\passwdFile.obj
 
 TEST_CPP_BINS = \
-	authenticationTest.exe \
+	passwdHashTest.exe \
 	passwdFileTest.exe \
 	textFileTest.exe
 
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-authenticationTest.exe: authenticationTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
 textFileTest.exe: textFileTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
 passwdHashTest.exe: passwdHashTest.obj $(CPP_OBJS)
 passwdFileTest.exe: passwdFileTest.obj $(CPP_OBJS)
-
 
 local_all:
 
@@ -52,7 +47,6 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-authenticationTest
 	@-passwdHashTest
 	@-passwdFileTest
 	@-textFileTest
