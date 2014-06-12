@@ -152,7 +152,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 	loadSource( const std::string& source, const ProgramLibrary& prglibrary)
 {
 	std::vector<std::pair<std::string,types::NormalizeFunctionR> > rt;
-	config::PositionalErrorMessageBase ERROR(source);
+	config::PositionalErrorMessageBase PRGBIND_ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
 	static const utils::CharTable optab( "#=;)(,");
 	std::string prgname,tok,funcname;
@@ -167,33 +167,33 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 			switch ((ch=utils::parseNextToken( prgname, si, se, optab)))
 			{
 				case '#': utils::parseLine( si, se); continue; //... comment
-				case ';': throw ERROR( si, "empty statement");
+				case ';': throw PRGBIND_ERROR( si, "empty statement");
 				case '\'':
-				case '\"': throw ERROR( si, "identifier expected instead of string at start of statement");
+				case '\"': throw PRGBIND_ERROR( si, "identifier expected instead of string at start of statement");
 				default:
-					if (optab[ ch]) throw ERROR( si, "identifier expected at start of statement");
+					if (optab[ ch]) throw PRGBIND_ERROR( si, "identifier expected at start of statement");
 			}
 			CombinedNormalizeFunction funcdef( prgname);
 
 			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
 			{
-				case '\0': throw ERROR( si, "unexpected end of program");
+				case '\0': throw PRGBIND_ERROR( si, "unexpected end of program");
 				case '=': break;
 				default:
-					if (optab[ ch]) throw ERROR( si, MSG << "'=' expected instead of '" << ch << "'");
-					throw ERROR( si, MSG << "'=' expected instead of '" << tok << "'");
+					if (optab[ ch]) throw PRGBIND_ERROR( si, MSG << "'=' expected instead of '" << ch << "'");
+					throw PRGBIND_ERROR( si, MSG << "'=' expected instead of '" << tok << "'");
 			}
 			while (ch != ';')
 			{
 				switch ((ch=utils::parseNextToken( funcname, si, se, optab)))
 				{
-					case '\0': throw ERROR( si, "unexpected end of program");
+					case '\0': throw PRGBIND_ERROR( si, "unexpected end of program");
 					default:
-						if (optab[ ch]) throw ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
+						if (optab[ ch]) throw PRGBIND_ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
 				}
 				switch ((ch=utils::gotoNextToken( si, se)))
 				{
-					case '\0': throw ERROR( si, "unexpected end of program");
+					case '\0': throw PRGBIND_ERROR( si, "unexpected end of program");
 					case ',':
 					case ';':
 						if (funcdef.hasMethod( funcname))
@@ -213,20 +213,20 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 						do
 						{
 							ch = utils::parseNextToken( tok, si, se, optab);
-							if (ch == '\0') throw ERROR( si, "unexpected end of program");
-							if (ch == '(') throw ERROR( si, "nested expressions, bracket not closed");
+							if (ch == '\0') throw PRGBIND_ERROR( si, "unexpected end of program");
+							if (ch == '(') throw PRGBIND_ERROR( si, "nested expressions, bracket not closed");
 							if (ch == ')')
 							{
 								if (arg.empty()) break;
-								throw ERROR( si, "unexpected token ')', argument expected");
+								throw PRGBIND_ERROR( si, "unexpected token ')', argument expected");
 							}
-							if (ch == '=') throw ERROR( si, "unexpected token '='");
-							if (ch == ';') throw ERROR( si, "unexpected end of expression, bracket not closed");
-							if (ch == ',') throw ERROR( si, "unexpected token ',', argument expected");
+							if (ch == '=') throw PRGBIND_ERROR( si, "unexpected token '='");
+							if (ch == ';') throw PRGBIND_ERROR( si, "unexpected end of expression, bracket not closed");
+							if (ch == ',') throw PRGBIND_ERROR( si, "unexpected token ',', argument expected");
 							arg.push_back( types::Variant( tok));
 						}
 						while ((ch=utils::parseNextToken( tok, si, se, optab)) == ',');
-						if (ch != ')') throw ERROR( si, "expected ')' or argument separator ','");
+						if (ch != ')') throw PRGBIND_ERROR( si, "expected ')' or argument separator ','");
 						
 						if (funcdef.hasMethod( funcname))
 						{
@@ -242,11 +242,11 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 							++si;
 							continue;
 						}
-						if (!ch) throw ERROR( si, "unexpected end of program");
-						throw ERROR( si, "unexpected token at end of expression");
+						if (!ch) throw PRGBIND_ERROR( si, "unexpected end of program");
+						throw PRGBIND_ERROR( si, "unexpected token at end of expression");
 					}
 					default:
-						throw ERROR( si, MSG << "separator ',' or ';' expected or function arguments in '(' ')' brackets instead of '" << ch << "'");
+						throw PRGBIND_ERROR( si, MSG << "separator ',' or ';' expected or function arguments in '(' ')' brackets instead of '" << ch << "'");
 				}
 			}
 			types::NormalizeFunctionR func( new CombinedNormalizeFunction( funcdef));
@@ -260,7 +260,7 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 	}
 	catch (const std::runtime_error& e)
 	{
-		throw ERROR( si, e.what());
+		throw PRGBIND_ERROR( si, e.what());
 	}
 }
 
