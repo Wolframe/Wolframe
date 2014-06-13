@@ -12,10 +12,10 @@
 	rules, nor do we implement our rules for all languages used for processing.
 
 == Integration capabilities of web services
-	Web services had a big success also because Able to integrate existing software, even legacy systems
+	Web services had a big success also because they allow to integrate existing software, even legacy systems
 	- Solving problems isolated and finishing projects
 
-==== Interconnectivity of IDL based systems
+== Interconnectivity as IDL based systems
 	Any language binding is able to call any other function written in any other language
 	where a language binding exists for Wolframe. But on contrary to IDL based systems, 
 	Wolframe does not need a global interface description for that.
@@ -31,86 +31,32 @@
 	In contrary to other systems offering this level of interconnectivity there 
 	is no code generation involved in Wolframe at all.
 
-==== Domain specific languages
-	--
+== Separation of aspects
+	Wolframe enforces the separation of the implementation into different aspects.
+	Separation of different aspects is important for a succesful project management because
+	otherwise much more has to be done on the process control level to prevent developers to care
+	about what they must not or should not care about. The best thing is to have natural borders
+	to separate tasks according knownledge, competence, user roles or rights.
+	Wolframe separates
+		- the handling of document formats and types
+		- the structure of documents processed and their validation
+		- the definition of atomic data types and the normalization of data
+		- the configuration of authorization to call certain functions or database transactions
+		- the configuration of auditing methods for groups of functions identified by name
+		- database schema and transaction definitions
+		- scripting for implementing functions
+	For implementing these different aspects you can either choose an universal programming language
+	or you can use a universal programming language.
+
+== Domain specific languages
+	For implementing one of the aspects mentioned above, a
+	Wolframe does not force you to use a specific language for an aspect.
+	Language bindings are loaded by modules and therefore replaceable.
 
 
---- How Wolframe defines its interfaces
-In Wolframe the aspect of separating the content to process from the message format is done similar
-to classical marshalling and demarshalling concepts as they exist elsewhere. The main difference is
-that serialization/deserialization of documents to process is solved as an own aspect and not
-in the programming language that implements the function to call. A good reason to do so is that
-many programming languages do implement serialization in their way. They select what they need
-from serialization and implement the subset they need. This leads especially in the handling of
-meta data and in the handling of atomic data types to problems. The industry standards you have
-to follow may not be on the list of the programming language authors, even with their best will
-and competence. Another drawback is that the use of many programming languages as service
-implementations lead to various solutions of serialization/deserialization. Of course these problems
-can also be solved in one or the other way. It is a matter of organization and costs.
-In Wolframe all functions are called with an iterator function closure as input and they return
-an iterator function closure as output. We introduce the concept of content filters creating
-such an iterator from a document along with its meta data as separate solution.
-The strong principle here is that the incarnation of this iterator as data is native in the
-language that implements the function. If you do not want, you do not see that there is an
-iterator behind. You for example write a function in C++ with a class as input and output,
-in Lua with a table as input, in Python with an object as input. In .NET you define a class
-implementing an interface you define that implements the function as method call with native
-named C# parameters as input. And so on....
-If such a function on the other hand calls another function implemented in another language, it
-simply passes a native object as parameter to the function. What happens internally is the
-creation of an iterator on this object that is passed to the callee.
-The content filters you define on document formats to process or, if you need transformations
-of big industry standard documents to your needs, you can also use programmable filters,
-for example with XSLT, that do an initial transformation. The output of a filter is an iterator
-that can be passed to a function. The return value of the function is passed to the filter to
-create the output wished.
-
---- Document filters and meta data and their reflection in Wolframe
-The standard behavior or Wolframe in handling input and output is reflecting the properties
-of the input in the output. If you for example pass an XML to a Wolframe service as document
-to process you get an XML back. If this XML is encoded as "UTF-16BE" you get an XML as result
-encoded in the same way. If you specify the document type as !DOCTYPE attribute, you get
-a document back where the document type is defined as !DOCTYPE attribute. If your document
-type is passed a XSD schema reference, the document type of the result will be specified
-as a XSD schema reference in the same namespace as the request.
-Of course you always can change this behavior.
-
---- Document validation
-.... TO BE CONTINUED
+== Implementation effort for new core components
 
 
---- Implementation effort for new core components like filters
-.... TO BE CONTINUED filters are easy to write
-
-
---- Bridging of languages of different class with iterators
-.... TO BE CONTINUED  how we handle different properties
-
-
---- Wolframe does not use code generation
-.... TO BE CONTINUED
-
-
-
-OLD VERSION TO BE REVISITED
-Separating languages to help separating processes and roles:
-- In Wolframe you have different languages for different aspects of your project.
-	This looks like a disadvantage but it is from the project management point of view a big advantage.
-	For controlling a universal "does it all" language you have to do a lot on the project management
-	side to prevent developers to care about what they must not care about. You may for example not want
-	an application developer to care about data normalization and the definition of the document
-	structure because this is a matter of industry standards and higher level organizational
-	concepts. Development there is mainly to know your data and not about programming.
-	One the other hand you want a database administrator to define the data base schemas and the
-	transaction definitions in a language that is close to his domain and familiar for him
-	to formulate the solution.
-	One important goal of Wolframe is to make you able to separate different aspects of a project
-	according to your organization. But we do not want to educate you. If your setup is simple,
-	you can also manage the problems in a simple way, for example using your preferred programming
-	language for the whole processing chain.
-	Important is that such decisions are defined by your processes and taken by management.
-	One thing left to mention is that Wolframe does not force you to use a specific language
-	for an aspect. Language bindings are loaded by modules and therefore replaceable.
 
 
 

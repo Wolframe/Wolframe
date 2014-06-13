@@ -44,6 +44,7 @@ namespace traits {
 /// \brief Test structure to stear the compiler
 class TypeCheck
 {
+public:
 	struct YES {};
 	struct NO {};
 
