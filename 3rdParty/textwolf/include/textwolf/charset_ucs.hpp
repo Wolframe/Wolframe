@@ -65,7 +65,7 @@ struct UCS2
 
 	///\brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static void skip( char*, unsigned int& bufpos, Iterator& itr)
+	static inline void skip( char*, unsigned int& bufpos, Iterator& itr)
 	{
 		for (;bufpos < 2; ++bufpos)
 		{
@@ -74,7 +74,7 @@ struct UCS2
 	}
 
 	template <class Iterator>
-	static UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos<2)
 		{
@@ -94,14 +94,14 @@ struct UCS2
 
 	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
+	inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
 		return value_impl( buf, bufpos, itr);
 	}
 
 	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		UChar ch = value_impl( buf, bufpos, itr);
 		return (ch > 127)?-1:(char)ch;
@@ -109,7 +109,7 @@ struct UCS2
 
 	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
-	void print( UChar chr, Buffer_& buf) const
+	inline void print( UChar chr, Buffer_& buf) const
 	{
 		if (chr>MaxChar)
 		{
@@ -152,7 +152,7 @@ struct UCS4
 
 	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static UChar value( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		for (;bufpos < 4; ++bufpos)
 		{
@@ -167,7 +167,7 @@ struct UCS4
 
 	///\brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static void skip( char*, unsigned int& bufpos, Iterator& itr)
+	static inline void skip( char*, unsigned int& bufpos, Iterator& itr)
 	{
 		for (;bufpos < 4; ++bufpos)
 		{
@@ -177,7 +177,7 @@ struct UCS4
 
 	///\brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		UChar ch = value( buf, bufpos, itr);
 		return (ch > 127)?-1:(char)ch;

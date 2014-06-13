@@ -59,7 +59,7 @@ struct IsoLatin :public IsoLatinCodePage
 
 	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static void skip( char*, unsigned int& bufpos, Iterator& itr)
+	static inline void skip( char*, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos==0)
 		{
@@ -70,7 +70,7 @@ struct IsoLatin :public IsoLatinCodePage
 
 	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos==0)
 		{
@@ -83,7 +83,7 @@ struct IsoLatin :public IsoLatinCodePage
 
 	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
+	inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
 		if (bufpos == 0)
 		{

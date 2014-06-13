@@ -330,7 +330,7 @@ public:
 	struct Statemachine :public ScannerStatemachine
 	{
 		/// \brief Constructor (defines the state machine completely)
-		Statemachine( bool doTokenize)
+		Statemachine()
 		{
 			(*this)
 			[ START    ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,STARTTAG).miss(ErrExpectedOpenTag)
@@ -348,20 +348,9 @@ public:
 			[ XTAGAVSQ ].action(ReturnSQString,HeaderAttribValue)(Sq,XTAGAVQE).miss(ErrStringNotTerminated)
 			[ XTAGAVDQ ].action(ReturnDQString,HeaderAttribValue)(Dq,XTAGAVQE).miss(ErrStringNotTerminated)
 			[ XTAGAVQE ](EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedTagAttribute)
-			[ DOCSTART ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,XMLTAG).fallback(TOKEN);
-			if (doTokenize)
-			{
-				(*this)
-				[ CONTENT  ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,XMLTAG).fallback(TOKEN)
-				[ TOKEN    ].action(ReturnWord,Content)(EndOfText,EXIT)(EndOfLine,Cntrl,Space,CONTENT)(Lt,XMLTAG).fallback(CONTENT);
-			}
-			else
-			{
-				(*this)
-				[ CONTENT  ](EndOfText,EXIT)(Lt,XMLTAG).fallback(TOKEN)
-				[ TOKEN    ].action(ReturnContent,Content)(EndOfText,EXIT)(EndOfLine,Cntrl,Space,CONTENT)(Lt,XMLTAG).fallback(CONTENT);
-			}
-			(*this)
+			[ DOCSTART ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,XMLTAG).fallback(TOKEN)
+			[ CONTENT  ](EndOfText,EXIT)(Lt,XMLTAG).fallback(TOKEN)
+			[ TOKEN    ].action(ReturnContent,Content)(EndOfText,EXIT)(EndOfLine,Cntrl,Space,CONTENT)(Lt,XMLTAG).fallback(CONTENT)
 			[ SEEKTOK  ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,XMLTAG).fallback(TOKEN)
 			[ XMLTAG   ](EndOfLine)(Cntrl)(Space)(Questm,PITAG)(Exclam,ENTITYSL)(Slash,CLOSETAG).fallback(OPENTAG)
 			[ OPENTAG  ].action(ReturnIdentifier,OpenTag)(EndOfLine,Cntrl,Space,TAGAISK)(Slash,TAGCLIM)(Gt,CONTENT).miss(ErrExpectedTagAttribute)
@@ -410,7 +399,8 @@ public:
 	};
 
 	/// \class IsWordCharMap
-	/// \brief Defines the set of content word characters (tokenization switched on)
+	/// \brief Defines the set of content word characters (for tokenization)
+	/// \deprecated automatic tokenization with whitespace separators option not provided anymore
 	struct IsWordCharMap :public IsTokenCharMap
 	{
 		IsWordCharMap()
@@ -765,6 +755,9 @@ private:
 		}
 		for (;;)
 		{
+			/// \todo When source and dest encoding are equal, then do not decode
+			///	the value in parsing and encode it when printing. Use some sort
+			///	of enable_if do redirect to a simple buffer copy.
 			ControlCharacter ch;
 			while (isTok[ (unsigned char)(ch=m_src.control())])
 			{
@@ -990,7 +983,6 @@ private:
 
 private:
 	STMState state;			///< current state of the XML scanner
-	bool m_doTokenize;		///< true, if we do tokenize the input, false if we get the content according the W3C default (see http://www.w3.org/TR/xml: 2.10 White Space Handling)
 	Error error;			///< last error code
 	InputReader m_src;		///< source input iterator
 	const EntityMap* m_entityMap;	///< map with entities defined by the caller
@@ -1003,29 +995,28 @@ public:
 	/// \param [in] p_outputBuf buffer to use for output
 	/// \param [in] p_entityMap read only map of named entities defined by the user
 	XMLScanner( const InputIterator& p_src, const EntityMap& p_entityMap)
-			:state(START),m_doTokenize(false),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
+			:state(START),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
 	{}
 	XMLScanner( const InputIterator& p_src)
-			:state(START),m_doTokenize(false),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(0),m_output(OutputCharSet())
+			:state(START),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(0),m_output(OutputCharSet())
 	{}
 	XMLScanner( const InputCharSet& charset_, const InputIterator& p_src, const EntityMap& p_entityMap)
-			:state(START),m_doTokenize(false),error(Ok),m_src(charset_,p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
+			:state(START),error(Ok),m_src(charset_,p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
 	{}
 	XMLScanner( const InputCharSet& charset_, const InputIterator& p_src)
-			:state(START),m_doTokenize(false),error(Ok),m_src(charset_,p_src),m_entityMap(0),m_output(OutputCharSet())
+			:state(START),error(Ok),m_src(charset_,p_src),m_entityMap(0),m_output(OutputCharSet())
 	{}
 	XMLScanner( const InputCharSet& charset_)
-			:state(START),m_doTokenize(false),error(Ok),m_src(charset_),m_entityMap(0)
+			:state(START),error(Ok),m_src(charset_),m_entityMap(0)
 	{}
 	XMLScanner()
-			:state(START),m_doTokenize(false),error(Ok),m_src(InputCharSet()),m_entityMap(0)
+			:state(START),error(Ok),m_src(InputCharSet()),m_entityMap(0)
 	{}
 
 	/// \brief Copy constructor
 	/// \param [in] o scanner to copy
 	XMLScanner( const XMLScanner& o)
 		:state(o.state)
-		,m_doTokenize(o.m_doTokenize)
 		,error(o.error)
 		,m_src(o.m_src)
 		,m_entityMap(o.m_entityMap)
@@ -1066,17 +1057,8 @@ public:
 	/// \return pointer to the state variables
 	ScannerStatemachine::Element* getState()
 	{
-		static Statemachine STMtok(true);
-		static Statemachine STMW3C(false);
-		static Statemachine* stm[2] = {&STMW3C,&STMtok};
-		return stm[ m_doTokenize]->get( state);
-	}
-
-	/// \brief Set the tokenization behaviour
-	/// \param [out] v the tokenization behaviour flag
-	void doTokenize( bool v)
-	{
-		m_doTokenize = v;
+		static Statemachine stm;
+		return stm.get( state);
 	}
 
 	/// \brief Get the last error

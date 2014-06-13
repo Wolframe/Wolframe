@@ -1,7 +1,6 @@
 
 
-== Data Processing in Wolframe
-=== Data Formats Processed
+== Data Formats Processed
 	The data formats processed are extensible by loadable modules. There are standard modules
 	defined to process XML and JSON. Modules for other widespread data formats are planned,
 	questions for not so widespread data formats can be asked for.
@@ -12,9 +11,8 @@
 	attached. We neither rely on the capability of a programming language to enforce our
 	rules, nor do we implement our rules for all languages used for processing.
 
-=== Combining selected aspects of the success stories of the last decades
-==== Integration capabilities of web services
-	- Able to integrate existing software, even legacy systems
+== Integration capabilities of web services
+	Web services had a big success also because Able to integrate existing software, even legacy systems
 	- Solving problems isolated and finishing projects
 
 ==== Interconnectivity of IDL based systems

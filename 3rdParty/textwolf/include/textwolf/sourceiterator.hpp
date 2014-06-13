@@ -82,7 +82,7 @@ public:
 	}
 
 	/// \brief Element access operator (required by textwolf for an input iterator)
-	char operator*()
+	inline char operator*()
 	{
 		if (m_itr >= m_end)
 		{
@@ -93,14 +93,14 @@ public:
 	}
 
 	/// \brief Prefix increment operator (required by textwolf for an input iterator)
-	SrcIterator& operator++()
+	inline SrcIterator& operator++()
 	{
 		++m_itr;
 		return *this;
 	}
 
 	/// \brief Get the iterator difference in bytes
-	std::size_t operator-( const SrcIterator& b) const
+	inline std::size_t operator-( const SrcIterator& b) const
 	{
 		if (b.m_end != m_end || m_itr < b.m_itr) throw std::logic_error( "illegal operation");
 		return m_itr - b.m_itr;

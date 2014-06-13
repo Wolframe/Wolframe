@@ -262,7 +262,6 @@ struct InputFilterImpl
 		,m_encoding(UTF8)
 		,m_codepage(0)
 		,m_withEmpty(true)
-		,m_doTokenize(false)
 		,m_parser(0)
 		,m_src(0)
 		,m_srcsize(0)
@@ -279,7 +278,6 @@ struct InputFilterImpl
 		,m_encoding(o.m_encoding)
 		,m_codepage(o.m_codepage)
 		,m_withEmpty(o.m_withEmpty)
-		,m_doTokenize(o.m_doTokenize)
 		,m_parser(0)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
@@ -315,14 +313,8 @@ struct InputFilterImpl
 			val = m_withEmpty?"true":"false";
 			return true;
 		}
-		if (0==std::strcmp( id, "tokenize"))
-		{
-			val = m_doTokenize?"true":"false";
-			return true;
-		}
 		return Parent::getValue( id, val);
 	}
-
 
 	/// \brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* id, const std::string& value)
@@ -343,26 +335,6 @@ struct InputFilterImpl
 			}
 			return true;
 		}
-		if (0==std::strcmp( id, "tokenize"))
-		{
-			if (0==std::strcmp( value.c_str(), "true"))
-			{
-				m_doTokenize = true;
-			}
-			else if (0==std::strcmp( value.c_str(), "false"))
-			{
-				m_doTokenize = false;
-			}
-			else
-			{
-				return false;
-			}
-			if (m_parser)
-			{
-				DOWITH_XMLScanner( ((XMLScanner*)m_parser)->doTokenize( m_doTokenize));
-			}
-			return true;
-		}
 		return Parent::setValue( id, value);
 	}
 
@@ -378,7 +350,6 @@ struct InputFilterImpl
 	{
 		InputFilterImpl* rt = new InputFilterImpl();
 		rt->m_withEmpty = m_withEmpty;
-		rt->m_doTokenize = m_doTokenize;
 		return rt;
 	}
 
@@ -409,7 +380,6 @@ struct InputFilterImpl
 				DOWITH_XMLScanner( 
 					m_parser = new XMLScanner();
 					((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
-					((XMLScanner*)m_parser)->doTokenize( m_doTokenize);
 				);
 				setState( Open);
 			}
@@ -870,7 +840,6 @@ private:
 	Encoding m_encoding;			///< encoding of content parsed
 	int m_codepage;				///< code page of encoding
 	bool m_withEmpty;			///< true, if empty tokens are returned too (default)
-	bool m_doTokenize;			///< true, if content chunks are tokenized by spaces
 	textwolf::XMLScannerBase* m_parser;	///< variant of XML scanner, one of them selected by m_encoding (type textwolf::XMLScanner<..>)
 	jmp_buf m_eom;				///< end of message fallback jump
 	const char* m_src;			///< pointer to current chunk parsed

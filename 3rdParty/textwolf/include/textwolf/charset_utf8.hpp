@@ -99,7 +99,7 @@ struct UTF8
 	/// \param [in,out] bufpos position in 'buf'
 	/// \param [in,out] itr iterator to skip
 	template <class Iterator>
-	static unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		static CharLengthTab charLengthTab;
 		if (bufpos==0)
@@ -113,7 +113,7 @@ struct UTF8
 
 	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static void skip( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline void skip( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		unsigned int bufsize = size( buf, bufpos, itr);
 		for (;bufpos < bufsize; ++bufpos)
@@ -124,7 +124,7 @@ struct UTF8
 
 	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos==0)
 		{
