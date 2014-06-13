@@ -151,7 +151,7 @@ Connection::~Connection()
 
 void Connection::setPeer( const net::RemoteEndpoint& remote)
 {
-	LOG_TRACE << "Peer set to " << remote.toString();
+	LOG_TRACE << "++++ Peer set to " << remote.toString();
 	m_cmdhandler.setPeer( remote);
 }
 
