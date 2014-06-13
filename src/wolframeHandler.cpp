@@ -180,6 +180,8 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		LOG_WARNING << "Authorization not available";
 		//		abort();
 	}
+	// Propagate setPeer to the command handler
+	m_cmdHandler.setPeer( remote);
 }
 
 static void logNetwork( const char* title, const void* ptr, std::size_t size)
