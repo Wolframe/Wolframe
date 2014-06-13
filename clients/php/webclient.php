@@ -30,7 +30,7 @@ try
 	{
 		$body = http_get_request_body();
 	}
-	$conn = new Session( "127.0.0.1", 7661, NULL, "NONE");
+	$conn = new Session( "127.0.0.1", 7661, NULL, NULL);
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
 	{
 		echo "<html><head><title>FAILED</title></head><body>" . $conn->lasterror() . "</body></html>";

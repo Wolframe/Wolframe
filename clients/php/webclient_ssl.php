@@ -38,7 +38,13 @@ try
 	{
 		$body = http_get_request_body();
 	}
-	$conn = new Session( "127.0.0.1", 7962, $sslopt, "NONE");
+	$authopt = array(
+		"mech" => "NONE",
+		"username" => "gunibert",
+		"password" => "bork123"
+	);
+
+	$conn = new Session( "127.0.0.1", 7962, $sslopt, $authopt);
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
 	{
 		echo "<html><head><title>FAILED</title></head><body>" . $conn->lasterror() . "</body></html>";

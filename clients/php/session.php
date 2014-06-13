@@ -2,6 +2,8 @@
 namespace Wolframe
 {
 require 'connection.php';
+require 'authentication/textfile.php';
+
 use Wolframe\Connection as Connection;
 
 /*
@@ -28,28 +30,55 @@ class Session extends Connection
 		throw new Exception( "illegal state in protocol. expected " . $expect . " but got " . $ln[0]);
 	}
 
-	/* Choose authentication mechanism NONE */
-	function auth_NONE()
+	/* Authentication mechanism WOLFRAME_CRAM */
+	function auth_WOLFRAME_CRAM( $username, $password)
 	{
-		$this->getline( "OK");
+		// Protocol
+		// 1. client sends a 256 bit seed followed by a HMAC-SHA1 of the (seed, username)
+		$this->writedata( userHash( $username)); 
+
+		// 2. if the server finds the user it will reply with a seed and a challenge. if the user is not found it will terminate
+		// [PF:QUESTION] Why does the client not get a message in case of an error here.
+		//	at least a random message, so that has to go into the next step (only info 
+		//	is the connection close)
+		$challenge = $this->readdata();
+
+		// 3. the client returns a response. The response is computed from the PBKDF2 of 
+		//	the seed and the challenge.
+		$this->writedata( CRAMresponse( $password, $challenge));
+
+		// 4. the server authenticates the user (or not)
+		// [PF:QUESTION] How does the client know he is authenticated without a message 
+		//	from the server
 	}
 
 	/* Constructor */
-	function __construct( $address, $port, $sslopt, $authmethod)
+	function __construct( $address, $port, $sslopt, $authopt)
 	{
 		parent::__construct( $address, $port, $sslopt);
 		$this->banner = $this->readline();
 		$this->getline( "OK");
 		$this->writeline( "AUTH");
 		$mechs = $this->getline( "MECHS");
+		$authmethod = $dataobject[ 'mech'];
+		if ($authmethod == NULL)
+		{
+			$authmethod = "NONE";
+		}
 		if (array_search( $authmethod, explode( " ", $mechs)) === FALSE)
 		{
-			throw $this->protocol_exception( "authentication method NONE not supported by server");
+			throw $this->protocol_exception( "authentication method '" . $authmethod . "' not supported by server");
 		}
 		$this->writeline( "MECH " . $authmethod);
-		if ($authmethod == "NONE")
+		$this->getline( "OK");
+
+		if (0==strcasecmp( $authmethod == "NONE"))
 		{
-			$this->auth_NONE();
+			// ... accepted without authentication 
+		}
+		else if (0==strcasecmp( $authmethod == "WOLFRAME-CRAM"))
+		{
+			$this->auth_WOLFRAME_CRAM( $authopt['username'], $authopt['password']);
 		}
 		else
 		{
