@@ -5,7 +5,7 @@
     STL conforming input iterator as source. It does no buffering
     or read ahead and is dedicated for stream processing of XML
     for a small set of XML queries.
-    Stream processing in this Object refers to processing the
+    Stream processing in this context refers to processing the
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
@@ -32,58 +32,33 @@
 
 --------------------------------------------------------------------
 */
-/// \file textwolf/istreamiterator.hpp
-/// \brief Definition of iterators for textwolf on STL input streams (std::istream)
+#ifndef __TEXTWOLF_TRAITS_HPP__
+#define __TEXTWOLF_TRAITS_HPP__
+/// \file textwolf/traits.hpp
+/// \brief Type traits
 
-#ifndef __TEXTWOLF_ISTREAM_ITERATOR_HPP__
-#define __TEXTWOLF_ISTREAM_ITERATOR_HPP__
-#include <iostream>
-#include <iterator>
-
-/// \namespace textwolf
-/// \brief Toplevel namespace of the library
 namespace textwolf {
+namespace traits {
 
-/// \class IStreamIterator
-/// \brief Input iterator on an STL input stream
-class IStreamIterator
+/// \class TypeCheck
+/// \brief Test structure to stear the compiler
+class TypeCheck
 {
-public:
-	/// \brief Default constructor
-	IStreamIterator(){}
+	struct YES {};
+	struct NO {};
 
-	/// \brief Constructor
-	/// \param [in] input input to iterate on
-	IStreamIterator( std::istream& input)
-		:m_itr(input)
+	template<typename T, typename U>
+	struct is_same 
 	{
-		input.unsetf( std::ios::skipws);
-	}
-
-	/// \brief Copy constructor
-	/// \param [in] o iterator to copy
-	IStreamIterator( const IStreamIterator& o)
-		:m_itr(o.m_itr)
-		,m_end(o.m_end){}
-
-	/// \brief Element access
-	/// \return current character
-	inline char operator* ()
+		static const NO type() {return NO();}
+	};
+	
+	template<typename T>
+	struct is_same<T,T>
 	{
-		return (m_itr != m_end)?*m_itr:0;
-	}
-
-	/// \brief Pre increment
-	inline IStreamIterator& operator++()
-	{
-		++m_itr;
-		return *this;
-	}
-
-private:
-	std::istream_iterator<unsigned char> m_itr;
-	std::istream_iterator<unsigned char> m_end;
+		static const YES type() {return YES();} 
+	};
 };
 
-}//namespace
+}}//namespace
 #endif

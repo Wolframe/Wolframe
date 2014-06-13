@@ -84,7 +84,7 @@ private:
 			}
 		}
 
-		const std::map<unsigned short, unsigned char>* get( unsigned int idx) const
+		inline const std::map<unsigned short, unsigned char>* get( unsigned int idx) const
 		{
 			return &m_map[ idx];
 		}
@@ -141,7 +141,7 @@ public:
 	/// \brief Get the unicode character representation of the character ch in this codepage
 	/// \param[in] ch character in this codepage
 	/// \return the unicode representation of the passed character
-	UChar ucharcode( char ch) const
+	inline UChar ucharcode( char ch) const
 	{
 		if ((signed char)ch >= 0) return ch;
 		return m_cd[ (unsigned int)(unsigned char)ch - 128];
@@ -150,7 +150,7 @@ public:
 	/// \brief Get the character representation of a unicode character in this codepage
 	/// \param[in] ch unicode character
 	/// \return the representation of the passed unicode character in this codepage
-	char invcode( UChar ch) const
+	inline char invcode( UChar ch) const
 	{
 		char rt = 0;
 		if (ch <= 128) return ch;
@@ -162,6 +162,12 @@ public:
 			rt = fi->second;
 		}
 		return rt;
+	}
+
+	/// \brief Evaluate if two code pages are equal
+	static inline bool is_equal( const IsoLatinCodePage& a, const IsoLatinCodePage& b)
+	{
+		return a.m_cd == b.m_cd;
 	}
 
 private:

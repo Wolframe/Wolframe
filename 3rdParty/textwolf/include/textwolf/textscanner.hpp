@@ -142,7 +142,7 @@ public:
 
 	/// \brief Get the unicode character of the current character
 	/// \return the unicode character
-	UChar chr()
+	inline UChar chr()
 	{
 		if (val == 0)
 		{
@@ -152,14 +152,25 @@ public:
 	}
 
 	/// \brief Fill the internal buffer with as many current character bytes needed for reading the ASCII representation
-	void getcur()
+	inline void getcur()
 	{
 		cur = CharSet::asciichar( buf, state, input);
 	}
 
+	/// \class copychar
+	/// \brief Direct copy of a character from input to output without encoding/decoding it
+	/// \remark Assumes the character sets to be equal
+	template <class Buffer>
+	inline void copychar( CharSet& output_, Buffer& buf_)
+	{
+		/// \todo more efficient solution of copy character to sink with same encoding here
+		/// \remark a check if the character sets fulfill is_equal(..) (IsoLatin code page !)
+		output_.print( chr(), buf_);
+	}
+
 	/// \brief Get the control character representation of the current character
 	/// \return the control character
-	ControlCharacter control()
+	inline ControlCharacter control()
 	{
 		static ControlCharMap controlCharMap;
 		getcur();
@@ -168,7 +179,7 @@ public:
 
 	/// \brief Get the ASCII character representation of the current character
 	/// \return the ASCII character or 0 if not defined
-	unsigned char ascii()
+	inline unsigned char ascii()
 	{
 		getcur();
 		return cur>=0?(unsigned char)cur:0;
@@ -176,7 +187,7 @@ public:
 
 	/// \brief Skip to the next character of the source
 	/// \return *this
-	TextScanner& skip()
+	inline TextScanner& skip()
 	{
 		CharSet::skip( buf, state, input);
 		state = 0;
@@ -186,18 +197,18 @@ public:
 	}
 
 	/// \brief see TextScanner::chr()
-	UChar operator*()
+	inline UChar operator*()
 	{
 		return chr();
 	}
 
 	/// \brief Preincrement: Skip to the next character of the source
 	/// \return *this
-	TextScanner& operator ++()	{return skip();}
+	inline TextScanner& operator ++()	{return skip();}
 
 	/// \brief Postincrement: Skip to the next character of the source
 	/// \return *this
-	TextScanner operator ++(int)	{TextScanner tmp(*this); skip(); return tmp;}
+	inline TextScanner operator ++(int)	{TextScanner tmp(*this); skip(); return tmp;}
 };
 
 }//namespace

@@ -72,25 +72,25 @@ public:
 
 	/// \brief Element access
 	/// \return current character
-	char operator* ()
+	inline char operator* ()
 	{
 		return (m_pos < m_size)?m_src[m_pos]:0;
 	}
 
 	/// \brief Preincrement
-	CStringIterator& operator++()
+	inline CStringIterator& operator++()
 	{
 		m_pos++;
 		return *this;
 	}
 
 	/// \brief Return current char position
-	unsigned int pos() const	{return m_pos;}
+	inline unsigned int pos() const	{return m_pos;}
 
 	/// \brief Set current char position
-	void pos( unsigned int i)	{m_pos=(i<m_size)?i:m_size;}
+	inline void pos( unsigned int i)	{m_pos=(i<m_size)?i:m_size;}
 
-	int operator - (const CStringIterator& o) const
+	inline int operator - (const CStringIterator& o) const
 	{
 		if (m_src != o.m_src) return 0;
 		return (int)(m_pos - o.m_pos);

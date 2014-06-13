@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty modules database AAAA wolfilter simpleFormCompiler compileTDL protocol
+SUBDIRS = 3rdParty modules database authentication wolfilter simpleFormCompiler compileTDL protocol
 
 # all broken on windows due to working telnet
 #!IFDEF WITH_EXPECT

@@ -262,7 +262,6 @@ struct InputFilterImpl
 		,m_encoding(UTF8)
 		,m_codepage(0)
 		,m_withEmpty(true)
-		,m_doTokenize(false)
 		,m_parser(0)
 		,m_src(0)
 		,m_srcsize(0)
@@ -279,7 +278,6 @@ struct InputFilterImpl
 		,m_encoding(o.m_encoding)
 		,m_codepage(o.m_codepage)
 		,m_withEmpty(o.m_withEmpty)
-		,m_doTokenize(o.m_doTokenize)
 		,m_parser(0)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
@@ -315,14 +313,8 @@ struct InputFilterImpl
 			val = m_withEmpty?"true":"false";
 			return true;
 		}
-		if (0==std::strcmp( id, "tokenize"))
-		{
-			val = m_doTokenize?"true":"false";
-			return true;
-		}
 		return Parent::getValue( id, val);
 	}
-
 
 	/// \brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* id, const std::string& value)
@@ -343,26 +335,6 @@ struct InputFilterImpl
 			}
 			return true;
 		}
-		if (0==std::strcmp( id, "tokenize"))
-		{
-			if (0==std::strcmp( value.c_str(), "true"))
-			{
-				m_doTokenize = true;
-			}
-			else if (0==std::strcmp( value.c_str(), "false"))
-			{
-				m_doTokenize = false;
-			}
-			else
-			{
-				return false;
-			}
-			if (m_parser)
-			{
-				DOWITH_XMLScanner( ((XMLScanner*)m_parser)->doTokenize( m_doTokenize));
-			}
-			return true;
-		}
 		return Parent::setValue( id, value);
 	}
 
@@ -378,7 +350,6 @@ struct InputFilterImpl
 	{
 		InputFilterImpl* rt = new InputFilterImpl();
 		rt->m_withEmpty = m_withEmpty;
-		rt->m_doTokenize = m_doTokenize;
 		return rt;
 	}
 
@@ -409,7 +380,6 @@ struct InputFilterImpl
 				DOWITH_XMLScanner( 
 					m_parser = new XMLScanner();
 					((XMLScanner*)m_parser)->setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
-					((XMLScanner*)m_parser)->doTokenize( m_doTokenize);
 				);
 				setState( Open);
 			}
@@ -503,7 +473,7 @@ struct InputFilterImpl
 
 	textwolf::XMLScannerBase::ElementType getNextItem( const char*& element, std::size_t& elementsize)
 	{
-		textwolf::XMLScannerBase::ElementType et;
+		textwolf::XMLScannerBase::ElementType et = textwolf::XMLScannerBase::ErrorOccurred;
 		DOWITH_XMLScanner(
 			et = ((XMLScanner*)m_parser)->nextItem();
 			element = ((XMLScanner*)m_parser)->getItem().c_str();
@@ -515,7 +485,7 @@ struct InputFilterImpl
 
 	void setParserError()
 	{
-		const char* ee;
+		const char* ee = 0;
 		DOWITH_XMLScanner(
 			((XMLScanner*)m_parser)->getError( &ee);
 		);
@@ -532,7 +502,7 @@ struct InputFilterImpl
 
 			while (m_metadatastate == MS_DoneElemCached)
 			{
-				const char* ee;
+				const char* ee = 0;
 				textwolf::XMLScannerBase::ElementType et = getLastItem( ee, elementsize);
 				element = (const void*)ee;
 
@@ -870,7 +840,6 @@ private:
 	Encoding m_encoding;			///< encoding of content parsed
 	int m_codepage;				///< code page of encoding
 	bool m_withEmpty;			///< true, if empty tokens are returned too (default)
-	bool m_doTokenize;			///< true, if content chunks are tokenized by spaces
 	textwolf::XMLScannerBase* m_parser;	///< variant of XML scanner, one of them selected by m_encoding (type textwolf::XMLScanner<..>)
 	jmp_buf m_eom;				///< end of message fallback jump
 	const char* m_src;			///< pointer to current chunk parsed
@@ -1059,7 +1028,7 @@ struct OutputFilterImpl :public OutputFilter
 		)
 		if (standalone && 0==std::strcmp( standalone, "yes"))
 		{
-			bool res;
+			bool res = false;
 			DOWITH_XMLPrinter(
 				res = ((XMLPrinter*)m_printer)->printOpenTag( root, std::strlen(root), m_elembuf);
 			);
@@ -1070,7 +1039,7 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		else if (standalone && 0==std::strcmp( standalone, "no"))
 		{
-			bool res;
+			bool res = false;
 			std::string doctype_system_buf;
 			if (doctype_system && !md.doctype().empty())
 			{
@@ -1097,7 +1066,7 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		else
 		{
-			bool res;
+			bool res = false;
 			DOWITH_XMLPrinter(
 				res = ((XMLPrinter*)m_printer)->printOpenTag( root, std::strlen(root), m_elembuf);
 			);
@@ -1203,7 +1172,7 @@ struct OutputFilterImpl :public OutputFilter
 			}
 			m_headerPrinted = true;
 		}
-		bool res;
+		bool res = false;
 #ifdef _Wolframe_LOWLEVEL_DEBUG
 		LOG_DATA2 << "[textwolf filter] print element " << FilterBase::elementTypeName(type) << " '" << std::string((const char*)element, elementsize) << "'";
 #endif

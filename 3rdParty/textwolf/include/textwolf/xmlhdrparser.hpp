@@ -46,6 +46,7 @@ namespace textwolf {
 
 /// \class XmlHdrParser
 /// \brief Class for parsing the header to get the character set encoding
+/// \remark Works with all single byte or multibyte character sets with ASCII as base
 class XmlHdrParser
 {
 public:
@@ -69,16 +70,23 @@ public:
 		,m_src(o.m_src){}
 
 
+	/// \brief Add another input chunk to process
+	/// \param[in] src_ pointer to chunk 
+	/// \param[in] srcsize_ size of chunk in bytes
 	void putInput( const char* src_, std::size_t srcsize_)
 	{
 		m_src.append( src_, srcsize_);
 	}
 
+	/// \brief Get the whole original data added with subsequent calls of putInput(const char*,std::size_t)
+	/// \return the data block as string reference
 	const std::string& consumedData() const
 	{
 		return m_src;
 	}
 
+	/// \brief Call the first/next iteration of parsing the header
+	/// \return true on success, false if more data is needed (putInput(const char*,std::size_t)) or if an error occurred. Check lasterror() for an error
 	bool parse()
 	{
 		unsigned char ch = nextChar();
@@ -299,23 +307,35 @@ public:
 		return false;
 	}
 
+	/// \brief Get the last error occurred
+	/// \return the pointer to the last error or NULL if no error occurred
 	const char* lasterror() const
 	{
 		return m_lasterror.empty()?0:m_lasterror.c_str();
 	}
 
+	/// \brief Get the encoding specified as attribute in the header
+	/// \return the encoding or NULL if not specified or not encountered yet in the source parsed
 	const char* encoding() const
 	{
 		return m_encoding.empty()?0:m_encoding.c_str();
 	}
 
+	/// \brief Get the number of ASCII characters consumed
+	/// \return the number of characters
 	std::size_t charsConsumed() const
 	{
 		return m_charsConsumed;
 	}
 
+	/// \brief Clear the data, reset the state
 	void clear()
 	{
+		m_state = Init;
+		m_attributetype = Encoding;
+		m_idx = 0;
+		m_charsConsumed = 0;
+		m_zeroCount = 0;
 		m_item.clear();
 		m_src.clear();
 		m_encoding.clear();
@@ -375,15 +395,15 @@ private:
 	}
 
 private:
-	State m_state;			//< header parsing state
-	AttributeType m_attributetype;	//< currently parsed attribute type
-	std::size_t m_idx;		//< source index (index in m_src)
-	std::size_t m_charsConsumed;	//< number of characters consumed
-	std::size_t m_zeroCount;	//< counter of subsequent null bytes
-	std::string m_item;		//< parsed item
-	std::string m_src;		//< source buffered
-	std::string m_encoding;		//< character set encoding parsed
-	std::string m_lasterror;	//< last error
+	State m_state;			///< header parsing state
+	AttributeType m_attributetype;	///< currently parsed attribute type
+	std::size_t m_idx;		///< source index (index in m_src)
+	std::size_t m_charsConsumed;	///< number of characters consumed
+	std::size_t m_zeroCount;	///< counter of subsequent null bytes
+	std::string m_item;		///< parsed item
+	std::string m_src;		///< source buffered
+	std::string m_encoding;		///< character set encoding parsed
+	std::string m_lasterror;	///< last error
 };
 
 }//namespace

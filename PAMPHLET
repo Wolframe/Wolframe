@@ -1,7 +1,6 @@
 
 
-== Data Processing in Wolframe
-=== Data Formats Processed
+== Data Formats Processed
 	The data formats processed are extensible by loadable modules. There are standard modules
 	defined to process XML and JSON. Modules for other widespread data formats are planned,
 	questions for not so widespread data formats can be asked for.
@@ -12,11 +11,11 @@
 	attached. We neither rely on the capability of a programming language to enforce our
 	rules, nor do we implement our rules for all languages used for processing.
 
-==== Integration capabilities as web services have
-	- Able to integrate existing software, even legacy systems
+== Integration capabilities of web services
+	Web services had a big success also because they allow to integrate existing software, even legacy systems
 	- Solving problems isolated and finishing projects
 
-==== Interconnectivity as IDL based systems
+== Interconnectivity as IDL based systems
 	Any language binding is able to call any other function written in any other language
 	where a language binding exists for Wolframe. But on contrary to IDL based systems, 
 	Wolframe does not need a global interface description for that.
@@ -32,7 +31,7 @@
 	In contrary to other systems offering this level of interconnectivity there 
 	is no code generation involved in Wolframe at all.
 
-==== Separation of aspects
+== Separation of aspects
 	Wolframe enforces the separation of the implementation into different aspects.
 	Separation of different aspects is important for a succesful project management because
 	otherwise much more has to be done on the process control level to prevent developers to care
@@ -49,13 +48,13 @@
 	For implementing these different aspects you can either choose an universal programming language
 	or you can use a universal programming language.
 
-==== Domain specific languages
+== Domain specific languages
 	For implementing one of the aspects mentioned above, a
 	Wolframe does not force you to use a specific language for an aspect.
 	Language bindings are loaded by modules and therefore replaceable.
 
 
-==== Implementation effort for new core components
+== Implementation effort for new core components
 
 
 

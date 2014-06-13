@@ -76,9 +76,11 @@ tests/database/dbTest
 tests/database/test.db
 tests/3rdParty/libxml2/testlibxml2
 tests/modules/moduleTest
-tests/AAAA/authenticationTest
-tests/AAAA/textFileTest
-tests/AAAA/sasl.db
+tests/authentication/textfile/textFileTest
+tests/authentication/sasl/sasl.db
+tests/authentication/pam/pamTest
+tests/authentication/textfile/passwdFileTest
+tests/authentication/textfile/passwdHashTest
 tests/testBoostPath
 tests/filter
 tests/testVariantTypes

@@ -77,7 +77,7 @@ public:
 	/// \param [in,out] bufpos position in 'buf'
 	/// \param [in,out] itr iterator to skip
 	template <class Iterator>
-	static unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos<2)
 		{
@@ -104,7 +104,7 @@ public:
 
 	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static void skip( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline void skip( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		unsigned int bufsize = size( buf, bufpos, itr);
 		for (;bufpos < bufsize; ++bufpos)
@@ -115,7 +115,7 @@ public:
 
 	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		UChar ch = value_impl( buf, bufpos, itr);
 		return (ch > 127)?-1:(char)ch;
@@ -150,7 +150,7 @@ public:
 	}
 
 	template <class Iterator>
-	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
+	inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
 		return value_impl( buf, bufpos, itr);
 	}
@@ -192,6 +192,12 @@ public:
 			buf.push_back( (char)(unsigned char)(((UChar)*cc >> Print2shift) & 0xFF));
 			++cc;
 		}
+	}
+
+	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
+	static bool is_equal( const UTF16&, const UTF16&)
+	{
+		return true;
 	}
 };
 
