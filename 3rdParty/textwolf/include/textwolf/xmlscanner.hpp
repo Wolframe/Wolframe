@@ -41,6 +41,7 @@
 #include "textwolf/charset_interface.hpp"
 #include "textwolf/exception.hpp"
 #include "textwolf/textscanner.hpp"
+#include "textwolf/traits.hpp"
 #include <map>
 #include <cstddef>
 
@@ -521,6 +522,21 @@ private:
 		m_output.print( ch, m_outputBuf);
 	}
 
+	void copychar_impl( const traits::TypeCheck::YES&)
+	{
+		m_src.copychar( m_output, m_outputBuf);
+	}
+
+	void copychar_impl( const traits::TypeCheck::NO&)
+	{
+		push( m_src.chr());
+	}
+
+	void copychar()
+	{
+		copychar_impl( traits::TypeCheck::is_same<InputCharSet,OutputCharSet>::type());
+	}
+
 	/// \brief Map a hexadecimal digit to its value
 	/// \param [in] ch hexadecimal digit to map to its decimal value
 	static unsigned char HEX( unsigned char ch)
@@ -761,11 +777,10 @@ private:
 			ControlCharacter ch;
 			while (isTok[ (unsigned char)(ch=m_src.control())])
 			{
-				UChar chr = m_src.chr();
-				if (chr <= 0xD)
+				unsigned char aa = m_src.ascii();
+				if (aa <= 0xD)
 				{
 					//handling W3C requirements for end of line translation in XML:
-					unsigned char aa = m_src.ascii();
 					if (aa == '\r')
 					{
 						push( (unsigned char)'\n');
@@ -781,13 +796,13 @@ private:
 					}
 					else
 					{
-						push( chr);
+						copychar();
 						tokstate.eolnState = TokState::SRC;
 					}
 				}
 				else
 				{
-					push( chr);
+					copychar();
 					tokstate.eolnState = TokState::SRC;
 				}
 				m_src.skip();

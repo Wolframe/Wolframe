@@ -193,6 +193,12 @@ public:
 			++cc;
 		}
 	}
+
+	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
+	static bool is_equal( const UTF16&, const UTF16&)
+	{
+		return true;
+	}
 };
 
 /// \class UTF16LE

@@ -157,6 +157,17 @@ public:
 		cur = CharSet::asciichar( buf, state, input);
 	}
 
+	/// \class copychar
+	/// \brief Direct copy of a character from input to output without encoding/decoding it
+	/// \remark Assumes the character sets to be equal
+	template <class Buffer>
+	inline void copychar( CharSet& output_, Buffer& buf_)
+	{
+		/// \todo more efficient solution of copy character to sink with same encoding here
+		/// \remark a check if the character sets fulfill is_equal(..) (IsoLatin code page !)
+		output_.print( chr(), buf_);
+	}
+
 	/// \brief Get the control character representation of the current character
 	/// \return the control character
 	inline ControlCharacter control()

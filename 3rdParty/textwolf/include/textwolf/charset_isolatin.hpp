@@ -111,6 +111,12 @@ struct IsoLatin :public IsoLatinCodePage
 			buf.push_back( chr_);
 		}
 	}
+
+	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
+	static bool is_equal( const IsoLatin& a, const IsoLatin& b)
+	{
+		return IsoLatinCodePage::is_equal( a, b);
+	}
 };
 
 }//namespace

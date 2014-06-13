@@ -164,6 +164,12 @@ public:
 		return rt;
 	}
 
+	/// \brief Evaluate if two code pages are equal
+	static inline bool is_equal( const IsoLatinCodePage& a, const IsoLatinCodePage& b)
+	{
+		return a.m_cd == b.m_cd;
+	}
+
 private:
 	const unsigned short* m_cd;
 	const unsigned short* m_invcd;

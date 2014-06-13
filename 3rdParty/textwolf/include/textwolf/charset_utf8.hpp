@@ -196,6 +196,12 @@ struct UTF8
 			buf.push_back( (char)(unsigned char) (((chr >> shf) & B00111111) | B10000000));
 		}
 	}
+
+	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
+	static bool is_equal( const UTF8&, const UTF8&)
+	{
+		return true;
+	}
 };
 
 }//namespace
