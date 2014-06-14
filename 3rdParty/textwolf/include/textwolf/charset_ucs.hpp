@@ -32,7 +32,7 @@
 
 --------------------------------------------------------------------
 */
-/// \file textwolf/charset_isolatin.hpp
+/// \file textwolf/charset_ucs.hpp
 /// \brief Definition of UCS-2/UCS-4 encodings
 
 #ifndef __TEXTWOLF_CHARSET_UCS_HPP__
@@ -45,12 +45,12 @@
 namespace textwolf {
 namespace charset {
 
-///\class UCS2
-///\brief Character set UCS-2 (little/big endian)
-///\tparam encoding charset::ByteOrder::LE or charset::ByteOrder::BE
-//   UCS-2 encoding is defined to be big-endian only. Although the similar designations 'UCS-2BE and UCS-2LE
-//   imitate the UTF-16 labels, they do not represent official encoding schemes. (http://en.wikipedia.org/wiki/UTF-16/UCS-2)
-//   therefore we take encoding=ByteOrder::BE as default.
+/// \class UCS2
+/// \brief Character set UCS-2 (little/big endian)
+/// \tparam encoding charset::ByteOrder::LE or charset::ByteOrder::BE
+///   UCS-2 encoding is defined to be big-endian only. Although the similar designations 'UCS-2BE and UCS-2LE
+///   imitate the UTF-16 labels, they do not represent official encoding schemes. (http://en.wikipedia.org/wiki/UTF-16/UCS-2)
+///   therefore we take encoding=ByteOrder::BE as default.
 template <int encoding=ByteOrder::BE>
 struct UCS2
 {
@@ -63,9 +63,9 @@ struct UCS2
 		MaxChar=0xFFFF
 	};
 
-	///\brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static void skip( char*, unsigned int& bufpos, Iterator& itr)
+	static inline void skip( char*, unsigned int& bufpos, Iterator& itr)
 	{
 		for (;bufpos < 2; ++bufpos)
 		{
@@ -74,7 +74,7 @@ struct UCS2
 	}
 
 	template <class Iterator>
-	static UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos<2)
 		{
@@ -92,24 +92,24 @@ struct UCS2
 		return (res << 8) + (unsigned char)buf[LSB];
 	}
 
-	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
+	inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
 		return value_impl( buf, bufpos, itr);
 	}
 
-	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		UChar ch = value_impl( buf, bufpos, itr);
 		return (ch > 127)?-1:(char)ch;
 	}
 
-	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
+	/// \brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
-	void print( UChar chr, Buffer_& buf) const
+	inline void print( UChar chr, Buffer_& buf) const
 	{
 		if (chr>MaxChar)
 		{
@@ -129,11 +129,17 @@ struct UCS2
 			buf.push_back( chr >> Print2shift);
 		}
 	}
+
+	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
+	static bool is_equal( const UCS2&, const UCS2&)
+	{
+		return true;
+	}
 };
 
-///\class UCS4
-///\brief Character set UCS-4 (little/big endian)
-///\tparam encoding ByteOrder::LE or ByteOrder::BE
+/// \class UCS4
+/// \brief Character set UCS-4 (little/big endian)
+/// \tparam encoding ByteOrder::LE or ByteOrder::BE
 template <int encoding>
 struct UCS4
 {
@@ -150,9 +156,9 @@ struct UCS4
 		MaxChar=0xFFFFFFFF
 	};
 
-	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static UChar value( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		for (;bufpos < 4; ++bufpos)
 		{
@@ -165,9 +171,9 @@ struct UCS4
 		return (res << 8) + (unsigned char)buf[B0];
 	}
 
-	///\brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static void skip( char*, unsigned int& bufpos, Iterator& itr)
+	static inline void skip( char*, unsigned int& bufpos, Iterator& itr)
 	{
 		for (;bufpos < 4; ++bufpos)
 		{
@@ -175,15 +181,15 @@ struct UCS4
 		}
 	}
 
-	///\brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		UChar ch = value( buf, bufpos, itr);
 		return (ch > 127)?-1:(char)ch;
 	}
 
-	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
+	/// \brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
 	static void print( UChar chr, Buffer_& buf)
 	{
@@ -192,19 +198,25 @@ struct UCS4
 		buf.push_back( (unsigned char)((chr >> Print3shift) & 0xFF));
 		buf.push_back( (unsigned char)((chr >> Print4shift) & 0xFF));
 	}
+
+	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
+	static bool is_equal( const UCS4&, const UCS4&)
+	{
+		return true;
+	}
 };
 
-///\class UCS2LE
-///\brief UCS-2 little endian character set encoding
+/// \class UCS2LE
+/// \brief UCS-2 little endian character set encoding
 struct UCS2LE :public UCS2<ByteOrder::LE> {};
-///\class UCS2BE
-///\brief UCS-2 big endian character set encoding
+/// \class UCS2BE
+/// \brief UCS-2 big endian character set encoding
 struct UCS2BE :public UCS2<ByteOrder::BE> {};
-///\class UCS4LE
-///\brief UCS-4 little endian character set encoding
+/// \class UCS4LE
+/// \brief UCS-4 little endian character set encoding
 struct UCS4LE :public UCS4<ByteOrder::LE> {};
-///\class UCS4BE
-///\brief UCS-4 big endian character set encoding
+/// \class UCS4BE
+/// \brief UCS-4 big endian character set encoding
 struct UCS4BE :public UCS4<ByteOrder::BE> {};
 
 }//namespace

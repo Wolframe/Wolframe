@@ -53,7 +53,7 @@ try
 	}
 	$body .= "</$root>\n";
 
-	$conn = new Session( "127.0.0.1", 7661, NULL, "NONE");
+	$conn = new Session( "127.0.0.1", 7661, NULL, NULL);
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
 	{
 		echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";

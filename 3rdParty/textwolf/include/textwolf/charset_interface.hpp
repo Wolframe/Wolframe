@@ -113,6 +113,13 @@ struct Interface
 	/// \param [out] buf buffer to print to
 	template <class Buffer_>
 	void print( UChar chr, Buffer_& buf) const;
+
+	/// \brief Evaluate if two character set encodings of the same type are equal in all properties (code page, etc.)
+	/// \return true if yes
+	static bool is_equal( const Interface&, const Interface&)
+	{
+		return true;
+	}
 };
 
 /// \class ByteOrder

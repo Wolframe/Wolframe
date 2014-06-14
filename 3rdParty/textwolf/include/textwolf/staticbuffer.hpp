@@ -32,8 +32,8 @@
 
 --------------------------------------------------------------------
 */
-/// \file textwolf/sourceiterator.hpp
-/// \brief textwolf byte source iterator template
+/// \file textwolf/staticbuffer.hpp
+/// \brief Fixed size buffer fulfilling the requirement of a back insertion sequence needed for textwolf output
 
 #ifndef __TEXTWOLF_STATIC_BUFFER_HPP__
 #define __TEXTWOLF_STATIC_BUFFER_HPP__

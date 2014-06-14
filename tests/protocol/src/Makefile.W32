@@ -29,7 +29,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
-OBJS = \
+CPP_OBJS = \
 	testProtocolFiles.obj
 
 TEST_CPP_BINS = \
@@ -49,5 +49,6 @@ local_clean:
 local_distclean:
 
 local_test:
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll . >NUL
 	@-testProtocol.exe
 

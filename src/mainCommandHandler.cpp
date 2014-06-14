@@ -211,6 +211,7 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		}
 		else
 		{
+			out << "OK go authentication with mech " << argv[0] << endl();
 			cmdbind::AuthCommandHandler* authch = new cmdbind::AuthCommandHandler( m_authenticator);
 			authch->setExecContext( execContext());
 			delegateProcessing<&MainCommandHandler::endMech>( authch);

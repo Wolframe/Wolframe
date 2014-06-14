@@ -68,13 +68,13 @@ public:
 
 	/// \brief Element access
 	/// \return current character
-	char operator* ()
+	inline char operator* ()
 	{
 		return (m_itr != m_end)?*m_itr:0;
 	}
 
 	/// \brief Pre increment
-	IStreamIterator& operator++()
+	inline IStreamIterator& operator++()
 	{
 		++m_itr;
 		return *this;

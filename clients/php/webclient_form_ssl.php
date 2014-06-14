@@ -52,6 +52,11 @@ try
 			$content[ $key] = $value;
 		}
 	}
+	$authopt = array(
+		"mech" => "NONE",
+		"username" => "gunibert",
+		"password" => "bork123"
+	);
 
 	$doc = array();
 	$doc[ 'doctype'] = $doctype;
@@ -59,7 +64,7 @@ try
 
 	$body = json_encode( $doc);
 
-	$conn = new Session( "127.0.0.1", 7962, $sslopt, "NONE");
+	$conn = new Session( "127.0.0.1", 7962, $sslopt, $authopt);
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
 	{
 		echo "<html><head><title>FAILED</title></head><body>" . $conn->lasterror() . "</body></html>";

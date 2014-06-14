@@ -1,0 +1,19 @@
+STRUCT CustomerStruct
+{
+	name string
+	address string
+}
+
+FORM Customer
+	-root customer
+{
+	_ CustomerStruct
+}
+
+FORM CustomerInserted
+	-root customer
+{
+	id string
+	_ CustomerStruct
+}
+

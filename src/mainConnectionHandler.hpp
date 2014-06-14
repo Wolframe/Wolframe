@@ -37,7 +37,6 @@
 #include "mainCommandHandler.hpp"
 #include "system/connectionHandler.hpp"
 #include "processor/execContext.hpp"
-#include "mainConnectionHandler_auth.hpp"
 #include "protocol/ioblocks.hpp"
 #include "types/keymap.hpp"
 #include <boost/shared_ptr.hpp>
