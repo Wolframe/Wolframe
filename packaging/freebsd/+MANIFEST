@@ -275,6 +275,7 @@ files:
  /usr/local/include/wolframe/prgbind/program.hpp: 'sha256sum'
  /usr/local/include/wolframe/prgbind/programLibrary.hpp: 'sha256sum'
  /usr/local/include/wolframe/prgbind/transactionProgram.hpp: 'sha256sum'
+ /usr/local/include/wolframe/crypto/AES256.h: 'sha256sum'
  /usr/local/include/wolframe/crypto/HMAC.h: 'sha256sum'
  /usr/local/include/wolframe/crypto/HMAC.hpp: 'sha256sum'
  /usr/local/include/wolframe/crypto/PBKDF2.h: 'sha256sum'
