@@ -29,6 +29,7 @@ TEST_OBJS =
 TEST_CPP_BINS = \
 	testSHA$(EXE) \
 	testMD5$(EXE) \
+	AES256test$(EXE) \
 	CRAMtest$(EXE) \
 	HMACtest$(EXE) \
 	PBKDF2test$(EXE)
@@ -37,6 +38,7 @@ TEST_CPP_BINS = \
 
 testSHA$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testMD5$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+AES256test$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 HMACtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 PBKDF2test$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
@@ -58,6 +60,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testMD5
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./AES256test
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./HMACtest
 	@echo

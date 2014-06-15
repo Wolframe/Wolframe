@@ -2542,6 +2542,8 @@ tests/configStructParser.cpp
 tests/configValueParser.cpp
 tests/config/wolframe-posix.conf
 tests/config/wolframe-win.conf
+tests/crypto/AES256test.cpp
+tests/crypto/AES-256.vectors/README.txt
 tests/crypto/CRAMtest.cpp
 tests/crypto/GNUmakefile
 tests/crypto/HMACtest.cpp

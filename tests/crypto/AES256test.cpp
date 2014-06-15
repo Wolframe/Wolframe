@@ -31,26 +31,15 @@
 
 ************************************************************************/
 //
-// CRAM tests
+// AES-256 ECB tests
 //
+
 #include "gtest/gtest.h"
 #include "wtest/testReport.hpp"
-#include <stdexcept>
-#include "AAAA/CRAM.hpp"
-#include "system/globalRngGen.hpp"
+#include "crypto/AES256.h"
 
-using namespace _Wolframe::AAAA;
-
-TEST( CRAM, Challenge )
+TEST( DISABLED_AES256, TestVectors )
 {
-	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance( "" );
-
-	CRAMchallenge challenge( rnd );
-	std::cout << "Challenge: " << challenge.toBCD() << std::endl;
-	CRAMresponse resp1( challenge.toString( PasswordHash::Salt( "GoodSalt" )), "password" );
-	CRAMresponse resp2( challenge, PasswordHash( "GoodSalt", "password" ));
-	EXPECT_TRUE( resp1 == resp2 );
-	std::cout << "Response : " << resp1.toBCD() << std::endl;
 }
 
 int main( int argc, char **argv )
@@ -59,4 +48,5 @@ int main( int argc, char **argv )
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }
+
 
