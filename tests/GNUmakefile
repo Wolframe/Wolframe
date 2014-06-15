@@ -25,7 +25,6 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(TOPDIR)/wtest/include \
-	-I$(LIBLT_DIR)/include \
 	$(INCLUDE_FLAGS_LT)
 
 INCLUDE_LDFLAGS = \
