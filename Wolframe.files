@@ -1666,7 +1666,7 @@ include/config/configurationTree.hpp
 include/config/programBase.hpp
 include/config/structSerialize.hpp
 include/config/valueParser.hpp
-include/crypto/AES-256.h
+include/crypto/AES256.h
 include/crypto/HMAC.h
 include/crypto/HMAC.hpp
 include/crypto/md5.h
@@ -1905,7 +1905,7 @@ src/libwfsingleton/logger/logSyslogFacility.cpp
 src/libwfsingleton/logger/syslog_win32.c
 src/libwfsingleton/logger/syslog_win32.h
 src/libwfsingleton/Makefile.W32
-src/libwolframe/AES-256.c
+src/libwolframe/AES256.c
 src/libwolframe/b64decode.c
 src/libwolframe/b64encode.c
 src/libwolframe/base64.cpp
