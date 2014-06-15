@@ -39,15 +39,18 @@
 #include "AAAA/CRAM.hpp"
 #include "system/globalRngGen.hpp"
 
-TEST( DISABLED_CRAM, Challenge )
+using namespace _Wolframe::AAAA;
+
+TEST( CRAM, Challenge )
 {
 	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance( "" );
 
-	_Wolframe::AAAA::CRAMchallenge	challenge( rnd );
-	std::cout << challenge.toBCD();
-	_Wolframe::AAAA::CRAMresponse	resp1( challenge.toString(), "password" );
-	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), "password" );
+	CRAMchallenge challenge( rnd );
+	std::cout << "Challenge: " << challenge.toBCD() << std::endl;
+	CRAMresponse resp1( challenge.toString( PasswordHash::Salt( "GoodSalt" )), "password" );
+	CRAMresponse resp2( challenge, PasswordHash( "GoodSalt", "password" ));
 	EXPECT_TRUE( resp1 == resp2 );
+	std::cout << "Response : " << resp1.toBCD() << std::endl;
 }
 
 int main( int argc, char **argv )
