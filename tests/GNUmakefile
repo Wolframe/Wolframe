@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty modules database authentication simpleFormCompiler wolfilter compileTDL protocol
+SUBDIRS = 3rdParty crypto modules database authentication simpleFormCompiler wolfilter compileTDL protocol
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -119,11 +119,6 @@ TEST_CPP_BINS = \
 	byte2hexTest$(EXE) \
 	base64Test$(EXE) \
 	base64Utility$(EXE) \
-	testSHA$(EXE) \
-	testMD5$(EXE) \
-	HMACtest$(EXE) \
-	PBKDF2test$(EXE) \
-	CRAMtest$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing$(EXE) \
@@ -147,12 +142,7 @@ TEST_CPP_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 logTest$(EXE): $(TOPDIR)/src/libwolframed.a
-testSHA$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-testMD5$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-HMACtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-PBKDF2test$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 protocolArgumentParsing$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testVariantStruct$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
@@ -224,10 +214,6 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testFiletypeRecognition
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testSHA
-	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testMD5
-	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./byte2hexTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./base64Test
@@ -235,10 +221,6 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testRand
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testTimestamp
-	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
-	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./HMACtest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./protocolArgumentParsing
 	@echo
@@ -271,7 +253,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 endif
 
-local_longtest: poolTest testArrayDoublingAllocator PBKDF2test
+local_longtest: poolTest testArrayDoublingAllocator
 ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./poolTest
 	@echo
@@ -280,8 +262,6 @@ ifeq ($(RUN_TESTS),1)
 # DISABLED (only for memory corruption checks):
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testTestAllocator
 #	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./PBKDF2test
-	@echo
 	@echo
 endif
 

@@ -34,7 +34,7 @@
  * optimizations are not included to reduce source code size and avoid
  * compile-time configuration.
  *
- * Modified for Wolframe by the Wolframe Team (c) 2012
+ * Modified for Wolframe by the Wolframe Team (c) 2012 - 2014
  */
 
 #include <string.h>

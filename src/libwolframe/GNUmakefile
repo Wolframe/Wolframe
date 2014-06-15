@@ -83,6 +83,7 @@ OBJS = \
 	b64encode.o \
 	b64decode.o \
 	byte2hex.o \
+	AES256.o \
 	sha1.o \
 	sha2.o \
 	hmac_sha1.o \
