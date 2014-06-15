@@ -16,13 +16,17 @@ endif
 
 INCLUDE_CXXFLAGS = \
 
+# note: something draws in libintl support, not sure what..
+
 INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/gtest/include \
-	-I$(TOPDIR)/wtest/include
+	-I$(TOPDIR)/wtest/include \
+	-I$(LIBLT_DIR)/include \
+	$(INCLUDE_FLAGS_LT)
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwfsingleton \
@@ -31,7 +35,8 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(TOPDIR)/wtest \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	$(LDFLAGS_LT)
 
 INCLUDE_LIBS = \
 	-lwolftest \
