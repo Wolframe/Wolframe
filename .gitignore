@@ -54,6 +54,7 @@ tests/threadLeakTest
 tests/counterTest
 tests/crypto/testSHA
 tests/crypto/testMD5
+tests/crypto/AES256test
 tests/crypto/CRAMtest
 tests/crypto/HMACtest
 tests/crypto/PBKDF2test
