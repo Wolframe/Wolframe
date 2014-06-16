@@ -51,8 +51,8 @@
 
 namespace textwolf {
 
-///\brief XML path select template
-///\tparam CharSet_ character set encoding of the automaton elements
+/// \brief XML path select template
+/// \tparam CharSet_ character set encoding of the automaton elements
 template <class CharSet_>
 class XMLPathSelect :public throws_exception
 {
@@ -68,9 +68,9 @@ private:
 	typedef typename ThisXMLPathSelectAutomaton::State State;
 	typedef typename ThisXMLPathSelectAutomaton::Scope Scope;
 
-	///\class Array
-	///\brief static array of POD types. I decided to implement it on my own though using boost::array would maybe be better.
-	///\tparam Element element type of the array
+	/// \class Array
+	/// \brief static array of POD types. I decided to implement it on my own though using boost::array would maybe be better.
+	/// \tparam Element element type of the array
 	template <typename Element>
 	class Array :public throws_exception
 	{
@@ -78,54 +78,54 @@ private:
 		std::size_t m_size;			//< fill size (number of elements inserted)
 		std::size_t m_maxSize;			//< allocation size (space reserved for this number of elements)
 	public:
-		///\brief Constructor
-		///\param [in] p_maxSize allocation size (number of elements) to reserve
+		/// \brief Constructor
+		/// \param [in] p_maxSize allocation size (number of elements) to reserve
 		Array( std::size_t p_maxSize) :m_size(0),m_maxSize(p_maxSize)
 		{
 			m_ar = new (std::nothrow) Element[ m_maxSize];
 			if (m_ar == 0) throw exception( OutOfMem);
 		}
 
-		///\brief Destructor
+		/// \brief Destructor
 		~Array()
 		{
 			if (m_ar) delete [] m_ar;
 		}
 
-		///\brief Append one element
-		///\param [in] elem element to append
+		/// \brief Append one element
+		/// \param [in] elem element to append
 		void push_back( const Element& elem)
 		{
 			if (m_size == m_maxSize) throw exception( OutOfMem);
 			m_ar[ m_size++] = elem;
 		}
 
-		///\brief Remove one element from the end
+		/// \brief Remove one element from the end
 		void pop_back()
 		{
 			if (m_size == 0) throw exception( NotAllowedOperation);
 			m_size--;
 		}
 
-		///\brief Access element by index
-		///\param [in] idx index of the element starting with 0
-		///\return element reference
+		/// \brief Access element by index
+		/// \param [in] idx index of the element starting with 0
+		/// \return element reference
 		Element& operator[]( std::size_t idx)
 		{
 			if (idx >= m_size) throw exception( ArrayBoundsReadWrite);
 			return m_ar[ idx];
 		}
 
-		///\brief Get a reference of the element at the end of the array
-		///\return element reference
+		/// \brief Get a reference of the element at the end of the array
+		/// \return element reference
 		Element& back()
 		{
 			if (m_size == 0) throw exception( ArrayBoundsReadWrite);
 			return m_ar[ m_size-1];
 		}
 
-		///\brief Resize of the array
-		///\param [in] p_size new array size
+		/// \brief Resize of the array
+		/// \param [in] p_size new array size
 		void resize( std::size_t p_size)
 		{
 			if (p_size > m_size) throw exception( ArrayBoundsReadWrite);
@@ -135,8 +135,8 @@ private:
 		bool empty() const			{return m_size==0;}
 	};
 
-	///\class Context
-	///\brief State variables without stacks of the automaton
+	/// \class Context
+	/// \brief State variables without stacks of the automaton
 	struct Context
 	{
 		XMLScannerBase::ElementType type;	//< element type processed
@@ -145,13 +145,13 @@ private:
 		Scope scope;				//< active scope
 		unsigned int scope_iter;		//< position of currently visited token in the active scope
 
-		///\brief Constructor
+		/// \brief Constructor
 		Context()				:type(XMLScannerBase::Content),key(0),keysize(0) {}
 
-		///\brief Initialization
-		///\param [in] p_type type of the current element processed
-		///\param [in] p_key current element processed
-		///\param [in] p_keysize size of the key in bytes
+		/// \brief Initialization
+		/// \param [in] p_type type of the current element processed
+		/// \param [in] p_key current element processed
+		/// \param [in] p_keysize size of the key in bytes
 		void init( XMLScannerBase::ElementType p_type, const char* p_key, int p_keysize)
 		{
 			type = p_type;
@@ -167,8 +167,8 @@ private:
 	Array<Token> tokens;		//< list of waiting tokens
 	Context context;		//< state variables without stacks of the automaton
 
-	///\brief Activate a state by index
-	///\param stateidx index of the state to activate
+	/// \brief Activate a state by index
+	/// \param stateidx index of the state to activate
 	void expand( int stateidx)
 	{
 		while (stateidx!=-1)
@@ -192,10 +192,10 @@ private:
 		}
 	}
 
-	///\brief Declares the currently processed element of the XMLScanner input. By calling fetch we get the output elements from it
-	///\param [in] type type of the current element processed
-	///\param [in] key current element processed
-	///\param [in] keysize size of the key in bytes
+	/// \brief Declares the currently processed element of the XMLScanner input. By calling fetch we get the output elements from it
+	/// \param [in] type type of the current element processed
+	/// \param [in] key current element processed
+	/// \param [in] keysize size of the key in bytes
 	void initProcessElement( XMLScannerBase::ElementType type, const char* key, int keysize)
 	{
 		if (context.type == XMLScannerBase::OpenTag)
@@ -228,9 +228,9 @@ private:
 		}
 	}
 
-	///\brief produce an element adressed by token index
-	///\param [in] tokenidx index of the token in the list of active tokens
-	///\param [in] st state from which the expand was triggered
+	/// \brief produce an element adressed by token index
+	/// \param [in] tokenidx index of the token in the list of active tokens
+	/// \param [in] st state from which the expand was triggered
 	void produce( unsigned int tokenidx, const State& st)
 	{
 		const Token& tk = tokens[ tokenidx];
@@ -258,9 +258,9 @@ private:
 		}
 	}
 
-	///\brief check if an active token addressed by index matches to the currently processed element
-	///\param [in] tokenidx index of the token in the list of active tokens
-	///\return matching token type
+	/// \brief check if an active token addressed by index matches to the currently processed element
+	/// \param [in] tokenidx index of the token in the list of active tokens
+	/// \return matching token type
 	int match( unsigned int tokenidx)
 	{
 		int rt = 0;
@@ -320,8 +320,8 @@ private:
 		return rt;
 	}
 
-	///\brief fetch the next matching element
-	///\return type of the matching element
+	/// \brief fetch the next matching element
+	/// \return type of the matching element
 	int fetch()
 	{
 		int type = 0;
@@ -367,21 +367,21 @@ private:
 	}
 
 public:
-	///\brief Constructor
-	///\param[in] p_atm read only ML path select automaton reference
+	/// \brief Constructor
+	/// \param[in] p_atm read only ML path select automaton reference
 	XMLPathSelect( const ThisXMLPathSelectAutomaton* p_atm)
 		:atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
 	{
 		if (atm->states.size() > 0) expand(0);
 	}
 
-	///\brief Copy constructor
-	///\param [in] o element to copy
+	/// \brief Copy constructor
+	/// \param [in] o element to copy
 	XMLPathSelect( const XMLPathSelect& o)
 		:atm(o.atm),scopestk(o.scopestk),follows(o.follows),triggers(o.triggers),tokens(o.tokens){}
 
-	///\class iterator
-	///\brief input iterator for the output of this XMLScanner
+	/// \class iterator
+	/// \brief input iterator for the output of this XMLScanner
 	class iterator
 	{
 	public:
@@ -395,8 +395,8 @@ public:
 		int element;					//< currently visited element (type)
 		ThisXMLPathSelect* input;			//< producing XML path selection stream
 
-		///\brief Skip to next element
-		///\return *this
+		/// \brief Skip to next element
+		/// \return *this
 		iterator& skip() throw(exception)
 		{
 			if (input != 0)
@@ -410,32 +410,35 @@ public:
 			return *this;
 		}
 
-		///\brief Iterator compare
-		///\param [in] iter iterator to compare with
-		///\return true, if the elements are equal
+		/// \brief Iterator compare
+		/// \param [in] iter iterator to compare with
+		/// \return true, if the elements are equal
 		bool compare( const iterator& iter) const
 		{
 			return (element == iter.element);
 		}
 
 	public:
-		///\brief Assign iterator
-		///\param [in] orig iterator to copy
+		/// \brief Assign iterator
+		/// \param [in] orig iterator to copy
 		void assign( const iterator& orig)
 		{
 			input = orig.input;
 			element = orig.element;
 		}
 
-		///\brief Copy constructor
-		///\param [in] orig iterator to copy
+		/// \brief Copy constructor
+		/// \param [in] orig iterator to copy
 		iterator( const iterator& orig)
 		{
 			assign( orig);
 		}
 
-		///\brief Constructor by values
-		///\param [in] p_input XML path selection stream to iterate through
+		/// \brief Constructor by values
+		/// \param [in] p_input XML path selection stream to iterate through
+		/// \param [in] type XML element type to feed to XML path matcher
+		/// \param [in] key XML element value reference to feed to XML path matcher
+		/// \param [in] keysize XML element value size in bytes to feed to XML path matcher
 		iterator( ThisXMLPathSelect& p_input, XMLScannerBase::ElementType type, const char* key, int keysize)
 				:input( &p_input)
 		{
@@ -443,60 +446,60 @@ public:
 			skip();
 		}
 
-		///\brief Constructor
-		///\param [in] et end of input tag
+		/// \brief Default constructor
+		/// \param [in] et end of input tag
 		iterator()
 			:element(0),input(0) {}
 
-		///\brief Assignement
-		///\param [in] orig iterator to copy
-		///\return *this
+		/// \brief Assignement
+		/// \param [in] orig iterator to copy
+		/// \return *this
 		iterator& operator = (const iterator& orig)
 		{
 			assign( orig);
 			return *this;
 		}
 
-		///\brief Element acceess
-		///\return read only element reference
+		/// \brief Element acceess
+		/// \return read only element reference
 		int operator*() const
 		{
 			return element;
 		}
 
-		///\brief Element acceess
-		///\return read only element reference
+		/// \brief Element acceess
+		/// \return read only element reference
 		const int* operator->() const
 		{
 			return &element;
 		}
 
-		///\brief Preincrement
-		///\return *this
+		/// \brief Preincrement
+		/// \return *this
 		iterator& operator++()		{return skip();}
 
-		///\brief Postincrement
-		///\return *this
+		/// \brief Postincrement
+		/// \return *this
 		iterator operator++(int)	{iterator tmp(*this); skip(); return tmp;}
 
-		///\brief Compare elements for equality
-		///\return true, if they are equal
+		/// \brief Compare elements for equality
+		/// \return true, if they are equal
 		bool operator==( const iterator& iter) const	{return compare( iter);}
 
-		///\brief Compare elements for inequality
-		///\return true, if they are not equal
+		/// \brief Compare elements for inequality
+		/// \return true, if they are not equal
 		bool operator!=( const iterator& iter) const	{return !compare( iter);}
 	};
 
-	///\brief Feed the path selector with the next token and get the start iterator for the results
-	///\return iterator pointing to the first of the selected XML path elements
+	/// \brief Feed the path selector with the next token and get the start iterator for the results
+	/// \return iterator pointing to the first of the selected XML path elements
 	iterator push( XMLScannerBase::ElementType type, const char* key, int keysize)
 	{
 		return iterator( *this, type, key, keysize);
 	}
 
-	///\brief Get the end of results returned by 'push(XMLScannerBase::ElementType,const char*, int)'
-	///\return the end iterator
+	/// \brief Get the end of results returned by 'push(XMLScannerBase::ElementType,const char*, int)'
+	/// \return the end iterator
 	iterator end()
 	{
 		return iterator();

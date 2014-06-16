@@ -46,7 +46,7 @@ try
 	}
 
 	$doc = array();
-	$doc[ 'doctype'] = $doctype;
+	$doc[ '-doctype'] = $doctype;
 	$doc[ $root] = $content;
 
 	$body = json_encode( $doc);

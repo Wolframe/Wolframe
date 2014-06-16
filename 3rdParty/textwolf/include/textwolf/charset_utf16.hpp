@@ -66,18 +66,17 @@ private:
 		Print1shift=(encoding==ByteOrder::BE)?8:0,	//< value to shift with to get the 1st character to print
 		Print2shift=(encoding==ByteOrder::LE)?8:0	//< value to shift with to get the 2nd character to print
 	};
+
 public:
 	enum
 	{
 		MaxChar=0x10FFFF				//< maximum character in alphabet
 	};
+
 public:
-	/// \brief Get the size of the current character in bytes (variable length encoding)
-	/// \param [in] buf buffer for the character data
-	/// \param [in,out] bufpos position in 'buf'
-	/// \param [in,out] itr iterator to skip
+	/// \brief See template<class Iterator>Interface::fetchbytes(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static inline unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline void fetchbytes( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos<2)
 		{
@@ -91,6 +90,17 @@ public:
 			++itr;
 			++bufpos;
 		}
+	}
+
+	/// \brief Get the size of the current character in bytes (variable length encoding)
+	/// \param [in] buf buffer for the character data
+	/// \param [in,out] bufpos position in 'buf'
+	/// \param [in,out] itr iterator
+	template <class Iterator>
+	static inline unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
+	{
+		fetchbytes( buf, bufpos, itr);
+
 		UChar rt = (unsigned char)buf[ MSB];
 		if ((rt - 0xD8) > 0x03)
 		{
@@ -195,7 +205,7 @@ public:
 	}
 
 	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
-	static bool is_equal( const UTF16&, const UTF16&)
+	static inline bool is_equal( const UTF16&, const UTF16&)
 	{
 		return true;
 	}

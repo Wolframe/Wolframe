@@ -100,7 +100,7 @@ public:
 		,m_invovlcd(o.m_invovlcd){}
 
 	/// \brief Constructor
-	/// \param[in] IsoLatin code page index, 1 for "IsoLatin-1"
+	/// \param[in] idx IsoLatin code page index, 1 for "IsoLatin-1"
 	IsoLatinCodePage( unsigned int idx)
 	{
 		enum {NofCodePages=9};

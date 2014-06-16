@@ -135,9 +135,9 @@ struct UTF8
 		return ((unsigned char)(buf[0])>127)?-1:buf[0];
 	}
 
-	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::fetch(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
+	static inline void fetchbytes( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos==0)
 		{
@@ -151,10 +151,18 @@ struct UTF8
 			buf[ bufpos] = *itr;
 			++itr;
 		}
+	}
+
+	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	template <class Iterator>
+	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
+	{
+		fetchbytes( buf, bufpos, itr);
+
 		UChar res = (unsigned char)buf[0];
 		if (res > 127)
 		{
-			int gg = bufsize-2;
+			int gg = bufpos-2;
 			if (gg < 0) return MaxChar;
 
 			res = ((unsigned char)buf[0])&(B00011111>>gg);

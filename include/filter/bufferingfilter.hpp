@@ -99,11 +99,16 @@ public:
 		if (end_)
 		{
 			m_ref->putInput( m_buf.c_str(), m_buf.size(), m_end=true);
-			setState( Open); m_ref->setState( Open);
+			if (m_ref->state() == Start)
+			{
+				setState( Open);
+				m_ref->setState( Open);
+			}
 		}
 		else
 		{
-			setState( Start); m_ref->setState( Start);
+			setState( Start);
+			m_ref->setState( Start);
 		}
 	}
 

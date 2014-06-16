@@ -47,19 +47,19 @@ namespace charset {
 
 /// \class UCS2
 /// \brief Character set UCS-2 (little/big endian)
-/// \tparam encoding charset::ByteOrder::LE or charset::ByteOrder::BE
+/// \tparam byteorder charset::ByteOrder::LE or charset::ByteOrder::BE
 ///   UCS-2 encoding is defined to be big-endian only. Although the similar designations 'UCS-2BE and UCS-2LE
 ///   imitate the UTF-16 labels, they do not represent official encoding schemes. (http://en.wikipedia.org/wiki/UTF-16/UCS-2)
-///   therefore we take encoding=ByteOrder::BE as default.
-template <int encoding=ByteOrder::BE>
+///   therefore we take byteorder=ByteOrder::BE as default.
+template <int byteorder=ByteOrder::BE>
 struct UCS2
 {
 	enum
 	{
-		LSB=(encoding==ByteOrder::BE),			//< least significant byte index (0 or 1)
-		MSB=(encoding==ByteOrder::LE),			//< most significant byte index (0 or 1)
-		Print1shift=(encoding==ByteOrder::BE)?8:0,	//< value to shift with to get the 1st character to print
-		Print2shift=(encoding==ByteOrder::LE)?8:0,	//< value to shift with to get the 2nd character to print
+		LSB=(byteorder==ByteOrder::BE),			//< least significant byte index (0 or 1)
+		MSB=(byteorder==ByteOrder::LE),			//< most significant byte index (0 or 1)
+		Print1shift=(byteorder==ByteOrder::BE)?8:0,	//< value to shift with to get the 1st character to print
+		Print2shift=(byteorder==ByteOrder::LE)?8:0,	//< value to shift with to get the 2nd character to print
 		MaxChar=0xFFFF
 	};
 
@@ -73,8 +73,9 @@ struct UCS2
 		}
 	}
 
+	/// \brief See template<class Iterator>Interface::fetchbytes(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static inline UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline void fetchbytes( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos<2)
 		{
@@ -88,6 +89,12 @@ struct UCS2
 			++itr;
 			++bufpos;
 		}
+	}
+
+	template <class Iterator>
+	static inline UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
+	{
+		fetchbytes( buf, bufpos, itr);
 		UChar res = (unsigned char)buf[MSB];
 		return (res << 8) + (unsigned char)buf[LSB];
 	}
@@ -131,7 +138,7 @@ struct UCS2
 	}
 
 	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
-	static bool is_equal( const UCS2&, const UCS2&)
+	static inline bool is_equal( const UCS2&, const UCS2&)
 	{
 		return true;
 	}
@@ -139,32 +146,39 @@ struct UCS2
 
 /// \class UCS4
 /// \brief Character set UCS-4 (little/big endian)
-/// \tparam encoding ByteOrder::LE or ByteOrder::BE
-template <int encoding>
+/// \tparam byteorder ByteOrder::LE or ByteOrder::BE
+template <int byteorder>
 struct UCS4
 {
 	enum
 	{
-		B0=(encoding==ByteOrder::BE)?3:0,
-		B1=(encoding==ByteOrder::BE)?2:1,
-		B2=(encoding==ByteOrder::BE)?1:2,
-		B3=(encoding==ByteOrder::BE)?0:3,
-		Print1shift=(encoding==ByteOrder::BE)?24:0,	//< value to shift with to get the 1st character to print
-		Print2shift=(encoding==ByteOrder::BE)?16:8,	//< value to shift with to get the 2nd character to print
-		Print3shift=(encoding==ByteOrder::BE)?8:16,	//< value to shift with to get the 3rd character to print
-		Print4shift=(encoding==ByteOrder::BE)?0:24,	//< value to shift with to get the 4th character to print
+		B0=(byteorder==ByteOrder::BE)?3:0,
+		B1=(byteorder==ByteOrder::BE)?2:1,
+		B2=(byteorder==ByteOrder::BE)?1:2,
+		B3=(byteorder==ByteOrder::BE)?0:3,
+		Print1shift=(byteorder==ByteOrder::BE)?24:0,	//< value to shift with to get the 1st character to print
+		Print2shift=(byteorder==ByteOrder::BE)?16:8,	//< value to shift with to get the 2nd character to print
+		Print3shift=(byteorder==ByteOrder::BE)?8:16,	//< value to shift with to get the 3rd character to print
+		Print4shift=(byteorder==ByteOrder::BE)?0:24,	//< value to shift with to get the 4th character to print
 		MaxChar=0xFFFFFFFF
 	};
 
-	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::fetchbytes(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline void fetchbytes( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		for (;bufpos < 4; ++bufpos)
 		{
 			buf[ bufpos] = *itr;
 			++itr;
 		}
+	}
+
+	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	template <class Iterator>
+	static inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr)
+	{
+		fetchbytes( buf, bufpos, itr);
 		UChar res = (unsigned char)buf[B3];
 		res = (res << 8) + (unsigned char)buf[B2];
 		res = (res << 8) + (unsigned char)buf[B1];
@@ -200,7 +214,7 @@ struct UCS4
 	}
 
 	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
-	static bool is_equal( const UCS4&, const UCS4&)
+	static inline bool is_equal( const UCS4&, const UCS4&)
 	{
 		return true;
 	}

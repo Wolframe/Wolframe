@@ -42,6 +42,8 @@ Project Wolframe.
 #include <cstring>
 #include <stdexcept>
 
+#undef _Wolframe_LOWLEVEL_DEBUG
+
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
@@ -184,6 +186,9 @@ public:
 			}
 			m_lastchar = ch;
 
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+			LOG_DEBUG << "[docformat detection] state " << stateName( m_state) << " char '" << ((ch < 32)?'_':(char)ch) << " [" << std::hex << (unsigned int)ch << std::dec << "]";
+#endif
 			switch (m_state)
 			{
 				case ParseStart:
@@ -413,6 +418,9 @@ public:
 						else
 						{
 							m_isDoctypeAttrib = (m_itembuf == "schemaLocation" || m_itembuf == "noNamespaceSchemaLocation");
+#ifdef _Wolframe_LOWLEVEL_DEBUG
+							LOG_DEBUG << "[docformat detection] check document type attribute '" << m_itembuf << "' " << ((m_isDoctypeAttrib?"YES":"NO"));
+#endif
 							setState( ch <= '='?SearchXMLRootAttribQuote:SearchXMLRootAttribAssign);
 						}
 					}

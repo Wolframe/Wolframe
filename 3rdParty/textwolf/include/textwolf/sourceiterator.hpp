@@ -110,11 +110,11 @@ public:
 	/// \param[in] buf poiner to start of input
 	/// \param[in] size size of input passed in bytes
 	/// \param[in] eom longjmp to call with parameter 1, if the end of data has been reached before EOF (null termination), eom=null, if the chunk passed contains the complete reset of the input and eof (null) can be returned if we reach the end
-	void putInput( const char* buf, std::size_t size, jmp_buf* eom_=0)
+	void putInput( const char* buf, std::size_t size, jmp_buf* eom=0)
 	{
 		m_itr = const_cast<char*>(buf);
 		m_end = m_itr+size;
-		m_eom = eom_;
+		m_eom = eom;
 	}
 
 	/// \brief Get the current position in the current chunk parsed

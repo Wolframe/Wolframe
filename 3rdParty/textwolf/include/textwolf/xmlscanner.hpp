@@ -1007,23 +1007,34 @@ private:
 public:
 	/// \brief Constructor
 	/// \param [in] p_src source iterator
-	/// \param [in] p_outputBuf buffer to use for output
 	/// \param [in] p_entityMap read only map of named entities defined by the user
 	XMLScanner( const InputIterator& p_src, const EntityMap& p_entityMap)
 			:state(START),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
 	{}
+	/// \brief Constructor
+	/// \param [in] p_src source iterator
 	XMLScanner( const InputIterator& p_src)
 			:state(START),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(0),m_output(OutputCharSet())
 	{}
-	XMLScanner( const InputCharSet& charset_, const InputIterator& p_src, const EntityMap& p_entityMap)
-			:state(START),error(Ok),m_src(charset_,p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
+	/// \brief Constructor
+	/// \param [in] p_charset character set encoding of input in case of non default settings (code page) needed
+	/// \param [in] p_src source iterator
+	/// \param [in] p_entityMap read only map of named entities defined by the user
+	XMLScanner( const InputCharSet& p_charset, const InputIterator& p_src, const EntityMap& p_entityMap)
+			:state(START),error(Ok),m_src(p_charset,p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
 	{}
-	XMLScanner( const InputCharSet& charset_, const InputIterator& p_src)
-			:state(START),error(Ok),m_src(charset_,p_src),m_entityMap(0),m_output(OutputCharSet())
+	/// \brief Constructor
+	/// \param [in] p_charset character set encoding of input in case of non default settings (code page) needed
+	/// \param [in] p_src source iterator
+	XMLScanner( const InputCharSet& p_charset, const InputIterator& p_src)
+			:state(START),error(Ok),m_src(p_charset,p_src),m_entityMap(0),m_output(OutputCharSet())
 	{}
-	XMLScanner( const InputCharSet& charset_)
-			:state(START),error(Ok),m_src(charset_),m_entityMap(0)
+	/// \brief Constructor
+	/// \param [in] p_charset character set encoding of input in case of non default settings (code page) needed
+	XMLScanner( const InputCharSet& p_charset)
+			:state(START),error(Ok),m_src(p_charset),m_entityMap(0)
 	{}
+	/// \brief Default constructor
 	XMLScanner()
 			:state(START),error(Ok),m_src(InputCharSet()),m_entityMap(0)
 	{}

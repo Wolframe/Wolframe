@@ -60,10 +60,18 @@ class Session extends Connection
 		$this->getline( "OK");
 		$this->writeline( "AUTH");
 		$mechs = $this->getline( "MECHS");
-		$authmethod = $dataobject[ 'mech'];
-		if ($authmethod == NULL)
+		if ($authopt == NULL)
 		{
 			$authmethod = "NONE";
+			$authopt = array();
+		}
+		else
+		{
+			$authmethod = $authopt[ 'mech'];
+			if ($authmethod == NULL)
+			{
+				$authmethod = "NONE";
+			}
 		}
 		if (array_search( $authmethod, explode( " ", $mechs)) === FALSE)
 		{
@@ -72,11 +80,11 @@ class Session extends Connection
 		$this->writeline( "MECH " . $authmethod);
 		$this->getline( "OK");
 
-		if (0==strcasecmp( $authmethod == "NONE"))
+		if (0==strcasecmp( $authmethod, "NONE"))
 		{
 			// ... accepted without authentication 
 		}
-		else if (0==strcasecmp( $authmethod == "WOLFRAME-CRAM"))
+		else if (0==strcasecmp( $authmethod, "WOLFRAME-CRAM"))
 		{
 			$this->auth_WOLFRAME_CRAM( $authopt['username'], $authopt['password']);
 		}

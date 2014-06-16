@@ -99,6 +99,13 @@ struct Interface
 	template <class Iterator>
 	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr);
 
+	/// \brief Fetches the bytes of the current character into a buffer
+	/// \param [in] buf buffer for the parses character data
+	/// \param [in,out] bufpos position in 'buf'
+	/// \param [in,out] itr iterator on the source
+	template <class Iterator>
+	static void fetchbytes( char* buf, unsigned int& bufpos, Iterator& itr);
+
 	/// \brief Fetches the unicode character representation of the current character
 	/// \param [in] buf buffer for the parses character data
 	/// \param [in,out] bufpos position in 'buf'

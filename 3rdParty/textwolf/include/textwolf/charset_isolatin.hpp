@@ -68,9 +68,9 @@ struct IsoLatin :public IsoLatinCodePage
 		}
 	}
 
-	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::fetchbytes(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline void fetchbytes( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos==0)
 		{
@@ -78,6 +78,13 @@ struct IsoLatin :public IsoLatinCodePage
 			++itr;
 			++bufpos;
 		}
+	}
+
+	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
+	template <class Iterator>
+	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	{
+		fetchbytes( buf, bufpos, itr);
 		return ((unsigned char)(buf[0])>127)?-1:buf[0];
 	}
 
@@ -85,12 +92,7 @@ struct IsoLatin :public IsoLatinCodePage
 	template <class Iterator>
 	inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
-		if (bufpos == 0)
-		{
-			buf[0] = *itr;
-			++itr;
-			++bufpos;
-		}
+		fetchbytes( buf, bufpos, itr);
 		return ucharcode( buf[0]);
 	}
 
@@ -113,7 +115,7 @@ struct IsoLatin :public IsoLatinCodePage
 	}
 
 	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
-	static bool is_equal( const IsoLatin& a, const IsoLatin& b)
+	static inline bool is_equal( const IsoLatin& a, const IsoLatin& b)
 	{
 		return IsoLatinCodePage::is_equal( a, b);
 	}

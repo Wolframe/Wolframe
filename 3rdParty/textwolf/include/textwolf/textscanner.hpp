@@ -57,7 +57,7 @@ private:
 	char buf[8];			///< buffer for one character (the current character parsed)
 	UChar val;			///< Unicode character representation of the current character parsed
 	signed char cur;		///< ASCII character representation of the current character parsed or -1 if not in ASCII range
-	unsigned int state;		///< current state of the text scanner
+	unsigned int state;		///< current state of the text scanner (byte position of iterator cursor in 'buf')
 	CharSet charset;
 
 public:
@@ -165,7 +165,17 @@ public:
 	{
 		/// \todo more efficient solution of copy character to sink with same encoding here
 		/// \remark a check if the character sets fulfill is_equal(..) (IsoLatin code page !)
-		output_.print( chr(), buf_);
+		if (CharSet::is_equal( charset, output_))
+		{
+			// ... if the character sets are equal and of the same subclass (code pages)
+			//	then we do not decode/encode the character but copy it directly to the output
+			charset.fetchbytes( buf, state, input);
+			for (unsigned int ii=0; ii<state; ++ii) buf_.push_back(buf[ii]);
+		}
+		else
+		{
+			output_.print( chr(), buf_);
+		}
 	}
 
 	/// \brief Get the control character representation of the current character

@@ -34,6 +34,7 @@
 */
 /// \file textwolf/charset.hpp
 /// \brief Character set encodings already implemented in textwolf
+/// \note The interface that the classes defined in the files included must fulfill is defined in "charset_interface.hpp"
 
 #ifndef __TEXTWOLF_XML_CHARSET_HPP__
 #define __TEXTWOLF_XML_CHARSET_HPP__
