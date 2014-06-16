@@ -1,0 +1,70 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\3rdParty\gtest\include \
+	/I$(TOPDIR)\wtest\include
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Advapi32.lib Ws2_32.lib \
+	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
+	$(TOPDIR)\wtest\wtest.lib \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
+
+TEST_CPP_BINS = \
+	AES256test.exe \
+	CRAMtest.exe \
+	HMACtest.exe \
+	PBKDF2test.exe \
+	testSHA.exe \
+	testMD5.exe \
+
+
+OBJS = \
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+testSHA.exe: testSHA.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+testMD5.exe: testMD5.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+AES256test.exe: AES256test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+CRAMtest.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+HMACtest.exe: HMACtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+PBKDF2test.exe: PBKDF2test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+
+local_all:
+
+local_clean:
+	@-erase logTest.log 2>NUL
+	@-erase /s /q temp >NUL 2>NUL
+	@-rmdir temp 2>NUL
+	@-erase reports\gtestReport.txt reports\*.xml 2>NUL
+
+local_distclean:
+
+local_test:
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll . >NUL
+	@-if not exist temp mkdir temp
+	@-erase /q temp 2>NUL
+	@-testSHA
+	@-testMD5
+	@-AES256test
+	@-CRAMtest
+	@-HMACtest
+
+local_longtest:
+	@-PBKDF2test

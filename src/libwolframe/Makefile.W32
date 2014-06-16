@@ -77,6 +77,7 @@ OBJS = \
 	b64encode.obj \
 	b64decode.obj \
 	byte2hex.obj \
+	AES256.obj \
 	sha1.obj \
 	sha2.obj \
 	hmac_sha1.obj \

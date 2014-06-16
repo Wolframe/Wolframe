@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty modules database authentication simpleFormCompiler wolfilter compileTDL protocol
+SUBDIRS = 3rdParty crypto modules database authentication simpleFormCompiler wolfilter compileTDL protocol
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -16,13 +16,16 @@ endif
 
 INCLUDE_CXXFLAGS = \
 
+# note: something draws in libintl support, not sure what..
+
 INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/gtest/include \
-	-I$(TOPDIR)/wtest/include
+	-I$(TOPDIR)/wtest/include \
+	$(INCLUDE_FLAGS_LT)
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwfsingleton \
@@ -31,7 +34,8 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(TOPDIR)/wtest \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	$(LDFLAGS_LT)
 
 INCLUDE_LIBS = \
 	-lwolftest \
@@ -119,11 +123,6 @@ TEST_CPP_BINS = \
 	byte2hexTest$(EXE) \
 	base64Test$(EXE) \
 	base64Utility$(EXE) \
-	testSHA$(EXE) \
-	testMD5$(EXE) \
-	HMACtest$(EXE) \
-	PBKDF2test$(EXE) \
-	CRAMtest$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
 	protocolArgumentParsing$(EXE) \
@@ -147,12 +146,7 @@ TEST_CPP_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 logTest$(EXE): $(TOPDIR)/src/libwolframed.a
-testSHA$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-testMD5$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-HMACtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-PBKDF2test$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 protocolArgumentParsing$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testVariantStruct$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
@@ -224,10 +218,6 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testFiletypeRecognition
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testSHA
-	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testMD5
-	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./byte2hexTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./base64Test
@@ -235,10 +225,6 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testRand
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testTimestamp
-	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
-	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./HMACtest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./protocolArgumentParsing
 	@echo
@@ -271,7 +257,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 endif
 
-local_longtest: poolTest testArrayDoublingAllocator PBKDF2test
+local_longtest: poolTest testArrayDoublingAllocator
 ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./poolTest
 	@echo
@@ -280,8 +266,6 @@ ifeq ($(RUN_TESTS),1)
 # DISABLED (only for memory corruption checks):
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testTestAllocator
 #	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./PBKDF2test
-	@echo
 	@echo
 endif
 

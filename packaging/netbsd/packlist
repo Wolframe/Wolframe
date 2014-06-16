@@ -283,6 +283,7 @@ usr/pkg/include/wolframe/prgbind/program.hpp
 usr/pkg/include/wolframe/prgbind/programLibrary.hpp
 usr/pkg/include/wolframe/prgbind/transactionProgram.hpp
 @dirrm usr/pkg/include/wolframe/prgbind
+usr/pkg/include/wolframe/crypto/AES256.h
 usr/pkg/include/wolframe/crypto/HMAC.h
 usr/pkg/include/wolframe/crypto/HMAC.hpp
 usr/pkg/include/wolframe/crypto/PBKDF2.h

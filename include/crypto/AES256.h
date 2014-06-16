@@ -16,26 +16,26 @@
 *   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 *   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 *   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*
+*   Modified for Wolframe by the Wolframe Team (c) 2012 - 2014
+*   The original code is available from http://www.literatecode.com/aes256
 */
-#ifndef uint8_t
-#define uint8_t  unsigned char
-#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    typedef struct {
-        uint8_t key[32];
-        uint8_t enckey[32];
-        uint8_t deckey[32];
-    } aes256_context;
+typedef struct	{
+	unsigned char	key[ 32 ];
+	unsigned char	enckey[ 32 ];
+	unsigned char	deckey[ 32 ];
+} AES256_context;
 
 
-    void aes256_init(aes256_context *, uint8_t * /* key */);
-    void aes256_done(aes256_context *);
-    void aes256_encrypt_ecb(aes256_context *, uint8_t * /* plaintext */);
-    void aes256_decrypt_ecb(aes256_context *, uint8_t * /* cipertext */);
+void AES256_init( AES256_context *ctx, unsigned char *key );
+void AES256_done( AES256_context *ctx );
+void AES256_encrypt_ECB( AES256_context *ctx, unsigned char *plaintext );
+void AES256_decrypt_ECB( AES256_context *ctx, unsigned char *cipertext );
 
 #ifdef __cplusplus
 }

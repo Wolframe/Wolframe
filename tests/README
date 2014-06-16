@@ -1,4 +1,5 @@
 3rdParty           - simple tests testing the 3rdparty software alone
+crypto             - cryptographic functions
 expect             - expect tests
 reporting          - reporting tools, gtest report XMLs and gtestReport.txt
 database           - database unit tests, only testing the database
@@ -12,4 +13,3 @@ wolfilter          - test description and data for testWolfilter
 config             - tests testing the configuration of Wolframe
 SSL                - SSL test files for Wolframe
 doc/filetype       - test documents for file type detection
-

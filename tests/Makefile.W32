@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty modules database authentication wolfilter simpleFormCompiler compileTDL protocol
+SUBDIRS = 3rdParty crypto modules database authentication wolfilter simpleFormCompiler compileTDL protocol
 
 # all broken on windows due to working telnet
 #!IFDEF WITH_EXPECT
@@ -61,10 +61,6 @@ TEST_CPP_BINS = \
 	byte2hexTest.exe \
 	base64Test.exe \
 	base64Utility.exe \
-	HMACtest.exe \
-	PBKDF2test.exe \
-	testSHA.exe \
-	testMD5.exe \
 	poolTest.exe \
 	logTest.exe \
 	protocolArgumentParsing.exe \
@@ -102,14 +98,9 @@ resolvePathTest.exe: resolvePathTest.obj
 testBoostPath.exe: testBoostPath.obj
 testFiletypeRecognition.exe : testFiletypeRecognition.obj
 poolTest.exe: poolTest.obj
-testSHA.exe: testSHA.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-testMD5.exe: testMD5.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 byte2hexTest.exe: byte2hexTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Test.exe: base64Test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Utility.exe: base64Utility.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-#CRAMtest.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-HMACtest.exe: HMACtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-PBKDF2test.exe: PBKDF2test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 logTest.exe: logTest.obj
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 testArrayDoublingAllocator.exe: testArrayDoublingAllocator.obj $(TOPDIR)\src\wolframe.lib
@@ -174,14 +165,10 @@ local_test:
 	@-counterTest 
 	@-resolvePathTest 
 	@-testBoostPath 
-	@-testSHA 
-	@-testMD5 
 	@-byte2hexTest 
 	@-base64Test 
 	@-testRand 
 	@-testTimestamp 
-#	@-CRAMtest 
-	@-HMACtest 
 	@-protocolArgumentParsing 
 	@-testProtocolLFdotEscaping 
 	@-testVariantStruct 
@@ -198,4 +185,3 @@ local_test:
 local_longtest:
 	@-poolTest 
 	@-testArrayDoublingAllocator 
-	@-PBKDF2test 

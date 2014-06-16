@@ -294,6 +294,7 @@ f none opt/csw/include/wolframe/prgbind/program.hpp 0644 root staff
 f none opt/csw/include/wolframe/prgbind/programLibrary.hpp 0644 root staff
 f none opt/csw/include/wolframe/prgbind/transactionProgram.hpp 0644 root staff
 d none opt/csw/include/wolframe/crypto 0755 root root
+f none opt/csw/include/wolframe/crypto/AES256.h 0644 root staff
 f none opt/csw/include/wolframe/crypto/HMAC.h 0644 root staff
 f none opt/csw/include/wolframe/crypto/HMAC.hpp 0644 root staff
 f none opt/csw/include/wolframe/crypto/PBKDF2.h 0644 root staff
