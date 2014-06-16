@@ -9,6 +9,7 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\3rdParty\gtest\include \
 	/I$(TOPDIR)\wtest\include
 
@@ -40,7 +41,7 @@ all: $(OBJS) $(CPP_BINS)
 
 testSHA.exe: testSHA.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 testMD5.exe: testMD5.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-AES256test.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+AES256test.exe: AES256test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 CRAMtest.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 HMACtest.exe: HMACtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 PBKDF2test.exe: PBKDF2test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
