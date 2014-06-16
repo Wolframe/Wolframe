@@ -43,17 +43,31 @@
 #include "crypto/AES256.h"
 
 /*
-static bool readValues( std::ifstream infile, const char* label1, std::string value1,
-					      const char* label2, std::string value2,
-					      const char* label3, std::string value3,
-					      const char* label4, std::string value4 )
+static bool readValues( std::ifstream infile, const char* label1, std::string& value1,
+					      const char* label2, std::string& value2,
+					      const char* label3, std::string& value3,
+					      const char* label4, std::string& value4 )
 {
 	bool	hasVal1, hasVal2, hasVal3, hasVal4;
 	hasVal1 = hasVal2 = hasVal3 = hasVal4 = false;
 
 	std::string line;
 	while ( std::getline( infile, line ))	{
-
+		std::string cleanLine = line.substr( 0, line.find( "#" ));
+		boost::trim( cleanLine );
+		if ( cleanLine.empty() )
+			continue;
+		if ( boost::starts_with( cleanLine, label1 ))	{
+			if ( cleanLine[ strlen( label1 )] == '=' )	{
+				if ( hasVal1 )	{
+					std::string msg;
+					msg = "DATA ERROR: '" + label1 + "' has already been defined";
+					throw( msg );
+				}
+				value1 = cleanLine.substr( strlen( label1 ));
+				hasVal1 = true;
+			}
+		}
 	}
 }
 */
