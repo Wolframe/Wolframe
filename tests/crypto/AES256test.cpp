@@ -34,9 +34,29 @@
 // AES-256 ECB tests
 //
 
+#include <string>
+#include <fstream>
+#include <boost/algorithm/string.hpp>
+
 #include "gtest/gtest.h"
 #include "wtest/testReport.hpp"
 #include "crypto/AES256.h"
+
+/*
+static bool readValues( std::ifstream infile, const char* label1, std::string value1,
+					      const char* label2, std::string value2,
+					      const char* label3, std::string value3,
+					      const char* label4, std::string value4 )
+{
+	bool	hasVal1, hasVal2, hasVal3, hasVal4;
+	hasVal1 = hasVal2 = hasVal3 = hasVal4 = false;
+
+	std::string line;
+	while ( std::getline( infile, line ))	{
+
+	}
+}
+*/
 
 TEST( DISABLED_AES256, TestVectors )
 {
