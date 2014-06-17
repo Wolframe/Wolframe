@@ -33,26 +33,35 @@ class Session extends Connection
 	/* Authentication mechanism WOLFRAME_CRAM */
 	function auth_WOLFRAME_CRAM( $username, $password)
 	{
-		// Protocol
-		// 1. client sends a 256 bit seed followed by a HMAC-SHA1 of the (seed, username)
+		error_log( "START AUTHENTICATION\n");
+
+		// 1. The client sends a 256 bit seed followed by a HMAC-SHA1 of the (seed, username)
 		$this->writedata( userHash( $username)); 
+		error_log( "SEND USER NAME " + $username + "\n", 3, "/var/tmp/mylog.txt");
 
-		// 2. if the server finds the user it will reply with a seed and a challenge. if the user is not found it will terminate
-		// [PF:QUESTION] Why does the client not get a message in case of an error here.
-		//	at least a random message, so that has to go into the next step (only info 
-		//	is the connection close)
+		// 2. If the server finds the user it will reply with a seed and a challenge. 
+		//	If the user is not found it will reply with a random challenge for not
+		//	giving any information to the client. The procedure will continue.
 		$challenge = $this->readdata();
+		error_log( "GOT CHALLENGE [" + $challenge + "]\n", 3, "/var/tmp/mylog.txt");
 
-		// 3. the client returns a response. The response is computed from the PBKDF2 of 
-		//	the seed and the challenge.
+		// 3. The client returns a response. The response is computed from the PBKDF2 
+		//	of the seed and the challenge.
 		$this->writedata( CRAMresponse( $password, $challenge));
+		error_log( "SEND PASSWORD\n", 3, "/var/tmp/mylog.txt");
 
-		// 4. the server authenticates the user (or not)
-		// [PF:QUESTION] How does the client know he is authenticated without a message 
-		//	from the server
+		// 4. the server tries to authenticate the user and returns "OK" in case
+		//	of success, "ERR" else.
+		$this->getline("OK");
+		error_log( "GOT AUTHENTICATED\n", 3, "/var/tmp/mylog.txt");
 	}
 
-	/* Constructor */
+	/** Constructor
+	* @param[in] address wolframe service ip
+	* @param[in] port wolframe service port
+	* @param[in] sslopt structure with named options for SSL
+	* @param[in] authopt structure with named options for authentication (depending on authentication mech)
+	*/
 	function __construct( $address, $port, $sslopt, $authopt)
 	{
 		parent::__construct( $address, $port, $sslopt);

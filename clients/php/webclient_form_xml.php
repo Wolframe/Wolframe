@@ -3,14 +3,21 @@ header('Content-Type: text/xml');
 require 'session.php';
 use Wolframe\Session as Session;
 /*
- Forwards HTTP GET request as XML to a wolframe server via TCP/IP plain and rendes the result
- as XML with a reference to a CSS associated to the document type identifier of the result
- to render it properly by the HTML client.
- The HTTP REQUEST parameters without 'CMD' are transformed into 
+ Example that shows that HTTP/HTTPS requests can be mapped to calls of a Wolframe service.
+ The emphasis is here more on 'that' rather than 'how' because security issues are only
+ handled here when it is about the protocol between PhP and Wolframe. So do not take this
+ script without caring about all aspects we did not show here, because we wanted to keep
+ the example simple.
+
+ The script forwards HTTP GET request as XML to a wolframe server via TCP/IP plain 
+ or SSL and renders the result as XML.
+ The HTTP REQUEST parameters without some reserved ones are transformed into 
  an XML request set sent to the server. The command prefix is specified with the parameter
  'CMD' and 'DOCTYPE'. If the parameter 'CMD' is not specified then the document type only
  determines what is executed on the server. The document type of the content is defined 
  with the parameter 'DOCTYPE'.
+ The authentication mechanism and wheter to use SSL or not are also selected by 
+ request parameters.
 */
 try
 {
