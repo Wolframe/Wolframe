@@ -42,7 +42,7 @@ if test ! -f $RPMBUILD/SOURCES/boost_1_48_0.tar.gz; then
 fi
 
 if test ! -f $RPMBUILD/SOURCES/Python-3.3.2.tar.bz2; then
-	wget -O $RPMBUILD/SOURCES/Python-3.3.2.tgz \
+	wget --no-check-certificate -O $RPMBUILD/SOURCES/Python-3.3.2.tgz \
 		http://www.python.org/ftp/python/3.3.2/Python-3.3.2.tgz
 	gunzip $RPMBUILD/SOURCES/Python-3.3.2.tgz
 	bzip2 $RPMBUILD/SOURCES/Python-3.3.2.tar
