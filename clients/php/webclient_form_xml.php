@@ -2,7 +2,6 @@
 header('Content-Type: text/xml');
 require 'session.php';
 use Wolframe\Session as Session;
-
 /*
  Forwards HTTP GET request as XML to a wolframe server via TCP/IP plain and rendes the result
  as XML with a reference to a CSS associated to the document type identifier of the result
@@ -13,7 +12,6 @@ use Wolframe\Session as Session;
  determines what is executed on the server. The document type of the content is defined 
  with the parameter 'DOCTYPE'.
 */
-
 try
 {
 	$cmd = NULL;			/* _REQUEST['CMD'] -> command to execute */
@@ -56,16 +54,11 @@ try
 	$conn = new Session( "127.0.0.1", 7661, NULL, NULL);
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
 	{
-		echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+		echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
 		echo "<error><class>ANSWER</class><message>" . $conn->lasterror() . "</message></error>";
 	}
 	else
 	{
-		$ar = explode( "\n", $result);
-		$hdr = preg_replace( "([ ]standalone[=][\"]no[\"])", " standalone=\"yes\"", $ar[0]);
-		$ar[0] = preg_replace("([<][!]DOCTYPE[ ][^>]+[>])", "", $hdr);
-		$ar[1] = preg_replace("([<][!]DOCTYPE[ ][^>]+[>])", "", $ar[1]);
-		$result = implode( "\n", $ar);
 		echo $result;
 	}
 	unset( $conn);
