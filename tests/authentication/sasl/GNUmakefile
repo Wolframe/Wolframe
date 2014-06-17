@@ -33,7 +33,7 @@ CPP_OBJS = \
 	$(TOPDIR)/src/modules/authentication/sasl/SaslAuth.o
 
 TEST_CPP_BINS = \
-#	saslTest$(EXE)
+	saslTest$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -55,6 +55,16 @@ ifeq "$(PLATFORM)" "NETBSD"
 endif
 endif
 
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/wtest"
+
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(PAM_LIB_DIR)"
+
 local_test: sasl.db $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./saslTest
+	@echo	
 endif
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
+
