@@ -18,6 +18,9 @@ try
 	$content = array();		/* request parameters without 'CMD' */
 	$doctype = NULL;
 	$root = NULL;
+	$ssl_enabled = false;		/* SSL yes (true) / no (false) */
+	$username = NULL;		/* Username for authorization with WOLFRAME-CRAM */
+	$password = NULL;		/* Password for authorization with WOLFRAME-CRAM */
 
 	foreach ($_REQUEST as $key => $value)
 	{
@@ -41,8 +44,20 @@ try
 		{
 			$cmd = $value;
 		}
+		else if ($key == "SSL" && 0==strcmp($value,"yes"))
+		{
+			$ssl_enabled = true;
+		}
 		else if ($key == "DOCTYPE")
 		{
+		}
+		else if ($key == "USERNAME")
+		{
+			$username = $value;
+		}
+		else if ($key == "PASSWORD")
+		{
+			$password = $value;
 		}
 		else
 		{
@@ -51,7 +66,28 @@ try
 	}
 	$body .= "</$root>\n";
 
-	$conn = new Session( "127.0.0.1", 7661, NULL, NULL);
+	if ($ssl_enabled == true)
+	{
+		$sslpath = "./SSL";
+		$sslopt = array(
+			"local_cert" => "$sslpath/combinedcert.pem",
+			"verify_peer" => false
+		);
+	}
+	if ($password != NULL && $username != NULL)
+	{
+		$authopt = array(
+			"mech" => "WOLFRAME-CRAM",
+			"username" => $username,
+			"password" => $password
+		);
+	}
+	$port = 7661;
+	if ($ssl_enabled)
+	{
+		$port = 7961;
+	}
+	$conn = new Session( "127.0.0.1", $port, $sslopt, $authopt);
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
 	{
 		echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";

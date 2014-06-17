@@ -1,30 +1,26 @@
 <?php
+header('Content-Type: text/xml');
 require 'session.php';
 use Wolframe\Session as Session;
-
 /*
- Same as webclient.php but using SSL to communicate with the Wolframe server.
- Forwards HTTP GET request as JSON to a wolframe server via TCP/IP with SSL and returns the result
- as the HTTP request answer. The HTTP REQUEST parameters without 'CMD' are transformed into 
- a JSON request set sent to the server. The command prefix is specified with the parameter
- 'CMD'. If the parameter 'CMD' is not specified then the document type only determines what is executed
- on the server. The document type of the content is defined in JSON as an attribute named 'doctype'
- and in XML as stem of the DOCYPE SYSTEM attribute or as stem of the xmlns:xsi root element
- attribute.
+ Forwards HTTP GET request as XML to a wolframe server via TCP/IP plain and rendes the result
+ as XML with a reference to a CSS associated to the document type identifier of the result
+ to render it properly by the HTML client.
+ The HTTP REQUEST parameters without 'CMD' are transformed into 
+ an XML request set sent to the server. The command prefix is specified with the parameter
+ 'CMD' and 'DOCTYPE'. If the parameter 'CMD' is not specified then the document type only
+ determines what is executed on the server. The document type of the content is defined 
+ with the parameter 'DOCTYPE'.
 */
-
 try
 {
-	$sslpath = "./SSL";
-	$sslopt = array(
-		"local_cert" => "$sslpath/combinedcert.pem",
-		"verify_peer" => false
-	);
-
 	$cmd = NULL;			/* _REQUEST['CMD'] -> command to execute */
 	$content = array();		/* request parameters without 'CMD' */
 	$doctype = NULL;
 	$root = NULL;
+	$ssl = false;
+	$username = NULL;
+	$password = NULL;
 
 	foreach ($_REQUEST as $key => $value)
 	{
@@ -38,6 +34,10 @@ try
 		}
 	}
 
+	$body = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' . "\n";
+	$body .= '<!DOCTYPE ' . $root . " SYSTEM '$doctype.sfrm'>\n";
+	$body .= "<$root>";
+
 	foreach ($_REQUEST as $key => $value)
 	{
 		if ($key == "CMD")
@@ -49,35 +49,33 @@ try
 		}
 		else
 		{
-			$content[ $key] = $value;
+			$body .= "<$key>" . $value . "</$key>";
 		}
 	}
-	$authopt = array(
-		"mech" => "NONE",
-		"username" => "gunibert",
-		"password" => "bork123"
+	$body .= "</$root>\n";
+
+	$sslpath = "./SSL";
+	$sslopt = array(
+		"local_cert" => "$sslpath/combinedcert.pem",
+		"verify_peer" => false
 	);
 
-	$doc = array();
-	$doc[ 'doctype'] = $doctype;
-	$doc[ $root] = $content;
-
-	$body = json_encode( $doc);
-
-	$conn = new Session( "127.0.0.1", 7962, $sslopt, $authopt);
+	$conn = new Session( "127.0.0.1", 7661, $sslopt, NULL);
 	if (($result = $conn->request( $cmd, $body)) === FALSE)
 	{
-		echo "<html><head><title>FAILED</title></head><body>" . $conn->lasterror() . "</body></html>";
+		echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+		echo "<error><class>ANSWER</class><message>" . $conn->lasterror() . "</message></error>";
 	}
 	else
 	{
-		echo "<html><head><title>RESULT</title></head><body><p>" . $result . "</p></body></html>";
+		echo $result;
 	}
 	unset( $conn);
 }
 catch ( \Exception $e)
 {
-	echo "<html><head><title>ERROR</title></head><body>" . $e->getMessage() . "</body></html>";
+	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+	echo "<error><class>EXCEPTION</class><message>" . $e->getMessage() . "</message></error>";
 }
 ?>
 
