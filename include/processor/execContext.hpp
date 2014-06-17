@@ -51,10 +51,10 @@ class ExecContext
 public:
 	/// \brief Default Constructor
 	ExecContext()
-		:m_provider(0),m_aaaaProvider(0){}
+		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0){}
 	/// \brief Constructor
 	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a)
-		:m_provider(p),m_aaaaProvider(a){}
+		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0){}
 
 	/// \brief Get the processor provider interface
 	const ProcessorProviderInterface* provider() const	{return m_provider;}
@@ -68,6 +68,11 @@ public:
 	const AAAA::Authorizer* authorizer() const		{return m_authorizer;}
 	/// \brief Set the authorization instance interface
 	void setAuthorizer( const AAAA::Authorizer* a)		{m_authorizer = a;}
+
+	/// \brief Get the default timeout for read operations in seconds
+	unsigned int defaultTimeout() const			{return m_default_timeout;}
+	/// \brief Set the default timeout for read operations in seconds (0=forever)
+	void setDefaultTimeout( unsigned int timeout_sec_)	{m_default_timeout = timeout_sec_;}
 
 	/// \brief Get an authenticator
 	AAAA::Authenticator* authenticator( const net::RemoteEndpoint& client ) const
@@ -83,11 +88,12 @@ private:
 	ExecContext( const ExecContext&);			//... non copyable
 	void operator=( const ExecContext&);			//... non copyable
 
-public:
+private:
 	const ProcessorProviderInterface* m_provider;		///< processor provider interface
 	types::SecureReference<AAAA::User> m_user;		///< user instance
 	const AAAA::Authorizer* m_authorizer;			///< instance to query for execution permission based on login data
 	const AAAA::AAAAprovider* m_aaaaProvider;		///< instance to query for an authenticator
+	unsigned int m_default_timeout;				///< default timeout
 };
 
 }} //namespace
