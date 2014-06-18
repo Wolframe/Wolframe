@@ -33,7 +33,6 @@
 /// \file execContext.cpp
 /// \brief Implementation execution context
 #include "processor/execContext.hpp"
-#include "logger-v1.hpp"
 #include "filter/typedfilter.hpp"
 #include "langbind/formFunction.hpp"
 
@@ -88,12 +87,12 @@ private:
 
 bool ExecContext::checkAuthorization( const std::string& authorizationFunction, const std::string& authorizationResource)
 {
+	if (authorizationFunction.empty()) return true;
 	try
 	{
 		const langbind::FormFunction* func = m_provider->formFunction( authorizationFunction);
 		if (func == 0)
 		{
-			LOG_ERROR << "Authorization failed because authorization function not found";
 			return false;
 		}
 		langbind::FormFunctionClosureR clos( func->createClosure());
@@ -101,7 +100,6 @@ bool ExecContext::checkAuthorization( const std::string& authorizationFunction, 
 		clos->init( this, input);
 		if (!clos->call())
 		{
-			LOG_ERROR << "Authorization function call and so authorization failed (internal error)";
 			return false;
 		}
 		langbind::TypedInputFilterR output = clos->result();
@@ -120,7 +118,6 @@ bool ExecContext::checkAuthorization( const std::string& authorizationFunction, 
 				//...boolean result is interpreted as result of authorization
 				return res_elem.tobool();
 			}
-			LOG_ERROR << "Authorization function failed (returned unexpected result type)";
 			return false;
 		}
 		else
@@ -131,7 +128,6 @@ bool ExecContext::checkAuthorization( const std::string& authorizationFunction, 
 	}
 	catch (std::runtime_error& e)
 	{
-		LOG_WARNING << "Authorization failed: " << e.what();
 		return false;
 	}
 }
