@@ -79,10 +79,7 @@ public:
 								{return m_aaaaProvider?m_aaaaProvider->authenticator( client ):0;}
 
 	/// \brief Checks if a function tagged with AUTHORIZE( authorizationFunction, authorizationResource) is allowed to be executed
-	bool checkAuthorization( const std::string& /*authorizationFunction*/, const std::string& /*authorizationResource*/)
-	{
-		return true;
-	}
+	bool checkAuthorization( const std::string& authorizationFunction, const std::string& authorizationResource);
 
 private:
 	ExecContext( const ExecContext&);			//... non copyable

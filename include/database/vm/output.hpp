@@ -91,12 +91,12 @@ public:
 		const types::Variant& arg() const	{return m_arg;}
 
 	private:
-		Operation m_op;				//< operation of output
-		types::Variant m_arg;			//< argument of output
+		Operation m_op;				///< operation of output
+		types::Variant m_arg;			///< argument of output
 	};
 
 	/// \brief Add element to output
-	/// \param[in] element to add
+	/// \param[in] elem element to add
 	void add( const Element& elem)
 	{
 		m_ar.back().push_back( elem);

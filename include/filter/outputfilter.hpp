@@ -137,9 +137,9 @@ public:
 	/// \brief Print the final close tag, if not printed yet, to close the output
 	virtual bool close()=0;
 
-	/// \brief Set type of the document.
-	/// \param [in] doctype type of the document
-	/// \remark For some types of filters (non buffering) the type has to be set before the first print
+	/// \brief Initialize the document meta data.
+	/// \param [in] md the new meta data of the document
+	/// \remark the meta data has to be set before the first print
 	void setMetaData( const types::DocMetaData& md)
 	{
 		if (state() != Start)
@@ -149,6 +149,7 @@ public:
 		m_metadata = md;
 	}
 
+	/// \brief Get the document meta data.
 	types::DocMetaData getMetaData() const
 	{
 		types::DocMetaData rt( m_metadata.doctype(), m_inheritMetadata->attributes());
@@ -156,6 +157,8 @@ public:
 		return rt;
 	}
 
+	/// \brief Declare the inherited document meta data.
+	/// \remark Inherited meta data implements a mechanism of reflection of the input document meta data in the output (if not explicitely redefined in the output)
 	virtual void inheritMetaData( const types::DocMetaDataR mdr)
 	{
 		m_inheritMetadata = mdr;
@@ -181,6 +184,8 @@ public:
 	}
 
 	/// \brief Set one document meta data element
+	/// \param [in] name_ name of the document meta data element
+	/// \param [in] value_ value of the document meta data element
 	void setAttribute( const std::string& name_, const std::string& value_)
 	{
 		if (state() != Start)
@@ -191,6 +196,7 @@ public:
 	}
 
 	/// \brief Set the document type meta data element
+	/// \param [in] id_ document type identifier
 	void setDoctype( const std::string& id_)
 	{
 		if (state() != Start)

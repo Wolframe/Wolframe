@@ -111,7 +111,7 @@ public:
 	/// \param [in] n number of bytes to shift
 	void incr( std::size_t n)				{if ((m_pos+n)>=m_size) m_pos=m_size; else m_pos+=n;}
 
-	/// \exception ArrayBoundReadError
+	/// \class ArrayBoundReadError
 	/// \brief Protocol memory block access violation exception
 	struct ArrayBoundReadError				:public std::logic_error {ArrayBoundReadError():std::logic_error("ABR"){}};
 

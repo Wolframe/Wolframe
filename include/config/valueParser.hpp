@@ -112,8 +112,8 @@ public:
 	struct RangeDomain :public BaseTypeDomain
 	{
 		/// \brief Constructor
-		/// \param[in] min minimal allowed value of the range
-		/// \param[in] max maximal allowed value of the range
+		/// \param[in] min_ minimal allowed value of the range
+		/// \param[in] max_ maximal allowed value of the range
 		RangeDomain( const DomainValueType& min_, const DomainValueType& max_=std::numeric_limits<DomainValueType>::max()) :m_min(min_),m_max(max_){}
 
 		/// \brief Get the description of the set of values allowed as string for the error log message

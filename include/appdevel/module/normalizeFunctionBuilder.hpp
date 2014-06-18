@@ -90,6 +90,7 @@ public:
 	///\brief Constructor
 	///\param[in] classname_ unique object name in the system (C++ name base)
 	///\param[in] identifier_ object name to reference the function
+	///\param[in] createFunc_ function creating the normalization function object
 	///\param[in] resource_ resource object (module singleton) shared by all instances using this resource
 	NormalizeFunctionBuilder( const char* classname_, const char* identifier_, types::CreateNormalizeFunction createFunc_, const types::NormalizeResourceHandleR& resource_)
 		:SimpleBuilder( classname_),m_identifier(identifier_),m_function(types::NormalizeFunctionType(createFunc_,resource_))
@@ -97,6 +98,7 @@ public:
 	///\brief Constructor
 	///\param[in] classname_ unique object name in the system (C++ name base)
 	///\param[in] identifier_ object name to reference the function
+	///\param[in] createFunc_ function creating the normalization function object
 	NormalizeFunctionBuilder( const char* classname_, const char* identifier_, types::CreateNormalizeFunction createFunc_)
 		:SimpleBuilder( classname_),m_identifier(identifier_),m_function(types::NormalizeFunctionType(createFunc_))
 	{}

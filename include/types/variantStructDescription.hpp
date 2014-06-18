@@ -191,17 +191,16 @@ public:
 	/// \return the index of the element added
 	int addStructure( const std::string& name, const VariantStructDescription& substruct);
 	/// \brief Add an indirection definition to the structure description (an indirection is a element expanded on access, e.g. for defining recursive structures)
-	/// \param[in] name name of the element added
+	/// \param[in] name_ name of the element added
 	/// \param[in] descr pointer to structure description of the element added
 	/// \return the index of the element added
 	int addIndirection( const std::string& name_, const VariantStructDescription* descr);
 	/// \brief Add an unresolved indirection definition to the structure description (an indirection is a element expanded on access, e.g. for defining recursive structures)
-	/// \param[in] name name of the element added
+	/// \param[in] name_ name of the element added
 	/// \param[in] symbol_ symbolic reference to be resolved later
 	/// \return the index of the element added
 	int addUnresolved( const std::string& name_, const std::string& symbol_);
 	/// \brief Add an element copy to the structure description
-	/// \param[in] name name of the element added
 	/// \param[in] elem element to be added
 	/// \return the index of the element added
 	int addElement( const Element& elem);
@@ -213,16 +212,33 @@ public:
 	void resolve( const ResolveMap& rmap);
 
 	/// \brief Find an element by name in the structure description
-	int findidx( const std::string& name) const;
-	const_iterator find( const std::string& name) const;
-	iterator find( const std::string& name);
+	/// \param[in] name_ name of the element to find
+	/// \return the index referencing the element found or -1 if not found
+	int findidx( const std::string& name_) const;
+	/// \brief Find an element by name in the structure description
+	/// \param[in] name_ name of the element to find
+	/// \return an iterator referencing the element found or the end if not found
+	const_iterator find( const std::string& name_) const;
+	/// \brief Find an element by name in the structure description
+	/// \param[in] name_ name of the element to find
+	/// \return an iterator referencing the element found or the end if not found
+	iterator find( const std::string& name_);
 
 	/// \brief Find an element by name with case insensitive comparison (of ascii A-Z) in the structure description
-	int findidx_cis( const std::string& name) const;
-	const_iterator find_cis( const std::string& name) const;
-	iterator find_cis( const std::string& name);
+	/// \param[in] name_ name of the element to find
+	/// \return the index referencing the element found or -1 if not found
+	int findidx_cis( const std::string& name_) const;
+	/// \brief Find an element by name with case insensitive comparison (of ascii A-Z) in the structure description
+	/// \param[in] name_ name of the element to find
+	/// \return an iterator referencing the element found or the end if not found
+	const_iterator find_cis( const std::string& name_) const;
+	/// \brief Find an element by name with case insensitive comparison (of ascii A-Z) in the structure description
+	/// \param[in] name_ name of the element to find
+	/// \return an iterator referencing the element found or the end if not found
+	iterator find_cis( const std::string& name_);
 
 	/// \brief Get the number of elements in the structure description
+	/// \return the number of elements
 	std::size_t size() const						{return m_size;}
 
 	/// \brief Compare two structure descriptions element by element (recursively)

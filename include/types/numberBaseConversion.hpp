@@ -49,8 +49,8 @@ namespace types {
 unsigned int convertBinaryToBCD( const unsigned char* uintptr, unsigned int uintsize, unsigned char* digitsbuf, unsigned int digitsbufsize);
 
 /// \brief Convert a large but limited size BCD number to a big endian integer value
-/// \param[in] digitsbuf buffer with BCD digits to convert (integers from 0..9 and NOT ascii '0'..'9')
-/// \param[in] digitsbufsize size of 'digitsbuf' in bytes
+/// \param[in] digits BCD digits to convert (integers from 0..9 and NOT ascii '0'..'9')
+/// \param[in] nofdigits number of digits in 'digits'
 /// \param[out] buf integer number (big endian) = conversion result
 /// \param[in] bufsize size of 'buf' in bytes
 /// \return number of digits in the result (might be 0 for "0")
@@ -70,8 +70,8 @@ unsigned int convertBigEndianUintToBCD( const UINTTYPE& val, unsigned char* digi
 
 /// \brief Convert a large but limited size BCD number to a big endian integer value
 /// \tparam UINTTYPE big endian integer type
-/// \param[in] digitsbuf buffer with BCD digits to convert (integers from 0..9 and NOT ascii '0'..'9')
-/// \param[in] digitsbufsize size of 'digitsbuf' in bytes
+/// \param[in] digits BCD digits to convert (integers from 0..9 and NOT ascii '0'..'9')
+/// \param[in] nofdigits number of digits in 'digits'
 /// \param[out] val big integer number
 /// \return number of digits in the result (might be 0 for "0")
 template <typename UINTTYPE>

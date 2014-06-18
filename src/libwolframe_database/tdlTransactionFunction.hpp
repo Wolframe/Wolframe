@@ -66,13 +66,19 @@ class TdlTransactionFunctionClosure
 	,public langbind::FormFunctionClosure
 {
 public:
+	/// \brief Constructor
+	/// \param[in] f function to create a closure for
 	TdlTransactionFunctionClosure( const db::TdlTransactionFunction* f);
+	/// \brief Copy constructor
 	TdlTransactionFunctionClosure( const TdlTransactionFunctionClosure& o);
 
+	/// \brief Call the function
 	virtual bool call();
 
+	/// \brief Initialize the execution context and the parameters
 	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f);
 
+	/// \brief Get the result of the function after its call
 	virtual langbind::TypedInputFilterR result() const;
 
 private:
