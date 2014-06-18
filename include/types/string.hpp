@@ -154,7 +154,7 @@ public:
 	};
 	/// \brief Guess the encoding from content
 	/// \param[in] content pointer to string
-	/// \param[in] contentsize length of 'content' in bytes
+	/// \param[in] size length of 'content' in bytes
 	/// \return the encoding class that can be guessed (with 100%, no probability decision !)
 	static EncodingClass::Id guessEncoding( const char* content, std::size_t size);
 	/// \brief Guess the encoding from content

@@ -57,7 +57,7 @@ struct DDLCompiler
 	/// \param[in] filename path of the file to compile as string
 	/// \param[in] typemap map with atomic type definitions
 	/// \return compilation result (a list of public and private forms).
-	/// \renmark Forms with an empty name are declared as private and not inserted into the map of public forms. But they are also not deleted and kept in a list, so that they can still be referenced by other forms in the list (for indirection).
+	/// \remark Forms with an empty name are declared as private and not inserted into the map of public forms. But they are also not deleted and kept in a list, so that they can still be referenced by other forms in the list (for indirection).
 	virtual std::vector<types::FormDescriptionR> compile( const std::string& filename, const types::NormalizeFunctionMap* typemap) const=0;
 
 	/// \brief Get the name of the ddl this compiler is for

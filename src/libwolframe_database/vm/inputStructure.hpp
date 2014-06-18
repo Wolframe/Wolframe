@@ -125,21 +125,29 @@ public://visit structure:
 	InputNodeVisitor::Index rootindex() const			{return 0;}
 
 	///\brief Get all children of a node having a tag matching to tag or all children if tag is 0.
+	///\param[in] nd referenced node
 	///\param[out] rt where to append the result nodes
 	void next( const InputNode* nd, int tag, std::vector<InputNodeIndex>& rt) const;
 	///\brief Get all children (transitive, e.g. also children of children) of a node having a tag matching to tag or all children if tag is 0.
+	///\param[in] nd referenced node
+	///\param[out] tag tag to match
 	///\param[out] rt where to append the result nodes
 	void find( const InputNode* nd, int tag, std::vector<InputNodeIndex>& rt) const;
 	///\brief Append parent of a node to a node list
+	///\param[in] nd referenced node
 	///\param[out] rt where to append the result node
 	void up( const InputNode* nd, std::vector<InputNodeIndex>& rt) const;
 	///\brief Get the value of a node or null, if not defined
+	///\param[in] nd referenced node
 	const types::Variant* contentvalue( const InputNode* nd) const;
 	///\brief Get the name of the tag of a node
+	///\param[in] nd referenced node
 	const char* tagname( const InputNode* nd) const;
 	///\brief Get the absolute path of a node as string with '/' as path element delimiter
+	///\param[in] nv referenced node visitor
 	std::string nodepath( const InputNodeVisitor& nv) const;
 	///\brief Get the absolute path of a node as string with '/' as path element delimiter
+	///\param[in] nd referenced node
 	std::string nodepath( const InputNode* nd) const;
 
 	///\brief Print a structure in a specified format to an output stream

@@ -42,7 +42,7 @@ namespace types {
 
 /// \class CountedReference
 /// \brief Shared reference to an object exchangeable in a single thread context
-/// \tparam OBJ
+/// \tparam OBJ object type referenced
 template <class OBJ>
 class CountedReference
 {

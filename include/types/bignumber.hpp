@@ -55,7 +55,7 @@ public:
 	/// \param[in] o number to copy
 	BigNumber( const BigNumber& o);
 	/// \brief Constructor from a variant type
-	/// \param[in] val number value as variant type
+	/// \param[in] v number value as variant type
 	BigNumber( const Variant& v);
 	/// \brief Constructor from a double
 	/// \param[in] val number value as double precision floating point number

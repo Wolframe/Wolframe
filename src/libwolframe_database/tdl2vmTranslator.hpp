@@ -75,6 +75,8 @@ public:
 
 	void output_statement_result( bool isLoop);
 
+	///\param[in] name name of the subroutine
+	///\param[in] templateParamValues template parameter of the subroutine
 	///\param[in] selector the selector string that has to be part of the mangled name of the subroutine created and called because references to input pathes may be be different and therefore require the distinguishing of the instances
 	void begin_DO_subroutine( const std::string& name, const std::vector<std::string>& templateParamValues, const std::string& selector);
 	void end_DO_subroutine();
@@ -142,13 +144,13 @@ private:
 			,mangledName(m){}
 	};
 
-	std::vector<State> m_stateStack;
-	const types::keymap<vm::Subroutine>* m_soubroutinemap;
-	std::vector<CalledSubroutineDef> m_calledSubroutines;
-	vm::Program m_sub_program;
-	vm::Program m_main_program;
-	bool m_isSubroutine;
-	unsigned int m_nofCommands;
+	std::vector<State> m_stateStack;			///< state stack to verify output and store context information
+	const types::keymap<vm::Subroutine>* m_soubroutinemap;	///< map of subroutines that can be called in this context
+	std::vector<CalledSubroutineDef> m_calledSubroutines;	///< list of subroutines called to eliminate duplicates (identical mangled name references)
+	vm::Program m_sub_program;				///< code segment where all subroutines called are added
+	vm::Program m_main_program;				///< code segment of the main program
+	bool m_isSubroutine;					///< bool if this program is a subroutine
+	unsigned int m_nofCommands;				///< counter of commands executed
 };
 
 }}//namespace
