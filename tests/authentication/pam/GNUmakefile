@@ -35,6 +35,8 @@ CPP_OBJS = \
 TEST_CPP_BINS = \
 	pamTest$(EXE)
 
+pamTest$(EXE): pamTest.o $(CPP_OBJS)
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

@@ -35,6 +35,8 @@ CPP_OBJS = \
 TEST_CPP_BINS = \
 	saslTest$(EXE)
 
+saslTest$(EXE): saslTest.o $(CPP_OBJS)
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
@@ -46,7 +48,7 @@ local_distclean:
 
 sasl.db:
 ifeq ($(WITH_SASL),1)
-	echo "xx" | $(SASL_DIR)/sbin/saslpasswd2 -f sasl.db -p test
+	echo "wolfpwd" | $(SASL_DIR)/sbin/saslpasswd2 -a wolframe -f sasl.db -u wolframe -c -p wolfusr
 ifeq "$(PLATFORM)" "FREEBSD"
 	mv sasl.db.db sasl.db
 endif
