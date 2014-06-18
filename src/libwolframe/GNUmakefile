@@ -71,6 +71,7 @@ CPP_OBJS = \
 	logObject.o \
 	logError.o \
 	version.o \
+	execContext.o \
 	getPassword.o \
 	user.o \
 	base64.o \

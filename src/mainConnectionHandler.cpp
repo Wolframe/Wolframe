@@ -105,7 +105,7 @@ const net::NetworkOperation Connection::nextOperation()
 		{
 			case cmdbind::CommandHandler::READ:
 				m_cmdhandler.getInputBlock( inpp, inppsize);
-				return net::ReadData( inpp, inppsize);
+				return net::ReadData( inpp, inppsize, m_cmdhandler.execContext()->defaultTimeout());
 	
 			case cmdbind::CommandHandler::WRITE:
 				m_cmdhandler.getOutput( outpp, outppsize);

@@ -109,7 +109,7 @@ private:
 
 /// \typedef TypedInputFilterR
 /// \brief Shared input filter reference
-typedef types::CountedReference<TypedInputFilter> TypedInputFilterR;
+typedef boost::shared_ptr<TypedInputFilter> TypedInputFilterR;
 
 
 
@@ -162,7 +162,7 @@ private:
 
 /// \typedef TypedOutputFilterR
 /// \brief Shared output filter reference
-typedef types::CountedReference<TypedOutputFilter> TypedOutputFilterR;
+typedef boost::shared_ptr<TypedOutputFilter> TypedOutputFilterR;
 
 
 }}//namespace
