@@ -1,7 +1,6 @@
 OPEN SOURCE PRODUCT MUSTS:
 Core:
-	- Authentication protocol integration
-	- AAAA stuff to a certain level (MBa, support for protocol PF)
+	- Authorization
 	- Client UI files from server with protocol support as ordinary wolframe function call (PF & MBa)
 	- For different type of transactions (get UI files, process request, etc..) chose DB in context
 
