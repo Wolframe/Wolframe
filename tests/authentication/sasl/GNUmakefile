@@ -63,8 +63,9 @@ LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(PAM_LIB_DIR)"
 
 local_test: sasl.db $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./saslTest
-	@echo	
+# Aba: disabled for now
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./saslTest
+#	@echo	
 endif
 
 showenv:
