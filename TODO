@@ -10,7 +10,3 @@ Processors:
 
 Fixes:
 	- Start SDK and splitting of graphix module and others
-
-Bugs:
-	- iofilterCommandHandlerEscDLF correct setting of m_nextmsg !
-

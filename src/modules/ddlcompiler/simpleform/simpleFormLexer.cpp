@@ -71,9 +71,9 @@ std::string Lexer::curtoken() const
 	}
 }
 
-Lexem Lexer::next2()
+Lexem Lexer::next2( bool eolnAsSeparator)
 {
-	Lexem rt = next();
+	Lexem rt = next( eolnAsSeparator);
 	if (rt.id() == Lexem::FORM)
 	{
 		rt = Lexem( rt.position(), Lexem::Identifier, "form");
@@ -87,25 +87,47 @@ Lexem Lexer::next2()
 	return rt;
 }
 
-Lexem Lexer::next()
+Lexem Lexer::next( bool eolnAsSeparator)
 {
 	enum Keywords {kw_none=0, kw_INCLUDE=1, kw_FORM=2, kw_STRUCT=3};
 	static const char* kwlist[] = {"INCLUDE","FORM","STRUCT", 0};
 	static const utils::IdentifierTable kwtab( false, kwlist);
 
-	m_tokch = utils::gotoNextToken( m_itr, m_end);
+	if (eolnAsSeparator)
+	{
+		while (m_itr != m_end && *m_itr != '\n' && *m_itr <= 32) ++m_itr;
+		m_position.update( m_itr_position, m_itr);
+		m_itr_position = m_itr;
+
+		if (m_itr == m_end)
+		{
+			return Lexem( m_position, Lexem::EndOfFile);
+		}
+		else if (*m_itr == '\n' || *m_itr == ',')
+		{
+			++m_itr;
+			return Lexem( m_position, Lexem::Separator);
+		}
+		m_tokch = *m_itr;
+	}
+	else
+	{
+		m_tokch = utils::gotoNextToken( m_itr, m_end);
+	}
 	while (m_tokch == ';' || m_tokch == '#')
 	{
 		utils::parseNextLine( m_itr, m_end);
 		m_tokch = utils::gotoNextToken( m_itr, m_end);
 	}
+
+	m_position.update( m_itr_position, m_itr);
+	m_itr_position = m_itr;
+
 	if (!m_tokch)
 	{
 		return Lexem( m_position, Lexem::EndOfFile);
 	}
 
-	m_position.update( m_itr_position, m_itr);
-	m_itr_position = m_itr;
 
 	switch ((Keywords)utils::parseNextIdentifier( m_itr, m_end, kwtab))
 	{
@@ -137,27 +159,10 @@ Lexem Lexer::next()
 		case '=': return Lexem( m_position, Lexem::Assign);
 		case '@': return Lexem( m_position, Lexem::AttributeTag);
 		case '-': return Lexem( m_position, Lexem::MetaDataDef);
-		case ';': return Lexem( m_position, Lexem::Semicolon);
+		case ',': return Lexem( m_position, Lexem::Separator);
 		default:
 			if (g_optab[m_tokch]) throw std::runtime_error( std::string("unexpected operator '") + (char)m_tokch + "'");
 			return Lexem( m_position, Lexem::Identifier, tok);
 	}
-}
-
-Lexem::Id Lexer::forwardLookup()
-{
-	std::string::const_iterator itr_prev = m_itr;
-	utils::SourceLineInfo position_prev = m_position;
-	std::string::const_iterator itr_position_prev = m_itr_position;
-	char tokch_prev = m_tokch;
-
-	Lexem lx = next();
-	Lexem::Id rt = lx.id();
-
-	m_itr_position = itr_position_prev;
-	m_itr = itr_prev;
-	m_position = position_prev;
-	m_tokch = tokch_prev;
-	return rt;
 }
 

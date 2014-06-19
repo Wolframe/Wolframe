@@ -51,8 +51,9 @@ using namespace _Wolframe::langbind::simpleform;
 
 static void compile_structure( Lexer& lexer, types::VariantStructDescription& result, const types::NormalizeFunctionMap* typemap, const types::keymap<types::FormDescriptionR>& formmap, std::vector<std::string>& unresolvedSymbols)
 {
+	bool seenCloseStruct = false;
 	Lexem lx;
-	for (lx = lexer.next2(); lx.id() != Lexem::CloseStruct; lx=lexer.next2())
+	for (lx = lexer.next2(false); lx.id() != Lexem::CloseStruct; lx=lexer.next2(false))
 	{
 		if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String)
 		{
@@ -66,8 +67,16 @@ static void compile_structure( Lexer& lexer, types::VariantStructDescription& re
 		bool isAttribute = false;			//< element is an attribute (for languages that know attributes like XML)
 		bool isInherited = (elementname == "_");	//< element is inherited (means it has no name and it acts as content of the enclosing element)
 
-		for (lx=lexer.next2();; lx=lexer.next2())
+		for (lx=lexer.next2(true);; lx=lexer.next2(true))
 		{
+			if (lx.id() == Lexem::Separator)
+			{
+				for (lx=lexer.next2(true); lx.id() == Lexem::Separator; lx=lexer.next2(true)){}
+				if (lx.id() != Lexem::OpenStruct)
+				{
+					throw std::runtime_error("unexpected end of line in the middle of an atomic element definition");
+				}
+			}
 			if (lx.id() == Lexem::OpenStruct)
 			{
 				types::VariantStructDescription substruct;
@@ -79,6 +88,15 @@ static void compile_structure( Lexer& lexer, types::VariantStructDescription& re
 				if (isIndirection) throw std::runtime_error("cannot declare embedded substructure as indirection ('^')");
 				if (isAttribute) throw std::runtime_error("cannot declare structure as attribute ('@')");
 				if (isInherited) throw std::runtime_error("cannot declare embedded substructure with name \"_\" used to declare inheritance");
+				lx = lexer.next2(true);
+				if (lx.id() == Lexem::CloseStruct)
+				{
+					seenCloseStruct = true;
+				}
+				else if (lx.id() != Lexem::Separator)
+				{
+					throw std::runtime_error("expected close structure '}' or end of line or comma ',' as separator after close struct");
+				}
 				break;
 			}
 			else if (lx.id() == Lexem::Identifier)
@@ -87,14 +105,9 @@ static void compile_structure( Lexer& lexer, types::VariantStructDescription& re
 				std::string defaultvalue;
 				bool hasDefault = false;
 
-				// Here we handle the case of default value assigment and postfix array marker.
-				//	Because simpleform language has no end of statement marker, we have to do forward lookups
-				//	to check when the next statement starts or the structure ends
-
-				Lexem::Id flx = lexer.forwardLookup();
-				for (; flx != Lexem::Semicolon && flx != Lexem::Identifier && flx != Lexem::CloseStruct; flx = lexer.forwardLookup())
+				lx = lexer.next2(true);
+				for (; lx.id() != Lexem::Separator && lx.id() != Lexem::CloseStruct; lx = lexer.next2(true))
 				{
-					lx = lexer.next();
 					if (lx.id() == Lexem::ArrayTag)
 					{
 						if (hasDefault) throw std::runtime_error("unexpected array marker after default value assignment");
@@ -105,10 +118,10 @@ static void compile_structure( Lexer& lexer, types::VariantStructDescription& re
 					{
 						if (isArray) throw std::runtime_error("cannot handle default value assignment for array");
 						if (hasDefault) throw std::runtime_error("cannot handle duplicate default value assignment");
-						lx = lexer.next2();
+						lx = lexer.next2(true);
 						if (lx.id() != Lexem::String && lx.id() != Lexem::Identifier)
 						{
-							throw std::runtime_error( "string expected for default value declaration after '='");
+							throw std::runtime_error( "string or identifier expected for default value declaration after '='");
 						}
 						defaultvalue = lx.value();
 						hasDefault = true;
@@ -118,9 +131,9 @@ static void compile_structure( Lexer& lexer, types::VariantStructDescription& re
 						throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", default value assignment or array marker or following structure element declaration expected");
 					}
 				}
-				if (flx == Lexem::Semicolon)
+				if (lx.id() == Lexem::CloseStruct)
 				{
-					lexer.next();
+					seenCloseStruct = true;
 				}
 
 				// Resolve type:
@@ -263,6 +276,10 @@ static void compile_structure( Lexer& lexer, types::VariantStructDescription& re
 				throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", attribute or type name or substructure expected");
 			}
 		}
+		if (seenCloseStruct)
+		{
+			break;
+		}
 	}
 }
 
@@ -288,22 +305,22 @@ static void compile_forms( const std::string& filename, std::vector<types::FormD
 		types::keymap<types::FormDescriptionR> formmap;
 	
 		// Compile all forms and structures:
-		for (lx=lexer.next(); lx.id() != Lexem::EndOfFile; lx=lexer.next())
+		for (lx=lexer.next(false); lx.id() != Lexem::EndOfFile; lx=lexer.next(false))
 		{
 			if (lx.id() == Lexem::INCLUDE)
 			{
-				lx = lexer.next();
+				lx = lexer.next(false);
 				if (lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string expected");
 				
 				compile_forms( utils::getCanonicalPath( lx.value(), includepath), result, typemap, filenamestack2);
 			}
 			else if (lx.id() == Lexem::STRUCT)
 			{
-				lx = lexer.next();
+				lx = lexer.next(false);
 				if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for name of structure");
 				if (lx.value().empty()) throw std::runtime_error( "non empty structure name expected after STRUCT");
 				std::string structname( lx.value());	//... name of the structure in the reference table for indirections and sub structures
-				lx = lexer.next();
+				lx = lexer.next(false);
 				if (lx.id() == Lexem::MetaDataDef) throw std::runtime_error("meta data definition (':') not possible in STRUCT definition");
 				if (lx.id() != Lexem::OpenStruct) throw std::runtime_error("open structure operator '{' expected (start of the form or structure declaration)");
 
@@ -314,19 +331,19 @@ static void compile_forms( const std::string& filename, std::vector<types::FormD
 			else if (lx.id() == Lexem::FORM)
 			{
 				// Define form structure name (doctype):
-				lx = lexer.next();
+				lx = lexer.next(false);
 				if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for name of structure");
 				if (lx.value().empty()) throw std::runtime_error( "non empty form name expected after FORM");
 				std::string structname( lx.value());	//... name of the form
 
 				types::DocMetaData metadata;
-				lx = lexer.next();
+				lx = lexer.next(false);
 
 				// Define meta data attributes:
 				std::map<std::string,bool> defmap;
 				while (lx.id() == Lexem::MetaDataDef)
 				{
-					lx = lexer.next();
+					lx = lexer.next(false);
 					if (lx.id() != Lexem::Identifier && lx.id() != Lexem::String) throw std::runtime_error( std::string("unexpected token ") + lexer.curtoken() + ", string or identifier expected for meta data attribute name after ':'");
 					if (lx.value().empty()) throw std::runtime_error( "non empty meta data attribute name name expected after ':'");
 					std::string attrnam( lx.value());
@@ -335,7 +352,7 @@ static void compile_forms( const std::string& filename, std::vector<types::FormD
 						throw std::runtime_error( "duplicate definition of meta data attribute in form");
 					}
 					defmap[ attrnam] = true;
-					lx = lexer.next();
+					lx = lexer.next(false);
 					if (lx.id() == Lexem::Identifier && lx.value() == "NULL")
 					{
 						metadata.deleteAttribute( attrnam);
@@ -349,7 +366,16 @@ static void compile_forms( const std::string& filename, std::vector<types::FormD
 						std::string attrval( lx.value());
 						metadata.setAttribute( attrnam, attrval);
 					}
-					lx = lexer.next();
+					lx = lexer.next(true);
+					if (lx.id() != Lexem::Separator)
+					{
+						if (lx.id() == Lexem::MetaDataDef)
+						{
+							throw std::runtime_error( "comma ',' or end of line expected as separator of meta data declarations");
+						}
+						break;
+					}
+					lx = lexer.next(false);
 				}
 				// Define form data structure:
 				if (lx.id() != Lexem::OpenStruct) throw std::runtime_error("open structure operator '{' expected (start of the form or structure declaration)");

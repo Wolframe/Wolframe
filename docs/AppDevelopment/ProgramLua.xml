@@ -279,19 +279,21 @@
 	</sect2>
 
 	<sect2>
-	<title>Serialization Iterators</title>
-	<para>Some objects introduced in the following sections are accessible through
-		iterators. These are called serialization iterators and are <application>Lua</application>
-		function closures. You should not mix them with the standard <application>Lua</application>
-		iterators though the semantic is similar. Serialization iterators do not
+	<title>Filter Interface Iterators</title>
+	<para>Lua provides an interface to the iterators internally used to couple 
+		objects and functions. They are accessible as iterator function closure
+		in <application>Lua</application>. 
+		The look similar to <application>Lua</application> iterators but are not.
+		You should not mix them with the standard <application>Lua</application>
+		iterators though the semantic is similar. Filter interface iterators do not
 		return nodes of the tree as subtree objects but only the node data in the
 		order of a pre-order traversal. You can recursively iterate on the tree
 		and build the object during traversal if you want.
-		The returned elements of the serialization iterators are tuples 
+		The returned elements of the Filter interface iterators are tuples 
 		with the following meaning:
 	</para>
 	<table frame="all" width="100%">
-		<title>Serialization Iterator Elements</title>
+		<title>Filter Interface Iterator Elements</title>
 		<tgroup cols="3">
 		<thead>
 			<row>
@@ -329,7 +331,7 @@
 
 	<sect2>
 	<title>Iterator Library</title>
-	<para><application>Wolframe</application> lets you access serialization
+	<para><application>Wolframe</application> lets you access filter interface
 		iterators through a library called <code>iterator</code> 
 		offering the following functions:
 
@@ -409,7 +411,7 @@
 		</para>
 		<para>
 		To access the data in a form there are two form methods available.
-		<code>get()</code> returns a serialization iterator on the form data.
+		<code>get()</code> returns a filter interface iterator on the form data.
 		There is also a method <code>value()</code> that returns the form data as
 		<application>Lua</application> data structure
 		(a <application>Lua</application> table or atomic value).
@@ -420,9 +422,9 @@
 	<para>
 		For calling transactions or built-in functions loaded as modules the <application>Lua</application> layer defines the
 		concept of functions. The provider function <code>provider.formfunction</code> with the name of the function
-		as argument returns a <application>Lua</application> function. This function takes a table or a serialization iterator as argument
+		as argument returns a <application>Lua</application> function. This function takes a table or a filter interface iterator as argument
 		and returns a data form structure. The data in the returned form data structure can be
-		accessed with <code>get()</code> that returns a serialization iterator on the content 
+		accessed with <code>get()</code> that returns a filter interface iterator on the content 
 		and <code>value()</code> that returns a <application>Lua</application> table or 
 		atomic value.
 		</para>
@@ -461,8 +463,8 @@
 				<row>
 					<entry>get</entry>
 					<entry></entry>
-					<entry>serialization iterator (*)</entry>
-					<entry>Returns a serialization iterator on the form elements</entry>
+					<entry>filter interface iterator (*)</entry>
+					<entry>Returns a filter interface iterator on the form elements</entry>
 				</row>
 				<row>
 					<entry>value</entry>
@@ -486,7 +488,7 @@
 				<row>
 					<entry>fill</entry>
 					<entry><application>Lua</application> table or 
-					serialization iterator (*), optional validation mode (**)</entry>
+					filter interface iterator (*), optional validation mode (**)</entry>
 					<entry>the filled form (for concatenation)</entry>
 					<entry>Validates input and fills the input data into the form.</entry>
 				</row>
@@ -494,7 +496,7 @@
 			</tgroup>
 		</table>
 		<para>
-			(*) See section "Serialization Iterator"
+			(*) See section "filter interface iterator"
 		</para>
 		<para>
 			(**) "strict" (full validation), "complete" (only check for all non optional elements initialization) or "relaxed" (no validation except matching of input to elements)
@@ -514,8 +516,8 @@
 			<tbody>
 				<row>
 					<entry>get</entry>
-					<entry>serialization iterator (*)</entry>
-					<entry>Returns a serialization iterator on the form elements</entry>
+					<entry>filter interface iterator (*)</entry>
+					<entry>Returns a filter interface iterator on the form elements</entry>
 				</row>
 				<row>
 					<entry>value</entry>
@@ -531,7 +533,7 @@
 			</tgroup>
 		</table>
 		<para>
-			(*) See section "Serialization Iterator"
+			(*) See section "filter interface iterator"
 		</para>
 
 		<table>
@@ -584,14 +586,14 @@
 				<row>
 					<entry>get</entry>
 					<entry> - </entry>
-					<entry>Returns a serialization iterator (*) on the form elements</entry>
+					<entry>Returns a filter interface iterator (*) on the form elements</entry>
 				</row>
 			</tbody>
 			</tgroup>
 
 		</table>
 		<para>
-			(*) See section "Serialization Iterator"
+			(*) See section "filter interface iterator"
 		</para>
 
 		<table frame="all" width="100%">
@@ -654,19 +656,14 @@
 					<entry>Returns an object of type "document" that allows the processing of the contents passed as argument.
 						See description of type "document"</entry>
 				</row>
-				<row>
-					<entry>scope</entry>
-					<entry>serialization iterator (*)</entry>
-					<entry>Returns a serialization iterator to iterate till the end of the current tag (**). Consumes the iterated scope from the argument iterator.</entry>
-				</row>
 			</tbody>
 			</tgroup>
 		</table>
 		<para>
-			(*) See section "Serialization Iterator"
+			(*) See section "filter interface iterator "
 		</para>
 		<para>
-			(**) The serialization iterator of a defined scope must be consumed completely before consuming anything of the parent iterator.
+			(**) The filter interface iterator  of a defined scope must be consumed completely before consuming anything of the parent iterator.
 			Otherwise it may lead to unexpected results because they share some part of the iterator state.
 		</para>
 	</sect2>

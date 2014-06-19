@@ -11,10 +11,11 @@
 		You configure the <acronym>DDL</acronym> sources to load and the compiler to use.
 	</para>
 	<para>
-		With the <acronym>DDL</acronym> form description we get a deserialization of some content
-		into a structure and a serialization for the output. We get also a validation
-		and normalization procedure of the content by assigning types to atomic form
-		elements that validate and normalize the data elements.
+		With the <acronym>DDL</acronym> form description we get a deserialization
+		of some content into a structure and a serialization for the output. 
+		We get also a validation and normalization procedure of the content by 
+		assigning types to atomic form elements that validate and normalize 
+		the data elements.
 		Most of the business transactions should be doable as input form
 		description, output form description and a transaction that maps
 		input to output without control flow aware programming.
@@ -26,43 +27,132 @@
 	<sect2>
 	<title>Forms in Simpleform DDL</title>
 	<para>
-		As example of a form <acronym>DDL</acronym> we provide the <glossterm>simpleform</glossterm> <acronym>DDL</acronym>. The format is based on the "INFO"-format
-		introduced by Marcin Kalicinski for the boost property tree library. We used this library to show an example
-		that is easy to understand and small enough.
-		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to describe structures.
-		The key represents the name of the element and the value represents the type of the element.
-		The type is defined by a typename and some operators that describe additional properties.
+		As example of a form <acronym>DDL</acronym> we provide the <glossterm>simpleform</glossterm> <acronym>DDL</acronym>. 
+		In simple form we forms, subtructures for reuse inside structures and forms
+		and includes that help you to organize your code.
+	</para>
+	<sect3>
+	<title>Commands</title>	
+	<para>
+		The <glossterm>simpleform</glossterm> language has 3 commands:
+		<simplelist type="horiz" columns="2">
+		<member><code>FORM</code></member><member>Declare the name of the form, some document meta data and the structure that represents the description of the document content of this form</member>
+		<member><code>STRUCT</code></member><member>Declare the name of the structure, the structure that can be referenced by name in structures of subsequent FORM or STRUCT declarations</member>
+		<member><code>INCLUDE</code></member><member>include the file given as argument</member>
+		</simplelist>
+	</para>
+	</sect3>
+	<sect3>
+	<title>Structures</title>	
+	<para>
+		Structures in <code>FORM</code> or <code>STRUCT</code> declarations
+		are defined as list of elements in curly brackets '{' '}'.
+	</para>
+	<para>The following example shows an empty structure declaration
+	<programlisting language='text'>
+STRUCT myStructure
+{
+}
+	</programlisting>
+	</para>
+	<para>The following example shows an empty form declaration
+	<programlisting language='text'>
+FORM myDocumentSchema
+{
+}
+	</programlisting>
+	</para>
+	</sect3>
+	<sect3>
+	<title>Elements of structures</title>	
+	<para>
+		An element in the list is either a declaration of a substructure or
+		an atomic element. The elements are separated by comma ',' or end of line.
+	</para>
+	<para>The following example shows a structure that is a list with 3 elements separated by end of line
+		<programlisting language='text'>
+{
+    number int
+    name string
+    id int
+}
+		</programlisting>
+	</para>
+	<para>And the same example with a comma as element separator
+		<programlisting language='text'>
+{
+    number int, name string, id int
+}
+		</programlisting>
 	</para>
 	<para>
-		Each form declaration starts with a keyword 'FORM' or 'STRUCT'. The difference 
-		between 'FORM' and 'STRUCT' is that the later is used for declarations that are 
-		only referenced inside the same file as sub structure reference,
-		while 'FORM' declares a structure to be exported as global form declaration.
-		The keyword 'FORM' is followed by 2 identifiers. The first one defines the
-		name of the form and the second the root element for serializations that need
-		a root element to be defined like XML.
-		This header is followed by the structure declaration inside curly brackets '{' '}'.
-		The keyword 'STRUCT' is followed by the name of the structure and the body as
-		for forms. No root element is defined here.
+		An element starts with an identifier, the name of the element.
+		The name is followed by some special characters defining the element 
+		attributes and the element type. The element attributes will be described
+		later. The element type is either an embedded substructure in '{' '}' 
+		brackets or an identifier naming an atomic type or a substructure 
+		declared previously as a <code>STRUCT</code>. 
+	</para>
+	</sect3>
+	<sect3>
+	<title>Embedded structure definitions</title>	
+	<para>Here is an example with a embedded substructure
+		<programlisting language='text'>
+{
+    number int
+    name string
+    address {
+        street string, country string
+    }
+}
+		</programlisting>
 	</para>
 	<para>
-		There is only one predefined data type known in <glossterm>simpleform</glossterm>
-		<acronym>DDL</acronym>: "string". All other data types are defined as sequence of 
-		<glossterm>normalizer</glossterm> functions in a normalize definition file.
-		The <glossterm>normalizer</glossterm> functions assigned to a type validate 
-		the value and transform it to its normalized form.
-		We explain in the next section how data types are defined.
+		Embedded substructure declarations follow recursively the same rules as 
+		structures defined here.
 	</para>
+	</sect3>
+	<sect3>
+	<title>Default atomic value assignments</title>	
 	<para>
-		The following element attributes are known in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>:
-
+		Named types referencing atomic types can be followed by an assignment
+		operator '=' and a string that declared a default value initialization of
+		the structure element. Here is an example with a default value assignment
+		<programlisting language='text'>
+{
+    number int = 1
+    name string
+}
+		</programlisting>
+	</para>
+	</sect3>
+	<sect3>
+	<title>Types of atomic values</title>	
+	<para>
+		The atomic element type names are either the reserved keyword <code>string</code>
+		or a type defined as sequence of <glossterm>normalizer</glossterm> functions 
+		in a normalize definition file. The <glossterm>normalizer</glossterm> 
+		functions assigned to a type validate the value and transform it to its 
+		normalized form. The next section will explain how data types are defined.
+	</para>
+	</sect3>
+	<sect3>
+	<title>Element attributes</title>
+	<para>
+		The element attributes are marked with some special characters listed and
+		explained in the following table:
 		<table frame="all" width="100%">
-			<title>element attributes in simpleform</title>
-			<tgroup cols="3">
+			<title>Element attributes in simpleform</title>
+			<tgroup cols="4">
+			<colspec colnum="1" colname="col1" colwidth="1*"/>
+			<colspec colnum="2" colname="col2" colwidth="4*"/>
+			<colspec colnum="3" colname="col3" colwidth="4*"/>
+			<colspec colnum="4" colname="col4" colwidth="8*"/>
 			<thead>
 				<row>
-					<entry>Attribute</entry>
+					<entry></entry>
 					<entry>Location</entry>
+					<entry>Example</entry>
 					<entry>Description</entry>
 				</row>
 			</thead>
@@ -71,61 +161,121 @@
 				<row>
 					<entry>@</entry>
 					<entry>prefix of data type</entry>
+					<entry><code>id @int</code></entry>
 					<entry>Expresses that the element is an attribute and not a content element of the structure. This has only influence on the XML or similar representation of the form content</entry>
 				</row>
 
 				<row>
 					<entry>?</entry>
 					<entry>prefix of data type</entry>
+					<entry><code>value ?string</code></entry>
 					<entry>Expresses that the element is optional also in strict validation</entry>
 				</row>
 
 				<row>
 					<entry>^</entry>
 					<entry>prefix of form name</entry>
+					<entry><code>ltree ^bintree</code></entry>
 					<entry>Expresses that the element is optional and refers to a structure defined in the same module that is expanded only if the element is present. With this construct it is possible to define recursive structures like trees.</entry>
 				</row>
 		
 				<row>
 					<entry>!</entry>
 					<entry>prefix of data type</entry>
+					<entry><code>id !int</code></entry>
 					<entry>Expresses that the element is always mandatory (also in non strict validation)</entry>
 				</row>
 
 				<row>
 					<entry>[]</entry>
 					<entry>suffix of data type</entry>
+					<entry><code>values string[]</code></entry>
 					<entry>Expresses that the element is an array of this type</entry>
 				</row>
 		
 				<row>
 					<entry>[]</entry>
 					<entry>without data type</entry>
+					<entry><code>ar [] { }</code></entry>
 					<entry>Expresses this element is an array of structures and that the structure defined describes the prototype (initialization) element of the array.</entry>
 				</row>
 
 				<row>
 					<entry>='..'</entry>
 					<entry>end of data type declaration</entry>
+					<entry><code>id int = 1</code></entry>
 					<entry>Expresses that '..' is the default initialization value of this element.</entry>
 				</row>
 			</tbody>
 			</tgroup>
 		</table>
+		Non contradicting attributes can be combined:
+		<programlisting language='text'>
+id ?@int = 1
+		</programlisting>
 	</para>
+	</sect3>
+	<sect3>
+	<title>Embedding elements and inheritance</title>
 	<para>
-		Using a single underscore as typename ('_') means that element is embedded 
-		into the structure without being referenceable by name. In case of an atomic 
-		value it means that value represents the content value of the structure. In 
-		case of a substructure it means that the structure inherits
-		the embedded elements of the substructure.
+		Using a single underscore '_' as atomic element name means that the 
+		atomic element is representing the unnamed content value of the structure.
+		Using a single underscore for a substructure means that the substructure
+		is embedded into the structure without being referenceable by name. 
+		The embedding into a structure is used to express inheritance.
 	</para>
+	<para>Here is an example with embedding of a named structure
+		<programlisting language='text'>
+STRUCT content
+{
+    name string
+    birth string
+}
+
+FORM insertedContent
+{
+    id int
+    _ content
+}
+		</programlisting>
+	</para>
+	</sect3>
+	<sect3>
+	<title>Declaring document meta data</title>
 	<para>
-		The following example shows a form defined in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>.
+		Document meta data in <code>FORM</code> definitions are declared after the
+		form declaration header and before the form structure declaration.
+		A meta data declaration starts with a dash '-' followed by the meta data
+		attribute name as identifier or string and the value as string.
+	</para>
+	<para>Here is an example of a form with meta data declarations
+		<programlisting language='text'>
+FORM myDoc
+    -root = 'doc', -schemaLocation = 'http://bla.com/schema'
+{
+}
+		</programlisting>
+	</para>
+	<para>or with end of line as attribute separator
+		<programlisting language='text'>
+FORM myDoc
+    -root = 'doc'
+    -schemaLocation = 'http://bla.com/schema'
+{
+}
+		</programlisting>
+	</para>
+	</sect3>
+	<sect3>
+	<title>Example form definition</title>
+	<para>
+		Now all elements of <glossterm>simpleform</glossterm> are explained.
+		Here is an example that shows a complete form definition in <glossterm>simpleform</glossterm> <acronym>DDL</acronym>.
 		<programlisting language='text'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customers.simpleform" parse="text" />
 		</programlisting>
 	</para>
+	</sect3>
 	</sect2>
 </sect1>
 

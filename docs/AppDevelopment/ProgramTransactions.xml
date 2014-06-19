@@ -3,17 +3,19 @@
 	<sect2>
 		<title>Introduction</title>
 		<para>
-			For the description of transactions <application>Wolframe</application> provides the
-			transaction definition language (<acronym>TDL</acronym>) introduced here.
-			<application>Wolframe</application> transactions in <acronym>TDL</acronym> are defined as functions in a
-			transactional context. This means that whatever is executed in a transaction function
-			belongs by default to a database transaction with an automatic commit on function completion
-			if not explicitly defined otherwise by the caller. Errors lead to an automatic abort
-			of the database transaction.
+			For the description of transactions <application>Wolframe</application>
+			provides the transaction definition language (<acronym>TDL</acronym>)
+			introduced here. <application>Wolframe</application> transactions 
+			in <acronym>TDL</acronym> are defined as functions in a transactional 
+			context. This means that whatever is executed in a transaction 
+			function belongs to a database transaction. The transaction
+			commit is executed implicitely on function completion. Errors or 
+			a denied authorization or a failing audit operation lead to an 
+			abort of the database transaction.
 		</para>
 		<para>
-			A <acronym>TDL</acronym> transaction function takes a structure as input
-			and returns a structure as output.
+			A <acronym>TDL</acronym> transaction function takes a structure 
+			as input and returns a structure as output.
 			The <application>Wolframe</application> database interface defines 
 			a transaction as object where the input is passed to as a structure 
 			and the output is fetched from it as a structure.
@@ -23,44 +25,49 @@
 			input and the building of the result structure from the database output.
 			It defines a transaction as a sequence of instructions on multiple data.
 			An instruction is either described as a single embedded database command
-			in the language of the underlying database, a name of a function declared
-			in the database (e.g. a PLSQL function) or a TDL subroutine call
+			in the language of the underlying database or a TDL subroutine call
 			working on multiple data.
 		</para>
 		<para>
 			Working on multiple data means that the instruction is executed
-			for every item of an input set. This set can consist of the set of
+			for every item of its input set. This set can consist of the set of
 			results of a previous instruction or a selection of the
 			input of the transaction function. A "for each" selector
 			defines the input set as part of the command.
 		</para>
 		<para>
-			Each instruction result can be declared as being part of the transaction
-			result structure. The language has no control structures and is 
-			therefore not a general purpose programming language.
-			It just offers some mapping of the input to commands and from the command 
-			results back to the output.
+			Each instruction result can be declared as being part of the 
+			transaction result structure. The language has no flow control 
+			based on state variables other than input and results of 
+			previous commands and is therefore not a general purpose programming 
+			language. But because of this, the processing and termination of the 
+			program is absolutely predictable.
 		</para>
 		<para>
-			To convert input data the transaction definition language 
-			defines a preprocessing section where globally defined Wolframe
+			As possibility to convert the input data before passing it to
+			the database, the transaction definition language defines a 
+			preprocessing section where globally defined Wolframe
 			functions can be called for the selected input. To build an output 
 			structure that cannot be modeled with a language without control
 			structures and recursion, TDL provides the possibility to define a
-			function as filter for postprocessing of the
-			result of the transaction function.
+			function as filter for postprocessing of the result of the 
+			transaction function. This way it is for example possible to
+			return a tree structure as TDL function result.
 		</para>
 		<para>
-			The TDL is case insensitive. For clearness and better readability
-			TDL keywords are written in uppercase here.
+			The TDL is - as most SQL databases - case insensitive. 
+			For clearness and better readability TDL keywords are written in 
+			uppercase here. We recommend in general to use uppercase letters 
+			for TDL keywords. It makes the source more readable.
 		</para>
 	</sect2>
 
 	<sect2>
 	<title>Configuration</title>
 		<para>
-		Each TDL program source referenced has to be declared in the <code>Processor</code>
-		section of the configuration with <code>program &lt;sourcefile&gt;</code>.
+		Each TDL program source referenced has to be declared in the 
+		<code>Processor</code> section of the configuration with 
+		<code>program &lt;sourcefile&gt;</code>.
 		</para>
 	</sect2>
 
@@ -77,18 +84,21 @@
 			<para>A subroutine declaration starts with the Keyword <code>SUBROUTINE</code>
 			followed by the subroutine name and optionally some parameter names
 			in brackets ('(' ')') separated by comma.
-			The declared subroutine name identifies the
-			function in the scope of this sourcefile after this subroutine declaration.
+			The declared subroutine name identifies the function in the scope 
+			of this sourcefile after this subroutine declaration.
 			The name is not exported and the subroutine not available for other TDL
-			modules. The body of the function contains the following parts:
+			modules. With includes described later we can reuse code.
+			The body of the function contains the following parts:
 			<itemizedlist>
 				<listitem><programlisting>DATABASE &lt;database name list&gt;</programlisting>
 					<para>
-						This optional definition is restriction the definition
-						and availability of the function to a set of
-						databases. The databases are listed by name
-						separated by comma (','). The names are the
-						database id's defined in your server configuration.
+						This optional definition is restriction the 
+						definition and availability of the function 
+						to a set of databases. The databases are 
+						listed by name separated by comma (','). 
+						The names are the database id's defined in 
+						your server configuration or database names
+						as specified in the module.
 						If the database declaration is omitted then the 
 						transaction function is avaiable for any 
 						database. This declaration allows you to
@@ -99,10 +109,10 @@
 				</listitem>
 				<listitem><programlisting>BEGIN &lt;...instructions...&gt; END</programlisting>
 					<para>
-					The main processing block starts with <code>BEGIN</code> and
-					ends with <code>END</code>. It contains all the commands
-					executed when calling this subroutine from another
-					subroutine or a transaction function.
+					The main processing block starts with <code>BEGIN</code>
+					and ends with <code>END</code>. It contains all the 
+					commands executed when calling this subroutine from 
+					another subroutine or a transaction function.
 					</para>
 				</listitem>
 			</itemizedlist>
@@ -127,22 +137,28 @@
 				<listitem><programlisting>AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )</programlisting>
 					<para>
 						This optional definition is dealing with 
-						authorization and access rights.
+						authorization and access rights. If the
+						authorization function fails, the transaction
+						function is not executed and returns with error.
+						The &lt;auth-function&gt; references a form
+						function implementing the authorization check.
+						The &lt;auth-resource&gt; is passed as parameter
+						with name 'resource' to the function.
 					</para>
 				</listitem>
 				<listitem><programlisting>DATABASE &lt;database name list&gt;</programlisting>
 					<para>
-						This optional definition is restriction the definition
-						and availability of the function to a set of
-						databases. The databases are listed by name
-						separated by comma (','). The names are the
-						database id's defined in your server configuration.
-						If the database declaration is omitted then the 
-						transaction function is avaiable for any 
-						database. This declaration allows you to
-						run your application with configurations
-						using different databases but sharing a common
-						code base.
+						This optional definition is restriction the
+						definition and availability of the function 
+						to a set of databases. The databases are listed 
+						by name separated by comma (','). The names 
+						are the database id's defined in your server 
+						configuration. If the database declaration is 
+						omitted then the transaction function is 
+						avaiable for any database. This declaration
+						allows you to run your application with 
+						configurations using different databases but 
+						sharing a common code base.
 					</para>
 				</listitem>
 				<listitem><programlisting>RESULT FILTER &lt;post-filter-name&gt;</programlisting>
@@ -162,7 +178,7 @@
 					<para>
 						This optional block contains instructions on the transaction
 						function input. The result of these preprocessing instructions are
-						put into the input structure, so that they can be referred to in the main
+						put into the input structure, so that they can be referenced in the main
 						code definition block of the transaction.
 						We can call any global normalization or form function in the 
 						preprocessing block to enrich or transform the input to process.
@@ -177,14 +193,18 @@
 				</listitem>
 				<listitem><programlisting>AUDIT [CRITICAL] &lt;funcname...&gt; WITH BEGIN &lt;...instructions...&gt; END</programlisting>
 					<para>
-						This optional block specifies a function that is executed
-						at the end of a transaction. The input of the function is
-						the structure built from the output of the instructions block.
-						If CRITICAL is specified then the transaction fails (rollback) if the
-						audit function fails. Otherwise there is just the error of
-						the audit function logged, but the transaction is completed (commit).
-						You can specify several audit functions. The variables in the
-						instructions block refer to the scope of the main processing
+						This optional block specifies a function
+						that is executed at the end of a transaction.
+						The input of the function is the structure built 
+						from the output of the instructions block.
+						If CRITICAL is specified then the transaction 
+						fails (rollback) if the audit function fails.
+						Otherwise there is just the error of
+						the audit function logged, but the transaction 
+						is completed (commit).
+						You can specify several audit functions. 
+						The variables in the instructions block refer 
+						to the scope of the main processing
 						block. So you can reference everything that is referencable
 						after the last instruction of the main processing block.
 					</para>
@@ -205,7 +225,7 @@
 			TRANSACTION &lt;name&gt;
 			AUTHORIZE ( &lt;auth-function&gt;, &lt;auth-resource&gt; )
 			DATABASE &lt;list of database names&gt;
-			RESULT INTO &lt;result-block-name&gt; FILTER &lt;post-filter-name&gt;
+			RESULT FILTER &lt;post-filter-name&gt;
 			PREPROC
 				...&lt;preprocessing instructions&gt;...
 			ENDPROC
@@ -215,7 +235,7 @@
 			AUDIT CRITICAL &lt;funcname&gt; ( ...&lt;parameter&gt;... )
 
 			</programlisting>
-			The lines with AUTHORIZE,DATABASE,RESULT INTO and FILTER are optional.
+			The lines with AUTHORIZE,DATABASE and RESULT FILTER are optional.
 			So is the preprocessing block PREPROC..ENDPROC. A simpler
 			transaction function looks like the following:
 			<programlisting language='sql'>
@@ -242,9 +262,9 @@
 						relative to the current substructure addressed in the
 						callers context.
 						For example a subroutine with an "INTO myres"
-						directive called by a subroutine with an "INTO output"
-						directive will write its result into a substructure with path
-						"output/myres".
+						directive in a block of an "INTO output"
+						directive will write its result into a 
+						substructure with path "output/myres".
 					</para>
 				</listitem>
 				<listitem><programlisting>FOREACH &lt;selector&gt;</programlisting>
@@ -286,9 +306,8 @@
 				<listitem><programlisting>DO &lt;command&gt;</programlisting>
 					<para>
 						Commands in an instruction are either embedded
-						database commands, named database functions (e.g. PLSQL functions)
-						or subroutine calls. Command arguments
-						are either constants or relative paths 
+						database commands or subroutine calls. 
+						Command arguments are either constants or relative paths 
 						from the selector path in the FOREACH selection
 						or referring to elements in the result of 
 						a previous command.

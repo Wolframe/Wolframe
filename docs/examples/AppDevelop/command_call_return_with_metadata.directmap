@@ -1,0 +1,4 @@
+
+COMMAND process Document 
+    CALL doProcessDocument
+        RETURN Document { root = 'doc', schema = 'bla.com/schema' };

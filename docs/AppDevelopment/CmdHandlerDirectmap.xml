@@ -116,6 +116,18 @@
 			</para>
 		</sect3>
 		<sect3>
+			<title>Returned Document Meta Data</title>
+			<para>We can define additional document meta data or overload existing
+			document meta or inherited document meta from input or a referenced 
+			form in the output.
+			This is done with a comma separated list of attribute assignments in
+			curly brackets after the document type name like:
+			<programlisting language='text'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_return_with_metadata.directmap" parse="text" />
+			</programlisting>
+			</para>
+		</sect3>
+		<sect3>
 			<title>Skipping the Document Validation</title>
 			<para>
 				If you want to skip the input document validation, either because you are dealing
@@ -130,10 +142,12 @@
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip.directmap" parse="text" />
 				</programlisting>
-				A second optional parameter of the <code>RETURN SKIP</code> declaration
-				specifies the root element of the returned data object. In this case
-				the form definition does not have to exist in a DDL form definition.
-				The output can be built without a form definition defined in a DDL.
+				For being able to skip validation of output of a processed XML 
+				we have additionally to specify the root element as document
+				meta data. This defintion can be part of a form declaration
+				(not used for validation) or it can be specified after 
+				the <code>RETURN SKIP</code> and the document 
+				type identifier in a standard command handler instruction.
 				The following example shows such a definition with 'list' 
 				as root element defined. Such a command definition makes sense
 				for strongly typed languages like .NET or native C++ where data 
@@ -197,8 +211,7 @@
 			<title>Using Brackets</title>
 			<para>
 				For better readability you can use optional '(' ')' brackets on 
-				the arguments. This way you can distinguish better between 
-				keywords and arguments and also avoid conflicts with keywords:
+				the arguments of the command declaration:
 				<programlisting language='text'>
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_with_arg_brackets.directmap" parse="text" />
 				</programlisting>
@@ -260,6 +273,13 @@
 					<entry>FILTER</entry>
 					<entry>Filter Name</entry>
 					<entry>Specifies that the filter &lt;Name&gt; should be used both as input and output filter</entry>
+				</row>
+				<row>
+					<entry>AUTHORIZE</entry>
+					<entry>func res</entry>
+					<entry>Specifies that the function &lt;func&gt; should be 
+					called with the resource &lt;res&gt; to check if the user is
+					allowed to execute the command.</entry>
 				</row>
 			</tbody>
 			</tgroup>
