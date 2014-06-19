@@ -79,6 +79,7 @@ tests/3rdParty/libxml2/testlibxml2
 tests/modules/moduleTest
 tests/authentication/textfile/textFileTest
 tests/authentication/sasl/sasl.db
+tests/authentication/sasl/saslTest
 tests/authentication/pam/pamTest
 tests/authentication/textfile/passwdFileTest
 tests/authentication/textfile/passwdHashTest
