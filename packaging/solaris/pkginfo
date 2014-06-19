@@ -1,6 +1,6 @@
 PKG="WFRGwolfrm"
 NAME="Wolframe server and modules"
-VERSION=0.0.1
+VERSION="0.0.1"
 CATEGORY="application"
 VENDOR="Wolframe Group"
 EMAIL="contact@wolframe.net"

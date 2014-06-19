@@ -1,5 +1,5 @@
-wolframe-0.0.2 Wolframe server and modules
-wolframe-0.0.2
-wolframe-0.0.2 Wolframe is an application server written in C++
-wolframe-0.0.2 providing database access, AAAA, printing, etc.
-wolframe-0.0.2 in a modular way.
+wolframe-0.0.1: Wolframe server and modules
+wolframe-0.0.1:
+wolframe-0.0.1: Wolframe is an application server written in C++
+wolframe-0.0.1: providing database access, AAAA, printing, etc.
+wolframe-0.0.1: in a modular way.

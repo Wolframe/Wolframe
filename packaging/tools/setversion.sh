@@ -27,9 +27,9 @@ sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD		$BUILD/g" include/wo
 # package metadata
 sed -i "s/pkgver=.*/pkgver=$VERSION/g" packaging/archlinux/PKGBUILD
 sed -i "s/^Version:.*/Version: $VERSION/g" packaging/redhat/wolframe.spec
-sed -i "s/^wolframe-.*:/wolframe-$VERSION/g" packaging/slackware/slack-desc
+sed -i "s/^wolframe-.*:/wolframe-$VERSION:/g" packaging/slackware/slack-desc
 sed -i "s/<?define.*ProductVersion.*=.*\"[^\"]*\".*?>/<?define ProductVersion = \"$VERSION\" ?>/g" packaging/windows/wolframe.wxs
-sed -i "s/^VERSION=.*/VERSION=$VERSION/g" packaging/solaris/pkginfo
+sed -i "s/^VERSION=.*/VERSION=\"$VERSION\"/g" packaging/solaris/pkginfo
 sed -i "s/^version:.*/version: $VERSION/g" packaging/freebsd/+MANIFEST
 sed -i "s/^wolframe - Wolframe server and module, .*/wolframe - Wolframe server and module, $VERSION/g" packaging/freebsd/comment
 sed -i "s/^@name wolframe-.*/@name wolframe-$VERSION/g" packaging/freebsd/packlist
