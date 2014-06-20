@@ -31,15 +31,14 @@
 
 ************************************************************************/
 ///
-/// \file authSlice.hpp
-/// \brief AuthenticationSlice interface
+/// \file pwdChangerSlice.hpp
+/// \brief Password changer slice interface
 ///
 
-#ifndef _AUTHENTICATION_SLICE_HPP_INCLUDED
-#define _AUTHENTICATION_SLICE_HPP_INCLUDED
+#ifndef _PASSWORD_CHANGER_SLICE_HPP_INCLUDED
+#define _PASSWORD_CHANGER_SLICE_HPP_INCLUDED
 
 #include <string>
-#include <vector>
 
 #include "AAAA/user.hpp"
 
@@ -52,48 +51,45 @@ namespace AAAA {
 /// The AuthenticatorSlice(s) are provided by the their respective
 /// AuthenticationUnit(s) in the AAAA provider
 ///
-class AuthenticatorSlice
+class PasswordChangerSlice
 {
 public:
 	enum Status	{
 		MESSAGE_AVAILABLE,	///< an output message is available
 		AWAITING_MESSAGE,	///< waiting for an input message
-		USER_NOT_FOUND,		///< this slice doesn't handle the credentials
-					///  for the requested user
-		AUTHENTICATED,		///< a user has been authenticated
-		INVALID_CREDENTIALS,	///< the user authentication failed,
-					///  either the username or the credentials are invalid
+		PASSWORD_CHANGED,	///< the password has been successfuly changed
+		INVALID_DATA,		///< the password change message is not valid,
+					///  most likely the credentials are invalid
 		SYSTEM_FAILURE		///< some other error occurred
 	};
 
-	static const char* statusName( Status i)
+	static const char* statusName( Status i )
 	{
 		static const char* ar[] = {	"MESSAGE_AVAILABLE",
 						"AWAITING_MESSAGE",
-						"USER_NOT_FOUND",
-						"AUTHENTICATED",
-						"INVALID_CREDENTIALS",
+						"PASSWORD_CHANGED",
+						"INVALID_DATA",
 						"SYSTEM_FAILURE"
 					  };
 		return ar[i];
 	}
 
 	/// The virtual destructor
-	virtual ~AuthenticatorSlice()	{}
+	virtual ~PasswordChangerSlice()	{}
 
 	/// Dispose of the authenticator
 	///
 	/// \note	In many cases this is a suicidal function (delete this),
 	///		so you should be very careful how you use it.
 	///		You should use this function instead of delete
-	///		because not all authentication instances are created with new.
+	///		because not all instances are created with new.
 	virtual void dispose() = 0;
 
-	/// The class name of the authentication unit / subunit
+	/// The class name of the authentication / changer unit / subunit
 	///\note	This is the name of the authentication type / class
 	virtual const char* className() const = 0;
 
-	/// The identifier of the authentication unit / slice
+	/// The identifier of the authentication /changer unit / slice
 	///\note	This is the identifier of the authentication unit / slice
 	virtual const std::string& identifier() const = 0;
 
@@ -107,28 +103,8 @@ public:
 
 	/// The current status of the authenticator
 	virtual Status status() const = 0;
-
-	/// Is the last input message reusable for this mech ?
-	/// If true then the last input message will be used also
-	/// for the next slice in case of an USER_NOT_FOUND status
-	/// otherwise a CLIENT_RESET will be issued
-	virtual bool inputReusable() const	{ return false; }
-
-	/// Tell the slice that it is the last one in the current authenticator.
-	/// In this case, if the user is not found, the slice will not make
-	/// the transition to USER_NOT_FOUND. Instead it will continue
-	/// the operations normally, using fake data and will end up in the
-	/// INVALID_CREDENTIALS state.
-	virtual void lastSlice()		{ }
-
-	/// The authenticated user or NULL if not authenticated
-	/// \note	It is intended that this function can be called only once
-	///		As a security precaution, all the instance information regarding
-	///		the current authentication operation should be destroyed after
-	///		calling this function
-	virtual User* user() = 0;
 };
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUTHENTICATION_SLICE_HPP_INCLUDED
+#endif // _PASSWORD_CHANGER_SLICE_HPP_INCLUDED

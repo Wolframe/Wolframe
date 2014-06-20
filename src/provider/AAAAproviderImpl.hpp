@@ -176,6 +176,8 @@ public:
 
 	Authenticator* authenticator( const net::RemoteEndpoint& client )
 						{ return m_authenticator.authenticator( client ); }
+	PasswordChanger* passwordChanger( const net::RemoteEndpoint& /*client*/ )
+						{ return NULL; }
 	Authorizer* authorizer()		{ return m_authorizer.authorizer(); }
 	Auditor* auditor()			{ return m_auditor.auditor(); }
 private:

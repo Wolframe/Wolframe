@@ -38,6 +38,7 @@
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
 #include "authenticator.hpp"
+#include "passwordChanger.hpp"
 #include "authorization.hpp"
 #include "audit.hpp"
 #include "config/configurationBase.hpp"
@@ -80,6 +81,7 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator( const net::RemoteEndpoint& client ) const;
+	PasswordChanger* passwordChanger( const net::RemoteEndpoint& client ) const;
 	Authorizer* authorizer() const;
 	Auditor* auditor() const;
 private:

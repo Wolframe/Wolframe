@@ -30,73 +30,60 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file AAAA/authenticator.hpp
+/// \file passwordChanger.hpp
 ///
-/// Authenticator interface definition
+/// Password changer interface definition
 
-#ifndef _AUTHENTICATOR_HPP_INCLUDED
-#define _AUTHENTICATOR_HPP_INCLUDED
+#ifndef _PASSWORD_CHANGER_HPP_INCLUDED
+#define _PASSWORD_CHANGER_HPP_INCLUDED
 
 #include <string>
-#include <vector>
-#include "AAAA/user.hpp"
-#include "system/connectionEndpoint.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-/// Authenticator interface
+/// Password changer interface
 /// This the only interface to be used by the system. All other interfaces
 /// are internal to the authentication objects.
 ///
-/// \note	The authenticator works only with complete messages.
+/// \note	The password changer works ony with complete messages.
 ///		Sending a message in multiple parts will most likely
-///		result in an error. But that depends also on the authentication
-///		backend.
-class Authenticator
+///		result in an error. But that depends also on the backend.
+class PasswordChanger
 {
 public:
 	enum Status	{
-		INITIALIZED,		///< the authenticator is initialized,
-					///  no mech has been selected yet
+		INITIALIZED,		///< the password changer has been initialized,
 		MESSAGE_AVAILABLE,	///< an output message is available
 		AWAITING_MESSAGE,	///< waiting for an input message
-		AUTHENTICATED,		///< a user has been authenticated
-		INVALID_CREDENTIALS,	///< the user authentication failed,
-					///  either the username or the credentials are invalid
-		MECH_UNAVAILABLE,	///< the requested mech is not available,
-					///  usually due to configured restrictions
+		PASSWORD_CHANGED,	///< the password has been successfuly changed
+		INVALID_DATA,		///< the password change message is not valid,
+					///  most likely the credentials are invalid
 		SYSTEM_FAILURE		///< some other error occurred
 	};
 
-	static const char* statusName( Status i)
+	static const char* statusName( Status i )
 	{
-		static const char* ar[] = {"INITIALIZED","MESSAGE_AVAILABLE","AWAITING_MESSAGE","AUTHENTICATED","INVALID_CREDENTIALS","MECH_UNAVAILABLE","SYSTEM_FAILURE"};
-		return ar[i];
+		static const char* ar[] = {	"INITIALIZED",
+						"MESSAGE_AVAILABLE",
+						"AWAITING_MESSAGE",
+						"PASSWORD_CHANGED",
+						"INVALID_DATA",
+						"SYSTEM_FAILURE"
+					  };
+		return ar[ i ];
 	}
 
 	/// The virtual destructor
-	virtual ~Authenticator()	{}
+	virtual ~PasswordChanger()	{}
 
-	/// Destroy the authenticator
+	/// Destroy the PasswordChanger
 	///
 	/// \note	In many cases this is a suicidal function (delete this),
 	///		so you should be very careful how you use it.
 	///		You should use this function instead of delete
-	///		because not all authentication instances are created with new.
+	///		because not all instances are created with new.
 	virtual void dispose() = 0;
-
-	/// The list of available mechs
-	virtual const std::vector<std::string>& mechs() const = 0;
-
-	/// Set the authentication mech
-	/// \param [in]	mech	the name of the mech (case-insensitive)
-	/// \returns		true if the mech could be selected
-	///			false if the mech is not available
-	/// \note	This function works like a reset function
-	///		Whenever it is called it will release all the allocated
-	///		resources and it will reinitialize all the data structures
-	virtual bool setMech( const std::string& mech ) = 0;
 
 	/// The input message
 	/// \param [in]	message	the input message
@@ -106,18 +93,10 @@ public:
 	/// \returns		the output message
 	virtual std::string messageOut() = 0;
 
-	/// The current status of the authenticator
+	/// The current status of the password changer
 	virtual Status status() const = 0;
-
-	/// The authenticated user or NULL if not authenticated
-	/// \note	It is intended that this function can be called only once.
-	///		As a security precaution, all the instance information regarding
-	///		the current authentication operation should be destroyed after
-	///		the authentication is complete and the user is no longer
-	///		available after the call of this function
-	virtual User* user() = 0;
 };
 
 }} // namespace _Wolframe::AAAA
 
-#endif // _AUTHENTICATOR_HPP_INCLUDED
+#endif // _PASSWORD_CHANGER_HPP_INCLUDED
