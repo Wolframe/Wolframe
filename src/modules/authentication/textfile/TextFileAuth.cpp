@@ -158,8 +158,12 @@ void TextFileAuthSlice::messageIn( const std::string& message )
 				m_inputReusable = true;
 				if ( m_backend.getUser( message, m_usr ))
 					m_state = SLICE_USER_FOUND;
-				else
-					m_state = SLICE_USER_NOT_FOUND;
+				else	{
+					if ( m_lastSlice )
+						m_state = SLICE_FAKE_USER;
+					else
+						m_state = SLICE_USER_NOT_FOUND;
+				}
 			}
 			catch( std::exception& e )	{
 				LOG_ERROR << "Text file auth slice: ("
@@ -172,6 +176,12 @@ void TextFileAuthSlice::messageIn( const std::string& message )
 		case SLICE_USER_FOUND:
 			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") received message in SLICE_USER_FOUND state";
+			m_state = SLICE_SYSTEM_FAILURE;
+			m_inputReusable = false;
+			break;
+		case SLICE_FAKE_USER:
+			LOG_ERROR << "Text file auth slice: (" << identifier()
+				  << ") received message in SLICE_FAKE_USER state";
 			m_state = SLICE_SYSTEM_FAILURE;
 			m_inputReusable = false;
 			break;
@@ -227,6 +237,13 @@ std::string TextFileAuthSlice::messageOut()
 			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") message requested in SLICE_USER_NOT_FOUND state";
 			break;
+		case SLICE_FAKE_USER:	{
+			GlobalRandomGenerator& rnd = GlobalRandomGenerator::instance( "" );
+			m_challenge = new CRAMchallenge( rnd );
+			m_state = SLICE_CHALLENGE_SENT;
+			PasswordHash::Salt salt( rnd );
+			return m_challenge->toString( salt );
+		}
 		case SLICE_CHALLENGE_SENT:
 			LOG_ERROR << "Text file auth slice: (" << identifier()
 				  << ") message requested in SLICE_CHALLENGE_SENT state";
@@ -257,6 +274,8 @@ AuthenticatorSlice::Status TextFileAuthSlice::status() const
 		case SLICE_USER_FOUND:
 			return MESSAGE_AVAILABLE;
 		case SLICE_USER_NOT_FOUND:
+			return USER_NOT_FOUND;
+		case SLICE_FAKE_USER:
 			return USER_NOT_FOUND;
 		case SLICE_CHALLENGE_SENT:
 			return AWAITING_MESSAGE;

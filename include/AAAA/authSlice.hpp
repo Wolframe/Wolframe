@@ -108,10 +108,11 @@ public:
 	/// otherwise a CLIENT_RESET will be issued
 	virtual bool inputReusable() const	{ return false; }
 
-	/// This is the last slice in the current mech trying to authenticate
-	/// the user. In this case, if the user is not found, the slice will
-	/// not get to USER_NOT_FOUND. Instead it will continue the operations
-	/// using fake data and will get to INVALID_CREDENTIALS in the end.
+	/// Tell the slice that it is the last one in the current authenticator.
+	/// In this case, if the user is not found, the slice will not make
+	/// the transition to USER_NOT_FOUND. Instead it will continue
+	/// the operations normally, using fake data and will end up in the
+	/// INVALID_CREDENTIALS state.
 	virtual void lastSlice()		{ }
 
 	/// The authenticated user or NULL if not authenticated
