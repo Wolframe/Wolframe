@@ -1,9 +1,9 @@
 <!-- Client wolfclient for Qt: The standard client for Wolframe -->
 
 <chapter>
-	<title>The Wolframe Standard Client</title>
+	<title>Clients With Qt</title>
 	<para>This chapter describes the standard <application>Wolframe</application> client
-	called wolfclient and how a user interface is built.
+	called wolfclient based on Qt and how a user interface is built with it.
 	</para>
 	&WolfclientArchitecture;
 	&WolfclientArtifacts;

@@ -17,6 +17,8 @@ namespace WolframeClient
         {
             public string banner { get; set; }
             public string authmethod { get; set; }
+            public string username { get; set; }
+            public string password { get; set; }
             public string schemadir { get; set; }
             public string schemaext { get; set; }
 
@@ -24,6 +26,8 @@ namespace WolframeClient
             {
                 banner = null;
                 authmethod = null;
+                username = null;
+                password = null;
                 schemadir = "http://www.wolframe.net";
                 schemaext = "xsd";
             }

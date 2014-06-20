@@ -84,6 +84,7 @@
 
 		&ClientIntroduction;
 		&PhpClient;
+		&DotNetClient;
 		&Wolfclient;
 		&ClientCLI;
 

@@ -72,7 +72,7 @@ namespace WolframeClient
         {
             try
             {
-                string relativeSslCertPath = "..\\..\\..\\..\\..\\..\\examples\\demo\\tutorial\\step4a\\server\\SSL\\wolframed.pfx";
+                string relativeSslCertPath = "wolframed.pfx";
                 string curpath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location).ToString();
                 string sslCertPath = Path.Combine( curpath, relativeSslCertPath).ToString();
 
@@ -99,20 +99,13 @@ namespace WolframeClient
                     Customer customer = new Customer { Name = "Ottmar Hitzfeld", Address = "Loerrach Germany" };
                     int answerid = (int)AnswerId.CustomerInsertedObj;
 
-                    int ii = 0;
-                    for (ii = 0; ii < 100; ++ii)
-                    {
-                        Request request = new Request { id = answerid, command = "Insert", number = ii, doctype = "Customer", root = "customer", obj = customer, objtype = typeof(Customer), answertype = typeof(CustomerInserted) };
-                        session.IssueRequest(request);
-                    }
-                    while (session.NofOpenRequests() > 0)
-                    {
-                        Thread.Sleep(200);
-                    }
-                    Thread.Sleep(2000);
-                    Console.WriteLine("All done");
+                    Request request = new Request { id = answerid, command = "Insert", number = ii, doctype = "Customer", root = "customer", obj = customer, objtype = typeof(Customer), answertype = typeof(CustomerInserted) };
+                    session.IssueRequest(request);
+
+                    Thread.Sleep(1000);
                     session.Shutdown();
                     session.Close();
+
                     string err = session.GetLastError();
                     if (err != null)
                     {

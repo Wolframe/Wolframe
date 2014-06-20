@@ -1,3 +1,11 @@
+== Main
+	Wolframe is a modular 3-tier application server written in C++ 
+	with an event-driven, cooperative, single-threaded processing model.
+	Its architecture supports the separation of tasks
+	by roles, developer skills and authorization into aspects
+	to support projects in complex environments.
+
+
 == Data processing
 === Data formats processed
 	In Wolframe the data formats processed are defined by 
@@ -66,7 +74,7 @@
 
 
 == Separation of aspects
-=== Separate tasks by roles, developper skills and authorization
+=== Separate tasks by roles, developer skills and authorization
 	Wolframe enforces the separation of the implementation
 	into different aspects. Separation of different aspects 
 	is important for a succesful project management, because
@@ -74,7 +82,7 @@
 	level to prevent developers to care about what they must not
 	or should not care about.
 	The wished thing here is to have natural borders to separate
-	tasks according knownledge, competence, user roles or rights.
+	tasks according knowledge, competence, user roles and rights.
 	Wolframe separates the following aspects:
 		- authentication (where you can define your own 
 			module with its own configuration)

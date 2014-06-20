@@ -1,0 +1,134 @@
+<!-- Calling Wolframe over HTTP/HTTPS via C# on .NET -->
+
+<chapter>
+	<title>Clients with .NET (C#)</title>
+	<para>This chapter describes how you can call Wolframe from .NET. As example language
+	C# is used. The client implementation introduced here has an asynchronous interface 
+	with a synchronous implementation. The client is feeded with requests over a queue 
+	and the issuer of a request gets notified over a delegate bound to the request.
+	An example program will show it's use.
+	</para>
+
+	<sect1>
+	<title>C# Client Modules</title>
+		<para>In the subdirectory clients/dotnet/csharp/WolframeClient of the Wolframe
+		installation you'll find a Microsoft Visual Studio project file and the 
+		following source files you need for a Wolframe C# client.
+		The main module you need to call to establish a session and
+		to issue requests is Session.cs, or the interface SessionInterface.cs respectively.
+		The other files are helper classes for the client:
+		</para>
+		<table frame="all" width="100%">
+			<title>C# Client Modules</title>
+			<tgroup cols="2">
+			<colspec colnum="1" colname="col1" colwidth="1*"/>
+			<colspec colnum="2" colname="col2" colwidth="3*"/>
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>SessionInterface.cs</entry>
+					<entry><para>interface of the Wolframe server session</para></entry>
+				</row>
+				<row>
+					<entry>Session.cs</entry>
+					<entry><para>implements the Wolframe client/server protocol
+					behind the scenes with a simple interface to issue requests 
+					with a notification delegate to handle the answer.</para></entry>
+				</row>
+				<row>
+					<entry>ConnectionInterface.cs</entry>
+					<entry><para>interface of the Wolframe server connection</para></entry>
+				</row>
+				<row>
+					<entry>Connection.cs</entry>
+					<entry><para>implements the base class of the connection to 
+					a Wolframe server with methods to read and write messages</para></entry>
+				</row>
+				<row>
+					<entry>Protocol.cs</entry>
+					<entry><para>some helper functions to handle LF dot escaping/unescaping
+					and parse protocol messages from the server.</para></entry>
+				</row>
+				<row>
+					<entry>ObjectQueue.cs</entry>
+					<entry><para>implementation of the message queue used as
+					standard queue with concurrent access and notification.</para></entry>
+				</row>
+				<row>
+					<entry>Serializer.cs</entry>
+					<entry><para>implementation of the serialization/deserialization
+					of C# objects sent to the server and received from the server 
+					as XML</para></entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+
+		<sect2>
+		<title>Example Script</title>
+		<para>The script examples/clients/dotnet/csharp/Program.cs shows the 
+		mechanisms of using the C# client modules to create a .NET client for
+		Wolframe. The example program defines the request and the answer type
+		as C# class, creates a session object, issues the request, sleeps
+		for a second (for simplicity) so that the request gets processed
+		and shuts down the connection.
+		</para>
+		</sect2>
+
+		<sect2>
+		<title>The Session Interface</title>
+		<para>
+		Here is the Wolframe session interface implemented in clients/dotnet/csharp/SessionInterface.cs: 
+		<programlisting language='C#'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="../clients/dotnet/csharp/WolframeClient/SessionInterface.cs" parse="text" />
+		</programlisting>
+		</para>
+		</sect2>
+
+		<sect2>
+		<title>The Session Constructor</title>
+		<para>
+		Here is the signature of the Session constructor as defined in clients/dotnet/csharp/Session.cs:
+		<programlisting language='C#'>
+namespace WolframeClient
+{
+    public class Session
+        :SessionInterface
+    {
+        public class Configuration
+            :Connection.Configuration
+        {
+            public string banner { get; set; }
+            public string authmethod { get; set; }
+            public string username { get; set; }
+            public string password { get; set; }
+            public string schemadir { get; set; }
+            public string schemaext { get; set; }
+
+            public Configuration()
+            {
+                banner = null;
+                authmethod = null;
+                username = null;
+                password = null;
+                schemadir = "http://www.wolframe.net";
+                schemaext = "xsd";
+            }
+        };
+
+        public delegate void AnswerCallback(Answer msg);
+
+        public Session( Configuration config_, AnswerCallback answerCallback_);
+    };
+}
+		</programlisting>
+		</para>
+		</sect2>
+	</sect1>
+</chapter>
+

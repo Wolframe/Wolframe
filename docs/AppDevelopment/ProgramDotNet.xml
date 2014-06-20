@@ -314,6 +314,7 @@
 	</programlisting>
 	</para>
 		<sect3>
+		<title>Assembly Declaration</title>
 		<table frame="all" width="80%">
 			<title>Attributes of assembly declarations</title>
 			<tgroup cols="2">

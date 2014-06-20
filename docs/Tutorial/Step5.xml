@@ -252,23 +252,24 @@
 		</imageobject>
 	</mediaobject>
 	<para>
-		For simplicity we defined before with the directive 'STANDALONE'
-		that the server should not return an explicit document type.
-		But the client expects a document type declaration. For this we have to change the
-		definition in the file <filename>tutorial.dmap</filename> we created in step 4
-		in the following way:
+		For simplicity we defined the output with the document meta data attribute
+		'{ standalone = "yes" }' that the returned document should not be built
+		with an explicit document type definition.
+		But the client expects a document type declaration. For this we 
+		change the definition in the file <filename>tutorial.dmap</filename> we 
+		created in step 4 in the following way:
 	</para>
 
 	<programlisting language='shell'>
 	COMMAND CustomerListRequest
 	        CALL SelectCustomerList
-	        RETURN SKIP CustomerList list;
+	        RETURN SKIP CustomerList {root='list'};
 	</programlisting>
 
 	<para>
-	The directive 'RETURN SKIP CustomerList list' states that a document
+	The directive "RETURN SKIP CustomerList {root='list'}" states that a document
 	of type 'CustomerList' with the root element 'list' is returned
-	without validation of the output. 
+	without validation of the output.
 	We omit a validation on purpose for now to get to the next step.
 	</para>
 </sect1>
