@@ -134,6 +134,7 @@ TextFileAuthSlice::TextFileAuthSlice( const TextFileAuthUnit& backend )
 	m_challenge = NULL;
 	m_state = SLICE_INITIALIZED;
 	m_inputReusable = false;
+	m_lastSlice = false;
 }
 
 TextFileAuthSlice::~TextFileAuthSlice()

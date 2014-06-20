@@ -46,7 +46,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// AuthenticatorInstance
+/// AuthenticatorSlice
 /// This is the base class for authenticator slices implementations
 /// An authenticator has (usually) several authenticator slices
 /// The AuthenticatorSlice(s) are provided by the their respective
@@ -106,7 +106,13 @@ public:
 	/// If true then the last input message will be used also
 	/// for the next slice in case of an USER_NOT_FOUND status
 	/// otherwise a CLIENT_RESET will be issued
-	virtual bool inputReusable() const = 0;
+	virtual bool inputReusable() const	{ return false; }
+
+	/// This is the last slice in the current mech trying to authenticate
+	/// the user. In this case, if the user is not found, the slice will
+	/// not get to USER_NOT_FOUND. Instead it will continue the operations
+	/// using fake data and will get to INVALID_CREDENTIALS in the end.
+	virtual void lastSlice()		{ }
 
 	/// The authenticated user or NULL if not authenticated
 	/// \note	It is intended that this function can be called only once

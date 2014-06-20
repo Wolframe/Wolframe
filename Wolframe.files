@@ -1098,6 +1098,11 @@ makefiles/nmake/top.mk
 .Attic/boostSystemErrorCode.cpp
 .Attic/clientlib.h
 .Attic/clientlib_protocol.c
+.Attic/clients/php/webclient_form_json.php
+.Attic/clients/php/webclient_form_json_ssl.php
+.Attic/clients/php/webclient_form_xml_ssl.php
+.Attic/clients/php/webclient.php
+.Attic/clients/php/webclient_ssl.php
 .Attic/cmdbind/cmdbind_contentBufferCommandHandlerEscDLF.cpp
 .Attic/cmdbind/contentBufferCommandHandlerEscDLF.hpp
 .Attic/config/config_descriptionBase.cpp
@@ -1200,13 +1205,11 @@ clients/lib/protocol.hpp
 clients/lib/session.cpp
 clients/lib/session.hpp
 clients/Makefile.W32
+clients/php/authentication/textfile.php
 clients/php/connection.php
+clients/php/crypto/pbkdf2.php
 clients/php/session.php
-clients/php/webclient_form.php
-clients/php/webclient_form_ssl.php
 clients/php/webclient_form_xml.php
-clients/php/webclient.php
-clients/php/webclient_ssl.php
 clients/README
 contrib/create_qtcreator_files.sh
 contrib/database/oracle/create_wolframe.sql
@@ -1855,6 +1858,7 @@ packaging/slackware/doinst.sh
 packaging/slackware/wolframe.conf
 packaging/solaris/buildlocal.sh
 packaging/solaris/wolframe.conf
+packaging/tools/setversion.sh
 packaging/windows/Makefile.W32
 packaging/windows/Readme.txt
 packaging/windows/wolframe.xml
@@ -1964,6 +1968,7 @@ src/libwolframe_database/vm/tagTable.cpp
 src/libwolframe_database/vm/tagTable.hpp
 src/libwolframe_database/vmTransactionInput.cpp
 src/libwolframe_database/vmTransactionOutput.cpp
+src/libwolframe/execContext.cpp
 src/libwolframe/getPassword.cpp
 src/libwolframe/GNUmakefile
 src/libwolframe/HMAC.cpp

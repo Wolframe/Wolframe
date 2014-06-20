@@ -154,6 +154,9 @@ public:
 	/// Is the last input message reusable for this mech ?
 	virtual bool inputReusable() const		{ return m_inputReusable; }
 
+	/// This is the last slice
+	virtual void lastSlice()			{ m_lastSlice = true; }
+
 	/// The authenticated user or NULL if not authenticated
 	virtual User* user();
 
@@ -163,6 +166,7 @@ private:
 	SliceState		m_state;
 	CRAMchallenge*		m_challenge;
 	bool			m_inputReusable;
+	bool			m_lastSlice;
 };
 
 
