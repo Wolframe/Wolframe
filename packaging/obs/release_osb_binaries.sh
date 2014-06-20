@@ -30,12 +30,11 @@ map_platform_and_arch( )
 		SLE_11_SP2)		NICE_PLATFORM="SLES-11_SP2"		;;
 		SLE_11_SP3)		NICE_PLATFORM="SLES-11_SP3"		;;
 		openSUSE_12.3)		NICE_PLATFORM="openSUSE-12.3"		;;
-		openSUSE_13.1 )		NICE_PLATFORM="openSUSE-13.1"		;;
+		openSUSE_13.1)		NICE_PLATFORM="openSUSE-13.1"		;;
 		xUbuntu_10.04)		NICE_PLATFORM="Ubuntu-10.04_LTS"	;;
 		xUbuntu_12.04)		NICE_PLATFORM="Ubuntu-12.04_LTS"	;;
-		xUbuntu_12.10)		NICE_PLATFORM="Ubuntu-12.10"		;;
-		xUbuntu_13.04)		NICE_PLATFORM="Ubuntu-13.04"		;;
 		xUbuntu_13.10)		NICE_PLATFORM="Ubuntu-13.10"		;;
+		xUbuntu_14.04)		NICE_PLATFORM="Ubuntu-14.04_LTS"		;;
 		*)			NICE_PLATFORM=$PLATFORM			;;
 	esac
 	

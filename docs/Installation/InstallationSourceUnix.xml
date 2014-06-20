@@ -691,31 +691,7 @@ export PATH
 						Boost version here.
 					</para>
 				</sect4>
-				
-				<sect4>
-					<title>Ubuntu 12.10</title>
-
-					<para>
-						You need the following packages:
-						'libboost-dev', 'libboost-program-options-dev',
-						'libboost-filesystem-dev', 'libboost-thread-dev',
-						'libboost-random-dev'.
-					</para>
-
-					<para>
-						If you want ICU support you will also need the 
-						'libboost-locale-dev' package.
-					</para>
-				</sect4>
-
-				<sect4>
-					<title>Ubuntu 13.04</title>
-					<para>
-						Currently libboost breaks in enable_if template, compile your own 
-						Boost version here.						
-					</para>
-				</sect4>
-				
+								
 				<sect4>
 					<title>Ubuntu 13.10 and 14.04</title>
 					<para>
@@ -2479,24 +2455,7 @@ export PATH
 						Build your own Boost version with ICU support here.
 					</para>
 				</sect4>
-				
-				<sect4>
-					<title>Ubuntu 12.10</title>
-
-					<para>
-						You need 'libboost-locale-dev' package.
-					</para>
-				</sect4>
-
-				<sect4>
-					<title>Ubuntu 13.04</title>
-					
-					<para>
-						The official Boost packages have problems.
-						Build your own Boost version with ICU support here.
-					</para>
-				</sect4>
-				
+								
 				<sect4>
 					<title>Ubuntu 13.10 and 14.04</title>
 

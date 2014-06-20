@@ -424,19 +424,6 @@ Ubuntu 10.04.1 LTS, Ubuntu 12.04
 The official Boost packages are not recent enough. Build your own Boost version
 here.
 
-Ubuntu 12.10
-
-You need the following packages: 'libboost-dev',
-'libboost-program-options-dev', 'libboost-filesystem-dev',
-'libboost-thread-dev', 'libboost-random-dev'.
-
-If you want ICU support you will also need the 'libboost-locale-dev' package.
-
-Ubuntu 13.04
-
-Currently libboost breaks in enable_if template, compile your own Boost version
-here.
-
 Ubuntu 13.10 and 14.04
 
 You need the following packages: 'libboost-dev',
@@ -1448,15 +1435,6 @@ Ubuntu 10.04.1 LTS, Ubuntu 12.04
 The official Boost packages are not recent enough. Build your own Boost version
 with ICU support here.
 
-Ubuntu 12.10
-
-You need 'libboost-locale-dev' package.
-
-Ubuntu 13.04
-
-The official Boost packages have problems. Build your own Boost version with
-ICU support here.
-
 Ubuntu 13.10 and 14.04
 
 You need 'libboost-locale-dev' package.
@@ -1917,13 +1895,16 @@ destination of the installation.
 
 For instance:
 
-        make DESTDIR=/var/tmp prefix=/usr/local/wolframe-0.0.1 install
+        make DESTDIR=/var/tmp prefix=/usr/local/wolframe-0.0.1
+ install
 
 
 installs the software in:
 
-        /var/tmp/usr/local/wolframe-0.0.1/sbin/wolframed
-        /var/tmp/usr/local/wolframe-0.0.1/etc/wolframe/wolframe.conf
+        /var/tmp/usr/local/wolframe-0.0.1
+/sbin/wolframed
+        /var/tmp/usr/local/wolframe-0.0.1
+/etc/wolframe/wolframe.conf
         ...
 
 
@@ -2030,13 +2011,13 @@ For Qt 4 you need the 'libqt4-dev' package.
 
 For Qt 5 compile your own version of the library.
 
-Ubuntu 10.04.1, 11.04, 12.04 and 12.10
+Ubuntu 10.04.1 and 12.04
 
 For Qt 4 you need the 'libqt4-dev' package.
 
 For Qt 5 compile your own version of the library.
 
-Ubuntu 13.04 and 13.10
+Ubuntu 13.10
 
 For Qt 4 you need the 'libqt4-dev' package.
 
