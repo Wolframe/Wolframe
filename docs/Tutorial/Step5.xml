@@ -193,11 +193,11 @@
 		
 		<programlisting language='shell'>
 	CustomerList list {
-		customer[] {
-			id={?};
-			name{{row.name}};
-			address{{row.address}}
-		}
+	    customer[] {
+	        id={?};
+	        name{{row.name}};
+	        address{{row.address}}
+	    }
 	}
 		</programlisting>
 		

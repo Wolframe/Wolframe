@@ -102,7 +102,7 @@
 	TRANSACTION CreateCustomer
 	BEGIN
 		DO INSERT INTO Customer( name, address )
-			VALUES( $(name), $(address) );
+		    VALUES( $(name), $(address) );
 	END
 	</programlisting>
 	

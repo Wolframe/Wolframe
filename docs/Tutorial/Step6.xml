@@ -127,8 +127,8 @@
 	
 	<para>
 		This is the moment we go back to the server and start with output form validation.
-		We add a form called 'CustomerList' to the file <filename>Customer.sfrm</filename> form which describes
-		the result of the 'CustomerListRequest' more precisely and especially
+		We add a form called 'CustomerList' to the file <filename>Customer.sfrm</filename>
+		form which describes the result of the 'CustomerListRequest' more precisely and especially
 		declares the 'id' as mandatory attribute of the customer. The form 'CustomerList'
 		contains now the meta data element definition for 'root' ("-root list"). 
 		We will not have to define it anymore in any directmap RESULT directive for
