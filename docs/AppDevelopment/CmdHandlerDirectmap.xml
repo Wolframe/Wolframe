@@ -193,7 +193,7 @@
 			</para>
 		</sect3>
 		<sect3>
-			<title>Authorization checks</title>
+			<title>Authorization Checks</title>
 			<para>
 				We can tag a command to be allowed only after an authorization check.
 				The check denies command execution with an error if the login of the

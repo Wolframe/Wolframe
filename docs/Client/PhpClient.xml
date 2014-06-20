@@ -1,42 +1,75 @@
 <!-- Calling Wolframe over HTTP/HTTPS via PHP Client -->
 
 <chapter>
-	<title>Using Wolframe as a Webservice</title>
-	<para>This chapter describes how you can call Wolframe from a Webservice.
-	We will show how a Wolframe command can be issued as HTTP call and how it is mapped
+	<title>Clients with PHP</title>
+	<para>This chapter describes how you can call Wolframe from a web service.
+	It will show how a Wolframe command can be issued as HTTP call and how it is mapped
 	in the Webserver by a scripting language. We use PHP as example language.
 	The example is so simple that you can easily map it to other languages than PHP.
 	We took PHP because its use for web services is so widespread nowadays.
 	</para>
 
 	<sect1>
-	<title>Calling Wolframe from PHP</title>
-		<para>In the clients/php subdirectory of the Wolframe installation
-		you'll find the following PHP source files:
-		<itemizedlist>
-		<listitem><para>connection.php defines the basic class of the connection to a Wolframe
-		server with methods to read and write messages.</para></listitem>
-		<listitem><para>session.php implements the Wolframe client/server protocol.</para></listitem>
-		<listitem><para>webclient.php is an example script that takes a HTTP request, interpretes
-		the request parameter "CONTENT" or the HTTP request body as document (XML,JSON,etc.)
-		to process and optionally "CMD" as command prefix. The corresponding command
-		configured to be executed by the Wolframe server is a combination of this prefix (that
-		can be undefined ot empty) plus the document type identifier extracted from the document
-		metadata (in XML the !DOCTYPE definition or the root attribute "xmlns:schemaLocation").
-		The example script uses the Session class (session.php) to process the command. 
-		We can adapt it to implement our web service with Wolframe.</para></listitem>
-		<listitem><para>webclient_ssl.php is the same as webclient.php, but with SSL. The
-		implementation of SSL in this example works. But it should be rewritten before using it
-		in a productional environment because of security problems of PHP using SSL in this minimal
-		configuration. Refer to your PHP manual for this.
-		</para></listitem>
-		</itemizedlist>
+	<title>PHP Client Modules</title>
+		<para>In the subdirectory clients/php of the Wolframe installation
+		you'll find the following source files you need.
+		The main module you need to call to establish a session and
+		to issue requests is session.php. The other files are helper classes for 
+		the client:
 		</para>
+		<table frame="all" width="100%">
+			<title>PHP Client Modules</title>
+			<tgroup cols="2">
+			<colspec colnum="1" colname="col1" colwidth="1*"/>
+			<colspec colnum="2" colname="col2" colwidth="3*"/>
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>session.php</entry>
+					<entry><para>implements the Wolframe client/server protocol
+					behind the scenes with a simple interface to send requests 
+					to the server and receive the answers.</para></entry>
+				</row>
+				<row>
+					<entry>connection.php</entry>
+					<entry><para>defines the base class of the connection to a Wolframe
+					server with methods to read and write messages</para></entry>
+				</row>
+				<row>
+					<entry>wolframe_cram.php</entry>
+					<entry><para>implements helper functions needed to implement
+					the authentication with the Wolframe-CRAM mech</para></entry>
+				</row>
+				<row>
+					<entry>pbkdf2.php</entry>
+					<entry><para>implements the function hash_pbkdf2 available
+					in PHP 5.5. for PHP 5.3. (patch published on php.net)</para></entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+
 		<sect2>
-		<title>The session Interface</title>
+		<title>Example Script</title>
+		<para>The script examples/clients/php/webclient_form_xml.php shows the 
+		mechanisms of using the PHP client modules to create a client calling 
+		Wolframe from a web service. It takes a HTTP request, builds an XML 
+		document and a Wolframe server request with this document, passes 
+		the request to the server and returns the answer XML to the web client.
+		In case of error an XML with the error message is returned.
+		</para>
+		</sect2>
+
+		<sect2>
+		<title>The Session Interface</title>
 		<para>
-		In the following we shortly introduce the Wolframe session interface implemented in session.php.
-		This is the only PHP file you really have to understand for writing a Webservice for Wolframe.
+		In the following we shortly introduce the Wolframe session interface 
+		implemented in clients/php/session.php. 
 		</para>
 		<programlisting language='PHP'>
 namespace Wolframe
@@ -49,39 +82,40 @@ class Session extends Connection
     /* Constructor
     * @param[in] address Wolframe server IP address to connect
     * @param[in] port Wolframe server port to connect
-    * @param[in] sslopt array of PHP options for SSL
-    * @param[in] authmethod authorization mechanism identifier
-    *   plus credentials (currently only "NONE")
+    * @param[in] sslopt array of PHP options for SSL. The options
+    *            are not interpreted, but directly passed to to the SSL
+    *            stream context with stream_context_set_option(..)'
+    * @param[in] authopt authorization options defining the mechanism
+    *            and depending on the mechanism, the credentials needed.
     */
     function __construct( $address, $port, $sslopt, $authmethod);
 
-    /* Get the last error of the request (protocol).
-    * @return the last non exceptional error reported by the Wolframe server
-    */
-    public function lasterror();
-
     /* Send a request to the server
-    * @param[in] command identifier prefix of the command to execute.
-    *   Identifies the command together with the document type.
+    * @param[in] command (optional) identifier prefix of the command
+    *            to execute.
     * @param[in] content content of the request (document to process)
-    * @return FALSE, if the server reports an error in processing the request.
-    *   The error details can be inspected with lasterror().
-    *   In case of success the function returns the request answer string.
+    * @return FALSE, if the server reports an error in processing
+    *            the request. The error details can be inspected with
+    *            lasterror(). In case of success the function returns
+    *            the request answer string.
     * @remark The function throws in case of a system or protocol error.
+    * @remark The function is blocking on read/write on its connection
     */
     public function request( $command, $content);
 
+    /* Get the last error returned by the Wolframe server (protocol).
+    * @return the last error 
+    */
+    public function lasterror();
 } // class Session
 } // namespace Wolframe
 		</programlisting>
-		<para>
-		</para>
 		</sect2>
 	</sect1>
 
 	<sect1>
 	<title>Installation</title>
-		<para>For making it work you just have to configure your webservice to run the
+		<para>For making it work you just have to configure your web service to run the
 		PHP scripts and to install the PHP scripts and the SSL credentials at the right place.
 		See the tutorial for details.
 		</para>

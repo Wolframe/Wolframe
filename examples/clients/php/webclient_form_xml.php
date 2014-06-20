@@ -12,12 +12,12 @@ use Wolframe\Session as Session;
  The script forwards HTTP GET request as XML to a wolframe server via TCP/IP plain 
  or SSL and renders the result as XML.
  The HTTP REQUEST parameters without some reserved ones are transformed into 
- an XML request set sent to the server. The command prefix is specified with the parameter
- 'CMD' and 'DOCTYPE'. If the parameter 'CMD' is not specified then the document type only
- determines what is executed on the server. The document type of the content is defined 
- with the parameter 'DOCTYPE'.
- The authentication mechanism and wheter to use SSL or not are also selected by 
- request parameters.
+ an XML request set sent to the server. The command is specified with the parameter
+ 'CMD' (command prefix) and 'DOCTYPE' (document type of the created XML). The 
+ parameter 'CMD' is optional. 
+ The authentication settings and wheter to use SSL or not are also selected by 
+ request parameters. The SSL settings are minimal and must be revised for the use in a 
+ productive system.
 */
 try
 {

@@ -23,7 +23,7 @@ namespace WolframeClient
             public string host { get; set; }
             public int port { get; set; }
             public string sslcert { get; set; }
-            public SecureString password { get; set; }
+            public SecureString sslpassword { get; set; }
             public bool validatecert { get; set; }
 
             public Configuration()
@@ -31,7 +31,7 @@ namespace WolframeClient
                 host = "localhost";
                 port = 7661;
                 sslcert = null;
-                password = null;
+                sslpassword = null;
                 validatecert = true;
             }
         };
@@ -198,7 +198,7 @@ namespace WolframeClient
         {
             if (m_config.sslcert != null)
             {
-                X509Certificate cert = new X509Certificate2(m_config.sslcert, m_config.password);
+                X509Certificate cert = new X509Certificate2(m_config.sslcert, m_config.sslpassword);
                 X509CertificateCollection certColl = new X509CertificateCollection();
                 certColl.Add(cert);
 
