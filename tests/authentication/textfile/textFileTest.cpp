@@ -321,6 +321,38 @@ TEST_F( AuthenticationFixture, AuthenticationWrongUser )
 		delete slice;
 }
 
+TEST_F( AuthenticationFixture, AuthenticationLastSlice )
+{
+	User* user = NULL;
+	TextFileAuthUnit authUnit( "test", "passwd" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
+	slice->lastSlice();
+
+	ASSERT_TRUE( slice != NULL );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	std::string userHash = usernameHash( "bzgg12" );
+	std::cout << "User hash: " << userHash << std::endl;
+	slice->messageIn( userHash );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
+
+	std::string challenge = slice->messageOut();
+	std::cout << "Challenge: " << challenge << std::endl;
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	AAAA::CRAMresponse response( challenge, "Extremely Good Password " );
+	std::cout << "Response:  " << response.toString() << std::endl;
+	slice->messageIn( response.toString() );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::INVALID_CREDENTIALS );
+
+	user = slice->user();
+	ASSERT_TRUE( user == NULL );
+
+	if ( slice )
+		delete slice;
+}
+
 //****************************************************************************
 
 int main( int argc, char **argv )

@@ -125,8 +125,6 @@ class TextFileAuthSlice : public AuthenticatorSlice
 		SLICE_INITIALIZED,		///< Has been initialized, no other data
 		SLICE_USER_FOUND,		///< User has been found, will send challenge
 		SLICE_USER_NOT_FOUND,		///< User has not been found -> fail
-		SLICE_FAKE_USER,		///< User has not been found but the slice
-						///  will fake the continuation
 		SLICE_CHALLENGE_SENT,		///< Waiting for the response
 		SLICE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
 		SLICE_AUTHENTICATED,		///< Response was correct -> user available
@@ -169,6 +167,7 @@ private:
 	CRAMchallenge*		m_challenge;
 	bool			m_inputReusable;
 	bool			m_lastSlice;
+	bool			m_fakeUser;
 };
 
 
