@@ -9,6 +9,18 @@ Make sure the build tests shows all green.
 Test the packages produced by the build system manually
 (see HowToTestPackage guide).
 
+Choose a reasonable version number, get inspired by http://semver.org/
+
+Create a release branch 'release-M.m.p' where only critical bugs will
+be fixed. Build tags indicate trials to build 'b' (and they correlate 
+to the distance to the branch in git commits, which are added to the
+artifacts for instance on OBS). The last one with the highest 'b' 
+is the official release.
+
+Set new version of package with:
+
+packaging/tools/setversion.sh M.m.p.b
+
 Check and adapt the dates in the docs/*Date.txt files.
 Check and adapt the versions in the docs/*Version.txt files.
 Build the documentation. Upload to wolframe.net (see README guide
@@ -20,17 +32,18 @@ Make INSTALL.Windows from docs/InstallationWindows.txt
 Check manpages and regenerate them from the Docbook sources if
 necessary.
 
-Choose a reasonable version number, get inspired by http://semver.org/
-
-Set new version of package with:
-
-packaging/tools/setversion.sh
-
 Update changelog in packaging/redhat/wolframe.spec for Redhat/Suse distros.
 
 Update packaging/debian/changelog for Debian/Ubuntu distros.
 
+Build and publish the source tarball
+
+make distclean
+make dist-gz
+make dist-bz2
+
 Release from source tarball
+
 
 make dist
 
@@ -40,20 +53,3 @@ Upload
   - write small guide for "how to release"
     - important: order of operations, conditions:
       - e.g. put source artifact latest onto sourceforge
-    - qtclient:
-      - global.hpp:#define WOLFRAME_VERSION "0.0.3"
-      - wolfclient.pro: PACKAGE_VERSION = 0.0.3
-      - skeleton.pro: VERSION = 0.0.3
-#       modified:   libqtwolfclient/libqtwolfclient.pro
-#       modified:   packaging/archlinux/PKGBUILD
-#       modified:   packaging/archlinux/wolfclient-git.PKGBUILD
-#       modified:   packaging/debian/changelog
-#       modified:   packaging/freebsd/packlist
-#       modified:   packaging/netbsd/packlist
-#       modified:   packaging/obs/PKGBUILD
-#       modified:   packaging/obs/deploy_to_obs.sh
-#       modified:   packaging/obs/wolfclient.dsc
-#       modified:   packaging/redhat/buildlocal.sh
-#       modified:   packaging/redhat/wolfclient.spec
-#       modified:   packaging/windows/wolfclient.wxs
-#       modified:   skeleton/skeleton.pro
