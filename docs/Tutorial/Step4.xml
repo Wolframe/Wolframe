@@ -130,14 +130,20 @@
 		<programlisting language='shell'>
 	COMMAND CustomerListRequest
 	       CALL SelectCustomerList
-	       RETURN STANDALONE list;
+	       RETURN {standalone="yes", root="list"};
 		</programlisting>
 
 		This is we map the 'CustomerListRequest' request to a function 'SelectCustomerList'
 		that is executed to perform the request. It will return the document 
-		without a document type assigned to it (standalone) and with the root element 'list'. 
-		The returned content will be a list of customers. The function will be implemented 
-		in a TDL program in the server. We first add the
+		without a document type assigned to it (standalone='yes') and with the 
+		root element 'list' (root='list'). The attributes in curly brackets after
+		the RETURN define the meta data of the document. Depending of the output
+		filters used we have to define a set of document meta data.
+		In our example we need to define the root element because we use XML for
+		output and XML needs a root element to be defined. Because we did not yet
+		define document type, we need to declare the document as standalone.
+		The returned content will be a list of customers. The function will 
+		be implemented in a TDL program in the server. We first add the
 		TDL program declaration to a new 'Processor' configuration section:
 
 		<programlisting language='shell'>
@@ -146,10 +152,13 @@
 	}
 		</programlisting>
 
-		The <filename>Customer.tdl</filename> file contains the database transaction 'SelectCustomerList' we want to execute.
-		We only have to specify the enclosing tag 'customer' for each customer record we are going to
-		retrieve with 'INTO customer'. The 'list' tag gets added by the directmap and is specified there as
-		'RETURN STANDALONE list':
+		The <filename>Customer.tdl</filename> file contains the database transaction 'SelectCustomerList' 
+		we want to execute.
+		We only have to specify the enclosing tag 'customer' for each customer record 
+		we are going to retrieve with 'INTO customer'. The 'list' tag is the root
+		element and does not belong to the content but to the document meta data
+		and gets added by the output filter as we specified with root='list' in the
+		document meta data definition before. 
 
 		<programlisting language='shell'>
 	TRANSACTION SelectCustomerList
