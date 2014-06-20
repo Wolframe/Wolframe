@@ -23,7 +23,7 @@ map_platform_and_arch( )
 		CentOS_CentOS-5)	NICE_PLATFORM="CentOS-5"		;;
 		CentOS_CentOS-6)	NICE_PLATFORM="CentOS-6"		;;
 		Fedora_19)		NICE_PLATFORM="Fedora-19"		;;
-		Fedora_18)		NICE_PLATFORM="Fedora-18"		;;
+		Fedora_20)		NICE_PLATFORM="Fedora-20"		;;
 		Debian_7.0)		NICE_PLATFORM="Debian-7"		;;
 		Debian_6.0)		NICE_PLATFORM="Debian-6"		;;
 		Arch_Extra)		NICE_PLATFORM="ArchLinux"		;;

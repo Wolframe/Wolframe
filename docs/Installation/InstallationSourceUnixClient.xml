@@ -125,7 +125,7 @@
 </sect3>
 
 <sect3>
-	<title>Ubuntu 13.10</title>
+	<title>Ubuntu 13.10 and 14.04</title>
 	
 	<para>
 		For Qt 4 you need the 'libqt4-dev' package.
