@@ -14,6 +14,8 @@ BUILD=`echo $FULL_VERSION | cut -f 4 -d .`
 
 VERSION="$MAJOR_VERSION.$MINOR_VERSION.$REVISION"
 
+DATE=`date '+%b %d, %Y'`
+
 # Set PACKAGE_VERSION in makefiles (make dist and building)
 sed -i "s/^PACKAGE_VERSION.*=.*/PACKAGE_VERSION = $VERSION/g" GNUmakefile
 sed -i "s/^PACKAGE_VERSION.*=.*/PACKAGE_VERSION = $VERSION/g" Makefile.W32
@@ -66,3 +68,7 @@ sed -i "s/^VERSION=.*/VERSION=$VERSION/g" packaging/obs/release_local_binaries.s
 # documentation
 echo $VERSION > docs/WolframeVersion.txt
 echo $VERSION > docs/InstallationVersion.txt
+
+echo $DATE > docs/InstallationDate.txt
+echo $DATE > docs/TutorialDate.txt
+echo $DATE > docs/WolfBookDate.txt

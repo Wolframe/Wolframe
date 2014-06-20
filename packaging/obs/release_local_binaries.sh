@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PROJECT=wolframe
-VERSION=0.0.1
+VERSION=0.0.2
 
 PACKAGE_ROOT=/mnt/packages
 SOURCEFORGE_ROOT=/mnt/sf

@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-May 25, 2014 version 0.0.1
+Jun 20, 2014 version 0.0.2
 
 -------------------------------------------------------------------------------
 
@@ -1895,15 +1895,15 @@ destination of the installation.
 
 For instance:
 
-        make DESTDIR=/var/tmp prefix=/usr/local/wolframe-0.0.1
+        make DESTDIR=/var/tmp prefix=/usr/local/wolframe-0.0.2
  install
 
 
 installs the software in:
 
-        /var/tmp/usr/local/wolframe-0.0.1
+        /var/tmp/usr/local/wolframe-0.0.2
 /sbin/wolframed
-        /var/tmp/usr/local/wolframe-0.0.1
+        /var/tmp/usr/local/wolframe-0.0.2
 /etc/wolframe/wolframe.conf
         ...
 
@@ -2017,7 +2017,7 @@ For Qt 4 you need the 'libqt4-dev' package.
 
 For Qt 5 compile your own version of the library.
 
-Ubuntu 13.10
+Ubuntu 13.10 and 14.04
 
 For Qt 4 you need the 'libqt4-dev' package.
 
