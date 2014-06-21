@@ -111,4 +111,6 @@ done < /tmp/results.$$
 rm /tmp/results.$$
 IFS=$OLDIFS
 
+rm -rf _work
+
 exit

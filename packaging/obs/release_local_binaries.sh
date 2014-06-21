@@ -6,7 +6,7 @@ VERSION=0.0.2
 PACKAGE_ROOT=/mnt/packages
 SOURCEFORGE_ROOT=/mnt/sf
 
-PLATFORMS="Slackware_14 FreeBSD_10 FreeBSD_9 FreeBSD_8 NetBSD_6 Scientific_Linux-6 Scientific_Linux-5 Solaris_10"
+PLATFORMS="Slackware_14 FreeBSD_10 FreeBSD_9 FreeBSD_8 NetBSD_6 Scientific_Linux-6 Scientific_Linux-5"
 #PLATFORMS="Solaris_10"
 ARCHS="i586 x86_64"
 #ARCHS="sun4u"
