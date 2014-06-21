@@ -4,7 +4,7 @@
 	<title>Step 2 - Basic Authorization</title>	
 
 	<para>
-		So we have to add a dummy authorization to the server configuration
+		For the time being we add a dummy authorization to the server configuration
 		which accepts all connections (not very secure, but for now good enough):
 		<programlisting language='shell'>
 	; dummy authorization
