@@ -135,19 +135,22 @@
 		<programlisting language='shell'>
 	COMMAND CustomerListRequest
 	       CALL SelectCustomerList
-	       RETURN {standalone="yes", root="list"};
+	       RETURN SKIP {standalone="yes", root="list"};
 		</programlisting>
 
-		This is we map the 'CustomerListRequest' request to a function 'SelectCustomerList'
+		We map the 'CustomerListRequest' request to a function 'SelectCustomerList'
 		that is executed to perform the request. It will return the document 
-		without a document type assigned to it (standalone='yes') and with the 
-		root element 'list' (root='list'). The attributes in curly brackets after
-		the RETURN define the meta data of the document. Depending of the output
+		without validation (SKIP). The attributes in curly brackets after the 
+		RETURN SKIP define the meta data of the document. Depending of the output 
 		filters used we have to define a set of document meta data.
+		Because we do not declare the meta data as part of the document type 
+		description as we will do later, we have to declare them here in the command.
+		The meta data attribute standalone='yes' tells the XML filter not to
+		include any document type declaration. The declaration root='list' 
+		declares the root element for the XML output.
 		In our example we need to define the root element because we use XML for
-		output and XML needs a root element to be defined. Because we did not yet
-		define the document type for the result, we need to declare the document 
-		as standalone. The returned content will be a list of customers. 
+		output and XML needs a root element to be defined. 
+		The returned content will be a list of customers. 
 		The function will be implemented in a TDL program in the server.
 		We first add the TDL program declaration to a new 'Processor' configuration 
 		section:
