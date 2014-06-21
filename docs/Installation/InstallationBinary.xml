@@ -287,18 +287,30 @@
 				
 				<para>
 					Installing the packages via repositories is usually the prefered way.
-				</para>	
+				</para>					
 			</sect3>
 			
 			<sect3>
 				<title>Install from repository</title>
+
+			<para>
+				<emphasis role="bold">Note</emphasis>: Some older versions of Ubuntu
+				(like Ubuntu 12.04 LTS, 10.04 LTS or Debian 6) have problems to download the metadata files from
+				Sourceforge. If you get messages like:
+			<programlisting language='shell'>
+	W: Failed to fetch http://sourceforge.net/projects/wolframe/files/repositories/Ubuntu-12.04_LTS/Release.gpg  Got a single header line over 360 chars
+	Err http://sourceforge.net  Packages               
+			</programlisting>
+				then you have to download the binaries manually.
+			</para>
+
 			<para>
 				Add a new repository file <filename>/etc/apt/sources.list.d/wolframe.list</filename>
 				which contains:
 				<programlisting language='shell'>
-	deb http://sourceforge.net/projects/wolframe/files/repositories/xUbuntu_13.10/ /
+	deb http://sourceforge.net/projects/wolframe/files/repositories/Ubuntu-14.04_LTS/ /
 				</programlisting>
-				(as example we choose Ubuntu 13.10).
+				(as example we choose Ubuntu 14.04).
 			</para>
 			
 			<para>

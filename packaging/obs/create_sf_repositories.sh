@@ -4,6 +4,8 @@ if test $# != 1; then
 	echo "Usage: packaging/obs/create_sf_repositories.sh <release>" 1>&2
 	echo "where release is CentOS-6, CentOS-5, RHEL-6, RHEL-5" 1>&2
 	echo "                 Fedora-20, Fedora-19" 1>&2
+	echo "                 Ubuntu-14.04_LTS, Ubuntu-13.10, Ubuntu-12.04_LTS" 1>&2
+	echo "                 Ubuntu-10.04_LTS, Debian-7, Debian-6" 1>&2
 	echo "                 ArchLinux" 1>&2
 	exit 1
 fi
@@ -13,6 +15,174 @@ SOURCEFORGE_ROOT=/mnt/sf
 BASE=$PWD
 
 DISTRO=$1
+
+if test $DISTRO = "Debian-7"; then
+
+	REPODIR=/mnt/sf/repositories/Debian-7
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/Debian_7.0/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/Debian_7.0/
+
+	cp Release $REPODIR
+	cp Release.gpg $REPODIR
+	cp Release.key $REPODIR
+	cp Packages $REPODIR
+	cp Packages.gz $REPODIR
+	cp Sources $REPODIR
+	cp Sources.gz $REPODIR
+	
+	mkdir -p $REPODIR/i386
+	mkdir -p $REPODIR/amd64
+
+	cp -v i386/wolf*.deb $REPODIR/i386/.
+	cp -v amd64/wolf*.deb $REPODIR/amd64/.
+
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
+
+if test $DISTRO = "Debian-6"; then
+
+	REPODIR=/mnt/sf/repositories/Debian-6
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/Debian_6.0/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/Debian_6.0/
+
+	cp Release $REPODIR
+	cp Release.gpg $REPODIR
+	cp Release.key $REPODIR
+	cp Packages $REPODIR
+	cp Packages.gz $REPODIR
+	cp Sources $REPODIR
+	cp Sources.gz $REPODIR
+	
+	mkdir -p $REPODIR/i386
+	mkdir -p $REPODIR/amd64
+
+	cp -v i386/*.deb $REPODIR/i386/.
+	cp -v amd64/*.deb $REPODIR/amd64/.
+
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
+
+if test $DISTRO = "Ubuntu-14.04_LTS"; then
+
+	REPODIR=/mnt/sf/repositories/Ubuntu-14.04_LTS
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/xUbuntu_14.04/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/xUbuntu_14.04/
+
+	cp Release $REPODIR
+	cp Release.gpg $REPODIR
+	cp Release.key $REPODIR
+	cp Packages $REPODIR
+	cp Packages.gz $REPODIR
+	cp Sources $REPODIR
+	cp Sources.gz $REPODIR
+	
+	mkdir -p $REPODIR/i386
+	mkdir -p $REPODIR/amd64
+
+	cp -v i386/wolf*.deb $REPODIR/i386/.
+	cp -v amd64/wolf*.deb $REPODIR/amd64/.
+
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
+
+if test $DISTRO = "Ubuntu-13.10"; then
+
+	REPODIR=/mnt/sf/repositories/Ubuntu-13.10
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/xUbuntu_13.10/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/xUbuntu_13.10/
+
+	cp Release $REPODIR
+	cp Release.gpg $REPODIR
+	cp Release.key $REPODIR
+	cp Packages $REPODIR
+	cp Packages.gz $REPODIR
+	cp Sources $REPODIR
+	cp Sources.gz $REPODIR
+	
+	mkdir -p $REPODIR/i386
+	mkdir -p $REPODIR/amd64
+
+	cp -v i386/wolf*.deb $REPODIR/i386/.
+	cp -v amd64/wolf*.deb $REPODIR/amd64/.
+
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
+
+if test $DISTRO = "Ubuntu-12.04_LTS"; then
+
+	REPODIR=/mnt/sf/repositories/Ubuntu-12.04_LTS
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/xUbuntu_12.04/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/xUbuntu_12.04/
+
+	cp Release $REPODIR
+	cp Release.gpg $REPODIR
+	cp Release.key $REPODIR
+	cp Packages $REPODIR
+	cp Packages.gz $REPODIR
+	cp Sources $REPODIR
+	cp Sources.gz $REPODIR
+	
+	mkdir -p $REPODIR/i386
+	mkdir -p $REPODIR/amd64
+
+	cp -v i386/*.deb $REPODIR/i386/.
+	cp -v amd64/*.deb $REPODIR/amd64/.
+
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
+
+if test $DISTRO = "Ubuntu-10.04_LTS"; then
+
+	REPODIR=/mnt/sf/repositories/Ubuntu-10.04_LTS
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/xUbuntu_10.04/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/xUbuntu_10.04/
+
+	cp Release $REPODIR
+	cp Release.gpg $REPODIR
+	cp Release.key $REPODIR
+	cp Packages $REPODIR
+	cp Packages.gz $REPODIR
+	cp Sources $REPODIR
+	cp Sources.gz $REPODIR
+	
+	mkdir -p $REPODIR/i386
+	mkdir -p $REPODIR/amd64
+
+	cp -v i386/*.deb $REPODIR/i386/.
+	cp -v amd64/*.deb $REPODIR/amd64/.
+
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
 
 if test $DISTRO = "Fedora-20"; then
 
