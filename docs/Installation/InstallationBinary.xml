@@ -304,7 +304,7 @@
 			<para>
 				Download the signing key:
 				<programlisting language='shell'>
-	wget http://sourceforge.net/projects/wolframe/files/repositories/xUbuntu_13.10/Release.key
+	wget http://wolframe.net/Release.key
 				</programlisting>
 			</para>
 			
@@ -604,7 +604,7 @@
 				
 				<para>
 					You can use the packages from
-					<ulink url="http://sourceforge.net/projects/wolframe/files/wolframe-binaries/0.0.1/ArchLinux/">http://sourceforge.net/projects/wolframe/files/wolframe-binaries/&WolframeVersion;/ArchLinux/</ulink>
+					<ulink url="http://sourceforge.net/projects/wolframe/files/wolframe-binaries/">http://sourceforge.net/projects/wolframe/files/wolframe-binaries/</ulink>
 					directly.
 				</para>	
 			</sect3>
@@ -616,14 +616,14 @@
 				<programlisting language='shell'>
 	[wolframe]
 	SigLevel = Optional DatabaseRequired
-	Server = http://sourceforge.net/projects/wolframe/files/repositories/Arch_Extra/$arch
+	Server = http://sourceforge.net/projects/wolframe/files/repositories/ArchLinux/$arch
 				</programlisting>
 			</para>
 
 			<para>
 				Fetch and verify the sigining key, import and locally sign the key:
 				<programlisting language='shell'>
-	wget http://download.opensuse.org/repositories/home:/wolframe_user/xUbuntu_13.10/Release.key
+	wget http://wolframe.net/Release.key
 	pacman-key --add Release.key
 	pacman-key --lsign 9D404026
 				</programlisting>

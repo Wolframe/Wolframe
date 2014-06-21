@@ -3,6 +3,7 @@
 if test $# != 1; then
 	echo "Usage: packaging/obs/create_sf_repositories.sh <release>" 1>&2
 	echo "where release is CentOS-6, CentOS-5, RHEL-6, RHEL-5" 1>&2
+	echo "                 ArchLinux" 1>&2
 	exit 1
 fi
 	
@@ -156,3 +157,27 @@ if test $DISTRO = "RHEL-5"; then
 	rm -rf download.opensuse.org
 fi
 
+if test $DISTRO = "ArchLinux"; then
+
+	REPODIR=/mnt/sf/repositories/ArchLinux
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/Arch_Extra/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/Arch_Extra/
+
+	mkdir -p $REPODIR/i686
+	mkdir -p $REPODIR/x86_64
+
+	cp i686/home_wolframe_user_Arch_Extra.db $REPODIR/i686/wolframe.db
+	cp i686/home_wolframe_user_Arch_Extra.db.sig $REPODIR/i686/wolframe.db.sig
+	cp x86_64/home_wolframe_user_Arch_Extra.db $REPODIR/x86_64/wolframe.db
+	cp x86_64/home_wolframe_user_Arch_Extra.db.sig $REPODIR/x86_64/wolframe.db.sig
+
+	cp -v i686/*.pkg.tar.xz $REPODIR/i686/
+	cp -v x86_64/*.pkg.tar.xz $REPODIR/x86_64/
+
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
