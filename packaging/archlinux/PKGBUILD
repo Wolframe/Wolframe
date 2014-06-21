@@ -2,7 +2,7 @@
 # Maintainer: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe
 pkgver=0.0.2
-pkgrel=2
+pkgrel=1
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
 arch=('i686' 'x86_64' 'armv6h')
@@ -20,8 +20,8 @@ source=(
   'wolframed.service'
 )
 
-md5sums=('68b6fd14c81367ee90a8a603ee017fc2'
-         '49ac64b1957318385c53afffffbdf912'
+md5sums=('94651cf857e1909729374c327c5023b4'
+         'faa0c7a37d5d6156fe3d8e9f16093a06'
          'cc146a28908aad55f156860340934095')
 
 package() {
