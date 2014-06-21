@@ -140,7 +140,7 @@
 				(as example we choose Centos 6):
 				<programlisting language='shell'>
 	cd /etc/yum.repos.d
-	wget http://sourceforge.net/projects/wolframe/files/repositories/CentOS_CentOS-6/wolframe.repo
+	wget http://sourceforge.net/projects/wolframe/files/repositories/CentOS-6/wolframe.repo
 				</programlisting>
 			</para>
 			
@@ -161,10 +161,10 @@
 			<para>
 				You have to accept the signing key:
 				<programlisting language='shell'>
-	Retrieving key from http://sourceforge.net/projects/wolframe/files/repositories/CentOS_CentOS-6/repodata/repomd.xml.key
+	Retrieving key from http://sourceforge.net/projects/wolframe/files/repositories/CentOS-6/repodata/repomd.xml.key
 	Importing GPG key 0x9D404026:
 	Userid: "home:wolframe_user OBS Project &lt;home:wolframe_user@build.opensuse.org>"
-	From  : http://sourceforge.net/projects/wolframe/files/repositories/CentOS_CentOS-6/repodata/repomd.xml.key
+	From  : http://sourceforge.net/projects/wolframe/files/repositories/CentOS-6/repodata/repomd.xml.key
 	Is this ok [y/N]: y
 				</programlisting>
 			</para>
