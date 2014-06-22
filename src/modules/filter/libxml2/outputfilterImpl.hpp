@@ -110,7 +110,6 @@ private:
 	DocumentWriter m_doc;					///< document writer structure
 	XsltMapper m_xsltMapper;				///< optional XSLT mapper
 	int m_taglevel;						///< tag hierarchy level
-	bool m_emptyDocument;					///< true, if the printed document is empty
 	std::string m_attribname;				///< attribute name buffer
 	std::string m_valuestrbuf;				///< value buffer
 	std::string m_elembuf;					///< buffer for current element
