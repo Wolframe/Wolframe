@@ -1160,15 +1160,9 @@ struct OutputFilterImpl :public OutputFilter
 				setState( Error, "textwolf: illegal print operation after final close (empty document)");
 				return false;
 			}
-			if (type == FilterBase::CloseTag)
+			if (!printHeader())
 			{
-				m_gotFinalClose = true;
-				m_emptyDocument = true;
-				return true;
-			}
-			else
-			{
-				if (!printHeader()) return false;
+				return false;
 			}
 			m_headerPrinted = true;
 		}
