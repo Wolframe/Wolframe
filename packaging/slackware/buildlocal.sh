@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.0.1
+VERSION=0.0.2
 PKGBUILD=$HOME/slackbuild
 ARCH=`uname -m`
 if test "x$ARCH" = "xx86_64"; then

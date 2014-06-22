@@ -1,7 +1,7 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
 # Maintainer: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe
-pkgver=0.0.1
+pkgver=0.0.2
 pkgrel=2
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
@@ -11,7 +11,7 @@ depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl'
          'sqlite' 'postgresql-libs' 'libxml2' 'libxslt' 'libpng' 'zlib'
          'python')
 makedepends=()
-checkdepends=('expect' 'inetutils')
+checkdepends=('expect' 'inetutils' 'diffutils')
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(

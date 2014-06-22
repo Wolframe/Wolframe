@@ -11,7 +11,7 @@ depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl'
          'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt'
          'python')
 makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
-checkdepends=('expect' 'inetutils')
+checkdepends=('expect' 'inetutils' 'diffutils')
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(

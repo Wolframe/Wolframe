@@ -9,7 +9,7 @@ SUBDIRS += examples
 endif
 
 PACKAGE_NAME = wolframe
-PACKAGE_VERSION = 0.0.1
+PACKAGE_VERSION = 0.0.2
 
 -include $(TOPDIR)/makefiles/gmake/top.mk
 

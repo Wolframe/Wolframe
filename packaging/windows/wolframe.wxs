@@ -38,7 +38,7 @@ Project Wolframe.
      xmlns:firewall="http://schemas.microsoft.com/wix/FirewallExtension"
 	 xmlns:contrib="http://wixtoolset.org/wixcontrib/2008">
 
-	<?define ProductVersion = "0.0.1" ?>
+	<?define ProductVersion = "0.0.2" ?>
 	<?define ProductCode = "{09E1E9CC-6AE6-4207-B7FE-F47CFDB2861F}" ?>
 	<?define ProductUpgradeCode = "{64361569-C468-42DE-95A1-901DDDE84D13}" ?>
 	

@@ -38,7 +38,7 @@
 
 #define WOLFRAME_MAJOR_VERSION	0
 #define WOLFRAME_MINOR_VERSION	0
-#define WOLFRAME_REVISION	1
+#define WOLFRAME_REVISION	2
 #define WOLFRAME_BUILD		0
 
 // The format of the version is MMmmrrbbb

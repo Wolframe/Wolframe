@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.0.1
+VERSION=0.0.2
 PKGBUILD=$HOME/archbuild
 ARCH=`uname -m`
 rm -rf $PKGBUILD/BUILD $PKGBUILD/PKG

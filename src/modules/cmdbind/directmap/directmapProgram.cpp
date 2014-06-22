@@ -58,7 +58,7 @@ bool DirectmapProgram::is_mine( const std::string& filename) const
 static void parseMetaData( types::DocMetaData& metadata, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
 	static const utils::CharTable keytab( "a..zA..Z_0..9.:-");
-	static const utils::CharTable optab( "=,}");
+	static const utils::CharTable optab( "=,{}");
 	char ch = utils::gotoNextToken( si, se);
 	if (ch != '{') throw std::logic_error("illegal call of parseMetaData");
 	++si;
@@ -102,24 +102,6 @@ static void parseMetaData( types::DocMetaData& metadata, std::string::const_iter
 	++si;
 }
 
-static void skipEndOfCommand( std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	char ch;
-	while ((ch = utils::gotoNextToken( si, se)) != 0)
-	{
-		if (ch == '#')
-		{
-			utils::parseNextLine( si, se);
-			continue;
-		}
-		if (ch == ';')
-		{
-			++si;
-			break;
-		}
-	}
-}
-
 static bool isAlphaNum( char ch)
 {
 	return (((ch|32) >= 'a' && (ch|32) <= 'z') || ch == '_' || (ch >= '0' && ch <= '9'));
@@ -138,7 +120,7 @@ static std::string errorToken( char ch, const std::string& tok)
 }
 
 static const utils::CharTable g_fchartab( "a..zA..Z_0..9.");
-static const utils::CharTable g_fcharoptab( ";#()");
+static const utils::CharTable g_fcharoptab( ";#(){}=,");
 
 static const char* g_directmap_ids[] = {"SKIP","FILTER","RETURN","CALL","AUTHORIZE",0};
 enum DirectmapKeyword{ d_NONE, d_SKIP,d_FILTER,d_RETURN,d_CALL,d_AUTHORIZE };
@@ -166,6 +148,13 @@ static char fetchNextToken( std::string& tok, std::string::const_iterator& si, c
 	}
 	if (!ch) throw std::runtime_error( "unexpected end of file in command definition");
 	return ch;
+}
+
+static void skipEndOfCommand( std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	char ch;
+	std::string tok;
+	while ((ch = fetchNextToken( tok, si, se)) != 0 && ch != ';'){}
 }
 
 static std::string parseName( std::string::const_iterator& si, const std::string::const_iterator& se, const char* statemsg)
@@ -379,7 +368,7 @@ static DirectmapCommandDescriptionR parseCommandDescription( std::string::const_
 					}
 					else
 					{
-						doctype = parseName( si, se, "(doctype) after RETURN");
+						doctype = parseName( si, se, "(doctype or SKIP) after RETURN");
 						rt->outputform = provider->formDescription( doctype);
 						if (!rt->outputform) throw std::runtime_error( std::string("referenced undefined form for output in result '") + doctype + "'");
 						rt->outputmetadata = rt->outputform->metadata();

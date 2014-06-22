@@ -19,9 +19,9 @@
 
 		<programlisting language='shell'>
 	CREATE TABLE Customer (
-		id              INTEGER PRIMARY KEY AUTOINCREMENT,
-		name            TEXT    NOT NULL,
-		address         TEXT
+	    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+	    name            TEXT    NOT NULL,
+	    address         TEXT
 	);
 		</programlisting>
 	</para>
@@ -39,10 +39,10 @@
 
 		<programlisting language='shell'>
 	database {
-		SQLite {
-			identifier	sqlitedb
-			file		tutorial.db
-			foreignKeys	yes
+	    SQLite {
+	        identifier     sqlitedb
+	        file           tutorial.db
+	        foreignKeys    yes
 		}
 	}
 		</programlisting>
@@ -60,17 +60,20 @@
 	
 	<para>
 		Now we want to use some XML filters to send/receive XML over the protocol,
-		so we have to add the following module to <filename>tutorial.conf</filename>:
+		so we have to add the following modules to <filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
 	LoadModules {
-		module mod_db_sqlite3
-		<emphasis role="bold">module mod_filter_libxml2</emphasis>
+	    module mod_db_sqlite3
+	    <emphasis role="bold">module mod_doctype_xml</emphasis>
+	    <emphasis role="bold">module mod_filter_libxml2</emphasis>
 	}
 		</programlisting>
 	</para>
 
 	<para>
+		The module mod_doctype_xml is there to detect documents of type XML.
+		The module mod_filter_libxml2 is there to process XML documents.
 		In order to see which modules are currently loaded in the wolframed we can
 		use:
 
@@ -86,6 +89,7 @@
 	..
 	Module files to load:
 	  /usr/lib/wolframe/modules/mod_db_sqlite3
+	  /usr/lib/wolframe/modules/mod_doctype_xml
 	  /usr/lib/wolframe/modules/mod_filter_libxml2
 	..
 		</programlisting>
@@ -100,6 +104,7 @@
 		<programlisting language='shell'>
 	LoadModules {
 		module mod_db_sqlite3
+		module mod_doctype_xml
 		module mod_filter_libxml2
 		<emphasis role="bold">module mod_command_directmap</emphasis>
 	}
@@ -107,20 +112,20 @@
 		and a new section 'Processor' on the same level as 'LoadModules'
 		<programlisting language='shell'>
 	Processor {
-		database sqlitedb
-		cmdhandler {
-			directmap {
-				filter libxml2
-				program tutorial.dmap
-			}
-		}
+	    database sqlitedb
+	    cmdhandler {
+	        directmap {
+	            filter XML=libxml2
+	            program tutorial.dmap
+	        }
+	    }
 	}
 		</programlisting>
 	</para>
 
 	<para>
 		The "filter" directive denotes that the command handler should
-		use the "libxml2" module to parse XML requests.
+		use the "libxml2" module for parsing XML requests.
 	</para>
 		
 	<para>
@@ -130,35 +135,36 @@
 		<programlisting language='shell'>
 	COMMAND CustomerListRequest
 	       CALL SelectCustomerList
-	       RETURN {standalone="yes", root="list"};
+	       RETURN SKIP {standalone="yes", root="list"};
 		</programlisting>
 
-		This is we map the 'CustomerListRequest' request to a function 'SelectCustomerList'
+		We map the 'CustomerListRequest' request to a function 'SelectCustomerList'
 		that is executed to perform the request. It will return the document 
-		without a document type assigned to it (standalone='yes') and with the 
-		root element 'list' (root='list'). The attributes in curly brackets after
-		the RETURN define the meta data of the document. Depending of the output
+		without validation (SKIP). The attributes in curly brackets after the 
+		RETURN SKIP define the meta data of the document. Depending of the output 
 		filters used we have to define a set of document meta data.
+		Because we do not declare the meta data as part of the document type 
+		description as we will do later, we have to declare them here in the command.
+		The meta data attribute standalone='yes' tells the XML filter not to
+		include any document type declaration. The declaration root='list' 
+		declares the root element for the XML output.
 		In our example we need to define the root element because we use XML for
-		output and XML needs a root element to be defined. Because we did not yet
-		define document type, we need to declare the document as standalone.
-		The returned content will be a list of customers. The function will 
-		be implemented in a TDL program in the server. We first add the
-		TDL program declaration to a new 'Processor' configuration section:
+		output and XML needs a root element to be defined. 
+		The returned content will be a list of customers. 
+		The function will be implemented in a TDL program in the server.
+		We first add the TDL program declaration to a new 'Processor' configuration 
+		section:
 
 		<programlisting language='shell'>
 	Processor {
-		program Customer.tdl
+	    program Customer.tdl
 	}
 		</programlisting>
 
 		The <filename>Customer.tdl</filename> file contains the database transaction 'SelectCustomerList' 
 		we want to execute.
 		We only have to specify the enclosing tag 'customer' for each customer record 
-		we are going to retrieve with 'INTO customer'. The 'list' tag is the root
-		element and does not belong to the content but to the document meta data
-		and gets added by the output filter as we specified with root='list' in the
-		document meta data definition before. 
+		we are going to retrieve with 'INTO customer'.
 
 		<programlisting language='shell'>
 	TRANSACTION SelectCustomerList
@@ -173,15 +179,16 @@
 
 		<programlisting language='shell'>
 	LoadModules {
-		module mod_db_sqlite3
-		module mod_filter_libxml2
-		module mod_command_directmap
-		<emphasis role="bold">module mod_ddlcompiler_simpleform</emphasis>
+	    module mod_db_sqlite3
+	    module mod_doctype_xml
+	    module mod_filter_libxml2
+	    module mod_command_directmap
+	    <emphasis role="bold">module mod_ddlcompiler_simpleform</emphasis>
 	}
 
 	Processor {
-		program Customer.tdl
-		<emphasis role="bold">program Customer.sfrm</emphasis>	
+	    program Customer.tdl
+	    <emphasis role="bold">program Customer.sfrm</emphasis>	
 	}
 		</programlisting>
 
@@ -191,10 +198,8 @@
 
 		<programlisting language='shell'>
 	FORM CustomerListRequest
-	{
-		customer {
-		}
-	}
+	    -root customer
+	{}
 		</programlisting>
 	</para>
 	

@@ -242,8 +242,8 @@
 
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: wolframe
-Version: 0.0.1
-Release: 0.2
+Version: 0.0.2
+Release: 1
 License: Wolframe License
 Group: Application/Business
 Source: %{name}_%{version}.tar.gz
@@ -1639,6 +1639,9 @@ fi
 %{_bindir}/wolframec
 
 %changelog
+* Fri Jun 20 2014 Andreas Baumann <abaumann@yahoo.com> 0.0.2-1
+- intermediary release
+
 * Mon Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.2
 - more splitting into sub-packages for modules
 - builds on OpenSuse Build Service (osc)

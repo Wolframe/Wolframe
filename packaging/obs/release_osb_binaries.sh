@@ -3,7 +3,7 @@
 OBS_PROJECT=home:wolframe_user
 OBS_PACKAGE=Wolframe
 PROJECT=wolframe
-VERSION=0.0.1
+VERSION=0.0.2
 
 SOURCEFORGE_ROOT=/mnt/sf
 
@@ -110,5 +110,7 @@ while read -r PLATFORM ARCH STATUS; do
 done < /tmp/results.$$
 rm /tmp/results.$$
 IFS=$OLDIFS
+
+rm -rf _work
 
 exit

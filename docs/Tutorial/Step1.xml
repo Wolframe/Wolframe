@@ -50,7 +50,6 @@
 	INFO: Undefined ServerTokens, using ProductOnly
 	INFO: Empty random generator device. Using default device.
 	DEBUG: Random generator initialized. Using device '/dev/urandom'
-	DEBUG: AAAA database references resolved
 	DEBUG: Loading programs
 	INFO: Accepting connections on 0.0.0.0:7661
 	DEBUG: 1 network acceptor(s) created.
