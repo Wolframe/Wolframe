@@ -238,14 +238,13 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			setState( Error, "libxml2 illegal print operation after final close (empty document)");
 			return false;
 		}
-		if (type == FilterBase::CloseTag)
-		{
-			m_emptyDocument = true;
-			return true;
-		}
 		if (!printHeader())
 		{
 			return false;
+		}
+		if (type == FilterBase::CloseTag)
+		{
+			m_emptyDocument = true;
 		}
 		xmlout = m_doc.get();
 	}
