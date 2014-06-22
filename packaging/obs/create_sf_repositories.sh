@@ -6,6 +6,7 @@ if test $# != 1; then
 	echo "                 Fedora-20, Fedora-19" 1>&2
 	echo "                 Ubuntu-14.04_LTS, Ubuntu-13.10, Ubuntu-12.04_LTS" 1>&2
 	echo "                 Ubuntu-10.04_LTS, Debian-7, Debian-6" 1>&2
+	echo "                 openSUSE-13.1, openSUSE-12.3, SLES-11_SP2, SLES-11_SP3" 1>&2
 	echo "                 ArchLinux" 1>&2
 	exit 1
 fi
@@ -424,3 +425,148 @@ if test $DISTRO = "ArchLinux"; then
 	cd $BASE
 	rm -rf download.opensuse.org
 fi
+
+if test $DISTRO = "openSUSE-13.1"; then
+
+	REPODIR=/mnt/sf/repositories/openSUSE-13.1
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/openSUSE_13.1/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/openSUSE_13.1/
+
+	sed 's|http://download.opensuse.org/repositories/home:/wolframe_user/|http://sourceforge.net/projects/wolframe/files/repositories/|g' \
+		home:wolframe_user.repo | \
+	sed 's|\[home_wolframe_user\]|[Wolframe]|g' | \
+	sed 's|wolframe_user.s Home Project|Wolframe Project|g' | \
+	sed 's|openSUSE_13.1|openSUSE-13.1|g' \
+		> $REPODIR/wolframe.repo
+
+	mkdir -p $REPODIR/repodata
+
+	cp repodata/repomd.xml.key $REPODIR/repodata
+	cp repodata/repomd.xml $REPODIR/repodata
+	cp repodata/*primary.xml.gz $REPODIR/repodata
+	cp repodata/*filelists.xml.gz $REPODIR/repodata
+	cp repodata/*other.xml.gz $REPODIR/repodata
+
+	mkdir -p $REPODIR/x86_64
+	cp -v x86_64/*.rpm $REPODIR/x86_64/.
+	mkdir -p $REPODIR/i586
+	cp -v i586/*.rpm $REPODIR/i586/.
+	mkdir -p $REPODIR/src
+	cp -v src/*.src.rpm $REPODIR/src/.
+	
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
+
+if test $DISTRO = "openSUSE-12.3"; then
+
+	REPODIR=/mnt/sf/repositories/openSUSE-12.3
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/openSUSE_12.3/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/openSUSE_12.3/
+
+	sed 's|http://download.opensuse.org/repositories/home:/wolframe_user/|http://sourceforge.net/projects/wolframe/files/repositories/|g' \
+		home:wolframe_user.repo | \
+	sed 's|\[home_wolframe_user\]|[Wolframe]|g' | \
+	sed 's|wolframe_user.s Home Project|Wolframe Project|g' | \
+	sed 's|openSUSE_12.3|openSUSE-12.3|g' \
+		> $REPODIR/wolframe.repo
+
+	mkdir -p $REPODIR/repodata
+
+	cp repodata/repomd.xml.key $REPODIR/repodata
+	cp repodata/repomd.xml $REPODIR/repodata
+	cp repodata/*primary.xml.gz $REPODIR/repodata
+	cp repodata/*filelists.xml.gz $REPODIR/repodata
+	cp repodata/*other.xml.gz $REPODIR/repodata
+
+	mkdir -p $REPODIR/x86_64
+	cp -v x86_64/*.rpm $REPODIR/x86_64/.
+	mkdir -p $REPODIR/i586
+	cp -v i586/*.rpm $REPODIR/i586/.
+	mkdir -p $REPODIR/src
+	cp -v src/*.src.rpm $REPODIR/src/.
+	
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
+
+if test $DISTRO = "SLES-11_SP3"; then
+
+	REPODIR=/mnt/sf/repositories/SLES-11_SP3
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/SLE_11_SP3/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/SLE_11_SP3/
+
+	sed 's|http://download.opensuse.org/repositories/home:/wolframe_user/|http://sourceforge.net/projects/wolframe/files/repositories/|g' \
+		home:wolframe_user.repo | \
+	sed 's|\[home_wolframe_user\]|[Wolframe]|g' | \
+	sed 's|wolframe_user.s Home Project|Wolframe Project|g' | \
+	sed 's|SLE_11_SP3|SLES-11_SP3|g' \
+		> $REPODIR/wolframe.repo
+
+	mkdir -p $REPODIR/repodata
+
+	cp repodata/repomd.xml.key $REPODIR/repodata
+	cp repodata/repomd.xml $REPODIR/repodata
+	cp repodata/*primary.xml.gz $REPODIR/repodata
+	cp repodata/*filelists.xml.gz $REPODIR/repodata
+	cp repodata/*other.xml.gz $REPODIR/repodata
+
+	mkdir -p $REPODIR/x86_64
+	cp -v x86_64/*.rpm $REPODIR/x86_64/.
+	mkdir -p $REPODIR/i586
+	cp -v i586/*.rpm $REPODIR/i586/.
+	mkdir -p $REPODIR/src
+	cp -v src/*.src.rpm $REPODIR/src/.
+	
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
+
+if test $DISTRO = "SLES-11_SP2"; then
+
+	REPODIR=/mnt/sf/repositories/SLES-11_SP2
+
+	rm -vrf $REPODIR
+	mkdir -p $REPODIR
+
+	wget --no-parent -m http://download.opensuse.org/repositories/home:/wolframe_user/SLE_11_SP2/
+	cd $BASE/download.opensuse.org/repositories/home:/wolframe_user/SLE_11_SP2/
+
+	sed 's|http://download.opensuse.org/repositories/home:/wolframe_user/|http://sourceforge.net/projects/wolframe/files/repositories/|g' \
+		home:wolframe_user.repo | \
+	sed 's|\[home_wolframe_user\]|[Wolframe]|g' | \
+	sed 's|wolframe_user.s Home Project|Wolframe Project|g' | \
+	sed 's|SLE_11_SP2|SLES-11_SP2|g' \
+		> $REPODIR/wolframe.repo
+
+	mkdir -p $REPODIR/repodata
+
+	cp repodata/repomd.xml.key $REPODIR/repodata
+	cp repodata/repomd.xml $REPODIR/repodata
+	cp repodata/*primary.xml.gz $REPODIR/repodata
+	cp repodata/*filelists.xml.gz $REPODIR/repodata
+	cp repodata/*other.xml.gz $REPODIR/repodata
+
+	mkdir -p $REPODIR/x86_64
+	cp -v x86_64/*.rpm $REPODIR/x86_64/.
+	mkdir -p $REPODIR/i586
+	cp -v i586/*.rpm $REPODIR/i586/.
+	mkdir -p $REPODIR/src
+	cp -v src/*.src.rpm $REPODIR/src/.
+	
+	cd $BASE
+	rm -rf download.opensuse.org
+fi
+
