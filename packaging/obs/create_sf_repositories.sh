@@ -8,6 +8,7 @@ if test $# != 1; then
 	echo "                 Ubuntu-10.04_LTS, Debian-7, Debian-6" 1>&2
 	echo "                 openSUSE-13.1, openSUSE-12.3, SLES-11_SP2, SLES-11_SP3" 1>&2
 	echo "                 ArchLinux" 1>&2
+	echo "or set release to all if you want to publish all the distros above" 1>&2
 	exit 1
 fi
 	
@@ -17,7 +18,7 @@ BASE=$PWD
 
 DISTRO=$1
 
-if test $DISTRO = "Debian-7"; then
+if test $DISTRO = "Debian-7" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/Debian-7
 
@@ -45,7 +46,7 @@ if test $DISTRO = "Debian-7"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "Debian-6"; then
+if test $DISTRO = "Debian-6" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/Debian-6
 
@@ -73,7 +74,7 @@ if test $DISTRO = "Debian-6"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "Ubuntu-14.04_LTS"; then
+if test $DISTRO = "Ubuntu-14.04_LTS" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/Ubuntu-14.04_LTS
 
@@ -101,7 +102,7 @@ if test $DISTRO = "Ubuntu-14.04_LTS"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "Ubuntu-13.10"; then
+if test $DISTRO = "Ubuntu-13.10" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/Ubuntu-13.10
 
@@ -129,7 +130,7 @@ if test $DISTRO = "Ubuntu-13.10"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "Ubuntu-12.04_LTS"; then
+if test $DISTRO = "Ubuntu-12.04_LTS" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/Ubuntu-12.04_LTS
 
@@ -157,7 +158,7 @@ if test $DISTRO = "Ubuntu-12.04_LTS"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "Ubuntu-10.04_LTS"; then
+if test $DISTRO = "Ubuntu-10.04_LTS" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/Ubuntu-10.04_LTS
 
@@ -185,7 +186,7 @@ if test $DISTRO = "Ubuntu-10.04_LTS"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "Fedora-20"; then
+if test $DISTRO = "Fedora-20" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/Fedora-20
 	
@@ -221,7 +222,7 @@ if test $DISTRO = "Fedora-20"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "Fedora-19"; then
+if test $DISTRO = "Fedora-19" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/Fedora-19
 	
@@ -257,7 +258,7 @@ if test $DISTRO = "Fedora-19"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "CentOS-6"; then
+if test $DISTRO = "CentOS-6" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/CentOS-6
 
@@ -293,7 +294,7 @@ if test $DISTRO = "CentOS-6"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "CentOS-5"; then
+if test $DISTRO = "CentOS-5" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/CentOS-5
 
@@ -329,7 +330,7 @@ if test $DISTRO = "CentOS-5"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "RHEL-6"; then
+if test $DISTRO = "RHEL-6" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/RHEL-6
 
@@ -365,7 +366,7 @@ if test $DISTRO = "RHEL-6"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "RHEL-5"; then
+if test $DISTRO = "RHEL-5" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/RHEL-5
 
@@ -401,7 +402,7 @@ if test $DISTRO = "RHEL-5"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "ArchLinux"; then
+if test $DISTRO = "ArchLinux" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/ArchLinux
 
@@ -426,7 +427,7 @@ if test $DISTRO = "ArchLinux"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "openSUSE-13.1"; then
+if test $DISTRO = "openSUSE-13.1" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/openSUSE-13.1
 
@@ -462,7 +463,7 @@ if test $DISTRO = "openSUSE-13.1"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "openSUSE-12.3"; then
+if test $DISTRO = "openSUSE-12.3" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/openSUSE-12.3
 
@@ -498,7 +499,7 @@ if test $DISTRO = "openSUSE-12.3"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "SLES-11_SP3"; then
+if test $DISTRO = "SLES-11_SP3" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/SLES-11_SP3
 
@@ -534,7 +535,7 @@ if test $DISTRO = "SLES-11_SP3"; then
 	rm -rf download.opensuse.org
 fi
 
-if test $DISTRO = "SLES-11_SP2"; then
+if test $DISTRO = "SLES-11_SP2" -o $DISTRO = "all"; then
 
 	REPODIR=/mnt/sf/repositories/SLES-11_SP2
 
