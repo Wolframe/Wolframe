@@ -203,7 +203,21 @@ bool OutputFilterImpl::close()
 {
 	if (m_taglevel == 0)
 	{
+		xmlTextWriterPtr xmlout = m_doc.get();
+		if (!xmlout)
+		{
+			// ... document is empty and got close without anything printed yet. So we have to print the header:
+			if (!printHeader())
+			{
+				return false;
+			}
+		}
 		return flushBuffer();
+	}
+	if (m_taglevel > 1)
+	{
+		setState( Error, "libxml2 document close but tags not balanced");
+		return false;
 	}
 	if (m_taglevel > 0)
 	{
