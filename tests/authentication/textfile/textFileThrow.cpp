@@ -31,86 +31,99 @@
 
 ************************************************************************/
 //
-// text file authenticator tests
+// text file authenticator throw tests
 //
 
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
 
-#include "module/moduleDirectory.hpp"
-#include "AAAA/AAAAprovider.hpp"
-
-
 #include "TextFileAuth.hpp"
 #include "types/base64.hpp"
-#include "system/globalRngGen.hpp"
 #include "crypto/HMAC.hpp"
+#include "system/globalRngGen.hpp"
 #include "AAAA/passwordHash.hpp"
+#include "AAAA/authSlice.hpp"
 #include "AAAA/CRAM.hpp"
 
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe::log;
-using namespace _Wolframe::module;
-
 using namespace _Wolframe;
 using namespace std;
 
 // The fixture for testing class _Wolframe::module
-class AuthenticatorFixture : public ::testing::Test
+class AuthenticationFixture : public ::testing::Test
 {
 protected:
-	LogBackend&		logBack;
+	LogBackend& logBack;
 
-	AuthenticatorFixture( ) :
+	AuthenticationFixture( ) :
 		logBack( LogBackend::instance( ) )
 	{
 		// Initialize the global random number generator
 		_Wolframe::GlobalRandomGenerator::instance( "" );
-		// Set the log level
-		logBack.setConsoleLevel( LogLevel::LOGLEVEL_INFO );
 
-		// Build the modules directory
-		ModulesDirectory modDir;
-		static module::ConfiguredBuilderDescription< AAAA::TextFileAuthConstructor,
-				AAAA::TextFileAuthConfig > builder( "Authentication file", "Authentication",
-								    "TextFile", "TextFileAuth" );
-		modDir.addBuilder( &builder );
-		AAAAconfiguration config;
-		AAAAprovider provider( &config, &modDir );
+		logBack.setConsoleLevel( LogLevel::LOGLEVEL_INFO );
 	}
 };
 
 
-//TEST_F( AuthenticatorFixture, AuthenticationSuccess )
-//{
-//	User* user = NULL;
+TEST_F( AuthenticationFixture, typeName )
+{
+	TextFileAuthUnit authenticator( "", "passwd" );
+	EXPECT_STREQ( authenticator.className( ), "TextFileAuth" );
+}
 
-//	AAAA::Authenticator* authenticator = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
-//	slice->lastSlice();
 
-//	ASSERT_TRUE( authenticator != NULL );
+static std::string usernameHash( const std::string& username )
+{
+	_Wolframe::GlobalRandomGenerator& rnd = _Wolframe::GlobalRandomGenerator::instance();
+	unsigned char salt[ PASSWORD_SALT_SIZE ];
 
-//	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+	rnd.generate( salt, PASSWORD_SALT_SIZE );
 
-//	std::string userHash = usernameHash( "bzgg12" );
-//	std::cout << "User hash: " << userHash << std::endl;
-//	slice->messageIn( userHash );
-//	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
+	crypto::HMAC_SHA256 hmac0( salt, PASSWORD_SALT_SIZE, username );
 
-//	std::string challenge = slice->messageOut();
-//	std::cout << "Challenge: " << challenge << std::endl;
-//	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+	char saltStr[ 2 * PASSWORD_SALT_SIZE ];
+	base64::encode( salt, PASSWORD_SALT_SIZE, saltStr, 2 * PASSWORD_SALT_SIZE, 0 );
 
-//	AAAA::CRAMresponse response( challenge, "Extremely Good Password " );
-//	std::cout << "Response:  " << response.toString() << std::endl;
-//	slice->messageIn( response.toString() );
-//	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::INVALID_CREDENTIALS );
+	return "$" + std::string( saltStr ) + "$" + hmac0.toString();
+}
 
-//	user = slice->user();
-//	ASSERT_TRUE( user == NULL );
-//}
+TEST_F( AuthenticationFixture, UnexpectedMessageOut )
+{
+	TextFileAuthUnit authUnit( "test", "passwd" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
+
+	ASSERT_TRUE( slice != NULL );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	EXPECT_THROW( std::string msg = slice->messageOut(),
+		      std::logic_error );
+
+	delete slice;
+}
+
+TEST_F( AuthenticationFixture, UnexpectedMessageIn )
+{
+	TextFileAuthUnit authUnit( "test", "passwd" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-CRAM", net::RemoteTCPendpoint( "localhost", 2222 ));
+
+	ASSERT_TRUE( slice != NULL );
+
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::AWAITING_MESSAGE );
+
+	std::string userHash = usernameHash( "Admin" );
+	slice->messageIn( userHash );
+	EXPECT_EQ( slice->status(), AAAA::AuthenticatorSlice::MESSAGE_AVAILABLE );
+
+	EXPECT_THROW( slice->messageIn( "The wrong message at the wrong time" ),
+		      std::logic_error );
+
+	delete slice;
+}
 
 //****************************************************************************
 

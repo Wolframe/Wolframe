@@ -50,7 +50,7 @@ namespace module {
 class BuilderBase
 {
 public:
-	virtual ~BuilderBase(){};
+	virtual ~BuilderBase()				{}
 
 	virtual const char* objectClassName() const = 0;
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
