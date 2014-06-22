@@ -35,7 +35,6 @@
 	<programlisting language='shell'>
 	COMMAND CustomerDelete CALL DeleteCustomer;
 	</programlisting>
-	
 		We also add a new form 'CustomerDelete' to the simpleform file <filename>Customer.sfrm</filename>
 		which allows us only the specify an 'id' attribute of the customer to delete:
 
