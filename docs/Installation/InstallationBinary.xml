@@ -473,31 +473,28 @@
 				<title>Install from repository</title>
 			
 			<para>
-				<emphasis role="bold">Note</emphasis>: This is currently not working,
-				see issues reported at <ulink url="http://sourceforge.net/p/forge/site-support/6928/">http://sourceforge.net/p/forge/site-support/6928/</ulink>
-				and <ulink url="https://github.com/openSUSE/zypper/issues/46">https://github.com/openSUSE/zypper/issues/46</ulink>.			
-				
-				Download the binary packages manually and install them by hand.
+				<emphasis role="bold">Note</emphasis>: This is currently not working perfectly
+				and some steps have to be done manually.
 			</para>
 			
 			<para>
 				First we add the Wolframe repository for the corresponding distribution
 				(as example we choose OpenSUSE 13.1):
 				<programlisting language='shell'>
-	zypper addrepo http://sourceforge.net/projects/wolframe/files/repositories/openSUSE_13.1/wolframe.repo
+	zypper addrepo http://sourceforge.net/projects/wolframe/files/repositories/openSUSE-13.1/wolframe.repo
 				</programlisting>
 			</para>
 
 			<para>
 				You may get the following error:
 				<programlisting language='shell'>
-	/var/adm/mount/AP_0xmiyYP3/projects/wolframe/files/repositories/openSUSE_13.1/wolframe.repo: Line 1 is missing '=' sign
+	/var/adm/mount/AP_0xmiyYP3/projects/wolframe/files/repositories/openSUSE-13.1/wolframe.repo: Line 1 is missing '=' sign
 	Is it a .repo file? See http://en.opensuse.org/Standards/RepoInfo for details.
 				</programlisting>
 				
 				Try to download the repo file by hand and install it by hand:
 				<programlisting language='shell'>
-	wget http://sourceforge.net/projects/wolframe/files/repositories/openSUSE_13.1/wolframe.repo
+	wget http://sourceforge.net/projects/wolframe/files/repositories/openSUSE-13.1/wolframe.repo
 	zypper addrepo wolframe.repo
 				</programlisting>
 			</para>
@@ -512,7 +509,7 @@
 			<para>
 				If you get the following message
 				<programlisting language='shell'>
-	File 'repomd.xml' from repository 'Wolframe Project (openSUSE_13.1)' is unsigned, continue? [yes/no] (no): yes
+	File 'repomd.xml' from repository 'Wolframe Project (openSUSE-13.1)' is unsigned, continue? [yes/no] (no): yes
 				</programlisting>
 				
 				the signing key could not be downloaded from SourceForge.
@@ -522,7 +519,7 @@
 			<para>
 				If you get the following message
 				<programlisting language='shell'>
-	File './repodata/ea7cb8d9a0caa2c3d8977919be124accdf55c6b8952ddee72f1b48f4decb0644-primary.xml.gz' not found on medium 'http://sourceforge.net/projects/wolframe/files/repositories/openSUSE_13.1/'
+	File './repodata/ea7cb8d9a0caa2c3d8977919be124accdf55c6b8952ddee72f1b48f4decb0644-primary.xml.gz' not found on medium 'http://sourceforge.net/projects/wolframe/files/repositories/openSUSE-13.1/'
 
 	Abort, retry, ignore? [a/r/i/? shows all options] (a): u^H
 	Invalid answer ''. [a/r/i/? shows all options] (a): ?
@@ -539,7 +536,7 @@
 				force the baseURL to be a SourceForge mirror like:
 
 				<programlisting language='shell'>
-	New URI: http://freefr.dl.sourceforge.net/project/wolframe/repositories/openSUSE_13.1/
+	New URI: http://freefr.dl.sourceforge.net/project/wolframe/repositories/openSUSE-13.1/
 				</programlisting>
 			</para>
 
