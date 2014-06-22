@@ -30,6 +30,8 @@ TRANSACTION testcall BEGIN
 END
 **outputfile:DBOUT
 **output
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<doc/>
 Code:
 [0] RESULT_SET_INIT
 [1] DBSTM_START STM (SELECT run( $1, $2, $3))

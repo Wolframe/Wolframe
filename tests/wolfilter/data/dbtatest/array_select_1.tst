@@ -30,6 +30,8 @@ BEGIN FOREACH //aa DO SELECT run($(.));
 END
 **outputfile:DBOUT
 **output
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<doc/>
 Code:
 [0] RESULT_SET_INIT
 [1] OPEN_ITER_TUPLESET TUPLESET 0

@@ -898,7 +898,6 @@ struct OutputFilterImpl :public OutputFilter
 		,m_codepage(0)
 		,m_printer(0)
 		,m_elemitr(0)
-		,m_emptyDocument(false)
 		,m_headerPrinted(false)
 		,m_gotFinalClose(false){}
 
@@ -912,7 +911,6 @@ struct OutputFilterImpl :public OutputFilter
 		,m_printer(0)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
-		,m_emptyDocument(o.m_emptyDocument)
 		,m_headerPrinted(o.m_headerPrinted)
 		,m_gotFinalClose(o.m_gotFinalClose)
 	{
@@ -1155,20 +1153,9 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		if (!m_headerPrinted)
 		{
-			if (m_emptyDocument)
+			if (!printHeader())
 			{
-				setState( Error, "textwolf: illegal print operation after final close (empty document)");
 				return false;
-			}
-			if (type == FilterBase::CloseTag)
-			{
-				m_gotFinalClose = true;
-				m_emptyDocument = true;
-				return true;
-			}
-			else
-			{
-				if (!printHeader()) return false;
 			}
 			m_headerPrinted = true;
 		}
@@ -1249,7 +1236,6 @@ private:
 	void* m_printer;			///< variant of XML printer, one of them selected by m_encoding (type textwolf::XMLScanner<..>)
 	std::string m_elembuf;			///< buffer for the currently printed element
 	std::size_t m_elemitr;			///< iterator to pass it to output
-	bool m_emptyDocument;			///< true, if the printed document is empty
 	bool m_headerPrinted;			///< true, if the XML header has already been printed
 	bool m_gotFinalClose;			///< true, if we got the final close tag
 };

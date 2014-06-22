@@ -42,7 +42,6 @@ OutputFilterImpl::OutputFilterImpl( const XsltMapper& xsltMapper_, const types::
 	,OutputFilter("libxslt", inheritMetaData_)
 	,m_xsltMapper(xsltMapper_)
 	,m_taglevel(0)
-	,m_emptyDocument(false)
 	,m_elemitr(0)
 	{}
 
@@ -50,7 +49,6 @@ OutputFilterImpl::OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
 	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
 	,OutputFilter("libxml2", inheritMetaData_)
 	,m_taglevel(0)
-	,m_emptyDocument(false)
 	,m_elemitr(0)
 	{}
 
@@ -60,7 +58,6 @@ OutputFilterImpl::OutputFilterImpl( const OutputFilterImpl& o)
 	,m_doc(o.m_doc)
 	,m_xsltMapper(o.m_xsltMapper)
 	,m_taglevel(o.m_taglevel)
-	,m_emptyDocument(o.m_emptyDocument)
 	,m_attribname(o.m_attribname)
 	,m_valuestrbuf(o.m_valuestrbuf)
 	,m_elembuf(o.m_elembuf)
@@ -233,16 +230,6 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 
 	if (!xmlout)
 	{
-		if (m_emptyDocument)
-		{
-			setState( Error, "libxml2 illegal print operation after final close (empty document)");
-			return false;
-		}
-		if (type == FilterBase::CloseTag)
-		{
-			m_emptyDocument = true;
-			return true;
-		}
 		if (!printHeader())
 		{
 			return false;
