@@ -850,12 +850,53 @@
 
 		</sect2>
 
-<!--				
 		<sect2>
-			<title>Solaris</title>
-			<para></para>
+			<title>Solaris 10</title>
+			<para>
+				Download the package file for SPARC Solaris 10 (the only one we can build at the moment):
+				<programlisting language='shell'>
+	wget http://sourceforge.net/projects/wolframe/files/wolframe-binaries/&WolframeVersion;/Solaris-10/sparc/wolframe-&WolframeVersion;-sparc-5.10.pkg.Z
+				</programlisting>
+			</para>
+
+			<para>
+				You install the Wolframe package with:
+				<programlisting language='shell'>
+	uncompress wolframe-&WolframeVersion;-sparc-5.10.pkg.Z
+	pkgadd -d wolframe-0.0.2-sparc-5.10.pkg all
+				</programlisting>
+			
+				The Solaris packages contain the whole server and the whole client respectively.
+			</para>
+			
+			<para>
+				The package installs to the <filename>/opt/csw</filename> directory tree.
+			</para>
+			
+			<para>
+				Install the CSW toolchain (<ulink url="http://www.opencsw.org">http://www.opencsw.org</ulink>)
+				and the minimally required packages:
+				<programlisting language='shell'>
+	pkgadd -d http://get.opencsw.org/now
+	pkgutil --install CSWlibgcc CSWlibssl1
+				</programlisting>					
+			</para>
+			
+			<para>
+				Depending on the third party software you plan to use
+				you also have to install those packages, for instance
+				to run a Sqlite3 database you have to install 'CSWsqlite3'.				
+			</para>
+
+			<para>
+				You can start the service now with:
+				<programlisting language='shell'>
+	/etc/opt/csw/init.d/wolframed start
+				</programlisting>
+			</para>
+			
 		</sect2>
--->		
+		
 	</sect1>
 
 <!--	
