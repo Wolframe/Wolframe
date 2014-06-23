@@ -1040,6 +1040,7 @@ makefiles/nmake/top.mk
 3rdParty/textwolf/include/textwolf/staticbuffer.hpp
 3rdParty/textwolf/include/textwolf/textscanner.hpp
 3rdParty/textwolf/include/textwolf/traits.hpp
+3rdParty/textwolf/include/textwolf/version.hpp
 3rdParty/textwolf/include/textwolf/xmlhdrparser.hpp
 3rdParty/textwolf/include/textwolf/xmlpathautomaton.hpp
 3rdParty/textwolf/include/textwolf/xmlpathautomatonparse.hpp
@@ -1484,6 +1485,7 @@ examples/demo/tutorial/step4a/server/SSL/README.txt
 examples/demo/tutorial/step4a/server/tutorial.conf
 examples/demo/tutorial/step4a/server/tutorial-windows.conf
 examples/demo/tutorial/step4/client/CustomerListRequest.netcat
+examples/demo/tutorial/step4/client/CustomerListRequest.xml
 examples/demo/tutorial/step4/client/tutorial.conf
 examples/demo/tutorial/step4/server/Customer.tdl
 examples/demo/tutorial/step4/server/data.sql
