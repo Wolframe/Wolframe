@@ -1205,11 +1205,10 @@ clients/lib/protocol.hpp
 clients/lib/session.cpp
 clients/lib/session.hpp
 clients/Makefile.W32
-clients/php/authentication/textfile.php
 clients/php/connection.php
-clients/php/crypto/pbkdf2.php
+clients/php/pbkdf2.php
 clients/php/session.php
-clients/php/webclient_form_xml.php
+clients/php/wolframe_cram.php
 clients/README
 contrib/create_qtcreator_files.sh
 contrib/database/oracle/create_wolframe.sql
@@ -1250,6 +1249,7 @@ docs/AppDevelopment/README
 docs/AppDevelopment/Testing.xml
 docs/Client/Client.ent
 docs/Client/CLI.xml
+docs/Client/DotNetClient.xml
 docs/Client/Introduction.xml
 docs/Client/PhpClient.xml
 docs/Client/Preface.xml
@@ -1425,6 +1425,7 @@ docs/wolfpasswd-man.xml
 docs/wolframe.conf-man.xml
 docs/wolframed-man.xml
 docs/wolframe-mod_db_sqlite3-man.xml
+examples/clients/php/webclient_form_xml.php
 examples/demo/crm/phpclient/test_HTTP_GET_html.php
 examples/demo/crm/server/crm.lua
 examples/demo/crm/server/crm.normalize
@@ -1831,12 +1832,9 @@ packaging/netbsd/buildlocal.sh
 packaging/netbsd/wolframe.conf
 packaging/obs/boost1.48/debian/README.Debian
 packaging/obs/boost1.48/debian/README.source
-packaging/obs/boost1.49/debian-xUbuntu_12.10/README.Debian
-packaging/obs/boost1.49/debian-xUbuntu_12.10/README.source
-packaging/obs/boost1.49/debian-xUbuntu_13.04/README.Debian
-packaging/obs/boost1.49/debian-xUbuntu_13.04/README.source
 packaging/obs/boost1.53/debian-xUbuntu_13.10/README.Debian
 packaging/obs/boost1.54/debian-xUbuntu_14.04/README.Debian
+packaging/obs/create_sf_repositories.sh
 packaging/obs/deploy_boost1.48_to_obs.sh
 packaging/obs/deploy_boost1.49_to_obs.sh
 packaging/obs/deploy_boost1.53_to_obs.sh
@@ -2518,7 +2516,9 @@ tests/authentication/textfile/passwdFileTest.cpp
 tests/authentication/textfile/passwdHashTest.cpp
 tests/authentication/textfile/test-response.php
 tests/authentication/textfile/test-userHash.php
+tests/authentication/textfile/textFileAuthenticator.cpp
 tests/authentication/textfile/textFileTest.cpp
+tests/authentication/textfile/textFileThrow.cpp
 tests/base64Test.cpp
 tests/base64Utility.cpp
 tests/byte2hexTest.cpp

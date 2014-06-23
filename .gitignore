@@ -77,12 +77,14 @@ tests/database/dbTest
 tests/database/test.db
 tests/3rdParty/libxml2/testlibxml2
 tests/modules/moduleTest
-tests/authentication/textfile/textFileTest
 tests/authentication/sasl/sasl.db
 tests/authentication/sasl/saslTest
 tests/authentication/pam/pamTest
 tests/authentication/textfile/passwdFileTest
 tests/authentication/textfile/passwdHashTest
+tests/authentication/textfile/textFileTest
+tests/authentication/textfile/textFileThrow
+tests/authentication/textfile/textFileAuthenticator
 tests/testBoostPath
 tests/filter
 tests/testVariantTypes

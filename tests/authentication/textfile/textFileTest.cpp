@@ -38,8 +38,6 @@
 #include "gtest/gtest.h"
 
 #include "TextFileAuth.hpp"
-#include "crypto/sha2.h"
-#include "types/byte2hex.h"
 #include "types/base64.hpp"
 #include "crypto/HMAC.hpp"
 #include "system/globalRngGen.hpp"

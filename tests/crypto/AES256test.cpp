@@ -35,45 +35,88 @@
 //
 
 #include <string>
+#include <map>
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 
 #include "gtest/gtest.h"
 #include "wtest/testReport.hpp"
+
+#include "types/byte2hex.h"
 #include "crypto/AES256.h"
 
-/*
-static bool readValues( std::ifstream infile, const char* label1, std::string& value1,
-					      const char* label2, std::string& value2,
-					      const char* label3, std::string& value3,
-					      const char* label4, std::string& value4 )
-{
-	bool	hasVal1, hasVal2, hasVal3, hasVal4;
-	hasVal1 = hasVal2 = hasVal3 = hasVal4 = false;
 
+//static const std::size_t AES256_KEY_SIZE = 256 / 8;
+//static const std::size_t AES256_TEXT_SIZE = 128 / 8;
+//static const std::size_t AES256_CIPHER_SIZE = 128 / 8;
+
+static bool readValues( std::ifstream& infile, std::map< std::string, std::string >& values )
+{
+	bool	hasValues = false;
+	bool	hasLine;
 	std::string line;
-	while ( std::getline( infile, line ))	{
-		std::string cleanLine = line.substr( 0, line.find( "#" ));
-		boost::trim( cleanLine );
-		if ( cleanLine.empty() )
-			continue;
-		if ( boost::starts_with( cleanLine, label1 ))	{
-			if ( cleanLine[ strlen( label1 )] == '=' )	{
-				if ( hasVal1 )	{
-					std::string msg;
-					msg = "DATA ERROR: '" + label1 + "' has already been defined";
-					throw( msg );
-				}
-				value1 = cleanLine.substr( strlen( label1 ));
-				hasVal1 = true;
-			}
-		}
-	}
-}
-*/
+	std::size_t pos;
 
-TEST( DISABLED_AES256, TestVectors )
+	while (( hasLine = std::getline( infile, line )))	{
+		if (( pos = line.find( "#" )) != std::string::npos )
+			line.erase( pos );
+		boost::trim( line );
+		if ( ! line.empty() )
+			break;
+	}
+
+	while ( hasLine )	{
+		hasValues = true;
+		if (( pos = line.find( "#" )) != std::string::npos )
+			line.erase( pos );
+		boost::trim( line );
+		if ( line.empty() )
+			return true;
+
+		size_t pos = line.find( "=" );
+		if ( pos != std::string::npos )
+			values.insert( std::pair< std::string, std::string >( boost::trim_copy( line.substr( 0, pos )),
+									      boost::trim_copy( line.substr( pos + 1 )) ));
+		else	{
+			std::string msg = "Invalid (key, value) string: '" + line + "'";
+			throw( std::runtime_error( msg ));
+		}
+		hasLine = std::getline( infile, line );
+	}
+	return hasValues;
+}
+
+
+//AES-256.vectors/ECBdecode256.rsp
+//AES-256.vectors/ECBencode256.rsp
+//AES-256.vectors/ECBGFSbox256.rsp
+//AES-256.vectors/ECBKeySbox256.rsp
+//AES-256.vectors/ECBtable256.rsp
+//AES-256.vectors/ECBvarKey256.rsp
+//AES-256.vectors/ECBVarKey256.rsp
+//AES-256.vectors/ECBvarTxt256.rsp
+//AES-256.vectors/ECBVarTxt256.rsp
+
+TEST( AES256, TestVectors )
 {
+	std::ifstream infile("AES-256.vectors/ECBGFSbox256.rsp");
+
+	bool hasValues = true;
+	do	{
+		std::map< std::string, std::string > values;
+		hasValues = readValues( infile, values );
+//		for( std::map< std::string, std::string >::const_iterator it = values.begin();
+//									it != values.end(); it++ )	{
+//			std::cout << "Values: ( " << it->first << ", " << it->second << " )" << std::endl;
+//		}
+		if ( hasValues )	{
+			std::cout << "Count    : " << values[ "COUNT" ] << std::endl;
+			std::cout << "Key      : " << values[ "KEY" ] << std::endl;
+			std::cout << "Plain    : " << values[ "PLAINTEXT" ] << std::endl;
+			std::cout << "Encrypted: " << values[ "CIPHERTEXT" ] << std::endl;
+			std::cout << "\n";
+		}
+	} while ( hasValues );
 }
 
 int main( int argc, char **argv )
@@ -82,5 +125,3 @@ int main( int argc, char **argv )
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }
-
-
