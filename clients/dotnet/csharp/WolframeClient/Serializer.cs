@@ -65,7 +65,7 @@ namespace WolframeClient
             {
                 return xs.Deserialize(xr);
             }
-            catch (System.InvalidOperationException e)
+            catch (System.InvalidOperationException)
             {
                 return null;
             }

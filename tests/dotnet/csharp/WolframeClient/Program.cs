@@ -87,7 +87,9 @@ namespace WolframeClient
                     sslcert = sslCertPath,
                     sslpassword = pw,
                     validatecert = false,
-                    authmethod = null
+                    authmethod = "WOLFRAME-CRAM",
+                    password = "bork123",
+                    username = "gunibert"
                 };
                 Session session = new Session( cfg, ProcessAnswer);
                 if (!session.Connect())
@@ -100,7 +102,7 @@ namespace WolframeClient
                     int answerid = (int)AnswerId.CustomerInsertedObj;
 
                     int ii = 0;
-                    for (ii = 0; ii < 100; ++ii)
+                    for (ii = 0; ii < 10; ++ii)
                     {
                         Request request = new Request { id = answerid, command = "Insert", number = ii, doctype = "Customer", root = "customer", obj = customer, objtype = typeof(Customer), answertype = typeof(CustomerInserted) };
                         session.IssueRequest(request);

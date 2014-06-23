@@ -112,5 +112,10 @@ namespace WolframeClient
         {
             return Encoding.UTF8.GetString(msg, cmd.Length + 1, msg.Length - cmd.Length -1);
         }
+
+        public static bool IsEqual( string a1, string a2)
+        {
+           return String.Equals( a1, a2, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }

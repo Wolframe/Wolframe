@@ -57,6 +57,7 @@
     <Compile Include="Serializer.cs" />
     <Compile Include="Session.cs" />
     <Compile Include="SessionInterface.cs" />
+    <Compile Include="AuthWolframeCram.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WolframeClient.snk" />

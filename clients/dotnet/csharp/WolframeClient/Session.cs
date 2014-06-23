@@ -83,6 +83,50 @@ namespace WolframeClient
             }
         }
 
+        private bool AuthMechWolframeCram()
+        {
+		    // 1. The client sends a 256 bit seed followed by a HMAC-SHA1 of the (seed, username)
+		    m_connection.WriteContent(
+                Encoding.ASCII.GetBytes( AuthWolframeCram.UsernameHash( m_config.username))); 
+
+		    // 2. If the server finds the user it will reply with a seed and a challenge. 
+		    //	If the user is not found it will reply with a random challenge for not
+		    //	giving any information to the client. The procedure will continue.
+            byte[] challenge = m_connection.ReadContent();
+            if (challenge == null)
+            {
+                SetState(State.Terminated, "server closed connection");
+                return false;
+            }
+		    // 3. The client returns a response. The response is computed from the PBKDF2 
+		    //	of the seed and the challenge.
+            string response = AuthWolframeCram.CRAMresponse(m_config.password, Encoding.ASCII.GetString(challenge));
+            m_connection.WriteContent( Encoding.ASCII.GetBytes( response));
+
+		    // 4. the server tries to authenticate the user and returns "OK" in case
+		    //	of success, "ERR" else.
+            byte[] ln = m_connection.ReadLine();
+            if (ln == null)
+            {
+                SetState(State.Terminated, "server closed connection");
+                return false;
+            }
+            if (Protocol.IsCommand("OK", ln))
+            {
+                return true;
+            }
+            else if (Protocol.IsCommand("ERR", ln))
+            {
+                SetState(State.Terminated, "authentication failed: " + Protocol.CommandArg("ERR", ln));
+                return false;
+            }
+            else
+            {
+                SetState(State.Terminated, "protocol error in authorization");
+                return false;
+            }
+        }
+
         private void HandleAnswer(PendingRequest rq)
         {
             byte[] ln = m_connection.ReadLine();
@@ -299,10 +343,20 @@ namespace WolframeClient
                         }
                         else if (Protocol.IsCommand("OK", ln))
                         {
-                            ///... authorized (MECHS NONE)
-                            m_request_thread = new Thread( new ThreadStart(this.RunRequests));
-                            m_answer_thread = new Thread( new ThreadStart(this.RunAnswers));
-                            SetState( State.Running, null);
+                            if (m_config.authmethod == null || Protocol.IsEqual(m_config.authmethod, "NONE"))
+                            {
+                                //... no authentication
+                            }
+                            else if (Protocol.IsEqual(m_config.authmethod, "WOLFRAME-CRAM"))
+                            {
+                                if (!AuthMechWolframeCram())
+                                {
+                                    return false;
+                                }
+                            }
+                            m_request_thread = new Thread(new ThreadStart(this.RunRequests));
+                            m_answer_thread = new Thread(new ThreadStart(this.RunAnswers));
+                            SetState(State.Running, null);
                             m_request_thread.Start();
                             m_answer_thread.Start();
                             return true;
