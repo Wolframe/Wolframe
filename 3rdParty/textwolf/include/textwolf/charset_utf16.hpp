@@ -70,7 +70,7 @@ private:
 public:
 	enum
 	{
-		MaxChar=0x10FFFF				//< maximum character in alphabet
+		MaxChar=0x10FFFFU				//< maximum character in alphabet
 	};
 
 public:
@@ -185,8 +185,8 @@ public:
 		else if (ch <= 0x10FFFF)
 		{
 			ch -= 0x10000;
-			unsigned short hi = (ch / 0x400) + 0xD800;
-			unsigned short lo = (ch % 0x400) + 0xDC00;
+			unsigned short hi = (unsigned short )((ch / 0x400) + 0xD800);
+			unsigned short lo = (unsigned short )((ch % 0x400) + 0xDC00);
 			buf.push_back( (char)(unsigned char)((hi >> Print1shift) & 0xFF));
 			buf.push_back( (char)(unsigned char)((hi >> Print2shift) & 0xFF));
 			buf.push_back( (char)(unsigned char)((lo >> Print1shift) & 0xFF));

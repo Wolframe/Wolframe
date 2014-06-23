@@ -78,13 +78,15 @@ struct Encoder
 };
 
 /// \class Interface
-/// \brief Interface that has to be implemented for a character set encoding
+/// \brief This interface has to be implemented for a character set encoding
 struct Interface
 {
 	/// \brief Maximum character this characer set encoding can represent
 	enum {MaxChar=0xFF};
 
 	/// \brief Skip to start of the next character
+	/// \tparam Iterator source iterator used
+	/// \remark 'bufpos' is used as state of the iterator 'itr' passed. Therefore it is strictly forbidden to use the class by two clients simultaneously wihtout sharing the buffer 'buf' and the state 'bufpos'.
 	/// \param [in] buf buffer for the character data
 	/// \param [in,out] bufpos position in 'buf'
 	/// \param [in,out] itr iterator to skip
@@ -92,6 +94,8 @@ struct Interface
 	static void skip( char* buf, unsigned int& bufpos, Iterator& itr);
 
 	/// \brief Fetches the ascii char representation of the current character
+	/// \tparam Iterator source iterator used
+	/// \remark 'bufpos' is used as state of the iterator 'itr' passed. Therefore it is strictly forbidden to use the class by two clients simultaneously wihtout sharing the buffer 'buf' and the state 'bufpos'.
 	/// \param [in] buf buffer for the parses character data
 	/// \param [in,out] bufpos position in 'buf'
 	/// \param [in,out] itr iterator on the source
@@ -100,6 +104,8 @@ struct Interface
 	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr);
 
 	/// \brief Fetches the bytes of the current character into a buffer
+	/// \tparam Iterator source iterator used
+	/// \remark 'bufpos' is used as state of the iterator 'itr' passed. Therefore it is strictly forbidden to use the class by two clients simultaneously wihtout sharing the buffer 'buf' and the state 'bufpos'.
 	/// \param [in] buf buffer for the parses character data
 	/// \param [in,out] bufpos position in 'buf'
 	/// \param [in,out] itr iterator on the source
@@ -107,6 +113,8 @@ struct Interface
 	static void fetchbytes( char* buf, unsigned int& bufpos, Iterator& itr);
 
 	/// \brief Fetches the unicode character representation of the current character
+	/// \tparam Iterator source iterator used
+	/// \remark 'bufpos' is used as state of the iterator 'itr' passed. Therefore it is strictly forbidden to use the class by two clients simultaneously wihtout sharing the buffer 'buf' and the state 'bufpos'.
 	/// \param [in] buf buffer for the parses character data
 	/// \param [in,out] bufpos position in 'buf'
 	/// \param [in,out] itr iterator on the source

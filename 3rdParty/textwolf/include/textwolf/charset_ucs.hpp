@@ -60,7 +60,7 @@ struct UCS2
 		MSB=(byteorder==ByteOrder::LE),			//< most significant byte index (0 or 1)
 		Print1shift=(byteorder==ByteOrder::BE)?8:0,	//< value to shift with to get the 1st character to print
 		Print2shift=(byteorder==ByteOrder::LE)?8:0,	//< value to shift with to get the 2nd character to print
-		MaxChar=0xFFFF
+		MaxChar=0xFFFFU
 	};
 
 	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
@@ -132,8 +132,8 @@ struct UCS2
 		}
 		else
 		{
-			buf.push_back( chr >> Print1shift);
-			buf.push_back( chr >> Print2shift);
+			buf.push_back( (unsigned char)(chr >> Print1shift));
+			buf.push_back( (unsigned char)(chr >> Print2shift));
 		}
 	}
 
@@ -160,7 +160,7 @@ struct UCS4
 		Print2shift=(byteorder==ByteOrder::BE)?16:8,	//< value to shift with to get the 2nd character to print
 		Print3shift=(byteorder==ByteOrder::BE)?8:16,	//< value to shift with to get the 3rd character to print
 		Print4shift=(byteorder==ByteOrder::BE)?0:24,	//< value to shift with to get the 4th character to print
-		MaxChar=0xFFFFFFFF
+		MaxChar=0xFFFFFFFFU
 	};
 
 	/// \brief See template<class Iterator>Interface::fetchbytes(char*,unsigned int&,Iterator&)

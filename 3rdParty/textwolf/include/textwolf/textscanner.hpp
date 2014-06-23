@@ -140,7 +140,7 @@ public:
 		return input - start;
 	}
 
-	/// \brief Get the unicode character of the current character
+	/// \brief Get the unicode representation of the current character
 	/// \return the unicode character
 	inline UChar chr()
 	{
@@ -159,7 +159,7 @@ public:
 
 	/// \class copychar
 	/// \brief Direct copy of a character from input to output without encoding/decoding it
-	/// \remark Assumes the character sets to be equal
+	/// \remark Assumes the character set encodings to be of the same class
 	template <class Buffer>
 	inline void copychar( CharSet& output_, Buffer& buf_)
 	{
