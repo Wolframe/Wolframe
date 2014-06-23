@@ -39,6 +39,8 @@
 #include "prgbind/transactionProgram.hpp"
 #include "prgbind/ddlProgram.hpp"
 #include "prgbind/normalizeProgram.hpp"
+#include "filter/null_filter.hpp"
+#include "filter/filter.hpp"
 #include "types/normalizeFunction.hpp"
 #include "langbind/formFunction.hpp"
 #include "logger-v1.hpp"
@@ -86,6 +88,7 @@ public:
 	{
 		m_programTypes.push_back( ProgramR( new TransactionDefinitionProgram()));
 		m_programTypes.push_back( ProgramR( new NormalizeProgram()));
+		m_filterTypeMap.insert( "null", langbind::FilterTypeR( new langbind::NullFilterType()));
 	}
 
 	Impl( const Impl& o)

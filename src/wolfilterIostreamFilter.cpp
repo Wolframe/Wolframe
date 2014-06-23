@@ -112,7 +112,7 @@ static Filter getFilter( const proc::ProcessorProviderInterface* provider, const
 	Filter rt;
 	if (ifl_.empty() && ofl_.empty())
 	{
-		return langbind::createNullFilter( "", "");
+		return langbind::createNullFilter();
 	}
 	std::pair<std::string,std::vector<langbind::FilterArgument> > ifl = filterIdentifier( ifl_);
 	std::pair<std::string,std::vector<langbind::FilterArgument> > ofl = filterIdentifier( ofl_);

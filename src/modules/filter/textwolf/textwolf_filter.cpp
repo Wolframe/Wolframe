@@ -269,6 +269,8 @@ struct InputFilterImpl
 		,m_metadatastate(MS_Init)
 		,m_doctype_parsed(false)
 		,m_lasttype(textwolf::XMLScannerBase::None)
+		,m_rootAttributeIdx(0)
+		,m_rootAttributeState(0)
 	{}
 	/// \brief Copy constructor
 	/// \param [in] o output filter to copy
@@ -286,6 +288,9 @@ struct InputFilterImpl
 		,m_doctype_parsed(o.m_doctype_parsed)
 		,m_elembuffer(o.m_elembuffer)
 		,m_lasttype(o.m_lasttype)
+		,m_rootAttributes(o.m_rootAttributes)
+		,m_rootAttributeIdx(o.m_rootAttributeIdx)
+		,m_rootAttributeState(o.m_rootAttributeState)
 	{
 		if (o.m_parser)
 		{
@@ -492,16 +497,50 @@ struct InputFilterImpl
 		setState( Error, ee);
 	}
 
+	void getRootAttribute( FilterBase::ElementType& type, const void*& element, std::size_t& elementsize)
+	{
+		if (m_rootAttributeState == 1)
+		{
+			type = FilterBase::Attribute;
+			element = m_rootAttributes.at(m_rootAttributeIdx).key.c_str();
+			elementsize = m_rootAttributes.at(m_rootAttributeIdx).key.size();
+			m_rootAttributeState = 2;
+		}
+		else
+		{
+			type = FilterBase::Value;
+			element = m_rootAttributes.at(m_rootAttributeIdx).value.c_str();
+			elementsize = m_rootAttributes.at(m_rootAttributeIdx).value.size();
+
+			++m_rootAttributeIdx;
+			if (m_rootAttributeIdx < m_rootAttributes.size())
+			{
+				m_rootAttributeState = 1;
+			}
+			else
+			{
+				m_rootAttributeState = 0;
+				m_rootAttributeIdx = 0;
+				m_rootAttributes.clear();							
+			}
+		}
+	}
+
 	/// \brief implement interface member InputFilter::getNext(typename InputFilter::ElementType&,const void*&,std::size_t&)
-	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+	virtual bool getNext( FilterBase::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (m_metadatastate != MS_Done)
 		{
 			if (state() == Error) return false;
 			if (!getMetaData()) return false;
 
-			while (m_metadatastate == MS_DoneElemCached)
+			if (m_metadatastate == MS_DoneElemCached)
 			{
+				if (m_rootAttributeState)
+				{
+					getRootAttribute( type, element, elementsize);
+					return true;
+				}
 				const char* ee = 0;
 				textwolf::XMLScannerBase::ElementType et = getLastItem( ee, elementsize);
 				element = (const void*)ee;
@@ -513,7 +552,7 @@ struct InputFilterImpl
 					{
 						return false;
 					}
-					//... fall through into following try block
+					//... fall through
 				}
 				else
 				{
@@ -528,7 +567,7 @@ struct InputFilterImpl
 						}
 						else
 						{
-							//... fall through into following try block
+							//... fall through
 						}
 					}
 					else
@@ -643,7 +682,6 @@ struct InputFilterImpl
 	{
 		types::DocMetaData* md = getMetaDataRef().get();
 		const char* elemstart = std::strchr( name_.c_str(), ':');
-		if (!elemstart) elemstart = name_.c_str();
 		if (m_elembuffer == "xmlns")
 		{
 			md->setAttribute( name_, std::string( ee, eesize));
@@ -656,15 +694,16 @@ struct InputFilterImpl
 		{
 			md->setAttribute( name_, std::string( ee, eesize));
 		}
+		else if (elemstart)
+		{
+			if (0==std::strcmp( elemstart, "schemaLocation") || 0==std::strcmp( elemstart, "noNamespaceSchemaLocation"))
+			{
+				md->setDoctype( types::DocMetaData::extractStem( std::string( ee, eesize)));
+			}
+		}
 		else
 		{
-			std::string msg = std::string("unknown XML root element attribute '") + m_elembuffer + "'";
-			setState( Error, msg.c_str());
-			return false;
-		}
-		if (0==std::strcmp( elemstart, "schemaLocation") || 0==std::strcmp( elemstart, "noNamespaceSchemaLocation"))
-		{
-			md->setDoctype( types::DocMetaData::extractStem( std::string( ee, eesize)));
+			m_rootAttributes.push_back( RootAttribute( name_, std::string( ee, eesize)));
 		}
 		return true;
 	}
@@ -881,6 +920,22 @@ private:
 	bool m_doctype_parsed;			///< true, if the !DOCTYPE definition has already been parsed
 	std::string m_elembuffer;		///< buffer for element
 	textwolf::XMLScannerBase::ElementType m_lasttype; ///< type of last element fetched (MS_DoneElemCached)
+
+	struct RootAttribute
+	{
+		std::string key;
+		std::string value;
+
+		RootAttribute( const std::string& key_, const std::string& value_)
+			:key(key_),value(value_){}
+		RootAttribute( const RootAttribute& o)
+			:key(o.key),value(o.value){}
+		RootAttribute(){}
+	};
+
+	std::vector<RootAttribute> m_rootAttributes;
+	std::size_t m_rootAttributeIdx;
+	int m_rootAttributeState;
 };
 
 

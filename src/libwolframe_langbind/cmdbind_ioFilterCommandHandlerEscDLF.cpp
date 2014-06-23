@@ -53,7 +53,7 @@ IOFilterCommandHandlerEscDLF::IOFilterCommandHandlerEscDLF()
 	,m_nextmsg(0)
 	,m_itrpos(0)
 {
-	langbind::Filter flt = createNullFilter( "", "");
+	langbind::Filter flt = createNullFilter();
 	m_inputfilter = flt.inputfilter();
 	m_outputfilter = flt.outputfilter();
 }

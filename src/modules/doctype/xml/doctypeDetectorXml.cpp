@@ -211,9 +211,24 @@ public:
 					{
 						setState( ParseXMLHeader);
 					}
-					else
+					else if (ch == '!')
+					{
+						setState( ParseXMLDoctype1);
+					}
+					else if (ch == '>')
 					{
 						setState( Done);
+					}
+					else if (ch > 32)
+					{
+						setState( ParseXMLRootName);
+						m_itembuf.clear();
+						m_itembuf.push_back(ch);
+					}
+					else
+					{
+						m_itembuf.clear();
+						setState( SearchXMLRootName);
 					}
 					break;
 
@@ -251,7 +266,7 @@ public:
 					{
 						setState( ParseXMLDoctype0);
 					}
-					else if ((unsigned char)ch > 32)
+					else if (ch > 32)
 					{
 						m_lasterror = "expected XML document type or root element";
 						setState( Done);
@@ -263,8 +278,19 @@ public:
 					{
 						setState( ParseXMLDoctype1);
 					}
+					else if (ch == '>')
+					{
+						setState( Done);
+					}
+					else if (ch > 32)
+					{
+						setState( ParseXMLRootName);
+						m_itembuf.clear();
+						m_itembuf.push_back(ch);
+					}
 					else
 					{
+						m_itembuf.clear();
 						setState( SearchXMLRootName);
 					}
 					break;
@@ -345,10 +371,11 @@ public:
 						m_lasterror = "invalid XML root element";
 						setState( Done);
 					}
-					if (ch > ' ')
+					if (ch > 32)
 					{
 						setState( ParseXMLRootName);
 						m_itembuf.clear();
+						m_itembuf.push_back(ch);
 					}
 					break;
 

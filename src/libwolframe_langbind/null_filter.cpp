@@ -148,12 +148,17 @@ struct NullFilter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createNullFilter( const std::string&, const std::string&)
+Filter _Wolframe::langbind::createNullFilter()
 {
 	return NullFilter();
 }
 
-Filter* _Wolframe::langbind::createNullFilterPtr( const std::string& name, const std::string& arg)
+Filter* _Wolframe::langbind::createNullFilterPtr( const std::string&, const std::vector<FilterArgument>& arg)
 {
-	return new Filter( createNullFilter( name, arg));
+	if (!arg.empty())
+	{
+		throw std::runtime_error("no arguments expected for null filter");
+	}
+	return new Filter( createNullFilter());
 }
+
