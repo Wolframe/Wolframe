@@ -46,9 +46,9 @@
 #include "crypto/AES256.h"
 
 
-//static const std::size_t AES256_KEY_SIZE = 256 / 8;
-//static const std::size_t AES256_TEXT_SIZE = 128 / 8;
-//static const std::size_t AES256_CIPHER_SIZE = 128 / 8;
+static const std::size_t AES256_KEY_SIZE = 256 / 8;
+static const std::size_t AES256_TEXT_SIZE = 128 / 8;
+static const std::size_t AES256_CIPHER_SIZE = 128 / 8;
 
 static bool readValues( std::ifstream& infile, std::map< std::string, std::string >& values )
 {
@@ -73,7 +73,7 @@ static bool readValues( std::ifstream& infile, std::map< std::string, std::strin
 		if ( line.empty() )
 			return true;
 
-		size_t pos = line.find( "=" );
+		pos = line.find( "=" );
 		if ( pos != std::string::npos )
 			values.insert( std::pair< std::string, std::string >( boost::trim_copy( line.substr( 0, pos )),
 									      boost::trim_copy( line.substr( pos + 1 )) ));
@@ -115,6 +115,24 @@ TEST( AES256, TestVectors )
 			std::cout << "Plain    : " << values[ "PLAINTEXT" ] << std::endl;
 			std::cout << "Encrypted: " << values[ "CIPHERTEXT" ] << std::endl;
 			std::cout << "\n";
+
+//			unsigned int count = boost::lexical_cast< unsigned int >( values[ "COUNT" ] );
+			unsigned char key[ AES256_KEY_SIZE ];
+			hex2byte( values[ "KEY" ].c_str(), key, AES256_KEY_SIZE );
+			unsigned char text[ AES256_TEXT_SIZE ];
+			hex2byte( values[ "PLAINTEXT" ].c_str(), text, AES256_TEXT_SIZE );
+
+			AES256_context	ctx;
+			AES256_init( &ctx, key );
+			AES256_encrypt_ECB( &ctx, text );
+			AES256_done( &ctx );
+
+			char output[65];
+			byte2hex( ctx.enckey, 32, output, 65 );
+			std::cout << "Enckey: " << output << std::endl;
+
+			byte2hex( ctx.deckey, 32, output, 65 );
+			std::cout << "Deckey: " << output << std::endl;
 		}
 	} while ( hasValues );
 }

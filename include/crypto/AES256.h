@@ -35,7 +35,7 @@ typedef struct	{
 void AES256_init( AES256_context *ctx, unsigned char *key );
 void AES256_done( AES256_context *ctx );
 void AES256_encrypt_ECB( AES256_context *ctx, unsigned char *plaintext );
-void AES256_decrypt_ECB( AES256_context *ctx, unsigned char *cipertext );
+void AES256_decrypt_ECB( AES256_context *ctx, unsigned char *ciphertext );
 
 #ifdef __cplusplus
 }
