@@ -117,3 +117,47 @@ const PropertyTree::Node& PropertyTree::Node::getChild( const std::string& noden
 	return *rt;
 }
 
+std::vector<const PropertyTree::Node*> PropertyTree::Node::getChildren( const std::string& nodename) const
+{
+	std::vector<const PropertyTree::Node*> rt;
+	types::PropertyTree::Node::const_iterator gi = begin(), ge = end();
+	for (; gi != ge; ++gi)
+	{
+		if (boost::algorithm::iequals( gi->first, nodename))
+		{
+			rt.push_back( &gi->second);
+		}
+	}
+	return rt;
+}
+
+PropertyTree::Node PropertyTree::Node::getChildrenJoined( const std::string& nodename) const
+{
+	Node rt( m_position);
+	unsigned int defcnt = 0;
+	Position first_def_pos;
+	types::PropertyTree::Node::const_iterator gi = begin(), ge = end();
+	for (; gi != ge; ++gi)
+	{
+		if (boost::algorithm::iequals( gi->first, nodename))
+		{
+			first_def_pos = gi->second.m_position;
+			++defcnt;
+			if (!gi->second.m_data.empty())
+			{
+				if (!rt.m_data.empty())
+				{
+					throw std::runtime_error( "cannot join nodes (multiple data definitions)");
+				}
+				rt.m_data = gi->second.m_data;
+			}
+			rt.m_subnodes.insert( rt.m_subnodes.end(), gi->second.begin(), gi->second.end());
+		}
+	}
+	if (defcnt == 1)
+	{
+		rt.m_position = first_def_pos;
+	}
+	return rt;
+}
+

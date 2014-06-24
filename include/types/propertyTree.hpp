@@ -124,6 +124,14 @@ public:
 		/// \remark no path expression argument allowed as in boost::property_tree
 		const Node& getChild( const std::string& nodename) const;
 
+		/// \brief Get a all children nodes with the a certain name
+		/// \remark no path expression argument allowed as in boost::property_tree
+		std::vector<const Node*> getChildren( const std::string& nodename) const;
+
+		/// \brief Get a all children nodes with the a certain name joined to one node
+		/// \remark no path expression argument allowed as in boost::property_tree
+		Node getChildrenJoined( const std::string& nodename) const;
+
 		/// \brief Add child reference
 		void add_child( const std::string& name_, const Node& node_)
 		{
