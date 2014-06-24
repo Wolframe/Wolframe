@@ -155,6 +155,13 @@
 	netcat -v localhost 7661 &lt; CustomerListRequest.netcat
 	</programlisting>
 	
+		or:
+
+	<programlisting language='shell'>
+	wolframec -d CustomerListRequest.xml
+	</programlisting>
+
+	
 		we get now:
 
 	<programlisting language='xml'>
@@ -255,7 +262,34 @@
 	<programlisting language='shell'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/Customer.sfrm" parse="text" />
 	</programlisting>
+	
+	</para>
+	
+	<para>
+		We can see in the shell if this new request is working. We define
+		create a file called <filename>CustomerRequest.xml</filename> with the
+		following content:
 
+	<programlisting language='shell'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerRequest.xml" parse="text" />
+	</programlisting>
+	
+		We can then see that our request is working by executing:
+
+	<programlisting language='shell'>
+	wolframec -d CustomerRequest.xml
+	</programlisting>
+	
+		which returns us:
+
+	<programlisting language='shell'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/Customer.xml" parse="text" />
+	</programlisting>
+
+		
+	</para>
+	
+	<para>
 		Now if we restart client and server and we click on the second
 		customer in the list we get:
 	</para>
