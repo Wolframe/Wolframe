@@ -83,19 +83,35 @@ static std::string configurationTree_tostring( const types::PropertyTree::Node& 
 
 config::ConfigurationNode WolfilterCommandLine::getConfigNode( const std::string& name) const
 {
-	return m_config.root().getChild( name);
+	return m_config.root().getChildrenJoined( name);
 }
 
 std::vector<std::string> WolfilterCommandLine::configModules( const std::string& refpath) const
 {
 	std::vector<std::string> rt;
-	types::PropertyTree::Node module_section = getConfigNode( "LoadModules");
+	config::ConfigurationNode module_section = getConfigNode( "LoadModules");
+	std::string directory;
+
 	types::PropertyTree::Node::const_iterator mi = module_section.begin(), me = module_section.end();
+	for (; mi != me; ++mi)
+	{
+		if (boost::algorithm::iequals( mi->first, "directory"))
+		{
+			if (!directory.empty()) throw std::runtime_error( "duplicate definition of 'directory' in section LoadModules");
+			directory = utils::getCanonicalPath( mi->second.data(), refpath);
+			if (directory.empty()) throw std::runtime_error( "empty definition of 'directory' in section LoadModules");
+		}
+	}
+	if (directory.empty())
+	{
+		directory = refpath;
+	}
+	mi = module_section.begin();
 	for (; mi != me; ++mi)
 	{
 		if (boost::algorithm::iequals( mi->first, "module"))
 		{
-			rt.push_back( utils::getCanonicalPath( mi->second.data(), refpath));
+			rt.push_back( utils::getCanonicalPath( mi->second.data(), directory));
 		}
 	}
 	return rt;
