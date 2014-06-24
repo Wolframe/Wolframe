@@ -152,12 +152,19 @@
 		output and XML needs a root element to be defined. 
 		The returned content will be a list of customers. 
 		The function will be implemented in a TDL program in the server.
-		We first add the TDL program declaration to a new 'Processor' configuration 
+		We first add the TDL program declaration to the 'Processor' configuration 
 		section:
 
 		<programlisting language='shell'>
 	Processor {
-	    program Customer.tdl
+	    database sqlitedb
+	    cmdhandler {
+	        directmap {
+	            filter XML=libxml2
+	            program tutorial.dmap
+	        }
+	    }
+	    <emphasis role="bold">program Customer.tdl</emphasis>
 	}
 		</programlisting>
 
@@ -187,6 +194,13 @@
 	}
 
 	Processor {
+	    database sqlitedb
+	    cmdhandler {
+	        directmap {
+	            filter XML=libxml2
+	            program tutorial.dmap
+	        }
+	    }
 	    program Customer.tdl
 	    <emphasis role="bold">program Customer.sfrm</emphasis>	
 	}
