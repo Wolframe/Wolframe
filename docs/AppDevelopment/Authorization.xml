@@ -1,0 +1,22 @@
+<sect1>
+	<title>Authorization</title>
+	<para>The aspect of authorization is configured in the 
+	subsection <code>Authorization</code> of the <code>AAAA</code> section
+	in the server configuration.
+	The following example shows the default <code>Authorization</code>
+	configuration with the setting to allow access to anybody authenticated
+	that is not explicitely denied:
+	<programlisting language='text'>
+AAAA
+{
+    Authorization
+    {
+        Authorization {
+            default allow
+        }
+    }
+}
+	</programlisting>
+	</para>
+</sect1>
+

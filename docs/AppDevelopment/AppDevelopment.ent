@@ -8,6 +8,11 @@
 
 <!ENTITY AppDataProcessing		SYSTEM "DataProcessing.xml">
 <!ENTITY AppAAAA			SYSTEM "AAAA.xml">
+<!ENTITY AppAAAAConfig			SYSTEM "AAAAConfig.xml">
+<!ENTITY AppAuthentication		SYSTEM "Authentication.xml">
+<!ENTITY AppAuthorization		SYSTEM "Authorization.xml">
+<!ENTITY AppAuditingAndAccounting	SYSTEM "AuditingAndAccounting.xml">
+<!ENTITY AppProcessorConfig		SYSTEM "ProcessorConfig.xml">
 <!ENTITY AppApplicationServerRequests	SYSTEM "ApplicationServerRequests.xml">
 <!ENTITY AppCmdhandlers			SYSTEM "CmdHandlers.xml">
 <!ENTITY AppCmdhandlerDirectmap		SYSTEM "CmdHandlerDirectmap.xml">

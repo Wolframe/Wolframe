@@ -44,7 +44,7 @@
 			authentication procedure. The resulting authentication
 			defines the privileges to execute functions or 
 			accessing resources (authorization).
-			The chapter <link linkend="chapterAAAA">AAAA (Authentication,Authorization,Accounting,Auditing)</link>
+			The chapter <link linkend="chapterAAAA">AAAA (Authentication,Authorization,Auditing and Accounting)</link>
 			will introduce the several aspects covered by Wolframe
 			besides data processing.
 			</para>

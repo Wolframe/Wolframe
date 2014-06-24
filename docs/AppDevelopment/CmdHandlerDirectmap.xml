@@ -14,14 +14,20 @@
 	</sect3>
 	<sect3>
 		<title>Example configuration</title>
-		<para>The following configuration declares a program <code>example.tdl</code> written in the 
-		transaction definition language (<acronym>TDL</acronym>) to contain the function
-		declarations for the provider that can be called by the command handler. It declares the database with
-		name <application>pgdb</application> to be used as the database for transactions. It loads a description 
-		<code>example.dmap</code> that will declare the mappings of commands to the filters used and functions 
-		called. It specifies the filter with name <application>libxml2</application> to be used for documents of format XML and
-		the filter with name <application>cjson</application> to be used for documents of format JSON, if
-		not specified else in <code>example.dmap</code>.
+		<para>The following annotated configuration example
+		declares (1) a program <code>example.tdl</code> written in the
+		transaction definition language (<acronym>TDL</acronym>)
+		to contain the function declarations that can be called by
+		the command handler. It (2) declares the database with
+		name <application>pgdb</application> to be used as the
+		database for transactions. It (3) loads a description
+		<code>example.dmap</code> that will declare the mappings
+		of commands to the filters used and functions called.
+		It (4) specifies the filter with name <application>libxml2</application>
+		to be used for documents of format XML and
+		(5) the filter with name <application>cjson</application>
+		to be used for documents of format JSON, if not specified
+		else in <code>example.dmap</code>.
 
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/standardCommandHandler.conf" parse="text" />
@@ -31,8 +37,8 @@
 
 	<sect3>
 		<title>Example command description</title>
-		<para>The following source example could be one of the <code>example.dmap</code> in the configuration example 
-		introduced above. It defines two commands. The first one links a command "insert" with document type
+		<para>The following source example could be one of the <code>example.dmap</code>
+		in the configuration example introduced above. It defines two commands. The first one links a command "insert" with document type
 		"Customer" as content to a transaction function "doInsertCustomer". The content is validated 
 		automatically against a form named "Customer" if not explicitly defined else. 
 		The command has no result except that it succeeds or fails. The second example command links a 

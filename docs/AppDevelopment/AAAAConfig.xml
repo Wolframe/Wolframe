@@ -1,0 +1,17 @@
+<sect1>
+	<title>AAAA Configuration</title>
+	<para>The aspects of authentication,authotization,auditing and accounting
+	are configured in the section <code>AAAA</code> of the 
+	server configuration.
+	The following example shows an empty <code>AAAA</code> configuration
+	section:
+	<programlisting language='text'>
+AAAA
+{
+    ;... configuration for 
+    ;    authentication,authorization,auditing and accounting
+}
+	</programlisting>
+	</para>
+</sect1>
+

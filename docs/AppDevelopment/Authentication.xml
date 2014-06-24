@@ -1,0 +1,31 @@
+<sect1>
+	<title>Authentication</title>
+	<para>The aspect of authentication is configured in the 
+	subsection <code>Authentication</code> of the <code>AAAA</code> section
+	in the server configuration.
+	The following example shows an <code>Authentication</code>
+	configuration with the Wolframe textfile authentication module
+	that provides an authentication over the "WOLFRAME-CRAM" protocol:
+	<programlisting language='text'>
+AAAA
+{
+    Authentication
+    {
+        randomDevice /dev/urandom
+        TextFile
+        {
+            identifier "TextFileAuth"
+            file /var/tmp/wolframe.auth
+        }
+}
+	</programlisting>
+	</para>
+	<sect2>
+		<title>Authentication Mechs</title>
+		<para>Currently only the authentication protocol for
+		<code>WOLFRAME-CRAM</code> is implemented. You configure
+		it as shown in the example above.
+		</para>
+	</sect2>
+</sect1>
+

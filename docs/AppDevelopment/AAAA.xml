@@ -3,6 +3,11 @@
 	<title>AAAA</title>
 	<para>
 	AAAA is an acronym for Authentication,Authorization,Accounting and Auditing.
+	This chapter describes how the different aspects of AAAA are configured.
 	</para>
+	&AppAAAAConfig;
+	&AppAuthentication;
+	&AppAuthorization;
+	&AppAuditingAndAccounting;
 </chapter>
 

@@ -12,6 +12,7 @@
 		Finally we will describe the tools available in Wolframe
 		for defect handling and testing.
 	</para>
+	&AppProcessorConfig;
 	&AppApplicationServerRequests;
 	&AppCmdhandlers;
 	&AppFunctions;

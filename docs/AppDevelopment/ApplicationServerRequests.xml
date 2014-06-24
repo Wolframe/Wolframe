@@ -4,10 +4,11 @@
 	application server requests consist of a named command and a 
 	structured content (document) as argument.
 	</para>
-	<para>The following illustration shows the processing of one client request to the server.
-		A call of the <application>Wolframe</application> logic tier gets to a command handler
-		that calls functions given by the provider to perform the transaction
-		requested.
+	<para>The following illustration shows the processing of one 
+		client request to the server.
+		A call of the <application>Wolframe</application> logic tier 
+		gets to a command handler that calls functions given by 
+		the provider to perform the transaction requested.
 	</para>
 	<figure>
 		<title>Overview</title>
