@@ -277,6 +277,35 @@
 	</para>
 		
 	<para>
+		Instead of using <command>netcat</command> you can also use the
+		<command>wolframec</command> for testing the requests.
+	</para>
+	
+	<para>
+		First create an XML file containing just the request and name
+		it <filename>CustomerListRequest.xml</filename>:
+		<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerListRequest.xml" parse="text" />
+		</programlisting>		
+	</para>
+	
+	<para>
+		The request can be executed by calling:
+		<programlisting language='shell'>
+	wolframec -d CustomerListRequest.xml
+		</programlisting>		
+	</para>
+	
+	<para>
+		We can also test the command without even starting the <command>wolframed</command>
+		daemon process. We use the <command>wolilter</command> program for that in the
+		following way:
+		<programlisting language='shell'>
+	cat ~/tutorial/client/CustomerListRequest.xml | wolfilter -c tutorial.conf CustomerListRequest
+		</programlisting>		
+	</para>
+	
+	<para>
 		We can move now to the wolfclient to make our first request visible.
 
 	</para>
