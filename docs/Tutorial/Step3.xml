@@ -5,11 +5,12 @@
 
 	<para>
 		Now that we have ensured that basic connectivity to the Wolframe server
-		is available, we can configure the basics for the Qt client.
+		is available, we can configure the basics for the Qt client,
+		called <command>wolfclient</command>.
 	</para>
 
 	<para>
-		We start the Qt client with:
+		We start wolfclient with:
 
 		<programlisting language='shell'>
 	cd ~/tutorial/client
