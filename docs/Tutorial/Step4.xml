@@ -298,11 +298,11 @@
 	
 	<para>
 		We can also test the command without even starting the <command>wolframed</command>
-		daemon process. We use the <command>wolilter</command> program for that in the
+		daemon process. We use the <command>wolfilter</command> program for that in the
 		following way:
 		<programlisting language='shell'>
 	cat ~/tutorial/client/CustomerListRequest.xml | wolfilter -c tutorial.conf CustomerListRequest
-		</programlisting>		
+		</programlisting>
 	</para>
 	
 	<para>
