@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>Form data definition languages</title>
-	<sect2>
+	<sect3>
 	<title>Introduction</title>
 	<para>
 		Form data structures can be defined in a <acronym>DDL</acronym> (Data Definition Language).
@@ -23,15 +23,15 @@
 	<para>
 		All types of data forms introduced here are equivalent in use for all programs.
 	</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 	<title>Forms in simpleform DDL</title>
 	<para>
 		As example of a form <acronym>DDL</acronym> we provide the <glossterm>simpleform</glossterm> <acronym>DDL</acronym>. 
 		In simple form we forms, subtructures for reuse inside structures and forms
 		and includes that help you to organize your code.
 	</para>
-	<sect3>
+	<sect4>
 	<title>Commands</title>	
 	<para>
 		The <glossterm>simpleform</glossterm> language has 3 commands:
@@ -41,8 +41,8 @@
 		<member><code>INCLUDE</code></member><member>include the file given as argument</member>
 		</simplelist>
 	</para>
-	</sect3>
-	<sect3>
+	</sect4>
+	<sect4>
 	<title>Structures</title>	
 	<para>
 		Structures in <code>FORM</code> or <code>STRUCT</code> declarations
@@ -62,8 +62,8 @@ FORM myDocumentSchema
 }
 	</programlisting>
 	</para>
-	</sect3>
-	<sect3>
+	</sect4>
+	<sect4>
 	<title>Elements of structures</title>	
 	<para>
 		An element in the list is either a declaration of a substructure or
@@ -93,8 +93,8 @@ FORM myDocumentSchema
 		brackets or an identifier naming an atomic type or a substructure 
 		declared previously as a <code>STRUCT</code>. 
 	</para>
-	</sect3>
-	<sect3>
+	</sect4>
+	<sect4>
 	<title>Embedded structure definitions</title>	
 	<para>Here is an example with a embedded substructure
 		<programlisting language='text'>
@@ -111,8 +111,8 @@ FORM myDocumentSchema
 		Embedded substructure declarations follow recursively the same rules as 
 		structures defined here.
 	</para>
-	</sect3>
-	<sect3>
+	</sect4>
+	<sect4>
 	<title>Default atomic value assignments</title>	
 	<para>
 		Named types referencing atomic types can be followed by an assignment
@@ -125,8 +125,8 @@ FORM myDocumentSchema
 }
 		</programlisting>
 	</para>
-	</sect3>
-	<sect3>
+	</sect4>
+	<sect4>
 	<title>Types of atomic values</title>	
 	<para>
 		The atomic element type names are either the reserved keyword <code>string</code>
@@ -135,8 +135,8 @@ FORM myDocumentSchema
 		functions assigned to a type validate the value and transform it to its 
 		normalized form. The next section will explain how data types are defined.
 	</para>
-	</sect3>
-	<sect3>
+	</sect4>
+	<sect4>
 	<title>Element attributes</title>
 	<para>
 		The element attributes are marked with some special characters listed and
@@ -214,8 +214,8 @@ FORM myDocumentSchema
 id ?@int = 1
 		</programlisting>
 	</para>
-	</sect3>
-	<sect3>
+	</sect4>
+	<sect4>
 	<title>Embedding elements and inheritance</title>
 	<para>
 		Using a single underscore '_' as atomic element name means that the 
@@ -239,8 +239,8 @@ FORM insertedContent
 }
 		</programlisting>
 	</para>
-	</sect3>
-	<sect3>
+	</sect4>
+	<sect4>
 	<title>Declaring document meta data</title>
 	<para>
 		Document meta data in <code>FORM</code> definitions are declared after the
@@ -265,8 +265,8 @@ FORM myDoc
 }
 		</programlisting>
 	</para>
-	</sect3>
-	<sect3>
+	</sect4>
+	<sect4>
 	<title>Example form definition</title>
 	<para>
 		Now all elements of <glossterm>simpleform</glossterm> are explained.
@@ -275,7 +275,7 @@ FORM myDoc
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customers.simpleform" parse="text" />
 		</programlisting>
 	</para>
+	</sect4>
 	</sect3>
-	</sect2>
-</sect1>
+</sect2>
 

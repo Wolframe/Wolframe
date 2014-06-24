@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>The standard command handler</title>
-	<sect2>
+	<sect3>
 	<title>Introduction</title>
 	<para>
 		The <application>Wolframe</application> standard command handler is called <glossterm>directmap</glossterm> and named so
@@ -11,8 +11,8 @@
 		The declarations of the <application>Wolframe</application> Standard Command Handler (<glossterm>directmap</glossterm>)
 		are specified in a program source file with the extension '.dmap' that is declared in the configuration.
 	</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 		<title>Example configuration</title>
 		<para>The following configuration declares a program <code>example.tdl</code> written in the 
 		transaction definition language (<acronym>TDL</acronym>) to contain the function
@@ -27,9 +27,9 @@
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/standardCommandHandler.conf" parse="text" />
 		</programlisting>
 		</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 		<title>Example command description</title>
 		<para>The following source example could be one of the <code>example.dmap</code> in the configuration example 
 		introduced above. It defines two commands. The first one links a command "insert" with document type
@@ -45,9 +45,9 @@
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/first_example.directmap" parse="text" />
 		</programlisting>
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Command description language</title>
 	<para>
 		A command map description file like our example shown consists of instructions started with 
@@ -55,7 +55,7 @@
 		command followed by the name of the document type of the input document. The name of the command
 		is optional. If not specified the first argument after <code>COMMAND</code> names the input document type.
 	</para>
-		<sect3>
+		<sect4>
 			<title>Keywords</title>
 			<para>
 			Conflicts with keywords and names are solved by using strings instead
@@ -72,8 +72,8 @@
 			<member>AUTHORIZE</member>
 			</simplelist>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Simple document map</title>
 			<para>
 				The following example shows the simplest possible declaration. It states that documents with the
@@ -82,8 +82,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/doctype_only.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Command with action prefix</title>
 			<para>
 				The next example adds a action name to the declaration. The implicit name of the function called is
@@ -92,8 +92,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_only.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Explicit function name declaration</title>
 			<para>
 				For declaring the function called explicitly like for example a function <code>doInsertDocument</code> we need to declare it with <code>CALL &lt;functionname&gt;</code>:
@@ -101,8 +101,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Returned document declaration</title>
 			<para>
 				The document type returned is specified with <code>RETURN &lt;doctype&gt;</code>:
@@ -114,8 +114,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_return.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Returned document meta data</title>
 			<para>We can define additional document meta data or overload existing
 			document meta or inherited document meta from input or a referenced 
@@ -126,8 +126,8 @@
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_return_with_metadata.directmap" parse="text" />
 			</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Skipping the document validation</title>
 			<para>
 				If you want to skip the input document validation, either because you are dealing
@@ -158,8 +158,8 @@
 				</programlisting>
 			</para>
 
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Return a standalone document</title>
 			<para>
 				If we want to return a document as standalone 
@@ -170,8 +170,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_return_standalone.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Explicit filter definitions for a command</title>
 			<para>
 				For most processing it's enough to declare the standard filters in the configuration of the command handler.
@@ -191,8 +191,8 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_filter_call_return.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Authorization checks</title>
 			<para>
 				We can tag a command to be allowed only after an authorization check.
@@ -206,8 +206,8 @@
 				<listitem><para><code>AUTHORIZE &lt;authfunc&gt; &lt;resource&gt;</code></para></listitem>
 				</itemizedlist>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Using brackets</title>
 			<para>
 				For better readability you can use optional '(' ')' brackets on 
@@ -216,9 +216,9 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_with_arg_brackets.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
+		<sect4>
 		<title>Overview</title>
 		<para>Each command declaration has as already explained the form
 		<itemizedlist>
@@ -286,8 +286,8 @@
 		</table>
 
 		</para>
-		</sect3>
-	</sect2>
-</sect1>
+		</sect4>
+	</sect3>
+</sect2>
 
 

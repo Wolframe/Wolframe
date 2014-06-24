@@ -141,7 +141,7 @@ public:
 	PasswordHash( const std::string& pwdSalt, const std::string& password );
 
 	/// Construct the password hash from a combined password hash string (base64)
-	/// \param str	password hash string in format $<salt>$<hash>
+	/// \param str	password hash string in format $&lt;salt&gt;$&lt;hash&gt;
 	///		if the string doesn't start with '$' then
 	///		the string is considered to represent only the
 	///		password hash as base64 and the salt will be zeroed
@@ -154,10 +154,10 @@ public:
 	const Hash& hash() const	{ return m_hash; }
 
 	/// Return the password hash as a BCD string.
-	/// The format is $<salt>$<hash> on one line, no whitespaces.
+	/// The format is $&lt;salt&gt;$&lt;hash&gt; on one line, no whitespaces.
 	std::string toBCD() const;
 	/// Return the password hash as a base64 string without base64 padding.
-	/// The format is $<salt>$<hash> on one line, no whitespaces.
+	/// The format is $&lt;salt&gt;$&lt;hash&gt; on one line, no whitespaces.
 	std::string toString() const;
 
 private:

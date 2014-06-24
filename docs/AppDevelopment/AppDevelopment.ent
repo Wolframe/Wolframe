@@ -6,6 +6,9 @@
 
 <!ENTITY AppGettingStarted		SYSTEM "GettingStarted.xml">
 
+<!ENTITY AppDataProcessing		SYSTEM "DataProcessing.xml">
+<!ENTITY AppAAAA			SYSTEM "AAAA.xml">
+<!ENTITY AppApplicationServerRequests	SYSTEM "ApplicationServerRequests.xml">
 <!ENTITY AppCmdhandlers			SYSTEM "CmdHandlers.xml">
 <!ENTITY AppCmdhandlerDirectmap		SYSTEM "CmdHandlerDirectmap.xml">
 <!ENTITY AppCmdhandlerLua		SYSTEM "CmdHandlerLua.xml">

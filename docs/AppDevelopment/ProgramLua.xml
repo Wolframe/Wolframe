@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>Functions in Lua</title>
-	<sect2>
+	<sect3>
 	<title>Introduction</title>
 	<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>Lua</application>. <application>Lua</application> is a scripting language designed, implemented, and maintained
 		at PUC-Rio in Brazil by Roberto Ierusalimschy, Waldemar Celes and Luiz Henrique de Figueiredo
@@ -8,9 +8,9 @@
 		For an introduction into programming with <application>Lua</application> see <ulink url="http://www.lua.org">http://www.lua.org</ulink>. The official manual which is also available as book
 		is very good. <application>Wolframe</application> introduces some <application>Lua</application> interfaces to access input and output and to execute functions.
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Configuration</title>
 	<para>For enabling <application>Lua</application> you have to declare the loading of the module 'mod_command_lua'
 		in the main section of the server configuration file.
@@ -22,9 +22,9 @@
 		The script is recognized as <application>Lua</application> script by the file extension ".lua".
 		Files without this extension cannot be loaded as <application>Lua</application> scripts.
 		</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Declaring functions</title>
 	<para>For <application>Lua</application> we do not have to declare anything in addition to the 
 		<application>Lua</application> script. If you configure a <application>Lua</application>
@@ -32,9 +32,9 @@
 		functions. For avoiding name conflicts you should declare private functions
 		of the script as <code>local</code>.
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Wolframe provider library</title>
 	<para><application>Wolframe</application> lets you access objects of the global context through
 		a library called <code>provider</code> offering the following functions:
@@ -76,9 +76,9 @@
 			</tgroup>
 		</table>
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Using atomic data types</title>
 	<para><application>Wolframe</application> lets us extend the type system consisting 
 		of Lua basic data types with our own. We can create atomic data types 
@@ -135,7 +135,7 @@
 		</table>
 		</para>
 
-		<sect3>
+		<sect4>
 		<title>Data type 'datetime'</title>
 		<para>
 			The data type 'datetime' is used as interface for date time values.
@@ -219,9 +219,9 @@
 				</tgroup>
 			</table>
 		</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
+		<sect4>
 		<title>Data Type 'bignumber'</title>
 		<para>
 			The data type 'bignumber' is used to reference fixed point BCD numbers with a precision of 32767 digits between -1E32767 and +1E32767.
@@ -275,10 +275,10 @@
 				</tgroup>
 			</table>
 		</para>
-		</sect3>
-	</sect2>
+		</sect4>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Filter interface iterators</title>
 	<para>Lua provides an interface to the iterators internally used to couple 
 		objects and functions. They are accessible as iterator function closure
@@ -327,9 +327,9 @@
 		</tbody>
 		</tgroup>
 	</table>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Iterator library</title>
 	<para><application>Wolframe</application> lets you access filter interface
 		iterators through a library called <code>iterator</code> 
@@ -363,9 +363,9 @@
 		(**) If iterator.scope is called, all elements of the returned iterator has to be visited in order to continue 
 		iteration with the origin iterator on which iterator.scope was called.
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Global objects</title>
 	<para>Besides the provider library <application>Wolframe</application> defines the following objects global in the script execution context:
 		<simplelist type="horiz" columns="2">
@@ -373,9 +373,9 @@
 		<member>logger</member><member>object with methods for logging or debugging</member>
 		</simplelist>
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Using forms</title>
 	<para>The provider function <code>provider.form( )</code> with the name of the form as string as 
 		parameter returns an empty instance of a form. It takes the name of 
@@ -416,8 +416,8 @@
 		<application>Lua</application> data structure
 		(a <application>Lua</application> table or atomic value).
 		</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 	<title>Form functions</title>
 	<para>
 		For calling transactions or built-in functions loaded as modules the <application>Lua</application> layer defines the
@@ -441,9 +441,9 @@
 		The second calls the transaction, the third creates a <application>Lua</application> table out of the result
 		and the fourth selects and prints the "id" element in the table.
 	</para>
-	</sect2>
+	</sect3>
 	
-	<sect2>
+	<sect3>
 	<title>List of <application>Lua</application> objects</title>
 	<para>This is a list of all objects and functions declared by <application>Wolframe</application>:</para>
 
@@ -666,6 +666,6 @@
 			(**) The filter interface iterator  of a defined scope must be consumed completely before consuming anything of the parent iterator.
 			Otherwise it may lead to unexpected results because they share some part of the iterator state.
 		</para>
-	</sect2>
-</sect1>
+	</sect3>
+</sect2>
 

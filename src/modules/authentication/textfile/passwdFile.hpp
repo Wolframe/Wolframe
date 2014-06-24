@@ -54,7 +54,7 @@ public:
 
 ///\brief Password file
 ///\note The password file format is:
-/// <username>:<password hash>:<user info>:<expiry date>
+/// &lt;username&gt;:&lt;password hash&gt;:&lt;user info&gt;:&lt;expiry date&gt;
 /// blank lines and the lines starting with # are ignored
 class PasswordFile
 {

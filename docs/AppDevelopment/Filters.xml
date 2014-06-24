@@ -1,4 +1,4 @@
-<chapter>
+<sect1>
 <title>Filters</title>
 <para>
 Filters describe the transformation of serialized data to a unified element sequence
@@ -26,4 +26,4 @@ of <application>Wolframe</application> has to be extended for its availability.
 	&AppFilterXML;
 	&AppFilterJSON;
 	&AppFilterXSLT;
-</chapter>
+</sect1>

@@ -1,4 +1,4 @@
-<chapter>
+<sect1>
 <title>Testing and defect handling</title>
 <para>In this chapter we learn how parts of a <application>Wolframe</application>
 application can be verified to work correctly. The basis for testing and debugging
@@ -6,7 +6,7 @@ a <application>Wolframe</application> application is the command line tool
 <application>wolfilter</application>. 
 </para>
 
-<sect1>
+<sect2>
 <title>Using wolfilter</title>
 	<para>The command line program <application>wolfilter</application> allows you 
 	to call any <application>Wolframe</application> function or filter or mapping 
@@ -23,7 +23,7 @@ a <application>Wolframe</application> application is the command line tool
 	<para>The following examples assume the input file name to be in.xml or in.json and
 	the output file to be named out.xml or out.json respectively.
 	</para>
-	<sect2>
+	<sect3>
 		<title>Test configuration</title>
 		<para>For the examples needing a configuration, we prepare the following simple
 		configuration, just declaring the processing stuff, we need. Of course wolfilter
@@ -45,8 +45,8 @@ Processor
 }
 		</programlisting>
 		</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 		<title>Testing a filter</title>
 		<para>The following example shows the mapping through a libxml2 filter.
 		Filters are tested by passing a dash '-' command to execute.
@@ -68,8 +68,8 @@ cat in.xml | wolfilter -e libxml2 -m mod_filter_libxml2 - > out.xml
 cat in.xml | wolfilter -i myfilter -o token -c test.conf - > out.xml
 		</programlisting>
 		</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 		<title>Testing a Form</title>
 		<para>The following example shows the mapping through a form defined with simpleform DDL.
 		Mapping through forms is tested by passing the name of the form as command to execute.
@@ -82,8 +82,8 @@ cat in.xml | wolfilter -e libxml2 -c test.conf MyForm > out.xml
 		we assume here that the form to use is defined in myform.sfrm that is declared
 		as program in the configuration and that the form is called MyForm.
 		</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 		<title>Testing a Function</title>
 		<para>The following example shows the execution of a function written in Lua.
 		A JSON filter is used for input and output.
@@ -94,8 +94,7 @@ cat in.xml | wolfilter -e cjson -c test.conf MyFunc > out.json
 		we assume here that the exported function to call defined in myfunc.lua 
 		declared in test.conf and is called MyFunc.
 		</para>
-	</sect2>
+	</sect3>
+</sect2>
 </sect1>
-
-</chapter>
 

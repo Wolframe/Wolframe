@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>Datatypes in DDLs</title>
-	<sect2>
+	<sect3>
 	<title>Introduction</title>
 	<para>The basic elements to build atomic data types in <application>Wolframe</application>
 		are normalization functions. Basic normalization functions are written in C++
@@ -25,8 +25,8 @@
 		Each normalization step validates the input as atomic type (arithmetic,string,etc.)
 		and transforms it to another atomic type.
 	</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 	<title>Example</title>
 	<para>
 		The example defines 3 numeric types including trimming of the input string for mode tolerant
@@ -37,11 +37,11 @@
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_1.normalize" parse="text" />
 		</programlisting>
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Language description</title>
-		<sect3>
+		<sect4>
 		<title>Type assignments</title>	
 		<para>
 			Each type declaration in a <code>.wnmp</code> file starts with an identifier followed by an assignment 
@@ -56,8 +56,8 @@
 			An integer type for example could have the maximum number of digits 
 			of the integer type.
 		</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 		<title>Standard modules for normalizers</title>	
 		<para>
 			There are some standard modules you can use when you define your own type system.
@@ -70,9 +70,9 @@
 			<listitem><para>mod_datatype_datetime: Custom data type for date and time arithmetics and normalization</para></listitem>
 			<listitem><para>mod_datatype_bcdnumber: Custom data type for bid number arithmetics and normalization</para></listitem>
 			</itemizedlist>
-		</sect3>
-	</sect2>
-	<sect2>
+		</sect4>
+	</sect3>
+	<sect3>
 	<title>Configuration</title>
 	<para>For declaring and using a .wnmp file in our example above, we have to load 
 	the module 'mod_normalize_string' and the module 'mod_normalize_number'.
@@ -87,7 +87,7 @@
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_program_wnmp.conf" parse="text" />
 	</programlisting>
 	</para>
-	</sect2>
-</sect1>
+	</sect3>
+</sect2>
 
 

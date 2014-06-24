@@ -1,4 +1,4 @@
-<chapter>
+<sect1>
 <title>Command handler</title>
 <para>This chapter introduces the standard command handler of the logic tier.
 </para>
@@ -6,4 +6,4 @@
 	<!-- PF: Temporarily excluded (Lua command handler should not be presented in the main documentation. It leads to confusion for non experienced Wolframe developpers )
 	&AppCmdhandlerLua;
 	-->
-</chapter>
+</sect1>

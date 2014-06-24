@@ -1,22 +1,22 @@
-<sect1>
+<sect2>
 <title>Functions in native C++</title>
-	<sect2>
+	<sect3>
 		<title>Introduction</title>
 		<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>C++</application>. 
 		Because native <application>C++</application> is by nature a compiled and not an
 		interpreted language, you have to build a module out of your function implementation.
 		</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Prerequisites</title>
 	<para>For native <application>C++</application> you need a <application>C++</application>
 	build system with compiler and linker or an integrated
 	development environment for <application>C++</application>. 
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Declaring functions</title>
 	<para>
 		Form functions declared in <application>C++</application> have two arguments. The output structure to fill
@@ -32,7 +32,7 @@
 		additional attributes needed for introspection. We will explain this in the following
 		section.
 	</para>
-		<sect3>
+		<sect4>
 		<title>Example Function Declaration</title>
 		<para>The function takes a structure as input and writes the result into an
 		output structure. In this example input and output type are the same, but this
@@ -55,10 +55,10 @@
 		<programlisting language='C++'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customersFunction.hpp" parse="text" />
 		</programlisting>
-		</sect3>
-	</sect2>
+		</sect4>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Input/output data structures</title>
 	<para>For defining input and output parameter structures in <application>C++</application> you have to define the 
 		structure and its serialization description. The serialization description is a static 
@@ -68,16 +68,16 @@
 	<para>
 		The following example shows a form function parameter structure defined in <application>C++</application>.
 	</para>
-		<sect3>
+		<sect4>
 		<title>Header file</title>
 		<para>Declares the structure and the serialization description of the structure.
 		Structures may contain structures with their own serialization description.</para>
 		<programlisting language='C++'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customers.hpp" parse="text" />
 		</programlisting>
-		</sect3>
+		</sect4>
 
-		<sect3>
+		<sect4>
 		<title>Source file</title>
 		<para>Declares 'ID' as attribute and name, canonical_Name, country, locality as tags. 
 		The '--' operator marks the end of attributes section and the start of content 
@@ -85,17 +85,17 @@
 		<programlisting language='C++'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customers.cpp" parse="text" />
 		</programlisting>
-		</sect3>
-	</sect2>
+		</sect4>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Writing the module</title>
 	<para>Now we have all pieces together to build a loadable
 	<application>Wolframe</application> module with our example <application>C++</application>
 	function. The following example shows what you have to
 	declare in the main module source file.
 	</para>
-		<sect3>
+		<sect4>
 		<title>Module declaration</title>
 		<para>The module declaration needs to include <code>appdevel.hpp</code> and
 		of course all headers with the function and data structure declarations needed.
@@ -120,27 +120,27 @@
 		<programlisting language='C++'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/customersModule.cpp" parse="text" />
 		</programlisting>
-		</sect3>
-	</sect2>
+		</sect4>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Building the module</title>
 	<para>For building the module we have to include all modules introduced here and
 	to link at against the wolframe serialization library (wolframe_serialize)
 	and the wolframe core library (wolframe).
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Using the module</title>
 	<para>The module built can be loaded as the other modules by declaring it in the wolframe
 	LoadModules section of the configuration. Simply list it there with 
 	<code>module &lt;yourModuleName&gt;</code> with &lt;yourModuleName&gt; being the name
 	or path to your module.
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Validation issues</title>
 	<para>
 	<application>C++</application> is a strongly typed language. This means that the
@@ -153,6 +153,6 @@
 	See in the documentation of the standard command handler how validation can be
 	skipped with the attribute <code>SKIP</code>.
 	</para>
-	</sect2>
+	</sect3>
 
-</sect1>
+</sect2>

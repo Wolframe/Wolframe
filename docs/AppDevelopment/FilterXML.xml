@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>XML Filter</title>
-	<sect2>
+	<sect3>
 	<title>Introduction</title>
 	<para>You can use <acronym>XML</acronym> for data filters in the logic tier of <application>Wolframe</application>.
 	There are the following variants of <acronym>XML</acronym> filters available:
@@ -9,9 +9,9 @@
 	<listitem><para><application>textwolf</application> (<ulink url="http://www.textwolf.net">http://www.textwolf.net</ulink>)</para></listitem>
 	</itemizedlist>	
 	</para>
-	</sect2>
+	</sect3>
 	
-	<sect2>
+	<sect3>
 	<title>Character set encodings</title>
 	<para>The <application>libxml2</application> and the <application>textwolf</application> filter support at least 
 	the following character set encodings. For character set encodings that are not in the list, 
@@ -25,9 +25,9 @@
 	<listitem><para><abbrev>ISO 8859</abbrev> (code pages '1' to '9')</para></listitem>
 	</itemizedlist>
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Configuration</title>
 	<para>For using an <acronym>XML</acronym> filter based <application>libxml2</application>, you have to load the module 'mod_filter_libxml2'.
 	For this you add the following line to the LoadModules section of your <application>Wolframe</application> configuration:
@@ -42,6 +42,6 @@
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_filter_textwolf.conf" parse="text" />
 		</programlisting>
 	</para>
-	</sect2>
-</sect1>
+	</sect3>
+</sect2>
 

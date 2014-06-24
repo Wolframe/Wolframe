@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>Functions in python</title>
-	<sect2>
+	<sect3>
 		<title>Current development status</title>
 		<para>You can write functions for the logic tier of <application>Wolframe</application> in the 
 		<application>Python</application> programming language (<ulink url="http://www.python.org">http://www.python.org</ulink>).
@@ -9,6 +9,6 @@
 		The implementation of <application>Python</application> calls is not yet available. 
 		But <application>Wolframe</application> will provide <application>Python</application> functions soon.
 		</para>
-	</sect2>
-</sect1>
+	</sect3>
+</sect2>
 

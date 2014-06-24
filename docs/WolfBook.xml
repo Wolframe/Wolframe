@@ -52,11 +52,8 @@
 
 		&AppPreface;
 		&AppIntroduction;
-		&AppCmdhandlers;
-		&AppFunctions;
-		&AppForms;
-		&AppFilters;
-		&AppTesting;
+		&AppAAAA;
+		&AppDataProcessing;
 		&AppGlossary;
 
 		<index>

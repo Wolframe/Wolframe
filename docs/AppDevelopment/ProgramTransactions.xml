@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>Transactions in TDL</title>
-	<sect2>
+	<sect3>
 		<title>Introduction</title>
 		<para>
 			For the description of transactions <application>Wolframe</application>
@@ -60,18 +60,18 @@
 			uppercase here. We recommend in general to use uppercase letters 
 			for TDL keywords. It makes the source more readable.
 		</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Configuration</title>
 		<para>
 		Each TDL program source referenced has to be declared in the 
 		<code>Processor</code> section of the configuration with 
 		<code>program &lt;sourcefile&gt;</code>.
 		</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Language description</title>
 		<para>
 		A TDL program consists of subroutine declarations and exported
@@ -79,7 +79,7 @@
 		structure as transaction function blocks but without pre- and postprocessing
 		and authorization method declarations.
 		</para>
-		<sect3>
+		<sect4>
 			<title>Subroutines</title>
 			<para>A subroutine declaration starts with the Keyword <code>SUBROUTINE</code>
 			followed by the subroutine name and optionally some parameter names
@@ -126,9 +126,9 @@
 			</programlisting>
 			The DATABASE declaration is optional.
 			</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
+		<sect4>
 			<title>Transaction function declarations</title>
 			<para>A transaction function declaration starts with the Keyword <code>TRANSACTION</code>
 			followed by the name of the transaction function. This name identifies the
@@ -246,8 +246,8 @@
 			END
 			</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Main processing instructions</title>
 			<para>Main processing instructions defined in the main execution block 
 			of a subroutine or transaction function consist of three parts in the
@@ -325,7 +325,7 @@
 				</listitem>
 			</itemizedlist>
 			</para>
-			<sect4>
+			<sect5>
 				<title>Main processing example</title>
 				<para>The following example illustrate how the FOREACH,INTO,DO
 				expressions in the main processing block work together:
@@ -333,9 +333,9 @@
 				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_mainprocessing.tdl" parse="text" />
 				</programlisting>
 				</para>
-			</sect4>
-		</sect3>
-		<sect3>
+			</sect5>
+		</sect4>
+		<sect4>
 		<title>Preprocessing instructions</title>
 		<para>Preprocessing instructions defined in the PREPROC execution block 
 			of a transaction function consist similar to the instructions
@@ -373,7 +373,7 @@
 			</listitem>
 		</itemizedlist>
 		</para>
-			<sect4>
+			<sect5>
 				<title>Preprocessing example</title>
 				<para>The following example illustrate how the "FOREACH, INTO, DO"
 				expressions in the main processing block work together:
@@ -381,9 +381,9 @@
 				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_preprocessing.tdl" parse="text" />
 				</programlisting>
 				</para>
-			</sect4>
-		</sect3>
-		<sect3>
+			</sect5>
+		</sect4>
+		<sect4>
 		<title>Selector path</title>
 		<para>An element of the input or a set of input elements can be selected by a path.
 			A path is a sequence of one of the following elements separated by slashes:
@@ -431,7 +431,7 @@
 			plain without '$' and '(' ')' markers. These markers are just used to 
 			identify substitution entities.
 		</para>
-			<sect4>
+			<sect5>
 			<title>Path expression examples</title>
 				<para>The following list shows different ways of addressing an element by path:
 				<itemizedlist>
@@ -461,8 +461,8 @@
 					</listitem>
 				</itemizedlist>
 				</para>
-			</sect4>
-			<sect4>
+			</sect5>
+			<sect5>
 			<title>Path usage example</title>
 			<para>This example shows the usage of path expression in the
 			preprocessing and the main processing part of a transaction function:
@@ -470,9 +470,9 @@
 			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/selectors_example.tdl" parse="text" />
 			</programlisting>
 			</para>
-			</sect4>
-		</sect3>
-		<sect3>
+			</sect5>
+		</sect4>
+		<sect4>
 			<title>Referencing Database Results</title>
 			<para>Database results of the previous instruction are referenced 
 			with a '$RESULT.' followed by the column identifier or column number.
@@ -532,8 +532,8 @@
 			        WHERE id = $id
 			</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Naming database results</title>
 				<para>Database results can be hold and made referenceable by name
 				with the declaration <code>KEEP AS &lt;resultname&gt;</code>
@@ -541,15 +541,15 @@
 				The identifier &lt;resultname&gt; references the
 				result in a variable reference or a FOREACH selector expression.
 				</para>
-				<sect4>
+				<sect5>
 				<title>Named Result Example</title>
 				<para>This example illustrates how a result is declared by name and referenced:
 				<programlisting language='sql'><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_keep_as.tdl" parse="text" />
 				</programlisting>
 				</para>
-				</sect4>
-		</sect3>
-		<sect3>
+				</sect5>
+		</sect4>
+		<sect4>
 			<title>Referencing Subroutine Parameters</title>
 				<para>
 				Subroutine Parameters are addressed like results but with
@@ -560,8 +560,8 @@
 				<programlisting language='sql'><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_soubroutine_params.tdl" parse="text" />
 				</programlisting>
 				</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Constraints on database results</title>
 			<para>Database commands returning results can have constraints to catch
 			certain errors that would not be recognized at all or too late otherwise.
@@ -595,7 +595,7 @@
 				</listitem>
 			</itemizedlist>
 			</para>
-			<sect4>
+			<sect5>
 				<title>Example with result constraints</title>
 				<para>
 				This example illustrates how to add result constraint for
@@ -604,9 +604,9 @@
 				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_result_constraint.tdl" parse="text" />
 				</programlisting>
 				</para>
-			</sect4>
-		</sect3>
-		<sect3>
+			</sect5>
+		</sect4>
+		<sect4>
 			<title>Rewriting error messages for the client</title>
 			<para>Sometimes internal error messages are confusing and are not helpful
 			to the user that does not have a deeper knowledge about the database
@@ -619,7 +619,7 @@
 			<para>We can have many subsequent ON ERROR definitions in a row if the
 			error classes to be caught are various.
 			</para>
-			<sect4>
+			<sect5>
 			<title>Database error HINT example</title>
 			<para>The following example shows the usage HINTs in error cases. It
 			catches errors that are constraint violations (error class CONSTRAINT)
@@ -635,9 +635,9 @@
 			-- Customers must have a unique name.
 			</programlisting>
 			</para>
-			</sect4>
-		</sect3>
-		<sect3>
+			</sect5>
+		</sect4>
+		<sect4>
 			<title>substructures in the result</title>
 			<para>We already learned how to define substructures of the 
 			transaction function result with the <code>RESULT INTO</code>
@@ -656,8 +656,8 @@
 			The nesting of result blocks can be arbitrary and the path of the 
 			elements in the result follows the scope of the sub-blocks.
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Explicit sefinition of elements in the result</title>
 			<para>The result of a transaction consists normally of database command 
 			results that are mapped into the result with the attached INTO directive.
@@ -673,8 +673,8 @@
 			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_print.tdl" parse="text" />
 			</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Database specific code</title>
 			<para>TDL allows the support of different transaction databases with one code base. 
 			For example one for testing and demonstration and one for the productive system.
@@ -691,8 +691,8 @@
 			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_database_global.tdl" parse="text" />
 			</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Subroutine templates</title>
 			<para>To reuse code with different context, for example for doing the same
 			procedure on different tables, subroutine templates can be defined in TDL.
@@ -710,8 +710,8 @@
 			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_subroutine_template.tdl" parse="text" />
 			</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Includes</title>
 			<para>TDL has the possibility to include files for reusing subroutines 
 			or subroutine templates in different modules.
@@ -727,8 +727,8 @@
 			<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_include.tdl" parse="text" />
 			</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Auditing</title>
 			<para>TDL defines hooks to add function calls for auditing transactions. An
 			audit call is a form function call with a structure build from transaction input
@@ -741,19 +741,19 @@
 			audit function calls with a more complex parameter structure.
 			</para>
 
-			<sect4>
+			<sect5>
 				<title>Audit example with function call syntax</title>
 				<programlisting language='sql'>
 				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_audit_call.tdl" parse="text" />
 				</programlisting>
-			</sect4>
-			<sect4>
+			</sect5>
+			<sect5>
 				<title>Audit example with parameter as structure</title>
 				<programlisting language='sql'>
 				<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_audit_with.tdl" parse="text" />
 				</programlisting>
-			</sect4>
-		</sect3>
-	</sect2>
-</sect1>
+			</sect5>
+		</sect4>
+	</sect3>
+</sect2>
 
