@@ -48,7 +48,7 @@
 
 static const std::size_t AES256_KEY_SIZE = 256 / 8;
 static const std::size_t AES256_TEXT_SIZE = 128 / 8;
-static const std::size_t AES256_CIPHER_SIZE = 128 / 8;
+//static const std::size_t AES256_CIPHER_SIZE = 128 / 8;
 
 static bool readValues( std::ifstream& infile, std::map< std::string, std::string >& values )
 {
