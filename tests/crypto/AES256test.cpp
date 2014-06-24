@@ -48,7 +48,7 @@
 
 static const std::size_t AES256_KEY_SIZE = 256 / 8;
 static const std::size_t AES256_TEXT_SIZE = 128 / 8;
-//static const std::size_t AES256_CIPHER_SIZE = 128 / 8;
+static const std::size_t AES256_CIPHER_SIZE = AES256_TEXT_SIZE;
 
 static bool readValues( std::ifstream& infile, std::map< std::string, std::string >& values )
 {
@@ -86,36 +86,18 @@ static bool readValues( std::ifstream& infile, std::map< std::string, std::strin
 	return hasValues;
 }
 
-
-//AES-256.vectors/ECBdecode256.rsp
-//AES-256.vectors/ECBencode256.rsp
-//AES-256.vectors/ECBGFSbox256.rsp
-//AES-256.vectors/ECBKeySbox256.rsp
-//AES-256.vectors/ECBtable256.rsp
-//AES-256.vectors/ECBvarKey256.rsp
-//AES-256.vectors/ECBVarKey256.rsp
-//AES-256.vectors/ECBvarTxt256.rsp
-//AES-256.vectors/ECBVarTxt256.rsp
-
-TEST( AES256, TestVectors )
+static void testVectors( std::ifstream& infile )
 {
-	std::ifstream infile("AES-256.vectors/ECBGFSbox256.rsp");
+	size_t outSize = 2 * AES256_CIPHER_SIZE + 1;
+	char output[ outSize ];
 
 	bool hasValues = true;
+
 	do	{
 		std::map< std::string, std::string > values;
 		hasValues = readValues( infile, values );
-//		for( std::map< std::string, std::string >::const_iterator it = values.begin();
-//									it != values.end(); it++ )	{
-//			std::cout << "Values: ( " << it->first << ", " << it->second << " )" << std::endl;
-//		}
-		if ( hasValues )	{
-			std::cout << "Count    : " << values[ "COUNT" ] << std::endl;
-			std::cout << "Key      : " << values[ "KEY" ] << std::endl;
-			std::cout << "Plain    : " << values[ "PLAINTEXT" ] << std::endl;
-			std::cout << "Encrypted: " << values[ "CIPHERTEXT" ] << std::endl;
-			std::cout << "\n";
 
+		if ( hasValues )	{
 //			unsigned int count = boost::lexical_cast< unsigned int >( values[ "COUNT" ] );
 			unsigned char key[ AES256_KEY_SIZE ];
 			hex2byte( values[ "KEY" ].c_str(), key, AES256_KEY_SIZE );
@@ -126,16 +108,138 @@ TEST( AES256, TestVectors )
 			AES256_init( &ctx, key );
 			AES256_encrypt_ECB( &ctx, text );
 			AES256_done( &ctx );
+			byte2hex( text, AES256_TEXT_SIZE, output, outSize );
+			EXPECT_STRCASEEQ( values[ "CYPHERTEXT" ].c_str(), output );
 
-			char output[65];
-			byte2hex( ctx.enckey, 32, output, 65 );
-			std::cout << "Enckey: " << output << std::endl;
+//			std::cout << "Count    : " << values[ "COUNT" ] << std::endl;
+//			std::cout << "Key      : " << values[ "KEY" ] << std::endl;
+//			std::cout << "Plain    : " << values[ "PLAINTEXT" ] << std::endl;
+//			std::cout << "Expected : " << values[ "CYPHERTEXT" ] << std::endl;
+//			std::cout << "Encrypted: " << output << std::endl;
+//			std::cout << "\n";
 
-			byte2hex( ctx.deckey, 32, output, 65 );
-			std::cout << "Deckey: " << output << std::endl;
+			AES256_init( &ctx, key );
+			AES256_decrypt_ECB( &ctx, text );
+			AES256_done( &ctx );
+			byte2hex( text, AES256_TEXT_SIZE, output, outSize );
+			EXPECT_STRCASEEQ( values[ "PLAINTEXT" ].c_str(), output );
 		}
 	} while ( hasValues );
 }
+
+
+TEST( AES256fixture, ECBGFSbox256 )
+{
+	std::ifstream infile("AES-256.vectors/ECBGFSbox256.rsp");
+	testVectors( infile );
+}
+
+TEST( AES256fixture, DISABLED_ECBencode256 )
+{
+	std::ifstream infile("AES-256.vectors/ECBencode256.rsp");
+	testVectors( infile );
+}
+
+TEST( AES256fixture, DISABLED_ECBdecode256 )
+{
+	std::ifstream infile("AES-256.vectors/ECBdecode256.rsp");
+	testVectors( infile );
+}
+
+TEST( AES256fixture, ECBKeySbox256 )
+{
+	std::ifstream infile("AES-256.vectors/ECBKeySbox256.rsp");
+	testVectors( infile );
+}
+
+TEST( AES256fixture, ECBtable256 )
+{
+	std::ifstream infile("AES-256.vectors/ECBtable256.rsp");
+	testVectors( infile );
+}
+
+TEST( AES256fixture, ECBvarKey256 )
+{
+	std::ifstream infile("AES-256.vectors/ECBvarKey256.rsp");
+
+	size_t outSize = 2 * AES256_CIPHER_SIZE + 1;
+	char output[ outSize ];
+
+	bool hasValues = true;
+	do	{
+		std::map< std::string, std::string > values;
+		hasValues = readValues( infile, values );
+
+		if ( hasValues )	{
+			unsigned char key[ AES256_KEY_SIZE ];
+			hex2byte( values[ "KEY" ].c_str(), key, AES256_KEY_SIZE );
+			unsigned char text[ AES256_TEXT_SIZE ];
+			for ( std::size_t i = 0; i < AES256_TEXT_SIZE; i++ )
+				text[ i ] = 0;
+
+			AES256_context	ctx;
+			AES256_init( &ctx, key );
+			AES256_encrypt_ECB( &ctx, text );
+			AES256_done( &ctx );
+			byte2hex( text, AES256_TEXT_SIZE, output, outSize );
+			EXPECT_STRCASEEQ( values[ "CYPHERTEXT" ].c_str(), output );
+
+			AES256_init( &ctx, key );
+			AES256_decrypt_ECB( &ctx, text );
+			AES256_done( &ctx );
+			byte2hex( text, AES256_TEXT_SIZE, output, outSize );
+			EXPECT_STRCASEEQ( "00000000000000000000000000000000", output );
+		}
+	} while ( hasValues );
+}
+
+TEST( AES256fixture, ECBVarKey256 )
+{
+	std::ifstream infile("AES-256.vectors/ECBVarKey256.rsp");
+	testVectors( infile );
+}
+
+TEST( AES256fixture, ECBvarTxt256 )
+{
+	std::ifstream infile("AES-256.vectors/ECBvarTxt256.rsp");
+	bool hasValues = true;
+
+	size_t outSize = 2 * AES256_CIPHER_SIZE + 1;
+	char output[ outSize ];
+
+	do	{
+		std::map< std::string, std::string > values;
+		hasValues = readValues( infile, values );
+
+		if ( hasValues )	{
+			unsigned char key[ AES256_KEY_SIZE ];
+			for ( std::size_t i = 0; i < AES256_KEY_SIZE; i++ )
+				key[ i ] = 0;
+			unsigned char text[ AES256_TEXT_SIZE ];
+			hex2byte( values[ "PLAINTEXT" ].c_str(), text, AES256_TEXT_SIZE );
+
+			AES256_context	ctx;
+			AES256_init( &ctx, key );
+			AES256_encrypt_ECB( &ctx, text );
+			AES256_done( &ctx );
+			byte2hex( text, AES256_TEXT_SIZE, output, outSize );
+			EXPECT_STRCASEEQ( values[ "CYPHERTEXT" ].c_str(), output );
+
+			AES256_init( &ctx, key );
+			AES256_decrypt_ECB( &ctx, text );
+			AES256_done( &ctx );
+			byte2hex( text, AES256_TEXT_SIZE, output, outSize );
+			EXPECT_STRCASEEQ( values[ "PLAINTEXT" ].c_str(), output );
+		}
+	} while ( hasValues );
+}
+
+TEST( AES256fixture, ECBVarTxt256 )
+{
+	std::ifstream infile("AES-256.vectors/ECBVarTxt256.rsp");
+	testVectors( infile );
+}
+
 
 int main( int argc, char **argv )
 {
