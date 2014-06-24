@@ -1,5 +1,5 @@
 <sect1>
-<title>Defining Command Handlers in Lua</title>
+<title>Defining command handlers in Lua</title>
 	<sect2>
 	<title>Introduction</title>
 	<para>You can write command handlers for the logic tier of Wolframe in Lua.
@@ -194,7 +194,7 @@
 
 
 	<sect2>
-	<title>List of new Lua Objects for the Lua Command Handler</title>
+	<title>List of new Lua objects for the Lua command handler</title>
 	<para>This is a list of all objects and functions that were not yet introduced
 		in the lua program description section:</para>
 		<table frame="all" width="100%">

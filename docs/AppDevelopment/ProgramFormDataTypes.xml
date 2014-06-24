@@ -40,9 +40,9 @@
 	</sect2>
 
 	<sect2>
-	<title>Language Description</title>
+	<title>Language description</title>
 		<sect3>
-		<title>Type Assignments</title>	
+		<title>Type assignments</title>	
 		<para>
 			Each type declaration in a <code>.wnmp</code> file starts with an identifier followed by an assignment 
 			operator '='. The left side identifier specifies the name of the type. 
@@ -58,7 +58,7 @@
 		</para>
 		</sect3>
 		<sect3>
-		<title>Standard Modules for Normalizer</title>	
+		<title>Standard modules for normalizers</title>	
 		<para>
 			There are some standard modules you can use when you define your own type system.
 			They are delivered with <application>Wolframe</application>:

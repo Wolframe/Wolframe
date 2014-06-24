@@ -1,5 +1,5 @@
 <chapter>
-<title>Command Handler</title>
+<title>Command handler</title>
 <para>This chapter introduces the standard command handler of the logic tier.
 </para>
 	&AppCmdhandlerDirectmap;

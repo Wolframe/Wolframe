@@ -1,5 +1,5 @@
 <sect1>
-<title>Form Data Definition Languages</title>
+<title>Form data definition languages</title>
 	<sect2>
 	<title>Introduction</title>
 	<para>
@@ -25,7 +25,7 @@
 	</para>
 	</sect2>
 	<sect2>
-	<title>Forms in Simpleform DDL</title>
+	<title>Forms in simpleform DDL</title>
 	<para>
 		As example of a form <acronym>DDL</acronym> we provide the <glossterm>simpleform</glossterm> <acronym>DDL</acronym>. 
 		In simple form we forms, subtructures for reuse inside structures and forms

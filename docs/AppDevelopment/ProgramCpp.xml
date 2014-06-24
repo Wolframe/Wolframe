@@ -1,5 +1,5 @@
 <sect1>
-<title>Functions in Native C++</title>
+<title>Functions in native C++</title>
 	<sect2>
 		<title>Introduction</title>
 		<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>C++</application>. 
@@ -17,7 +17,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Declaring Functions</title>
+	<title>Declaring functions</title>
 	<para>
 		Form functions declared in <application>C++</application> have two arguments. The output structure to fill
 		is passed by reference as first and the input structure passed is by value.
@@ -59,7 +59,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Input/Output Data Structures</title>
+	<title>Input/output data structures</title>
 	<para>For defining input and output parameter structures in <application>C++</application> you have to define the 
 		structure and its serialization description. The serialization description is a static 
 		function <code>getStructDescription</code> without arguments returning a const structure that describes 
@@ -69,7 +69,7 @@
 		The following example shows a form function parameter structure defined in <application>C++</application>.
 	</para>
 		<sect3>
-		<title>Header File</title>
+		<title>Header file</title>
 		<para>Declares the structure and the serialization description of the structure.
 		Structures may contain structures with their own serialization description.</para>
 		<programlisting language='C++'>
@@ -78,7 +78,7 @@
 		</sect3>
 
 		<sect3>
-		<title>Source File</title>
+		<title>Source file</title>
 		<para>Declares 'ID' as attribute and name, canonical_Name, country, locality as tags. 
 		The '--' operator marks the end of attributes section and the start of content 
 		section.</para>
@@ -89,14 +89,14 @@
 	</sect2>
 
 	<sect2>
-	<title>Writing the Module</title>
+	<title>Writing the module</title>
 	<para>Now we have all pieces together to build a loadable
 	<application>Wolframe</application> module with our example <application>C++</application>
 	function. The following example shows what you have to
 	declare in the main module source file.
 	</para>
 		<sect3>
-		<title>Module Declaration</title>
+		<title>Module declaration</title>
 		<para>The module declaration needs to include <code>appdevel.hpp</code> and
 		of course all headers with the function and data structure declarations needed.
 		The module starts with the header macro CPP_APPLICATION_FORM_FUNCTION_MODULE
@@ -124,7 +124,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Building the Module</title>
+	<title>Building the module</title>
 	<para>For building the module we have to include all modules introduced here and
 	to link at against the wolframe serialization library (wolframe_serialize)
 	and the wolframe core library (wolframe).
@@ -132,7 +132,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Using the Module</title>
+	<title>Using the module</title>
 	<para>The module built can be loaded as the other modules by declaring it in the wolframe
 	LoadModules section of the configuration. Simply list it there with 
 	<code>module &lt;yourModuleName&gt;</code> with &lt;yourModuleName&gt; being the name
@@ -141,7 +141,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Validation Issues</title>
+	<title>Validation issues</title>
 	<para>
 	<application>C++</application> is a strongly typed language. This means that the
 	input of a function and the output is already validated to be of a strictly

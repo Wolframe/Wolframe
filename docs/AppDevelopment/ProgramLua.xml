@@ -25,7 +25,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Declaring Functions</title>
+	<title>Declaring functions</title>
 	<para>For <application>Lua</application> we do not have to declare anything in addition to the 
 		<application>Lua</application> script. If you configure a <application>Lua</application>
 		script as program, all global functions declared in this script are declared as global form
@@ -35,7 +35,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Wolframe Provider Library</title>
+	<title>Wolframe provider library</title>
 	<para><application>Wolframe</application> lets you access objects of the global context through
 		a library called <code>provider</code> offering the following functions:
 
@@ -79,7 +79,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Using Atomic Data Types</title>
+	<title>Using atomic data types</title>
 	<para><application>Wolframe</application> lets us extend the type system consisting 
 		of Lua basic data types with our own. We can create atomic data types 
 		defined in a module or in a DDL datatype definition program (.wnmp file).
@@ -106,27 +106,27 @@
 			</thead>
 			<tbody>
 				<row>
-					<entry>Custom Data Type</entry>
+					<entry>Custom data type</entry>
 					<entry>Custom Type Parameters</entry>
 					<entry>A custom data type defined in a module with arithmetic operators and methods</entry>
 				</row>
 				<row>
-					<entry>Normalization Function</entry>
-					<entry>Initializer Arguments</entry>
+					<entry>Normalization function</entry>
+					<entry>Dimension parameters</entry>
 					<entry>A type defined as normalization function in a module</entry>
 				</row>
 				<row>
-					<entry>DDL Data Type</entry>
+					<entry>DDL data type</entry>
 					<entry>(no arguments)</entry>
 					<entry>A normalizer defined as sequence of normalization functions in a .wnmp source file</entry>
 				</row>
 				<row>
-					<entry>Data Type 'bignumber'</entry>
+					<entry>Data type 'bignumber'</entry>
 					<entry>(no arguments)</entry>
 					<entry>Arbitrary precision number type</entry>
 				</row>
 				<row>
-					<entry>Data Type 'datetime'</entry>
+					<entry>Data fype 'datetime'</entry>
 					<entry>(no arguments)</entry>
 					<entry>Data type representing date and time down to a granularity of microseconds</entry>
 				</row>
@@ -136,7 +136,7 @@
 		</para>
 
 		<sect3>
-		<title>Data Type 'datetime'</title>
+		<title>Data type 'datetime'</title>
 		<para>
 			The data type 'datetime' is used as interface for date time values.
 			<table frame="all" width="100%">
@@ -230,7 +230,7 @@
 				<tgroup cols="3">
 				<thead>
 				<row>
-					<entry>Method Name</entry>
+					<entry>Method name</entry>
 					<entry>Arguments</entry>
 					<entry>Description</entry>
 				</row>
@@ -279,7 +279,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Filter Interface Iterators</title>
+	<title>Filter interface iterators</title>
 	<para>Lua provides an interface to the iterators internally used to couple 
 		objects and functions. They are accessible as iterator function closure
 		in <application>Lua</application>. 
@@ -293,7 +293,7 @@
 		with the following meaning:
 	</para>
 	<table frame="all" width="100%">
-		<title>Filter Interface Iterator Elements</title>
+		<title>Filter interface iterator elements</title>
 		<tgroup cols="3">
 		<thead>
 			<row>
@@ -330,7 +330,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Iterator Library</title>
+	<title>Iterator library</title>
 	<para><application>Wolframe</application> lets you access filter interface
 		iterators through a library called <code>iterator</code> 
 		offering the following functions:
@@ -357,7 +357,7 @@
 		</table>
 	</para>
 	<para>
-		(*) See section "Serialization Iterator"
+		(*) See section "serialization iterator"
 	</para>
 	<para>
 		(**) If iterator.scope is called, all elements of the returned iterator has to be visited in order to continue 
@@ -366,7 +366,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Global Objects</title>
+	<title>Global objects</title>
 	<para>Besides the provider library <application>Wolframe</application> defines the following objects global in the script execution context:
 		<simplelist type="horiz" columns="2">
 		<member>Name</member><member>Description</member>
@@ -376,7 +376,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Using Forms</title>
+	<title>Using forms</title>
 	<para>The provider function <code>provider.form( )</code> with the name of the form as string as 
 		parameter returns an empty instance of a form. It takes the name of 
 		the form as string argument. If you for example have a form configured 
@@ -418,7 +418,7 @@
 		</para>
 	</sect2>
 	<sect2>
-	<title>Form Functions</title>
+	<title>Form functions</title>
 	<para>
 		For calling transactions or built-in functions loaded as modules the <application>Lua</application> layer defines the
 		concept of functions. The provider function <code>provider.formfunction</code> with the name of the function
@@ -444,7 +444,7 @@
 	</sect2>
 	
 	<sect2>
-	<title>List of <application>Lua</application> Objects</title>
+	<title>List of <application>Lua</application> objects</title>
 	<para>This is a list of all objects and functions declared by <application>Wolframe</application>:</para>
 
 		<table frame="all" width="100%">

@@ -12,7 +12,7 @@
 	</sect2>
 	
 	<sect2>
-	<title>Character Set Encodings</title>
+	<title>Character set encodings</title>
 	<para>The <application>libxml2</application> and the <application>textwolf</application> filter support at least 
 	the following character set encodings. For character set encodings that are not in the list, 
 	please ask the <application>Wolframe</application> team.

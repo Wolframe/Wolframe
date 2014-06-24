@@ -1,5 +1,5 @@
 <chapter>
-<title>Testing and Defect Handling</title>
+<title>Testing and defect handling</title>
 <para>In this chapter we learn how parts of a <application>Wolframe</application>
 application can be verified to work correctly. The basis for testing and debugging
 a <application>Wolframe</application> application is the command line tool 
@@ -47,7 +47,7 @@ Processor
 		</para>
 	</sect2>
 	<sect2>
-		<title>Testing a Filter</title>
+		<title>Testing a filter</title>
 		<para>The following example shows the mapping through a libxml2 filter.
 		Filters are tested by passing a dash '-' command to execute.
 		Because we do not need to load programs, we can call wolfilter without

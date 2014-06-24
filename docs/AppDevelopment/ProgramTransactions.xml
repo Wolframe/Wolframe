@@ -72,7 +72,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Language Description</title>
+	<title>Language description</title>
 		<para>
 		A TDL program consists of subroutine declarations and exported
 		transaction function declarations. Subroutines have the same
@@ -129,7 +129,7 @@
 		</sect3>
 
 		<sect3>
-			<title>Transaction Function Declarations</title>
+			<title>Transaction function declarations</title>
 			<para>A transaction function declaration starts with the Keyword <code>TRANSACTION</code>
 			followed by the name of the transaction function. This name identifies the
 			function globally. The body of the function contains the following parts:
@@ -248,7 +248,7 @@
 			</para>
 		</sect3>
 		<sect3>
-			<title>Main Processing Instructions</title>
+			<title>Main processing instructions</title>
 			<para>Main processing instructions defined in the main execution block 
 			of a subroutine or transaction function consist of three parts in the
 			following order terminated by a semicolon ';' (the order of the 
@@ -326,7 +326,7 @@
 			</itemizedlist>
 			</para>
 			<sect4>
-				<title>Main Processing Example</title>
+				<title>Main processing example</title>
 				<para>The following example illustrate how the FOREACH,INTO,DO
 				expressions in the main processing block work together:
 				<programlisting language='sql'>
@@ -336,7 +336,7 @@
 			</sect4>
 		</sect3>
 		<sect3>
-		<title>Preprocessing Instructions</title>
+		<title>Preprocessing instructions</title>
 		<para>Preprocessing instructions defined in the PREPROC execution block 
 			of a transaction function consist similar to the instructions
 			in the main execution block of three parts in the
@@ -374,7 +374,7 @@
 		</itemizedlist>
 		</para>
 			<sect4>
-				<title>Preprocessing Example</title>
+				<title>Preprocessing example</title>
 				<para>The following example illustrate how the "FOREACH, INTO, DO"
 				expressions in the main processing block work together:
 				<programlisting language='sql'>
@@ -384,7 +384,7 @@
 			</sect4>
 		</sect3>
 		<sect3>
-		<title>Selector Path</title>
+		<title>Selector path</title>
 		<para>An element of the input or a set of input elements can be selected by a path.
 			A path is a sequence of one of the following elements separated by slashes:
 			<itemizedlist>
@@ -395,7 +395,7 @@
 				</listitem>
 				<listitem><programlisting>*</programlisting>
 				<para>
-				An asterisk selects any sub element of the current position in the tree.
+				Anp asterisk selects any sub element of the current position in the tree.
 				</para>
 				</listitem>
 				<listitem><programlisting>..</programlisting>
@@ -432,7 +432,7 @@
 			identify substitution entities.
 		</para>
 			<sect4>
-			<title>Path Expression Examples</title>
+			<title>Path expression examples</title>
 				<para>The following list shows different ways of addressing an element by path:
 				<itemizedlist>
 					<listitem><programlisting>/</programlisting>
@@ -463,7 +463,7 @@
 				</para>
 			</sect4>
 			<sect4>
-			<title>Path Usage Example</title>
+			<title>Path usage example</title>
 			<para>This example shows the usage of path expression in the
 			preprocessing and the main processing part of a transaction function:
 			<programlisting language='sql'>
@@ -534,7 +534,7 @@
 			</para>
 		</sect3>
 		<sect3>
-			<title>Naming Database Results</title>
+			<title>Naming database results</title>
 				<para>Database results can be hold and made referenceable by name
 				with the declaration <code>KEEP AS &lt;resultname&gt;</code>
 				following immediately the instruction with the result to be referenced.
@@ -562,7 +562,7 @@
 				</para>
 		</sect3>
 		<sect3>
-			<title>Constraints on Database Results</title>
+			<title>Constraints on database results</title>
 			<para>Database commands returning results can have constraints to catch
 			certain errors that would not be recognized at all or too late otherwise.
 			For example a transaction having a result of a previous command as argument
@@ -596,7 +596,7 @@
 			</itemizedlist>
 			</para>
 			<sect4>
-				<title>Example with Result Constraints</title>
+				<title>Example with result constraints</title>
 				<para>
 				This example illustrates how to add result constraint for
 				database commands returning results:
@@ -607,7 +607,7 @@
 			</sect4>
 		</sect3>
 		<sect3>
-			<title>Rewriting Error Messages for the Client</title>
+			<title>Rewriting error messages for the client</title>
 			<para>Sometimes internal error messages are confusing and are not helpful
 			to the user that does not have a deeper knowledge about the database
 			internals. For a set of error types it is possible to add a message
@@ -620,7 +620,7 @@
 			error classes to be caught are various.
 			</para>
 			<sect4>
-			<title>Database Error HINT Example</title>
+			<title>Database error HINT example</title>
 			<para>The following example shows the usage HINTs in error cases. It
 			catches errors that are constraint violations (error class CONSTRAINT)
 			and extends the error message with a hint that will be shown to the client as error message:
@@ -638,7 +638,7 @@
 			</sect4>
 		</sect3>
 		<sect3>
-			<title>Substructures in the Result</title>
+			<title>substructures in the result</title>
 			<para>We already learned how to define substructures of the 
 			transaction function result with the <code>RESULT INTO</code>
 			directive of a TRANSACTION. 
@@ -658,7 +658,7 @@
 			</para>
 		</sect3>
 		<sect3>
-			<title>Explicit Definition of Elements in the Result</title>
+			<title>Explicit sefinition of elements in the result</title>
 			<para>The result of a transaction consists normally of database command 
 			results that are mapped into the result with the attached INTO directive.
 			For printing variable values or constant values you can in certain
@@ -675,7 +675,7 @@
 			</para>
 		</sect3>
 		<sect3>
-			<title>Database Specific Code</title>
+			<title>Database specific code</title>
 			<para>TDL allows the support of different transaction databases with one code base. 
 			For example one for testing and demonstration and one for the productive system.
 			We can tag transactions,subroutines or whole TDL sources as beeing valid for one or a list of databases
@@ -693,7 +693,7 @@
 			</para>
 		</sect3>
 		<sect3>
-			<title>Subroutine Templates</title>
+			<title>Subroutine templates</title>
 			<para>To reuse code with different context, for example for doing the same
 			procedure on different tables, subroutine templates can be defined in TDL.
 			Subroutine templates become useful when we want to make items instantiable

@@ -1,5 +1,5 @@
 <sect1>
-<title>JSON Filter</title>
+<title>JSON filter</title>
 	<sect2>
 	<title>Introduction</title>
 	<para>You can use <application>JSON</application> for data filters in the logic tier of <application>Wolframe</application>.
@@ -9,7 +9,7 @@
 	</sect2>
 	
 	<sect2>
-	<title>Character Set Encodings</title>
+	<title>Character set encodings</title>
 	<para>Without explicitly specified, the <application>cjson</application> filter support the following character set 
 	encodings. For character set encodings that are not in the list, please ask the <application>Wolframe</application> team.
 	<itemizedlist>
