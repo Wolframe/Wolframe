@@ -301,7 +301,7 @@
 		daemon process. We use the <command>wolfilter</command> program for that in the
 		following way:
 		<programlisting language='shell'>
-	cat ~/tutorial/client/CustomerListRequest.xml | wolfilter -c tutorial.conf CustomerListRequest
+	cat ~/tutorial/client/CustomerListRequest.xml | wolfilter -c ~/tutorial/server/tutorial.conf CustomerListRequest
 		</programlisting>
 	</para>
 	
