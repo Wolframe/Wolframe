@@ -63,8 +63,10 @@ local_uninstall:
 LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton/:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/clients/lib"
 
 local_test:
+ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testWolframec
+endif
 endif
 
 run:
