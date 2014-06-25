@@ -3,10 +3,25 @@
 	<para>The aspect of authorization is configured in the 
 	subsection <code>Authorization</code> of the <code>AAAA</code> section
 	in the server configuration.
-	The following example shows the default <code>Authorization</code>
-	configuration with the setting to allow access to anybody authenticated
-	that is not explicitely denied:
-	<programlisting language='text'>
+	Authorization in Wolframe has two levels. The first level is authorization
+	based on connection info, e.g. is a client allowed/denied to connect
+	from a certain ip range. Connection info based authorization happens on
+	connect to the server. The second level is command execution authorization
+	that happens on execution of a function or on access of some resources 
+	based on authentication info and connection info.
+	</para>
+	<sect2>
+		<title>Authorization based on connection info</title>
+		<sect3>
+		<title>Development status</title>
+		<para>The authorization based on connection info is not
+		implemented yet. Authorization based on connection info
+		will be a subject of the next release.
+		The only working configuration is the
+		default <code>Authorization</code> configuration with 
+		the setting to allow access to anybody authenticated 
+		that is not explicitely denied:
+		<programlisting language='text'>
 AAAA
 {
     Authorization
@@ -16,7 +31,22 @@ AAAA
         }
     }
 }
-	</programlisting>
-	</para>
+		</programlisting>
+		</para>
+		</sect3>
+	</sect2>
+	<sect2>
+	<title>Command execution authorization</title>
+		<sect3>
+		<title>Development status</title>
+		<para>The command execution authorization is implemented as
+		call of a function of the global context. The function has
+		access to the user and connection data. Unfortunately there
+		is no support implemented yet to configure an authentication
+		schema. But authorization based on command execution
+		will be a subject of the next release.
+		</para>
+		</sect3>
+	</sect2>
 </sect1>
 

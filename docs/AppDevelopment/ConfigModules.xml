@@ -1,0 +1,45 @@
+<sect1>
+	<title>Modules</title>
+	<para>
+	The configuration of modules loaded by the server for processing
+	are defined in the <code>LoadModules</code> section.
+	The following table describes the settings in the modules:
+	<table frame="all" width="100%">
+		<title>LoadModules configuration settings</title>
+		<tgroup cols="3">
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Arguments</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+
+		<tbody>
+			<row>
+				<entry>Directory</entry>
+				<entry>path</entry>
+				<entry>Path to use as base path for relative module paths specified with 'Module'. If specified as relative path, it is relative to the directory containing the main configuration file.</entry>
+			</row>
+			<row>
+				<entry>Module</entry>
+				<entry>path</entry>
+				<entry>Define a module to load by path. If the setting 'directory' was not specified then the path is relative to the library directory of wolframe (subdirectory 'wolframe' of the user library directory)</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	Example configuration:
+	<programlisting language='text'>
+LoadModules
+{
+    Directory /usr/lib/wolframe
+    Module mod_db_postgresql
+    Module mod_auth_textfile
+    Module mod_filter_libxml2
+}
+	</programlisting>
+	</para>
+</sect1>
+
+

@@ -21,7 +21,7 @@ AAAA
 	</programlisting>
 	</para>
 	<sect2>
-		<title>Authentication Mechs</title>
+		<title>Authentication mechs</title>
 		<para>Currently only the authentication protocol for
 		<code>WOLFRAME-CRAM</code> is implemented. You configure
 		it as shown in the example above.

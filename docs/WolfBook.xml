@@ -52,6 +52,7 @@
 
 		&AppPreface;
 		&AppIntroduction;
+		&AppServerConfiguration;
 		&AppAAAA;
 		&AppDataProcessing;
 		&AppGlossary;

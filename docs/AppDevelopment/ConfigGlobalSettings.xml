@@ -1,0 +1,37 @@
+<sect1>
+	<title>Global Settings</title>
+	<para>
+	The following table describes the global settings you can configure:
+	<table frame="all" width="100%">
+		<title>Global Settings</title>
+		<tgroup cols="3">
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Arguments</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+
+		<tbody>
+			<row>
+				<entry>ServerTokens</entry>
+				<entry>One of ProductOnly, Major, Minor, Revision, OS, None</entry>
+				<entry>Define what to print in the initial greeting of the protocol (first message of the server)</entry>
+			</row>
+			<row>
+				<entry>ServerSignature</entry>
+				<entry>string</entry>
+				<entry>Define the string to be printed in the initial greeting of the protocol (first message of the server)</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	Example configuration:
+	<programlisting language='text'>
+ServerTokens OS
+ServerSignature "Wolframe"
+	</programlisting>
+	</para>
+</sect1>
+
