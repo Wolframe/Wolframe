@@ -191,7 +191,6 @@ usr/pkg/include/wolframe/utils/typeSignature.hpp
 usr/pkg/include/wolframe/serialize/mapContext.hpp
 usr/pkg/include/wolframe/serialize/structOptionParser.hpp
 usr/pkg/include/wolframe/serialize/tostringUtils.hpp
-usr/pkg/include/wolframe/serialize/serializationErrorException.hpp
 usr/pkg/include/wolframe/serialize/cppFormFunction.hpp
 usr/pkg/include/wolframe/serialize/ddlFormParser.hpp
 usr/pkg/include/wolframe/serialize/ddlFormSerializer.hpp
@@ -273,6 +272,8 @@ usr/pkg/include/wolframe/AAAA/CRAM.hpp
 usr/pkg/include/wolframe/AAAA/audit.hpp
 usr/pkg/include/wolframe/AAAA/authorization.hpp
 usr/pkg/include/wolframe/AAAA/passwordHash.hpp
+usr/pkg/include/wolframe/AAAA/passwordChanger.hpp
+usr/pkg/include/wolframe/AAAA/pwdChangerSlice.hpp
 usr/pkg/include/wolframe/AAAA/user.hpp
 @dirrm usr/pkg/include/wolframe/AAAA
 usr/pkg/include/wolframe/module/constructor.hpp

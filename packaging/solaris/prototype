@@ -204,7 +204,6 @@ f none opt/csw/include/wolframe/serialize/ddlFormParser.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/ddlFormSerializer.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/flags.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/mapContext.hpp 0644 root staff
-f none opt/csw/include/wolframe/serialize/serializationErrorException.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/structOptionParser.hpp 0644 root staff
 f none opt/csw/include/wolframe/serialize/tostringUtils.hpp 0644 root staff
 d none opt/csw/include/wolframe/serialize/struct 0755 root root
@@ -282,6 +281,8 @@ f none opt/csw/include/wolframe/AAAA/CRAM.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/audit.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/authorization.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/passwordHash.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/passwordChanger.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/pwdChangerSlice.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/user.hpp 0644 root staff
 d none opt/csw/include/wolframe/module 0755 root root
 f none opt/csw/include/wolframe/module/constructor.hpp 0644 root staff
