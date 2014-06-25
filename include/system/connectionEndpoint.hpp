@@ -89,8 +89,8 @@ private:
 class LocalEndpoint : public ConnectionEndpoint
 {
 public:
-	LocalEndpoint( const std::string& Host, unsigned short Port )
-		: ConnectionEndpoint( Host, Port )
+	LocalEndpoint( const std::string& Host, unsigned short Port, const char* socketIdentifier_=0)
+		: ConnectionEndpoint( Host, Port ), m_socketIdentifier(socketIdentifier_)
 	{
 		m_creationTime = time( NULL );
 	}
@@ -98,17 +98,19 @@ public:
 	virtual ConnectionType type() const = 0;
 	EndPoint endpoint() const			{ return LOCAL_ENDPOINT; }
 	time_t creationTime() const			{ return m_creationTime; }
+	const char* socketIdentifier() const		{ return m_socketIdentifier; }
 
 private:
-	time_t	m_creationTime;
+	const char* m_socketIdentifier;			///< reference to name in configuration (listen.socket.identifier)
+	time_t	m_creationTime;				///< time when object has been constructed
 };
 
 /// local unencrypted endpoint
 class LocalTCPendpoint : public LocalEndpoint
 {
 public:
-	LocalTCPendpoint( const std::string& Host, unsigned short Port )
-		: LocalEndpoint( Host, Port )		{}
+	LocalTCPendpoint( const std::string& Host, unsigned short Port, const char* socketIdentifier_=0)
+		: LocalEndpoint( Host, Port, socketIdentifier_)		{}
 
 	ConnectionType type() const			{ return TCP; }
 };
@@ -118,8 +120,8 @@ public:
 class LocalSSLendpoint : public LocalEndpoint
 {
 public:
-	LocalSSLendpoint( const std::string& Host, unsigned short Port )
-		: LocalEndpoint( Host, Port )		{}
+	LocalSSLendpoint( const std::string& Host, unsigned short Port, const char* socketIdentifier_=0)
+		: LocalEndpoint( Host, Port, socketIdentifier_)		{}
 
 	ConnectionType type() const			{ return SSL; }
 };

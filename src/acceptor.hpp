@@ -60,6 +60,7 @@ public:
 	/// Constructor
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, unsigned short port, unsigned maxConnections,
+			   const std::string& socketIdentifier_,
 			   GlobalConnectionList& globalList,
 			   _Wolframe::ServerHandler& srvHandler );
 
@@ -84,7 +85,8 @@ private:
 	connection_ptr				m_newConnection;///< The next connection to be accepted.
 	SocketConnectionList< connection_ptr >	m_connList;	///< List of active connections
 
-	std::string				m_identifier;
+	std::string				m_identifier;	///< ip:port
+	std::string				m_socketIdentifier;	///< identifier in configuration
 
 	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.
 };
@@ -102,6 +104,7 @@ public:
 			      const std::string& certFile, const std::string& keyFile,
 			      bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			      const std::string& host, unsigned short port, unsigned maxConnections,
+			      const std::string& socketIdentifier_,
 			      GlobalConnectionList& globalList,
 			      _Wolframe::ServerHandler& srvHandler );
 
@@ -130,7 +133,8 @@ private:
 	SSLconnection_ptr			m_newConnection;///< The next connection to be accepted.
 	SocketConnectionList< SSLconnection_ptr > m_connList;	///< List of active connections
 
-	std::string				m_identifier;
+	std::string				m_identifier;	///< ip:port
+	std::string				m_socketIdentifier;	///< identifier in configuration
 
 	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.
 };

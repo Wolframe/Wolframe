@@ -79,11 +79,17 @@ static MainSTM mainstm;
 
 MainCommandHandler::MainCommandHandler()
 	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>(&mainstm)
-	,m_remoteEndpoint(0){}
+	,m_remoteEndpoint(0)
+	,m_localEndpoint(0){}
 
 void MainCommandHandler::setPeer( const net::RemoteEndpoint& remote)
 {
 	m_remoteEndpoint = &remote;
+}
+
+void MainCommandHandler::setLocalEndPoint( const net::LocalEndpoint& local)
+{
+	m_localEndpoint = &local;
 }
 
 int MainCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
@@ -166,6 +172,7 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 		{
 			out << "OK authenticated" << endl();
 			execContext()->setUser( usr);
+			execContext()->setSocketIdentifier( m_localEndpoint->socketIdentifier());
 			return MainSTM::Authenticated;
 		}
 		else

@@ -51,10 +51,12 @@ class MainCommandHandler
 {
 public:
 	typedef cmdbind::LineCommandHandlerTemplate<MainCommandHandler> Parent;
+
 	MainCommandHandler();
 	virtual ~MainCommandHandler(){}
 
 	void setPeer( const net::RemoteEndpoint& remote);
+	void setLocalEndPoint( const net::LocalEndpoint& local);
 
 public:
 	int doAuth( int argc, const char** argv, std::ostream& out);
@@ -80,6 +82,7 @@ private:
 private:
 	boost::shared_ptr<AAAA::Authenticator> m_authenticator;
 	const net::RemoteEndpoint* m_remoteEndpoint;
+	const net::LocalEndpoint* m_localEndpoint;
 	std::string m_command;
 	std::string m_commandtag;
 };

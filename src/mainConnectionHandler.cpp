@@ -141,6 +141,7 @@ Connection::Connection( const net::LocalEndpoint& local)
 {
 	m_cmdhandler.setInputBuffer( m_input.ptr(), m_input.size());
 	m_cmdhandler.setOutputBuffer( m_output.ptr(), m_output.size());
+	m_cmdhandler.setLocalEndPoint( local);
 	LOG_TRACE << "Created connection handler for " << local.toString();
 }
 

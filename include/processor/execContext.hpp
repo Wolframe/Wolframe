@@ -51,10 +51,10 @@ class ExecContext
 public:
 	/// \brief Default Constructor
 	ExecContext()
-		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0){}
+		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0),m_socket_identifier(0){}
 	/// \brief Constructor
 	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a)
-		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0){}
+		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0),m_socket_identifier(0){}
 
 	/// \brief Get the processor provider interface
 	const ProcessorProviderInterface* provider() const	{return m_provider;}
@@ -74,6 +74,11 @@ public:
 	/// \brief Set the default timeout for read operations in seconds (0=forever)
 	void setDefaultTimeout( unsigned int timeout_sec_)	{m_default_timeout = timeout_sec_;}
 
+	/// \brief Get the socket identifier for authorization checks
+	const char* socketIdentifier() const			{return m_socket_identifier;}
+	/// \brief Set the socket identifier for authorization checks
+	void setSocketIdentifier( const char* socket_identifier_){m_socket_identifier = socket_identifier_;}
+
 	/// \brief Get an authenticator
 	AAAA::Authenticator* authenticator( const net::RemoteEndpoint& client ) const
 								{return m_aaaaProvider?m_aaaaProvider->authenticator( client ):0;}
@@ -91,6 +96,7 @@ private:
 	const AAAA::Authorizer* m_authorizer;			///< instance to query for execution permission based on login data
 	const AAAA::AAAAprovider* m_aaaaProvider;		///< instance to query for an authenticator
 	unsigned int m_default_timeout;				///< default timeout
+	const char* m_socket_identifier;			///< configured "identifier" in socket configuration
 };
 
 }} //namespace
