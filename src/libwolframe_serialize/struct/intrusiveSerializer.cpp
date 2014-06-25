@@ -34,7 +34,7 @@ Project Wolframe.
 #include "serialize/struct/intrusiveSerializer.hpp"
 #include "serialize/struct/structSerializer.hpp"
 #include "serialize/struct/printValue.hpp"
-#include "serialize/serializationErrorException.hpp"
+#include "serializationErrorException.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;

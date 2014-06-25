@@ -32,13 +32,13 @@ Project Wolframe.
 ///\file ddl/ddlStructSerializer.cpp
 
 #include "serialize/ddl/ddlStructSerializer.hpp"
-#include "serialize/serializationErrorException.hpp"
 #include "filter/typedfilter.hpp"
 #include "types/variant.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
-#include "logger-v1.hpp"
 #include "utils/printFormats.hpp"
+#include "serializationErrorException.hpp"
+#include "logger-v1.hpp"
 #include <cstring>
 #include <sstream>
 

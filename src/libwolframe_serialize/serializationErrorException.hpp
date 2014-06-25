@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file serialize/serializationErrorException.hpp
+/// \file serializationErrorException.hpp
 /// \brief Defines the error exception of serialization/deserialization
 
 #ifndef _Wolframe_SERIALIZE_ERROR_EXCEPTION_HPP_INCLUDED

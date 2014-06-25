@@ -32,13 +32,13 @@ Project Wolframe.
 ///\file ddl/structParser.cpp
 
 #include "serialize/ddl/ddlStructParser.hpp"
-#include "serialize/serializationErrorException.hpp"
 #include "filter/typedfilter.hpp"
 #include "types/bignumber.hpp"
 #include "types/datetime.hpp"
 #include "types/customDataType.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
+#include "serializationErrorException.hpp"
 #include "logger-v1.hpp"
 #include "utils/printFormats.hpp"
 #include <cstring>

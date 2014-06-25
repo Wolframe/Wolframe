@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Implements serialization
 #include "serialize/struct/structSerializer.hpp"
 #include "serialize/struct/serializeStack.hpp"
-#include "serialize/serializationErrorException.hpp"
+#include "serializationErrorException.hpp"
 #include "filter/typingfilter.hpp"
 #include "utils/printFormats.hpp"
 #include <cstring>

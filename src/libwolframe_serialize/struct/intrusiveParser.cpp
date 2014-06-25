@@ -35,7 +35,7 @@ Project Wolframe.
 #include "serialize/struct/structParser.hpp"
 #include "serialize/struct/parseStack.hpp"
 #include "serialize/struct/parseValue.hpp"
-#include "serialize/serializationErrorException.hpp"
+#include "serializationErrorException.hpp"
 #include "logger-v1.hpp"
 #include "utils/printFormats.hpp"
 

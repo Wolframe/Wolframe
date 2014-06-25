@@ -66,7 +66,7 @@ public:
 	const StructDescriptionBase* descr() const				{return m_descr;}
 
 	/// \brief Call of one processing step the parser
-	/// \remark The processing is finished when the call returns true. In case of false returned you have to inspect the input filter state to determine what is to do next. In case of a validation error, the function throws a SerializationErrorException
+	/// \remark The processing is finished when the call returns true. In case of false returned you have to inspect the input filter state to determine what is to do next. In case of a validation error, the function throws a std::runtime_error
 	bool call();
 
 private:
