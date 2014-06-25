@@ -21,25 +21,8 @@ if { [catch {
 	expect 	{
 		timeout	{ return "--> oops. timeout occured waiting for server banner\n" }
 		eof	{ return "--> EOF waiting for server banner: that's bad\n" }
-		"GogoServer Wolframe version 0.0.5 OS\r" { }
-		"OK\r"	{ send_user " --> Connected.\n" }
+		"state 'authorized'\r"	{ send_user " --> Connected.\n" }
 	}
-
-	set message "1 short line"
-	send "$message\r"
-	expect "$message"
-
-	set message "2nd short line with üèöéäà°§"
-	send "$message\r"
-	expect "$message"
-
-	set timeout 1
-	send "quit\r"
-	expect "Bye.\r"
-#	expect 	{
-#		timeout	{ send_user " --> oops. timeout occured\n"; return 1 }
-#		eof	{ send_user " --> Connection closed. OK\n" }
-#	}
 } reason] } {
 	send_user "Error: $reason\n"
 	exit 1

@@ -35,7 +35,7 @@ if { [catch {
 	sleep 0.5
 
 	send "quit\r"
-	expect "Bye\r"
+	expect "BYE\r"
 	expect 	{
 		timeout	{ send_user " --> oops. timeout occured\n"; return 1 }
 		eof	{ send_user " --> Connection closed. OK\n" }

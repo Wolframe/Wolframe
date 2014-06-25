@@ -1,7 +1,7 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
 # Maintainer: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe-git
-pkgver=20130621
+pkgver=release_0.0.2.r55.gcea7f58
 pkgrel=1
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
@@ -12,19 +12,26 @@ depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl'
          'python')
 makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 checkdepends=('expect' 'inetutils' 'diffutils')
+conflicts=('wolframe')
+provides=('wolframe')
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(
+  'git://github.com/Wolframe/Wolframe.git'
   'wolframe.conf'
   'wolframed.service'
 )
-md5sums=('faa0c7a37d5d6156fe3d8e9f16093a06'
+md5sums=('SKIP'
+         'faa0c7a37d5d6156fe3d8e9f16093a06'
          'cc146a28908aad55f156860340934095')
-_gitroot=git://github.com/mbarbos/Wolframe.git
-_gitname=Wolframe
+
+pkgver() {
+   cd ${srcdir}/Wolframe
+   git describe --long --tags | sed -r 's/([^-]*-g)/r\1/;s/-/./g'
+}
 
 package() {
-  cd ${srcdir}/$_gitname-build
+  cd ${srcdir}/Wolframe
 
   msg "Installing.."
   make \
@@ -46,7 +53,7 @@ package() {
 }
 
 check() {
-  cd ${srcdir}/$_gitname-build
+  cd ${srcdir}/Wolframe
 
   msg "Testing..."
   make test \
@@ -61,18 +68,8 @@ check() {
 }
 
 build() {
-  cd ${srcdir}
+  cd ${srcdir}/Wolframe
   
-  msg "Getting source from git..."
-  if [ -d ${srcdir}/$_gitname ] ; then
-    cd $_gitname && git pull origin
-  else
-    git clone $_gitroot
-  fi
-
-  cp -r ${srcdir}/$_gitname ${srcdir}/$_gitname-build
-  cd ${srcdir}/$_gitname-build
-
   msg "Generating dependencies..."
   make depend \
     WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
