@@ -227,6 +227,7 @@ usr/local/include/wolframe/filter/typedfilter.hpp
 usr/local/include/wolframe/filter/typedfilterScope.hpp
 usr/local/include/wolframe/filter/typingfilter.hpp
 @dirrm usr/local/include/wolframe/filter
+usr/local/include/wolframe/types/authorizationFunction.hpp
 usr/local/include/wolframe/types/base64.h
 usr/local/include/wolframe/types/base64.hpp
 usr/local/include/wolframe/types/byte2hex.h
@@ -267,6 +268,7 @@ usr/local/include/wolframe/AAAA/user.hpp
 @dirrm usr/local/include/wolframe/AAAA
 usr/local/include/wolframe/module/constructor.hpp
 @dirrm usr/local/include/wolframe/module
+usr/local/include/wolframe/prgbind/authorizationProgram.hpp
 usr/local/include/wolframe/prgbind/ddlProgram.hpp
 usr/local/include/wolframe/prgbind/normalizeProgram.hpp
 usr/local/include/wolframe/prgbind/program.hpp
