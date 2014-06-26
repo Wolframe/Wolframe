@@ -51,7 +51,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe,--enable-new-dtags" \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
@@ -63,7 +63,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe,--enable-new-dtags" \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
@@ -75,7 +75,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe,--enable-new-dtags" \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
@@ -88,7 +88,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe,--enable-new-dtags" \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
@@ -101,7 +101,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/pkg/lib/wolframe,--enable-new-dtags" \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \

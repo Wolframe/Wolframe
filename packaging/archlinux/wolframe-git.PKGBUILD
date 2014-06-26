@@ -63,8 +63,8 @@ check() {
     WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
     WITH_TEXTWOLF=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
-    CFLAGS='-O2' CXXFLAGS='-O2' \
-    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
+    RELEASE=1 \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,--enable-new-dtags
 }
 
 build() {
@@ -78,8 +78,8 @@ build() {
     WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
     WITH_TEXTWOLF=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
-    CFLAGS='-O2' CXXFLAGS='-O2' \
-    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
+    RELEASE=1 \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,--enable-new-dtags
 
   msg "Building..."
   make \
@@ -89,8 +89,8 @@ build() {
     WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
     WITH_TEXTWOLF=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
-    CFLAGS='-O2' CXXFLAGS='-O2' \
-    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
+    RELEASE=1 \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,--enable-new-dtags
 
 #  msg "Building documentation.."
 #  cd docs

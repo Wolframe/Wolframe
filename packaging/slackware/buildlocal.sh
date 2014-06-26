@@ -49,7 +49,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules \
 	help
 
@@ -59,7 +59,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules \
 	config
 
@@ -69,7 +69,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules
 check_for_errors
 
@@ -79,7 +79,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules \
 	testreport
 check_for_errors
@@ -90,7 +90,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	DESTDIR=$PKGBUILD/PKG install sysconfdir=/etc libdir=$LIBDIR
 check_for_errors
 
