@@ -59,7 +59,8 @@ struct Program
 		Core=10,
 		FormType=20,
 		Form=30,
-		Function=40
+		Function=40,
+		SuperFunction=50
 	};
 
 	explicit Program( Category category_)

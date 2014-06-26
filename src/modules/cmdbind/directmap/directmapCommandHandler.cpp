@@ -61,9 +61,10 @@ void DirectmapCommandHandler::initcall()
 	// Check if we are allowed to execute the command:
 	if (!m_cmd->authfunction.empty())
 	{
-		if (!execContext()->checkAuthorization( m_cmd->authfunction, m_cmd->authresource))
+		std::string errmsg;
+		if (!execContext()->checkAuthorization( m_cmd->authfunction, m_cmd->authresource, errmsg))
 		{
-			throw std::runtime_error( std::string( "not authorized to execute command '") + m_name + "'");
+			throw std::runtime_error( std::string( "not authorized to execute command '") + m_name + "': " + errmsg);
 		}
 	}
 	// Initialize input form for validation if defined:

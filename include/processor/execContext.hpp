@@ -83,8 +83,8 @@ public:
 	AAAA::Authenticator* authenticator( const net::RemoteEndpoint& client ) const
 								{return m_aaaaProvider?m_aaaaProvider->authenticator( client ):0;}
 
-	/// \brief Checks if a function tagged with AUTHORIZE( authorizationFunction, authorizationResource) is allowed to be executed
-	bool checkAuthorization( const std::string& authorizationFunction, const std::string& authorizationResource);
+	/// \brief Checks if a function tagged with AUTHORIZE( funcname, resource) is allowed to be executed
+	bool checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg);
 
 private:
 	ExecContext( const ExecContext&);			//... non copyable

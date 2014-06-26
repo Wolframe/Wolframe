@@ -56,6 +56,8 @@ class FormDescription;
 class NormalizeFunction;
 /// \brief Forward declaration
 class NormalizeFunctionType;
+/// \brief Forward declaration
+class AuthorizationFunction;
 }
 namespace cmdbind
 {
@@ -63,6 +65,11 @@ namespace cmdbind
 class CommandHandler;
 /// \brief Forward declaration
 class DoctypeDetector;
+}
+namespace langbind
+{
+/// \brief Forward declaration
+class AuthorizationFunction;
 }
 
 namespace proc {
@@ -90,6 +97,11 @@ public:
 	/// \param[in] name name of the transaction
 	/// \return allocated transaction object now owned by the caller and to destroy by the caller with delete
 	virtual db::Transaction* transaction( const std::string& name) const=0;
+
+	/// \brief Get an authorization function by name
+	/// \param[in] name name of the function
+	/// \return reference to function
+	virtual const types::AuthorizationFunction* authorizationFunction( const std::string& name) const=0;
 	/// \brief Get a normalization function
 	/// \param[in] name name of the function
 	/// \return reference to normalization function

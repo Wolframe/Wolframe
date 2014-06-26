@@ -30,32 +30,37 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file execContext.cpp
-/// \brief Implementation execution context
-#include "processor/execContext.hpp"
-#include "filter/typedfilter.hpp"
-#include "types/authorizationFunction.hpp"
+/// \file prgbind/authorizationProgram.hpp
+/// \brief Interface of the authorization program type
 
-using namespace _Wolframe;
-using namespace _Wolframe::proc;
+#ifndef _Wolframe_PRGBIND_AUTHORIZATION_PROGRAM_HPP_INCLUDED
+#define _Wolframe_PRGBIND_AUTHORIZATION_PROGRAM_HPP_INCLUDED
+#include "prgbind/program.hpp"
+#include "prgbind/programLibrary.hpp"
+#include <string>
 
-bool ExecContext::checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg)
+namespace _Wolframe {
+namespace prgbind {
+
+/// \class AuthorizationProgram
+/// \brief Program type for authorization function descriptions.
+class AuthorizationProgram
+	:public Program
 {
-	if (funcname.empty()) return true;
-	try
-	{
-		const types::AuthorizationFunction* func = m_provider->authorizationFunction( funcname);
-		if (func == 0)
-		{
-			errmsg = std::string("authorization function '") + funcname + "' is not defined";
-			return false;
-		}
-		return func->call( this, resource);
-	}
-	catch (std::runtime_error& e)
-	{
-		errmsg = std::string("authorization function '") + funcname + "' failed: " + e.what();
-		return false;
-	}
-}
+public:
+	/// \brief Default constructor
+	AuthorizationProgram()
+		:Program( SuperFunction){}
+
+	/// \brief Destructor
+	virtual ~AuthorizationProgram(){}
+
+	/// \brief Implementation of Program::is_mine( const std::string&) const;
+	virtual bool is_mine( const std::string& filename) const;
+	/// \brief Implementation of Program::loadProgram( ProgramLibrary&, db::Database*, const std::string&);
+	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
+};
+
+}}//namespace
+#endif
 

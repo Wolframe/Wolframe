@@ -63,6 +63,7 @@ PROVIDER_OBJS = \
 
 PROGRAM_OBJS = \
 	prgbind/transactionProgram.o \
+	prgbind/authorizationProgram.o \
 	prgbind/normalizeProgram.o \
 	prgbind/ddlProgram.o \
 	prgbind/programLibrary.o

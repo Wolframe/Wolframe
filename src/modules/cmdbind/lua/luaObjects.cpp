@@ -1133,7 +1133,8 @@ LUA_FUNCTION_THROWS( "provider.authorize(..)", function_authorize)
 	const char* authorizationResource = lua_tostring( ls, 2);
 
 	proc::ExecContext* ctx = getExecContext( ls);
-	lua_pushboolean( ls, ctx->checkAuthorization( authorizationFunction, authorizationResource));
+	std::string errmsg;
+	lua_pushboolean( ls, ctx->checkAuthorization( authorizationFunction, authorizationResource, errmsg));
 	return 1;
 }
 

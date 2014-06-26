@@ -374,19 +374,20 @@ TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransacti
 
 bool TdlTransactionFunctionClosure::call()
 {
+	std::string errmsg;
 	switch (m_state)
 	{
 		case 0:
 			throw std::runtime_error( "input not initialized");
 		case 1:
 			LOG_DEBUG << "check authorization '" << m_func->name() << "'";
-			if (m_context->checkAuthorization( m_func->authorizationFunction(), m_func->authorizationResource()))
+			if (m_context->checkAuthorization( m_func->authorizationFunction(), m_func->authorizationResource(), errmsg))
 			{
 				LOG_DEBUG << "authorization allows exection of function '" << m_func->name() << "'";
 			}
 			else
 			{
-				throw std::runtime_error( std::string("execution of transaction function '") + m_func->name() + "' denied in this authorization context");
+				throw std::runtime_error( std::string( "execution of transaction function '") + m_func->name() + "' denied in this authorization context: " + errmsg);
 			}
 			LOG_DEBUG << "execute transaction '" << m_func->name() << "'";
 			m_state = 2;
