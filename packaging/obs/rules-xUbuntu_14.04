@@ -35,11 +35,11 @@ build-stamp:
 	# Add here commands to compile the package.
 	$(MAKE) help
 	$(MAKE) $(WOLFRAME_PARAMS) config
-	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
+	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe,--enable-new-dtags" \
 		$(WOLFRAME_PARAMS) depend
-	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
+	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe,--enable-new-dtags" \
 		$(WOLFRAME_PARAMS) $(PARALLEL_BUILD) all
-	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
+	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe,--enable-new-dtags" \
 		$(WOLFRAME_PARAMS) $(PARALLEL_BUILD) test
 	cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc-doxygen; cd ..
 

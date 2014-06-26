@@ -825,7 +825,7 @@ cd %{_builddir}/boost_%{boost_underscore_version}
 cd %{_builddir}/Python-%{python_version}
 ./configure --prefix=/tmp/Python-%{python_version} \
 	--enable-shared 
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make %{?_smp_mflags}
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make %{?_smp_mflags}
 make install
 %endif
 
@@ -849,7 +849,7 @@ cd %{_builddir}/%{name}-%{version}
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make help \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make help \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -902,7 +902,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make help \
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make config \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make config \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -958,7 +958,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make config \
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make depend \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make depend \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -1011,7 +1011,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make depend \
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make all \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make all \
 	%{?_smp_mflags} \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
@@ -1070,7 +1070,7 @@ echo ======================= TESTING ==============================
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make test \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make test \
 	%{?_smp_mflags} \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}

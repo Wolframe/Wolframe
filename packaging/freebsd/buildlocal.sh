@@ -83,7 +83,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
 	mandir=/usr/local/man \
@@ -94,7 +94,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
 	mandir=/usr/local/man \
@@ -105,7 +105,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
 	mandir=/usr/local/man
@@ -116,7 +116,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
 	mandir=/usr/local/man \
@@ -128,7 +128,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	prefix=/usr/local \
 	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION \
 	sysconfdir=/usr/local/etc \
