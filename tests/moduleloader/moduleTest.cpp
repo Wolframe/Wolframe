@@ -189,6 +189,20 @@ TEST_F( ModuleFixture, LoadingModuleWithoutExtension )
 	ASSERT_TRUE( res );
 }
 
+TEST_F( ModuleFixture, LoadingModuleLackingASymbol )
+{
+	ModulesDirectory modDir;
+	list<string> modFiles;
+
+#ifndef _WIN32
+	modFiles.push_back( "./tests/missing_symbol/missing_symbol.so" );
+#else
+	modFiles.push_back( ".\\tests\\missing_symbol\\missing_symbol.dll" );
+#endif
+	bool res = LoadModules( modDir, modFiles );
+	ASSERT_FALSE( res );
+}
+
 int main( int argc, char **argv )
 {
 	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());

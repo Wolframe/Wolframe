@@ -1,0 +1,29 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+LIBRARIES = \
+	bla.dll
+
+CPP_OBJS = \
+	bla.o
+
+all: $(CPP_OBJS) $(LIBRARIES)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+bla.dll: $(OBJS) $(CPP_OBJS)
+	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:
