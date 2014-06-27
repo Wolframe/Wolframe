@@ -9,12 +9,14 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
-	/I$(TOPDIR)\include
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
 	/LIBPATH:$(TOPDIR)\src\libwfsingleton
 
 INCLUDE_LIBS = \
+	..\libbla\bla.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	wfsingleton.lib

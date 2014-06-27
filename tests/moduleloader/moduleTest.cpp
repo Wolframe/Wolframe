@@ -13,6 +13,10 @@
 #include <string>
 #include <list>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 using namespace _Wolframe::module;
 using namespace _Wolframe::log;
 using namespace _Wolframe;
@@ -207,6 +211,10 @@ TEST_F( ModuleFixture, LoadingModuleResolvableSymbol )
 {
 	ModulesDirectory modDir;
 	list<string> modFiles;
+
+#ifdef _WIN32
+	SetDllDirectory( "tests\\libbla" );
+#endif
 
 #ifndef _WIN32
 	modFiles.push_back( "./tests/resolvable_symbol/resolvable_symbol.so" );

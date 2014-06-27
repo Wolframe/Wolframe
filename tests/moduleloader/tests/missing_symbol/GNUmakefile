@@ -5,7 +5,8 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include
+	-I. -I$(TOPDIR)/include \
+	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_CXXFLAGS =
 
