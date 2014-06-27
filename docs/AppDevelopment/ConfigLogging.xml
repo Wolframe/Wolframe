@@ -20,6 +20,8 @@
 	<table frame="all" width="100%">
 		<title>Log message types</title>
 		<tgroup cols="2">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="3*"/>
 		<thead>
 			<row>
 				<entry>Name</entry>
