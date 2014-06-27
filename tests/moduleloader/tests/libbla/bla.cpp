@@ -1,2 +1,2 @@
-void bla( ) {
+void bar( ) {
 }

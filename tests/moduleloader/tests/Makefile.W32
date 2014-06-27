@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = mod_test mod_test_containers not_a_mod missing_symbol
+SUBDIRS = mod_test mod_test_containers not_a_mod missing_symbol resolvable_symbol
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

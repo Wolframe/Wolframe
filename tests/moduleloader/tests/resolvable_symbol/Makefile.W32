@@ -20,10 +20,10 @@ INCLUDE_LIBS = \
 	wfsingleton.lib
 
 DYNAMIC_MODULE = \
-	missing_symbol.dll
+	resolvable_symbol.dll
 
 CPP_OBJS = \
-	missing_symbol.obj
+	resolvable_symbol.obj
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

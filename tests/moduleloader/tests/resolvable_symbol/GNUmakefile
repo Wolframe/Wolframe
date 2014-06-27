@@ -11,17 +11,19 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwfsingleton
+	-L$(TOPDIR)/src/libwfsingleton \
+	-L../libbla
 
 INCLUDE_LIBS = \
 	-lwfsingleton \
-	-lwolframe
+	-lwolframe \
+	-lbla
 
 DYNAMIC_MODULE = \
-	missing_symbol.so
+	resolvable_symbol.so
 
 CPP_OBJS = \
-	missing_symbol.o
+	resolvable_symbol.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

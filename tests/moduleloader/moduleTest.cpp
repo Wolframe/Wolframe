@@ -203,6 +203,20 @@ TEST_F( ModuleFixture, LoadingModuleLackingASymbol )
 	ASSERT_FALSE( res );
 }
 
+TEST_F( ModuleFixture, LoadingModuleResolvableSymbol )
+{
+	ModulesDirectory modDir;
+	list<string> modFiles;
+
+#ifndef _WIN32
+	modFiles.push_back( "./tests/resolvable_symbol/resolvable_symbol.so" );
+#else
+	modFiles.push_back( ".\\tests\\resolvable_symbol\\resolvable_symbol.dll" );
+#endif
+	bool res = LoadModules( modDir, modFiles );
+	ASSERT_TRUE( res );
+}
+
 int main( int argc, char **argv )
 {
 	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
