@@ -1,10 +1,8 @@
 <sect1>
 	<title>Listener Configuration</title>
 	<para>
-	The listener configuration is defined in the <code>Logging</code>
-	section. The logger is defined for different backends.
-	We can define several backends for the logger. In the following
-	sections we list the configuration for the different backends.
+	The listener configuration is defined in the <code>Listener</code>
+	section. The listener specifies the set accepted connections.
 	</para>
 </sect1>
 
