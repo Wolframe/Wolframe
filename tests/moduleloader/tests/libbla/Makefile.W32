@@ -1,4 +1,4 @@
-TOPDIR = ..\..
+TOPDIR = ..\..\..\..
 
 SUBDIRS =
 
@@ -11,7 +11,7 @@ LIBRARIES = \
 	bla.dll
 
 CPP_OBJS = \
-	bla.o
+	bla.obj
 
 all: $(CPP_OBJS) $(LIBRARIES)
 
@@ -26,4 +26,4 @@ local_clean:
 
 local_distclean:
 
-local_test:
+local_test: $(LIBRARIES)

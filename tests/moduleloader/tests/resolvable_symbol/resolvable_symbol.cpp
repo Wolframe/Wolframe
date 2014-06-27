@@ -47,4 +47,10 @@ static _Wolframe::module::BuilderBase* (*containers[])() = {
 	NULL
 };
 
-_Wolframe::module::ModuleEntryPoint entryPoint( 0, "Test Module", containers );
+#ifdef _WIN32
+#define DLLEXPORT __declspec( dllexport )
+#else
+#define DLLEXPORT
+#endif
+
+extern "C" DLLEXPORT _Wolframe::module::ModuleEntryPoint entryPoint( 0, "Test Module", containers );
