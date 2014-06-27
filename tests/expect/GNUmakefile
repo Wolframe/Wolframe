@@ -22,8 +22,10 @@ LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton/:$(TOPDIR)/src/
 local_test:
 ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
+ifeq ($(WITH_EXAMPLES),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testEcho.ex
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testPecho.ex
+endif
 endif
 endif
 

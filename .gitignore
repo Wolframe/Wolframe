@@ -76,7 +76,7 @@ tests/configStructParser
 tests/database/dbTest
 tests/database/test.db
 tests/3rdParty/libxml2/testlibxml2
-tests/modules/moduleTest
+tests/moduleloader/moduleTest
 tests/authentication/sasl/sasl.db
 tests/authentication/sasl/saslTest
 tests/authentication/pam/pamTest

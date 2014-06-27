@@ -91,5 +91,5 @@ build() {
     WITH_TEXTWOLF=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
     RELEASE=1 \
-    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,--enable-new-dtags
 }

@@ -111,8 +111,8 @@ public:
 		,langbind::TypedInputFilter(o)
 		,m_state(o.m_state)
 		,m_paramidx(o.m_paramidx)
-		,m_function(m_function)
-		,m_ctx(m_ctx)
+		,m_function(o.m_function)
+		,m_ctx(o.m_ctx)
 		,m_authorizationResource(o.m_authorizationResource)
 		{}
 

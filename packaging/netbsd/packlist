@@ -238,6 +238,7 @@ usr/pkg/include/wolframe/filter/typedfilter.hpp
 usr/pkg/include/wolframe/filter/typedfilterScope.hpp
 usr/pkg/include/wolframe/filter/typingfilter.hpp
 @dirrm usr/pkg/include/wolframe/filter
+usr/pkg/include/wolframe/types/authorizationFunction.hpp
 usr/pkg/include/wolframe/types/base64.h
 usr/pkg/include/wolframe/types/base64.hpp
 usr/pkg/include/wolframe/types/byte2hex.h
@@ -278,6 +279,7 @@ usr/pkg/include/wolframe/AAAA/user.hpp
 @dirrm usr/pkg/include/wolframe/AAAA
 usr/pkg/include/wolframe/module/constructor.hpp
 @dirrm usr/pkg/include/wolframe/module
+usr/pkg/include/wolframe/prgbind/authorizationProgram.hpp
 usr/pkg/include/wolframe/prgbind/ddlProgram.hpp
 usr/pkg/include/wolframe/prgbind/normalizeProgram.hpp
 usr/pkg/include/wolframe/prgbind/program.hpp
