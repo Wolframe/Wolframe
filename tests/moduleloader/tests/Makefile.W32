@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = mod_test mod_test_containers
+SUBDIRS = mod_test mod_test_containers not_a_mod
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
