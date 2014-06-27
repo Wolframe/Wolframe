@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty crypto modules database authentication simpleFormCompiler wolfilter compileTDL protocol
+SUBDIRS = 3rdParty crypto modules moduleloader database authentication simpleFormCompiler wolfilter compileTDL protocol
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
