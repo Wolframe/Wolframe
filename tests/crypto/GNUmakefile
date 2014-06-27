@@ -62,8 +62,6 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./AES256test
-	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./HMACtest
 	@echo
 	@echo
@@ -72,6 +70,8 @@ endif
 local_longtest: PBKDF2test
 ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./PBKDF2test
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./AES256test
 	@echo
 	@echo
 endif

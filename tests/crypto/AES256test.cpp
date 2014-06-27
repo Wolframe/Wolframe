@@ -87,7 +87,7 @@ static bool readValues( std::ifstream& infile, std::map< std::string, std::strin
 	return hasValues;
 }
 
-static void testVectors( std::ifstream& infile )
+static void testVectors( std::ifstream& infile, unsigned rounds = 1 )
 {
 	char output[ STRING_BUFER_SIZE ];
 
@@ -104,9 +104,11 @@ static void testVectors( std::ifstream& infile )
 			hex2byte( values[ "PLAINTEXT" ].c_str(), text, AES256_TEXT_SIZE );
 
 			AES256_context	ctx;
-			AES256_init( &ctx, key );
-			AES256_encrypt_ECB( &ctx, text );
-			AES256_done( &ctx );
+			for ( unsigned i = 0; i < rounds; i++ )	{
+				AES256_init( &ctx, key );
+				AES256_encrypt_ECB( &ctx, text );
+				AES256_done( &ctx );
+			}
 			byte2hex( text, AES256_TEXT_SIZE, output, STRING_BUFER_SIZE );
 			EXPECT_STRCASEEQ( values[ "CYPHERTEXT" ].c_str(), output );
 
@@ -117,9 +119,11 @@ static void testVectors( std::ifstream& infile )
 //			std::cout << "Encrypted: " << output << std::endl;
 //			std::cout << "\n";
 
-			AES256_init( &ctx, key );
-			AES256_decrypt_ECB( &ctx, text );
-			AES256_done( &ctx );
+			for ( unsigned i = 0; i < rounds; i++ )	{
+				AES256_init( &ctx, key );
+				AES256_decrypt_ECB( &ctx, text );
+				AES256_done( &ctx );
+			}
 			byte2hex( text, AES256_TEXT_SIZE, output, STRING_BUFER_SIZE );
 			EXPECT_STRCASEEQ( values[ "PLAINTEXT" ].c_str(), output );
 		}
@@ -133,16 +137,16 @@ TEST( AES256fixture, ECBGFSbox256 )
 	testVectors( infile );
 }
 
-TEST( AES256fixture, DISABLED_ECBencode256 )
+TEST( AES256fixture, ECBencode256 )
 {
 	std::ifstream infile("AES-256.vectors/ECBencode256.rsp");
-	testVectors( infile );
+	testVectors( infile, 10000 );
 }
 
-TEST( AES256fixture, DISABLED_ECBdecode256 )
+TEST( AES256fixture, ECBdecode256 )
 {
 	std::ifstream infile("AES-256.vectors/ECBdecode256.rsp");
-	testVectors( infile );
+	testVectors( infile, 10000 );
 }
 
 TEST( AES256fixture, ECBKeySbox256 )

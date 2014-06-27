@@ -62,9 +62,10 @@ local_test:
 	@-erase /q temp 2>NUL
 	@-testSHA
 	@-testMD5
-	@-AES256test
 	@-CRAMtest
 	@-HMACtest
 
 local_longtest:
 	@-PBKDF2test
+	@-AES256test
+
