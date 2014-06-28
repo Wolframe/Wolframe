@@ -151,7 +151,7 @@ Logging
 			<title>Backend eventlog</title>
 			<para>On Windows we can also log to eventlog.
 			For defining the backend to log to eventlog, we
-			have to configure a subsection <code>syslog</code> of the
+			have to configure a subsection <code>eventlog</code> of the
 			<code>Logging</code> section. For logging to eventlog we 
 			can define the logging level with <code>level</code>,
 			the eventlog source with <code>source</code>

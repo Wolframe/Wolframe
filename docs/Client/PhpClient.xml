@@ -10,6 +10,13 @@
 	</para>
 
 	<sect1>
+	<title>Requirements</title>
+	<para>
+		The minimum PHP version required for the client is 5.3.
+		No additional PHP modules are needed.
+	</para>
+	</sect1>
+	<sect1>
 	<title>PHP Client Modules</title>
 		<para>In the subdirectory clients/php of the Wolframe installation
 		you'll find the following source files you need.

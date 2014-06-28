@@ -10,7 +10,9 @@
 	<para>
 	The service configuration for Windows is defined in the section
 	<code>Service</code>. The following table describes the settings
-	in the service configuration for Windows:
+	in the service configuration for Windows. The service configuration
+	for Windows is only read at installation time. Changing them later
+	in the configuration file has no effect.
 	<table frame="all" width="100%">
 		<title>Windows service configuration settings</title>
 		<tgroup cols="3">
@@ -77,17 +79,17 @@ Service {
 
 		<tbody>
 			<row>
-				<entry>user</entry>
+				<entry>User</entry>
 				<entry>identifier</entry>
 				<entry>Defines the name of the user the Wolframe server should run as.</entry>
 			</row>
 			<row>
-				<entry>group</entry>
+				<entry>Group</entry>
 				<entry>identifier</entry>
 				<entry>Defines the name of the group of the user the Wolframe server should run as.</entry>
 			</row>
 			<row>
-				<entry>pidFile</entry>
+				<entry>PidFile</entry>
 				<entry>filepath</entry>
 				<entry>Defines the path to the file used as pid file</entry>
 			</row>
@@ -103,9 +105,9 @@ Service {
 	Example configuration:
 	<programlisting language='text'>
 Daemon {
-    User    nobody
-    Group   nobody
-    PidFile /tmp/wolframed.pid
+    User    wolframe
+    Group   wolframe
+    PidFile /var/run/wolframed.pid
     ServiceName wolframe
 }
 	</programlisting>

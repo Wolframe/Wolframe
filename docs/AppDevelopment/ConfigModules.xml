@@ -22,12 +22,12 @@
 			<row>
 				<entry>Directory</entry>
 				<entry>path</entry>
-				<entry>Path to use as base path for relative module paths specified with 'Module'. If specified as relative path, it is relative to the directory containing the main configuration file.</entry>
+				<entry>Path to use as base path for relative module paths specified with 'Module'. If specified as relative path, it is relative to the directory containing the main configuration file. If not specified, the default module directory of Wolframe is used (for example /usr/lib64/wolframe/modules).</entry>
 			</row>
 			<row>
 				<entry>Module</entry>
 				<entry>path</entry>
-				<entry>Define a module to load by path. If the setting 'directory' was not specified then the path is relative to the library directory of wolframe (subdirectory 'wolframe' of the user library directory)</entry>
+				<entry>Define a module to load by path. If the setting 'directory' was not specified then the path is relative to the library directory of Wolframe (subdirectory 'wolframe' of the user library directory)</entry>
 			</row>
 		</tbody>
 		</tgroup>
