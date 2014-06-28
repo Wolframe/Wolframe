@@ -67,7 +67,7 @@ Listener
 		<tbody>
 			<row>
 				<entry>Address</entry>
-				<entry>IPv4 or IPv6 address of the server</entry>
+				<entry>Listening address (IPv4 or IPv6) of the server</entry>
 			</row>
 			<row>
 				<entry>Port</entry>
