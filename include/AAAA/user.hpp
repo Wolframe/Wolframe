@@ -52,9 +52,9 @@ public:
 		: m_authenticator( o.m_authenticator ), m_mech( o.m_mech ),
 		  m_loginTime( o.m_loginTime ),
 		  m_uname( o.m_uname ), m_name( o.m_name )	{}
-	User( const std::string& Authenticator, const std::string& mech,
+	User( const std::string& Authenticator, const std::string& Mech,
 	      const std::string& uName, const std::string& Name )
-		: m_authenticator( Authenticator ), m_mech( mech ),
+		: m_authenticator( Authenticator ), m_mech( Mech ),
 		  m_loginTime( time( NULL )),
 		  m_uname( uName ), m_name( Name )		{}
 
