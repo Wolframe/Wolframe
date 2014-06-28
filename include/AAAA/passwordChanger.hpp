@@ -46,7 +46,7 @@ namespace AAAA {
 /// This the only interface to be used by the system. All other interfaces
 /// are internal to the authentication objects.
 ///
-/// \note	The password changer works ony with complete messages.
+/// \note	The password changer works only with complete messages.
 ///		Sending a message in multiple parts will most likely
 ///		result in an error. But that depends also on the backend.
 class PasswordChanger
@@ -56,7 +56,7 @@ public:
 		MESSAGE_AVAILABLE,	///< an output message is available
 		AWAITING_MESSAGE,	///< waiting for an input message
 		PASSWORD_CHANGED,	///< the password has been successfuly changed
-		INVALID_DATA,		///< the password change message is not valid,
+		INVALID_MESSAGE,	///< the password change message is not valid,
 					///  most likely the credentials are invalid
 		SYSTEM_FAILURE		///< some other error occurred
 	};
@@ -66,7 +66,7 @@ public:
 		static const char* ar[] = {	"MESSAGE_AVAILABLE",
 						"AWAITING_MESSAGE",
 						"PASSWORD_CHANGED",
-						"INVALID_DATA",
+						"INVALID_MESSAGE",
 						"SYSTEM_FAILURE"
 					  };
 		return ar[ i ];

@@ -240,7 +240,7 @@ static void aes_expandDecKey( unsigned char *k, unsigned char *rc )
 		k[ i + 2 ] ^= k[ i - 2 ], k[ i + 3 ] ^= k[ i - 1 ];
 
 	*rc = FD( *rc );
-	k[ 0 ] ^= rj_sbox( k[ 29 ] ) ^ (*rc );
+	k[ 0 ] ^= rj_sbox( k[ 29 ] ) ^ ( *rc );
 	k[ 1 ] ^= rj_sbox( k[ 30 ] );
 	k[ 2 ] ^= rj_sbox( k[ 31 ] );
 	k[ 3 ] ^= rj_sbox( k[ 28 ] );
@@ -248,7 +248,7 @@ static void aes_expandDecKey( unsigned char *k, unsigned char *rc )
 
 
 /* -------------------------------------------------------------------------- */
-void AES256_init( AES256_context *ctx, unsigned char *k )
+void AES256_init( AES256_context *ctx, const unsigned char *k )
 {
 	unsigned char rcon = 1;
 	register unsigned char i;
@@ -313,7 +313,7 @@ void AES256_decrypt_ECB( AES256_context *ctx, unsigned char *ciphertext )
 } /* aes256_decrypt_ECB */
 
 /* -------------------------------------------------------------------------- */
-int AES256_encrypt_CBC( AES256_context *ctx,  unsigned char *IV,
+int AES256_encrypt_CBC( AES256_context *ctx, const unsigned char *IV,
 			unsigned char *plaintext, unsigned size )
 {
 	unsigned char	*p = plaintext;
@@ -338,7 +338,7 @@ int AES256_encrypt_CBC( AES256_context *ctx,  unsigned char *IV,
 } /* AES256_encrypt_CBC */
 
 /* -------------------------------------------------------------------------- */
-int AES256_decrypt_CBC( AES256_context *ctx, unsigned char *IV,
+int AES256_decrypt_CBC( AES256_context *ctx, const unsigned char *IV,
 			unsigned char *ciphertext, unsigned size )
 {
 	unsigned char	*c = ciphertext;

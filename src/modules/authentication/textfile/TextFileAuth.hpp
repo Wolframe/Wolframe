@@ -192,7 +192,7 @@ class TextFilePwdChanger : public PasswordChanger
 	enum	ChangerState	{
 		CHANGER_INITIALIZED,		///< Has been initialized, no other data
 		CHANGER_CHALLENGE_SENT,		///< Waiting for the answer
-		CHANGER_INVALID_DATA,		///< Answer CRC was wrong -> fail
+		CHANGER_INVALID_MESSAGE,	///< Answer CRC was wrong -> fail
 		CHANGER_PASSWORD_CHANGED,	///< Answer CRC was correct -> password changed
 		CHANGER_SYSTEM_FAILURE		///< Something is wrong
 	};

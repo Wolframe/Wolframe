@@ -40,9 +40,12 @@
 #include "logger-v1.hpp"
 #include "TextFileAuth.hpp"
 #include "crypto/sha2.h"
-#include "types/byte2hex.h"
+#include "crypto/AES256.h"
+//#include "types/byte2hex.h"
+#include "types/base64.hpp"
 #include "AAAA/CRAM.hpp"
 #include "AAAA/passwordHash.hpp"
+#include "AAAA/pwdChangeMessage.hpp"
 #include "passwdFile.hpp"
 #include "system/globalRngGen.hpp"
 
@@ -401,7 +404,7 @@ void TextFilePwdChanger::dispose()
 }
 
 /// The input message
-void TextFilePwdChanger::messageIn( const std::string& /*message*/ )
+void TextFilePwdChanger::messageIn( const std::string& message )
 {
 	switch ( m_state )	{
 		case CHANGER_INITIALIZED:	{
@@ -413,9 +416,20 @@ void TextFilePwdChanger::messageIn( const std::string& /*message*/ )
 			break;
 		}
 		case CHANGER_CHALLENGE_SENT:	{
-
+			PasswordHash hash( m_usr.hash );
+			CRAMresponse response( *m_challenge, hash );
+			unsigned char buffer[ 64 ];
+			base64::decode( message, buffer, 64 );
+			AES256_context ctx;
+			AES256_init( &ctx, response.response() );
+			AES256_decrypt_CBC( &ctx, hash.salt().salt(), buffer, 64 );
+			AES256_done( &ctx );
+			PasswordChangeMessage pwd( buffer );
+			std::cout << pwd.password();
+			m_state = CHANGER_PASSWORD_CHANGED;
+			break;
 		}
-		case CHANGER_INVALID_DATA:	{
+		case CHANGER_INVALID_MESSAGE:	{
 			std::string msg = "Text file password changer (" + identifier() +
 					  "): received message in CHANGER_INVALID_DATA state";
 			LOG_ALERT << msg;
@@ -461,7 +475,7 @@ std::string TextFilePwdChanger::messageOut()
 			throw std::logic_error( msg );
 			break;
 		}
-		case CHANGER_INVALID_DATA:	{
+		case CHANGER_INVALID_MESSAGE:	{
 			std::string msg = "Text file password changer (" + identifier() +
 					  "): message requested in CHANGER_INVALID_DATA state";
 			LOG_ALERT << msg;
@@ -491,15 +505,15 @@ PasswordChanger::Status TextFilePwdChanger::status() const
 {
 	switch ( m_state )	{
 		case CHANGER_INITIALIZED:
-			return MESSAGE_AVAILABLE;
+			return PasswordChanger::MESSAGE_AVAILABLE;
 		case CHANGER_CHALLENGE_SENT:
-			return AWAITING_MESSAGE;
-		case CHANGER_INVALID_DATA:
-			return INVALID_DATA;
+			return PasswordChanger::AWAITING_MESSAGE;
+		case CHANGER_INVALID_MESSAGE:
+			return PasswordChanger::INVALID_MESSAGE;
 		case CHANGER_PASSWORD_CHANGED:
-			return PASSWORD_CHANGED;
+			return PasswordChanger::PASSWORD_CHANGED;
 		case CHANGER_SYSTEM_FAILURE:
-			return SYSTEM_FAILURE;
+			return PasswordChanger::SYSTEM_FAILURE;
 	}
 	return SYSTEM_FAILURE;		// just to silence some compilers
 }
