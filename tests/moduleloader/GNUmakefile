@@ -39,6 +39,8 @@ TEST_CPP_BINS = \
 
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe"
 
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):tests/libbla"
+
 local_all:
 
 local_clean:

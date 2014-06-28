@@ -39,11 +39,13 @@ AAAA
 	<title>Command execution authorization</title>
 		<sect3>
 		<title>Development status</title>
-		<para>The command execution authorization is implemented as
-		call of a function of the global context. The function has
-		access to the user and connection data. Unfortunately there
-		is no support implemented yet to configure an authentication
-		schema. But authorization based on command execution
+		<para>The command execution authorization is not implemented 
+		yet completely. The idea is to have programs that map
+		authorization function calls to Wolframe function calls.
+		The language to describe these programs is not yet defined.
+		The mechanism to map the authorize requests to the function
+		calls already exists.
+		Authorization based on command execution
 		will be a subject of the next release.
 		</para>
 		</sect3>

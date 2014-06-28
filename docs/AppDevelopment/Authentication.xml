@@ -23,7 +23,10 @@ AAAA
 	<sect2>
 		<title>Authentication mechs</title>
 		<para>Currently only the authentication protocol for
-		<code>WOLFRAME-CRAM</code> is implemented. You configure
+		<code>WOLFRAME-CRAM</code> is implemented. Currently 
+		the client can choose between no authentication
+		(if configured to allow no authentication)
+		or <code>WOLFRAME-CRAM</code>. You configure
 		it as shown in the example above.
 		</para>
 	</sect2>

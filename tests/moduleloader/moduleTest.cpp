@@ -13,6 +13,10 @@
 #include <string>
 #include <list>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 using namespace _Wolframe::module;
 using namespace _Wolframe::log;
 using namespace _Wolframe;
@@ -184,6 +188,38 @@ TEST_F( ModuleFixture, LoadingModuleWithoutExtension )
 	modFiles.push_back( "./tests/mod_test/mod_test" );
 #else
 	modFiles.push_back( ".\\tests\\mod_test\\mod_test" );
+#endif
+	bool res = LoadModules( modDir, modFiles );
+	ASSERT_TRUE( res );
+}
+
+TEST_F( ModuleFixture, LoadingModuleLackingASymbol )
+{
+	ModulesDirectory modDir;
+	list<string> modFiles;
+
+#ifndef _WIN32
+	modFiles.push_back( "./tests/missing_symbol/missing_symbol.so" );
+#else
+	modFiles.push_back( ".\\tests\\missing_symbol\\missing_symbol.dll" );
+#endif
+	bool res = LoadModules( modDir, modFiles );
+	ASSERT_FALSE( res );
+}
+
+TEST_F( ModuleFixture, LoadingModuleResolvableSymbol )
+{
+	ModulesDirectory modDir;
+	list<string> modFiles;
+
+#ifdef _WIN32
+	SetDllDirectory( "tests\\libbla" );
+#endif
+
+#ifndef _WIN32
+	modFiles.push_back( "./tests/resolvable_symbol/resolvable_symbol.so" );
+#else
+	modFiles.push_back( ".\\tests\\resolvable_symbol\\resolvable_symbol.dll" );
 #endif
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );

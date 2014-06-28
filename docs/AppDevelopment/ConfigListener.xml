@@ -1,10 +1,183 @@
 <sect1>
 	<title>Listener Configuration</title>
 	<para>
-	The listener configuration is defined in the <code>Logging</code>
-	section. The logger is defined for different backends.
-	We can define several backends for the logger. In the following
-	sections we list the configuration for the different backends.
+	The listener configuration is defined in the <code>Listener</code>
+	section. The listener specifies the set of accepted connections
+	and their attributes. It also defines some global settings listed
+	in the following table:
+
+	<table frame="all" width="100%">
+		<title>Global listener settings</title>
+		<tgroup cols="2">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="3*"/>
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+
+		<tbody>
+			<row>
+				<entry>MaxConnections</entry>
+				<entry>The maximum number of total simultaneous connections (clients). When set to 0 then the default is used. The Default is the operating system limit.</entry>
+			</row>
+			<row>
+				<entry>Threads</entry>
+				<entry>Number of threads for serving client connections</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	Here is an example configuration of the global settings:
+	<programlisting language='text'>
+Listener
+{
+    MaxConnections 12
+    Threads 7
+}
+	</programlisting>
+	The listener allows 2 different types of connections to configure.
+	The types are also the section names where they are configured in
+	the listener configuration. One is <code>Socket</code> that describes 
+	a plain connection. The other is <code>SslSsocket</code> that describes 
+	a connection with transport layer encryption based on SSL/TLS. In the 
+	following 2 sections they are introduced:
 	</para>
+
+	<sect2>
+	<title>Socket</title>
+	<para>In subsections <code>Socket</code> of the section <code>Listener</code>
+	of the configuration we describe plain connections based on TCP.
+	The follwing table describes the attributes you can set for plain TCP
+	connections:
+	<table frame="all" width="100%">
+		<title>Socket settings</title>
+		<tgroup cols="2">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="3*"/>
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+
+		<tbody>
+			<row>
+				<entry>Address</entry>
+				<entry>IPv4 or IPv6 address of the server</entry>
+			</row>
+			<row>
+				<entry>Port</entry>
+				<entry>Connection port</entry>
+			</row>
+			<row>
+				<entry>Identifier</entry>
+				<entry>Identifier that can be reference in authorization functions to classify connections and do authorization based on it.</entry>
+			</row>
+			<row>
+				<entry>MaxConnections</entry>
+				<entry>The maximum number of simultaneus connections for this port.</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	The following configuration shows an example plain TCP connection definition:
+	<programlisting language='text'>
+Listener
+{
+    Socket
+    {
+        address     localhost
+        port        7662
+        identifier  "Interface 1"
+    }
+}
+	</programlisting>
+	</para>
+	</sect2>
+
+
+	<sect2>
+	<title>SslSocket</title>
+	<para>In subsections <code>SslSocket</code> of the section <code>Listener</code>
+	of the configuration we describe connections connection with transport 
+	layer encryption based on SSL/TLS.
+	The follwing table describes the attributes you can set for SSL/TLS
+	connections. The first 4 attributes are the same as for TCP/IP plain:
+	<table frame="all" width="100%">
+		<title>SslSocket settings</title>
+		<tgroup cols="2">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="3*"/>
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+
+		<tbody>
+			<row>
+				<entry>Address</entry>
+				<entry>IPv4 or IPv6 address of the server</entry>
+			</row>
+			<row>
+				<entry>Port</entry>
+				<entry>Connection port</entry>
+			</row>
+			<row>
+				<entry>Identifier</entry>
+				<entry>Identifier that can be reference in authorization functions to classify connections and do authorization based on it.</entry>
+			</row>
+			<row>
+				<entry>MaxConnections</entry>
+				<entry>The maximum number of simultaneus connections for this port.</entry>
+			</row>
+			<row>
+				<entry>Certificate</entry>
+				<entry>File with the SSL certificate</entry>
+			</row>
+			<row>
+				<entry>Key</entry>
+				<entry>File with the SSL key</entry>
+			</row>
+			<row>
+				<entry>CAdirectory</entry>
+				<entry>Directory holding the CA certificate files</entry>
+			</row>
+			<row>
+				<entry>CAchainFile</entry>
+				<entry>SSL CA chain file</entry>
+			</row>
+			<row>
+				<entry>verify</entry>
+				<entry>ON/OFF switch to enabe/disable client certificate verification</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	The following configuration shows an example SSL connection definition:
+	<programlisting language='text'>
+Listener
+{
+    SslSocket
+    {
+        address        localhost
+        port           7662
+        identifier     "Interface 1"
+        maxConnections 2
+        certificate    SSL/wolframed.crt
+        key            SSL/wolframed.key
+        CAchainFile    SSL/CAchain.pem
+        verify         OFF
+    }
+}
+	</programlisting>
+	</para>
+	</sect2>
+
 </sect1>
 
