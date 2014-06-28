@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
+///
 /// \file user.cpp
-//
-//
 
 #include <string>
 #include <AAAA/user.hpp>
@@ -50,6 +49,9 @@ User::~User()
 
 	for ( i = 0; i < m_authenticator.length(); i++ )
 		const_cast< char& >( m_authenticator[ i ] ) = 'x';
+
+	for ( i = 0; i < m_mech.length(); i++ )
+		const_cast< char& >( m_mech[ i ] ) = 'x';
 
 	tptr = const_cast< time_t* >( &m_loginTime ); *tptr = 0;
 

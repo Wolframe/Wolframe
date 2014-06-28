@@ -41,6 +41,7 @@
 #include "passwordChanger.hpp"
 #include "authorization.hpp"
 #include "audit.hpp"
+#include "user.hpp"
 #include "config/configurationBase.hpp"
 #include "system/connectionEndpoint.hpp"
 #include <boost/noncopyable.hpp>
@@ -81,7 +82,8 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator( const net::RemoteEndpoint& client ) const;
-	PasswordChanger* passwordChanger( const net::RemoteEndpoint& client ) const;
+	PasswordChanger* passwordChanger( const User& user,
+					  const net::RemoteEndpoint& client ) const;
 	Authorizer* authorizer() const;
 	Auditor* auditor() const;
 private:

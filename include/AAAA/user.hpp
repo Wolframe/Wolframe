@@ -30,10 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-//
+///
 ///\file user.hpp
 /// Basic user information
-//
 
 #ifndef _USER_HPP_INCLUDED
 #define _USER_HPP_INCLUDED
@@ -48,18 +47,24 @@ class User
 {
 public:
 	User()
-		:m_loginTime( time( NULL)){}
-	User( const User& o)
-		: m_authenticator( o.m_authenticator ), m_loginTime( o.m_loginTime ),
+		: m_loginTime( time( NULL ))			{}
+	User( const User& o )
+		: m_authenticator( o.m_authenticator ), m_mech( o.m_mech ),
+		  m_loginTime( o.m_loginTime ),
 		  m_uname( o.m_uname ), m_name( o.m_name )	{}
-	User( const std::string& Authenticator, const std::string& uName, const std::string& Name )
-		: m_authenticator( Authenticator ), m_loginTime( time( NULL )),
-		  m_uname( uName ), m_name( Name )	{}
+	User( const std::string& Authenticator, const std::string& mech,
+	      const std::string& uName, const std::string& Name )
+		: m_authenticator( Authenticator ), m_mech( mech ),
+		  m_loginTime( time( NULL )),
+		  m_uname( uName ), m_name( Name )		{}
 
 	/// Destructor
 	~User();
 
+	/// Return the authenticator identifier
 	const std::string& authenticator() const	{ return m_authenticator; }
+	/// Return the authentication mech
+	const std::string& mech() const			{ return m_mech; }
 	/// Return the login moment
 	time_t loginTime() const			{ return m_loginTime; }
 	/// Return the username
@@ -68,10 +73,11 @@ public:
 	const std::string& name() const			{ return m_name; }
 
 private:
-	std::string	m_authenticator;
-	time_t		m_loginTime;
-	std::string	m_uname;
-	std::string	m_name;
+	std::string	m_authenticator;	///< authenticator identifier
+	std::string	m_mech;			///< authentication mech
+	time_t		m_loginTime;		///< login time
+	std::string	m_uname;		///< username
+	std::string	m_name;			///< name of the user
 };
 
 }} // namespace _Wolframe::AAAA

@@ -22,6 +22,7 @@
 */
 
 #include "crypto/AES256.h"
+#include <string.h>
 
 #define F(x)	((( x ) << 1 ) ^ (((( x ) >>7 ) & 1 ) * 0x1b ))
 #define FD(x)	((( x ) >> 1 ) ^ ((( x ) & 1 ) ? 0x8d : 0 ))
@@ -278,7 +279,7 @@ void AES256_encrypt_ECB( AES256_context *ctx, unsigned char *buf )
 		aes_shiftRows( buf );
 		aes_mixColumns( buf );
 		if( i & 1 )
-			aes_addRoundKey( buf, &ctx->key[16] );
+			aes_addRoundKey( buf, &ctx->key[ 16 ] );
 		else
 			aes_expandEncKey( ctx->key, &rcon ), aes_addRoundKey( buf, ctx->key );
 	}
@@ -286,7 +287,7 @@ void AES256_encrypt_ECB( AES256_context *ctx, unsigned char *buf )
 	aes_shiftRows( buf );
 	aes_expandEncKey( ctx->key, &rcon );
 	aes_addRoundKey( buf, ctx->key );
-} /* aes256_encrypt */
+} /* aes256_encrypt_ECB */
 
 /* -------------------------------------------------------------------------- */
 void AES256_decrypt_ECB( AES256_context *ctx, unsigned char *ciphertext )
@@ -301,7 +302,7 @@ void AES256_decrypt_ECB( AES256_context *ctx, unsigned char *ciphertext )
 	{
 		if( ( i & 1 ) )	{
 			aes_expandDecKey( ctx->key, &rcon );
-			aes_addRoundKey( ciphertext, &ctx->key[16] );
+			aes_addRoundKey( ciphertext, &ctx->key[ 16 ] );
 		}
 		else aes_addRoundKey( ciphertext, ctx->key );
 		aes_mixColumns_inv( ciphertext );
@@ -309,4 +310,59 @@ void AES256_decrypt_ECB( AES256_context *ctx, unsigned char *ciphertext )
 		aes_subBytes_inv( ciphertext );
 	}
 	aes_addRoundKey( ciphertext, ctx->key );
-} /* aes256_decrypt */
+} /* aes256_decrypt_ECB */
+
+/* -------------------------------------------------------------------------- */
+int AES256_encrypt_CBC( AES256_context *ctx,  unsigned char *IV,
+			unsigned char *plaintext, unsigned size )
+{
+	unsigned char	*p = plaintext;
+	unsigned	i;
+
+	if ( size == 0 )
+		return( 0 );
+	if ( size % 16 )
+		return( -1 );
+
+	for ( i = 0; i < 16; i++ )
+		p[ i ] ^= IV[ i ];
+	AES256_encrypt_ECB( ctx, p );
+	size -= 16;
+	while ( size > 0 )	{
+		for ( i = 0; i < 16; i++ )
+			p[ i + 16 ] ^= p[ i ];
+		p += 16, size -= 16;
+		AES256_encrypt_ECB( ctx, p );
+	}
+	return( 0 );
+} /* AES256_encrypt_CBC */
+
+/* -------------------------------------------------------------------------- */
+int AES256_decrypt_CBC( AES256_context *ctx, unsigned char *IV,
+			unsigned char *ciphertext, unsigned size )
+{
+	unsigned char	*c = ciphertext;
+	unsigned char	prevBuf[ 16 ];
+	unsigned char	nextBuf[ 16 ];
+	unsigned	i;
+
+	if ( size == 0 )
+		return( 0 );
+	if ( size % 16 )
+		return( -1 );
+
+	memcpy( prevBuf, c, 16);
+	AES256_decrypt_ECB( ctx, c );
+	for ( i = 0; i < 16; i++ )
+		c[ i ] ^= IV[ i ];
+	c += 16, size -= 16;
+	while ( size > 0 )	{
+		memcpy( nextBuf, c, 16);
+		AES256_decrypt_ECB( ctx, c );
+		for ( i = 0; i < 16; i++ )
+			c[ i ] ^= prevBuf[ i ];
+		c += 16, size -= 16;
+		memcpy( prevBuf, nextBuf, 16 );
+	}
+	return( 0 );
+} /* AES256_decrypt_CBC */

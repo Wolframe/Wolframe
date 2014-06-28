@@ -53,7 +53,6 @@ class PasswordChanger
 {
 public:
 	enum Status	{
-		INITIALIZED,		///< the password changer has been initialized,
 		MESSAGE_AVAILABLE,	///< an output message is available
 		AWAITING_MESSAGE,	///< waiting for an input message
 		PASSWORD_CHANGED,	///< the password has been successfuly changed
@@ -64,8 +63,7 @@ public:
 
 	static const char* statusName( Status i )
 	{
-		static const char* ar[] = {	"INITIALIZED",
-						"MESSAGE_AVAILABLE",
+		static const char* ar[] = {	"MESSAGE_AVAILABLE",
 						"AWAITING_MESSAGE",
 						"PASSWORD_CHANGED",
 						"INVALID_DATA",

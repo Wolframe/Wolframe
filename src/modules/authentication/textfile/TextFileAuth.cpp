@@ -56,7 +56,7 @@ namespace AAAA {
 //***********************************************************************
 
 TextFileAuthUnit::TextFileAuthUnit( const std::string& Identifier,
-					      const std::string& filename )
+				    const std::string& filename )
 	: AuthenticationUnit( Identifier ), m_pwdFile( filename, false )
 {
 	LOG_DEBUG << "Text file authenticator '" << identifier()
@@ -74,14 +74,25 @@ const char** TextFileAuthUnit::mechs() const
 }
 
 
-AuthenticatorSlice* TextFileAuthUnit::slice( const std::string& /*mech*/,
+AuthenticatorSlice* TextFileAuthUnit::slice( const std::string& mech,
 					     const net::RemoteEndpoint& /*client*/ )
 {
-	return new TextFileAuthSlice( *this );
+	if ( boost::to_upper_copy( mech ) == "WOLFRAME-CRAM" )
+		return new TextFileAuthSlice( *this );
+	else
+		return NULL;
 }
 
-// clang says unused
-//static const std::size_t PWD_LINE_SIZE = 1024;
+
+PasswordChanger* TextFileAuthUnit::pwdChanger( const User& user,
+					       const net::RemoteEndpoint& /*client*/ )
+{
+	if ( boost::to_upper_copy( user.mech() ) == "WOLFRAME-CRAM" &&
+			user.authenticator() == identifier() )
+		return new TextFilePwdChanger( *this, user.uname() );
+	else
+		return NULL;
+}
 
 User* TextFileAuthUnit::authenticatePlain( const std::string& username,
 					   const std::string& password,
@@ -96,14 +107,14 @@ User* TextFileAuthUnit::authenticatePlain( const std::string& username,
 		PasswordHash::Hash	h0 = filePwd.hash();
 		PasswordHash::Hash	h1 = clientPwd.hash();
 		if ( h0 == h1 )
-			return new User( "TextFile", user.user, user.info );
+			return new User( identifier(), "PLAIN", user.user, user.info );
 	}
 	return NULL;
 }
 
 
 bool TextFileAuthUnit::getUser( const std::string& hash, const std::string& key,
-				       PwdFileUser& user, bool caseSensitveUser ) const
+				PwdFileUser& user, bool caseSensitveUser ) const
 {
 	if ( m_pwdFile.getHMACuser( hash, key, user, caseSensitveUser ))	{
 		assert( !user.user.empty() );
@@ -115,7 +126,7 @@ bool TextFileAuthUnit::getUser( const std::string& hash, const std::string& key,
 }
 
 bool TextFileAuthUnit::getUser( const std::string& userHash, PwdFileUser& user,
-				       bool caseSensitveUser ) const
+				bool caseSensitveUser ) const
 {
 	if ( m_pwdFile.getHMACuser( userHash, user, caseSensitveUser ))	{
 		assert( !user.user.empty() );
@@ -125,6 +136,19 @@ bool TextFileAuthUnit::getUser( const std::string& userHash, PwdFileUser& user,
 		user.clear();
 	return false;
 }
+
+bool TextFileAuthUnit::getUserPlain( const std::string& username, PwdFileUser& user,
+				     bool caseSensitveUser ) const
+{
+	if ( m_pwdFile.getUser( username, user, caseSensitveUser ))	{
+		assert( !user.user.empty() );
+		return true;
+	}
+	else
+		user.clear();
+	return false;
+}
+
 
 // Text file authentication - authentication slice
 //***********************************************************************
@@ -267,8 +291,8 @@ std::string TextFileAuthSlice::messageOut()
 			return challenge;
 		}
 		case SLICE_USER_NOT_FOUND:	{
-			std::string msg = "Text file auth slice: (" + identifier() +
-					  ") message requested in SLICE_USER_NOT_FOUND state";
+			std::string msg = "Text file auth slice (" + identifier() +
+					  "): message requested in SLICE_USER_NOT_FOUND state";
 			LOG_ALERT << msg;
 			m_state = SLICE_SYSTEM_FAILURE;
 			m_inputReusable = false;
@@ -276,8 +300,8 @@ std::string TextFileAuthSlice::messageOut()
 			break;
 		}
 		case SLICE_CHALLENGE_SENT:	{
-			std::string msg = "Text file auth slice: (" + identifier() +
-					  ") message requested in SLICE_CHALLENGE_SENT state";
+			std::string msg = "Text file auth slice (" + identifier() +
+					  "): message requested in SLICE_CHALLENGE_SENT state";
 			LOG_ALERT << msg;
 			m_state = SLICE_SYSTEM_FAILURE;
 			m_inputReusable = false;
@@ -285,8 +309,8 @@ std::string TextFileAuthSlice::messageOut()
 			break;
 		}
 		case SLICE_INVALID_CREDENTIALS:	{
-			std::string msg = "Text file auth slice: (" + identifier() +
-					  ") message requested in SLICE_INVALID_CREDENTIALS state";
+			std::string msg = "Text file auth slice (" + identifier() +
+					  "): message requested in SLICE_INVALID_CREDENTIALS state";
 			LOG_ALERT << msg;
 			m_state = SLICE_SYSTEM_FAILURE;
 			m_inputReusable = false;
@@ -294,8 +318,8 @@ std::string TextFileAuthSlice::messageOut()
 			break;
 		}
 		case SLICE_AUTHENTICATED:	{
-			std::string msg = "Text file auth slice: (" + identifier() +
-					  ") message requested in SLICE_AUTHENTICATED state";
+			std::string msg = "Text file auth slice (" + identifier() +
+					  "): message requested in SLICE_AUTHENTICATED state";
 			LOG_ALERT << msg;
 			m_state = SLICE_SYSTEM_FAILURE;
 			m_inputReusable = false;
@@ -303,8 +327,8 @@ std::string TextFileAuthSlice::messageOut()
 			break;
 		}
 		case SLICE_SYSTEM_FAILURE:	{
-			std::string msg = "Text file auth slice: (" + identifier() +
-					  ") message requested in SLICE_SYSTEM_FAILURE state";
+			std::string msg = "Text file auth slice (" + identifier() +
+					  "): message requested in SLICE_SYSTEM_FAILURE state";
 			LOG_ALERT << msg;
 			m_inputReusable = false;
 			throw std::logic_error( msg );
@@ -342,12 +366,142 @@ User* TextFileAuthSlice::user()
 	if ( m_state == SLICE_AUTHENTICATED )	{
 		if ( m_usr.user.empty() )
 			return NULL;
-		User* usr = new User( identifier(), m_usr.user, m_usr.info );
+		User* usr = new User( identifier(), "WOLFRAME-CRAM", m_usr.user, m_usr.info );
 		m_usr.clear();
 		return usr;
 	}
 	else
 		return NULL;
+}
+
+
+// Text file authentication - password changer
+//***********************************************************************
+TextFilePwdChanger::TextFilePwdChanger( const TextFileAuthUnit& backend,
+					const std::string& username )
+	: m_backend( backend )
+{
+	m_challenge = NULL;
+	if ( m_backend.getUserPlain( username, m_usr ))
+		m_state = CHANGER_INITIALIZED;
+	else
+		m_state = CHANGER_SYSTEM_FAILURE;
+}
+
+TextFilePwdChanger::~TextFilePwdChanger()
+{
+	m_usr.clear();
+	if ( m_challenge != NULL )
+		delete m_challenge;
+}
+
+void TextFilePwdChanger::dispose()
+{
+	delete this;
+}
+
+/// The input message
+void TextFilePwdChanger::messageIn( const std::string& /*message*/ )
+{
+	switch ( m_state )	{
+		case CHANGER_INITIALIZED:	{
+			std::string msg = "Text file password changer (" + identifier() +
+					  "): received message in CHANGER_INITIALIZED state";
+			LOG_ALERT << msg;
+			m_state = CHANGER_SYSTEM_FAILURE;
+			throw std::logic_error( msg );
+			break;
+		}
+		case CHANGER_CHALLENGE_SENT:	{
+
+		}
+		case CHANGER_INVALID_DATA:	{
+			std::string msg = "Text file password changer (" + identifier() +
+					  "): received message in CHANGER_INVALID_DATA state";
+			LOG_ALERT << msg;
+			m_state = CHANGER_SYSTEM_FAILURE;
+			throw std::logic_error( msg );
+			break;
+		}
+		case CHANGER_PASSWORD_CHANGED:	{
+			std::string msg = "Text file password changer (" + identifier() +
+					  "): received message in CHANGER_PASSWORD_CHANGED state";
+			LOG_ALERT << msg;
+			m_state = CHANGER_SYSTEM_FAILURE;
+			throw std::logic_error( msg );
+			break;
+		}
+		case CHANGER_SYSTEM_FAILURE:	{
+			std::string msg = "Text file password changer (" + identifier() +
+					  "): received message in CHANGER_SYSTEM_FAILURE state";
+			LOG_ALERT << msg;
+			m_state = CHANGER_SYSTEM_FAILURE;
+			throw std::logic_error( msg );
+			break;
+		}
+	}
+}
+
+/// The output message
+std::string TextFilePwdChanger::messageOut()
+{
+	switch ( m_state )	{
+		case CHANGER_INITIALIZED:	{
+			GlobalRandomGenerator& rnd = GlobalRandomGenerator::instance( "" );
+			m_challenge = new CRAMchallenge( rnd );
+			PasswordHash hash( m_usr.hash );
+			std::string challenge = m_challenge->toString( hash.salt() );
+			m_state = CHANGER_CHALLENGE_SENT;
+			return challenge;
+		}
+		case CHANGER_CHALLENGE_SENT:	{
+			std::string msg = "Text file password changer (" + identifier() +
+					  "): message requested in CHANGER_CHALLENGE_SENT state";
+			LOG_ALERT << msg;
+			throw std::logic_error( msg );
+			break;
+		}
+		case CHANGER_INVALID_DATA:	{
+			std::string msg = "Text file password changer (" + identifier() +
+					  "): message requested in CHANGER_INVALID_DATA state";
+			LOG_ALERT << msg;
+			throw std::logic_error( msg );
+			break;
+		}
+		case CHANGER_PASSWORD_CHANGED:	{
+			std::string msg = "Text file password changer (" + identifier() +
+					  "): message requested in CHANGER_PASSWORD_CHANGED state";
+			LOG_ALERT << msg;
+			throw std::logic_error( msg );
+			break;
+		}
+		case CHANGER_SYSTEM_FAILURE:	{
+			std::string msg = "Text file password changer (" + identifier() +
+					  "): message requested in CHANGER_SYSTEM_FAILURE state";
+			LOG_ALERT << msg;
+			throw std::logic_error( msg );
+			break;
+		}
+	}
+	return std::string();
+}
+
+/// The current status of the password changer
+PasswordChanger::Status TextFilePwdChanger::status() const
+{
+	switch ( m_state )	{
+		case CHANGER_INITIALIZED:
+			return MESSAGE_AVAILABLE;
+		case CHANGER_CHALLENGE_SENT:
+			return AWAITING_MESSAGE;
+		case CHANGER_INVALID_DATA:
+			return INVALID_DATA;
+		case CHANGER_PASSWORD_CHANGED:
+			return PASSWORD_CHANGED;
+		case CHANGER_SYSTEM_FAILURE:
+			return SYSTEM_FAILURE;
+	}
+	return SYSTEM_FAILURE;		// just to silence some compilers
 }
 
 }} // namespace _Wolframe::AAAA

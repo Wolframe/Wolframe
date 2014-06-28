@@ -199,7 +199,7 @@ void TestAuthenticatorSlice::messageIn( const std::string& msg)
 			{
 				if (m_user) delete m_user;
 				m_user = 0;
-				m_user = new User( "Test", m_username, m_username);
+				m_user = new User( identifier(), "TEST", m_username, m_username);
 				m_username.clear();
 			}
 			setState( Done);

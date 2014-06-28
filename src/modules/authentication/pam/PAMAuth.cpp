@@ -268,27 +268,27 @@ User* PAMAuthUnit::authenticatePlain(	const std::string& username,
 	int rc;
 	pam_appdata appdata;
 	const struct pam_conv conv = { pam_conv_func, &appdata };
-	
+
 	appdata.has_login = true;
 	appdata.login = username;
 	appdata.h = NULL;
 	appdata.has_pass = true;
 	appdata.pass = password;
-	
+
 	rc = pam_start( m_service.c_str( ), NULL, &conv, &appdata.h );
 	if( rc != PAM_SUCCESS ) {
 		LOG_ERROR << "pam_start failed with service '" << m_service << "': "
 			<< pam_strerror( appdata.h, rc );
 		return NULL;
 	}
-	
+
 	for( int i = 0; i < 10; i++ ) {
 		rc = pam_authenticate( appdata.h, 0 );
 #ifdef PAM_INCOMPLETE
 		if( rc != PAM_INCOMPLETE )
 #endif
 			break;
-			
+
 		sleep( 1 );
 
 		// we need a password
@@ -317,7 +317,7 @@ User* PAMAuthUnit::authenticatePlain(	const std::string& username,
 			<< pam_strerror( appdata.h, rc );
 	}
 
-	return new User( "PAM", appdata.login, "" );
+	return new User( identifier(), "WOLFRAME-PAM", appdata.login, "" );
 }
 
 #define STRINGIFY( name ) # name
@@ -403,7 +403,7 @@ void PAMAuthSlice::messageIn( const std::string& message )
 
 			// get the name of the user as reported by PAM
 			if( rc == PAM_SUCCESS ) {
-				union { const char *s; const void *v; } user_union;			
+				union { const char *s; const void *v; } user_union;
 #ifdef SUNOS
 				rc = pam_get_item( m_appdata.h, PAM_USER, (void **)&user_union.v );
 #else
@@ -456,12 +456,12 @@ std::string PAMAuthSlice::messageOut()
 			LOG_ERROR << "PAM auth slice: receiving unexpected message in state '"
 				<< m_sliceStateToString[m_state] << "', this is illegal!";
 			break;
-		
+
 		default:
 			LOG_FATAL << "PAM auth slice: receiving unexpected message in illegal state "
 				<< m_state << "!";
 	}
-	
+
 	return std::string( );
 }
 
@@ -476,20 +476,20 @@ AuthenticatorSlice::Status PAMAuthSlice::status() const
 			return MESSAGE_AVAILABLE;
 
 		case SLICE_WAITING_FOR_PWD:
-			return AWAITING_MESSAGE;		
-		
+			return AWAITING_MESSAGE;
+
 		case SLICE_USER_NOT_FOUND:
 			return USER_NOT_FOUND;
-		
+
 		case SLICE_INVALID_CREDENTIALS:
 			return INVALID_CREDENTIALS;
 
 		case SLICE_AUTHENTICATED:
 			return AUTHENTICATED;
-			
+
 		case SLICE_SYSTEM_FAILURE:
 			return SYSTEM_FAILURE;
-		
+
 		default:
 			LOG_FATAL << "PAM auth slice: called status( ) in illegal state "
 				<< m_state << "!";
@@ -497,19 +497,19 @@ AuthenticatorSlice::Status PAMAuthSlice::status() const
 	}
 	return SYSTEM_FAILURE;
 }
-	
+
 /// The authenticated user or NULL if not authenticated
 User* PAMAuthSlice::user()
 {
-	if ( m_state == SLICE_AUTHENTICATED )	{		
+	if ( m_state == SLICE_AUTHENTICATED )	{
 		if( m_user.empty( ) ) {
 			return NULL;
 		}
-		
-		User *usr = new User( identifier(), m_user, "" );
-		
+
+		User *usr = new User( identifier(), "WOLFRAME-PAM", m_user, "" );
+
 		m_user.clear( );
-			
+
 		return usr;
 	} else {
 		return NULL;
