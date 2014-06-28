@@ -53,4 +53,6 @@ static _Wolframe::module::BuilderBase* (*containers[])() = {
 #define DLLEXPORT
 #endif
 
-extern "C" DLLEXPORT _Wolframe::module::ModuleEntryPoint entryPoint( 0, "Test Module", containers );
+extern "C" DLLEXPORT _Wolframe::module::ModuleEntryPoint entryPoint;
+
+_Wolframe::module::ModuleEntryPoint entryPoint( 0, "Test Module", containers );

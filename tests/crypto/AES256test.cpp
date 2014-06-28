@@ -47,9 +47,9 @@
 
 
 static const std::size_t AES256_KEY_SIZE = 256 / 8;
-static const std::size_t AES256_TEXT_SIZE = 128 / 8;
-static const std::size_t AES256_CIPHER_SIZE = AES256_TEXT_SIZE;
-static const std::size_t STRING_BUFER_SIZE = 2 * AES256_CIPHER_SIZE + 1;
+static const std::size_t AES256_BLOCK_SIZE = 128 / 8;
+static const std::size_t DATA_MAX_SIZE = 256;
+static const std::size_t STRING_BUFER_SIZE = 2 * DATA_MAX_SIZE + 1;
 
 static bool readValues( std::ifstream& infile, std::map< std::string, std::string >& values )
 {
@@ -87,7 +87,7 @@ static bool readValues( std::ifstream& infile, std::map< std::string, std::strin
 	return hasValues;
 }
 
-static void testVectors( std::ifstream& infile )
+static void testECB( std::ifstream& infile, unsigned rounds = 1 )
 {
 	char output[ STRING_BUFER_SIZE ];
 
@@ -100,14 +100,16 @@ static void testVectors( std::ifstream& infile )
 		if ( hasValues )	{
 			unsigned char key[ AES256_KEY_SIZE ];
 			hex2byte( values[ "KEY" ].c_str(), key, AES256_KEY_SIZE );
-			unsigned char text[ AES256_TEXT_SIZE ];
-			hex2byte( values[ "PLAINTEXT" ].c_str(), text, AES256_TEXT_SIZE );
+			unsigned char text[ AES256_BLOCK_SIZE ];
+			hex2byte( values[ "PLAINTEXT" ].c_str(), text, AES256_BLOCK_SIZE );
 
 			AES256_context	ctx;
-			AES256_init( &ctx, key );
-			AES256_encrypt_ECB( &ctx, text );
-			AES256_done( &ctx );
-			byte2hex( text, AES256_TEXT_SIZE, output, STRING_BUFER_SIZE );
+			for ( unsigned i = 0; i < rounds; i++ )	{
+				AES256_init( &ctx, key );
+				AES256_encrypt_ECB( &ctx, text );
+				AES256_done( &ctx );
+			}
+			byte2hex( text, AES256_BLOCK_SIZE, output, STRING_BUFER_SIZE );
 			EXPECT_STRCASEEQ( values[ "CYPHERTEXT" ].c_str(), output );
 
 //			std::cout << "Count    : " << values[ "COUNT" ] << std::endl;
@@ -117,10 +119,57 @@ static void testVectors( std::ifstream& infile )
 //			std::cout << "Encrypted: " << output << std::endl;
 //			std::cout << "\n";
 
+			for ( unsigned i = 0; i < rounds; i++ )	{
+				AES256_init( &ctx, key );
+				AES256_decrypt_ECB( &ctx, text );
+				AES256_done( &ctx );
+			}
+			byte2hex( text, AES256_BLOCK_SIZE, output, STRING_BUFER_SIZE );
+			EXPECT_STRCASEEQ( values[ "PLAINTEXT" ].c_str(), output );
+		}
+	} while ( hasValues );
+}
+
+static void testCBC( std::ifstream& infile )
+{
+	char output[ STRING_BUFER_SIZE ];
+
+	bool hasValues = true;
+
+	do	{
+		std::map< std::string, std::string > values;
+		hasValues = readValues( infile, values );
+
+		if ( hasValues )	{
+			unsigned char key[ AES256_KEY_SIZE ];
+			hex2byte( values[ "KEY" ].c_str(), key, AES256_KEY_SIZE );
+			unsigned char text[ DATA_MAX_SIZE ];
+			int dataSize = hex2byte( values[ "PLAINTEXT" ].c_str(), text, DATA_MAX_SIZE );
+			unsigned char IV[ AES256_BLOCK_SIZE ];
+			hex2byte( values[ "IV" ].c_str(), IV, AES256_BLOCK_SIZE );
+
+			AES256_context	ctx;
 			AES256_init( &ctx, key );
-			AES256_decrypt_ECB( &ctx, text );
+			int ret = AES256_encrypt_CBC( &ctx, IV, text, dataSize );
 			AES256_done( &ctx );
-			byte2hex( text, AES256_TEXT_SIZE, output, STRING_BUFER_SIZE );
+			EXPECT_EQ( 0, ret );
+			byte2hex( text, dataSize, output, STRING_BUFER_SIZE );
+			EXPECT_STRCASEEQ( values[ "CYPHERTEXT" ].c_str(), output );
+
+//			std::cout << "Count    : " << values[ "COUNT" ] << std::endl;
+//			std::cout << "Key      : " << values[ "KEY" ] << std::endl;
+//			std::cout << "IV       : " << values[ "IV" ] << std::endl;
+//			std::cout << "Plain    : " << values[ "PLAINTEXT" ] << std::endl;
+//			std::cout << "Expected : " << values[ "CYPHERTEXT" ] << std::endl;
+//			std::cout << "Data size: " << dataSize << std::endl;
+//			std::cout << "Encrypted: " << output << std::endl;
+//			std::cout << "\n";
+
+			AES256_init( &ctx, key );
+			ret = AES256_decrypt_CBC( &ctx, IV, text, dataSize );
+			AES256_done( &ctx );
+			EXPECT_EQ( 0, ret );
+			byte2hex( text, dataSize, output, STRING_BUFER_SIZE );
 			EXPECT_STRCASEEQ( values[ "PLAINTEXT" ].c_str(), output );
 		}
 	} while ( hasValues );
@@ -130,31 +179,31 @@ static void testVectors( std::ifstream& infile )
 TEST( AES256fixture, ECBGFSbox256 )
 {
 	std::ifstream infile("AES-256.vectors/ECBGFSbox256.rsp");
-	testVectors( infile );
+	testECB( infile );
 }
 
-TEST( AES256fixture, DISABLED_ECBencode256 )
+TEST( AES256fixture, ECBencode256 )
 {
 	std::ifstream infile("AES-256.vectors/ECBencode256.rsp");
-	testVectors( infile );
+	testECB( infile, 10000 );
 }
 
-TEST( AES256fixture, DISABLED_ECBdecode256 )
+TEST( AES256fixture, ECBdecode256 )
 {
 	std::ifstream infile("AES-256.vectors/ECBdecode256.rsp");
-	testVectors( infile );
+	testECB( infile, 10000 );
 }
 
 TEST( AES256fixture, ECBKeySbox256 )
 {
 	std::ifstream infile("AES-256.vectors/ECBKeySbox256.rsp");
-	testVectors( infile );
+	testECB( infile );
 }
 
 TEST( AES256fixture, ECBtable256 )
 {
 	std::ifstream infile("AES-256.vectors/ECBtable256.rsp");
-	testVectors( infile );
+	testECB( infile );
 }
 
 TEST( AES256fixture, ECBvarKey256 )
@@ -171,21 +220,21 @@ TEST( AES256fixture, ECBvarKey256 )
 		if ( hasValues )	{
 			unsigned char key[ AES256_KEY_SIZE ];
 			hex2byte( values[ "KEY" ].c_str(), key, AES256_KEY_SIZE );
-			unsigned char text[ AES256_TEXT_SIZE ];
-			for ( std::size_t i = 0; i < AES256_TEXT_SIZE; i++ )
+			unsigned char text[ AES256_BLOCK_SIZE ];
+			for ( std::size_t i = 0; i < AES256_BLOCK_SIZE; i++ )
 				text[ i ] = 0;
 
 			AES256_context	ctx;
 			AES256_init( &ctx, key );
 			AES256_encrypt_ECB( &ctx, text );
 			AES256_done( &ctx );
-			byte2hex( text, AES256_TEXT_SIZE, output, STRING_BUFER_SIZE );
+			byte2hex( text, AES256_BLOCK_SIZE, output, STRING_BUFER_SIZE );
 			EXPECT_STRCASEEQ( values[ "CYPHERTEXT" ].c_str(), output );
 
 			AES256_init( &ctx, key );
 			AES256_decrypt_ECB( &ctx, text );
 			AES256_done( &ctx );
-			byte2hex( text, AES256_TEXT_SIZE, output, STRING_BUFER_SIZE );
+			byte2hex( text, AES256_BLOCK_SIZE, output, STRING_BUFER_SIZE );
 			EXPECT_STRCASEEQ( "00000000000000000000000000000000", output );
 		}
 	} while ( hasValues );
@@ -194,7 +243,7 @@ TEST( AES256fixture, ECBvarKey256 )
 TEST( AES256fixture, ECBVarKey256 )
 {
 	std::ifstream infile("AES-256.vectors/ECBVarKey256.rsp");
-	testVectors( infile );
+	testECB( infile );
 }
 
 TEST( AES256fixture, ECBvarTxt256 )
@@ -212,20 +261,20 @@ TEST( AES256fixture, ECBvarTxt256 )
 			unsigned char key[ AES256_KEY_SIZE ];
 			for ( std::size_t i = 0; i < AES256_KEY_SIZE; i++ )
 				key[ i ] = 0;
-			unsigned char text[ AES256_TEXT_SIZE ];
-			hex2byte( values[ "PLAINTEXT" ].c_str(), text, AES256_TEXT_SIZE );
+			unsigned char text[ AES256_BLOCK_SIZE ];
+			hex2byte( values[ "PLAINTEXT" ].c_str(), text, AES256_BLOCK_SIZE );
 
 			AES256_context	ctx;
 			AES256_init( &ctx, key );
 			AES256_encrypt_ECB( &ctx, text );
 			AES256_done( &ctx );
-			byte2hex( text, AES256_TEXT_SIZE, output, STRING_BUFER_SIZE );
+			byte2hex( text, AES256_BLOCK_SIZE, output, STRING_BUFER_SIZE );
 			EXPECT_STRCASEEQ( values[ "CYPHERTEXT" ].c_str(), output );
 
 			AES256_init( &ctx, key );
 			AES256_decrypt_ECB( &ctx, text );
 			AES256_done( &ctx );
-			byte2hex( text, AES256_TEXT_SIZE, output, STRING_BUFER_SIZE );
+			byte2hex( text, AES256_BLOCK_SIZE, output, STRING_BUFER_SIZE );
 			EXPECT_STRCASEEQ( values[ "PLAINTEXT" ].c_str(), output );
 		}
 	} while ( hasValues );
@@ -234,9 +283,38 @@ TEST( AES256fixture, ECBvarTxt256 )
 TEST( AES256fixture, ECBVarTxt256 )
 {
 	std::ifstream infile("AES-256.vectors/ECBVarTxt256.rsp");
-	testVectors( infile );
+	testECB( infile );
 }
 
+TEST( AES256fixture, CBCGFSbox256 )
+{
+	std::ifstream infile("AES-256.vectors/CBCGFSbox256.rsp");
+	testCBC( infile );
+}
+
+TEST( AES256fixture, CBCKeySbox256 )
+{
+	std::ifstream infile("AES-256.vectors/CBCKeySbox256.rsp");
+	testCBC( infile );
+}
+
+TEST( AES256fixture, CBCVarKey256 )
+{
+	std::ifstream infile("AES-256.vectors/CBCVarKey256.rsp");
+	testCBC( infile );
+}
+
+TEST( AES256fixture, CBCVarTxt256 )
+{
+	std::ifstream infile("AES-256.vectors/CBCVarTxt256.rsp");
+	testCBC( infile );
+}
+
+TEST( AES256fixture, CBCmisc256 )
+{
+	std::ifstream infile("AES-256.vectors/CBCmisc256.rsp");
+	testCBC( infile );
+}
 
 int main( int argc, char **argv )
 {

@@ -89,6 +89,7 @@ public:
 	const char** mechs() const;
 
 	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client );
+	PasswordChanger* pwdChanger( const User& user, const net::RemoteEndpoint& client );
 
 	/// \brief	Authenticate a user with its plain username and password
 	/// \note	This function is supposed to be used only for tests.
@@ -100,11 +101,20 @@ public:
 	User* authenticatePlain( const std::string& username, const std::string& password,
 				 bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 
-	/// \brief
+	/// \brief	Get the user data
+	/// \param [in]	hash		username hash (base64 of the HMAC-SHA256)
+	/// \param [in]	key		the key used for computing the username hash (base64)
+	/// \param [out] user		reference to the user structure that will be filled
+	///				by the function in case of success
+	/// \param [in]	caseSensitveUser should the username be treated as case-sensitive or not
+	/// \returns	true if the user was found, false otherwise
 	bool getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
 		      bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 	bool getUser( const std::string& userHash, PwdFileUser& user,
 		      bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+
+	bool getUserPlain( const std::string& username, PwdFileUser& user,
+			   bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 
 private:
 	static const std::string	m_mechs[];
@@ -168,6 +178,50 @@ private:
 	bool			m_inputReusable;
 	bool			m_lastSlice;
 	bool			m_fakeUser;
+};
+
+
+// Flow:
+// Initialize --> send salt + challenge -->
+//  --> client encrypts the new password + password crc with the response -->
+//  --> server decrypts with the response --> crc matches --> + - yes --> change pwd
+//                                                            + - no  --> abort
+//
+class TextFilePwdChanger : public PasswordChanger
+{
+	enum	ChangerState	{
+		CHANGER_INITIALIZED,		///< Has been initialized, no other data
+		CHANGER_CHALLENGE_SENT,		///< Waiting for the answer
+		CHANGER_INVALID_DATA,		///< Answer CRC was wrong -> fail
+		CHANGER_PASSWORD_CHANGED,	///< Answer CRC was correct -> password changed
+		CHANGER_SYSTEM_FAILURE		///< Something is wrong
+	};
+
+public:
+	TextFilePwdChanger( const TextFileAuthUnit& backend, const std::string& username );
+
+	~TextFilePwdChanger();
+
+	void dispose();
+
+	virtual const char* className() const		{ return m_backend.className(); }
+
+	virtual const std::string& identifier() const	{ return m_backend.identifier(); }
+
+	/// The input message
+	virtual void messageIn( const std::string& message );
+
+	/// The output message
+	virtual std::string messageOut();
+
+	/// The current status of the authenticator slice
+	virtual Status status() const;
+
+private:
+	const TextFileAuthUnit&	m_backend;
+	struct PwdFileUser	m_usr;
+	ChangerState		m_state;
+	CRAMchallenge*		m_challenge;
 };
 
 
