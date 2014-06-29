@@ -38,6 +38,7 @@
 #include "config/valueParser.hpp"
 #include "logger-v1.hpp"
 #include "appInfo.hpp"
+#include "platform.hpp"
 
 #include <string>
 #include <stdexcept>
@@ -156,8 +157,10 @@ std::string ServiceBanner::toString() const
 		case VERSION_REVISION:
 			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m.%r" );
 			break;
-		case PRODUCT_OS:
-			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m.%r" ) + " OS";
+		case PRODUCT_OS: {
+			Platform p = Platform::makePlatform( );
+			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m.%r" ) + " " + p.toString( );
+			}
 			break;
 		case NONE:
 			break;

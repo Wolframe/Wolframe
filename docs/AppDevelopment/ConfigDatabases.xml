@@ -8,6 +8,157 @@
 	<title>PostgreSQL</title>
 	<para>
 	</para>
+	<table frame="all" width="100%">
+		<title>PostgreSQL database configuration settings</title>
+		<tgroup cols="2">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="1*"/>
+		<colspec colnum="3" colname="col3" colwidth="3*"/>
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Parameter</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry>Identifier</entry>
+				<entry>identifier</entry>
+				<entry>Database identifier used to reference this database.</entry>
+			</row>
+			<row>
+				<entry>Host</entry>
+				<entry>identifier or string</entry>
+				<entry>Address of PostgreSQL database server</entry>
+			</row>
+			<row>
+				<entry>Port</entry>
+				<entry>number</entry>
+				<entry>Port of PostgreSQL database server</entry>
+			</row>
+			<row>
+				<entry>Database</entry>
+				<entry>identifier</entry>
+				<entry>Name of database to connect to</entry>
+			</row>
+			<row>
+				<entry>User</entry>
+				<entry>identifier</entry>
+				<entry>User to connect to database with</entry>
+			</row>
+			<row>
+				<entry>Password</entry>
+				<entry>string</entry>
+				<entry>Password to connect to database with</entry>
+			</row>
+			<row>
+				<entry>ConnectionTimeout</entry>
+				<entry>number</entry>
+				<entry>Connection timeout in seconds</entry>
+			</row>
+			<row>
+				<entry>Connections</entry>
+				<entry>number</entry>
+				<entry>Maximum number of simoultaneus database connections (size of connection pool)</entry>
+			</row>
+			<row>
+				<entry>AcquireTimeout</entry>
+				<entry>number</entry>
+				<entry>Maximum time allowed to acquire a database connection in seconds</entry>
+			</row>
+			<row>
+				<entry>SslMode</entry>
+				<entry>identifier</entry>
+				<entry>How a SSL TCP/IP connection should be negotiated with the server.
+					Possible values and their explanation can be found in the SslMode table
+					below.</entry>
+			</row>
+			<row>
+				<entry>SslCert</entry>
+				<entry>filename</entry>
+				<entry>The file name of the client SSL certificate in case of an SSL connection to the database.</entry>
+			</row>
+			<row>
+				<entry>SslKey</entry>
+				<entry>filename</entry>
+				<entry>The file with the secret key used for the client certificate in case of an SSL connection to the database.</entry>
+			</row>
+			<row>
+				<entry>SslRootCert</entry>
+				<entry>filename</entry>
+				<entry>The File name of the root SSL CA certificate in case of an SSL connection to the database.</entry>
+			</row>
+			<row>
+				<entry>SslCRL</entry>
+				<entry>filename</entry>
+				<entry>The File name of the SSL certificate revocation list (CRL) in case of an SSL connection to the database.</entry>
+			</row>
+			<row>
+				<entry>StatementTimeout</entry>
+				<entry>number</entry>
+				<entry>The maximum allowed time to execute a statement in milliseconds.</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	<table frame="all" width="100%">
+		<title>SSL modes</title>
+		<tgroup cols="2">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="3*"/>
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+		<tbody>
+			<row>
+				<entry>disable</entry>
+				<entry>Only try a non-SSL connection</entry>
+			</row>
+			<row>
+				<entry>allow</entry>
+				<entry>First try a non-SSL connection. If that fails, try an SSL connection</entry>
+			</row>
+			<row>
+				<entry>prefer</entry>
+				<entry>First try an SSL connection. If that fails, try a non-SSL connection. This is the default.</entry>
+			</row>
+			<row>
+				<entry>require</entry>
+				<entry>Only try an SSL connection. If a root CA file is present, verify the certificate.</entry>
+			</row>
+			<row>
+				<entry>verify-ca</entry>
+				<entry>Only try an SSL connection, and verify that the server. The certificate is issued by a trusted CA.</entry>
+			</row>
+			<row>
+				<entry>verify-full</entry>
+				<entry>Only try an SSL connection, verify that the server certificate is issued by a trusted CA and that the server hostname matches that in the certificate.</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	Here follows an example PostgreSQL configuration:
+	<programlisting language='text'>
+Database
+{
+    PostgreSQL
+    {
+        identifier      pgdb
+        host            localhost
+        port            5432
+        database        wolframe
+        user            wolfusr
+        password        wolfpwd
+        connectionTimeout 10
+        connections     40
+        acquireTimeout  10
+    }
+}
+	</programlisting>
 	</sect2>
 
 	<sect2>
