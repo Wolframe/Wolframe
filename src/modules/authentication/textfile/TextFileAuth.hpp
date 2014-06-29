@@ -89,7 +89,7 @@ public:
 	const char** mechs() const;
 
 	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client );
-	PasswordChanger* pwdChanger( const User& user, const net::RemoteEndpoint& client );
+	PasswordChanger* passwordChanger( const User& user, const net::RemoteEndpoint& client );
 
 	/// \brief	Authenticate a user with its plain username and password
 	/// \note	This function is supposed to be used only for tests.
@@ -193,9 +193,20 @@ class TextFilePwdChanger : public PasswordChanger
 		CHANGER_INITIALIZED,		///< Has been initialized, no other data
 		CHANGER_CHALLENGE_SENT,		///< Waiting for the answer
 		CHANGER_INVALID_MESSAGE,	///< Answer CRC was wrong -> fail
-		CHANGER_PASSWORD_CHANGED,	///< Answer CRC was correct -> password changed
+		CHANGER_PASSWORD_EXCHANGED,	///< Answer CRC was correct -> password changed
 		CHANGER_SYSTEM_FAILURE		///< Something is wrong
 	};
+
+	static const char* statusName( ChangerState i )
+	{
+		static const char* ar[] = {	"CHANGER_INITIALIZED",
+						"CHANGER_CHALLENGE_SENT",
+						"CHANGER_INVALID_MESSAGE",
+						"CHANGER_PASSWORD_EXCHANGED",
+						"CHANGER_SYSTEM_FAILURE"
+					  };
+		return ar[ i ];
+	}
 
 public:
 	TextFilePwdChanger( const TextFileAuthUnit& backend, const std::string& username );
@@ -217,11 +228,15 @@ public:
 	/// The current status of the authenticator slice
 	virtual Status status() const;
 
+	/// The new password
+	virtual std::string password();
+
 private:
 	const TextFileAuthUnit&	m_backend;
 	struct PwdFileUser	m_usr;
 	ChangerState		m_state;
 	CRAMchallenge*		m_challenge;
+	std::string		m_password;
 };
 
 

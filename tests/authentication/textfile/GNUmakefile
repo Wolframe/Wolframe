@@ -34,6 +34,7 @@ TEST_CPP_BINS = \
 	passwdFileTest$(EXE) \
 	textFileTest$(EXE) \
 	textFileThrow$(EXE) \
+	textFilePwdChange$(EXE) \
 	textFileAuthenticator
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -43,6 +44,7 @@ passwdHashTest$(EXE): $(CPP_OBJS)
 passwdFileTest$(EXE): $(CPP_OBJS)
 textFileTest$(EXE): $(CPP_OBJS)
 textFileThrow$(EXE): $(CPP_OBJS)
+textFilePwdChange$(EXE): $(CPP_OBJS)
 textFileAuthenticator$(EXE): $(CPP_OBJS)
 
 
@@ -61,6 +63,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileThrow
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFilePwdChange
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileAuthenticator
 	@echo

@@ -1629,6 +1629,12 @@ examples/tproc/execCommandHandler.hpp
 examples/tproc/GNUmakefile
 examples/tproc/handlerConfig.hpp
 examples/tproc/Makefile.W32
+examples/tproc/tests/temp/echo.lua
+examples/tproc/tests/temp/example_1.lua
+examples/tproc/tests/temp/example_2.lua
+examples/tproc/tests/temp/example_3.lua
+examples/tproc/tests/temp/example_4.lua
+examples/tproc/tests/temp/example_5.lua
 examples/tproc/tests/template/data/multilingual.UTF-8.xml
 examples/tproc/tests/template/expand.sh
 examples/tproc/tests/template/output_provider_cfg.sh
@@ -2543,6 +2549,7 @@ tests/authentication/textfile/passwdHashTest.cpp
 tests/authentication/textfile/test-response.php
 tests/authentication/textfile/test-userHash.php
 tests/authentication/textfile/textFileAuthenticator.cpp
+tests/authentication/textfile/textFilePwdChange.cpp
 tests/authentication/textfile/textFileTest.cpp
 tests/authentication/textfile/textFileThrow.cpp
 tests/base64Test.cpp

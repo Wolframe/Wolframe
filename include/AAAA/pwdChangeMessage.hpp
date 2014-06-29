@@ -38,29 +38,59 @@
 #define _PASSWORD_CHANGE_MESSAGE_HPP_INCLUDED
 
 #include <string>
+#include <cstring>
 #include "crypto/md5.h"
 
 namespace _Wolframe {
 namespace AAAA {
 
-#define PASSWORD_MAX_LENGTH	( 64 - sizeof( unsigned short ) - MD5_DIGEST_SIZE )
-
-
 /// Password changer data structure
-union PasswordChangeMessage
+class PasswordChangeMessage
 {
-	unsigned char data[ 64 ];
-	struct	{
-		unsigned short	length;
-		char		passwd[ PASSWORD_MAX_LENGTH ];
-		unsigned char	digest[ MD5_DIGEST_SIZE ];
-	} message;
+private:
+	enum	{
+		PASSWORD_MAX_LENGTH = 64 - sizeof( unsigned short ) - MD5_DIGEST_SIZE,
+		PAYLOAD_LENGTH = 64 - MD5_DIGEST_SIZE
+	};
+
+	union {
+		unsigned char data[ 64 ];
+		struct	{
+			unsigned short	length;
+			char		passwd[ PASSWORD_MAX_LENGTH ];
+			unsigned char	digest[ MD5_DIGEST_SIZE ];
+		} parts;
+	} m_message;
 
 public:
 	PasswordChangeMessage( const std::string& pwd );
 	PasswordChangeMessage( const unsigned char msg[ 64 ] );
 
-	std::string password() const;
+	/// Empty message constructor
+	/// \note that this is an invalid message
+	PasswordChangeMessage()			{ memset( m_message.data, 0, 64 ); }
+
+	~PasswordChangeMessage()		{ clear(); }
+
+	void clear()				{ memset( m_message.data, 0, 64 ); }
+	unsigned char* data()			{ return m_message.data; }
+	std::size_t size() const		{ return sizeof( m_message.data ); }
+	std::string password() const		{ return std::string( m_message.parts.passwd,
+								      m_message.parts.length ); }
+
+	/// Check if the buffer is a valid message
+	static bool isValid( const unsigned char buffer[ 64 ] )
+						{ return isValid( buffer, 64u ); }
+	static bool isValid( const unsigned char buffer[], std::size_t size );
+
+	/// Check if the message is valid
+	bool isValid() const			{ return isValid( m_message.data, 64u ); }
+
+	/// Encrypt the message to a base64 string
+	std::string toBase64( const unsigned char IV[ 16 ], const unsigned char key[ 32 ] ) const;
+	/// Build the message from an encrypted base64 message
+	bool fromBase64( const std::string& msg,
+			 const unsigned char IV[ 16 ], const unsigned char key[ 32 ] );
 };
 
 }} // namespace _Wolframe::AAAA

@@ -33,12 +33,14 @@ TEST_CPP_BINS = \
 	passwdHashTest.exe \
 	passwdFileTest.exe \
 	textFileTest.exe \
-	textFileThrow.exe
+	textFileThrow.exe \
+	textFilePwdChange.exe
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 textFileThrow.exe: textFileThrow.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
 textFileTest.exe: textFileTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
+textFilePwdChange.exe: textFilePwdChange.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
 passwdHashTest.exe: passwdHashTest.obj $(CPP_OBJS)
 passwdFileTest.exe: passwdFileTest.obj $(CPP_OBJS)
 
@@ -53,3 +55,4 @@ local_test:
 	@-passwdFileTest
 	@-textFileTest
 	@-textFileThrow
+	@-textFilePwdChange

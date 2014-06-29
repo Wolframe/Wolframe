@@ -85,6 +85,7 @@ tests/authentication/textfile/passwdHashTest
 tests/authentication/textfile/textFileTest
 tests/authentication/textfile/textFileThrow
 tests/authentication/textfile/textFileAuthenticator
+tests/authentication/textfile/textFilePwdChange
 tests/testBoostPath
 tests/filter
 tests/testVariantTypes

@@ -42,7 +42,6 @@
 #include "crypto/HMAC.hpp"
 #include "system/globalRngGen.hpp"
 #include "AAAA/passwordHash.hpp"
-#include "AAAA/authSlice.hpp"
 #include "AAAA/CRAM.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -52,7 +51,7 @@ using namespace _Wolframe::log;
 using namespace _Wolframe;
 using namespace std;
 
-// The fixture for testing class _Wolframe::module
+// The fixture for testing
 class AuthenticationFixture : public ::testing::Test
 {
 protected:

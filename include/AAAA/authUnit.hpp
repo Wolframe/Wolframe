@@ -76,8 +76,8 @@ public:
 					   const net::RemoteEndpoint& client ) = 0;
 
 	/// A PasswordChanger for the user (or NULL)
-	virtual PasswordChanger* pwdChanger( const User& /*user*/,
-					     const net::RemoteEndpoint& /*client*/ )
+	virtual PasswordChanger* passwordChanger( const User& /*user*/,
+						  const net::RemoteEndpoint& /*client*/ )
 						{ return NULL; }
 private:
 	const std::string	m_identifier;

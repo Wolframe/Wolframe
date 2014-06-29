@@ -36,8 +36,11 @@
 
 #include "AAAA/pwdChangeMessage.hpp"
 #include "crypto/md5.h"
+#include "crypto/AES256.h"
+#include "types/base64.hpp"
 #include <stdexcept>
-#include <string.h>
+#include <string>
+#include <cstring>
 #include <boost/lexical_cast.hpp>
 
 namespace _Wolframe {
@@ -45,38 +48,75 @@ namespace AAAA {
 
 PasswordChangeMessage::PasswordChangeMessage( const std::string& pwd )
 {
-	memset( data, 0, 64 );
+	memset( m_message.data, 0, 64 );
 	if ( pwd.length() > PASSWORD_MAX_LENGTH )	{
 		std::string msg = "Password is " + boost::lexical_cast< std::string >( pwd.length())
 				  + "bytes long, maximum is "
 				  + boost::lexical_cast< std::string >( PASSWORD_MAX_LENGTH ) + " bytes";
 		throw( std::runtime_error( msg ) );
 	}
-	message.length = pwd.length();
-	memcpy( message.passwd, pwd.data(), PASSWORD_MAX_LENGTH );
+	m_message.parts.length = pwd.length();
+	memcpy( m_message.parts.passwd, pwd.data(), m_message.parts.length );
 	md5_ctx ctx;
 	md5_init( &ctx );
-	md5( data, sizeof(unsigned short) + PASSWORD_MAX_LENGTH, message.digest );
+	md5( m_message.data, PAYLOAD_LENGTH, m_message.parts.digest );
 }
 
 PasswordChangeMessage::PasswordChangeMessage( const unsigned char msg[ 64 ] )
 {
-	unsigned char hash[ MD5_DIGEST_SIZE ];
-
-	memcpy( data, msg, 64 );
-
-	md5_ctx ctx;
-	md5_init( &ctx );
-	md5( data, sizeof(unsigned short) + PASSWORD_MAX_LENGTH, hash );
-
-	if ( memcmp( message.digest, hash, 16 ))
+	if ( !isValid( msg, 64 ) )
 		throw( std::runtime_error( "Message is not a valid password change message" ));
+	memcpy( m_message.data, msg, 64 );
 }
 
-std::string PasswordChangeMessage::password() const
+
+/// Check if the buffer is a valid message
+bool PasswordChangeMessage::isValid( const unsigned char buffer[], std::size_t size )
 {
-	std::string pwd( message.passwd, message.length );
-	return pwd;
+	if ( size != 64u )
+		return false;
+
+	unsigned char hash[ MD5_DIGEST_SIZE ];
+	md5_ctx ctx;
+	md5_init( &ctx );
+	md5( buffer, PAYLOAD_LENGTH, hash );
+	if ( memcmp( buffer + PAYLOAD_LENGTH, hash, MD5_DIGEST_SIZE ))
+		return false;
+	return true;
+}
+
+
+// Encrypt the message to a base64 string
+std::string PasswordChangeMessage::toBase64( const unsigned char IV[ 16 ], const unsigned char key[ 32 ] ) const
+{
+	unsigned char	crypted[ 64 ];
+	memcpy( crypted, m_message.data, 64 );
+
+	AES256_context	ctx;
+	AES256_init( &ctx, key );
+	AES256_encrypt_CBC( &ctx, IV, crypted, 64 );
+	AES256_done( &ctx );
+
+	return base64::encode( crypted, 64, 0 );
+}
+
+// Build the message from an encrypted base64 message
+bool PasswordChangeMessage::fromBase64( const std::string& msg,
+					const unsigned char IV[ 16 ], const unsigned char key[ 32 ] )
+{
+	unsigned char	crypted[ 64 ];
+	if ( base64::decode( msg, crypted, 64 ) < 0 )
+		return false;
+
+	AES256_context	ctx;
+	AES256_init( &ctx, key );
+	AES256_decrypt_CBC( &ctx, IV, crypted, 64 );
+	AES256_done( &ctx );
+
+	if ( !isValid( crypted ))
+		return false;
+	memcpy( m_message.data, crypted, 64 );
+	return true;
 }
 
 }} // namespace _Wolframe::AAAA

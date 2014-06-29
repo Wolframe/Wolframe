@@ -55,7 +55,7 @@ public:
 	enum Status	{
 		MESSAGE_AVAILABLE,	///< an output message is available
 		AWAITING_MESSAGE,	///< waiting for an input message
-		PASSWORD_CHANGED,	///< the password has been successfuly changed
+		PASSWORD_EXCHANGED,	///< the password has been successfuly changed
 		INVALID_MESSAGE,	///< the password change message is not valid,
 					///  most likely the credentials are invalid
 		SYSTEM_FAILURE		///< some other error occurred
@@ -65,7 +65,7 @@ public:
 	{
 		static const char* ar[] = {	"MESSAGE_AVAILABLE",
 						"AWAITING_MESSAGE",
-						"PASSWORD_CHANGED",
+						"PASSWORD_EXCHANGED",
 						"INVALID_MESSAGE",
 						"SYSTEM_FAILURE"
 					  };
@@ -88,11 +88,19 @@ public:
 	virtual void messageIn( const std::string& message ) = 0;
 
 	/// The output message
-	/// \returns		the output message
+	/// \returns	the output message
 	virtual std::string messageOut() = 0;
 
 	/// The current status of the password changer
 	virtual Status status() const = 0;
+
+	/// The new password
+	/// \returns	the new password if it exists or an empty string otherwise
+	/// \note	The new password is valid only if the changer is
+	///		in the PASSWORD_EXCHANGED state.
+	///		The function may even throw if called when the changed is
+	///		in another state.
+	virtual std::string password() = 0;
 };
 
 }} // namespace _Wolframe::AAAA

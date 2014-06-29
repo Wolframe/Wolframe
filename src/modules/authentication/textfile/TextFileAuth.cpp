@@ -39,10 +39,6 @@
 
 #include "logger-v1.hpp"
 #include "TextFileAuth.hpp"
-#include "crypto/sha2.h"
-#include "crypto/AES256.h"
-//#include "types/byte2hex.h"
-#include "types/base64.hpp"
 #include "AAAA/CRAM.hpp"
 #include "AAAA/passwordHash.hpp"
 #include "AAAA/pwdChangeMessage.hpp"
@@ -87,7 +83,7 @@ AuthenticatorSlice* TextFileAuthUnit::slice( const std::string& mech,
 }
 
 
-PasswordChanger* TextFileAuthUnit::pwdChanger( const User& user,
+PasswordChanger* TextFileAuthUnit::passwordChanger( const User& user,
 					       const net::RemoteEndpoint& /*client*/ )
 {
 	if ( boost::to_upper_copy( user.mech() ) == "WOLFRAME-CRAM" &&
@@ -394,6 +390,9 @@ TextFilePwdChanger::TextFilePwdChanger( const TextFileAuthUnit& backend,
 TextFilePwdChanger::~TextFilePwdChanger()
 {
 	m_usr.clear();
+	for ( std::size_t i = 0; i < m_password.length(); i++ )
+		m_password[ i ] = 'x';
+	m_password.clear();
 	if ( m_challenge != NULL )
 		delete m_challenge;
 }
@@ -418,15 +417,14 @@ void TextFilePwdChanger::messageIn( const std::string& message )
 		case CHANGER_CHALLENGE_SENT:	{
 			PasswordHash hash( m_usr.hash );
 			CRAMresponse response( *m_challenge, hash );
-			unsigned char buffer[ 64 ];
-			base64::decode( message, buffer, 64 );
-			AES256_context ctx;
-			AES256_init( &ctx, response.response() );
-			AES256_decrypt_CBC( &ctx, hash.salt().salt(), buffer, 64 );
-			AES256_done( &ctx );
-			PasswordChangeMessage pwd( buffer );
-			std::cout << pwd.password();
-			m_state = CHANGER_PASSWORD_CHANGED;
+			PasswordChangeMessage pwd;
+			if ( pwd.fromBase64( message, hash.salt().salt(), response.response() ))	{
+				m_password = pwd.password();
+				pwd.clear();
+				m_state = CHANGER_PASSWORD_EXCHANGED;
+			}
+			else
+				m_state = CHANGER_INVALID_MESSAGE;
 			break;
 		}
 		case CHANGER_INVALID_MESSAGE:	{
@@ -437,9 +435,9 @@ void TextFilePwdChanger::messageIn( const std::string& message )
 			throw std::logic_error( msg );
 			break;
 		}
-		case CHANGER_PASSWORD_CHANGED:	{
+		case CHANGER_PASSWORD_EXCHANGED:	{
 			std::string msg = "Text file password changer (" + identifier() +
-					  "): received message in CHANGER_PASSWORD_CHANGED state";
+					  "): received message in CHANGER_PASSWORD_EXCHANGED state";
 			LOG_ALERT << msg;
 			m_state = CHANGER_SYSTEM_FAILURE;
 			throw std::logic_error( msg );
@@ -482,9 +480,9 @@ std::string TextFilePwdChanger::messageOut()
 			throw std::logic_error( msg );
 			break;
 		}
-		case CHANGER_PASSWORD_CHANGED:	{
+		case CHANGER_PASSWORD_EXCHANGED:	{
 			std::string msg = "Text file password changer (" + identifier() +
-					  "): message requested in CHANGER_PASSWORD_CHANGED state";
+					  "): message requested in CHANGER_PASSWORD_EXCHANGED state";
 			LOG_ALERT << msg;
 			throw std::logic_error( msg );
 			break;
@@ -510,12 +508,25 @@ PasswordChanger::Status TextFilePwdChanger::status() const
 			return PasswordChanger::AWAITING_MESSAGE;
 		case CHANGER_INVALID_MESSAGE:
 			return PasswordChanger::INVALID_MESSAGE;
-		case CHANGER_PASSWORD_CHANGED:
-			return PasswordChanger::PASSWORD_CHANGED;
+		case CHANGER_PASSWORD_EXCHANGED:
+			return PasswordChanger::PASSWORD_EXCHANGED;
 		case CHANGER_SYSTEM_FAILURE:
 			return PasswordChanger::SYSTEM_FAILURE;
 	}
 	return SYSTEM_FAILURE;		// just to silence some compilers
+}
+
+/// The new password
+std::string TextFilePwdChanger::password()
+{
+	if ( m_state == CHANGER_PASSWORD_EXCHANGED )
+		return m_password;
+	else	{
+		std::string msg = "Password changer (" + identifier() + ") : password requested in " +
+				  statusName( m_state ) + " state";
+		LOG_ALERT << msg;
+		throw std::logic_error( msg );
+	}
 }
 
 }} // namespace _Wolframe::AAAA
