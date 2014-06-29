@@ -119,7 +119,7 @@
 		the following value:
 
 		<programlisting language='shell'>
-	CustomerListRequest customer { }
+CustomerListRequest customer { }
 		</programlisting>
 		
 		We define the 'action' to be executed, when the form is loaded. In our
@@ -192,13 +192,13 @@
 		dynamic property 'answer' similar to the 'action' property:
 		
 		<programlisting language='shell'>
-	CustomerList list {
-	    customer[] {
-	        id={?};
-	        name{{row.name}};
-	        address{{row.address}}
-	    }
-	}
+CustomerList list {
+    customer[] {
+        id={?};
+        name{{row.name}};
+        address{{row.address}}
+    }
+}
 		</programlisting>
 		
 		The line breaks and indentation are optional and you can write the mapping
@@ -261,9 +261,9 @@
 	</para>
 
 	<programlisting language='shell'>
-	COMMAND CustomerListRequest
-	        CALL SelectCustomerList
-	        RETURN SKIP CustomerList {root='list'};
+COMMAND CustomerListRequest
+    CALL SelectCustomerList
+    RETURN SKIP CustomerList {root='list'};
 	</programlisting>
 
 	<para>

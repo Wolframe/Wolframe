@@ -23,10 +23,10 @@
 		as this one is automatically choosen by the sequence in the database:
 
 		<programlisting language='shell'>
-	CustomerCreate customer {
-	    name {{main.name}};
-	    address {{main.address}}
-	}
+CustomerCreate customer {
+    name {{main.name}};
+    address {{main.address}}
+}
 		</programlisting>
 	</para>
 
@@ -82,7 +82,7 @@
 		in <filename>tutorial.dmap</filename>:
 
 	<programlisting language='shell'>
-	COMMAND CustomerCreate CALL CreateCustomer;
+COMMAND CustomerCreate CALL CreateCustomer;
 	</programlisting>
 	
 		We also have to add the form 'CustomerCreate' to <filename>Customer.sfrm</filename>:
@@ -99,11 +99,11 @@
 		Last we add a 'CreateCustomer' transaction function:
 
 	<programlisting language='sql'>
-	TRANSACTION CreateCustomer
-	BEGIN
-		DO INSERT INTO Customer( name, address )
-		    VALUES( $(name), $(address) );
-	END
+TRANSACTION CreateCustomer
+BEGIN
+    DO INSERT INTO Customer( name, address )
+        VALUES( $(name), $(address) );
+END
 	</programlisting>
 	
 		When we restart the server and client we see the following request

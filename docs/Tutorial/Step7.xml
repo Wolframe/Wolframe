@@ -19,7 +19,7 @@
 		set to:
 
 		<programlisting language='shell'>
-	customer_edit?id={customer.selected}
+customer_edit?id={customer.selected}
 		</programlisting>
 	</para>
 
@@ -44,11 +44,11 @@
 		'CustomerUpdate' request:
 
 		<programlisting language='shell'>
-	CustomerUpdate customer {
-	    id={main.id};
-	    name {{main.name}};
-	    address {{main.address}}
-	}
+CustomerUpdate customer {
+    id={main.id};
+    name {{main.name}};
+    address {{main.address}}
+}
 		</programlisting>
 		
 		We also set 'form' to 'customers', so the user gets taken back
@@ -80,7 +80,7 @@
 		in <filename>tutorial.dmap</filename>:
 
 	<programlisting language='xml'>
-	COMMAND CustomerUpdate CALL UpdateCustomer;
+COMMAND CustomerUpdate CALL UpdateCustomer;
 	</programlisting>
 
 		We also add a simple form 'CustomerUpdate' to <filename>Customer.sfrm</filename>
@@ -96,11 +96,11 @@
 	</para>
 
 	<programlisting language='sql'>
-	TRANSACTION UpdateCustomer
-	BEGIN
-		DO UPDATE Customer SET name=$(name), address=$(address)
-			WHERE id=$(id);
-	END
+TRANSACTION UpdateCustomer
+BEGIN
+    DO UPDATE Customer SET name=$(name), address=$(address)
+        WHERE id=$(id);
+END
 	</programlisting>
 
 	<para>

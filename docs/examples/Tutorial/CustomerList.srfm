@@ -1,10 +1,10 @@
-	FORM CustomerList
-		-root list
-	{
-		customer []
-		{
-			id !@string
-			name string
-			address string
-		}
-	}
+FORM CustomerList
+    -root list
+{
+    customer []
+    {
+        id !@string
+        name string
+        address string
+    }
+}

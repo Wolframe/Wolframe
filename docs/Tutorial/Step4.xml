@@ -7,9 +7,9 @@
 		We want to store the customer data in an Sqlite database, so we have to
 		tell the server to load the database module for Sqlite:
 		<programlisting language='shell'>
-	LoadModules {
-		<emphasis role="bold">module mod_db_sqlite3</emphasis>
-	}
+LoadModules {
+    <emphasis role="bold">module mod_db_sqlite3</emphasis>
+}
 		</programlisting>
 	</para>
 	
@@ -18,11 +18,11 @@
 		following schema:
 
 		<programlisting language='shell'>
-	CREATE TABLE Customer (
-	    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-	    name            TEXT    NOT NULL,
-	    address         TEXT
-	);
+CREATE TABLE Customer (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    name            TEXT    NOT NULL,
+    address         TEXT
+);
 		</programlisting>
 	</para>
 	
@@ -30,7 +30,7 @@
 		Store this into <filename>schema.sql</filename>. Then execute:
 
 		<programlisting language='shell'>
-	sqlite3 tutorial.db &lt; schema.sql
+sqlite3 tutorial.db &lt; schema.sql
 		</programlisting>
 	</para>
 
@@ -38,13 +38,13 @@
 		Now we have to tell server to use this sqlite database file:
 
 		<programlisting language='shell'>
-	database {
-	    SQLite {
-	        identifier     sqlitedb
-	        file           tutorial.db
-	        foreignKeys    yes
-		}
-	}
+database {
+    SQLite {
+        identifier     sqlitedb
+        file           tutorial.db
+        foreignKeys    yes
+    }
+}
 		</programlisting>
 	
 	</para>
@@ -53,8 +53,7 @@
 		When we restart the server we see:
 
 		<programlisting language='shell'>
-	DEBUG: SQLite database unit 'sqlitedb' created with 3 connections
-		to file 'tutorial.db'
+DEBUG: SQLite database unit 'sqlitedb' created with 3 connections to file 'tutorial.db'
 		</programlisting>
 	</para>
 	
@@ -63,11 +62,11 @@
 		so we have to add the following modules to <filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
-	LoadModules {
-	    module mod_db_sqlite3
-	    <emphasis role="bold">module mod_doctype_xml</emphasis>
-	    <emphasis role="bold">module mod_filter_libxml2</emphasis>
-	}
+LoadModules {
+    module mod_db_sqlite3
+    <emphasis role="bold">module mod_doctype_xml</emphasis>
+    <emphasis role="bold">module mod_filter_libxml2</emphasis>
+}
 		</programlisting>
 	</para>
 
@@ -78,7 +77,7 @@
 		use:
 
 		<programlisting language='shell'>
-	/usr/sbin/wolframed -p -c tutorial.conf
+/usr/sbin/wolframed -p -c tutorial.conf
 		</programlisting>
 	</para>
 
@@ -86,12 +85,12 @@
 		We see:
 
 		<programlisting language='shell'>
-	..
-	Module files to load:
-	  /usr/lib/wolframe/modules/mod_db_sqlite3
-	  /usr/lib/wolframe/modules/mod_doctype_xml
-	  /usr/lib/wolframe/modules/mod_filter_libxml2
-	..
+..
+Module files to load:
+  /usr/lib/wolframe/modules/mod_db_sqlite3
+  /usr/lib/wolframe/modules/mod_doctype_xml
+  /usr/lib/wolframe/modules/mod_filter_libxml2
+..
 		</programlisting>
 		which looks ok.
 	</para>
@@ -102,24 +101,24 @@
 		<filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
-	LoadModules {
-		module mod_db_sqlite3
-		module mod_doctype_xml
-		module mod_filter_libxml2
-		<emphasis role="bold">module mod_command_directmap</emphasis>
-	}
+LoadModules {
+    module mod_db_sqlite3
+    module mod_doctype_xml
+    module mod_filter_libxml2
+    <emphasis role="bold">module mod_command_directmap</emphasis>
+}
 		</programlisting>
 		and a new section 'Processor' on the same level as 'LoadModules'
 		<programlisting language='shell'>
-	Processor {
-	    database sqlitedb
-	    cmdhandler {
-	        directmap {
-	            filter XML=libxml2
-	            program tutorial.dmap
-	        }
-	    }
+Processor {
+    database sqlitedb
+    cmdhandler {
+	directmap {
+	    filter XML=libxml2
+	    program tutorial.dmap
 	}
+    }
+}
 		</programlisting>
 	</para>
 
@@ -133,9 +132,9 @@
 		This file maps the requests to the corresponding transaction definitions:
 
 		<programlisting language='shell'>
-	COMMAND CustomerListRequest
-	       CALL SelectCustomerList
-	       RETURN SKIP {standalone="yes", root="list"};
+COMMAND CustomerListRequest
+    CALL SelectCustomerList
+    RETURN SKIP {standalone="yes", root="list"};
 		</programlisting>
 
 		We map the 'CustomerListRequest' request to a function 'SelectCustomerList'
@@ -156,16 +155,16 @@
 		section:
 
 		<programlisting language='shell'>
-	Processor {
-	    database sqlitedb
-	    cmdhandler {
-	        directmap {
-	            filter XML=libxml2
-	            program tutorial.dmap
-	        }
-	    }
-	    <emphasis role="bold">program Customer.tdl</emphasis>
-	}
+Processor {
+    database sqlitedb
+    cmdhandler {
+        directmap {
+            filter XML=libxml2
+            program tutorial.dmap
+        }
+    }
+    <emphasis role="bold">program Customer.tdl</emphasis>
+}
 		</programlisting>
 
 		The <filename>Customer.tdl</filename> file contains the database transaction 'SelectCustomerList' 
@@ -174,10 +173,10 @@
 		we are going to retrieve with 'INTO customer'.
 
 		<programlisting language='shell'>
-	TRANSACTION SelectCustomerList
-	BEGIN
-		INTO customer DO SELECT * from Customer;
-	END
+TRANSACTION SelectCustomerList
+BEGIN
+    INTO customer DO SELECT * from Customer;
+END
 		</programlisting>
 
 	We also need a validator for the input when the client sends a 'CustomerListRequest'.
@@ -185,25 +184,25 @@
 	register the simpleform program <filename>Customer.sfrm</filename> to the list of programs in the same file:
 
 		<programlisting language='shell'>
-	LoadModules {
-	    module mod_db_sqlite3
-	    module mod_doctype_xml
-	    module mod_filter_libxml2
-	    module mod_command_directmap
-	    <emphasis role="bold">module mod_ddlcompiler_simpleform</emphasis>
-	}
+LoadModules {
+    module mod_db_sqlite3
+    module mod_doctype_xml
+    module mod_filter_libxml2
+    module mod_command_directmap
+    <emphasis role="bold">module mod_ddlcompiler_simpleform</emphasis>
+}
 
-	Processor {
-	    database sqlitedb
-	    cmdhandler {
-	        directmap {
-	            filter XML=libxml2
-	            program tutorial.dmap
-	        }
-	    }
-	    program Customer.tdl
-	    <emphasis role="bold">program Customer.sfrm</emphasis>	
-	}
+Processor {
+    database sqlitedb
+    cmdhandler {
+        directmap {
+            filter XML=libxml2
+            program tutorial.dmap
+        }
+    }
+    program Customer.tdl
+    <emphasis role="bold">program Customer.sfrm</emphasis>	
+}
 		</programlisting>
 
 	and we add a simple form file <filename>Customer.sfrm</filename>.
@@ -211,17 +210,18 @@
 	but for the root element 'customer':
 
 		<programlisting language='shell'>
-	FORM CustomerListRequest
-	    -root customer
-	{}
+FORM CustomerListRequest
+    -root customer
+{
+}
 		</programlisting>
 	</para>
 	
 	<para>
-		We have to restart the wolframe daemon now and restart it with
+		We have to restart the wolframe daemon now and restart it with:
 		<programlisting language='shell'>
-	pkill wolframed
-	/usr/sbin/wolframed -f -c tutorial.conf			
+pkill wolframed
+/usr/sbin/wolframed -f -c tutorial.conf			
 		</programlisting>	
 	
 		This we have to do <emphasis role="bold">every time</emphasis> we
@@ -235,7 +235,7 @@
 		loaded:
 		
 		<programlisting language='shell'>
-	DEBUG: Loaded transaction function 'SelectCustomerList'
+DEBUG: Loaded transaction function 'SelectCustomerList'
 		</programlisting>
 	</para>
 
@@ -251,7 +251,7 @@
 		This we can execute with:
 
 		<programlisting language='shell'>
-	netcat -v localhost 7661 &lt; CustomerListRequest.netcat
+netcat -v localhost 7661 &lt; CustomerListRequest.netcat
 		</programlisting>
 
 		and we get:
@@ -270,12 +270,12 @@
 		Let's add some customer data now:
 
 		<programlisting language='shell'>
-	cat > data.sql
-	insert into customer(name,address) values('Dr Who','Blue Police Box');
-	insert into customer(name,address) values('John Smith','The Wheel in Space');
-	Ctrl-D
+cat > data.sql
+insert into customer(name,address) values('Dr Who','Blue Police Box');
+insert into customer(name,address) values('John Smith','The Wheel in Space');
+Ctrl-D
 
-	sqlite3 tutorial.db &lt; data.sql
+sqlite3 tutorial.db &lt; data.sql
 		</programlisting>
 	</para>
 
@@ -306,7 +306,7 @@
 	<para>
 		The request can be executed by calling:
 		<programlisting language='shell'>
-	wolframec -d CustomerListRequest.xml
+wolframec -d CustomerListRequest.xml
 		</programlisting>		
 	</para>
 	
@@ -315,12 +315,12 @@
 		daemon process. We use the <command>wolfilter</command> program for that in the
 		following way:
 		<programlisting language='shell'>
-	cat ~/tutorial/client/CustomerListRequest.xml | wolfilter -c ~/tutorial/server/tutorial.conf CustomerListRequest
+cat ~/tutorial/client/CustomerListRequest.xml | \
+    wolfilter -c ~/tutorial/server/tutorial.conf CustomerListRequest
 		</programlisting>
 	</para>
 	
 	<para>
 		We can move now to the wolfclient to make our first request visible.
-
 	</para>
 </sect1>

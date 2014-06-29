@@ -7,12 +7,12 @@
 		For the time being we add a dummy authorization to the server configuration
 		which accepts all connections (not very secure, but for now good enough):
 		<programlisting language='shell'>
-	; dummy authorization
-	AAAA {
-		Authorization {
-			default allow
-		}
-	}
+; dummy authorization
+AAAA {
+    Authorization {
+        default allow
+    }
+}
 		</programlisting>
 	</para>
 	
@@ -20,10 +20,10 @@
 		If we start the server now, the telnet shows us:
 		
 		<programlisting language='shell'>
-	Connected to localhost.
-	Escape character is '^]'.
-	Wolframe
-	OK
+Connected to localhost.
+Escape character is '^]'.
+Wolframe
+OK
 		</programlisting>
 	</para>
 	
@@ -31,8 +31,8 @@
 		Type <userinput>quit</userinput>, then <keycap>Enter</keycap>
 		now and get back to the shell:
 		<programlisting language='shell'>
-	BYE
-	Connection closed by foreign host.
+BYE
+Connection closed by foreign host.
 		</programlisting>
 	</para>
 
@@ -41,8 +41,8 @@
 		that authorization was successful:
 		
 		<programlisting language='shell'>
-	DEBUG: Connection from 127.0.0.1:47064 to 0.0.0.0:7661 authorized
-	DEBUG: Connection to 127.0.0.1:47064 closed
+DEBUG: Connection from 127.0.0.1:47064 to 0.0.0.0:7661 authorized
+DEBUG: Connection to 127.0.0.1:47064 closed
 		</programlisting>
 
 	</para>
