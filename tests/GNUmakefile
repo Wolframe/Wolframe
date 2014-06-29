@@ -117,6 +117,7 @@ TEST_CPP_BINS = \
 	testVirtualInheritance$(EXE) \
 	testArrayDoublingAllocator$(EXE) \
 	versionTest$(EXE) \
+	platformTest$(EXE) \
 	resolvePathTest$(EXE) \
 	testBoostPath$(EXE) \
 	testFiletypeRecognition$(EXE) \
@@ -211,6 +212,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./logTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./versionTest
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./platformTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./resolvePathTest
 	@echo

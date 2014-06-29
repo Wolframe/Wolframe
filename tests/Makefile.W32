@@ -54,6 +54,7 @@ TEST_CPP_BINS = \
 	testNamedRetVal.exe \
 	testVirtualInheritance.exe \
 	versionTest.exe \
+	platformTest.exe \
 	testMethodMemberPointerTemplate.exe \
 	resolvePathTest.exe \
 	testFiletypeRecognition.exe \
@@ -94,6 +95,7 @@ testNamedRetVal.exe: testNamedRetVal.obj
 testVirtualInheritance.exe: testVirtualInheritance.obj
 testMethodMemberPointerTemplate.exe: testMethodMemberPointerTemplate.obj
 versionTest.exe: versionTest.obj
+platformTest.exe: platformTest.obj
 resolvePathTest.exe: resolvePathTest.obj
 testBoostPath.exe: testBoostPath.obj
 testFiletypeRecognition.exe : testFiletypeRecognition.obj
@@ -162,6 +164,7 @@ local_test:
 # DISABLED (only for memory corruption checks):	@-testTestAllocator 
 	@-logTest 
 	@-versionTest 
+	@-platformTest
 	@-counterTest 
 	@-resolvePathTest 
 	@-testBoostPath 

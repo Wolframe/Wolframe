@@ -65,6 +65,7 @@ CPP_OBJS = \
 	logObject.obj \
 	logError.obj \
 	version.obj \
+	platform.obj \
 	execContext.obj \
 	getPassword.obj \
 	user.obj \
