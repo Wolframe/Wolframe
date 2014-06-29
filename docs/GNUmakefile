@@ -75,22 +75,22 @@ doc-doxygen-webpage:
 	@-mkdir doxygen/html-webpage
 	cd $(TOPDIR); doxygen docs/doxygen-webpage.conf
 
-doc-html: WolfBook.html Tutorial.html Installation.html
+doc-html: WolfBook.html Tutorial.html
 
 doc-txt: InstallationUnix.txt
 
-doc-html-chunked: html/index.html html-tutorial/index.html html-installation/index.html
+doc-html-chunked: html/index.html html-tutorial/index.html
 
-doc-html-webpage: html-webpage/index.html html-tutorial-webpage/index.html html-installation-webpage/index.html
+doc-html-webpage: html-webpage/index.html html-tutorial-webpage/index.html
 
-doc-html-webpage-chunked: html-webpage-chunked/index.html html-tutorial-webpage-chunked/index.html html-installation-webpage-chunked/index.html
+doc-html-webpage-chunked: html-webpage-chunked/index.html html-tutorial-webpage-chunked/index.html
 
-doc-pdf: WolfBook.pdf Tutorial.pdf Installation.pdf
+doc-pdf: WolfBook.pdf Tutorial.pdf
 
 .PHONY: depend
 depend:
 
-doc-epub: WolfBook.epub Tutorial.epub Installation.epub
+doc-epub: WolfBook.epub Tutorial.epub
 
 doc-towordml: WolfBook.docx
 
@@ -114,79 +114,48 @@ doc-towordml: WolfBook.docx
 	@sed 's/Copyright ?/Copyright (C)/g' $@ > _tmp
 	@mv -f _tmp $@ 
 
-# Installation Guide
-
-INSTALLATION_FILES = \
-	Installation.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
-	Installation/Preface.xml \
-	Installation/InstallationSource.xml \
-	Installation/InstallationSourceUnix.xml \
-	Installation/InstallationSourceUnixClient.xml \
-	Installation/InstallationSourceWindows.xml \
-	Installation/InstallationSourceWindowsClient.xml \
-	Installation/InstallationBinary.xml \
-	WolframeVersion.txt \
-	WolfclientVersion.txt
+# Installation files 'INSTALL.Unix' and 'Install.Windows' are generated
+# from the corresponding source sections of the Wolfbook, both for the
+# Wolframe and the wolfclient project. Keep that in mind when you change
+# things in the Installation sections of Wolfbook!
 
 INSTALLATION_UNIX_FILES = \
 	InstallationUnix.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
+	WolfBookVersion.txt \
+	WolfBookDate.txt \
 	Installation/InstallationSourceUnix.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 
 INSTALLATION_WINDOWS_FILES = \
 	InstallationWindows.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
+	WolfBookVersion.txt \
+	WolfBookDate.txt \
 	Installation/InstallationSourceWindows.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 
 INSTALLATION_UNIX_CLIENT_FILES = \
 	InstallationUnixClient.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
+	WolfBookVersion.txt \
+	WolfBookDate.txt \
 	Installation/InstallationSourceUnixClient.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 
 INSTALLATION_WINDOWS_CLIENT_FILES = \
 	InstallationWindowsClient.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
+	WolfBookVersion.txt \
+	WolfBookDate.txt \
 	Installation/InstallationSourceWindowsClient.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 	
-Installation.html: $(INSTALLATION_FILES)
-Installation.pdf: $(INSTALLATION_FILES)
-
 InstallationUnix.html: $(INSTALLATION_UNIX_FILES)
 InstallationWindows.html: $(INSTALLATION_WINDOWS_FILES)
 
 InstallationUnixClient.html: $(INSTALLATION_UNIX_CLIENT_FILES)
 InstallationWindowsClient.html: $(INSTALLATION_WINDOWS_CLIENT_FILES)
-
-html-installation/index.html: $(INSTALLATION_FILES)
-	$(XSLT_HTML_CHUNKED) $<
-
-html-installation-webpage/index.html: $(INSTALLATION_FILES)
-	$(XSLT_WEBPAGE_HTML) $<
-
-html-installation-webpage-chunked/index.html: $(INSTALLATION_FILES)
-	$(XSLT_WEBPAGE_HTML_CHUNKED) $<
-
-Installation.epub: $(INSTALLATION_FILES)
-	mkdir -p OEBPS/images
-	cp images/draft.png images/*.svg OEBPS/images
-	echo "application/epub+zip" > mimetype
-	zip -0Xq  Installation.epub mimetype
-	zip -Xr9D Installation.epub META-INF OEBPS
-	rm -rf mimetype META-INF OEBPS
 
 # WolfBook
 
@@ -194,11 +163,26 @@ WOLFBOOK_SOURCE_FILES = \
 	WolfBook.xml \
 	WolfBookVersion.txt \
 	WolfBookDate.txt \
+	WolframeVersion.txt \
+	WolfclientVersion.txt \
+	AppDevelopment/AAAA.xml \
+	AppDevelopment/AAAAConfig.xml \
 	AppDevelopment/AppDevelopment.ent \
+	AppDevelopment/ApplicationServerRequests.xml \
+	AppDevelopment/AuditingAndAccounting.xml \
+	AppDevelopment/Authentication.xml \
+	AppDevelopment/Authorization.xml \
 	AppDevelopment/Appendix.xml \
 	AppDevelopment/CmdHandlerDirectmap.xml \
 	AppDevelopment/CmdHandlerLua.xml \
 	AppDevelopment/CmdHandlers.xml \
+	AppDevelopment/ConfigDatabases.xml \
+	AppDevelopment/ConfigGlobalSettings.xml \
+	AppDevelopment/ConfigListener.xml \
+	AppDevelopment/ConfigLogging.xml \
+	AppDevelopment/ConfigModules.xml \
+	AppDevelopment/ConfigService.xml \
+	AppDevelopment/DataProcessing.xml \
 	AppDevelopment/EBNF_Normalizer.xml \
 	AppDevelopment/EBNF_TransactionDefinitionLanguage.xml \
 	AppDevelopment/FilterJSON.xml \
@@ -211,6 +195,7 @@ WOLFBOOK_SOURCE_FILES = \
 	AppDevelopment/Introduction.xml \
 	AppDevelopment/ModelTypedFilter.xml \
 	AppDevelopment/Preface.xml \
+	AppDevelopment/ProcessorConfig.xml \
 	AppDevelopment/ProgramCpp.xml \
 	AppDevelopment/ProgramDotNet.xml \
 	AppDevelopment/ProgramFormDataTypes.xml \
@@ -218,6 +203,7 @@ WOLFBOOK_SOURCE_FILES = \
 	AppDevelopment/ProgramLua.xml \
 	AppDevelopment/ProgramPython.xml \
 	AppDevelopment/ProgramTransactions.xml \
+	AppDevelopment/ServerConfiguration.xml \
 	AppDevelopment/README \
 	AppDevelopment/Testing.xml \
 	Client/CLI.xml \
@@ -239,7 +225,13 @@ WOLFBOOK_SOURCE_FILES = \
 	ExtDevelopment/Glossary.xml \
 	ExtDevelopment/Introduction.xml \
 	ExtDevelopment/NormalizerModules.xml \
-	ExtDevelopment/Preface.xml
+	ExtDevelopment/Preface.xml \
+	Installation/InstallationBinary.xml \
+	Installation/InstallationSource.xml \
+	Installation/InstallationSourceUnix.xml \
+	Installation/InstallationSourceUnixClient.xml \
+	Installation/InstallationSourceWindows.xml \
+	Installation/InstallationSourceWindowsClient.xml
 
 WolfBook.html: $(WOLFBOOK_SOURCE_FILES)
 
@@ -314,16 +306,13 @@ local_clean:
 	-rm -rf doxygen/html/* doxygen/man/*  doxygen/perlmod/*
 	-rm -f WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
-	-rm -f Installation.html Installation.pdf InstallationUnix.html InstallationUnix.txt InstallationWindows.html InstallationWindows.txt
+	-rm -f InstallationUnix.html InstallationUnix.txt InstallationWindows.html InstallationWindows.txt
 	-rm -rf html/*.html
 	-rm -rf html-webpage/*.html
 	-rm -rf html-tutorial/*.html
-	-rm -rf html-installation/*.html
 	-rm -rf html-webpage-chunked/*.html
 	-rm -rf html-tutorial-webpage/*.html
 	-rm -rf html-tutorial-webpage-chunked/*.html
-	-rm -rf html-installation-webpage/*.html
-	-rm -rf html-installation-webpage-chunked/*.html
 	-rm -rf doxygen/html-webpage/*
 	-rm -rf InstallationUnixClient.html InstallationUnixClient.txt
 	-rm -rf InstallationWindowsClient.html InstallationWindowsClient.txt
@@ -374,4 +363,3 @@ check:
 	xmllint --noout --xinclude --postvalid wolframe.conf-man.xml
 	xmllint --noout --xinclude --postvalid wolframed-man.xml
 	xmllint --noout --xinclude --postvalid wolfpasswd-man.xml
-

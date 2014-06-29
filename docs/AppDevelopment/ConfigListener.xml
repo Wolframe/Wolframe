@@ -67,7 +67,8 @@ Listener
 		<tbody>
 			<row>
 				<entry>Address</entry>
-				<entry>Listening address (IPv4 or IPv6) of the server</entry>
+				<entry>Listening address (IPv4 or IPv6) of the server. '127.0.0.1' and '::1' stand for the loopback address (IPv4 an IPv6 respectively).
+				       The listener wildcards '*' or '0.0.0.0'/'::' (IPv4 or IPv6) are also accepted.</entry>
 			</row>
 			<row>
 				<entry>Port</entry>
@@ -122,7 +123,8 @@ Listener
 		<tbody>
 			<row>
 				<entry>Address</entry>
-				<entry>IPv4 or IPv6 address of the server</entry>
+				<entry>Listening address (IPv4 or IPv6) of the server. '127.0.0.1' and '::1' stand for the loopback address (IPv4 an IPv6 respectively).
+				       The listener wildcards '*' or '0.0.0.0'/'::' (IPv4 or IPv6) are also accepted.</entry>
 			</row>
 			<row>
 				<entry>Port</entry>
