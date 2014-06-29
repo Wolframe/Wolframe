@@ -165,11 +165,24 @@ WOLFBOOK_SOURCE_FILES = \
 	WolfBookDate.txt \
 	WolframeVersion.txt \
 	WolfclientVersion.txt \
+	AppDevelopment/AAAA.xml \
+	AppDevelopment/AAAAConfig.xml \
 	AppDevelopment/AppDevelopment.ent \
+	AppDevelopment/ApplicationServerRequests.xml \
+	AppDevelopment/AuditingAndAccounting.xml \
+	AppDevelopment/Authentication.xml \
+	AppDevelopment/Authorization.xml \
 	AppDevelopment/Appendix.xml \
 	AppDevelopment/CmdHandlerDirectmap.xml \
 	AppDevelopment/CmdHandlerLua.xml \
 	AppDevelopment/CmdHandlers.xml \
+	AppDevelopment/ConfigDatabases.xml \
+	AppDevelopment/ConfigGlobalSettings.xml \
+	AppDevelopment/ConfigListener.xml \
+	AppDevelopment/ConfigLogging.xml \
+	AppDevelopment/ConfigModules.xml \
+	AppDevelopment/ConfigService.xml \
+	AppDevelopment/DataProcessing.xml \
 	AppDevelopment/EBNF_Normalizer.xml \
 	AppDevelopment/EBNF_TransactionDefinitionLanguage.xml \
 	AppDevelopment/FilterJSON.xml \
@@ -182,6 +195,7 @@ WOLFBOOK_SOURCE_FILES = \
 	AppDevelopment/Introduction.xml \
 	AppDevelopment/ModelTypedFilter.xml \
 	AppDevelopment/Preface.xml \
+	AppDevelopment/ProcessorConfig.xml \
 	AppDevelopment/ProgramCpp.xml \
 	AppDevelopment/ProgramDotNet.xml \
 	AppDevelopment/ProgramFormDataTypes.xml \
@@ -189,6 +203,7 @@ WOLFBOOK_SOURCE_FILES = \
 	AppDevelopment/ProgramLua.xml \
 	AppDevelopment/ProgramPython.xml \
 	AppDevelopment/ProgramTransactions.xml \
+	AppDevelopment/ServerConfiguration.xml \
 	AppDevelopment/README \
 	AppDevelopment/Testing.xml \
 	Client/CLI.xml \
@@ -348,4 +363,3 @@ check:
 	xmllint --noout --xinclude --postvalid wolframe.conf-man.xml
 	xmllint --noout --xinclude --postvalid wolframed-man.xml
 	xmllint --noout --xinclude --postvalid wolfpasswd-man.xml
-
