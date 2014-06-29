@@ -1629,12 +1629,6 @@ examples/tproc/execCommandHandler.hpp
 examples/tproc/GNUmakefile
 examples/tproc/handlerConfig.hpp
 examples/tproc/Makefile.W32
-examples/tproc/tests/temp/echo.lua
-examples/tproc/tests/temp/example_1.lua
-examples/tproc/tests/temp/example_2.lua
-examples/tproc/tests/temp/example_3.lua
-examples/tproc/tests/temp/example_4.lua
-examples/tproc/tests/temp/example_5.lua
 examples/tproc/tests/template/data/multilingual.UTF-8.xml
 examples/tproc/tests/template/expand.sh
 examples/tproc/tests/template/output_provider_cfg.sh
@@ -2023,6 +2017,7 @@ src/libwolframe/md5.c
 src/libwolframe/passwordHash.cpp
 src/libwolframe/PBKDF2.cpp
 src/libwolframe/pbkdf2_hmac_sha1.c
+src/libwolframe/pwdChangeMessage.cpp
 src/libwolframe_serialize/cppFormFunction.cpp
 src/libwolframe_serialize/ddl/ddlStructParser.cpp
 src/libwolframe_serialize/ddl/ddlStructSerializer.cpp

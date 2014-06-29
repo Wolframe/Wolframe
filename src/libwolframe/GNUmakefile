@@ -78,7 +78,8 @@ CPP_OBJS = \
 	HMAC.o \
 	PBKDF2.o \
 	passwordHash.o \
-	CRAM.o
+	CRAM.o \
+	pwdChangeMessage.o
 
 OBJS = \
 	b64encode.o \

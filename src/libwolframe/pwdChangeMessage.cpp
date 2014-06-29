@@ -30,39 +30,53 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file pwdChangeMessage.hpp
+/// \file pwdChangeMessage.cpp
 ///
-/// Password changer data structure
+/// Password changer data structure implementation
 
-#ifndef _PASSWORD_CHANGE_MESSAGE_HPP_INCLUDED
-#define _PASSWORD_CHANGE_MESSAGE_HPP_INCLUDED
-
-#include <string>
+#include "AAAA/pwdChangeMessage.hpp"
 #include "crypto/md5.h"
+#include <stdexcept>
+#include <string.h>
+#include <boost/lexical_cast.hpp>
 
 namespace _Wolframe {
 namespace AAAA {
 
-#define PASSWORD_MAX_LENGTH	( 64 - sizeof( unsigned short ) - MD5_DIGEST_SIZE )
-
-
-/// Password changer data structure
-union PasswordChangeMessage
+PasswordChangeMessage::PasswordChangeMessage( const std::string& pwd )
 {
-	unsigned char data[ 64 ];
-	struct	{
-		unsigned short	length;
-		char		passwd[ PASSWORD_MAX_LENGTH ];
-		unsigned char	digest[ MD5_DIGEST_SIZE ];
-	} message;
+	memset( data, 0, 64 );
+	if ( pwd.length() > PASSWORD_MAX_LENGTH )	{
+		std::string msg = "Password is " + boost::lexical_cast< std::string >( pwd.length())
+				  + "bytes long, maximum is "
+				  + boost::lexical_cast< std::string >( PASSWORD_MAX_LENGTH ) + " bytes";
+		throw( std::runtime_error( msg ) );
+	}
+	message.length = pwd.length();
+	memcpy( message.passwd, pwd.data(), PASSWORD_MAX_LENGTH );
+	md5_ctx ctx;
+	md5_init( &ctx );
+	md5( data, sizeof(unsigned short) + PASSWORD_MAX_LENGTH, message.digest );
+}
 
-public:
-	PasswordChangeMessage( const std::string& pwd );
-	PasswordChangeMessage( const unsigned char msg[ 64 ] );
+PasswordChangeMessage::PasswordChangeMessage( const unsigned char msg[ 64 ] )
+{
+	unsigned char hash[ MD5_DIGEST_SIZE ];
 
-	std::string password() const;
-};
+	memcpy( data, msg, 64 );
+
+	md5_ctx ctx;
+	md5_init( &ctx );
+	md5( data, sizeof(unsigned short) + PASSWORD_MAX_LENGTH, hash );
+
+	if ( memcmp( message.digest, hash, 16 ))
+		throw( std::runtime_error( "Message is not a valid password change message" ));
+}
+
+std::string PasswordChangeMessage::password() const
+{
+	std::string pwd( message.passwd, message.length );
+	return pwd;
+}
 
 }} // namespace _Wolframe::AAAA
-
-#endif // _PASSWORD_CHANGE_MESSAGE_HPP_INCLUDED

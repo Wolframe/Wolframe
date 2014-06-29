@@ -72,7 +72,8 @@ CPP_OBJS = \
 	HMAC.obj \
 	PBKDF2.obj \
 	passwordHash.obj \
-	CRAM.obj
+	CRAM.obj \
+	pwdChangeMessage.obj
 
 OBJS = \
 	b64encode.obj \
