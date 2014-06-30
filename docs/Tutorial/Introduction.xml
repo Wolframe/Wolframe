@@ -100,9 +100,9 @@
 			Instead we create two directories, one for server data and one for
 			client data:
 		        <programlisting language='shell'>
-	mkdir ~/tutorial
-	mkdir ~/tutorial/server
-	mkdir ~/tutorial/client
+mkdir ~/tutorial
+mkdir ~/tutorial/server
+mkdir ~/tutorial/client
 			</programlisting>
 		</para>
 		

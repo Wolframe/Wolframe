@@ -6,7 +6,7 @@
 	<para>
 		We have to set up the wolframed daemon with a running configuration file:
 		<programlisting language='shell'>
-	cd ~/tutorial/server
+cd ~/tutorial/server
 		</programlisting>
 	</para>
 	
@@ -14,23 +14,23 @@
 		We create the central confuguration file of the server <filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
-	; we install a verbose default logger to the shell
-	logging	{
-		stderr	{
-			level DEBUG
-		}
-	}
+; we install a verbose default logger to the shell
+logging {
+    stderr {
+        level DEBUG
+    }
+}
 
-	; one connection, one thread is enough
-	listen	{
-		maxConnections 1
-		threads 1
-		socket	{
-			address		*
-			port		7661
-			maxConnections	1
-		}
-	}
+; one connection, one thread is enough
+listen {
+    maxConnections 1
+    threads 1
+    socket {
+        address	*
+        port 7661
+        maxConnections 1
+    }
+}
 		</programlisting>
 	</para>
 		
@@ -38,7 +38,7 @@
 		We can start the server now in the shell foreground with:
 
 		<programlisting language='shell'>
-	/usr/sbin/wolframed -f -c tutorial.conf
+usr/sbin/wolframed -f -c tutorial.conf
 		</programlisting>
 	</para>
 	
@@ -46,14 +46,14 @@
 		We see the following output of the server in the shell:
 		
 		<programlisting language='shell'>
-	NOTICE: Starting server
-	INFO: Undefined ServerTokens, using ProductOnly
-	INFO: Empty random generator device. Using default device.
-	DEBUG: Random generator initialized. Using device '/dev/urandom'
-	DEBUG: Loading programs
-	INFO: Accepting connections on 0.0.0.0:7661
-	DEBUG: 1 network acceptor(s) created.
-	DEBUG: 0 network SSL acceptor(s) created.
+NOTICE: Starting server
+INFO: Undefined ServerTokens, using ProductOnly
+INFO: Empty random generator device. Using default device.
+DEBUG: Random generator initialized. Using device '/dev/urandom'
+DEBUG: Loading programs
+INFO: Accepting connections on 0.0.0.0:7661
+DEBUG: 1 network acceptor(s) created.
+DEBUG: 0 network SSL acceptor(s) created.
 		</programlisting>
 
 	</para>
@@ -71,7 +71,7 @@
 		If we use a telnet to connect to the server with:
 
 		<programlisting language='shell'>
-	telnet localhost 7661
+telnet localhost 7661
 		</programlisting>
 	</para>
 
@@ -79,10 +79,10 @@
 		we get:
 
 		<programlisting language='shell'>
-	Connected to localhost.
-	Escape character is '^]'.
-	BYE Access denied.
-	Connection closed by foreign host.
+Connected to localhost.
+Escape character is '^]'.
+BYE Access denied.
+Connection closed by foreign host.
 		</programlisting>
 	</para>
 	
@@ -90,8 +90,8 @@
 		The server tells us:
 
 		<programlisting language='shell'>
-	DEBUG: Connection from 127.0.0.1:39110 to 0.0.0.0:7661 not authorized
-	DEBUG: Connection to 127.0.0.1:39110 closed
+DEBUG: Connection from 127.0.0.1:39110 to 0.0.0.0:7661 not authorized
+DEBUG: Connection to 127.0.0.1:39110 closed
 		</programlisting>
 	</para>
 	

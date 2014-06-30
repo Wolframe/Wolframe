@@ -28,7 +28,7 @@
 		We add a dynamic property 'form' to the button which we set to:
 
 		<programlisting language='shell'>
-	customer_show?id={customer.selected}
+customer_show?id={customer.selected}
 		</programlisting>
 
 		As before 'customer_show' is the name of the form to be loaded
@@ -108,12 +108,12 @@
 		in the 'customers.ui' form:
 
 		<programlisting language='shell'>
-	CustomerList list {
-	    customer[] {
-	        id={row.id};
-	        name{{row.name}};
-	        address{{row.address}}
-	    }}
+CustomerList list {
+    customer[] {
+        id={row.id};
+        name{{row.name}};
+        address{{row.address}}
+    }}
 		</programlisting>
 		
 		'id={row.id}' maps the 'id' attribute to the 'id' property of each row.
@@ -146,19 +146,19 @@
 		in the form declaration:
 
 	<programlisting language='shell'>
-	COMMAND CustomerListRequest CALL SelectCustomerList RETURN CustomerList;
+COMMAND CustomerListRequest CALL SelectCustomerList RETURN CustomerList;
 	</programlisting>
 	
 		Checking with:
 
 	<programlisting language='shell'>
-	netcat -v localhost 7661 &lt; CustomerListRequest.netcat
+netcat -v localhost 7661 &lt; CustomerListRequest.netcat
 	</programlisting>
 	
 		or:
 
 	<programlisting language='shell'>
-	wolframec -d CustomerListRequest.xml
+wolframec -d CustomerListRequest.xml
 	</programlisting>
 
 	
@@ -210,20 +210,20 @@
 		We also get in the client:
 
 	<programlisting language='shell'>
-	no command handler for 'CustomerRequest'
+no command handler for 'CustomerRequest'
 	</programlisting>
 
 		and in the server:
 
 	<programlisting language='shell'>
-	ERROR: Error calling procedure: no command handler for 'CustomerRequest'	
+ERROR: Error calling procedure: no command handler for 'CustomerRequest'	
 	</programlisting>
 
 	We see, that the request is sent to the server, but we didn't define the
 	necessary things in the server yet. So we add another simple mapping:
 
 	<programlisting language='shell'>
-	COMMAND CustomerRequest CALL SelectCustomer RETURN Customer;
+COMMAND CustomerRequest CALL SelectCustomer RETURN Customer;
 	</programlisting>
 
 		to <filename>tutorial.dmap</filename>.
@@ -244,10 +244,10 @@
 		in <filename>Customer.tdl</filename>:
 
 	<programlisting language='sql'>
-	TRANSACTION SelectCustomer
-	BEGIN
-		INTO . DO SELECT * from Customer WHERE id=$(id);
-	END
+TRANSACTION SelectCustomer
+BEGIN
+    INTO . DO SELECT * from Customer WHERE id=$(id);
+END
 	</programlisting>
 	
 		The '$(id)' refers to the 'id' we pass down for the customer record
@@ -277,7 +277,7 @@
 		We can then see that our request is working by executing:
 
 	<programlisting language='shell'>
-	wolframec -d CustomerRequest.xml
+wolframec -d CustomerRequest.xml
 	</programlisting>
 	
 		which returns us:
@@ -318,9 +318,8 @@
 		specify an explicit answer as follows:
 
 		<programlisting language='shell'>
-	Customer customer { id={?}; name{{name}}; address{{address}} }
+Customer customer { id={?}; name{{name}}; address{{address}} }
 		</programlisting>
 	</para>
-	
-	
+		
 </sect1>

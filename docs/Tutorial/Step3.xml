@@ -13,8 +13,8 @@
 		We start wolfclient with:
 
 		<programlisting language='shell'>
-	cd ~/tutorial/client
-	wolfclient tutorial.conf
+cd ~/tutorial/client
+wolfclient tutorial.conf
 		</programlisting>
 	</para>
 		
@@ -34,7 +34,7 @@
 		You should get a message like
 
 		<programlisting language='shell'>
-	Connection successful
+Connection successful
 		</programlisting>
 		
 		in a dialog box.
@@ -58,7 +58,7 @@
 		Because we didn't write any user interfaces yet, we get
 		an error message:
 		<programlisting language='shell'>
-	Unable to load form or plugin 'init', does the it exist?
+Unable to load form or plugin 'init', does the it exist?
 		</programlisting>
 		
 		To get rid of that error message we will have to create
