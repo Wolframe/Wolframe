@@ -77,7 +77,7 @@ TEST_F( PasswordChangerFixture, PasswordMessage )
 	PasswordChangeMessage	msg0( "Good Password" );
 
 	unsigned char buf[ 64 ];
-	hex2byte( "0D00476F6F642050617373776F7264000000000000000000000000000000000000000000000000000000000000000000E43B5A28926AE43FD5B449A41CC3CCB7", buf, 64 );
+	hex2byte( "0D476F6F642050617373776F72640000000000000000000000000000000000000000000000000000000000000000000003A5B5940AF7517EE9EBF096671C7C4E", buf, 64 );
 	PasswordChangeMessage	msg1( buf );
 
 	EXPECT_STREQ( "Good Password", msg0.password().c_str() );
@@ -87,15 +87,15 @@ TEST_F( PasswordChangerFixture, PasswordMessage )
 TEST_F( PasswordChangerFixture, PasswordMessageThrow )
 {
 	unsigned char buf[ 64 ];
-	hex2byte( "0D00476F6F642050617373776F7264000000000000000000000000000000000000001000000000000000000000000000E43B5A28926AE43FD5B449A41CC3CCB7", buf, 64 );
+	hex2byte( "0D476F6F642050617373776F72640000000000000000000000000000000000000000000010000000000000000000000003A5B5940AF7517EE9EBF096671C7C4E", buf, 64 );
 	EXPECT_THROW( PasswordChangeMessage msg( buf ), std::runtime_error );
 
-	std::string goodPwd = "Goooooooooooooooood loooooooooooooong password";
-	std::string badPwd  = "Baaaaaaaaaaaaaaaaaad loooooooooooooong password";
+	std::string goodPwd = "Goooooooooooooooood looooooooooooooong password";
+	std::string badPwd  = "Baaaaaaaaaaaaaaaaaad looooooooooooooong password";
 	EXPECT_NO_THROW( PasswordChangeMessage msg( goodPwd ));
-	EXPECT_EQ( goodPwd.length(), 46u );
+	EXPECT_EQ( goodPwd.length(), 47u );
 	EXPECT_THROW( PasswordChangeMessage msg( badPwd ), std::runtime_error );
-	EXPECT_GT( badPwd.length(), 46u );
+	EXPECT_GT( badPwd.length(), 47u );
 }
 
 TEST_F( PasswordChangerFixture, PasswordMessageEncryption )

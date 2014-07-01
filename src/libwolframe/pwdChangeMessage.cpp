@@ -50,7 +50,7 @@ PasswordChangeMessage::PasswordChangeMessage( const std::string& pwd )
 {
 	memset( m_message.data, 0, 64 );
 	if ( pwd.length() > PASSWORD_MAX_LENGTH )	{
-		std::string msg = "Password is " + boost::lexical_cast< std::string >( pwd.length())
+		std::string msg = "Password is " + boost::lexical_cast< std::string >( (unsigned)pwd.length() )
 				  + "bytes long, maximum is "
 				  + boost::lexical_cast< std::string >( (int)PASSWORD_MAX_LENGTH ) + " bytes";
 		throw( std::runtime_error( msg ) );

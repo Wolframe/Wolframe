@@ -49,14 +49,14 @@ class PasswordChangeMessage
 {
 private:
 	enum	{
-		PASSWORD_MAX_LENGTH = 64 - sizeof( unsigned short ) - MD5_DIGEST_SIZE,
+		PASSWORD_MAX_LENGTH = 64 - sizeof( unsigned char ) - MD5_DIGEST_SIZE,
 		PAYLOAD_LENGTH = 64 - MD5_DIGEST_SIZE
 	};
 
 	union {
 		unsigned char data[ 64 ];
 		struct	{
-			unsigned short	length;
+			unsigned char	length;
 			char		passwd[ PASSWORD_MAX_LENGTH ];
 			unsigned char	digest[ MD5_DIGEST_SIZE ];
 		} parts;
