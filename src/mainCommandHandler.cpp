@@ -70,6 +70,7 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 				.cmd< &MainCommandHandler::doRequest >( "REQUEST")
 				.cmd< &MainCommandHandler::doInterface >( "INTERFACE")
 				.cmd< &MainCommandHandler::doAuth >( "AUTH")
+				.cmd< &MainCommandHandler::doPasswordChange >( "PASSWD")
 				.cmd< &MainCommandHandler::doQuit >( "QUIT")
 				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
 		;
@@ -224,6 +225,23 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 			delegateProcessing<&MainCommandHandler::endMech>( authch);
 		}
 	}
+	return stateidx();
+}
+
+int MainCommandHandler::doPasswordChange( int argc, const char**, std::ostream& out)
+{
+	if (argc >= 1)
+	{
+		out << "ERR to many arguments for PASSWD" << endl();
+		return stateidx();
+	}
+	//TODO IMPLEMENTATION
+	return stateidx();
+}
+
+int MainCommandHandler::endPasswordChange( cmdbind::CommandHandler*, std::ostream&)
+{
+	//TODO IMPLEMENTATION
 	return stateidx();
 }
 

@@ -30,27 +30,27 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file authCommandHandler.hpp
-/// \brief Interface of the authentication command handler
+/// \file passwordChangeCommandHandler.hpp
+/// \brief Interface of the password change command handler
 
-#ifndef _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
+#ifndef _Wolframe_PASSWORD_CHANGE_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_PASSWORD_CHANGE_COMMAND_HANDLER_HPP_INCLUDED
 
 #include "baseCryptoCommandHandler.hpp"
-#include "AAAA/authenticator.hpp"
+#include "AAAA/passwordChanger.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \class AuthCommandHandler
-/// \brief Command handler for the sub protocol for authentication
-class AuthCommandHandler
+/// \class PasswordChangeCommandHandler
+/// \brief Command handler for the sub protocol for password change
+class PasswordChangeCommandHandler
 	:public cmdbind::BaseCryptoCommandHandler
 {
 public:
-	explicit AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_);
-	virtual ~AuthCommandHandler();
+	explicit PasswordChangeCommandHandler( const boost::shared_ptr<AAAA::PasswordChanger>& passwordChanger_);
+	virtual ~PasswordChangeCommandHandler();
 
 public:
 	/// \brief See CommandHandler::nextOperation()
@@ -59,7 +59,7 @@ public:
 	virtual void processMessage( const std::string& msg);
 
 private:
-	boost::shared_ptr<AAAA::Authenticator> m_authenticator;	///< authenticator object reference
+	boost::shared_ptr<AAAA::PasswordChanger> m_passwordChanger;	///< password changer object reference
 };
 
 }} //namespace

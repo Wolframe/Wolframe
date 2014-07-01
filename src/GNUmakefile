@@ -72,6 +72,8 @@ CMDHANDLER_OBJS =\
 	mainCommandHandler.o \
 	interfaceCommandHandler.o \
 	doctypeFilterCommandHandler.o \
+	baseCryptoCommandHandler.o \
+	passwordChangeCommandHandler.o \
 	authCommandHandler.o
 
 LOCAL_STATIC_LIB_OBJS = \

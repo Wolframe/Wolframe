@@ -30,32 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file authCommandHandler.cpp
+/// \file passwordChangeCommandHandler.cpp
 /// \brief Implementation of the authentication command handler
 
-#include "authCommandHandler.hpp"
+#include "passwordChangeCommandHandler.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
-AuthCommandHandler::AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_)
-	:m_authenticator(authenticator_)
+PasswordChangeCommandHandler::PasswordChangeCommandHandler( const boost::shared_ptr<AAAA::PasswordChanger>& passwordChanger_)
+	:m_passwordChanger(passwordChanger_)
 {}
 
-AuthCommandHandler::~AuthCommandHandler()
+PasswordChangeCommandHandler::~PasswordChangeCommandHandler()
 {
 }
 
-void AuthCommandHandler::processMessage( const std::string& msg)
+void PasswordChangeCommandHandler::processMessage( const std::string& msg)
 {
-	m_authenticator->messageIn( msg);
+	m_passwordChanger->messageIn( msg);
 }
 
-CommandHandler::Operation AuthCommandHandler::nextOperation()
+CommandHandler::Operation PasswordChangeCommandHandler::nextOperation()
 {
 	for (;;)
 	{
-		LOG_TRACE << "STATE AuthCommandHandler " << stateName( state()) << " " << m_authenticator->statusName( m_authenticator->status());
+		LOG_TRACE << "STATE PasswordChangeCommandHandler " << stateName( state()) << " " << m_passwordChanger->statusName( m_passwordChanger->status());
 		switch (state())
 		{
 			case Init:
@@ -63,32 +63,27 @@ CommandHandler::Operation AuthCommandHandler::nextOperation()
 				/*no break here!*/
 
 			case NextOperation:
-				switch (m_authenticator->status())
+				switch (m_passwordChanger->status())
 				{
-					case AAAA::Authenticator::INITIALIZED:
-						throw std::logic_error("authentication protocol operation in state INITIALIZED");
-					case AAAA::Authenticator::MESSAGE_AVAILABLE:
-						pushOutput( m_authenticator->messageOut());
+					case AAAA::PasswordChanger::MESSAGE_AVAILABLE:
+						pushOutput( m_passwordChanger->messageOut());
 						continue;
-					case AAAA::Authenticator::AWAITING_MESSAGE:
+					case AAAA::PasswordChanger::AWAITING_MESSAGE:
 						if (!consumeNextMessage())
 						{
 							return READ;
 						}
 						continue;
-					case AAAA::Authenticator::AUTHENTICATED:
+					case AAAA::PasswordChanger::PASSWORD_EXCHANGED:
 						return CLOSE;
-					case AAAA::Authenticator::INVALID_CREDENTIALS:
-						setLastError( "either the username or the credentials are invalid");
+					case AAAA::PasswordChanger::INVALID_MESSAGE:
+						setLastError( "invalid message");
 						return CLOSE;
-					case AAAA::Authenticator::MECH_UNAVAILABLE:
-						setLastError( "the requested authentication mech is not available");
-						return CLOSE;
-					case AAAA::Authenticator::SYSTEM_FAILURE:
+					case AAAA::PasswordChanger::SYSTEM_FAILURE:
 						setLastError( "unspecified authentication system error");
 						return CLOSE;
 				}
-				setLastError( "internal: unhandled authenticator status");
+				setLastError( "internal: unhandled password changer status");
 				return CLOSE;
 
 			case FlushOutput:

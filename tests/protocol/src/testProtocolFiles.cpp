@@ -1,4 +1,6 @@
 #include "mainCommandHandler.cpp"
+#include "baseCryptoCommandHandler.cpp"
+#include "passwordChangeCommandHandler.cpp"
 #include "authCommandHandler.cpp"
 #include "interfaceCommandHandler.cpp"
 #include "moduleDirectory.cpp"

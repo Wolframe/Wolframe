@@ -61,6 +61,9 @@ public:
 public:
 	int doAuth( int argc, const char** argv, std::ostream& out);
 
+	int doPasswordChange( int argc, const char** argv, std::ostream& out);
+	int endPasswordChange( cmdbind::CommandHandler* ch, std::ostream& out);
+
 	int doMech( int argc, const char** argv, std::ostream& out);
 	int endMech( cmdbind::CommandHandler* ch, std::ostream& out);
 
