@@ -3,3 +3,11 @@ TOPDIR = ..\..
 SUBDIRS = authentication
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:
