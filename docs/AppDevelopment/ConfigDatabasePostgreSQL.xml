@@ -1,0 +1,114 @@
+<sect2>
+<title>PostgreSQL</title>
+<para>This section explains how to configure a Postgres database.
+</para>
+<sect3>
+<title>Requirements</title>
+<para>In order to use a Postgres database in Wolframe you have to configure the 
+loading of the module mod_db_postgresql in the LoadModules section 
+of your configuration. The addressed Postgres database server must be running
+and the database and the user configured must have been created before.
+</para>
+</sect3>
+<sect3>
+<title>Configuration settings</title>
+<para>The configuration settings for PostgreSQL are splitted in two parts:
+The database configuration settings and the SSL configuration settings.
+The following three tables show the PostgreSQL database configuration settings,
+the PostgreSQL SSL configuration settings and the table with configurable SSL modes:
+</para>
+<table frame="all" width="100%">
+	<title>PostgreSQL database configuration settings</title>
+	<tgroup cols="3">
+	<colspec colnum="1" colname="col1" colwidth="1*"/>
+	<colspec colnum="2" colname="col2" colwidth="1*"/>
+	<colspec colnum="3" colname="col3" colwidth="3*"/>
+	<thead>
+		<row>
+			<entry>Name</entry>
+			<entry>Parameter</entry>
+			<entry>Description</entry>
+		</row>
+	</thead>
+	<tbody>
+		<row>
+			<entry>Identifier</entry>
+			<entry>identifier</entry>
+			<entry>Database identifier used to reference this database.</entry>
+		</row>
+		<row>
+			<entry>Host</entry>
+			<entry>identifier or string</entry>
+			<entry>Address of the PostgreSQL database server</entry>
+		</row>
+		<row>
+			<entry>Port</entry>
+			<entry>number</entry>
+			<entry>Port of the PostgreSQL database server</entry>
+		</row>
+		<row>
+			<entry>Database</entry>
+			<entry>identifier</entry>
+			<entry>Name of the database to connect to</entry>
+		</row>
+		<row>
+			<entry>User</entry>
+			<entry>identifier</entry>
+			<entry>User to connect to the database with</entry>
+		</row>
+		<row>
+			<entry>Password</entry>
+			<entry>string</entry>
+			<entry>Password to connect to the database with</entry>
+		</row>
+		<row>
+			<entry>ConnectionTimeout</entry>
+			<entry>number</entry>
+			<entry>Connection timeout in seconds</entry>
+		</row>
+		<row>
+			<entry>Connections</entry>
+			<entry>number</entry>
+			<entry>Maximum number of simoultaneus database connections (size of connection pool)</entry>
+		</row>
+		<row>
+			<entry>AcquireTimeout</entry>
+			<entry>number</entry>
+			<entry>Maximum time allowed to acquire a database connection in seconds</entry>
+		</row>
+		<row>
+			<entry>StatementTimeout</entry>
+			<entry>number</entry>
+			<entry>The maximum allowed time to execute a statement in milliseconds.</entry>
+		</row>
+	</tbody>
+	</tgroup>
+</table>
+&AppConfigDatabasePostgresSslOptionTable;
+&AppConfigDatabasePostgresSslModeTable;
+</sect3>
+<sect3>
+<title>Example configuration</title>
+<para>Here follows an example PostgreSQL database configuration:
+</para>
+
+<programlisting language='text'>
+Database
+{
+    PostgreSQL
+    {
+        Identifier        pgdb
+        Host              localhost
+        Port              5432
+        Database          wolframe
+        User              wolfusr
+        Password          wolfpwd
+        ConnectionTimeout 10
+        Connections       40
+        AcquireTimeout    10
+    }
+}
+</programlisting>
+</sect3>
+</sect2>
+

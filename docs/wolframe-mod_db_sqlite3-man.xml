@@ -188,19 +188,6 @@ database
 						</para>
 					</listitem>
 				</varlistentry>
-
-				<varlistentry>
-					<term>
-						<option>program <replaceable>filename</replaceable></option>
-					</term>
-					<listitem>
-						<para>
-							Load SQL statements from program file <replaceable>filename</replaceable>
-							when creating a database connection. This can be used to prepare
-							named statements (TODO: not implemented currently?).
-						</para>
-					</listitem>
-				</varlistentry>
 				
 				<varlistentry>
 					<term>
