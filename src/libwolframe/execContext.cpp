@@ -35,9 +35,33 @@
 #include "processor/execContext.hpp"
 #include "filter/typedfilter.hpp"
 #include "types/authorizationFunction.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::proc;
+
+db::Transaction* ExecContext::transaction( const std::string& name) const
+{
+	if (m_dbstack.empty()) return m_provider->transaction( name);
+	if (m_dbProvider)
+	{
+		db::Database* database = m_dbProvider->database( m_dbstack.back());
+		if (!database)
+		{
+			throw std::runtime_error( std::string("no database defined with name '") + m_dbstack.back() + "'");
+		}
+		return database->transaction( name);
+	}
+	else
+	{
+		db::Database* database  = m_provider->transactionDatabase();
+		if (!boost::algorithm::iequals( database->ID(), m_dbstack.back()))
+		{
+			throw std::runtime_error( std::string("cannot use database different to the transaction database '") + database->ID() + "' because no database provider is defined");
+		}
+		return m_provider->transaction( name);
+	}
+}
 
 bool ExecContext::checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg)
 {

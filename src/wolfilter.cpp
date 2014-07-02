@@ -82,7 +82,7 @@ int main( int argc, char **argv )
 
 		AAAA::AAAAprovider aaaaProvider( &cmdline.aaaaProviderConfig(), &cmdline.modulesDirectory());
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &programLibrary);
-		proc::ExecContext execContext( &processorProvider, &aaaaProvider);
+		proc::ExecContext execContext( &processorProvider, &aaaaProvider, &databaseProvider);
 
 		if (!processorProvider.resolveDB( databaseProvider))
 		{

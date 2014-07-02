@@ -281,7 +281,7 @@ struct GlobalContext
 		m_aaaaProvider = new AAAA::AAAAprovider( &m_aaaaProviderConfig, &m_modulesDirectory);
 		m_databaseProvider = new db::DatabaseProvider( &m_dbProviderConfig, &m_modulesDirectory);
 		m_processorProvider = new proc::ProcessorProvider( &m_procProviderConfig, &m_modulesDirectory, &m_programLibrary);
-		m_execContext = new proc::ExecContext( m_processorProvider, m_aaaaProvider);
+		m_execContext = new proc::ExecContext( m_processorProvider, m_aaaaProvider, m_databaseProvider);
 	}
 
 	~GlobalContext()
@@ -295,7 +295,7 @@ struct GlobalContext
 	void resetExecContext()
 	{
 		if (m_execContext) delete m_execContext;
-		m_execContext = new proc::ExecContext( m_processorProvider, m_aaaaProvider);
+		m_execContext = new proc::ExecContext( m_processorProvider, m_aaaaProvider, m_databaseProvider);
 	}
 
 	proc::ExecContext* execContext()

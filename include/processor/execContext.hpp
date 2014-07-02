@@ -53,8 +53,8 @@ public:
 	ExecContext()
 		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0),m_socket_identifier(0){}
 	/// \brief Constructor
-	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a)
-		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0),m_socket_identifier(0){}
+	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a, const db::DatabaseProvider* d)
+		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_dbProvider(d),m_default_timeout(0),m_socket_identifier(0){}
 
 	/// \brief Get the processor provider interface
 	const ProcessorProviderInterface* provider() const	{return m_provider;}
@@ -89,6 +89,13 @@ public:
 	/// \brief Checks if a function tagged with AUTHORIZE( funcname, resource) is allowed to be executed
 	bool checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg);
 
+	db::Transaction* transaction( const std::string& name) const;
+
+	/// \brief Declare the database 'dbname' as the current transaction database
+	void push_database( const std::string& dbname)		{m_dbstack.push_back( dbname);}
+	/// \brief Restore the previous current transaction database
+	void pop_database()					{m_dbstack.pop_back();}
+
 private:
 	ExecContext( const ExecContext&);			//... non copyable
 	void operator=( const ExecContext&);			//... non copyable
@@ -98,8 +105,10 @@ private:
 	types::SecureReference<AAAA::User> m_user;		///< user instance
 	const AAAA::Authorizer* m_authorizer;			///< instance to query for execution permission based on login data
 	const AAAA::AAAAprovider* m_aaaaProvider;		///< instance to query for an authenticator
+	const db::DatabaseProvider* m_dbProvider;		///< database provider for alternative transaction database
 	unsigned int m_default_timeout;				///< default timeout
 	const char* m_socket_identifier;			///< configured "identifier" in socket configuration
+	std::vector<std::string> m_dbstack;			///< stack for implementing current database as scope
 };
 
 }} //namespace
