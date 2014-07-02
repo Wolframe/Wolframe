@@ -45,12 +45,12 @@ db::Transaction* ExecContext::transaction( const std::string& name) const
 	if (m_dbstack.empty()) return m_provider->transaction( name);
 	if (m_dbProvider)
 	{
-		db::Database* database = m_dbProvider->database( m_dbstack.back());
-		if (!database)
-		{
+//[+]		db::Database* database = m_dbProvider->database( m_dbstack.back());
+//[+]		if (!database)
+//[+]		{
 			throw std::runtime_error( std::string("no database defined with name '") + m_dbstack.back() + "'");
-		}
-		return database->transaction( name);
+//[+]		}
+//[+]		return database->transaction( name);
 	}
 	else
 	{
