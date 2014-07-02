@@ -97,6 +97,11 @@ public:
 	/// \param[in] name name of the transaction
 	/// \return allocated transaction object now owned by the caller and to destroy by the caller with delete
 	virtual db::Transaction* transaction( const std::string& name) const=0;
+	/// \brief Get a database transaction object for a transaction identified by name on an alternative database than the default transaction database
+	/// \param[in] dbname name of the alternative database
+	/// \param[in] name name of the transaction
+	/// \return allocated transaction object now owned by the caller and to destroy by the caller with delete
+	virtual db::Transaction* transaction( const std::string& dbname, const std::string& name) const=0;
 
 	/// \brief Get an authorization function by name
 	/// \param[in] name name of the function

@@ -42,24 +42,13 @@ using namespace _Wolframe::proc;
 
 db::Transaction* ExecContext::transaction( const std::string& name) const
 {
-	if (m_dbstack.empty()) return m_provider->transaction( name);
-	if (m_dbProvider)
+	if (m_dbstack.empty())
 	{
-//[+]		db::Database* database = m_dbProvider->database( m_dbstack.back());
-//[+]		if (!database)
-//[+]		{
-			throw std::runtime_error( std::string("no database defined with name '") + m_dbstack.back() + "'");
-//[+]		}
-//[+]		return database->transaction( name);
+		return m_provider->transaction( name);
 	}
 	else
 	{
-		db::Database* database  = m_provider->transactionDatabase();
-		if (!boost::algorithm::iequals( database->ID(), m_dbstack.back()))
-		{
-			throw std::runtime_error( std::string("cannot use database different to the transaction database '") + database->ID() + "' because no database provider is defined");
-		}
-		return m_provider->transaction( name);
+		return m_provider->transaction( m_dbstack.back(), name);
 	}
 }
 

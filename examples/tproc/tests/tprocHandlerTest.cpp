@@ -135,7 +135,7 @@ public:
 		m_config->setBuffers( ib + EoDBufferSize, ob + MinOutBufferSize);
 		m_connection = new tproc::Connection( ep, m_config);
 		m_provider = getProcProvider( m_config->providerConfig(), &m_prglib);
-		m_execContext.reset( new proc::ExecContext( m_provider.get(), 0, 0));
+		m_execContext.reset( new proc::ExecContext( m_provider.get(), 0));
 		m_connection->setExecContext( m_execContext.get());
 	}
 
