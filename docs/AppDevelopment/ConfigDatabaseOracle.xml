@@ -12,10 +12,7 @@ and the database and the user configured must have been created before.
 </sect3>
 <sect3>
 <title>Configuration settings</title>
-<para>The configuration settings for Oracle are splitted in two parts:
-The database configuration settings and the SSL configuration settings.
-The following three tables show the Oracle database configuration settings,
-the Oracle SSL configuration settings and the table with configurable SSL modes:
+<para>The following table shows the Oracle database configuration settings:
 </para>
 <table frame="all" width="100%">
 	<title>Oracle database configuration settings</title>
