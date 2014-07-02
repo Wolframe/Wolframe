@@ -82,8 +82,8 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator( const net::RemoteEndpoint& client ) const;
-	PasswordChanger* passwordChanger( const User& user,
-					  const net::RemoteEndpoint& client ) const;
+	PasswordChanger* passwordChanger( const User&,
+					  const net::RemoteEndpoint& ) const;
 	Authorizer* authorizer() const;
 	Auditor* auditor() const;
 private:

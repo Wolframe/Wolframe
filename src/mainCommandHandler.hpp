@@ -84,6 +84,7 @@ private:
 
 private:
 	boost::shared_ptr<AAAA::Authenticator> m_authenticator;
+	boost::shared_ptr<AAAA::PasswordChanger> m_passwordChanger;
 	const net::RemoteEndpoint* m_remoteEndpoint;
 	const net::LocalEndpoint* m_localEndpoint;
 	std::string m_command;

@@ -52,7 +52,7 @@ public:
 	explicit AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_);
 	virtual ~AuthCommandHandler();
 
-public:
+private:
 	/// \brief See CommandHandler::nextOperation()
 	virtual Operation nextOperation();
 	/// \brief See BaseCryptoCommandHandler::processMessage(const std::string&)

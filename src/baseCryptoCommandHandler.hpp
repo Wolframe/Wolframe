@@ -73,7 +73,7 @@ public:
 	/// \brief See CommandHandler::interruptDataSessionMarker()
 	virtual const char* interruptDataSessionMarker() const;
 
-public:
+private:
 	/// \brief Method to define by inheriting classes. See CommandHandler::nextOperation()
 	virtual Operation nextOperation()=0;
 	/// \brief Method to define by inheriting classes.

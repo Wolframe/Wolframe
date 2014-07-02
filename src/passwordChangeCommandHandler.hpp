@@ -52,7 +52,7 @@ public:
 	explicit PasswordChangeCommandHandler( const boost::shared_ptr<AAAA::PasswordChanger>& passwordChanger_);
 	virtual ~PasswordChangeCommandHandler();
 
-public:
+private:
 	/// \brief See CommandHandler::nextOperation()
 	virtual Operation nextOperation();
 	/// \brief See BaseCryptoCommandHandler::processMessage(const std::string&)

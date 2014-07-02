@@ -34,6 +34,7 @@
 #include "mainCommandHandler.hpp"
 #include "interfaceCommandHandler.hpp"
 #include "authCommandHandler.hpp"
+#include "passwordChangeCommandHandler.hpp"
 #include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
 #include "processor/execContext.hpp"
 #include "interfaceCommandHandler.hpp"
@@ -228,6 +229,29 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 	return stateidx();
 }
 
+int MainCommandHandler::endPasswordChange( cmdbind::CommandHandler* ch, std::ostream& out)
+{
+	cmdbind::CommandHandlerR chr( ch);
+	const char* error = ch->lastError();
+	if (error)
+	{
+		out << "ERR password change failed: " << error << endl();
+	}
+	else
+	{
+		if (m_passwordChanger->status() == AAAA::PasswordChanger::PASSWORD_EXCHANGED)
+		{
+			out << "OK password changed" << endl();
+		}
+		else
+		{
+			out << "ERR password change failed (unknown error)" << endl();
+		}
+	}
+	m_passwordChanger.reset();
+	return stateidx();
+}
+
 int MainCommandHandler::doPasswordChange( int argc, const char**, std::ostream& out)
 {
 	if (argc >= 1)
@@ -235,13 +259,22 @@ int MainCommandHandler::doPasswordChange( int argc, const char**, std::ostream& 
 		out << "ERR to many arguments for PASSWD" << endl();
 		return stateidx();
 	}
-	//TODO IMPLEMENTATION
-	return stateidx();
-}
+	if (!m_remoteEndpoint)
+	{
+		throw std::logic_error("no remote endpoint set, cannot change password");
+	}
+	m_passwordChanger.reset( execContext()->passwordChanger( *m_remoteEndpoint ));
 
-int MainCommandHandler::endPasswordChange( cmdbind::CommandHandler*, std::ostream&)
-{
-	//TODO IMPLEMENTATION
+	if (!m_passwordChanger.get())
+	{
+		out << "ERR PASSWD denied" << endl();
+		return stateidx();
+	}
+	out << "OK start password change" << endl();
+
+	cmdbind::PasswordChangeCommandHandler* pwdch = new cmdbind::PasswordChangeCommandHandler( m_passwordChanger);
+	pwdch->setExecContext( execContext());
+	delegateProcessing<&MainCommandHandler::endPasswordChange>( pwdch);
 	return stateidx();
 }
 

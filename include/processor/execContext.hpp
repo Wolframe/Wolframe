@@ -82,6 +82,9 @@ public:
 	/// \brief Get an authenticator
 	AAAA::Authenticator* authenticator( const net::RemoteEndpoint& client ) const
 								{return m_aaaaProvider?m_aaaaProvider->authenticator( client ):0;}
+	/// \brief Get a password changer
+	AAAA::PasswordChanger* passwordChanger( const net::RemoteEndpoint& client ) const
+								{return m_aaaaProvider?m_aaaaProvider->passwordChanger( *m_user.get(), client ):0;}
 
 	/// \brief Checks if a function tagged with AUTHORIZE( funcname, resource) is allowed to be executed
 	bool checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg);
