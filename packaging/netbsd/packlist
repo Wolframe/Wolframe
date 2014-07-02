@@ -128,6 +128,7 @@ usr/pkg/include/wolframe/appProperties.hpp
 usr/pkg/include/wolframe/logger-v1.hpp
 usr/pkg/include/wolframe/standardConfigs.hpp
 usr/pkg/include/wolframe/version.hpp
+usr/pkg/include/wolframe/platform.hpp
 usr/pkg/include/wolframe/wolframe.hpp
 usr/pkg/include/wolframe/langbind/authorization.hpp
 usr/pkg/include/wolframe/langbind/ddlCompilerInterface.hpp
@@ -274,7 +275,7 @@ usr/pkg/include/wolframe/AAAA/audit.hpp
 usr/pkg/include/wolframe/AAAA/authorization.hpp
 usr/pkg/include/wolframe/AAAA/passwordHash.hpp
 usr/pkg/include/wolframe/AAAA/passwordChanger.hpp
-usr/pkg/include/wolframe/AAAA/pwdChangerSlice.hpp
+usr/pkg/include/wolframe/AAAA/pwdChangeMessage.hpp
 usr/pkg/include/wolframe/AAAA/user.hpp
 @dirrm usr/pkg/include/wolframe/AAAA
 usr/pkg/include/wolframe/module/constructor.hpp
