@@ -32,6 +32,7 @@ INCLUDE_LIBS = \
 	-lwolframe_database \
 	-lwolframe_langbind \
 	-lwolftest \
+	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(LIBS_DL) $(LIBS_LT) $(LIBS_NET)
 
