@@ -83,6 +83,7 @@ OBJS = \
 	tprocHandlerConfig.o \
 	$(TOPDIR)/src/posixMain.o
 
+
 TEST_BINS = \
 	tests/tprocHandlerTest$(EXE)
 
