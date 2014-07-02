@@ -1,9 +1,0 @@
-; goes into Wolfbook, section Configuration, Databases, Oracle
-;      Oracle  {
-;              identifier      oracldb                         ; Oracle database.
-;              host            localhost                       ; Database host.
-;              port            1521                            ; Database port. Default i
-;              database        orcl                            ; Connection_data SID.
-;              user            wolfusr                         ; Database user.
-;              password        wolfpwd                         ; Database password.
-;      }

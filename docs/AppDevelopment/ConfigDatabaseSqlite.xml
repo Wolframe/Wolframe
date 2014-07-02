@@ -43,7 +43,7 @@ in Wolframe.
 		<row>
 			<entry>Connections</entry>
 			<entry>number</entry>
-			<entry>Number of simultaneus connections to the database.
+			<entry>Number of simultaneous connections to the database.
 			Specifies the size of the pool of connections used
 			for database transactions.</entry>
 		</row>

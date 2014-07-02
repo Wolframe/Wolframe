@@ -44,12 +44,12 @@ the Oracle SSL configuration settings and the table with configurable SSL modes:
 		<row>
 			<entry>Port</entry>
 			<entry>number</entry>
-			<entry>Port of the Oracle database server</entry>
+			<entry>Port of the Oracle database server, the default is 1521 if not specified</entry>
 		</row>
 		<row>
 			<entry>Database</entry>
 			<entry>identifier</entry>
-			<entry>Name of the database to connect to</entry>
+			<entry>Name of the database to connect to, this is the Oracle SID.</entry>
 		</row>
 		<row>
 			<entry>User</entry>
@@ -62,30 +62,18 @@ the Oracle SSL configuration settings and the table with configurable SSL modes:
 			<entry>Password to connect to the database with</entry>
 		</row>
 		<row>
-			<entry>ConnectionTimeout</entry>
-			<entry>number</entry>
-			<entry>Connection timeout in seconds</entry>
-		</row>
-		<row>
 			<entry>Connections</entry>
 			<entry>number</entry>
-			<entry>Maximum number of simoultaneus database connections (size of connection pool)</entry>
+			<entry>Maximum number of simultaneous database connections (size of connection pool)</entry>
 		</row>
 		<row>
 			<entry>AcquireTimeout</entry>
 			<entry>number</entry>
 			<entry>Maximum time allowed to acquire a database connection in seconds</entry>
 		</row>
-		<row>
-			<entry>StatementTimeout</entry>
-			<entry>number</entry>
-			<entry>The maximum allowed time to execute a statement in milliseconds.</entry>
-		</row>
 	</tbody>
 	</tgroup>
 </table>
-&AppConfigDatabaseOracleSslOptionTable;
-&AppConfigDatabaseOracleSslModeTable;
 </sect3>
 <sect3>
 <title>Example configuration</title>
@@ -103,8 +91,7 @@ Database
         Database          orcl
         User              wolfusr
         Password          wolfpwd
-        ConnectionTimeout 10
-        Connections       40
+        Connections       10
         AcquireTimeout    10
     }
 }
