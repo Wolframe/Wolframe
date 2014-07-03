@@ -40,8 +40,9 @@
 using namespace _Wolframe;
 using namespace _Wolframe::proc;
 
-db::Transaction* ExecContext::transaction( const std::string& name) const
+db::Transaction* ExecContext::transaction( const std::string& name)
 {
+	m_transaction_env.clear();
 	if (m_dbstack.empty())
 	{
 		return m_provider->transaction( name);

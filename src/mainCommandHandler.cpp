@@ -124,6 +124,8 @@ int MainCommandHandler::doQuit( int argc, const char**, std::ostream& out)
 
 int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
+	execContext()->setConnectionData( m_remoteEndpoint, m_localEndpoint);
+
 	if (!m_authenticator.get())
 	{
 		if (!m_remoteEndpoint)
@@ -174,7 +176,6 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 		{
 			out << "OK authenticated" << endl();
 			execContext()->setUser( usr);
-			execContext()->setSocketIdentifier( m_localEndpoint->socketIdentifier());
 			return MainSTM::Authenticated;
 		}
 		else

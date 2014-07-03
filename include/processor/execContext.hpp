@@ -36,6 +36,7 @@
 #define _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
 #include "processor/procProviderInterface.hpp"
 #include "types/secureReference.hpp"
+#include "types/keymap.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/authorization.hpp"
 #include "AAAA/authenticator.hpp"
@@ -51,10 +52,10 @@ class ExecContext
 public:
 	/// \brief Default Constructor
 	ExecContext()
-		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0),m_socket_identifier(0){}
+		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0),m_remoteEndpoint(0),m_localEndpoint(0){}
 	/// \brief Constructor
 	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a)
-		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0),m_socket_identifier(0){}
+		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0){}
 
 	/// \brief Get the processor provider interface
 	const ProcessorProviderInterface* provider() const	{return m_provider;}
@@ -75,27 +76,45 @@ public:
 	void setDefaultTimeout( unsigned int timeout_sec_)	{m_default_timeout = timeout_sec_;}
 
 	/// \brief Get the socket identifier for authorization checks
-	const char* socketIdentifier() const			{return m_socket_identifier;}
+	const char* socketIdentifier() const			{return m_localEndpoint?m_localEndpoint->socketIdentifier():0;}
+	/// \brief Get the remote endpoint for authorization checks
+	const net::RemoteEndpoint* remoteEndpoint() const	{return m_remoteEndpoint;}
+	/// \brief Get the local endpoint for authorization checks
+	const net::LocalEndpoint* localEndpoint() const		{return m_localEndpoint;}
+
 	/// \brief Set the socket identifier for authorization checks
-	void setSocketIdentifier( const char* socket_identifier_){m_socket_identifier = socket_identifier_;}
+	void setConnectionData(
+			const net::RemoteEndpoint* remoteEndpoint_,
+			const net::LocalEndpoint* localEndpoint_)
+	{
+		m_remoteEndpoint = remoteEndpoint_;
+		m_localEndpoint = localEndpoint_;
+	}
 
 	/// \brief Get an authenticator
 	AAAA::Authenticator* authenticator( const net::RemoteEndpoint& client ) const
-								{return m_aaaaProvider?m_aaaaProvider->authenticator( client ):0;}
+	{
+		return m_aaaaProvider?m_aaaaProvider->authenticator( client ):0;
+	}
 	/// \brief Get a password changer
 	AAAA::PasswordChanger* passwordChanger( const net::RemoteEndpoint& client ) const
-								{return m_aaaaProvider?m_aaaaProvider->passwordChanger( *m_user.get(), client ):0;}
+	{
+		return m_aaaaProvider?m_aaaaProvider->passwordChanger( *m_user.get(), client ):0;
+	}
 
 	/// \brief Checks if a function tagged with AUTHORIZE( funcname, resource) is allowed to be executed
 	bool checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg);
 
 	/// \brief Create a new transaction object
-	db::Transaction* transaction( const std::string& name) const;
+	db::Transaction* transaction( const std::string& name);
 
 	/// \brief Declare the database 'dbname' as the current transaction database
-	void push_database( const std::string& dbname)		{m_dbstack.push_back( dbname);}
+	void push_database( const std::string& dbname)			{m_dbstack.push_back( dbname);}
 	/// \brief Restore the previous current transaction database
-	void pop_database()					{m_dbstack.pop_back();}
+	void pop_database()						{m_dbstack.pop_back();}
+
+	void transaction_setenv( const std::string& key, const types::Variant& val)	{m_transaction_env.insert( key, val);}
+	const types::Variant& transaction_getenv( const std::string& key) const		{return m_transaction_env.at(key);}
 
 private:
 	ExecContext( const ExecContext&);			//... non copyable
@@ -107,8 +126,10 @@ private:
 	const AAAA::Authorizer* m_authorizer;			///< instance to query for execution permission based on login data
 	const AAAA::AAAAprovider* m_aaaaProvider;		///< instance to query for an authenticator
 	unsigned int m_default_timeout;				///< default timeout
-	const char* m_socket_identifier;			///< configured "identifier" in socket configuration
+	const net::RemoteEndpoint* m_remoteEndpoint;		///< remote end point of the connection
+	const net::LocalEndpoint* m_localEndpoint;		///< local end point of the connection
 	std::vector<std::string> m_dbstack;			///< stack for implementing current database as scope
+	types::keymap<types::Variant> m_transaction_env;	///< transaction environment variables set by authorization
 };
 
 }} //namespace

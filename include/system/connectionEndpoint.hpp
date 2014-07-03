@@ -53,6 +53,11 @@ public:
 		TCP,
 		SSL
 	};
+	static const char* connectionTypeName( ConnectionType t)
+	{
+		static const char* ar[] = {"UDP","TCP","SSL"};
+		return ar[t];
+	}
 
 	enum EndPoint	{
 		LOCAL_ENDPOINT,
