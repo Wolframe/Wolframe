@@ -49,6 +49,10 @@
 #include <boost/noncopyable.hpp>
 
 namespace _Wolframe {
+namespace db {
+/// \brief Forward declaration
+class DatabaseProvider;
+}
 namespace proc {
 
 /// \class ProcessorProvider
@@ -79,7 +83,10 @@ public:
 	virtual db::Database* transactionDatabase() const;
 
 	/// \brief Return a database transaction object for a transaction identified by name
-	virtual db::Transaction* transaction( const std::string& name ) const;
+	virtual db::Transaction* transaction( const std::string& name) const;
+
+	/// \brief Return a database transaction object for a transaction identified by name on an alternative database than the default transaction database
+	virtual db::Transaction* transaction( const std::string& dbname, const std::string& name) const;
 
 	/// \brief Get a reference to an authorization function identified by name
 	virtual const types::AuthorizationFunction* authorizationFunction( const std::string& name) const;
@@ -112,6 +119,7 @@ public:
 private:
 	std::string			m_dbLabel;	///< idenfifier of the transaction database
 	db::Database*			m_db;		///< reference to the transaction database
+	const db::DatabaseProvider*	m_dbProvider;	///< alternative database
 
 	/// \class CommandHandlerDef
 	/// \brief Definition of a command handler with its configuration
@@ -134,6 +142,7 @@ private:
 		cmdbind::CommandHandlerUnitR unit;			///< command handler unit to instantiate new command handlers
 		const config::NamedConfiguration* configuration;	///< command handler configuration
 	};
+
 	std::vector<CommandHandlerDef> m_cmd;				///< list of defined command handlers
 	types::keymap<std::size_t> m_cmdMap;				///< map of command names to indices in 'm_cmd'
 
