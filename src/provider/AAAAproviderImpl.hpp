@@ -100,6 +100,8 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator( const net::RemoteEndpoint& client );
+	PasswordChanger* passwordChanger( const User& user,
+					  const net::RemoteEndpoint& client );
 private:
 	std::list< AuthenticationUnit* >	m_authUnits;
 	std::vector< std::string >		m_mechs;
@@ -171,13 +173,14 @@ class AAAAprovider::AAAAprovider_Impl
 public:
 	AAAAprovider_Impl( const AAAAconfiguration* conf,
 			   const module::ModulesDirectory* modules );
-	~AAAAprovider_Impl()				{}
+	~AAAAprovider_Impl()			{}
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator( const net::RemoteEndpoint& client )
 						{ return m_authenticator.authenticator( client ); }
-	PasswordChanger* passwordChanger( const net::RemoteEndpoint& /*client*/ )
-						{ return NULL; }
+	PasswordChanger* passwordChanger( const User& user,
+					  const net::RemoteEndpoint& client )
+						{ return m_authenticator.passwordChanger( user, client ); }
 	Authorizer* authorizer()		{ return m_authorizer.authorizer(); }
 	Auditor* auditor()			{ return m_auditor.auditor(); }
 private:

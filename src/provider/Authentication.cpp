@@ -116,6 +116,18 @@ Authenticator* AuthenticationFactory::authenticator( const net::RemoteEndpoint& 
 	return new StandardAuthenticator( m_mechs, m_authUnits, client );
 }
 
+PasswordChanger* AuthenticationFactory::passwordChanger( const User& user,
+							 const net::RemoteEndpoint& client )
+{
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authUnits.begin();
+								it != m_authUnits.end(); it++ )
+		if ( boost::iequals( (*it)->identifier(), user.authenticator() ))	{
+			PasswordChanger* pwc = (*it)->passwordChanger( user, client );
+			if ( pwc )
+				return pwc;
+		}
+	return NULL;
+}
 
 //*********************************************************************************
 // Standard authenticator
