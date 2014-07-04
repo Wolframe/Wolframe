@@ -59,16 +59,8 @@ Project Wolframe.
 							in the initial greeting.
 							Allowed values are:
 							   ProductOnly, Major, Minor, Revision, OS, None -->
-	<ServerSignature>Off</ServerSignature>	<!--	Print the name of the server as first element
+	<ServerSignature>None</ServerSignature>	<!--	Print the name of the server as first element
 							of the greeting -->
-
-	<!--	Unix daemon parameters. This section is not valid for windows
-	<daemon>
-		<user>nobody</user>
-		<group>nobody</group>
-		<pidFile>/tmp/wolframed.pid</pidFile>
-	</daemon>
-	-->
 
 	<!--	Windows service parameters (for service registration).
 		This section is not valid on non-Windows OSes -->
@@ -77,7 +69,6 @@ Project Wolframe.
 		<displayName>Wolframe Daemon</displayName>
 		<description>Wolframe Daemon</description>
 	</service>
-
 
 	<!--	Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
 		Let's use 7660 for unencrypted connections and 7960 for SSL connections.

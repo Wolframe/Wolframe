@@ -87,21 +87,11 @@ bool ServiceConfiguration::parse( const config::ConfigurationNode& pt, const std
 					retVal = false;
 				}
 			}
-			else if ( boost::algorithm::iequals( L1it->first, "serviceName" ))	{
-				bool isDefined = ( !serviceName.empty());
-				if ( !Parser::getValue( logPrefix().c_str(), *L1it, serviceName, &isDefined ))
-				{
-					LOG_ERROR << logPrefix() << "config value parse error " << L1it->second.position().logtext();
-					retVal = false;
-				}
-			}
 			else	{
 				LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					    << L1it->first << "' (" << L1it->second.position().logtext() << ")";
 			}
 		}
-		if ( serviceName.empty() )
-			serviceName = defaultServiceName();
 	}
 #endif
 #if !defined(_WIN32)
@@ -171,7 +161,6 @@ void ServiceConfiguration::print( std::ostream& os, size_t /* indent */ ) const
 	os << "   Run as " << (user.empty() ? "(not specified)" : user) << ":"
 	   << (group.empty() ? "(not specified)" : group) << std::endl;
 	os << "   PID file: " << pidFile << std::endl;
-	os << "   Process name: " << serviceName << std::endl;
 #else
 	// Windows service
 	os << "   When run as service" << std::endl
