@@ -91,7 +91,6 @@ Database
         ForeignKeys   yes
         Profiling     no
         Connections   3
-        Program       sqlite.prg
         Extension     sqlite_module.so
     }
 }
