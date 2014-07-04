@@ -536,7 +536,7 @@ types::PropertyTree utils::readXmlPropertyTreeFile( const std::string& filename)
 	return types::PropertyTree( rootpt, filename);
 }
 
-static std::vector<std::string> getIncludeFiles( const std::string& filename)
+static std::vector<std::string> getIncludeFiles( const std::string& filename, const std::string& including_filename)
 {
 	std::vector<std::string> rt;
 	if (0==std::strchr( filename.c_str(), '*'))
@@ -567,12 +567,20 @@ static std::vector<std::string> getIncludeFiles( const std::string& filename)
 		std::string namhead( nam.c_str(), cc - nam.c_str());
 		std::string namtail( cc+1);
 
+		std::string ifn = boost::filesystem::path( including_filename).filename().string();
 		boost::filesystem::directory_iterator di( pt), de;
 		for (; di != de; ++di)
 		{
 			std::string dirfn( di->path().filename().string());
+#if defined(_WIN32)
+			if ((namhead.empty() || boost::algorithm::istarts_with( dirfn, namhead))
+			&&  (namtail.empty() || boost::algorithm::iends_with( dirfn, namtail))
+			&&  !boost::algorithm::iequals( dirfn, ifn))
+#else
 			if ((namhead.empty() || boost::algorithm::starts_with( dirfn, namhead))
-			&&  (namtail.empty() || boost::algorithm::ends_with( dirfn, namtail)))
+			&&  (namtail.empty() || boost::algorithm::ends_with( dirfn, namtail))
+			&&  dirfn != ifn)
+#endif
 			{
 				rt.push_back( (pt / dirfn).string());
 			}
@@ -689,7 +697,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 								if (!ch) throw std::runtime_error( "unexpected end of file");
 								if (tok.empty()) throw std::runtime_error( "illegal file name in include directive");
 
-								std::vector<std::string> files = getIncludeFiles( getCanonicalPath( tok, includepath));
+								std::vector<std::string> files = getIncludeFiles( getCanonicalPath( tok, includepath), filename);
 								std::vector<std::string>::const_iterator di = files.begin(), de = files.end();
 								for (; di != de; ++di)
 								{
