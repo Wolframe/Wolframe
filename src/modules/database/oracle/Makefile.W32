@@ -34,7 +34,6 @@ CPP_OBJS = \
 	Oracle.obj \
 	OracleTransactionExecStatemachine.obj \
 	OracleStatement.obj \
-	OracleProgram.obj \
 	OracleModule.obj
 
 all: $(DYNAMIC_MODULE)
