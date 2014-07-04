@@ -186,7 +186,7 @@ static vm::ProgramImage singleStatementProgram( const std::string& stm, const st
 	//prg.begin_loop_INTO_block( resultpath);
 	rt.tagnames.push_back("");
 	rt.code
-		( IS::Op_OUTPUT_OPEN_ARRAY, 0 )
+		( IS::Op_OUTPUT_OPEN_ARRAY, 1/*tagname*/ )
 	;
 	//prg.output_statement_result( true);
 	IS::ArgumentIndex endofblock
@@ -208,6 +208,7 @@ static vm::ProgramImage singleStatementProgram( const std::string& stm, const st
 	//prg.end_loop_INTO_block();
 	rt.code
 		( IS::Op_OUTPUT_CLOSE_ARRAY )
+		( IS::Op_RETURN )
 	;
 	return rt;
 }
