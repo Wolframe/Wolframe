@@ -39,7 +39,6 @@
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
-#include "OracleProgram.hpp"
 #include "config/configurationBase.hpp"
 #include "config/structSerialize.hpp"
 #include "module/constructor.hpp"
@@ -78,7 +77,6 @@ struct OracleConfigStruct
 	unsigned short	connections;		//< number of database connection (pool size)
 	unsigned short	acquireTimeout;		//< timeout when acquiring a connection from the pool
 	unsigned	statementTimeout;	//< default timeout when executin a statement
-	std::vector<std::string> m_programFiles;//< list of program files
 
 	//\brief Structure description for serialization/parsing
 	static const serialize::StructDescriptionBase* getStructDescription();
@@ -107,7 +105,6 @@ public:
 	const std::string& dbName() const			{return m_dbName;}
 	const std::string& user() const				{return m_user;}
 	const std::string& password() const			{return m_password;}
-	const std::vector<std::string>& programFiles() const	{return m_programFiles;}
 
 private:
 	//\brief Check the domains of the configured values and do some mappings (e.g. instantiating enum values from strings)
@@ -184,8 +181,7 @@ public:
 			  std::string sslRootCert, std::string sslCRL,
 			  unsigned short connectTimeout,
 			  size_t connections, unsigned short acquireTimeout,
-			  unsigned statementTimeout,
-			  const std::vector<std::string>& programFiles_);
+			  unsigned statementTimeout);
 	~OracleDbUnit();
 
 	const std::string& ID() const		{ return m_ID; }
@@ -202,8 +198,6 @@ private:
 	ObjectPool< OracleConnection* >	m_connPool;	//< pool of connections
 	unsigned		m_statementTimeout;	//< default statement execution timeout
 	OracleDatabase	m_db;				//< real database object
-	OracleProgram	m_program;
-	std::vector<std::string> m_programFiles;
 };
 
 

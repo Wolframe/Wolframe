@@ -50,8 +50,7 @@ OracleDbUnit* OracleConstructor::object( const config::NamedConfiguration& conf 
 						       cfg.sslRootCert, cfg.sslCRL,
 						       cfg.connectTimeout,
 						       cfg.connections, cfg.acquireTimeout,
-						       cfg.statementTimeout,
-						       cfg.programFiles());
+						       cfg.statementTimeout);
 	LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
 	return m_db;
 }

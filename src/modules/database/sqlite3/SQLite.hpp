@@ -68,7 +68,6 @@ struct SQLiteConfigStruct
 	bool		m_foreignKeys;
 	bool		m_profiling;
 	unsigned short	m_connections;
-	std::vector< std::string > m_programFiles;		//< list of program files
 	std::vector< std::string > m_extensionFiles;		//< list of Sqlite extension modules to load
 
 	//\brief Structure description for serialization/parsing
@@ -98,7 +97,6 @@ public:
 	bool foreignKeys() const				{ return m_foreignKeys; }
 	bool profiling() const					{ return m_profiling; }
 	unsigned short connections() const			{ return m_connections; }
-	const std::vector< std::string > programFiles() const	{ return m_programFiles; }
 	const std::vector< std::string > extensionFiles() const	{ return m_extensionFiles; }
 private:
 	config::ConfigurationTree::Position m_config_pos;
@@ -154,7 +152,6 @@ public:
 	SQLiteDBunit( const std::string& id, const std::string& filename,
 		      bool foreignKeys, bool profiling,
 		      unsigned short connections,
-		      const std::vector<std::string>& programFiles_,
 		      const std::vector<std::string>& extensionFiles_ );
 	~SQLiteDBunit();
 
@@ -172,7 +169,6 @@ private:
 
 	SQLiteProgram		m_program;		///< database programs
 	SQLiteDatabase		m_db;
-	std::vector<std::string>m_programFiles;
 	std::vector<std::string>m_extensionFiles;
 };
 

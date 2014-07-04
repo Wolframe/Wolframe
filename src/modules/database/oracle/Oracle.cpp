@@ -98,10 +98,9 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 				    std::string /*sslRootCert*/, std::string /*sslCRL*/ ,
 				    unsigned short /*connectTimeout*/,
 				    size_t connections, unsigned short acquireTimeout,
-				    unsigned statementTimeout,
-				    const std::vector<std::string>& programFiles_)
+				    unsigned statementTimeout)
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
-	  m_statementTimeout( statementTimeout ), m_programFiles(programFiles_)
+	  m_statementTimeout( statementTimeout )
 {
 	m_connStr = buildConnStr( host, port,  dbName );
 	LOG_DATA << "Oracle database '" << m_ID << "' connection string '" << m_connStr << "'";

@@ -108,7 +108,7 @@ listen	{
 
 .include database.conf
 .include logging.conf
-
+.include patter*.conf
 
 ; Authentication, authorization, auditing and accounting configuration
 AAAA	{
@@ -176,6 +176,11 @@ Processor
 		}
 	}
 }
+**file:pattern1.conf
+; hula hop
+**file:pattern2.conf
+; birim zoe
+**file:pattern3.conf
 **file:logging.conf
 ; Logging configuration
 logging	{

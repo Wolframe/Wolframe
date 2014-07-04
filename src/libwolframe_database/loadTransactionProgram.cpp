@@ -596,8 +596,7 @@ static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::str
 	bool isValidDatabase = true;
 	unsigned int mask = 0;
 	std::string resultfilter;
-	std::string authfunction;
-	std::string authresource;
+	std::vector<TdlTransactionFunction::Authorization> authorizations;
 	tdl::PreProcBlock preproc;
 	std::vector<AuditCallDef> auditcalls;
 
@@ -650,12 +649,14 @@ static bool parseTransactionBody( langbind::FormFunctionR& tfunc, const std::str
 					throw std::runtime_error( "Open bracket '(' expected after AUTHORIZE function call");
 				}
 				si++;
-				authfunction = tdl::parseFunctionName( langdescr, si, se);
+				std::string authfunction = tdl::parseFunctionName( langdescr, si, se);
 				char ch = tdl::gotoNextToken( langdescr, si, se);
 				if (ch == ',')
 				{
 					++si;
-					authresource = tdl::parseResourceName( langdescr, si, se);
+					std::string authresource = tdl::parseResourceName( langdescr, si, se);
+					TdlTransactionFunction::Authorization auth( authfunction, authresource);
+					authorizations.push_back( auth);
 				}
 				if (')' != tdl::gotoNextToken( langdescr, si, se))
 				{
@@ -706,7 +707,7 @@ EXITLOOP:
 		}
 
 		vm::ProgramR program = prg.createProgram();
-		tfunc.reset( new TdlTransactionFunction( transactionFunctionName, resultfilter, authfunction, authresource, preproc.build(program.get()), auditsteps, program));
+		tfunc.reset( new TdlTransactionFunction( transactionFunctionName, resultfilter, authorizations, preproc.build(program.get()), auditsteps, program));
 	}
 	posinfo.update( posinfo_si, si);
 	return isValidDatabase;

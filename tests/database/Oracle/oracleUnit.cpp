@@ -31,7 +31,7 @@ TEST_F( OracleFixture, CreateOracleUnit )
 {
 	OracleDbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>());
+			     3, 4, 3, 10);
 	ASSERT_STREQ( "Oracle", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
 	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
@@ -41,35 +41,35 @@ TEST_F( OracleFixture, WrongHost )
 {
 	ASSERT_THROW( OracleDbUnit db( "testDB", "blabla", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>()), std::runtime_error );
+			     3, 4, 3, 10), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongPassword )
 {
 	ASSERT_THROW( OracleDbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 					   "wolfusr", "wolfpwdd", "", "", "", "", "",
-					   3, 4, 3, 10, std::vector<std::string>()), std::runtime_error );
+					   3, 4, 3, 10), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongUser )
 {
 	ASSERT_THROW( OracleDbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 					   "wolfusrr", "wolfpwd", "", "", "", "", "",
-					   3, 4, 3, 10, std::vector<std::string>()), std::runtime_error );
+					   3, 4, 3, 10), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongDatabase )
 {
 	ASSERT_THROW( OracleDbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcle",
 					   "wolfusr", "wolfpwd", "", "", "", "", "",
-					   3, 4, 3, 10, std::vector<std::string>()), std::runtime_error );
+					   3, 4, 3, 10), std::runtime_error );
 }
 
 TEST_F( OracleFixture, Transaction )
 {
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>());
+			     3, 4, 3, 10);
 
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
@@ -149,7 +149,7 @@ TEST_F( OracleFixture, ExecuteInstruction )
 {
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>());
+			     3, 4, 3, 10);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -259,7 +259,7 @@ TEST_F( OracleFixture, ExceptionSyntaxError )
 {
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>());
+			     3, 4, 3, 10);
 
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
@@ -286,7 +286,7 @@ TEST_F( OracleFixture, TooFewBindParameter )
 {
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>());
+			     3, 4, 3, 10);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -315,7 +315,7 @@ TEST_F( OracleFixture, TooManyBindParameter )
 {
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>());
+			     3, 4, 3, 10);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -346,7 +346,7 @@ TEST_F( OracleFixture, IllegalBindParameter )
 {
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>());
+			     3, 4, 3, 10);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -376,7 +376,7 @@ TEST_F( OracleFixture, ReusedBindParameter )
 {
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>());
+			     3, 4, 3, 10);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -413,7 +413,7 @@ TEST_F( OracleFixture, ExpressionWithParametersAndTypeCoercion )
 {
 	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, std::vector<std::string>());
+			     3, 4, 3, 10);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
