@@ -301,12 +301,13 @@ void TdlTransactionFunction::print( std::ostream& out) const
 	out << "TRANSACTION " << m_name << std::endl;
 
 	// Print authorization constraints:
-	if (!m_authorizationFunction.empty())
+	std::vector<Authorization>::const_iterator zi = m_authorizations.begin(), ze = m_authorizations.end();
+	for (; zi != ze; ++zi)
 	{
-		out << "AUTHORIZE (" << m_authorizationFunction;
-		if (!m_authorizationResource.empty())
+		out << "AUTHORIZE (" << zi->function;
+		if (!zi->resource.empty())
 		{
-			out << ", " << m_authorizationResource;
+			out << ", " << zi->resource;
 		}
 		out << ")" << std::endl;
 	}
@@ -380,18 +381,21 @@ bool TdlTransactionFunctionClosure::call()
 		case 0:
 			throw std::runtime_error( "input not initialized");
 		case 1:
-			LOG_DEBUG << "check authorization '" << m_func->name() << "'";
-			if (m_context->checkAuthorization( m_func->authorizationFunction(), m_func->authorizationResource(), errmsg))
+		{
+			std::vector<TdlTransactionFunction::Authorization>::const_iterator zi = m_func->authorizations().begin(), ze = m_func->authorizations().end();
+			for (; zi != ze; ++zi)
 			{
-				LOG_DEBUG << "authorization allows exection of function '" << m_func->name() << "'";
+				LOG_DEBUG << "check authorization '" << zi->function << "' on '" << zi->resource;
+				if (!m_context->checkAuthorization( zi->function, zi->resource, errmsg))
+				{
+					throw std::runtime_error( std::string( "execution of transaction function '") + m_func->name() + "' denied in this authorization context: " + errmsg);
+				}
 			}
-			else
-			{
-				throw std::runtime_error( std::string( "execution of transaction function '") + m_func->name() + "' denied in this authorization context: " + errmsg);
-			}
+			LOG_DEBUG << "authorization allows exection of function '" << m_func->name() << "'";
 			LOG_DEBUG << "execute transaction '" << m_func->name() << "'";
 			m_state = 2;
 			/*no break here!*/
+		}
 		case 2:
 			if (!m_input.call()) return false;
 			m_state = 3;

@@ -53,9 +53,8 @@ extern "C" void profiling_callback(  void * /*a*/, const char *b, sqlite3_uint64
 SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			    bool foreignKeys, bool profiling,
 			    unsigned short connections,
-			    const std::vector<std::string>& programFiles_,
 			    const std::vector<std::string>& extensionFiles_)
-	: m_ID( id ), m_filename( filename ), m_programFiles(programFiles_),
+	: m_ID( id ), m_filename( filename ),
 	m_extensionFiles(extensionFiles_)
 {
 	bool	checked = false;

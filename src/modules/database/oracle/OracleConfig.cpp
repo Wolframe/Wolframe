@@ -82,7 +82,6 @@ const serialize::StructDescriptionBase* OracleConfigStruct::getStructDescription
 		( "connections", &OracleConfigStruct::connections )	.optional()
 		( "acquireTimeout", &OracleConfigStruct::acquireTimeout ).optional()
 		( "statementTimeout", &OracleConfigStruct::statementTimeout ).optional()
-		( "program", &OracleConfigStruct::m_programFiles )
 		;
 	}
 	};
@@ -191,15 +190,6 @@ void OracleConfig::setCanonicalPathes( const std::string& refPath )
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
-	for ( std::vector< std::string >::iterator it = m_programFiles.begin();
-						it != m_programFiles.end(); it++ )	{
-		std::string oldPath = *it;
-		*it = utils::getCanonicalPath( *it, refPath );
-		if ( oldPath != *it ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
-				       << "' instead of '" << oldPath << "'";
-		}
-	}
 }
 
 void OracleConfig::print( std::ostream& os, size_t indent ) const
@@ -241,17 +231,6 @@ void OracleConfig::print( std::ostream& os, size_t indent ) const
 		os << indStr << "   Default statement execution timeout: 0 (wait indefinitely)" << std::endl;
 	else
 		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
-
-	if ( m_programFiles.size() == 0 )
-		os << indStr << "   Program file: none" << std::endl;
-	else if ( m_programFiles.size() == 1 )
-		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;
-	else	{
-		std::vector< std::string >::const_iterator it = m_programFiles.begin();
-		os << indStr << "   Program files: " << *it++ << std::endl;
-		while ( it != m_programFiles.end() )
-			os << indStr << "                  " << *it++ << std::endl;
-	}
 }
 
 bool OracleConfig::check() const

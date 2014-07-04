@@ -99,18 +99,29 @@ class TdlTransactionFunction
 	:public langbind::FormFunction
 {
 public:
+	struct Authorization
+	{
+		std::string function;
+		std::string resource;
+
+		Authorization(){}
+		Authorization( const std::string& f, const std::string& r)
+			:function(f),resource(r){}
+		Authorization( const Authorization& o)
+			:function(o.function),resource(o.resource){}
+	};
+
 	TdlTransactionFunction(){}
 	TdlTransactionFunction( const TdlTransactionFunction& o)
-		:m_resultfilter(o.m_resultfilter),m_authorizationFunction(o.m_authorizationFunction),m_authorizationResource(o.m_authorizationResource),m_preproc(o.m_preproc),m_audit(o.m_audit),m_program(o.m_program){}
-	TdlTransactionFunction( const std::string& name_, const std::string& rf, const std::string& af, const std::string& ar, const std::vector<TdlTransactionPreprocStep>& pp, const std::vector<TdlAuditStep>& au, const vm::ProgramR& prg)
-		:m_name(name_),m_resultfilter(rf),m_authorizationFunction(af),m_authorizationResource(ar),m_preproc(pp),m_audit(au),m_program(prg){}
+		:m_resultfilter(o.m_resultfilter),m_authorizations(o.m_authorizations),m_preproc(o.m_preproc),m_audit(o.m_audit),m_program(o.m_program){}
+	TdlTransactionFunction( const std::string& name_, const std::string& rf, const std::vector<Authorization>& az, const std::vector<TdlTransactionPreprocStep>& pp, const std::vector<TdlAuditStep>& au, const vm::ProgramR& prg)
+		:m_name(name_),m_resultfilter(rf),m_authorizations(az),m_preproc(pp),m_audit(au),m_program(prg){}
 
 	void print( std::ostream& out) const;
 
 	const std::string& name() const					{return m_name;}
 	const std::string& resultfilter() const				{return m_resultfilter;}
-	const std::string& authorizationFunction() const		{return m_authorizationFunction;}
-	const std::string& authorizationResource() const		{return m_authorizationResource;}
+	const std::vector<Authorization>& authorizations() const	{return m_authorizations;}
 	const std::vector<TdlTransactionPreprocStep>& preproc() const	{return m_preproc;}
 	const std::vector<TdlAuditStep>& audit() const			{return m_audit;}
 	const vm::ProgramR& program() const				{return m_program;}
@@ -123,8 +134,7 @@ public:
 private:
 	std::string m_name;		 			///< function name
 	std::string m_resultfilter;				///< name of result filter function to call with the transaction result
-	std::string m_authorizationFunction;			///< authorization function name
-	std::string m_authorizationResource;			///< authorization resource name
+	std::vector<Authorization> m_authorizations;		///< authorization functions to call
 	std::vector<TdlTransactionPreprocStep> m_preproc;	///< preprocessing steps to perform on input before transaction execution
 	std::vector<TdlAuditStep> m_audit;			///< auditing steps to perform before transaction commit
 	vm::ProgramR m_program;					///< program to execute
