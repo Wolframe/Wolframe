@@ -387,6 +387,7 @@ FileType utils::getFileType( const std::string& filename)
 
 	static const CharTable xmlTagCharTab( "a..zA..Z0..9=_.-\"\' ?!");
 	static const CharTable SpaceCharTab( " \t\r\n");
+	static const CharTable keyOpTab( "{}.;");
 
 	std::string::const_iterator si = source.begin(), se = source.end();
 	//[0] Handle special cases:
@@ -469,11 +470,20 @@ FileType utils::getFileType( const std::string& filename)
 				ch = utils::gotoNextToken( si, se);
 			}
 			std::string tok;
-			ch = utils::parseNextToken( tok, si, se);
+			ch = utils::parseNextToken( tok, si, se, keyOpTab);
 			if (ch == '{' || ch == '}')
 			{
 				//... illegal but we decide to INFO
 				rt.format = FileType::Info;
+			}
+			else if (ch == '.')
+			{
+				ch = utils::parseNextToken( tok, si, se, keyOpTab);
+				if ((ch|32) == 'i' && boost::algorithm::iequals( tok, "include"))
+				{
+					//... file start with .include and this is allowed in a wolframe configuration file
+					rt.format = FileType::Info;
+				}
 			}
 			else if (ch && !tok.empty())
 			{
@@ -490,7 +500,7 @@ FileType utils::getFileType( const std::string& filename)
 					//... starts with an identifier or a string followed by a '{'
 					rt.format = FileType::Info;
 				}
-				utils::parseNextToken( tok, si, se);
+				utils::parseNextToken( tok, si, se, keyOpTab);
 				if (!tok.empty())
 				{
 					//... starts with two subsequent identifiers or strings
@@ -524,6 +534,51 @@ types::PropertyTree utils::readXmlPropertyTreeFile( const std::string& filename)
 		}
 	}
 	return types::PropertyTree( rootpt, filename);
+}
+
+static std::vector<std::string> getIncludeFiles( const std::string& filename)
+{
+	std::vector<std::string> rt;
+	if (0==std::strchr( filename.c_str(), '*'))
+	{
+		rt.push_back( filename);
+	}
+	else
+	{
+		boost::filesystem::path fn( filename);
+		std::string stem = fn.stem().string();
+		std::string ext = fn.extension().string();
+		std::string nam = stem + ext;
+		boost::filesystem::path pt = fn.parent_path();
+		if (0!=std::strchr( pt.string().c_str(), '*'))
+		{
+			throw std::runtime_error( "placeholder '*' only allowed in file name and not in parent path");
+		}
+		const char* cc = std::strchr( nam.c_str(), '*');
+		if (cc == 0)
+		{
+			throw std::runtime_error( std::string("internal: unable to retrieve files with pattern '") + filename + "'");
+		}
+		const char* cc2 = std::strchr( cc+1, '*');
+		if (cc2)
+		{
+			throw std::runtime_error( "only single placeholder '*' allowed in an include file name");
+		}
+		std::string namhead( nam.c_str(), cc - nam.c_str());
+		std::string namtail( cc+1);
+
+		boost::filesystem::directory_iterator di( pt), de;
+		for (; di != de; ++di)
+		{
+			std::string dirfn( di->path().filename().string());
+			if ((namhead.empty() || boost::algorithm::starts_with( dirfn, namhead))
+			&&  (namtail.empty() || boost::algorithm::ends_with( dirfn, namtail)))
+			{
+				rt.push_back( (pt / dirfn).string());
+			}
+		}
+	}
+	return rt;
 }
 
 static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& filename, const std::vector<std::string>& filenamestack)
@@ -633,12 +688,18 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 								ch = utils::parseNextToken( tok, ci, ce, valueOpTab, valueAlphaTab);
 								if (!ch) throw std::runtime_error( "unexpected end of file");
 								if (tok.empty()) throw std::runtime_error( "illegal file name in include directive");
-								types::PropertyTree::Node subnode = readInfoPropertyTreeFile_( getCanonicalPath( tok, includepath), filenamestack2);
-								types::PropertyTree::Node::const_iterator ni = subnode.begin(), ne = subnode.end();
-	
-								for (; ni != ne; ++ni)
+
+								std::vector<std::string> files = getIncludeFiles( getCanonicalPath( tok, includepath));
+								std::vector<std::string>::const_iterator di = files.begin(), de = files.end();
+								for (; di != de; ++di)
 								{
-									stk.back().second.add_child( ni->first, ni->second);
+									types::PropertyTree::Node subnode = readInfoPropertyTreeFile_( *di, filenamestack2);
+									types::PropertyTree::Node::const_iterator ni = subnode.begin(), ne = subnode.end();
+	
+									for (; ni != ne; ++ni)
+									{
+										stk.back().second.add_child( ni->first, ni->second);
+									}
 								}
 							}
 						}

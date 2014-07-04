@@ -20,6 +20,12 @@ testdata="
 `cat ../config/daemon.conf`
 **file:processor.conf
 `cat ../config/processor.conf`
+**file:pattern1.conf
+`cat ../config/pattern1.conf`
+**file:pattern2.conf
+`cat ../config/pattern2.conf`
+**file:pattern3.conf
+`cat ../config/pattern3.conf`
 **file:logging.conf
 `cat ../config/logging.conf`
 **file:simpleform.wnmp
