@@ -63,7 +63,6 @@ PROVIDER_OBJS = \
 	provider\procProvider.obj
 
 PROGRAM_OBJS = \
-	prgbind\transactionProgram.obj \
 	prgbind\authorizationProgram.obj \
 	prgbind\normalizeProgram.obj \
 	prgbind\ddlProgram.obj \

@@ -33,6 +33,7 @@
 ///\brief Implementaion of the methods of a transaction function based on TDL
 ///\file tdlTransactionFunction.cpp
 #include "tdlTransactionFunction.hpp"
+#include "tdlTransactionInput.hpp"
 #include "database/transaction.hpp"
 #include "vm/inputStructure.hpp"
 #include "utils/typeSignature.hpp"
@@ -143,7 +144,7 @@ void TdlTransactionFunctionClosure::InputStructure::finalize( proc::ExecContext*
 
 VmTransactionInputR TdlTransactionFunctionClosure::InputStructure::get() const
 {
-	return VmTransactionInputR( new VmTransactionInput( *m_func->program(), *m_structure));
+	return VmTransactionInputR( new TdlTransactionInput( *m_func->program(), *m_structure));
 }
 
 const vm::InputStructure& TdlTransactionFunctionClosure::InputStructure::structure() const
@@ -404,7 +405,7 @@ bool TdlTransactionFunctionClosure::call()
 		{
 			// Execute function:
 			m_inputstructptr->finalize( m_context);
-			db::VmTransactionInput inp( *m_func->program(), m_inputstructptr->structure());
+			db::TdlTransactionInput inp( *m_func->program(), m_inputstructptr->structure());
 			db::VmTransactionOutput res;
 			{
 				boost::scoped_ptr<db::Transaction> trsr( m_context->provider()->transaction( m_func->name()));

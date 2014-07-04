@@ -320,4 +320,30 @@ void Program::print( std::ostream& out) const
 	}
 }
 
+ProgramImage Program::image() const
+{
+	ProgramImage rt;
+	{
+		rt.code = code;
+		rt.constants = constants;
+		rt.colnames = colnametab.array();
+		rt.tagnames = tagnametab.array();
+		rt.resultnames = resultnametab.array();
+		rt.statements = statements;
+		ErrorHintTable::const_iterator hi = hinttab.begin(), he = hinttab.end();
+		for (; hi != he; ++hi)
+		{
+			rt.errorhints.push_back( ProgramImage::ErrorHintList());
+	
+			ErrorHintTable::HintList::const_iterator ei = hi->begin(), ee = hi->end();
+			for (; ei != ee; ++ei)
+			{
+				rt.errorhints.back().push_back( ProgramImage::ErrorHint( ei->errorclass, ei->message));
+			}
+		}
+		rt.signatures = signatures;
+		rt.tuplesets = tuplesets;
+	}
+	return rt;
+}
 

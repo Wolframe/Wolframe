@@ -32,12 +32,12 @@
 ************************************************************************/
 ///\brief Implements the loading of programs in the transaction definition language
 ///\file prgbind_transactionProgram.cpp
-#include "prgbind/transactionProgram.hpp"
+#include "transactionProgram.hpp"
+#include "loadTransactionProgram.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "filter/redirectFilterClosure.hpp"
 #include "database/databaseError.hpp"
 #include "database/database.hpp"
-#include "database/loadTransactionProgram.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 

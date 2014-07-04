@@ -79,7 +79,6 @@ public:
 
 public:
 	ProgramImage(){}
-	ProgramImage( const Program& program);
 	ProgramImage( const ProgramImage& o)
 		:code(o.code)
 		,constants(o.constants)

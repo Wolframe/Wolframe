@@ -1,0 +1,80 @@
+TOPDIR = ..\..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)"
+
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_database.lib \
+	kernel32.lib advapi32.lib Ws2_32.lib
+
+TDL_CPP_OBJS = \
+	tdl\auditCallStatement.obj \
+	tdl\auditElementReference.obj \
+	tdl\commandDefinition.obj \
+	tdl\elementReference.obj \
+	tdl\embeddedStatement.obj \
+	tdl\parseUtils.obj \
+	tdl\preprocBlock.obj \
+	tdl\preprocCallStatement.obj \
+	tdl\preprocElementReference.obj \
+	tdl\subroutineCallStatement.obj
+
+VM_CPP_OBJS = \
+	vm\inputStructure.obj \
+	vm\program.obj \
+	vm\selectorPath.obj \
+	vm\selectorPathSet.obj \
+	vm\subroutine.obj \
+	vm\tagTable.obj
+
+CPP_OBJS = \
+	$(TDL_CPP_OBJS) \
+	$(VM_CPP_OBJS) \
+	tdlFunctionProgramType.obj \
+	tdlTransactionFunction.obj \
+	tdlTransactionInput.obj \
+	tdlTransactionPreprocStep.obj \
+	loadTransactionProgram.obj \
+	tdl2vmTranslator.obj \
+	transactionProgram.obj \
+	mod_command_tdl.obj
+
+DYNAMIC_MODULE = \
+	mod_command_tdl.dll
+
+CPP_OBJS = \
+	mod_command_tdl.obj
+
+all: $(DYNAMIC_MODULE)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+$(DYNAMIC_MODULE): $(CPP_OBJS)
+	$(LINK) /dll /def:ModTdlLanguageBinding.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+	@-erase $(DYNAMIC_MODULE) 2>NUL
+	@-erase $(CPP_OBJS) 2>NUL
+
+local_distclean:
+
+local_test:
+
+

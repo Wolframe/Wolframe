@@ -36,7 +36,6 @@
 #include "types/customDataNormalizer.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "prgbind/program.hpp"
-#include "prgbind/transactionProgram.hpp"
 #include "prgbind/ddlProgram.hpp"
 #include "prgbind/normalizeProgram.hpp"
 #include "filter/null_filter.hpp"
@@ -87,7 +86,6 @@ public:
 	virtual ~Impl(){}
 	Impl()
 	{
-		m_programTypes.push_back( ProgramR( new TransactionDefinitionProgram()));
 		m_programTypes.push_back( ProgramR( new NormalizeProgram()));
 		m_filterTypeMap.insert( "null", langbind::FilterTypeR( new langbind::NullFilterType()));
 	}

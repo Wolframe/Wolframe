@@ -1,0 +1,4 @@
+LIBRARY mod_command_tdl
+
+EXPORTS
+entryPoint	@1
