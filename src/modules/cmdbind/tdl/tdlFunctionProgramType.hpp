@@ -38,7 +38,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace prgbind {
 
-Program* createTdlProgramType();
+prgbind::Program* createTdlProgramType();
 
 }} //namespace
 #endif

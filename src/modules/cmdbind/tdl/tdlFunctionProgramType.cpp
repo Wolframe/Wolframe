@@ -40,7 +40,7 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-Program* prgbind::createTdlProgramType()
+prgbind::Program* prgbind::createTdlProgramType()
 {
 	return new TransactionDefinitionProgram();
 }

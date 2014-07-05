@@ -19,7 +19,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
-	$(TOPDIR)\src\libwolframe_langbind\wolframe_database.lib \
+	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 TDL_CPP_OBJS = \
@@ -47,6 +47,7 @@ CPP_OBJS = \
 	$(VM_CPP_OBJS) \
 	tdlFunctionProgramType.obj \
 	tdlTransactionFunction.obj \
+	tdlFunctionProgramType.obj \
 	tdlTransactionInput.obj \
 	tdlTransactionPreprocStep.obj \
 	loadTransactionProgram.obj \
@@ -56,9 +57,6 @@ CPP_OBJS = \
 
 DYNAMIC_MODULE = \
 	mod_command_tdl.dll
-
-CPP_OBJS = \
-	mod_command_tdl.obj
 
 all: $(DYNAMIC_MODULE)
 
