@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Definition of transaction input
-///\file database/vmTransactionInput.hpp
+/// \brief Definition of transaction input
+/// \file database/vmTransactionInput.hpp
 #ifndef _DATABASE_VM_TRANSACTION_INPUT_HPP_INCLUDED
 #define _DATABASE_VM_TRANSACTION_INPUT_HPP_INCLUDED
 #include "database/vm/programImage.hpp"
@@ -41,20 +41,20 @@
 namespace _Wolframe {
 namespace db {
 
-///\class VmTransactionInput
-///\brief Input of a transaction
+/// \class VmTransactionInput
+/// \brief Input of a transaction
 class VmTransactionInput
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	VmTransactionInput(){}
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	VmTransactionInput( const VmTransactionInput& o)
 		:m_program(o.m_program){}
 	VmTransactionInput( const vm::ProgramImage& p)
 		:m_program(p){}
 
-	///\brief Return the input as readable serialization
+	/// \brief Return the input as readable serialization
 	std::string tostring() const;
 
 	void print( std::ostream& out) const;

@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file database/transaction.hpp
-///\brief Interface of a database transaction
+/// \file database/transaction.hpp
+/// \brief Interface of a database transaction
 
 #ifndef _TRANSACTION_HPP_INCLUDED
 #define _TRANSACTION_HPP_INCLUDED
@@ -47,46 +47,56 @@
 namespace _Wolframe {
 namespace db {
 
-///\brief Transaction interface
+/// \class Transaction
+/// \brief Transaction interface
 class Transaction
 {
 public:
+	/// \brief Constructor
+	/// \param[in] name_ name of the transaction (for logging purpose only)
+	/// \param[in] stm_ database interface needed by the virtual machine to execute the transaction
 	Transaction( const std::string& name_, const TransactionExecStatemachineR& stm_)
 		:m_name(name_),m_stm(stm_){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~Transaction()			{close();}
-	///\brief Configured ID of the underlaying database
+	/// \brief Configured ID of the underlaying database
 	const std::string& databaseID() const	{return m_stm->databaseID();}
 
-	///\brief Begin of a new transaction
+	/// \brief Begin of a new transaction
 	void begin();
-	///\brief Commit of the running transaction
+	/// \brief Commit of the running transaction
 	void commit();
-	///\brief Rollback of the running transaction
+	/// \brief Rollback of the running transaction
 	void rollback();
-	///\brief Close of the committed or rolled back transaction
+	/// \brief Close of the committed or rolled back transaction
 	void close()				{m_stm.reset();}
 
-	///\brief Execute a transaction
-	///\return true if successful, otherwise false (use getLastError to get details)
+	/// \brief Execute a transaction
+	/// \return true if successful, otherwise false (use getLastError to get details)
 	virtual bool execute( const VmTransactionInput& input, VmTransactionOutput& output);
 
+	/// \brief Get the name of the transaction
 	const std::string& name() const
 	{
 		return m_name;
 	}
 
-	///\class Result
-	///\brief Result of a single statement execute call: executeStatement( const std::string&, const std::vector<types::Variant>&);
+	/// \class Result
+	/// \brief Result of a single statement execute call: executeStatement( const std::string&, const std::vector<types::Variant>&);
 	class Result
 	{
 	public:
 		typedef std::vector<types::Variant> Row;
 
+		/// \brief Default constructor
 		Result(){}
+		/// \brief Constructor
+		/// \param[in] colnames_ column names of the result
+		/// \param[in] rows_ data rows of the result
 		Result( const std::vector<std::string>& colnames_, const std::vector<Row>& rows_)
 			:m_colnames(colnames_),m_rows(rows_){}
+		/// \brief Copy constructor
 		Result( const Result& o)
 			:m_colnames(o.m_colnames),m_rows(o.m_rows){}
 
@@ -101,14 +111,16 @@ public:
 		std::vector<Row> m_rows;
 	};
 
-	///\brief Execute a single statement with result
-	///\return true if successful, otherwise false (use getLastError to get details)
+	/// \brief Execute a single statement with result
+	/// \return true if successful, otherwise false (use getLastError to get details)
 	bool executeStatement( Result& result, const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
-	///\brief Execute a single statement without result
-	///\return true if successful, otherwise false (use getLastError to get details)
+	/// \brief Execute a single statement without result
+	/// \return true if successful, otherwise false (use getLastError to get details)
 	bool executeStatement( const std::string& stm, const std::vector<types::Variant>& params=std::vector<types::Variant>());
 
+	/// \brief Get the lower lever database specific execution statemachine of the transaction
 	TransactionExecStatemachine* execStatemachine()			{return m_stm.get();}
+	/// \brief Get the last error occurred
 	const DatabaseError* getLastError() const			{return &m_lastError;}
 
 private:

@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file database/vm/programImage.hpp
-///\brief Interface for program executing database transactions
+/// \file database/vm/programImage.hpp
+/// \brief Interface for program executing database transactions
 #ifndef _DATABASE_VM_PROGRAM_IMAGE_HPP_INCLUDED
 #define _DATABASE_VM_PROGRAM_IMAGE_HPP_INCLUDED
 #include "database/vm/instructionSet.hpp"
@@ -46,14 +46,18 @@
 namespace _Wolframe {
 namespace db {
 namespace vm {
-///\brief Forward declaration
+/// \brief Forward declaration
 class Program;
 
+/// \class ProgramImage
+/// \brief Program addressing only flat data structures and with symbolic information stripped out
 class ProgramImage
 	:public InstructionSet
 {
 public:
 	typedef std::vector<std::string> SubroutineSignature;
+	/// \class ErrorHint
+	/// \brief Hint for adding user information to the database error
 	struct ErrorHint
 	{
 		std::string errorclass;
@@ -67,18 +71,20 @@ public:
 	typedef std::vector<ErrorHint> ErrorHintList;
 
 public:
-	ProgramCode code;				//< program code
-	std::vector<types::Variant> constants;		//< constants
-	std::vector<std::string> colnames;		//< column names
-	std::vector<std::string> tagnames;		//< tag names
-	std::vector<std::string> resultnames;		//< result name table
-	std::vector<std::string> statements;		//< database statements
-	std::vector<ErrorHintList> errorhints;		//< hints for error classes of failing database statements
-	std::vector<SubroutineSignature> signatures;	//< subroutine signatures
-	std::vector<ValueTupleSetR> tuplesets;		//< value sets from input path expressions
+	ProgramCode code;				///< program code
+	std::vector<types::Variant> constants;		///< constants
+	std::vector<std::string> colnames;		///< column names
+	std::vector<std::string> tagnames;		///< tag names
+	std::vector<std::string> resultnames;		///< result name table
+	std::vector<std::string> statements;		///< database statements
+	std::vector<ErrorHintList> errorhints;		///< hints for error classes of failing database statements
+	std::vector<SubroutineSignature> signatures;	///< subroutine signatures
+	std::vector<ValueTupleSetR> tuplesets;		///< value sets from input path expressions
 
 public:
+	/// \brief Constructor
 	ProgramImage(){}
+	/// \brief Copy constructor
 	ProgramImage( const ProgramImage& o)
 		:code(o.code)
 		,constants(o.constants)
@@ -91,7 +97,9 @@ public:
 		,tuplesets(o.tuplesets)
 	{}
 
+	/// \brief Print one instruction without symbolic information
 	void printInstruction( std::ostream& out, const Instruction& instr) const;
+	/// \brief Print the whole program without symbolic information
 	void print( std::ostream& out) const;
 };
 
