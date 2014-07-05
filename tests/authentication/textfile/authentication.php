@@ -81,5 +81,45 @@ function CRAMresponse( $password, $challenge )
 	return base64_encode( hash( "sha256", $response, true ));
 }
 
-?>
 
+function passwordMessage( $oldPassword, $challenge, $newPassword )
+{
+	if ( $challenge[ 0 ] != '$' )
+		return 'invalid challenge format';
+	$challenge = ltrim( $challenge, '$' );
+	$chlngPart = explode( '$', $challenge );
+	if ( count( $chlngPart ) != 2 )
+		return 'invalid challenge format';
+	$salt = base64_decode( $chlngPart[ 0 ] );
+	$chlng = base64_decode( $chlngPart[ 1 ] );
+	if ( strlen( $chlng ) != 64 )
+		return 'invalid challenge length';
+
+	$passwd = hash_pbkdf2( "sha1", $oldPassword, $salt, 10589, 48, 'true' );
+	if ( count( $passwd ) > 64 )	{
+		$response = hash( "sha512", $passwd, true );
+	}
+	else	{
+		$respArray = array_fill( 0, 64, 0x3c );
+		$response = implode( array_map( "chr", $respArray ));
+		for ( $i = 0; $i < strlen( $passwd ); $i++ )
+			$response[ $i ] = $passwd[ $i ];
+	}
+	for ( $i = 0; $i < 64; $i++ )
+		$response[ $i ] = $response[ $i ] ^ $chlng[ $i ];
+	$key = hash( "sha256", $response, true );
+
+	$pwdArray = array_fill( 0, 48, 0x00 );
+	$pwdMessage = implode( array_map( "chr", $pwdArray ));
+	$pwdLen = strlen( $newPassword );
+	if ( $pwdLen > 47 )
+		$pwdLen = 47;
+	for ( $i = 0; $i < $pwdLen; $i++ )
+		$pwdMessage[ $i + 1 ] = $newPassword[ $i ];
+	$pwdMessage[ 0 ] = pack( "C", $pwdLen );
+	$pwdHash = hash( "md5", $pwdMessage, true );
+	return base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_128, $key,
+                                 ( $pwdMessage . $pwdHash ), MCRYPT_MODE_CBC, $salt ));
+}
+
+?>

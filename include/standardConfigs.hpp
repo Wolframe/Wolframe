@@ -133,7 +133,6 @@ public:
 	std::string		user;
 	std::string		group;
 	std::string		pidFile;
-	std::string		serviceName;
 #endif
 #if defined( _WIN32 )
 	// Windows service configuration

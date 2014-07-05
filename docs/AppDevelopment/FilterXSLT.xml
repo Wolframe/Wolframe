@@ -7,7 +7,7 @@
 	(<ulink url="http://www.xmlsoft.org">http://www.xmlsoft.org</ulink>).
 	</para>
 	</sect3>
-	
+
 	<sect3>
 	<title>Character set encodings</title>
 	<para>Without explicitly specified, the <acronym>XSLT</acronym> filter support the following character set 
@@ -24,14 +24,16 @@
 
 	<sect3>
 	<title>Configuration</title>
-	<para>For using an XSLT filter based <application>libxml2</application>, you have to load the module 'mod_filter_libxml2'.
-	For this you add the following line to the LoadModules section of your <application>Wolframe</application> configuration:
+	<para>For using an XSLT filter based <application>libxml2</application>, you have to load the modules 
+		<code>mod_filter_libxml2</code> and <code>mod_doctype_xml</code>.
+		For this you add the following 2 lines to the LoadModules section of your <application>Wolframe</application> configuration:
 		<programlisting language='text'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_filter_libxml2.conf" parse="text" />
 		</programlisting>
 	</para>
-	<para>You also have to add the program of the XSLT filter into the Processor section of the configuration.
-	The name of the filter is the filename of the XSLT filter program without path and extension. In our example
+	<para>You also have to add the program of the XSLT filter into the Processor 
+	section of the configuration. The name of the filter is the filename 
+	of the XSLT filter program without path and extension. In our example
 	the filter would be named invoice_ISOxxxx:
 	<programlisting language='text'>
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_program_xslt.conf" parse="text" />

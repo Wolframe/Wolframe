@@ -1,7 +1,7 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
 # Maintainer: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe-git
-pkgver=release_0.0.2.r55.gcea7f58
+pkgver=release_0.0.2.r145.gb4e281e
 pkgrel=1
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
@@ -22,7 +22,7 @@ source=(
   'wolframed.service'
 )
 md5sums=('SKIP'
-         'faa0c7a37d5d6156fe3d8e9f16093a06'
+         '430413ab85140e468f8f65d80d15760b'
          'cc146a28908aad55f156860340934095')
 
 pkgver() {

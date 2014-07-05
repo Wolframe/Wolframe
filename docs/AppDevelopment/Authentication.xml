@@ -3,6 +3,57 @@
 	<para>The aspect of authentication is configured in the 
 	subsection <code>Authentication</code> of the <code>AAAA</code> section
 	in the server configuration.
+	</para>
+<sect2>
+<title>Requirements</title>
+<para>In order to use authentication in Wolframe you have to configure the 
+loading of the module implementing it. The authentication mech explained 
+here as example is implemented in the module mod_auth_textfile.
+For using it you have to declare the module <code>mod_auth_textfile</code>
+in the <code>LoadModules</code> section of your configuration before.
+</para>
+</sect2>
+<sect2>
+<title>Configuration settings</title>
+<para>The following table shows the configuration settings for Authentication
+in Wolframe.
+</para>
+<table frame="all" width="100%">
+	<title>Authentication configuration settings</title>
+	<tgroup cols="3">
+	<colspec colnum="1" colname="col1" colwidth="1*"/>
+	<colspec colnum="2" colname="col2" colwidth="1*"/>
+	<colspec colnum="3" colname="col3" colwidth="3*"/>
+	<thead>
+		<row>
+			<entry>Name</entry>
+			<entry>Parameter</entry>
+			<entry>Description</entry>
+		</row>
+	</thead>
+	<tbody>
+		<row>
+			<entry>RandomDevice</entry>
+			<entry>address or path</entry>
+			<entry>Specifies the random device to be used. This
+				configuration setting is optional. The
+				system should have a reasonable default
+				for most applications.</entry>
+		</row>
+		<row>
+			<entry>Textfile</entry>
+			<entry>section</entry>
+			<entry>Specifies the block with the configuration for
+				authentication based on a textfile with
+				WOLFRAME-CRAM as authentication mech.</entry>
+		</row>
+	</tbody>
+	</tgroup>
+</table>
+</sect2>
+<sect2>
+	<title>Example configuration</title>
+	<para>
 	The following example shows an <code>Authentication</code>
 	configuration with the Wolframe textfile authentication module
 	that provides an authentication over the "WOLFRAME-CRAM" protocol:
@@ -20,15 +71,24 @@ AAAA
 }
 	</programlisting>
 	</para>
-	<sect2>
-		<title>Authentication mechs</title>
-		<para>Currently only the authentication protocol for
-		<code>WOLFRAME-CRAM</code> is implemented. The 
-		client can choose between no authentication
-		(if configured to allow no authentication)
-		or <code>WOLFRAME-CRAM</code>. You configure
-		it as shown in the example above.
-		</para>
-	</sect2>
+</sect2>
+<sect2>
+	<title>Authentication mechs</title>
+	<para>Currently only the authentication protocol for
+	<code>WOLFRAME-CRAM</code> is implemented. The 
+	client can choose between no authentication
+	(if configured to allow no authentication)
+	or <code>WOLFRAME-CRAM</code>. You configure
+	it as shown in the example above. For the setup of a
+	client see the chapter "Clients".
+	</para>
+</sect2>
+<sect2>
+	<title>Development status</title>
+	<para>We are currently developing other authentication methods
+	like <code>PAM</code>, <code>SASL</code> and database based
+	authentication implementing <code>WOLFRAME-CRAM</code></para>.
+	They will be subject of the next release.
+</sect2>
 </sect1>
 
