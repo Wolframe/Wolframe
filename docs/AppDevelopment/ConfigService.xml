@@ -93,11 +93,6 @@ Service {
 				<entry>filepath</entry>
 				<entry>Defines the path to the file used as pid file</entry>
 			</row>
-			<row>
-				<entry>Description</entry>
-				<entry>string</entry>
-				<entry>Defines the name displayed in the list of processes</entry>
-			</row>
 			
 		</tbody>
 		</tgroup>
@@ -108,7 +103,6 @@ Daemon {
     User    wolframe
     Group   wolframe
     PidFile /var/run/wolframed.pid
-    ServiceName wolframe
 }
 	</programlisting>
 	</para>

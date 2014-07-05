@@ -206,6 +206,7 @@ TEST_F( PasswordChangerFixture, PasswordChangeSuccess )
 
 	PasswordChangeMessage pwd( "New Password" );
 	std::string pwdMsg = pwd.toBase64( salt.salt(), response.response() );
+	std::cout << "Message:   " << pwdMsg << std::endl;
 	changer->messageIn( pwdMsg );
 	EXPECT_EQ( changer->status(), AAAA::PasswordChanger::PASSWORD_EXCHANGED );
 

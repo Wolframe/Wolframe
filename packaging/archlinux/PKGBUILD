@@ -20,8 +20,8 @@ source=(
   'wolframed.service'
 )
 
-md5sums=('94651cf857e1909729374c327c5023b4'
-         'faa0c7a37d5d6156fe3d8e9f16093a06'
+md5sums=('ff2d5db70d6910d0060a3cab3a11bacf'
+         '430413ab85140e468f8f65d80d15760b'
          'cc146a28908aad55f156860340934095')
 
 package() {
