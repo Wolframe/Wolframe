@@ -39,7 +39,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::tdl;
 
-static const utils::CharTable g_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
+static const utils::CharTable g_tdl_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 
 bool tdl::isIdentifier( const std::string& str)
 {
@@ -67,7 +67,7 @@ std::string tdl::extractImplicitNameFromSelector( const std::string& selector)
 
 std::string tdl::errorTokenString( char ch, const std::string& tok)
 {
-	if (g_optab[ch])
+	if (g_tdl_optab[ch])
 	{
 		std::string rt;
 		rt.push_back( ch);
@@ -120,7 +120,7 @@ char tdl::parseNextToken( const LanguageDescription* langdescr, std::string& tok
 {
 	char ch = gotoNextToken( langdescr, si, se);
 	if (!ch) return 0;
-	return utils::parseNextToken( tok, si, se, g_optab);
+	return utils::parseNextToken( tok, si, se, g_tdl_optab);
 }
 
 std::vector<std::string> tdl::parse_INTO_path( const LanguageDescription* langdescr, std::string::const_iterator& si, std::string::const_iterator se)

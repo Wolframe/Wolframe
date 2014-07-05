@@ -32,10 +32,11 @@
 ************************************************************************/
 ///\file testCompileTDL.cpp
 ///\brief Test the parsing and mapping of TDL programs to its internal compiled representation
-#include "database/loadTransactionProgram.hpp"
+#include "loadTransactionProgram.hpp"
 #include "database/databaseLanguage.hpp"
 #include "database/vmTransactionInput.hpp"
 #include "tdlTransactionFunction.hpp"
+#include "tdlTransactionInput.hpp"
 #include "vm/inputStructure.hpp"
 #include "utils/fileUtils.hpp"
 #include "types/propertyTree.hpp"
@@ -186,7 +187,7 @@ TEST_P( CompileTDLTest, tests)
 			vm::InputStructure input( tfunc->program()->pathset.tagtab());
 			fillInputStructure( input_ptree, input);
 
-			VmTransactionInput trsinput( *tfunc->program(), input);
+			TdlTransactionInput trsinput( *tfunc->program(), input);
 			out << "TRANSACTION INPUT:" << std::endl;
 			trsinput.print( out);
 			out << std::endl;

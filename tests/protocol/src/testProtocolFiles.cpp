@@ -18,4 +18,3 @@
 #include "prgbind/programLibrary.cpp"
 #include "prgbind/ddlProgram.cpp"
 #include "prgbind/normalizeProgram.cpp"
-#include "prgbind/transactionProgram.cpp"
