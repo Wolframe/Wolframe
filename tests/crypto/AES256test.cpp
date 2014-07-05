@@ -206,11 +206,11 @@ TEST( AES256fixture, ECBtable256 )
 	testECB( infile );
 }
 
-TEST( AES256fixture, ECBvarKey256 )
+TEST( AES256fixture, ECBvarKey256_2 )
 {
 	char output[ STRING_BUFER_SIZE ];
 
-	std::ifstream infile("AES-256.vectors/ECBvarKey256.rsp");
+	std::ifstream infile("AES-256.vectors/ECBvarKey256-2.rsp");
 
 	bool hasValues = true;
 	do	{
@@ -240,17 +240,17 @@ TEST( AES256fixture, ECBvarKey256 )
 	} while ( hasValues );
 }
 
-TEST( AES256fixture, ECBVarKey256 )
+TEST( AES256fixture, ECBvarKey256_1 )
 {
-	std::ifstream infile("AES-256.vectors/ECBVarKey256.rsp");
+	std::ifstream infile("AES-256.vectors/ECBvarKey256-1.rsp");
 	testECB( infile );
 }
 
-TEST( AES256fixture, ECBvarTxt256 )
+TEST( AES256fixture, ECBvarTxt256_2 )
 {
 	char output[ STRING_BUFER_SIZE ];
 
-	std::ifstream infile("AES-256.vectors/ECBvarTxt256.rsp");
+	std::ifstream infile("AES-256.vectors/ECBvarTxt256-2.rsp");
 
 	bool hasValues = true;
 	do	{
@@ -280,9 +280,9 @@ TEST( AES256fixture, ECBvarTxt256 )
 	} while ( hasValues );
 }
 
-TEST( AES256fixture, ECBVarTxt256 )
+TEST( AES256fixture, ECBvarTxt256_1 )
 {
-	std::ifstream infile("AES-256.vectors/ECBVarTxt256.rsp");
+	std::ifstream infile("AES-256.vectors/ECBvarTxt256-1.rsp");
 	testECB( infile );
 }
 
