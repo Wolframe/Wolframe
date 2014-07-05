@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file prgbind/authorizationProgram.cpp
+/// \file authorizationProgram.cpp
 /// \brief Implementation of authorization programs
 
+#include "authorizationProgram.hpp"
 #include "types/authorizationFunction.hpp"
-#include "prgbind/authorizationProgram.hpp"
 #include "processor/execContext.hpp"
 #include "langbind/formFunction.hpp"
 #include "utils/fileUtils.hpp"

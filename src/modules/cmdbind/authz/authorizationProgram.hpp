@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file prgbind/authorizationProgram.hpp
+/// \file authorizationProgram.hpp
 /// \brief Interface of the authorization program type
 
 #ifndef _Wolframe_PRGBIND_AUTHORIZATION_PROGRAM_HPP_INCLUDED

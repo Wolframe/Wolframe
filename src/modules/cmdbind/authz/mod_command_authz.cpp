@@ -30,21 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/programTypeModuleMacros.hpp
-///\brief Macros for a module for a program type for a binding language
-#include "module/moduleInterface.hpp"
+///\file mod_command_authz.cpp
+///\brief Module for AUTHZ language binding (language to define mappings of authz calls to form functions)
 #include "appdevel/module/programTypeBuilder.hpp"
+#include "appdevel/programTypeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "authzFunctionProgramType.hpp"
 
-///\brief Defines a Wolframe program type
-#define WF_PROGRAM_TYPE( LANGNAME, CREATEPRGFUNC)\
-{\
-	struct Constructor\
-	{\
-		static _Wolframe::module::BuilderBase* impl()\
-		{\
-			return new _Wolframe::module::ProgramTypeBuilder( LANGNAME "ProgramType", LANGNAME "Language", CREATEPRGFUNC);\
-		}\
-	};\
-	(*this)(&Constructor ::impl);\
-}
+WF_MODULE_BEGIN( "AuthzFunctionMap", "authorization call to form function map module")
+ WF_PROGRAM_TYPE( "Authz", _Wolframe::prgbind::createAuthzProgramType)
+WF_MODULE_END
 
