@@ -1,5 +1,5 @@
 <sect1>
-	<title>Programming the Interface</title>
+	<title>Programming the interface</title>
 	<para>
 		Programming means we annotate the XML of the UI form files with
 		some extra properties. They control the following things:
@@ -23,9 +23,9 @@
 		</itemizedlist>
 	</para>
 	<sect2>
-		<title>Mapping XML Data</title>
+		<title>Mapping XML data</title>
 		<sect3>
-			<title>Starting Position</title>
+			<title>Starting position</title>
 			<para>For mapping data structures from the user interface elements to the
 			data description needed to fulfill an interface for a server request we need
 			some kind of translation. An implicit mapping would only be able to describe
@@ -37,7 +37,7 @@
 			</para>
 		</sect3>
 		<sect3>
-			<title>First Example</title>
+			<title>First example</title>
 			<para>
 				Let's have a look at a <classname>QLineEdit</classname>
 				element of a form and a possible XML representation of the
@@ -91,7 +91,7 @@
 			</programlisting>
 		</sect3>
 		<sect3>
-			<title>Another Example</title>
+			<title>Another example</title>
 			<para>
 				Some elements are more complicated than that.
 				They present the user a list of options or items the user to pick from, e.g. a list of cities.
@@ -182,19 +182,19 @@
 	</sect2>
 
 	<sect2>
-		<title>States and Behaviour</title>
+		<title>States and behaviour</title>
 		<sect3>
-		<title>Reserved Private Dynamic Properties</title>
+		<title>Reserved private dynamic properties</title>
 			<para>The <code>_w_</code> prefix is used for internal widget properties not of interest for the user.
 			</para>
 		</sect3>
 
 		<sect3>
-		<title>Reserved Public Dynamic Properties</title>
+		<title>Reserved public dynamic properties</title>
 		<para>The dynamic properties introduced here are edited by the user to stear application behaviour:
 		</para>
 			<sect4>
-			<title>Stearing of Widget Behaviour</title>
+			<title>Stearing of widget behaviour</title>
 			<para>The following properties are reserved for states steering the behavior of the user interface:
 			</para>
 			<table frame="all" width="100%">
@@ -218,7 +218,7 @@
 			</sect4>
 
 			<sect4>
-			<title>User Interface Flow</title>
+			<title>User interface flow</title>
 			<para>The following properties stear the user interface elements flow:
 			</para>
 			<table frame="all" width="100%">
@@ -245,7 +245,7 @@
 			</sect4>
 
 			<sect4>
-			<title>Additional Interface Elements</title>
+			<title>Additional interface elements</title>
 			<para>The following properties define additional interface elements:
 			</para>
 			<table frame="all" width="100%">
@@ -272,7 +272,7 @@
 			</sect4>
 
 			<sect4>
-			<title>Defining Server Request/Answer</title>
+			<title>Defining server request/answer</title>
 			<para>The following properties are used for the communication with the server:
 			</para>
 			<table frame="all" width="100%">
@@ -355,7 +355,7 @@
 			</sect4>
 
 			<sect4>
-			<title>Variables and Symbolic Links</title>
+			<title>Variables and symbolic links</title>
 			<para>
 			</para>
 			<table frame="all" width="100%">
@@ -407,7 +407,7 @@
 			</sect4>
 
 			<sect4>
-			<title>Widget States Depending on Data</title>
+			<title>Widget states depending on data</title>
 			<para>
 			</para>
 			<table frame="all" width="100%">
@@ -441,7 +441,7 @@
 			</sect4>
 
 			<sect4>
-			<title>Additional Signals and Slots</title>
+			<title>Additional signals and slots</title>
 			<para>
 			</para>
 			<table frame="all" width="100%">
@@ -478,7 +478,7 @@
 			</table>
 			</sect4>
 			<sect4>
-			<title>Drag and Drop</title>
+			<title>Drag and drop</title>
 			<para>
 				Drag and Drop events are defined with the properties 'dropmove' and 'dropcopy'
 				that define the action requests issued on a drop event.

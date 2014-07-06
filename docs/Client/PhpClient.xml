@@ -13,11 +13,32 @@
 	<title>Requirements</title>
 	<para>
 		The minimum PHP version required for the client is 5.3.
-		No additional PHP modules are needed.
+		The following additional PHP modules have to be installed:
+		<table frame="all" width="100%">
+			<title>PHP modules required</title>
+			<tgroup cols="2">
+			<colspec colnum="1" colname="col1" colwidth="1*"/>
+			<colspec colnum="2" colname="col2" colwidth="3*"/>
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>php5-mcrypt</entry>
+					<entry><para>Encryption functions needed 
+					for the password change protocol of
+					WOLFRAME-CRAM.</para></entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
 	</para>
 	</sect1>
 	<sect1>
-	<title>PHP Client Modules</title>
+	<title>PHP client modules</title>
 		<para>In the subdirectory clients/php of the Wolframe installation
 		you'll find the following source files you need.
 		The main module you need to call to establish a session and
@@ -25,7 +46,7 @@
 		the client:
 		</para>
 		<table frame="all" width="100%">
-			<title>PHP Client Modules</title>
+			<title>PHP client modules</title>
 			<tgroup cols="2">
 			<colspec colnum="1" colname="col1" colwidth="1*"/>
 			<colspec colnum="2" colname="col2" colwidth="3*"/>
@@ -62,7 +83,7 @@
 		</table>
 
 		<sect2>
-		<title>Example Script</title>
+		<title>Example script</title>
 		<para>The script examples/clients/php/webclient_form_xml.php shows the 
 		mechanisms of using the PHP client modules to create a client calling 
 		Wolframe from a web service. It takes a HTTP request, builds an XML 
@@ -73,7 +94,7 @@
 		</sect2>
 
 		<sect2>
-		<title>The Session Interface</title>
+		<title>The session interface</title>
 		<para>
 		In the following we shortly introduce the Wolframe session interface 
 		implemented in clients/php/session.php. 

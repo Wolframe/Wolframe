@@ -51,28 +51,6 @@ class Session extends Connection
 		$this->getline("OK");
 	}
 
-	/* Change password */
-	private function changePassword( $oldpassword, $newpassword)
-	{
-		if (!$this->isalive())
-		{
-			throw $this->protocol_exception( "connection run away");
-		}
-		// 1. The client asks to open the password change dialog:
-		$this->writeline( "PASSWD");
-		// 2. The server accepts or not:
-		$this->getline("OK");
-		// 3. The server sends a challenge:
-		$challenge = $this->readdata();
-		// 4. The client returns a message with the password 
-		//	pair (old, new) encrypted with the challenge:
-		$this->writedata(
-			WolframeCram::passwordChangeMessage(
-				$oldpassword, $challenge, $newpassword));
-		// 5. The server accepts the password change or not:
-		$this->getline( "OK");
-	}
-
 	/** Constructor
 	* @param[in] address wolframe service ip
 	* @param[in] port wolframe service port
@@ -131,6 +109,28 @@ class Session extends Connection
 	public function lasterror()
 	{
 		return $this->requesterror;
+	}
+
+	/* Change the password */
+	public function changePassword( $oldpassword, $newpassword)
+	{
+		if (!$this->isalive())
+		{
+			throw $this->protocol_exception( "connection run away");
+		}
+		// 1. The client asks to open the password change dialog:
+		$this->writeline( "PASSWD");
+		// 2. The server accepts or not:
+		$this->getline("OK");
+		// 3. The server sends a challenge:
+		$challenge = $this->readdata();
+		// 4. The client returns a message with the password 
+		//	pair (old, new) encrypted with the challenge:
+		$this->writedata(
+			WolframeCram::passwordChangeMessage(
+				$oldpassword, $challenge, $newpassword));
+		// 5. The server accepts the password change or not:
+		$this->getline( "OK");
 	}
 
 	/* Send a request to the server */
