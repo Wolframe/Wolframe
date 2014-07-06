@@ -1,0 +1,18 @@
+
+# [1] Implicit authorization check called immediately after connect:
+#	-> Redirect to function checkValidConnect( from="156.217.32.32", to="PublicInterface", user="Koebi" );
+
+AUTHORIZE CONNECT checkValidConnect( from=remotehost, to=socketid, user=username );
+
+# [2] Implicit authorization check called from main protocol to 
+#	switch ON/OFF capability to change own password:
+#	-> Redirect to function checkCapabilityPasswordChange( from="156.217.32.32", type="SSL" );
+
+AUTHORIZE PASSWD checkCapabilityPasswordChange( from=remotehost, type=connectiontype );
+
+# [3] Explicit authorization check called in transaction
+# example: AUTHORIZE (DBACCESS, Customer.WRITE)
+#	-> Redirect to function checkTableAccess( table=Customer, op=WRITE, user=Fredi );
+
+AUTHORIZE DBACCESS checkTableAccess( table=resource[.1], op=resource[.2], user=username );
+

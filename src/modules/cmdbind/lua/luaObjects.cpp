@@ -1127,11 +1127,25 @@ LUA_FUNCTION_THROWS( "provider.formfunction(..)", function_formfunction)
 
 LUA_FUNCTION_THROWS( "provider.authorize(..)", function_authorize)
 {
-	check_parameters( ls, 0, 2, LUA_TSTRING, LUA_TSTRING);
+	int nn = lua_gettop( ls);
+	if (nn > 2) throw std::runtime_error( "too many arguments");
+	if (nn < 1) throw std::runtime_error( "too few arguments");
 
+	if (lua_type( ls, 1) != LUA_TSTRING)
+	{
+		throw std::runtime_error("string expected as first argument (authorization function)");
+	}
 	const char* authorizationFunction = lua_tostring( ls, 1);
-	const char* authorizationResource = lua_tostring( ls, 2);
+	std::string authorizationResource;
 
+	if (nn >= 2)
+	{
+		if (lua_type( ls, 2) != LUA_TSTRING)
+		{
+			throw std::runtime_error("string expected as second argument (authorization resource)");
+		}
+		authorizationResource.append( lua_tostring( ls, 2));
+	}
 	proc::ExecContext* ctx = getExecContext( ls);
 	std::string errmsg;
 	lua_pushboolean( ls, ctx->checkAuthorization( authorizationFunction, authorizationResource, errmsg));

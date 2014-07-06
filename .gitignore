@@ -88,6 +88,7 @@ tests/authentication/textfile/textFileAuthenticator
 tests/authentication/textfile/textFilePwdChange
 tests/testBoostPath
 tests/filter
+tests/modules/moduleTest
 tests/testVariantTypes
 tests/testIntegers
 tests/testVariantStruct
