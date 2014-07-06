@@ -3340,7 +3340,7 @@ make check-po           check sanity of gettext files
 		        </para>
 		        
 		        <para>
-				Additionally the make system understands 'MAKEDEPS',
+				Additionally the make system understands 'MAKEDEPEND',
 				so you can provide you own dependency generator at need.
 		        </para>
 		        
