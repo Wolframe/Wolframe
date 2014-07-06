@@ -84,7 +84,7 @@ AuthenticatorSlice* TextFileAuthUnit::slice( const std::string& mech,
 
 
 PasswordChanger* TextFileAuthUnit::passwordChanger( const User& user,
-					       const net::RemoteEndpoint& /*client*/ )
+						    const net::RemoteEndpoint& /*client*/ )
 {
 	if ( boost::to_upper_copy( user.mech() ) == "WOLFRAME-CRAM" &&
 			user.authenticator() == identifier() )
@@ -94,12 +94,11 @@ PasswordChanger* TextFileAuthUnit::passwordChanger( const User& user,
 }
 
 User* TextFileAuthUnit::authenticatePlain( const std::string& username,
-					   const std::string& password,
-					   bool caseSensitveUser ) const
+					   const std::string& password ) const
 {
 	PwdFileUser	user;
 
-	if ( m_pwdFile.getUser( username, user, caseSensitveUser ))	{
+	if ( m_pwdFile.getUser( username, user ))	{
 		PasswordHash	filePwd( user.hash );
 		PasswordHash	clientPwd( filePwd.salt(), password );
 
@@ -113,9 +112,9 @@ User* TextFileAuthUnit::authenticatePlain( const std::string& username,
 
 
 bool TextFileAuthUnit::getUser( const std::string& hash, const std::string& key,
-				PwdFileUser& user, bool caseSensitveUser ) const
+				PwdFileUser& user ) const
 {
-	if ( m_pwdFile.getHMACuser( hash, key, user, caseSensitveUser ))	{
+	if ( m_pwdFile.getHMACuser( hash, key, user ))	{
 		assert( !user.user.empty() );
 		return true;
 	}
@@ -124,10 +123,9 @@ bool TextFileAuthUnit::getUser( const std::string& hash, const std::string& key,
 	return false;
 }
 
-bool TextFileAuthUnit::getUser( const std::string& userHash, PwdFileUser& user,
-				bool caseSensitveUser ) const
+bool TextFileAuthUnit::getUser( const std::string& userHash, PwdFileUser& user ) const
 {
-	if ( m_pwdFile.getHMACuser( userHash, user, caseSensitveUser ))	{
+	if ( m_pwdFile.getHMACuser( userHash, user ))	{
 		assert( !user.user.empty() );
 		return true;
 	}
@@ -136,10 +134,9 @@ bool TextFileAuthUnit::getUser( const std::string& userHash, PwdFileUser& user,
 	return false;
 }
 
-bool TextFileAuthUnit::getUserPlain( const std::string& username, PwdFileUser& user,
-				     bool caseSensitveUser ) const
+bool TextFileAuthUnit::getUserPlain( const std::string& username, PwdFileUser& user ) const
 {
-	if ( m_pwdFile.getUser( username, user, caseSensitveUser ))	{
+	if ( m_pwdFile.getUser( username, user ))	{
 		assert( !user.user.empty() );
 		return true;
 	}

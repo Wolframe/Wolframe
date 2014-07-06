@@ -131,7 +131,7 @@ static bool parsePwdLine( const char* pwdLine, PwdFileUser& user )
 }
 
 
-bool PasswordFile::addUser( const PwdFileUser& user, bool caseSensitive )
+bool PasswordFile::addUser( const PwdFileUser& user )
 {
 	FILE*	file;
 
@@ -152,7 +152,7 @@ bool PasswordFile::addUser( const PwdFileUser& user, bool caseSensitive )
 	}
 	else	{
 		PwdFileUser tmpUser;
-		if ( getUser( user.user, tmpUser, caseSensitive ))
+		if ( getUser( user.user, tmpUser ))
 			return false;
 		if (( file = fopen( m_filename.c_str(), "a+" )) == NULL )	{
 			int err = errno;
@@ -177,18 +177,17 @@ bool PasswordFile::addUser( const PwdFileUser& user, bool caseSensitive )
 	return true;
 }
 
-bool PasswordFile::delUser( const std::string& username, bool caseSensitive )
+bool PasswordFile::delUser( const std::string& username )
 {
 	PwdFileUser user;
-	if ( ! getUser( username, user, caseSensitive ))
+	if ( ! getUser( username, user ))
 		return false;
 	std::cout << "Delete user '" << username << "' from password file '"
 		  << m_filename << "'\n";
 	return true;
 }
 
-bool PasswordFile::getUser( const std::string& username, PwdFileUser& user,
-			    bool caseSensitive ) const
+bool PasswordFile::getUser( const std::string& username, PwdFileUser& user ) const
 {
 	FILE*	file;
 	char	line[ PWD_FILE_LINE_SIZE ];
@@ -207,7 +206,7 @@ bool PasswordFile::getUser( const std::string& username, PwdFileUser& user,
 	}
 
 	std::string trimmedName = boost::algorithm::trim_copy( username );
-	if ( !caseSensitive )
+	if ( !m_caseSensitive )
 		boost::algorithm::to_lower( trimmedName );
 	while ( !feof( file ) )	{
 		char* ret = fgets( line, PWD_FILE_LINE_SIZE, file );
@@ -227,7 +226,7 @@ bool PasswordFile::getUser( const std::string& username, PwdFileUser& user,
 		std::string uname = pwdLineUser( line );
 		if ( uname.empty() )
 			continue;
-		if ( !caseSensitive )
+		if ( !m_caseSensitive )
 			boost::algorithm::to_lower( uname );
 		if ( uname == trimmedName )	{
 			fclose( file );
@@ -240,7 +239,7 @@ bool PasswordFile::getUser( const std::string& username, PwdFileUser& user,
 }
 
 bool PasswordFile::getHMACuser( const std::string& hash, const std::string& key,
-				PwdFileUser& user, bool caseSensitive ) const
+				PwdFileUser& user ) const
 {
 	FILE*		file;
 	char		line[ PWD_FILE_LINE_SIZE ];
@@ -285,7 +284,7 @@ bool PasswordFile::getHMACuser( const std::string& hash, const std::string& key,
 		std::string uname = pwdLineUser( line );
 		if ( uname.empty())
 			continue;
-		if ( !caseSensitive )
+		if ( !m_caseSensitive )
 			boost::algorithm::to_lower( uname );
 		crypto::HMAC_SHA256 hsh( binKey, keySize, uname );
 		if ( hsh == userHash )	{
@@ -299,7 +298,7 @@ bool PasswordFile::getHMACuser( const std::string& hash, const std::string& key,
 }
 
 bool PasswordFile::getHMACuser( const std::string& userHash,
-				PwdFileUser& user, bool caseSensitive ) const
+				PwdFileUser& user ) const
 {
 	std::string	key;
 	std::string	hash;
@@ -317,7 +316,7 @@ bool PasswordFile::getHMACuser( const std::string& userHash,
 	else	{
 		hash = userHash;
 	}
-	return getHMACuser( hash, key, user, caseSensitive );
+	return getHMACuser( hash, key, user );
 }
 
 }} // namepspace _Wolframe::AAAA
