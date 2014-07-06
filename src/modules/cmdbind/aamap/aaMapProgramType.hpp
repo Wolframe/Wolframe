@@ -29,16 +29,16 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file authzFunctionProgramType.hpp
+///\file aaMapProgramType.hpp
 ///\brief Function to create a program type object for map a language to create types::AuthorizationFunction objects
-#ifndef _Wolframe_AUTHZ_FUNCTION_PROGRAM_TYPE_HPP_INCLUDED
-#define _Wolframe_AUTHZ_FUNCTION_PROGRAM_TYPE_HPP_INCLUDED
+#ifndef _Wolframe_AAMAP_PROGRAM_TYPE_HPP_INCLUDED
+#define _Wolframe_AAMAP_PROGRAM_TYPE_HPP_INCLUDED
 #include "prgbind/program.hpp"
 
 namespace _Wolframe {
 namespace prgbind {
 
-prgbind::Program* createAuthzProgramType();
+prgbind::Program* createAaMapProgramType();
 
 }} //namespace
 #endif

@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file authorizationProgram.cpp
-/// \brief Implementation of authorization programs
+/// \file aaMapProgram.cpp
+/// \brief Implementation of  programs mapping authorization/audit calls to form function calls
 
-#include "authorizationProgram.hpp"
+#include "aaMapProgram.hpp"
 #include "types/authorizationFunction.hpp"
 #include "processor/execContext.hpp"
 #include "langbind/formFunction.hpp"
@@ -171,8 +171,8 @@ public:
 	{
 		if (!delim) return ar;
 		const char* cc = ar.c_str();
-		const char* ee = std::strchr( ar.c_str(), delim);
-		for (; idx > 1 && ee != 0; --idx,cc=ee+1,ee=std::strchr(ar.c_str(),delim)){}
+		const char* ee = std::strchr( cc, delim);
+		for (; idx > 1 && ee != 0; --idx,cc=ee+1,ee=std::strchr(cc,delim)){}
 		m_elembuf.clear();
 		if (idx == 1)
 		{
@@ -189,12 +189,12 @@ public:
 		{
 			case 0: if (m_paramidx == m_function->params().size())
 				{
-					m_state = 1/*2*/;
+					m_state = 2/*3*/;
 					continue;
 				}
 				else
 				{
-					type = langbind::FilterBase::Attribute;
+					type = langbind::FilterBase::OpenTag;
 					element = m_function->params().at( m_paramidx).name;
 					return true;
 				}
@@ -207,39 +207,23 @@ public:
 						element = getElement( pp->const_value, pp->value_delim, pp->value_idx);
 						break;
 					case AuthorizationFunctionImpl::Parameter::UserName:
+						if (!m_ctx->user()) continue;
 						element = getElement( m_ctx->user()->uname(), pp->value_delim, pp->value_idx);
 						break;
 					case AuthorizationFunctionImpl::Parameter::SocketId:
-						if (m_ctx->socketIdentifier())
-						{
-							element = getElement( m_ctx->socketIdentifier(), pp->value_delim, pp->value_idx);
-						}
-						else
-						{
-							element.init();
-						}
+						if (!m_ctx->socketIdentifier()) continue;
+						element = getElement( m_ctx->socketIdentifier(), pp->value_delim, pp->value_idx);
 						break;
 					case AuthorizationFunctionImpl::Parameter::RemoteHost:
-						if (m_ctx->remoteEndpoint())
-						{
-							element = getElement( m_ctx->remoteEndpoint()->host(), pp->value_delim, pp->value_idx);
-						}
-						else
-						{
-							element.init();
-						}
+						if (!m_ctx->remoteEndpoint()) continue;
+						element = getElement( m_ctx->remoteEndpoint()->host(), pp->value_delim, pp->value_idx);
 						break;
 					case AuthorizationFunctionImpl::Parameter::ConnectionType:
-						if (m_ctx->remoteEndpoint())
-						{
-							element = getElement( net::ConnectionEndpoint::connectionTypeName( m_ctx->remoteEndpoint()->type()), pp->value_delim, pp->value_idx);
-						}
-						else
-						{
-							element.init();
-						}
+						if (!m_ctx->remoteEndpoint()) continue;
+						element = getElement( net::ConnectionEndpoint::connectionTypeName( m_ctx->remoteEndpoint()->type()), pp->value_delim, pp->value_idx);
 						break;
 					case AuthorizationFunctionImpl::Parameter::Authenticator:
+						if (!m_ctx->user()) continue;
 						element = getElement( m_ctx->user()->authenticator(), pp->value_delim, pp->value_idx);
 						break;
 					case AuthorizationFunctionImpl::Parameter::Resource:
@@ -247,12 +231,11 @@ public:
 						break;
 				}
 				type = langbind::FilterBase::Value;
-				++m_paramidx;
-				m_state -= 2;
 				return true;
 			}
-			case 2: type = langbind::FilterBase::CloseTag; element.init(); return true;
+			case 2: type = langbind::FilterBase::CloseTag; element.init(); m_state -= 3; ++m_paramidx; return true;
 			case 3: type = langbind::FilterBase::CloseTag; element.init(); return true;
+			case 4: type = langbind::FilterBase::CloseTag; element.init(); return true;
 			default: return false;
 		}
 	}
@@ -361,10 +344,10 @@ bool AuthorizationFunctionImpl::call( proc::ExecContext* ctx, const std::string&
 	}
 }
 
-bool AuthorizationProgram::is_mine( const std::string& filename) const
+bool AaMapProgram::is_mine( const std::string& filename) const
 {
 	std::string ext = utils::getFileExtension( filename);
-	if (boost::algorithm::iequals( ext, ".authz"))
+	if (boost::algorithm::iequals( ext, ".aamap"))
 	{
 		return true;
 	}
@@ -405,7 +388,7 @@ static char parseNextToken( std::string& tok, std::string::const_iterator& si, c
 }
 
 static const char* g_keyword_ids[] = {"AUTHORIZE","DATABASE",0};
-enum AuthzKeyword{ m_NONE, m_AUTHORIZE, m_DATABASE};
+enum AaMapKeyword{ m_NONE, m_AUTHORIZE, m_DATABASE};
 static const utils::IdentifierTable g_keyword_idtab( false, g_keyword_ids);
 
 static void parseArrayAccess( char& delim, std::size_t& idx, std::string::const_iterator& si, const std::string::const_iterator& se)
@@ -487,37 +470,37 @@ static AuthorizationFunctionImpl::Parameter
 	}
 }
 
-struct AuthzExpression
+struct AaMapExpression
 {
 	typedef AuthorizationFunctionImpl::Parameter Parameter;
 
-	AuthzExpression(){}
-	AuthzExpression( const AuthzExpression& o)
-		:authzfunc(o.authzfunc),formfunc(o.formfunc),params(o.params){}
+	AaMapExpression(){}
+	AaMapExpression( const AaMapExpression& o)
+		:aafunc(o.aafunc),formfunc(o.formfunc),params(o.params){}
 
-	std::string authzfunc;
+	std::string aafunc;
 	const langbind::FormFunction* formfunc;
 	std::vector<Parameter> params;
 };
 
-struct AuthzProgram
+struct AaMapProgramDescription
 {
-	AuthzProgram(){}
-	AuthzProgram( const AuthzProgram& o)
+	AaMapProgramDescription(){}
+	AaMapProgramDescription( const AaMapProgramDescription& o)
 		:database(o.database),expressions(o.expressions){}
 
 	std::string database;
-	std::vector<AuthzExpression> expressions;
+	std::vector<AaMapExpression> expressions;
 };
 
-static AuthzProgram parseProgram( const ProgramLibrary& library, std::string::const_iterator& si, const std::string::const_iterator& se)
+static AaMapProgramDescription parseProgram( const ProgramLibrary& library, std::string::const_iterator& si, const std::string::const_iterator& se)
 {
-	AuthzProgram rt;
+	AaMapProgramDescription rt;
 	bool databaseDefined = false;
 	char ch = gotoNextToken( si, se);
 	for (; ch != 0; ch = gotoNextToken( si, se))
 	{
-		switch ((AuthzKeyword)utils::parseNextIdentifier( si, se, g_keyword_idtab))
+		switch ((AaMapKeyword)utils::parseNextIdentifier( si, se, g_keyword_idtab))
 		{
 			case m_NONE:
 				if (ch == ';')
@@ -544,15 +527,15 @@ static AuthzProgram parseProgram( const ProgramLibrary& library, std::string::co
 
 			case m_AUTHORIZE:
 			{
-				AuthzExpression expr;
-				ch = parseNextToken( expr.authzfunc, si, se);
+				AaMapExpression expr;
+				ch = parseNextToken( expr.aafunc, si, se);
 				if (ch == 0 || g_optab[ch])
 				{
 					throw std::runtime_error( "string or identifier expected for authorization function name after AUTHORIZE");
 				}
-				if (library.getAuthorizationFunction( expr.authzfunc))
+				if (library.getAuthorizationFunction( expr.aafunc))
 				{
-					throw std::runtime_error( std::string("duplicate definition of authorization function '") + expr.authzfunc + "'");
+					throw std::runtime_error( std::string("duplicate definition of authorization function '") + expr.aafunc + "'");
 				}
 				std::string formfunc;
 				ch = parseNextToken( formfunc, si, se);
@@ -574,7 +557,6 @@ static AuthzProgram parseProgram( const ProgramLibrary& library, std::string::co
 				ch = gotoNextToken( si, se);
 				for (; ch != ')' && ch != 0; gotoNextToken( si, se))
 				{
-					++si;
 					AuthorizationFunctionImpl::Parameter param
 						= parseParameter( si, se);
 					ch = gotoNextToken( si, se);
@@ -599,6 +581,7 @@ static AuthzProgram parseProgram( const ProgramLibrary& library, std::string::co
 				{
 					throw std::runtime_error( "semicolon ';' expected after function declaration");
 				}
+				++si;
 				rt.expressions.push_back( expr);
 				break;
 			}
@@ -607,7 +590,7 @@ static AuthzProgram parseProgram( const ProgramLibrary& library, std::string::co
 	return rt;
 }
 
-void AuthorizationProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)
+void AaMapProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)
 {
 	std::string source;
 	try
@@ -625,12 +608,12 @@ void AuthorizationProgram::loadProgram( ProgramLibrary& library, db::Database*, 
 
 	try
 	{
-		AuthzProgram prg = parseProgram( library, si, se);
-		std::vector<AuthzExpression>::const_iterator xi = prg.expressions.begin(), xe = prg.expressions.end();
+		AaMapProgramDescription prg = parseProgram( library, si, se);
+		std::vector<AaMapExpression>::const_iterator xi = prg.expressions.begin(), xe = prg.expressions.end();
 		for (; xi != xe; ++xi)
 		{
-			types::AuthorizationFunctionR authzf( new AuthorizationFunctionImpl( xi->formfunc, xi->params, prg.database));
-			library.defineAuthorizationFunction( xi->authzfunc, authzf);
+			types::AuthorizationFunctionR aaf( new AuthorizationFunctionImpl( xi->formfunc, xi->params, prg.database));
+			library.defineAuthorizationFunction( xi->aafunc, aaf);
 		}
 	}
 	catch (const std::runtime_error& e)

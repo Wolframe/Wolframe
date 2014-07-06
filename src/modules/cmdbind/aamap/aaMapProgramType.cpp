@@ -29,17 +29,17 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file authzFunctionProgramType.cpp
+///\file aamapFunctionProgramType.cpp
 ///\brief Implementation of a language to create types::AuthorizationFunction objects
-#include "authzFunctionProgramType.hpp"
-#include "authorizationProgram.hpp"
+#include "aaMapProgramType.hpp"
+#include "aaMapProgram.hpp"
 #include "types/authorizationFunction.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-prgbind::Program* prgbind::createAuthzProgramType()
+prgbind::Program* prgbind::createAaMapProgramType()
 {
-	return new AuthorizationProgram();
+	return new AaMapProgram();
 }
 

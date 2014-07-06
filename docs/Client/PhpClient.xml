@@ -71,7 +71,8 @@
 				<row>
 					<entry>wolframe_cram.php</entry>
 					<entry><para>implements helper functions needed to implement
-					the authentication with the Wolframe-CRAM mech</para></entry>
+					the authentication with the Wolframe-CRAM mech and its
+					password change protocol.</para></entry>
 				</row>
 				<row>
 					<entry>pbkdf2.php</entry>
@@ -83,13 +84,22 @@
 		</table>
 
 		<sect2>
-		<title>Example script</title>
+		<title>Example script implementing a request</title>
 		<para>The script examples/clients/php/webclient_form_xml.php shows the 
 		mechanisms of using the PHP client modules to create a client calling 
 		Wolframe from a web service. It takes a HTTP request, builds an XML 
 		document and a Wolframe server request with this document, passes 
 		the request to the server and returns the answer XML to the web client.
 		In case of error an XML with the error message is returned.
+		</para>
+		</sect2>
+
+		<sect2>
+		<title>Example script for a password change</title>
+		<para>The script examples/clients/php/webclient_change_password.php 
+		shows the changing of password when authenticated with "WOLFRAME-CRAM".
+		It takes a HTTP request, authenticates an initiates a password 
+		change. In case of error an XML with the error message is returned.
 		</para>
 		</sect2>
 
@@ -117,6 +127,14 @@ class Session extends Connection
     *            and depending on the mechanism, the credentials needed.
     */
     function __construct( $address, $port, $sslopt, $authmethod);
+
+    /* Change the users password
+    * @param[in] the old password
+    * @param[in] the new password
+    * @remark The function throws in case of an error.
+    * @remark The function is blocking on read/write on its connection
+    */
+    public function changePassword( $oldpassword, $newpassword)
 
     /* Send a request to the server
     * @param[in] command (optional) identifier prefix of the command

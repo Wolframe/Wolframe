@@ -1,4 +1,0 @@
-LIBRARY mod_command_authz
-
-EXPORTS
-entryPoint	@1

@@ -21,19 +21,19 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 CPP_OBJS = \
-	authzFunctionProgramType.obj \
-	authorizationProgram.obj \
-	mod_command_authz.obj
+	aaMapProgramType.obj \
+	aaMapProgram.obj \
+	mod_command_aamap.obj
 
 DYNAMIC_MODULE = \
-	mod_command_authz.dll
+	mod_command_aamap.dll
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModAuthzLanguageBinding.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:ModAaMapLanguageBinding.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

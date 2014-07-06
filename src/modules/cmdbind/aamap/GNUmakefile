@@ -18,12 +18,12 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwfsingleton \
 
-DYNAMIC_MODULE = mod_command_authz.so
+DYNAMIC_MODULE = mod_command_aamap.so
 
 CPP_OBJS = \
-	authzFunctionProgramType.o \
-	authorizationProgram.o \
-	mod_command_authz.o
+	aaMapProgramType.o \
+	aaMapProgram.o \
+	mod_command_aamap.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

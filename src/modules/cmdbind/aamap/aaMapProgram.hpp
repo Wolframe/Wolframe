@@ -30,14 +30,38 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_command_authz.cpp
-///\brief Module for AUTHZ language binding (language to define mappings of authz calls to form functions)
-#include "appdevel/module/programTypeBuilder.hpp"
-#include "appdevel/programTypeModuleMacros.hpp"
-#include "appdevel/moduleFrameMacros.hpp"
-#include "authzFunctionProgramType.hpp"
+/// \file aaMapProgram.hpp
+/// \brief Interface of the AaMap program type
 
-WF_MODULE_BEGIN( "AuthzFunctionMap", "authorization call to form function map module")
- WF_PROGRAM_TYPE( "Authz", _Wolframe::prgbind::createAuthzProgramType)
-WF_MODULE_END
+#ifndef _Wolframe_PRGBIND_AAMAP_PROGRAM_HPP_INCLUDED
+#define _Wolframe_PRGBIND_AAMAP_PROGRAM_HPP_INCLUDED
+#include "prgbind/program.hpp"
+#include "prgbind/programLibrary.hpp"
+#include <string>
+
+namespace _Wolframe {
+namespace prgbind {
+
+/// \class AaMapProgram
+/// \brief Program type for AaMap function descriptions.
+class AaMapProgram
+	:public Program
+{
+public:
+	/// \brief Default constructor
+	AaMapProgram()
+		:Program( SuperFunction){}
+
+	/// \brief Destructor
+	virtual ~AaMapProgram(){}
+
+	/// \brief Implementation of Program::is_mine( const std::string&) const;
+	virtual bool is_mine( const std::string& filename) const;
+
+	/// \brief Implementation of Program::loadProgram( ProgramLibrary&, db::Database*, const std::string&);
+	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
+};
+
+}}//namespace
+#endif
 
