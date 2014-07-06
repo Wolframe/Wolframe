@@ -38,6 +38,7 @@ usr/pkg/lib/wolframe/modules/mod_auth_textfile.so
 usr/pkg/lib/wolframe/modules/mod_auth_database.so
 usr/pkg/lib/wolframe/modules/mod_auth_sasl.so
 usr/pkg/lib/wolframe/modules/mod_authz_database.so
+usr/pkg/lib/wolframe/modules/mod_command_authz.so
 usr/pkg/lib/wolframe/modules/mod_filter_blob.so
 usr/pkg/lib/wolframe/modules/mod_filter_textwolf.so
 usr/pkg/lib/wolframe/modules/mod_filter_token.so
