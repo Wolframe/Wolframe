@@ -51,6 +51,7 @@ f none opt/csw/lib/wolframe/modules/mod_auth_textfile.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_auth_pam.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_auth_sasl.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_authz_database.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_command_authz.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_db_postgresql.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_db_sqlite3.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_datatype_datetime.so 0775 root staff
