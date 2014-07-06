@@ -149,6 +149,13 @@ TEST_P( WolfilterTest, tests)
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &prglib);
 
 		proc::ExecContext execContext( &processorProvider, &aaaaProvider);
+		AAAA::User* fakeuser = new AAAA::User( "WolfilterAuth", "NONE", "wolfilter", "Wolfilter");
+
+		execContext.setUser( fakeuser);
+		net::LocalTCPendpoint localEndPointFake( "localhost", 9876, "fakeSocketIdentifier");
+		net::RemoteTCPendpoint remoteEndPointFake( "123.123.123.123", 9876);
+		
+		execContext.setConnectionData( &remoteEndPointFake, &localEndPointFake);
 
 		if (!processorProvider.resolveDB( databaseProvider))
 		{

@@ -16,3 +16,10 @@ AUTHORIZE PASSWD checkCapabilityPasswordChange( from=remotehost, type=connection
 
 AUTHORIZE DBACCESS checkTableAccess( table=resource[.1], op=resource[.2], user=username );
 
+# [4] 
+AUTHORIZE NOARG checkNoArg();
+
+# [5] 
+AUTHORIZE AUTHENTICATOR checkAuthenticator( auth=authenticator );
+
+

@@ -15,13 +15,13 @@ LoadModules
 }
 Processor
 {
-	program ../wolfilter/scripts/authorize.lua
 	program ../wolfilter/template/program/basic.aamap
+	program ../wolfilter/scripts/authorize.lua
 	cmdhandler
 	{
 		lua
 		{
-			program authorize.lua
+			program authorize_test.lua
 		}
 	}
 }
@@ -43,26 +43,78 @@ AUTHORIZE PASSWD checkCapabilityPasswordChange( from=remotehost, type=connection
 #	-> Redirect to function checkTableAccess( table=Customer, op=WRITE, user=Fredi );
 
 AUTHORIZE DBACCESS checkTableAccess( table=resource[.1], op=resource[.2], user=username );
-**file:authorize.lua
-function run( input )
-	provider.authorize("CONNECT")
-	provider.authorize("PASSWD")
-	provider.authorize("DBACCESS", "Customer.WRITE")
-end
 
+# [4] 
+AUTHORIZE NOARG checkNoArg();
+
+# [5] 
+AUTHORIZE AUTHENTICATOR checkAuthenticator( auth=authenticator );
+**file:authorize_test.lua
+function run( input )
+	if not provider.authorize("CONNECT") then
+		error( "CONNECT not authorized")
+	end
+	if not provider.authorize("PASSWD") then
+		error( "PASSWD not authorized")
+	end
+	if not provider.authorize("DBACCESS", "Customer.WRITE") then
+		error( "DBACCESS WRITE Customer on not authorized")
+	end
+	if not provider.authorize("NOARG") then
+		error( "NOARG not authorized")
+	end
+	if not provider.authorize("AUTHENTICATOR") then
+		error( "AUTHENTICATOR not authorized")
+	end
+end
+**file:authorize.lua
 function checkValidConnect( struct )
 	st = struct:value()
-	logger.printc( "STRUCT [", st, "] FROM='", st.from, "' TO='", st.to, "' USER='", st.user, "'")
+	if st[ 'from' ] ~= "123.123.123.123" then
+		return false
+	end
+	if st[ 'to' ] ~= "fakeSocketIdentifier" then
+		return false
+	end
+	if st[ 'user' ] ~= "wolfilter" then
+		return false
+	end
+	return true
 end
 
 function checkCapabilityPasswordChange( struct )
 	st = struct:value()
-	logger.printc( "STRUCT [", st, "] FROM='", st.from, "' TYPE='", st.type, "'")
+	if st[ 'from' ] ~= "123.123.123.123" then
+		return false
+	end
+	if st[ 'type' ] ~= "TCP" then
+		return false
+	end
+	return true
 end
 
 function checkTableAccess( struct )
 	st = struct:value()
-	logger.printc( "STRUCT [", st, "] TAB='", st['table'], "' OP='", st['op'], "' USER='", st['user'], "'")
+	if st[ 'table' ] ~= "Customer" then
+		return false
+	end
+	if st[ 'op' ] ~= "WRITE" then
+		return false
+	end
+	if st[ 'user' ] ~= "wolfilter" then
+		return false
+	end
+	return true
+end
+
+function checkNoArg( struct )
+	st = struct:value()
+	return true
+end
+
+function checkAuthenticator( struct )
+	st = struct:value()
+	return (st[ 'auth' ] == "WolfilterAuth")
 end
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>

@@ -14,16 +14,19 @@ LoadModules
 Processor
 {
 	program `cmd/PROGRAM basic.aamap`
+	program `cmd/PROGRAM authorize.lua`
 	cmdhandler
 	{
 		lua
 		{
-			program authorize.lua
+			program authorize_test.lua
 		}
 	}
 }
 **file:basic.aamap
 `cat program/basic.aamap`
+**file:authorize_test.lua
+`cat ../scripts/authorize_test.lua`
 **file:authorize.lua
-`cat ../scripts/$luascript`"
+`cat ../scripts/authorize.lua`"
 . ./output_tst_all.sh

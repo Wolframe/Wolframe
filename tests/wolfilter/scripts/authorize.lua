@@ -1,22 +1,50 @@
-function run( input )
-	provider.authorize("CONNECT")
-	provider.authorize("PASSWD")
-	provider.authorize("DBACCESS", "Customer.WRITE")
-end
-
 function checkValidConnect( struct )
 	st = struct:value()
-	logger.printc( "STRUCT [", st, "] FROM='", st.from, "' TO='", st.to, "' USER='", st.user, "'")
+	if st[ 'from' ] ~= "123.123.123.123" then
+		return false
+	end
+	if st[ 'to' ] ~= "fakeSocketIdentifier" then
+		return false
+	end
+	if st[ 'user' ] ~= "wolfilter" then
+		return false
+	end
+	return true
 end
 
 function checkCapabilityPasswordChange( struct )
 	st = struct:value()
-	logger.printc( "STRUCT [", st, "] FROM='", st.from, "' TYPE='", st.type, "'")
+	if st[ 'from' ] ~= "123.123.123.123" then
+		return false
+	end
+	if st[ 'type' ] ~= "TCP" then
+		return false
+	end
+	return true
 end
 
 function checkTableAccess( struct )
 	st = struct:value()
-	logger.printc( "STRUCT [", st, "] TAB='", st['table'], "' OP='", st['op'], "' USER='", st['user'], "'")
+	if st[ 'table' ] ~= "Customer" then
+		return false
+	end
+	if st[ 'op' ] ~= "WRITE" then
+		return false
+	end
+	if st[ 'user' ] ~= "wolfilter" then
+		return false
+	end
+	return true
+end
+
+function checkNoArg( struct )
+	st = struct:value()
+	return true
+end
+
+function checkAuthenticator( struct )
+	st = struct:value()
+	return (st[ 'auth' ] == "WolfilterAuth")
 end
 
 
