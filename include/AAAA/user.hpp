@@ -36,7 +36,7 @@
 
 #ifndef _USER_HPP_INCLUDED
 #define _USER_HPP_INCLUDED
-
+#include "types/secureString.hpp"
 #include <string>
 #include <ctime>
 
@@ -59,7 +59,7 @@ public:
 		  m_uname( uName ), m_name( Name )		{}
 
 	/// Destructor
-	~User();
+	~User()						{m_loginTime=0;}
 
 	/// Return the authenticator identifier
 	const std::string& authenticator() const	{ return m_authenticator; }
@@ -73,11 +73,11 @@ public:
 	const std::string& name() const			{ return m_name; }
 
 private:
-	std::string	m_authenticator;	///< authenticator identifier
-	std::string	m_mech;			///< authentication mech
-	time_t		m_loginTime;		///< login time
-	std::string	m_uname;		///< username
-	std::string	m_name;			///< name of the user
+	types::SecureString	m_authenticator;	///< authenticator identifier
+	types::SecureString	m_mech;			///< authentication mech
+	time_t			m_loginTime;		///< login time
+	types::SecureString	m_uname;		///< username
+	types::SecureString	m_name;			///< name of the user
 };
 
 }} // namespace _Wolframe::AAAA
