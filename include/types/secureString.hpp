@@ -41,13 +41,15 @@ namespace types {
 
 /// \class SecureString
 /// \brief String definition with the intention to hold sensitive data
-/// \note Non modifiable standard STL string implementation with erasing of its data when releasing it
+/// \note Standard STL string implementation wipes out all of its data before releasing it
 class SecureString
+	:public std::string
 {
 public:
 	SecureString(){}
 	SecureString( const std::string& o)
-		:m_content(o){}
+		:std::string(o){}
+
 	~SecureString()
 	{
 		eraseContent();
@@ -55,31 +57,15 @@ public:
 	void clear()
 	{
 		eraseContent();
-		m_content.clear();
+		std::string::clear();
 	}
-	operator const std::string&() const
-	{
-		return m_content;
-	}
-	bool operator == (const std::string& o) const	{return m_content == o;}
-	bool operator != (const std::string& o) const	{return m_content != o;}
-	bool operator <  (const std::string& o) const	{return m_content < o;}
-	bool operator <= (const std::string& o) const	{return m_content <= o;}
-	bool operator >  (const std::string& o) const	{return m_content > o;}
-	bool operator >= (const std::string& o) const	{return m_content >= o;}
 
 private:
 	void eraseContent()
 	{
-		std::string::iterator si = m_content.begin(), se = m_content.end();
+		std::string::iterator si = begin(), se = end();
 		for (; si != se; ++si) *si = '\0';
 	}
-
-	void operator=( const SecureString&){}	//... non assigable
-	void operator=( const std::string&){}	//... non assigable
-
-private:
-	std::string m_content;
 };
 
 }}//namespace

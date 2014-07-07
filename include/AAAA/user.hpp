@@ -73,11 +73,11 @@ public:
 	const std::string& name() const			{ return m_name; }
 
 private:
-	types::SecureString	m_authenticator;	///< authenticator identifier
-	types::SecureString	m_mech;			///< authentication mech
-	time_t			m_loginTime;		///< login time
-	types::SecureString	m_uname;		///< username
-	types::SecureString	m_name;			///< name of the user
+	const types::SecureString	m_authenticator;	///< authenticator identifier
+	const types::SecureString	m_mech;			///< authentication mech
+	time_t				m_loginTime;		///< login time
+	const types::SecureString	m_uname;		///< username
+	const types::SecureString	m_name;			///< name of the user
 };
 
 }} // namespace _Wolframe::AAAA
