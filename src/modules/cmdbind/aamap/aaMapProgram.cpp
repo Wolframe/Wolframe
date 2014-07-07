@@ -46,125 +46,88 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-/// \class AuthorizationFunctionImpl
-/// \brief Description of a an authorization function
-class AuthorizationFunctionImpl
-	:public langbind::AuthorizationFunction
+struct ExecContextParameter
 {
-public:
-	struct Parameter
+	enum Value
 	{
-		enum Value
-		{
-			Const,
-			UserName,
-			SocketId,
-			RemoteHost,
-			ConnectionType,
-			Authenticator,
-			Resource
-		};
-		enum {MaxValue=(int)Resource};
-
-		static const char* valueName( Value v)
-		{
-			static const char* ar[] = {"Const","UserName","SocketId","RemoteHost","ConnectionType","Authenticator","Resource"};
-			return ar[v];
-		}
-		static Value valueFromId( const std::string& v)
-		{
-			int rt = (int)UserName; //... do not accept reserved "Const"
-
-			while (rt <= (int)MaxValue)
-			{
-				if (boost::algorithm::iequals( v, valueName((Value)rt)))
-				{
-					return (Value)rt;
-				}
-				++rt;
-			}
-			throw std::runtime_error( std::string("unknown identifier for value in expression '") + v + "'");
-		}
-
-		std::string name;		///< name of the parameter
-		Value value;			///< value taken from execution context
-		std::string const_value;	///< value in case of const
-		char value_delim;		///< delimiter in case of array access (0 else)
-		std::size_t value_idx;		///< index >= 1 in case of array access (0 else)
-
-		Parameter()
-			:value(Const),value_delim(0),value_idx(0){}
-		Parameter( const Parameter& o)
-			:name(o.name),value(o.value),const_value(o.const_value),value_delim(o.value_delim),value_idx(o.value_idx){}
-		Parameter( const std::string& name_, const std::string& const_value_)
-			:name(name_),value(Const),const_value(const_value_),value_delim(0),value_idx(0){}
-		Parameter( const std::string& name_, Value value_)
-			:name(name_),value(value_),value_delim(0),value_idx(0){}
-		Parameter( const std::string& name_, Value value_, char value_delim_, std::size_t value_idx_)
-			:name(name_),value(value_),value_delim(value_delim_),value_idx(value_idx_){}
+		Const,
+		UserName,
+		SocketId,
+		RemoteHost,
+		ConnectionType,
+		Authenticator,
+		Resource
 	};
+	enum {MaxValue=(int)Resource};
 
-public:
-	/// \brief Constructor
-	AuthorizationFunctionImpl( const langbind::FormFunction* function_, const std::vector<Parameter>& params_, const std::string& database_)
-		:m_function(function_)
-		,m_params(params_)
-		,m_database(database_){}
+	static const char* valueName( Value v)
+	{
+		static const char* ar[] = {"Const","UserName","SocketId","RemoteHost","ConnectionType","Authenticator","Resource"};
+		return ar[v];
+	}
+	static Value valueFromId( const std::string& v)
+	{
+		int rt = (int)UserName; //... do not accept reserved "Const"
 
-	/// \brief Copy constructor
-	AuthorizationFunctionImpl( const AuthorizationFunctionImpl& o)
-		:m_function(o.m_function)
-		,m_params(o.m_params)
-		,m_database(o.m_database){}
+		while (rt <= (int)MaxValue)
+		{
+			if (boost::algorithm::iequals( v, valueName((Value)rt)))
+			{
+				return (Value)rt;
+			}
+			++rt;
+		}
+		throw std::runtime_error( std::string("unknown identifier for value in expression '") + v + "'");
+	}
 
-	/// \brief Default constructor
-	AuthorizationFunctionImpl(){}
+	std::string name;		///< name of the parameter
+	Value value;			///< value taken from execution context
+	std::string const_value;	///< value in case of const
+	char value_delim;		///< delimiter in case of array access (0 else)
+	std::size_t value_idx;		///< index >= 1 in case of array access (0 else)
 
-	/// \brief Destructor
-	virtual ~AuthorizationFunctionImpl(){}
-
-	const langbind::FormFunction* function() const	{return m_function;}
-	const std::vector<Parameter>& params() const	{return m_params;}
-
-	virtual bool call( proc::ExecContext* ctx, const std::string& resource, std::vector<Attribute>& attributes) const;
-
-private:
-	const langbind::FormFunction* m_function;	///< form function to call
-	std::vector<Parameter> m_params;		///< parameter description
-	std::string m_database;				///< database used for authorization functions
+	ExecContextParameter()
+		:value(Const),value_delim(0),value_idx(0){}
+	ExecContextParameter( const ExecContextParameter& o)
+		:name(o.name),value(o.value),const_value(o.const_value),value_delim(o.value_delim),value_idx(o.value_idx){}
+	ExecContextParameter( const std::string& name_, const std::string& const_value_)
+		:name(name_),value(Const),const_value(const_value_),value_delim(0),value_idx(0){}
+	ExecContextParameter( const std::string& name_, Value value_)
+		:name(name_),value(value_),value_delim(0),value_idx(0){}
+	ExecContextParameter( const std::string& name_, Value value_, char value_delim_, std::size_t value_idx_)
+		:name(name_),value(value_),value_delim(value_delim_),value_idx(value_idx_){}
 };
 
-
-class AuthorizationArg
+class ExecContextArg
 	:public langbind::TypedInputFilter
 {
 public:
-	explicit AuthorizationArg( const AuthorizationFunctionImpl& function_, const proc::ExecContext& ctx_, const std::string& authorizationResource_)
-		:utils::TypeSignature("prgbind::AuthorizationArg", __LINE__)
+	explicit ExecContextArg( const std::vector<ExecContextParameter>& params_, const proc::ExecContext& ctx_, const std::string& authorizationResource_)
+		:utils::TypeSignature("prgbind::ExecContextArg", __LINE__)
 		,langbind::TypedInputFilter("authzarg")
 		,m_state(0)
 		,m_paramidx(0)
-		,m_function(&function_)
+		,m_params(&params_)
 		,m_ctx(&ctx_)
 		,m_authorizationResource(authorizationResource_)
 		{}
 
-	AuthorizationArg( const AuthorizationArg& o)
-		:utils::TypeSignature("prgbind::AuthorizationArg", __LINE__)
+	ExecContextArg( const ExecContextArg& o)
+		:utils::TypeSignature("prgbind::ExecContextArg", __LINE__)
 		,langbind::TypedInputFilter(o)
 		,m_state(o.m_state)
 		,m_paramidx(o.m_paramidx)
-		,m_function(o.m_function)
+		,m_params(o.m_params)
 		,m_ctx(o.m_ctx)
 		,m_authorizationResource(o.m_authorizationResource)
 		,m_elembuf(o.m_elembuf)
 		{}
 
-	virtual ~AuthorizationArg(){}
+	virtual ~ExecContextArg(){}
 
 	virtual langbind::TypedInputFilter* copy() const
 	{
-		return new AuthorizationArg(*this);
+		return new ExecContextArg(*this);
 	}
 
 	const std::string& getElement( const std::string& ar, char delim, std::size_t idx)
@@ -187,7 +150,7 @@ public:
 		for (;;)
 		switch (m_state++)
 		{
-			case 0: if (m_paramidx == m_function->params().size())
+			case 0: if (m_paramidx == m_params->size())
 				{
 					m_state = 2/*3*/;
 					continue;
@@ -195,39 +158,39 @@ public:
 				else
 				{
 					type = langbind::FilterBase::OpenTag;
-					element = m_function->params().at( m_paramidx).name;
+					element = m_params->at( m_paramidx).name;
 					return true;
 				}
 			case 1:
 			{
-				const AuthorizationFunctionImpl::Parameter* pp = &m_function->params().at( m_paramidx);
-				switch (pp->value)
+				const ExecContextParameter& pp = m_params->at( m_paramidx);
+				switch (pp.value)
 				{
-					case AuthorizationFunctionImpl::Parameter::Const:
-						element = getElement( pp->const_value, pp->value_delim, pp->value_idx);
+					case ExecContextParameter::Const:
+						element = getElement( pp.const_value, pp.value_delim, pp.value_idx);
 						break;
-					case AuthorizationFunctionImpl::Parameter::UserName:
+					case ExecContextParameter::UserName:
 						if (!m_ctx->user()) continue;
-						element = getElement( m_ctx->user()->uname(), pp->value_delim, pp->value_idx);
+						element = getElement( m_ctx->user()->uname(), pp.value_delim, pp.value_idx);
 						break;
-					case AuthorizationFunctionImpl::Parameter::SocketId:
+					case ExecContextParameter::SocketId:
 						if (!m_ctx->socketIdentifier()) continue;
-						element = getElement( m_ctx->socketIdentifier(), pp->value_delim, pp->value_idx);
+						element = getElement( m_ctx->socketIdentifier(), pp.value_delim, pp.value_idx);
 						break;
-					case AuthorizationFunctionImpl::Parameter::RemoteHost:
+					case ExecContextParameter::RemoteHost:
 						if (!m_ctx->remoteEndpoint()) continue;
-						element = getElement( m_ctx->remoteEndpoint()->host(), pp->value_delim, pp->value_idx);
+						element = getElement( m_ctx->remoteEndpoint()->host(), pp.value_delim, pp.value_idx);
 						break;
-					case AuthorizationFunctionImpl::Parameter::ConnectionType:
+					case ExecContextParameter::ConnectionType:
 						if (!m_ctx->remoteEndpoint()) continue;
-						element = getElement( net::ConnectionEndpoint::connectionTypeName( m_ctx->remoteEndpoint()->type()), pp->value_delim, pp->value_idx);
+						element = getElement( net::ConnectionEndpoint::connectionTypeName( m_ctx->remoteEndpoint()->type()), pp.value_delim, pp.value_idx);
 						break;
-					case AuthorizationFunctionImpl::Parameter::Authenticator:
+					case ExecContextParameter::Authenticator:
 						if (!m_ctx->user()) continue;
-						element = getElement( m_ctx->user()->authenticator(), pp->value_delim, pp->value_idx);
+						element = getElement( m_ctx->user()->authenticator(), pp.value_delim, pp.value_idx);
 						break;
-					case AuthorizationFunctionImpl::Parameter::Resource:
-						element = getElement( m_authorizationResource, pp->value_delim, pp->value_idx);
+					case ExecContextParameter::Resource:
+						element = getElement( m_authorizationResource, pp.value_delim, pp.value_idx);
 						break;
 				}
 				type = langbind::FilterBase::Value;
@@ -249,11 +212,55 @@ public:
 private:
 	int m_state;
 	std::size_t m_paramidx;
-	const AuthorizationFunctionImpl* m_function;
+	const std::vector<ExecContextParameter>* m_params;
 	const proc::ExecContext* m_ctx;
 	std::string m_authorizationResource;
 	std::string m_elembuf;
 };
+
+
+/// \class AuthorizationFunctionImpl
+/// \brief Description of a an authorization function
+class AuthorizationFunctionImpl
+	:public langbind::AuthorizationFunction
+{
+public:
+	/// \brief Constructor
+	AuthorizationFunctionImpl( const langbind::FormFunction* function_, const std::vector<ExecContextParameter>& params_, const std::string& database_)
+		:m_function(function_)
+		,m_params(params_)
+		,m_database(database_){}
+
+	/// \brief Copy constructor
+	AuthorizationFunctionImpl( const AuthorizationFunctionImpl& o)
+		:m_function(o.m_function)
+		,m_params(o.m_params)
+		,m_database(o.m_database){}
+
+	/// \brief Default constructor
+	AuthorizationFunctionImpl(){}
+
+	/// \brief Destructor
+	virtual ~AuthorizationFunctionImpl(){}
+
+	const langbind::FormFunction* function() const
+	{
+		return m_function;
+	}
+	const std::vector<ExecContextParameter>& params() const
+	{
+		return m_params;
+	}
+
+	virtual bool call( proc::ExecContext* ctx, const std::string& resource, std::vector<Attribute>& attributes) const;
+
+private:
+	const langbind::FormFunction* m_function;	///< form function to call
+	std::vector<ExecContextParameter> m_params;	///< parameter description
+	std::string m_database;				///< database used for authorization functions
+};
+
+
 
 
 bool AuthorizationFunctionImpl::call( proc::ExecContext* ctx, const std::string& resource, std::vector<Attribute>& attributes) const
@@ -284,7 +291,7 @@ bool AuthorizationFunctionImpl::call( proc::ExecContext* ctx, const std::string&
 		DatabaseScope databaseScope( &m_database, ctx);
 
 		langbind::FormFunctionClosureR clos( m_function->createClosure());
-		langbind::TypedInputFilterR input( new AuthorizationArg( *this, *ctx, resource));
+		langbind::TypedInputFilterR input( new ExecContextArg( params(), *ctx, resource));
 		clos->init( ctx, input);
 		if (!clos->call())
 		{
@@ -413,10 +420,8 @@ static void parseArrayAccess( char& delim, std::size_t& idx, std::string::const_
 	++si;
 }
 
-static AuthorizationFunctionImpl::Parameter
-	parseParameter( std::string::const_iterator& si, const std::string::const_iterator& se)
+static ExecContextParameter parseParameter( std::string::const_iterator& si, const std::string::const_iterator& se, bool knowsResource)
 {
-	typedef AuthorizationFunctionImpl::Parameter Parameter;
 	std::string name;
 	char ch = parseNextToken( name, si, se);
 	if (ch == '"' || ch == '\'') throw std::runtime_error("identifier expected as parameter name instead of string");
@@ -431,37 +436,45 @@ static AuthorizationFunctionImpl::Parameter
 		if (g_optab[ch]) throw std::runtime_error( std::string( "identifier or string expected as parameter value of '") + ch + "'");
 		if (ch == '"' || ch == '\'')
 		{
-			return Parameter( name, valuestr);
+			return ExecContextParameter( name, valuestr);
 		}
 		else
 		{
-			Parameter::Value value = Parameter::valueFromId( valuestr);
+			ExecContextParameter::Value value = ExecContextParameter::valueFromId( valuestr);
+			if (!knowsResource && value == ExecContextParameter::Resource)
+			{
+				throw std::runtime_error( std::string("unknown parameter '") + ExecContextParameter::valueName( ExecContextParameter::Resource) + "'");
+			}
 			if (gotoNextToken( si, se) == '[')
 			{
 				char delim;
 				std::size_t idx;
 				parseArrayAccess( delim, idx, si, se);
-				return Parameter( name, value, delim, idx);
+				return ExecContextParameter( name, value, delim, idx);
 			}
 			else
 			{
-				return Parameter( name, value);
+				return ExecContextParameter( name, value);
 			}
 		}
 	}
 	else if (ch == ',' || ch == ')')
 	{
-		Parameter::Value value = Parameter::valueFromId( name);
+		ExecContextParameter::Value value = ExecContextParameter::valueFromId( name);
+		if (!knowsResource && value == ExecContextParameter::Resource)
+		{
+			throw std::runtime_error( std::string("unknown parameter '") + ExecContextParameter::valueName( ExecContextParameter::Resource) + "'");
+		}
 		if (gotoNextToken( si, se) == '[')
 		{
 			char delim;
 			std::size_t idx;
 			parseArrayAccess( delim, idx, si, se);
-			return Parameter( name, value, delim, idx);
+			return ExecContextParameter( name, value, delim, idx);
 		}
 		else
 		{
-			return Parameter( name, value);
+			return ExecContextParameter( name, value);
 		}
 	}
 	else
@@ -472,15 +485,13 @@ static AuthorizationFunctionImpl::Parameter
 
 struct AaMapExpression
 {
-	typedef AuthorizationFunctionImpl::Parameter Parameter;
-
 	AaMapExpression(){}
 	AaMapExpression( const AaMapExpression& o)
 		:aafunc(o.aafunc),formfunc(o.formfunc),params(o.params){}
 
 	std::string aafunc;
 	const langbind::FormFunction* formfunc;
-	std::vector<Parameter> params;
+	std::vector<ExecContextParameter> params;
 };
 
 struct AaMapProgramDescription
@@ -557,8 +568,7 @@ static AaMapProgramDescription parseProgram( const ProgramLibrary& library, std:
 				ch = gotoNextToken( si, se);
 				for (; ch != ')' && ch != 0; gotoNextToken( si, se))
 				{
-					AuthorizationFunctionImpl::Parameter param
-						= parseParameter( si, se);
+					ExecContextParameter param = parseParameter( si, se, true);
 					ch = gotoNextToken( si, se);
 					if (ch == ',')
 					{
