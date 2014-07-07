@@ -394,8 +394,8 @@ static char parseNextToken( std::string& tok, std::string::const_iterator& si, c
 	}
 }
 
-static const char* g_keyword_ids[] = {"AUTHORIZE","DATABASE",0};
-enum AaMapKeyword{ m_NONE, m_AUTHORIZE, m_DATABASE};
+static const char* g_keyword_ids[] = {"AUDIT","AUTHORIZE","DATABASE",0};
+enum AaMapKeyword{ m_NONE, m_AUDIT, m_AUTHORIZE, m_DATABASE};
 static const utils::IdentifierTable g_keyword_idtab( false, g_keyword_ids);
 
 static void parseArrayAccess( char& delim, std::size_t& idx, std::string::const_iterator& si, const std::string::const_iterator& se)
@@ -485,10 +485,20 @@ static ExecContextParameter parseParameter( std::string::const_iterator& si, con
 
 struct AaMapExpression
 {
-	AaMapExpression(){}
-	AaMapExpression( const AaMapExpression& o)
-		:aafunc(o.aafunc),formfunc(o.formfunc),params(o.params){}
+	enum FuncType
+	{
+		AuditFunc,
+		AuthorizeFunc
+	};
 
+	AaMapExpression()
+		:aafunctype(AuthorizeFunc),formfunc(0){}
+	AaMapExpression( FuncType ft)
+		:aafunctype(ft),formfunc(0){}
+	AaMapExpression( const AaMapExpression& o)
+		:aafunctype(o.aafunctype),aafunc(o.aafunc),formfunc(o.formfunc),params(o.params){}
+
+	FuncType aafunctype;
 	std::string aafunc;
 	const langbind::FormFunction* formfunc;
 	std::vector<ExecContextParameter> params;
@@ -511,7 +521,8 @@ static AaMapProgramDescription parseProgram( const ProgramLibrary& library, std:
 	char ch = gotoNextToken( si, se);
 	for (; ch != 0; ch = gotoNextToken( si, se))
 	{
-		switch ((AaMapKeyword)utils::parseNextIdentifier( si, se, g_keyword_idtab))
+		AaMapKeyword kw = (AaMapKeyword)utils::parseNextIdentifier( si, se, g_keyword_idtab);
+		switch (kw)
 		{
 			case m_NONE:
 				if (ch == ';')
@@ -536,9 +547,10 @@ static AaMapProgramDescription parseProgram( const ProgramLibrary& library, std:
 				}
 				break;
 
+			case m_AUDIT:
 			case m_AUTHORIZE:
 			{
-				AaMapExpression expr;
+				AaMapExpression expr( kw==m_AUDIT?AaMapExpression::AuditFunc:AaMapExpression::AuthorizeFunc);
 				ch = parseNextToken( expr.aafunc, si, se);
 				if (ch == 0 || g_optab[ch])
 				{
@@ -568,7 +580,8 @@ static AaMapProgramDescription parseProgram( const ProgramLibrary& library, std:
 				ch = gotoNextToken( si, se);
 				for (; ch != ')' && ch != 0; gotoNextToken( si, se))
 				{
-					ExecContextParameter param = parseParameter( si, se, true);
+					bool knowsResource = (expr.aafunctype == AaMapExpression::AuthorizeFunc);
+					ExecContextParameter param = parseParameter( si, se, knowsResource);
 					ch = gotoNextToken( si, se);
 					if (ch == ',')
 					{
