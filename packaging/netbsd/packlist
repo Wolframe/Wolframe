@@ -281,7 +281,6 @@ usr/pkg/include/wolframe/AAAA/user.hpp
 @dirrm usr/pkg/include/wolframe/AAAA
 usr/pkg/include/wolframe/module/constructor.hpp
 @dirrm usr/pkg/include/wolframe/module
-usr/pkg/include/wolframe/prgbind/authorizationProgram.hpp
 usr/pkg/include/wolframe/prgbind/ddlProgram.hpp
 usr/pkg/include/wolframe/prgbind/normalizeProgram.hpp
 usr/pkg/include/wolframe/prgbind/program.hpp

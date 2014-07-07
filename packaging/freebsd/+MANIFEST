@@ -274,7 +274,6 @@ files:
  /usr/local/include/wolframe/AAAA/pwdChangeMessage.hpp: 'sha256sum'
  /usr/local/include/wolframe/AAAA/user.hpp: 'sha256sum'
  /usr/local/include/wolframe/module/constructor.hpp: 'sha256sum'
- /usr/local/include/wolframe/prgbind/authorizationProgram.hpp: 'sha256sum'
  /usr/local/include/wolframe/prgbind/ddlProgram.hpp: 'sha256sum'
  /usr/local/include/wolframe/prgbind/normalizeProgram.hpp: 'sha256sum'
  /usr/local/include/wolframe/prgbind/program.hpp: 'sha256sum'

@@ -292,7 +292,6 @@ f none opt/csw/include/wolframe/module/constructor.hpp 0644 root staff
 f none opt/csw/include/wolframe/module/moduleDirectory.hpp 0644 root staff
 f none opt/csw/include/wolframe/module/moduleInterface.hpp 0644 root staff
 d none opt/csw/include/wolframe/prgbind 0755 root root
-f none opt/csw/include/wolframe/prgbind/authorizationProgram.hpp 0644 root staff
 f none opt/csw/include/wolframe/prgbind/ddlProgram.hpp 0644 root staff
 f none opt/csw/include/wolframe/prgbind/normalizeProgram.hpp 0644 root staff
 f none opt/csw/include/wolframe/prgbind/program.hpp 0644 root staff
