@@ -34,11 +34,13 @@ Project Wolframe.
 
 #include "aaMapProgram.hpp"
 #include "langbind/authorizationFunction.hpp"
+#include "langbind/auditFunction.hpp"
 #include "processor/execContext.hpp"
 #include "langbind/formFunction.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/fileLineInfo.hpp"
 #include "utils/parseUtils.hpp"
+#include "filter/joinfilter.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -260,6 +262,79 @@ private:
 	std::string m_database;				///< database used for authorization functions
 };
 
+
+/// \class AuditFunctionClosureImpl
+/// \brief Closure of a an auditing function
+class AuditFunctionClosureImpl
+	:public langbind::FormFunctionClosure
+{
+	AuditFunctionClosureImpl( const std::vector<ExecContextParameter>* params_)
+		:m_params(params_){}
+
+	/// \brief Destructor
+	virtual ~AuditFunctionClosureImpl()
+	{}
+
+	/// \brief Calls the function with the input from the input filter specified
+	/// \return true when completed
+	virtual bool call()
+	{
+		return false;
+	}
+
+	/// \brief Initialization of call context for a new call
+	/// \param[in] c execution context reference
+	/// \param[in] i call input
+	/// \param[in] f serialization flags for validating form functions depending on caller context (directmap "strict",lua relaxed)
+	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum)
+	{
+		langbind::TypedInputFilterR argfilter( new ExecContextArg( *m_params, *c, ""));
+		m_input.reset( new langbind::JoinInputFilter( "auditfilterarg", argfilter, i));
+	}
+
+	/// \brief Get the iterator for the function result
+	/// \remark MUST be standalone (alive after destruction of this 'FormFunctionClosure'!)
+	virtual langbind::TypedInputFilterR result() const
+	{
+		return langbind::TypedInputFilterR();
+	}
+
+private:
+	const std::vector<ExecContextParameter>* m_params;
+	langbind::TypedInputFilterR m_input;
+};
+
+/// \class AuditFunctionImpl
+/// \brief Description of a an auditing function
+class AuditFunctionImpl
+	:public langbind::AuditFunction
+{
+public:
+	/// \brief Constructor
+	AuditFunctionImpl( const langbind::FormFunction* function_, const std::vector<ExecContextParameter>& params_, const std::string& database_)
+		:m_function(function_)
+		,m_params(params_)
+		,m_database(database_){}
+
+	/// \brief Copy constructor
+	AuditFunctionImpl( const AuditFunctionImpl& o)
+		:m_function(o.m_function)
+		,m_params(o.m_params)
+		,m_database(o.m_database){}
+
+	/// \brief Default constructor
+	AuditFunctionImpl(){}
+
+	/// \brief Destructor
+	virtual ~AuditFunctionImpl(){}
+
+	virtual langbind::FormFunctionClosure* createClosure() const;
+
+private:
+	const langbind::FormFunction* m_function;	///< form function to call
+	std::vector<ExecContextParameter> m_params;	///< parameter description
+	std::string m_database;				///< database used for authorization functions
+};
 
 
 
