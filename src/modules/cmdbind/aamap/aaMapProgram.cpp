@@ -44,9 +44,37 @@ Project Wolframe.
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
+
+namespace
+{
+struct DatabaseScope
+{
+	const std::string* dbname;
+	proc::ExecContext* ctx;
+
+	DatabaseScope( const std::string* dbname_, proc::ExecContext* ctx_)
+		:dbname(dbname_),ctx(ctx_)
+	{
+		if (!dbname->empty())
+		{
+			ctx->push_database( *dbname);
+		}
+	}
+	~DatabaseScope()
+	{
+		if (!dbname->empty())
+		{
+			ctx->pop_database();
+		}
+	}
+};
+
+typedef boost::shared_ptr<DatabaseScope> DatabaseScopeR;
+
 
 struct ExecContextParameter
 {
@@ -263,45 +291,45 @@ private:
 };
 
 
+/// \brief Foward declaration
+class AuditFunctionImpl;
+
 /// \class AuditFunctionClosureImpl
 /// \brief Closure of a an auditing function
 class AuditFunctionClosureImpl
 	:public langbind::FormFunctionClosure
 {
-	AuditFunctionClosureImpl( const std::vector<ExecContextParameter>* params_)
-		:m_params(params_){}
+public:
+	AuditFunctionClosureImpl( const AuditFunctionImpl* auditfunc_, const langbind::FormFunctionClosureR& formFunctionClosure_)
+		:m_auditfunc(auditfunc_)
+		,m_formFunctionClosure(formFunctionClosure_)
+		,m_context(0){}
 
 	/// \brief Destructor
-	virtual ~AuditFunctionClosureImpl()
-	{}
+	virtual ~AuditFunctionClosureImpl(){}
 
 	/// \brief Calls the function with the input from the input filter specified
 	/// \return true when completed
-	virtual bool call()
-	{
-		return false;
-	}
+	virtual bool call();
 
 	/// \brief Initialization of call context for a new call
 	/// \param[in] c execution context reference
 	/// \param[in] i call input
 	/// \param[in] f serialization flags for validating form functions depending on caller context (directmap "strict",lua relaxed)
-	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum)
-	{
-		langbind::TypedInputFilterR argfilter( new ExecContextArg( *m_params, *c, ""));
-		m_input.reset( new langbind::JoinInputFilter( "auditfilterarg", argfilter, i));
-	}
+	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f);
 
 	/// \brief Get the iterator for the function result
 	/// \remark MUST be standalone (alive after destruction of this 'FormFunctionClosure'!)
 	virtual langbind::TypedInputFilterR result() const
 	{
-		return langbind::TypedInputFilterR();
+		return m_formFunctionClosure->result();
 	}
 
 private:
-	const std::vector<ExecContextParameter>* m_params;
-	langbind::TypedInputFilterR m_input;
+	const AuditFunctionImpl* m_auditfunc;
+	langbind::FormFunctionClosureR m_formFunctionClosure;
+	proc::ExecContext* m_context;
+	DatabaseScopeR m_dbscope;
 };
 
 /// \class AuditFunctionImpl
@@ -328,7 +356,21 @@ public:
 	/// \brief Destructor
 	virtual ~AuditFunctionImpl(){}
 
-	virtual langbind::FormFunctionClosure* createClosure() const;
+	virtual langbind::FormFunctionClosure* createClosure() const
+	{
+		langbind::FormFunctionClosureR fc( m_function->createClosure());
+		return new AuditFunctionClosureImpl( this, fc);
+	}
+
+	const std::vector<ExecContextParameter>& params() const
+	{
+		return m_params;
+	}
+
+	const std::string& database() const
+	{
+		return m_database;
+	}
 
 private:
 	const langbind::FormFunction* m_function;	///< form function to call
@@ -336,33 +378,43 @@ private:
 	std::string m_database;				///< database used for authorization functions
 };
 
+}//anonymous namespace
+
+
+void AuditFunctionClosureImpl::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f)
+{
+	m_context = c;
+	langbind::TypedInputFilterR argfilter( new ExecContextArg( m_auditfunc->params(), *c, ""));
+	langbind::TypedInputFilterR input( new langbind::JoinInputFilter( "auditfilterarg", argfilter, i));
+	m_formFunctionClosure->init( c, input, f);
+}
+
+bool AuditFunctionClosureImpl::call()
+{
+	if (!m_context)
+	{
+		throw std::runtime_error( "execution context not initialized");
+	}
+	if (!m_dbscope.get())
+	{
+		m_dbscope.reset( new DatabaseScope( &m_auditfunc->database(), m_context));
+	}
+	if (m_formFunctionClosure->call())
+	{
+		m_dbscope.reset();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 
 bool AuthorizationFunctionImpl::call( proc::ExecContext* ctx, const std::string& resource, std::vector<Attribute>& attributes) const
 {
 	try
 	{
-		struct DatabaseScope
-		{
-			const std::string* dbname;
-			proc::ExecContext* ctx;
-
-			DatabaseScope( const std::string* dbname_, proc::ExecContext* ctx_)
-				:dbname(dbname_),ctx(ctx_)
-			{
-				if (!dbname->empty())
-				{
-					ctx->push_database( *dbname);
-				}
-			}
-			~DatabaseScope()
-			{
-				if (!dbname->empty())
-				{
-					ctx->pop_database();
-				}
-			}
-		};
 		DatabaseScope databaseScope( &m_database, ctx);
 
 		langbind::FormFunctionClosureR clos( m_function->createClosure());
@@ -710,8 +762,21 @@ void AaMapProgram::loadProgram( ProgramLibrary& library, db::Database*, const st
 		std::vector<AaMapExpression>::const_iterator xi = prg.expressions.begin(), xe = prg.expressions.end();
 		for (; xi != xe; ++xi)
 		{
-			langbind::AuthorizationFunctionR aaf( new AuthorizationFunctionImpl( xi->formfunc, xi->params, prg.database));
-			library.defineAuthorizationFunction( xi->aafunc, aaf);
+			switch (xi->aafunctype)
+			{
+				case AaMapExpression::AuditFunc:
+				{
+					langbind::AuditFunctionR aaf( new AuditFunctionImpl( xi->formfunc, xi->params, prg.database));
+					library.defineAuditFunction( xi->aafunc, aaf);
+					break;
+				}
+				case AaMapExpression::AuthorizeFunc:
+				{
+					langbind::AuthorizationFunctionR aaf( new AuthorizationFunctionImpl( xi->formfunc, xi->params, prg.database));
+					library.defineAuthorizationFunction( xi->aafunc, aaf);
+					break;
+				}
+			}
 		}
 	}
 	catch (const std::runtime_error& e)

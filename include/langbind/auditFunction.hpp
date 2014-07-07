@@ -40,7 +40,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-/// \brief Interface of a an auditing function
+/// \brief Interface of a an auditing function as special form function
 typedef FormFunction AuditFunction;
 
 /// \brief shared ownership reference on an auditing function
