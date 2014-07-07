@@ -33,7 +33,7 @@ Project Wolframe.
 /// \brief Implementation of  programs mapping authorization/audit calls to form function calls
 
 #include "aaMapProgram.hpp"
-#include "types/authorizationFunction.hpp"
+#include "langbind/authorizationFunction.hpp"
 #include "processor/execContext.hpp"
 #include "langbind/formFunction.hpp"
 #include "utils/fileUtils.hpp"
@@ -49,7 +49,7 @@ using namespace _Wolframe::prgbind;
 /// \class AuthorizationFunctionImpl
 /// \brief Description of a an authorization function
 class AuthorizationFunctionImpl
-	:public types::AuthorizationFunction
+	:public langbind::AuthorizationFunction
 {
 public:
 	struct Parameter
@@ -126,7 +126,7 @@ public:
 	const langbind::FormFunction* function() const	{return m_function;}
 	const std::vector<Parameter>& params() const	{return m_params;}
 
-	virtual bool call( proc::ExecContext* ctx, const std::string& resource) const;
+	virtual bool call( proc::ExecContext* ctx, const std::string& resource, std::vector<Attribute>& attributes) const;
 
 private:
 	const langbind::FormFunction* m_function;	///< form function to call
@@ -140,8 +140,8 @@ class AuthorizationArg
 {
 public:
 	explicit AuthorizationArg( const AuthorizationFunctionImpl& function_, const proc::ExecContext& ctx_, const std::string& authorizationResource_)
-		:utils::TypeSignature("proc::AuthorizationArg", __LINE__)
-		,langbind::TypedInputFilter("autharg")
+		:utils::TypeSignature("prgbind::AuthorizationArg", __LINE__)
+		,langbind::TypedInputFilter("authzarg")
 		,m_state(0)
 		,m_paramidx(0)
 		,m_function(&function_)
@@ -150,7 +150,7 @@ public:
 		{}
 
 	AuthorizationArg( const AuthorizationArg& o)
-		:utils::TypeSignature("proc::AuthorizationArg", __LINE__)
+		:utils::TypeSignature("prgbind::AuthorizationArg", __LINE__)
 		,langbind::TypedInputFilter(o)
 		,m_state(o.m_state)
 		,m_paramidx(o.m_paramidx)
@@ -256,7 +256,7 @@ private:
 };
 
 
-bool AuthorizationFunctionImpl::call( proc::ExecContext* ctx, const std::string& resource) const
+bool AuthorizationFunctionImpl::call( proc::ExecContext* ctx, const std::string& resource, std::vector<Attribute>& attributes) const
 {
 	try
 	{
@@ -316,7 +316,7 @@ bool AuthorizationFunctionImpl::call( proc::ExecContext* ctx, const std::string&
 				{
 					throw std::runtime_error( "cannot interpret output of authorize function (key value pairs expected)");
 				}
-				ctx->transaction_setenv( key, res_elem);
+				attributes.push_back( Attribute( key, res_elem));
 				if (expectCloseTag)
 				{
 					if (!output->getNext( res_type, res_elem)
@@ -612,7 +612,7 @@ void AaMapProgram::loadProgram( ProgramLibrary& library, db::Database*, const st
 		std::vector<AaMapExpression>::const_iterator xi = prg.expressions.begin(), xe = prg.expressions.end();
 		for (; xi != xe; ++xi)
 		{
-			types::AuthorizationFunctionR aaf( new AuthorizationFunctionImpl( xi->formfunc, xi->params, prg.database));
+			langbind::AuthorizationFunctionR aaf( new AuthorizationFunctionImpl( xi->formfunc, xi->params, prg.database));
 			library.defineAuthorizationFunction( xi->aafunc, aaf);
 		}
 	}

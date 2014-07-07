@@ -33,7 +33,6 @@ Project Wolframe.
 ///\brief Implementation of a language to create types::AuthorizationFunction objects
 #include "aaMapProgramType.hpp"
 #include "aaMapProgram.hpp"
-#include "types/authorizationFunction.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;

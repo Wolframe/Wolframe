@@ -485,7 +485,7 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return rt;
 }
 
-const types::AuthorizationFunction* ProcessorProvider::authorizationFunction( const std::string& name) const
+const langbind::AuthorizationFunction* ProcessorProvider::authorizationFunction( const std::string& name) const
 {
 	return m_programs->getAuthorizationFunction( name);
 }

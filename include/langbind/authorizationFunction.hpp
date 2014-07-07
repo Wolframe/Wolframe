@@ -29,11 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file types/authorizationFunction.hpp
+/// \file langbind/authorizationFunction.hpp
 /// \brief Interface of the authorization function
 
 #ifndef _Wolframe_TYPES_AUTHORIZATION_FUNCTION_HPP_INCLUDED
 #define _Wolframe_TYPES_AUTHORIZATION_FUNCTION_HPP_INCLUDED
+#include "types/variant.hpp"
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -43,7 +44,7 @@ namespace proc {
 /// \brief Forward declaration
 class ExecContext;
 }
-namespace types {
+namespace langbind {
 
 /// \class AuthorizationFunction
 /// \brief Interface of a an authorization function
@@ -55,7 +56,21 @@ public:
 	/// \brief Destructor
 	virtual ~AuthorizationFunction(){}
 
-	virtual bool call( proc::ExecContext* ctx, const std::string& resource) const=0;
+	/// \class Attribute
+	/// \brief Key value pair as authorization function result
+	struct Attribute
+	{
+		std::string name;
+		types::Variant value;
+
+		Attribute(){}
+		Attribute( const Attribute& o)
+			:name(o.name),value(o.value){}
+		Attribute( const std::string& name_, const types::Variant& value_)
+			:name(name_),value(value_){}
+	};
+
+	virtual bool call( proc::ExecContext* ctx, const std::string& resource, std::vector<Attribute>& attributes) const=0;
 };
 
 /// \brief shared ownership reference of an authorization function
