@@ -36,6 +36,7 @@ Project Wolframe.
 #include "luafilter.hpp"
 #include "luaException.hpp"
 #include "luaCppCall.hpp"
+#include "langbind/auditFunction.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/docmetadata.hpp"
 #include "filter/typingfilter.hpp"
@@ -1123,6 +1124,51 @@ LUA_FUNCTION_THROWS( "provider.formfunction(..)", function_formfunction)
 		return 1;
 	}
 	throw std::runtime_error( std::string( "form function '") + name + "' not found");
+}
+
+LUA_FUNCTION_THROWS( "provider.audit(..)", function_audit)
+{
+	FormFunctionClosureR closure;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		int nn = lua_gettop( ls);
+		if (nn > 2) throw std::runtime_error( "too many arguments");
+		if (nn < 2) throw std::runtime_error( "too few arguments");
+
+		if (lua_type( ls, 1) != LUA_TSTRING)
+		{
+			throw std::runtime_error("string expected as first argument (authorization function)");
+		}
+		const char* name = lua_tostring( ls, 1);
+
+		proc::ExecContext* exc = getExecContext( ls);
+		const AuditFunction* af = exc->provider()->auditFunction( name);
+		if (af)
+		{
+			closure.reset( af->createClosure());
+		}
+		else
+		{
+			const FormFunction* ff = exc->provider()->formFunction( name);
+			if (!ff) throw std::runtime_error( std::string( "audit function '") + name + "' not found");
+			closure.reset( ff->createClosure());
+		}
+		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
+		closure->init( exc, inp, serialize::Flags::None);
+	}
+	else
+	{
+		FormFunctionClosureR* closureptr = LuaObject<FormFunctionClosureR>::get( ls, -1);
+		closure = *closureptr;
+		lua_pop( ls, 1);
+	}
+	if (!closure->call())
+	{
+		LuaObject<FormFunctionClosureR>::push_luastack( ls, closure);
+		lua_yieldk( ls, 0, 1, function_audit);
+	}
+	return 0;
 }
 
 LUA_FUNCTION_THROWS( "provider.authorize(..)", function_authorize)
@@ -2547,13 +2593,14 @@ static const luaL_Reg form_methodtable[ 8] =
 	{0,0}
 };
 
-static const luaL_Reg provider_methodtable[ 7] =
+static const luaL_Reg provider_methodtable[ 8] =
 {
 	{"filter",&function_filter},
 	{"form",&function_form},
 	{"type",&function_type},
 	{"formfunction",&function_formfunction},
 	{"authorize",&function_authorize},
+	{"audit",&function_audit},
 	{"document",&function_document},
 	{0,0}
 };

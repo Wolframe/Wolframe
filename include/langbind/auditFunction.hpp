@@ -41,7 +41,13 @@ namespace _Wolframe {
 namespace langbind {
 
 /// \brief Interface of a an auditing function as special form function
-typedef FormFunction AuditFunction;
+class AuditFunction
+	:public FormFunction
+{
+public:
+	virtual ~AuditFunction(){}
+	virtual FormFunctionClosure* createClosure() const=0;
+};
 
 /// \brief shared ownership reference on an auditing function
 typedef boost::shared_ptr<AuditFunction> AuditFunctionR;
