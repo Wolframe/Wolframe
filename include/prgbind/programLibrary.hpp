@@ -42,6 +42,7 @@
 #include "langbind/formFunction.hpp"
 #include "langbind/runtimeEnvironment.hpp"
 #include "langbind/authorizationFunction.hpp"
+#include "langbind/auditFunction.hpp"
 #include "types/form.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/customDataType.hpp"
@@ -68,6 +69,8 @@ public:
 
 	/// \brief Define an authorization function
 	virtual void defineAuthorizationFunction( const std::string& name, const langbind::AuthorizationFunctionR& f);
+	/// \brief Define an audit function
+	virtual void defineAuditFunction( const std::string& name, const langbind::AuditFunctionR& f);
 	/// \brief Define a C++ form function
 	virtual void defineCppFormFunction( const std::string& name, const serialize::CppFormFunction& f);
 	/// \brief Define an ordinary form function
@@ -105,6 +108,8 @@ public:
 
 	/// \brief Get an authorization function by name
 	virtual const langbind::AuthorizationFunction* getAuthorizationFunction( const std::string& name) const;
+	/// \brief Get an audit function by name
+	virtual const langbind::AuditFunction* getAuditFunction( const std::string& name) const;
 	/// \brief Get a form function by name
 	virtual const langbind::FormFunction* getFormFunction( const std::string& name) const;
 	/// \brief Get a normalizer function by name

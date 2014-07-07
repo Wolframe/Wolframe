@@ -75,8 +75,8 @@ private:
 		for (; si != se; ++si) *si = '\0';
 	}
 
-	void operator=( const SecureString&){}	//... non assigable
-	void operator=( const std::string&){}	//... non assigable
+	void operator=( const SecureString&){}	//... non assignable
+	void operator=( const std::string&){}	//... non assignable
 
 private:
 	std::string m_content;

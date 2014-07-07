@@ -490,6 +490,11 @@ const langbind::AuthorizationFunction* ProcessorProvider::authorizationFunction(
 	return m_programs->getAuthorizationFunction( name);
 }
 
+const langbind::AuditFunction* ProcessorProvider::auditFunction( const std::string& name) const
+{
+	return m_programs->getAuditFunction( name);
+}
+
 const types::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
 {
 	return m_programs->getNormalizeFunction( name);
