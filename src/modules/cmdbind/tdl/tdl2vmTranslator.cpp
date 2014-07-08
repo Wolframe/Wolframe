@@ -878,9 +878,9 @@ void Tdl2vmTranslator::add_auditcall( const vm::Program& auditcallprg)
 	;
 }
 
-ProgramR Tdl2vmTranslator::createProgram( bool withReturn) const
+vm::ProgramR Tdl2vmTranslator::createProgram( bool withReturn) const
 {
-	ProgramR rt;
+	vm::ProgramR rt;
 
 	// Patch first instruction of the program, a GOTO that jumps to the start of main
 	std::size_t ip_start_main = m_sub_program.code.size();
@@ -890,13 +890,13 @@ ProgramR Tdl2vmTranslator::createProgram( bool withReturn) const
 	}
 	if (ip_start_main > 1)
 	{
-		rt.reset( new Program( m_sub_program));
+		rt.reset( new vm::Program( m_sub_program));
 		rt->code[ 0] = InstructionSet::instruction( Op_GOTO, ip_start_main);
 	}
 	else
 	{
 		ip_start_main = 0;
-		rt.reset( new Program());
+		rt.reset( new vm::Program());
 	}
 	rt->add( m_main_program, false/*do not patch GOTOs*/);
 	std::size_t ip_end_main = rt->code.size();

@@ -53,6 +53,7 @@ struct MutationDescription :public serialize::StructDescription<Mutation>
 	MutationDescription( )
 	{
 		( *this )
+		( "user", &Mutation::user )
 		( "operation", &Mutation::operation )
 		( "id", &Mutation::id)
 		( "oldvalue", &Mutation::oldvalue)
@@ -93,7 +94,9 @@ int audit::Audit::mutation( proc::ExecContext* ctx, serialize::EmptyStruct& /*re
 	{
 		throw std::runtime_error( std::string( "audit failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for appending");
 	}
-	fprintf( fh, "audit %s id %d old '%s' new '%s'\n", param.operation.c_str(), param.id, param.oldvalue.c_str(), param.newvalue.c_str());
+	fprintf( fh, "audit %s user '%s' id %d old '%s' new '%s'\n",
+			param.operation.c_str(), param.user.c_str(),
+			param.id, param.oldvalue.c_str(), param.newvalue.c_str());
 	fclose( fh);
 	return 0;
 }
@@ -112,7 +115,9 @@ int audit::Audit::mutation1( proc::ExecContext* ctx, serialize::EmptyStruct& /*r
 	{
 		throw std::runtime_error( std::string( "audit failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for appending");
 	}
-	fprintf( fh, "audit %s id %d old '%s' new '%s'\n", param.operation.c_str(), param.id, param.oldvalue.c_str(), param.newvalue.c_str());
+	fprintf( fh, "audit %s user '%s' id %d old '%s' new '%s'\n",
+		 param.operation.c_str(), param.user.c_str(),
+		 param.id, param.oldvalue.c_str(), param.newvalue.c_str());
 	fclose( fh);
 	return 0;
 }

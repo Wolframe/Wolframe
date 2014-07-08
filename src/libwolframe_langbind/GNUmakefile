@@ -36,6 +36,7 @@ CPP_OBJS = \
 	typingfilter.o \
 	typedfilterScope.o \
 	inputfilterScope.o \
+	joinfilter.o \
 	tostringfilter.o \
 	ptreefilter.o \
 	cmdbind_lineCommandHandler.o \

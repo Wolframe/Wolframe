@@ -9,6 +9,7 @@ LoadModules
 {
 	module `cmd/MODULE mod_db_postgresqltest`
 	module `cmd/MODULE mod_command_directmap`
+	module `cmd/MODULE mod_command_tdl`
 	module `cmd/MODULE mod_audit`
 }
 Database

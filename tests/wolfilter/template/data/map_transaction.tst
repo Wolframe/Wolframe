@@ -12,6 +12,7 @@ testdata="
 LoadModules
 {
 	module ../wolfilter/modules/database/testtrace/mod_db_testtrace
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 }
 Database
 {

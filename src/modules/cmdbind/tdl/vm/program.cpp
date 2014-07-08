@@ -77,7 +77,7 @@ static void patchCode( ProgramCode& code, InstructionSet::ArgumentType argtype, 
 	}
 }
 
-void Program::add( const Program& oth, bool doPatchGOTOs)
+void vm::Program::add( const vm::Program& oth, bool doPatchGOTOs)
 {
 	std::size_t startidx = code.size();
 
@@ -139,12 +139,12 @@ void Program::add( const Program& oth, bool doPatchGOTOs)
 	}
 }
 
-void Program::setCurrentSourceReference( const utils::FileLineInfo& posinfo)
+void vm::Program::setCurrentSourceReference( const utils::FileLineInfo& posinfo)
 {
 	tdlpositions.push_back( InstructionPos( code.size(), posinfo));
 }
 
-bool Program::getSourceReference( std::size_t ip, utils::FileLineInfo& posinfo) const
+bool vm::Program::getSourceReference( std::size_t ip, utils::FileLineInfo& posinfo) const
 {
 	std::vector<InstructionPos>::const_iterator prev = tdlpositions.begin(), di = tdlpositions.begin(), de = tdlpositions.end();
 	for (; di != de && ip >= di->ip; prev=di++) {}
@@ -153,26 +153,26 @@ bool Program::getSourceReference( std::size_t ip, utils::FileLineInfo& posinfo) 
 	return true;
 }
 
-std::string Program::instructionString( const Instruction& instr) const
+std::string vm::Program::instructionString( const Instruction& instr) const
 {
 	std::ostringstream out;
 	printInstruction( out, instr);
 	return out.str();
 }
 
-std::string Program::instructionStringAt( const std::size_t& ip) const
+std::string vm::Program::instructionStringAt( const std::size_t& ip) const
 {
 	std::ostringstream out;
 	printInstructionAt( out, ip);
 	return out.str();
 }
 
-void Program::printInstructionAt( std::ostream& out, const std::size_t& ip) const
+void vm::Program::printInstructionAt( std::ostream& out, const std::size_t& ip) const
 {
 	printInstruction( out, *code.at( ip));
 }
 
-void Program::printInstruction( std::ostream& out, const Instruction& instr) const
+void vm::Program::printInstruction( std::ostream& out, const Instruction& instr) const
 {
 	CondCode cc = condCode( instr);
 	const char* ccnam = condCodeName( cc);
@@ -231,7 +231,7 @@ void Program::printInstruction( std::ostream& out, const Instruction& instr) con
 	}
 }
 
-void Program::print( std::ostream& out) const
+void vm::Program::print( std::ostream& out) const
 {
 	out << "Code:" << std::endl;
 	std::vector<Instruction>::const_iterator pi = code.begin(), pe = code.end();
@@ -320,4 +320,30 @@ void Program::print( std::ostream& out) const
 	}
 }
 
+ProgramImage vm::Program::image() const
+{
+	ProgramImage rt;
+	{
+		rt.code = code;
+		rt.constants = constants;
+		rt.colnames = colnametab.array();
+		rt.tagnames = tagnametab.array();
+		rt.resultnames = resultnametab.array();
+		rt.statements = statements;
+		ErrorHintTable::const_iterator hi = hinttab.begin(), he = hinttab.end();
+		for (; hi != he; ++hi)
+		{
+			rt.errorhints.push_back( ProgramImage::ErrorHintList());
+	
+			ErrorHintTable::HintList::const_iterator ei = hi->begin(), ee = hi->end();
+			for (; ei != ee; ++ei)
+			{
+				rt.errorhints.back().push_back( ProgramImage::ErrorHint( ei->errorclass, ei->message));
+			}
+		}
+		rt.signatures = signatures;
+		rt.tuplesets = tuplesets;
+	}
+	return rt;
+}
 

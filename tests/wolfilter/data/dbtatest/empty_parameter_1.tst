@@ -9,6 +9,7 @@
 LoadModules
 {
 	module ../../src/modules/filter/textwolf/mod_filter_textwolf
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 }
 Database

@@ -40,6 +40,7 @@
 #include "vm/nameTable.hpp"
 #include "vm/errorHintTable.hpp"
 #include "vm/selectorPathSet.hpp"
+#include "database/vm/programImage.hpp"
 #include "utils/fileLineInfo.hpp"
 #include "types/keymap.hpp"
 #include "types/variant.hpp"
@@ -98,6 +99,9 @@ public:
 		,tuplesets(o.tuplesets)
 		,tdlpositions(o.tdlpositions)
 	{}
+
+	///\brief Return an image of this program reduced to its basic structures
+	ProgramImage image() const;
 
 	///\brief Add the program to this, joining all tables and doing necessary instruction patches
 	void add( const Program& oth, bool doPatchGOTOs=true);

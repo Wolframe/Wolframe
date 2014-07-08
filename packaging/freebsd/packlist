@@ -38,7 +38,7 @@ usr/local/lib/wolframe/modules/mod_auth_textfile.so
 usr/local/lib/wolframe/modules/mod_auth_database.so
 usr/local/lib/wolframe/modules/mod_auth_sasl.so
 usr/local/lib/wolframe/modules/mod_authz_database.so
-usr/local/lib/wolframe/modules/mod_command_authz.so
+usr/local/lib/wolframe/modules/mod_command_aamap.so
 usr/local/lib/wolframe/modules/mod_filter_blob.so
 usr/local/lib/wolframe/modules/mod_filter_textwolf.so
 usr/local/lib/wolframe/modules/mod_filter_token.so
@@ -270,7 +270,6 @@ usr/local/include/wolframe/AAAA/user.hpp
 @dirrm usr/local/include/wolframe/AAAA
 usr/local/include/wolframe/module/constructor.hpp
 @dirrm usr/local/include/wolframe/module
-usr/local/include/wolframe/prgbind/authorizationProgram.hpp
 usr/local/include/wolframe/prgbind/ddlProgram.hpp
 usr/local/include/wolframe/prgbind/normalizeProgram.hpp
 usr/local/include/wolframe/prgbind/program.hpp

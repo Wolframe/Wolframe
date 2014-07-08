@@ -9,6 +9,7 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
+	/I$(TOPDIR)\src\modules\cmdbind\tdl \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
 	/I$(TOPDIR)\src\libwolframe_database \
@@ -29,7 +30,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
-OBJS =
+OBJS = \
+	compileTdlFiles.obj
 
 TEST_CPP_BINS = \
 	testCompileTDL.exe
@@ -39,7 +41,7 @@ all: $(TEST_OBJS) $(TEST_CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-testCompileTDL.exe: testCompileTDL.obj $(TOPDIR)\src\wolframe.lib
+testCompileTDL.exe: $(OBJS) testCompileTDL.obj $(TOPDIR)\src\wolframe.lib
 
 local_all:
 

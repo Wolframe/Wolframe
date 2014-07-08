@@ -9,6 +9,7 @@ testdata="
 LoadModules
 {
 	module ../wolfilter/modules/database/testtrace/mod_db_testtrace
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../../src/modules/cmdbind/lua/mod_command_lua
 }
 Database

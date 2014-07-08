@@ -42,15 +42,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 using namespace _Wolframe::db::vm;
 
-static const utils::CharTable g_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
-
-static bool isAlpha( char ch)
-{
-	if (ch >= 'A' && ch <= 'Z') return true;
-	if (ch >= 'a' && ch <= 'z') return true;
-	if (ch == '_') return true;
-	return false;
-}
+static const utils::CharTable g_sub_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 
 static std::string substituteTemplateArguments( const std::string& cmd, const std::vector<std::string>& templateParamNames, const std::vector<std::string>& templateParamValues)
 {
@@ -60,10 +52,10 @@ static std::string substituteTemplateArguments( const std::string& cmd, const st
 	std::string::const_iterator start = si;
 	char ch;
 
-	while (0!=(ch=utils::parseNextToken( tok, si, se, g_optab)))
+	while (0!=(ch=utils::parseNextToken( tok, si, se, g_sub_optab)))
 	{
 		char stringQuot = (ch == '\'' || ch == '\"')?ch:0;
-		if (isAlpha(ch) || stringQuot)
+		if (((ch|32) >= 'a' && (ch|32) <= 'z') || ch == '_' || stringQuot)
 		{
 			std::vector<std::string>::const_iterator ai = templateParamNames.begin(), ae = templateParamNames.end();
 			std::vector<std::string>::const_iterator vi = templateParamValues.begin(), ve = templateParamValues.end();

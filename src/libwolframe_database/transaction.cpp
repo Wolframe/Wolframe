@@ -34,8 +34,7 @@
 //\brief Implementation database transaction
 #include "database/transaction.hpp"
 #include "database/vm/programInstance.hpp"
-#include "vm/inputStructure.hpp"
-#include "tdl2vmTranslator.hpp"
+#include "database/vm/instructionSet.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -158,31 +157,65 @@ static std::string errorMessageString( const DatabaseError& err)
 	return logmsg.str();
 }
 
-static vm::ProgramR singleStatementProgram( const std::string& stm, const std::vector<types::Variant>& params)
+static vm::ProgramImage singleStatementProgram( const std::string& stm, const std::vector<types::Variant>& params)
 {
-	std::vector<std::string> resultpath;
-	resultpath.push_back( "");
-	types::keymap<vm::Subroutine> sm;
+	vm::ProgramImage rt;
 
-	Tdl2vmTranslator prg( &sm, false);
-	prg.begin_DO_statement( stm);
+	typedef vm::InstructionSet IS;
+	//Tdl2vmTranslator prg( &sm, false);
+	//prg.begin_DO_statement( stm);
+	rt.code
+		( IS::Op_RESULT_SET_INIT )
+		( IS::Op_DBSTM_START, 0 )
+	;
+	rt.statements.push_back( stm);
+
 	std::vector<types::Variant>::const_iterator pi = params.begin(), pe = params.end();
 	for (; pi != pe; ++pi)
 	{
-		prg.push_ARGUMENT_CONST( *pi);
+		//prg.push_ARGUMENT_CONST( *pi);
+		rt.code
+			( IS::Op_DBSTM_BIND_CONST, rt.constants.size() )
+		;
+		rt.constants.push_back( *pi);
 	}
-	prg.end_DO_statement();
-	prg.begin_loop_INTO_block( resultpath);
-	prg.output_statement_result( true);
-	prg.end_loop_INTO_block();
-	return prg.createProgram();
+	//prg.end_DO_statement();
+	rt.code
+		( IS::Op_DBSTM_EXEC, 0 )
+	;
+	//prg.begin_loop_INTO_block( resultpath);
+	rt.tagnames.push_back("");
+	rt.code
+		( IS::Op_OUTPUT_OPEN_ARRAY, 1/*tagname*/ )
+	;
+	//prg.output_statement_result( true);
+	IS::ArgumentIndex endofblock
+		= (IS::ArgumentIndex)(rt.code.size() + 7);
+
+	IS::ArgumentIndex startofblock
+		= (IS::ArgumentIndex)(rt.code.size() + 2);
+
+	rt.code
+		( IS::Op_OPEN_ITER_LAST_RESULT )
+		( IS::Co_NOT_IF_COND, IS::Op_GOTO, endofblock)
+		( IS::Op_OUTPUT_OPEN_ELEM )
+		( IS::Op_OUTPUT_ITR_COLUMN )
+		( IS::Op_OUTPUT_CLOSE_ELEM )
+		( IS::Op_NEXT )
+		( IS::Co_IF_COND, IS::Op_GOTO, startofblock )
+	;
+
+	//prg.end_loop_INTO_block();
+	rt.code
+		( IS::Op_OUTPUT_CLOSE_ARRAY )
+		( IS::Op_RETURN )
+	;
+	return rt;
 }
 
 bool Transaction::executeStatement( const std::string& stm, const std::vector<types::Variant>& params)
 {
-	vm::ProgramR program = singleStatementProgram( stm, params);
-
-	VmTransactionInput input( *program, vm::InputStructure( program->pathset.tagtab()));
+	VmTransactionInput input( singleStatementProgram( stm, params));
 	VmTransactionOutput output;
 
 	return execute( input, output);
@@ -190,9 +223,7 @@ bool Transaction::executeStatement( const std::string& stm, const std::vector<ty
 
 bool Transaction::executeStatement( Result& result, const std::string& stm, const std::vector<types::Variant>& params)
 {
-	vm::ProgramR program = singleStatementProgram( stm, params);
-
-	VmTransactionInput input( *program, vm::InputStructure( program->pathset.tagtab()));
+	VmTransactionInput input( singleStatementProgram( stm, params));
 	VmTransactionOutput output;
 
 	if (!execute( input, output))

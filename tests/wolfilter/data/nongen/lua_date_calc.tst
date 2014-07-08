@@ -163,7 +163,6 @@ LoadModules
 }
 Processor
 {
-	program DBIN.tdl
 	cmdhandler
 	{
 		lua

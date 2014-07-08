@@ -1391,7 +1391,7 @@ fi
 %{_libdir}/wolframe/modules/mod_normalize_locale.so
 %endif
 
-%{_libdir}/wolframe/modules/mod_command_authz.so
+%{_libdir}/wolframe/modules/mod_command_aamap.so
 
 #%dir %{_datadir}/wolframe
 #%doc LICENSE

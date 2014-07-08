@@ -32,8 +32,8 @@ Project Wolframe.
 /// \file langbind/authorizationFunction.hpp
 /// \brief Interface of the authorization function
 
-#ifndef _Wolframe_TYPES_AUTHORIZATION_FUNCTION_HPP_INCLUDED
-#define _Wolframe_TYPES_AUTHORIZATION_FUNCTION_HPP_INCLUDED
+#ifndef _Wolframe_LANGBIND_AUTHORIZATION_FUNCTION_HPP_INCLUDED
+#define _Wolframe_LANGBIND_AUTHORIZATION_FUNCTION_HPP_INCLUDED
 #include "types/variant.hpp"
 #include <string>
 #include <vector>

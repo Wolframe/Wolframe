@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\brief Loading function for transaction definition programs
 ///\file loadTransactionProgram.cpp
-#include "database/loadTransactionProgram.hpp"
+#include "loadTransactionProgram.hpp"
 #include "tdl/commandDefinition.hpp"
 #include "tdl/elementReference.hpp"
 #include "tdl/subroutineCallStatement.hpp"

@@ -9,4 +9,4 @@ Person:
 sqlite_sequence:
 'Person', '6'
 
-audit insert id 6 old '' new 'Hugi Turbo'
+audit insert user '' id 6 old '' new 'Hugi Turbo'

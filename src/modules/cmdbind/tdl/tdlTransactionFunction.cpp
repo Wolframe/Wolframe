@@ -33,10 +33,12 @@
 ///\brief Implementaion of the methods of a transaction function based on TDL
 ///\file tdlTransactionFunction.cpp
 #include "tdlTransactionFunction.hpp"
+#include "tdlTransactionInput.hpp"
 #include "database/transaction.hpp"
 #include "vm/inputStructure.hpp"
 #include "utils/typeSignature.hpp"
 #include "langbind/formFunction.hpp"
+#include "langbind/auditFunction.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "logger-v1.hpp"
 #include <string>
@@ -143,7 +145,7 @@ void TdlTransactionFunctionClosure::InputStructure::finalize( proc::ExecContext*
 
 VmTransactionInputR TdlTransactionFunctionClosure::InputStructure::get() const
 {
-	return VmTransactionInputR( new VmTransactionInput( *m_func->program(), *m_structure));
+	return VmTransactionInputR( new TdlTransactionInput( *m_func->program(), *m_structure));
 }
 
 const vm::InputStructure& TdlTransactionFunctionClosure::InputStructure::structure() const
@@ -404,7 +406,7 @@ bool TdlTransactionFunctionClosure::call()
 		{
 			// Execute function:
 			m_inputstructptr->finalize( m_context);
-			db::VmTransactionInput inp( *m_func->program(), m_inputstructptr->structure());
+			db::TdlTransactionInput inp( *m_func->program(), m_inputstructptr->structure());
 			db::VmTransactionOutput res;
 			{
 				boost::scoped_ptr<db::Transaction> trsr( m_context->provider()->transaction( m_func->name()));
@@ -440,13 +442,20 @@ bool TdlTransactionFunctionClosure::call()
 						LOG_DEBUG << "calling audit function '" << ai->function() << "'";
 						LOG_DATA << "audit function call: " << ai->function() << "(" << inputfilter_logtext( res.get( auditFunctionIdx)) << ")";
 
+						langbind::FormFunctionClosureR auditclosure;
 						langbind::TypedInputFilterR auditParameter = res.get( auditFunctionIdx);
-						const langbind::FormFunction* auditfunc = m_context->provider()->formFunction( ai->function());
-						if (!auditfunc)
+						const langbind::AuditFunction* auditfunc = m_context->provider()->auditFunction( ai->function());
+						if (auditfunc)
 						{
-							throw std::runtime_error( std::string( "transaction audit function '") + ai->function() + "' not found (must be defined as form function)");
+							auditclosure.reset( auditfunc->createClosure());
 						}
-						langbind::FormFunctionClosureR auditclosure = langbind::FormFunctionClosureR( auditfunc->createClosure());
+						else
+						{
+							//... if it is not a genuine audit function we try to find a form function with the same name
+							const langbind::FormFunction* formfunc = m_context->provider()->formFunction( ai->function());
+							if (!formfunc) throw std::runtime_error( std::string( "transaction audit function '") + ai->function() + "' not found (must be defined as audit or form function)");
+							auditclosure.reset( formfunc->createClosure());
+						}
 						auditclosure->init( m_context, auditParameter);
 					
 						if (!auditclosure->call())

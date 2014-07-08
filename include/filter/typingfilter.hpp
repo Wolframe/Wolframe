@@ -34,7 +34,6 @@ Project Wolframe.
 #ifndef _Wolframe_TYPING_FILTER_HPP_INCLUDED
 #define _Wolframe_TYPING_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "types/variant.hpp"
 #include <vector>
 
 namespace _Wolframe {
