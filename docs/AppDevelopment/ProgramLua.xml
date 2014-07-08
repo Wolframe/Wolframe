@@ -72,6 +72,11 @@
 					<entry>Returns an object of type "document" that allows the processing of the contents passed as argument.
 						See description of type "document"</entry>
 				</row>
+				<row>
+					<entry>authorize</entry>
+					<entry>1) authorization function 2) (optional) authorization resource</entry>
+					<entry>Calls the specified authorization function and returns true on success (authorized) and false on failure (authorization denied or error)</entry>
+				</row>
 			</tbody>
 			</tgroup>
 		</table>

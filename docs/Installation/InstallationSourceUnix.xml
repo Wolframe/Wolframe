@@ -390,6 +390,13 @@
 				You get spurious errors when you don't set 'CCACHE_CPP2'!
 			</para>
 			
+			<para>
+				<emphasis role="bold">Note:</emphasis>: distcc is not very helpfull as most
+				time is spent currently in dependency calculation and in the C++ preprocessing.
+				If you want to use the pump mode of distcc you will experience a lot of errors
+				in the pre-computed header files mainly due to boost.
+			</para>
+			
 		</sect2>
 		
 		<sect2>
@@ -3333,7 +3340,7 @@ make check-po           check sanity of gettext files
 		        </para>
 		        
 		        <para>
-				Additionally the make system understands 'MAKEDEPS',
+				Additionally the make system understands 'MAKEDEPEND',
 				so you can provide you own dependency generator at need.
 		        </para>
 		        

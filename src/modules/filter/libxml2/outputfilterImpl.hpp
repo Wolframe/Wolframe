@@ -89,6 +89,7 @@ public:
 
 private:
 	bool printHeader();
+	bool printTrailer();
 
 	static const xmlChar* getXmlString( const std::string& aa)
 	{
@@ -110,6 +111,7 @@ private:
 	DocumentWriter m_doc;					///< document writer structure
 	XsltMapper m_xsltMapper;				///< optional XSLT mapper
 	int m_taglevel;						///< tag hierarchy level
+	bool m_trailerPrinted;					///< true if the trailer has been printed
 	std::string m_attribname;				///< attribute name buffer
 	std::string m_valuestrbuf;				///< value buffer
 	std::string m_elembuf;					///< buffer for current element

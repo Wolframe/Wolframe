@@ -89,7 +89,10 @@ public:
 	virtual db::Transaction* transaction( const std::string& dbname, const std::string& name) const;
 
 	/// \brief Get a reference to an authorization function identified by name
-	virtual const types::AuthorizationFunction* authorizationFunction( const std::string& name) const;
+	virtual const langbind::AuthorizationFunction* authorizationFunction( const std::string& name) const;
+
+	/// \brief Get a reference to an audit function identified by name
+	virtual const langbind::AuditFunction* auditFunction( const std::string& name) const;
 
 	/// \brief Get a reference to a normalization function identified by name
 	virtual const types::NormalizeFunction* normalizeFunction( const std::string& name) const;

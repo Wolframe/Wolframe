@@ -56,8 +56,6 @@ class FormDescription;
 class NormalizeFunction;
 /// \brief Forward declaration
 class NormalizeFunctionType;
-/// \brief Forward declaration
-class AuthorizationFunction;
 }
 namespace cmdbind
 {
@@ -70,6 +68,8 @@ namespace langbind
 {
 /// \brief Forward declaration
 class AuthorizationFunction;
+/// \brief Forward declaration
+class AuditFunction;
 }
 
 namespace proc {
@@ -104,9 +104,13 @@ public:
 	virtual db::Transaction* transaction( const std::string& dbname, const std::string& name) const=0;
 
 	/// \brief Get an authorization function by name
-	/// \param[in] name name of the function
+	/// \param[in] name name of the authorization function
 	/// \return reference to function
-	virtual const types::AuthorizationFunction* authorizationFunction( const std::string& name) const=0;
+	virtual const langbind::AuthorizationFunction* authorizationFunction( const std::string& name) const=0;
+	/// \brief Get an audit function by name
+	/// \param[in] name name of the audit function
+	/// \return reference to function
+	virtual const langbind::AuditFunction* auditFunction( const std::string& name) const=0;
 	/// \brief Get a normalization function
 	/// \param[in] name name of the function
 	/// \return reference to normalization function

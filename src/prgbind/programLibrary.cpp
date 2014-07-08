@@ -71,7 +71,8 @@ private:
 class ProgramLibrary::Impl
 {
 public:
-	types::keymap<types::AuthorizationFunctionR> m_authorizationFunctionMap;
+	types::keymap<langbind::AuthorizationFunctionR> m_authorizationFunctionMap;
+	types::keymap<langbind::AuditFunctionR> m_auditFunctionMap;
 	types::keymap<types::NormalizeFunctionType> m_normalizeFunctionTypeMap;
 	types::keymap<types::CustomDataTypeR> m_customDataTypeMap;
 	NormalizeFunctionMap m_normalizeFunctionMap;
@@ -92,6 +93,7 @@ public:
 
 	Impl( const Impl& o)
 		:m_authorizationFunctionMap(o.m_authorizationFunctionMap)
+		,m_auditFunctionMap(o.m_auditFunctionMap)
 		,m_normalizeFunctionTypeMap(o.m_normalizeFunctionTypeMap)
 		,m_customDataTypeMap(o.m_customDataTypeMap)
 		,m_normalizeFunctionMap(o.m_normalizeFunctionMap)
@@ -104,9 +106,14 @@ public:
 		,m_curfile(o.m_curfile)
 		{}
 
-	void defineAuthorizationFunction( const std::string& name, const types::AuthorizationFunctionR& f)
+	void defineAuthorizationFunction( const std::string& name, const langbind::AuthorizationFunctionR& f)
 	{
 		m_authorizationFunctionMap.insert( name, f);
+	}
+	
+	void defineAuditFunction( const std::string& name, const langbind::AuditFunctionR& f)
+	{
+		m_auditFunctionMap.insert( name, f);
 	}
 	
 	void defineCppFormFunction( const std::string& name, const serialize::CppFormFunction& f)
@@ -177,10 +184,17 @@ public:
 		return m_formMap.getkeys< std::vector<std::string> >();
 	}
 
-	const types::AuthorizationFunction* getAuthorizationFunction( const std::string& name) const
+	const langbind::AuthorizationFunction* getAuthorizationFunction( const std::string& name) const
 	{
-		types::keymap<types::AuthorizationFunctionR>::const_iterator fi = m_authorizationFunctionMap.find( name);
+		types::keymap<langbind::AuthorizationFunctionR>::const_iterator fi = m_authorizationFunctionMap.find( name);
 		if (fi == m_authorizationFunctionMap.end()) return 0;
+		return fi->second.get();
+	}
+	
+	const langbind::AuditFunction* getAuditFunction( const std::string& name) const
+	{
+		types::keymap<langbind::AuditFunctionR>::const_iterator fi = m_auditFunctionMap.find( name);
+		if (fi == m_auditFunctionMap.end()) return 0;
 		return fi->second.get();
 	}
 	
@@ -287,9 +301,14 @@ ProgramLibrary::~ProgramLibrary()
 	delete m_impl;
 }
 
-void ProgramLibrary::defineAuthorizationFunction( const std::string& name, const types::AuthorizationFunctionR& f)
+void ProgramLibrary::defineAuthorizationFunction( const std::string& name, const langbind::AuthorizationFunctionR& f)
 {
 	m_impl->defineAuthorizationFunction( name, f);
+}
+
+void ProgramLibrary::defineAuditFunction( const std::string& name, const langbind::AuditFunctionR& f)
+{
+	m_impl->defineAuditFunction( name, f);
 }
 
 void ProgramLibrary::defineCppFormFunction( const std::string& name, const serialize::CppFormFunction& f)
@@ -352,9 +371,14 @@ const types::NormalizeFunctionMap* ProgramLibrary::formtypemap() const
 	return m_impl->formtypemap();
 }
 
-const types::AuthorizationFunction* ProgramLibrary::getAuthorizationFunction( const std::string& name) const
+const langbind::AuthorizationFunction* ProgramLibrary::getAuthorizationFunction( const std::string& name) const
 {
 	return m_impl->getAuthorizationFunction( name);
+}
+
+const langbind::AuditFunction* ProgramLibrary::getAuditFunction( const std::string& name) const
+{
+	return m_impl->getAuditFunction( name);
 }
 
 const types::CustomDataType* ProgramLibrary::getCustomDataType( const std::string& name) const

@@ -10,7 +10,7 @@
 	</para>
 
 	<sect1>
-	<title>C# Client Modules</title>
+	<title>C# client modules</title>
 		<para>In the subdirectory clients/dotnet/csharp/WolframeClient of the Wolframe
 		installation you'll find a Microsoft Visual Studio project file and the 
 		following source files you need for a Wolframe C# client.
@@ -19,7 +19,7 @@
 		The other files are helper classes for the client:
 		</para>
 		<table frame="all" width="100%">
-			<title>C# Client Modules</title>
+			<title>C# client modules</title>
 			<tgroup cols="2">
 			<colspec colnum="1" colname="col1" colwidth="1*"/>
 			<colspec colnum="2" colname="col2" colwidth="3*"/>
@@ -70,7 +70,7 @@
 		</table>
 
 		<sect2>
-		<title>Example Script</title>
+		<title>Example script</title>
 		<para>The script examples/clients/dotnet/csharp/Program.cs shows the 
 		mechanisms of using the C# client modules to create a .NET client for
 		Wolframe. The example program defines the request and the answer type
@@ -81,7 +81,7 @@
 		</sect2>
 
 		<sect2>
-		<title>The Session Interface</title>
+		<title>The session interface</title>
 		<para>
 		Here is the Wolframe session interface implemented in clients/dotnet/csharp/SessionInterface.cs: 
 		<programlisting language='C#'>
@@ -91,7 +91,7 @@
 		</sect2>
 
 		<sect2>
-		<title>The Session Constructor</title>
+		<title>The session constructor</title>
 		<para>
 		Here is the signature of the Session constructor as defined in clients/dotnet/csharp/Session.cs:
 		<programlisting language='C#'>

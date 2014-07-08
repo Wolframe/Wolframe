@@ -34,7 +34,7 @@ class Session extends Connection
 	/* Authentication mechanism WOLFRAME_CRAM */
 	private function auth_WOLFRAME_CRAM( $username, $password)
 	{
-		// 1. The client sends a 256 bit seed followed by a HMAC-SHA1 of the (seed, username)
+		// 1. The client sends a 256 bit seed followed by a HMAC-SHA1 of the (seed, username):
 		$this->writedata( WolframeCram::userHash( $username)); 
 
 		// 2. If the server finds the user it will reply with a seed and a challenge. 
@@ -43,11 +43,11 @@ class Session extends Connection
 		$challenge = $this->readdata();
 
 		// 3. The client returns a response. The response is computed from the PBKDF2 
-		//	of the seed and the challenge.
+		//	of the seed and the challenge:
 		$this->writedata( WolframeCram::CRAMresponse( $password, $challenge));
 
 		// 4. the server tries to authenticate the user and returns "OK" in case
-		//	of success, "ERR" else.
+		//	of success, "ERR" else:
 		$this->getline("OK");
 	}
 
@@ -111,10 +111,36 @@ class Session extends Connection
 		return $this->requesterror;
 	}
 
+	/* Change the password */
+	public function changePassword( $oldpassword, $newpassword)
+	{
+		if (!$this->isalive())
+		{
+			throw $this->protocol_exception( "connection run away");
+		}
+		// 1. The client asks to open the password change dialog:
+		$this->writeline( "PASSWD");
+		// 2. The server accepts or not:
+		$this->getline("OK");
+		// 3. The server sends a challenge:
+		$challenge = $this->readdata();
+		// 4. The client returns a message with the password 
+		//	pair (old, new) encrypted with the challenge:
+		$this->writedata(
+			WolframeCram::passwordChangeMessage(
+				$oldpassword, $challenge, $newpassword));
+		// 5. The server accepts the password change or not:
+		$this->getline( "OK");
+	}
+
 	/* Send a request to the server */
 	public function request( $command, $query)
 	{
 		$requesterror = FALSE;
+		if (!$this->isalive())
+		{
+			throw $this->protocol_exception( "connection run away");
+		}
 		if ($command == "")
 		{
 			$this->writeline( "REQUEST");

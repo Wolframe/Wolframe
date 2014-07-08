@@ -30,50 +30,38 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \brief Interface for describing the authorization procedure for a transaction or command to execute
-/// \file langbind/authorization.hpp
-//
-#ifndef _LANGBIND_AUTHORIZATION_HPP_INCLUDED
-#define _LANGBIND_AUTHORIZATION_HPP_INCLUDED
+/// \file aaMapProgram.hpp
+/// \brief Interface of the AaMap program type
 
+#ifndef _Wolframe_PRGBIND_AAMAP_PROGRAM_HPP_INCLUDED
+#define _Wolframe_PRGBIND_AAMAP_PROGRAM_HPP_INCLUDED
+#include "prgbind/program.hpp"
+#include "prgbind/programLibrary.hpp"
 #include <string>
 
 namespace _Wolframe {
-namespace langbind {
+namespace prgbind {
 
-/// \class Authorization
-/// \brief Structure describing the authorization procedure for a transaction or command to execute
-class Authorization
+/// \class AaMapProgram
+/// \brief Program type for AaMap function descriptions.
+class AaMapProgram
+	:public Program
 {
 public:
 	/// \brief Default constructor
-	Authorization(){}
-	/// \brief Copy constructor
-	Authorization( const Authorization& o)
-		:m_function(o.m_function)
-		,m_resource(o.m_resource){}
-	/// \brief Constructor
-	Authorization( const std::string& f, const std::string& r)
-		:m_function(f)
-		,m_resource(r){}
+	AaMapProgram()
+		:Program( SuperFunction){}
 
-	/// \brief Get function name
-	const std::string& function() const;
-	/// \brief Get resource name
-	const std::string& resource() const;
+	/// \brief Destructor
+	virtual ~AaMapProgram(){}
 
-	/// \brief Set function and resource name
-	void init( const std::string& f, const std::string& r)
-	{
-		m_function = f;
-		m_resource = r;
-	}
+	/// \brief Implementation of Program::is_mine( const std::string&) const;
+	virtual bool is_mine( const std::string& filename) const;
 
-private:
-	std::string m_function;
-	std::string m_resource;
+	/// \brief Implementation of Program::loadProgram( ProgramLibrary&, db::Database*, const std::string&);
+	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
 };
 
-}} //namespace
-
+}}//namespace
 #endif
+

@@ -485,9 +485,14 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return rt;
 }
 
-const types::AuthorizationFunction* ProcessorProvider::authorizationFunction( const std::string& name) const
+const langbind::AuthorizationFunction* ProcessorProvider::authorizationFunction( const std::string& name) const
 {
 	return m_programs->getAuthorizationFunction( name);
+}
+
+const langbind::AuditFunction* ProcessorProvider::auditFunction( const std::string& name) const
+{
+	return m_programs->getAuditFunction( name);
 }
 
 const types::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const

@@ -30,38 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file prgbind/authorizationProgram.hpp
-/// \brief Interface of the authorization program type
+///\file mod_command_aamap.cpp
+///\brief Module for aamap language binding (language to define mappings of authorization/audit calls to form functions)
+#include "appdevel/module/programTypeBuilder.hpp"
+#include "appdevel/programTypeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "aaMapProgramType.hpp"
 
-#ifndef _Wolframe_PRGBIND_AUTHORIZATION_PROGRAM_HPP_INCLUDED
-#define _Wolframe_PRGBIND_AUTHORIZATION_PROGRAM_HPP_INCLUDED
-#include "prgbind/program.hpp"
-#include "prgbind/programLibrary.hpp"
-#include <string>
-
-namespace _Wolframe {
-namespace prgbind {
-
-/// \class AuthorizationProgram
-/// \brief Program type for authorization function descriptions.
-class AuthorizationProgram
-	:public Program
-{
-public:
-	/// \brief Default constructor
-	AuthorizationProgram()
-		:Program( SuperFunction){}
-
-	/// \brief Destructor
-	virtual ~AuthorizationProgram(){}
-
-	/// \brief Implementation of Program::is_mine( const std::string&) const;
-	virtual bool is_mine( const std::string& filename) const;
-
-	/// \brief Implementation of Program::loadProgram( ProgramLibrary&, db::Database*, const std::string&);
-	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
-};
-
-}}//namespace
-#endif
+WF_MODULE_BEGIN( "AaFunctionMap", "module to map authorization/audit calls to form functions")
+ WF_PROGRAM_TYPE( "AaMap", _Wolframe::prgbind::createAaMapProgramType)
+WF_MODULE_END
 

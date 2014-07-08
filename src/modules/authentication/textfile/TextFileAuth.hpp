@@ -45,12 +45,6 @@
 #include "AAAA/CRAM.hpp"
 #include "passwdFile.hpp"
 
-#ifndef _WIN32
-static const bool	USERNAME_DEFAULT_CASE_SENSIVE = true;
-#else
-static const bool	USERNAME_DEFAULT_CASE_SENSIVE = false;
-#endif
-
 namespace _Wolframe {
 namespace AAAA {
 
@@ -74,6 +68,8 @@ public:
 private:
 	std::string			m_identifier;
 	std::string			m_file;
+	bool				m_caseSensitive;
+	bool				m_canChangePassword;
 };
 
 
@@ -98,8 +94,7 @@ public:
 	/// \param [in]	username
 	/// \param [in]	password	guess what this are :D
 	/// \param [in]	caseSensitveUser should the username be treated as case-sensitive or not
-	User* authenticatePlain( const std::string& username, const std::string& password,
-				 bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+	User* authenticatePlain( const std::string& username, const std::string& password ) const;
 
 	/// \brief	Get the user data
 	/// \param [in]	hash		username hash (base64 of the HMAC-SHA256)
@@ -108,13 +103,10 @@ public:
 	///				by the function in case of success
 	/// \param [in]	caseSensitveUser should the username be treated as case-sensitive or not
 	/// \returns	true if the user was found, false otherwise
-	bool getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
-		      bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
-	bool getUser( const std::string& userHash, PwdFileUser& user,
-		      bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+	bool getUser( const std::string& hash, const std::string& key, PwdFileUser& user ) const;
+	bool getUser( const std::string& userHash, PwdFileUser& user ) const;
 
-	bool getUserPlain( const std::string& username, PwdFileUser& user,
-			   bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+	bool getUserPlain( const std::string& username, PwdFileUser& user ) const;
 
 private:
 	static const std::string	m_mechs[];

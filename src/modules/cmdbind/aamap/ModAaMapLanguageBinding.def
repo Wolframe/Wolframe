@@ -1,0 +1,4 @@
+LIBRARY mod_command_aamap
+
+EXPORTS
+entryPoint	@1

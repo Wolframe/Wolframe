@@ -34,7 +34,7 @@
 /// \brief Implementation execution context
 #include "processor/execContext.hpp"
 #include "filter/typedfilter.hpp"
-#include "types/authorizationFunction.hpp"
+#include "langbind/authorizationFunction.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
@@ -42,7 +42,6 @@ using namespace _Wolframe::proc;
 
 db::Transaction* ExecContext::transaction( const std::string& name)
 {
-	m_transaction_env.clear();
 	if (m_dbstack.empty())
 	{
 		return m_provider->transaction( name);
@@ -58,13 +57,14 @@ bool ExecContext::checkAuthorization( const std::string& funcname, const std::st
 	if (funcname.empty()) return true;
 	try
 	{
-		const types::AuthorizationFunction* func = m_provider->authorizationFunction( funcname);
+		const langbind::AuthorizationFunction* func = m_provider->authorizationFunction( funcname);
 		if (func == 0)
 		{
 			errmsg = std::string("authorization function '") + funcname + "' is not defined";
 			return false;
 		}
-		return func->call( this, resource);
+		std::vector<langbind::AuthorizationFunction::Attribute> attributes;
+		return func->call( this, resource, attributes);
 	}
 	catch (std::runtime_error& e)
 	{

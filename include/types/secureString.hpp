@@ -34,20 +34,20 @@
 /// \brief String constant definition with the intention to hold sensitive data
 #ifndef _WOLFRAME_TYPES_SECURE_STRING_HPP_INCLUDED
 #define _WOLFRAME_TYPES_SECURE_STRING_HPP_INCLUDED
+#include <string>
 
 namespace _Wolframe {
 namespace types {
 
 /// \class SecureString
 /// \brief String definition with the intention to hold sensitive data
-/// \note Standard string implementation with erasing of its data when releasing it
+/// \note Non modifiable standard STL string implementation with erasing of its data when releasing it
 class SecureString
-	:public std::string
 {
 public:
 	SecureString(){}
 	SecureString( const std::string& o)
-		:std::string(o){}
+		:m_content(o){}
 	~SecureString()
 	{
 		eraseContent();
@@ -55,15 +55,31 @@ public:
 	void clear()
 	{
 		eraseContent();
-		std::string::clear();
+		m_content.clear();
 	}
+	operator const std::string&() const
+	{
+		return m_content;
+	}
+	bool operator == (const std::string& o) const	{return m_content == o;}
+	bool operator != (const std::string& o) const	{return m_content != o;}
+	bool operator <  (const std::string& o) const	{return m_content < o;}
+	bool operator <= (const std::string& o) const	{return m_content <= o;}
+	bool operator >  (const std::string& o) const	{return m_content > o;}
+	bool operator >= (const std::string& o) const	{return m_content >= o;}
 
 private:
 	void eraseContent()
 	{
-		std::string::iterator si = begin(), se = end();
+		std::string::iterator si = m_content.begin(), se = m_content.end();
 		for (; si != se; ++si) *si = '\0';
 	}
+
+	void operator=( const SecureString&){}	//... non assignable
+	void operator=( const std::string&){}	//... non assignable
+
+private:
+	std::string m_content;
 };
 
 }}//namespace

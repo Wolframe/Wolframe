@@ -42,6 +42,12 @@
 namespace _Wolframe {
 namespace AAAA {
 
+#ifndef _WIN32
+static const bool	USERNAME_DEFAULT_CASE_SENSIVE = true;
+#else
+static const bool	USERNAME_DEFAULT_CASE_SENSIVE = false;
+#endif
+
 struct PwdFileUser	{
 	std::string	user;
 	std::string	hash;
@@ -54,8 +60,11 @@ public:
 
 ///\brief Password file
 ///\note The password file format is:
-/// &lt;username&gt;:&lt;password hash&gt;:&lt;user info&gt;:&lt;expiry date&gt;
-/// blank lines and the lines starting with # are ignored
+///      &lt;username&gt;:&lt;password hash&gt;:&lt;user info&gt;:&lt;expiry date&gt;
+///      blank lines and the lines starting with # are ignored
+///
+/// \note For case insensitive usernames always convert the username to lowecase
+///       when you use hashed usernames
 class PasswordFile
 {
 public:
@@ -63,8 +72,10 @@ public:
 	///\param filename	password file filename
 	///\param create	flag, create the file if it doesn't exist.
 	///			this flag is set only in the password utility
-	PasswordFile( const std::string& file, bool create = false )
-		: m_filename( file ), m_create( create )	{}
+	PasswordFile( const std::string& file, bool create = false,
+		      bool caseSensitive = USERNAME_DEFAULT_CASE_SENSIVE )
+		: m_filename( file ), m_create( create ),
+		  m_caseSensitive( caseSensitive )		{}
 
 	const std::string& filename() const			{ return m_filename; }
 
@@ -75,62 +86,51 @@ public:
 
 	///\brief Add an user to the password file
 	///\param username	A filled PwdFileUser structure
-	///\param [in] caseSensitive The username should be treated as case sensitive
-	///			if this flag is set (default)
 	///\return		true if the user has been add or false
 	///			if the user already exists in the password file
 	///\note Throws in case of file operation error.
-	bool addUser( const PwdFileUser& user, bool caseSensitive = true );
+	bool addUser( const PwdFileUser& user );
 
 	///\brief Delete an user from the password file
 	///\param username	The username of the user to delete
-	///\param [in] caseSensitive The username should be treated as case sensitive
-	///			if this flag is set (default)
 	///\return		true if the user has been deleted or false
 	///			if the user doesn't exist in the password file
 	///\note Throws in case of file operation error.
-	bool delUser( const std::string& username, bool caseSensitive = true );
+	bool delUser( const std::string& username );
 
 	///\brief Get an user from the password file
 	///\param [in] username	The username of the user to get
-	///\param [in] caseSensitive The username should be treated as case sensitive
-	///			if this flag is set (default)
 	///\param [out] user	A filled PwdFileUser structure
 	///\return		true if the user has been found or false
 	///			if the user doesn't exist in the password file
 	///\note Throws in case of file operation error.
-	bool getUser( const std::string& username, PwdFileUser& user,
-		      bool caseSensitive = true ) const;
+	bool getUser( const std::string& username, PwdFileUser& user ) const;
 
 	///\brief Get an user from the password file defined by an username hash
 	///\param [in] hash	The HMAC-SHA256 hash of the username (base64)
 	///\param [in] key	The HMAC-SHA256 key (base64 string)
 	///\param [out] user	A filled PwdFileUser structure
-	///\param [in] caseSensitive The username should be treated as case sensitive
-	///			if this flag is set (converted to lower case)
 	///\return		true if the user has been found or false
 	///			if the user doesn't exist in the password file
 	///\note Throws in case of file operation error or if the hash cannot
 	///			be converted to a HMAC-SHA256
 	bool getHMACuser( const std::string& hash, const std::string& key,
-			  PwdFileUser& user, bool caseSensitive = true ) const;
+			  PwdFileUser& user ) const;
 
 	///\brief Get an user from the password file defined by an username hash
 	///\param [in] userHash	The HMAC-SHA256 hash of the username (base64)
 	///			combined with the HMAC-SHA256 key (base64)
 	///			in the form $key$hash
 	///\param [out] user	A filled PwdFileUser structure
-	///\param [in] caseSensitive The username should be treated as case sensitive
-	///			if this flag is set (converted to lower case)
 	///\return		true if the user has been found or false
 	///			if the user doesn't exist in the password file
 	///\note Throws in case of file operation error or if the hash cannot
 	///			be converted to a HMAC-SHA256
-	bool getHMACuser( const std::string& userHash,
-			  PwdFileUser& user, bool caseSensitive = true ) const;
+	bool getHMACuser( const std::string& userHash, PwdFileUser& user ) const;
 private:
 	const std::string	m_filename;
 	const bool		m_create;
+	const bool		m_caseSensitive;
 };
 
 }} // namepspace _Wolframe::AAAA

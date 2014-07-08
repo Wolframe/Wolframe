@@ -29,37 +29,28 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file types/authorizationFunction.hpp
-/// \brief Interface of the authorization function
+/// \file langbind/auditFunction.hpp
+/// \brief Interface of auditing functions
 
-#ifndef _Wolframe_TYPES_AUTHORIZATION_FUNCTION_HPP_INCLUDED
-#define _Wolframe_TYPES_AUTHORIZATION_FUNCTION_HPP_INCLUDED
-#include <string>
-#include <vector>
+#ifndef _Wolframe_LANGBIND_AUDIT_FUNCTION_HPP_INCLUDED
+#define _Wolframe_LANGBIND_AUDIT_FUNCTION_HPP_INCLUDED
+#include "langbind/formFunction.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace proc {
-/// \brief Forward declaration
-class ExecContext;
-}
-namespace types {
+namespace langbind {
 
-/// \class AuthorizationFunction
-/// \brief Interface of a an authorization function
-class AuthorizationFunction
+/// \brief Interface of a an auditing function as special form function
+class AuditFunction
+	:public FormFunction
 {
 public:
-	/// \brief Default constructor
-	AuthorizationFunction(){}
-	/// \brief Destructor
-	virtual ~AuthorizationFunction(){}
-
-	virtual bool call( proc::ExecContext* ctx, const std::string& resource) const=0;
+	virtual ~AuditFunction(){}
+	virtual FormFunctionClosure* createClosure() const=0;
 };
 
-/// \brief shared ownership reference of an authorization function
-typedef boost::shared_ptr<AuthorizationFunction> AuthorizationFunctionR;
+/// \brief shared ownership reference on an auditing function
+typedef boost::shared_ptr<AuditFunction> AuditFunctionR;
 
 }}//namespace
 #endif

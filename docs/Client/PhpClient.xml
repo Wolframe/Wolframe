@@ -13,11 +13,32 @@
 	<title>Requirements</title>
 	<para>
 		The minimum PHP version required for the client is 5.3.
-		No additional PHP modules are needed.
+		The following additional PHP modules have to be installed:
+		<table frame="all" width="100%">
+			<title>PHP modules required</title>
+			<tgroup cols="2">
+			<colspec colnum="1" colname="col1" colwidth="1*"/>
+			<colspec colnum="2" colname="col2" colwidth="3*"/>
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>php5-mcrypt</entry>
+					<entry><para>Encryption functions needed 
+					for the password change protocol of
+					WOLFRAME-CRAM.</para></entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
 	</para>
 	</sect1>
 	<sect1>
-	<title>PHP Client Modules</title>
+	<title>PHP client modules</title>
 		<para>In the subdirectory clients/php of the Wolframe installation
 		you'll find the following source files you need.
 		The main module you need to call to establish a session and
@@ -25,7 +46,7 @@
 		the client:
 		</para>
 		<table frame="all" width="100%">
-			<title>PHP Client Modules</title>
+			<title>PHP client modules</title>
 			<tgroup cols="2">
 			<colspec colnum="1" colname="col1" colwidth="1*"/>
 			<colspec colnum="2" colname="col2" colwidth="3*"/>
@@ -50,7 +71,8 @@
 				<row>
 					<entry>wolframe_cram.php</entry>
 					<entry><para>implements helper functions needed to implement
-					the authentication with the Wolframe-CRAM mech</para></entry>
+					the authentication with the Wolframe-CRAM mech and its
+					password change protocol.</para></entry>
 				</row>
 				<row>
 					<entry>pbkdf2.php</entry>
@@ -62,7 +84,7 @@
 		</table>
 
 		<sect2>
-		<title>Example Script</title>
+		<title>Example script implementing a request</title>
 		<para>The script examples/clients/php/webclient_form_xml.php shows the 
 		mechanisms of using the PHP client modules to create a client calling 
 		Wolframe from a web service. It takes a HTTP request, builds an XML 
@@ -73,7 +95,16 @@
 		</sect2>
 
 		<sect2>
-		<title>The Session Interface</title>
+		<title>Example script for a password change</title>
+		<para>The script examples/clients/php/webclient_change_password.php 
+		shows the changing of password when authenticated with "WOLFRAME-CRAM".
+		It takes a HTTP request, authenticates an initiates a password 
+		change. In case of error an XML with the error message is returned.
+		</para>
+		</sect2>
+
+		<sect2>
+		<title>The session interface</title>
 		<para>
 		In the following we shortly introduce the Wolframe session interface 
 		implemented in clients/php/session.php. 
@@ -96,6 +127,14 @@ class Session extends Connection
     *            and depending on the mechanism, the credentials needed.
     */
     function __construct( $address, $port, $sslopt, $authmethod);
+
+    /* Change the users password
+    * @param[in] the old password
+    * @param[in] the new password
+    * @remark The function throws in case of an error.
+    * @remark The function is blocking on read/write on its connection
+    */
+    public function changePassword( $oldpassword, $newpassword)
 
     /* Send a request to the server
     * @param[in] command (optional) identifier prefix of the command
