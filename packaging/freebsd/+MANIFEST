@@ -55,7 +55,7 @@ files:
  /usr/local/lib/wolframe/modules/mod_auth_database.so: 'sha256sum'
  /usr/local/lib/wolframe/modules/mod_auth_sasl.so: 'sha256sum'
  /usr/local/lib/wolframe/modules/mod_authz_database.so: 'sha256sum'
- /usr/local/lib/wolframe/modules/mod_command_authz.so: 'sha256sum'
+ /usr/local/lib/wolframe/modules/mod_command_aamap.so: 'sha256sum'
  /usr/local/lib/wolframe/modules/mod_filter_blob.so: 'sha256sum'
  /usr/local/lib/wolframe/modules/mod_filter_textwolf.so: 'sha256sum'
  /usr/local/lib/wolframe/modules/mod_filter_token.so: 'sha256sum'
