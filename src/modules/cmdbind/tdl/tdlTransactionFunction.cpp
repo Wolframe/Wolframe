@@ -441,13 +441,6 @@ bool TdlTransactionFunctionClosure::call()
 						LOG_DEBUG << "calling audit function '" << ai->function() << "'";
 						LOG_DATA << "audit function call: " << ai->function() << "(" << inputfilter_logtext( res.get( auditFunctionIdx)) << ")";
 
-						langbind::TypedInputFilterR auditParameter = res.get( auditFunctionIdx);
-						const langbind::FormFunction* auditfunc = m_context->provider()->formFunction( ai->function());
-						if (!auditfunc)
-						{
-							throw std::runtime_error( std::string( "transaction audit function '") + ai->function() + "' not found (must be defined as form function)");
-						}
-	
 						langbind::FormFunctionClosureR auditclosure;
 						langbind::TypedInputFilterR auditParameter = res.get( auditFunctionIdx);
 						const langbind::AuditFunction* auditfunc = m_context->provider()->auditFunction( ai->function());
