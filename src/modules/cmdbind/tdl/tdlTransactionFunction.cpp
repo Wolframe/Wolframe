@@ -447,7 +447,21 @@ bool TdlTransactionFunctionClosure::call()
 						{
 							throw std::runtime_error( std::string( "transaction audit function '") + ai->function() + "' not found (must be defined as form function)");
 						}
-						langbind::FormFunctionClosureR auditclosure = langbind::FormFunctionClosureR( auditfunc->createClosure());
+	
+						langbind::FormFunctionClosureR auditclosure;
+						langbind::TypedInputFilterR auditParameter = res.get( auditFunctionIdx);
+						const langbind::AuditFunction* auditfunc = m_context->provider()->auditFunction( ai->function());
+						if (auditfunc)
+						{
+							auditclosure.reset( auditfunc->createClosure());
+						}
+						else
+						{
+							//... if it is not a genuine audit function we try to find a form function with the same name
+							const langbind::FormFunction* formfunc = m_context->provider()->formFunction( ai->function());
+							if (!formfunc) throw std::runtime_error( std::string( "transaction audit function '") + ai->function() + "' not found (must be defined as audit or form function)");
+							auditclosure.reset( formfunc->createClosure());
+						}
 						auditclosure->init( m_context, auditParameter);
 					
 						if (!auditclosure->call())
