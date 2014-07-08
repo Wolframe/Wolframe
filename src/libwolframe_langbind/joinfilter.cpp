@@ -74,6 +74,7 @@ bool JoinInputFilter::getNext( ElementType& type, types::VariantConst& element)
 				}
 				else
 				{
+					m_taglevel = 0;
 					m_joinstate = ProcessFilter2;
 					/*no break here!*/
 				}

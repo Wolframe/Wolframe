@@ -62,6 +62,17 @@ struct Program
 		Function=40,
 		SuperFunction=50
 	};
+	struct EnvVariable
+	{
+		std::string name;
+		std::string value;
+
+		EnvVariable(){}
+		EnvVariable( const std::string& name_, const std::string& value_)
+			:name(name_),value(value_){}
+		EnvVariable( const EnvVariable& o)
+			:name(o.name),value(o.value){}
+	};
 
 	explicit Program( Category category_)
 		:m_category(category_){}
@@ -69,7 +80,8 @@ struct Program
 	virtual ~Program(){}
 
 	virtual bool is_mine( const std::string& filename) const=0;
-	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename)=0;
+//[+]	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename, const std::vector<EnvVariable>& env=std::vector<EnvVariable>())=0;
+/*[-]*/	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename)=0;
 
 	Category category() const		{return m_category;}
 

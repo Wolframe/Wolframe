@@ -1,12 +1,9 @@
-Person:
+PERSON:
+ID, NAME, ADDRESS
 '1', 'Aufru', 'Amselstrasse 12 Aulach'
 '2', 'Beno', 'Butterweg 23 Bendorf'
 '3', 'Carla', 'Camelstreet 34 Carassa'
 '4', 'Dorothe', 'Demotastrasse 45 Durnfo'
 '5', 'Erik', 'Erakimolstrasse 56 Enden'
 '6', 'Hugi Turbo', 'Gurkenstrasse 7a 3145 Gumligen'
-
-sqlite_sequence:
-'Person', '6'
-
-audit insert user '' id 6 old '' new 'Hugi Turbo'
+audit insert user 'wolfilter' id 6 old '' new 'Hugi Turbo'

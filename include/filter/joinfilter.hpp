@@ -49,7 +49,7 @@ public:
 		:utils::TypeSignature("langbind::JoinInputFilter", __LINE__)
 		,TypedInputFilter(name_)
 		,m_inputfilter1(f1)
-		,m_inputfilter2(f1)
+		,m_inputfilter2(f2)
 		,m_joinstate(Init)
 		,m_taglevel(0)
 	{

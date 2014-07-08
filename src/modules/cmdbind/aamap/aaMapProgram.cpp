@@ -180,8 +180,13 @@ public:
 		for (;;)
 		switch (m_state++)
 		{
-			case 0: if (m_paramidx == m_params->size())
+			case 0: if (m_paramidx >= m_params->size())
 				{
+					if (m_paramidx > m_params->size())
+					{
+						setState( langbind::InputFilter::Error, "internal: call of get next after close");
+						return false;
+					}
 					m_state = 2/*3*/;
 					continue;
 				}
