@@ -38,7 +38,7 @@ usr/local/lib/wolframe/modules/mod_auth_textfile.so
 usr/local/lib/wolframe/modules/mod_auth_database.so
 usr/local/lib/wolframe/modules/mod_auth_sasl.so
 usr/local/lib/wolframe/modules/mod_authz_database.so
-usr/local/lib/wolframe/modules/mod_command_authz.so
+usr/local/lib/wolframe/modules/mod_command_aamap.so
 usr/local/lib/wolframe/modules/mod_filter_blob.so
 usr/local/lib/wolframe/modules/mod_filter_textwolf.so
 usr/local/lib/wolframe/modules/mod_filter_token.so
