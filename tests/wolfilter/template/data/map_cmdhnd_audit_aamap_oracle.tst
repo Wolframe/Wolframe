@@ -10,6 +10,7 @@ LoadModules
 	module `cmd/MODULE mod_db_oracletest`
 	module `cmd/MODULE mod_command_directmap`
 	module `cmd/MODULE mod_command_aamap`
+	module `cmd/MODULE mod_command_tdl`
 	module `cmd/MODULE mod_audit`
 }
 Database

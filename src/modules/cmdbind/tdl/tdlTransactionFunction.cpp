@@ -38,6 +38,7 @@
 #include "vm/inputStructure.hpp"
 #include "utils/typeSignature.hpp"
 #include "langbind/formFunction.hpp"
+#include "langbind/auditFunction.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "logger-v1.hpp"
 #include <string>
