@@ -121,7 +121,8 @@ usr/local/include/wolframe/standardConfigs.hpp
 usr/local/include/wolframe/version.hpp
 usr/local/include/wolframe/platform.hpp
 usr/local/include/wolframe/wolframe.hpp
-usr/local/include/wolframe/langbind/authorization.hpp
+usr/local/include/wolframe/langbind/auditFunction.hpp
+usr/local/include/wolframe/langbind/authorizationFunction.hpp
 usr/local/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/local/include/wolframe/langbind/formFunction.hpp
 usr/local/include/wolframe/langbind/input.hpp
@@ -146,7 +147,6 @@ usr/local/include/wolframe/database/DBprovider.hpp
 usr/local/include/wolframe/database/database.hpp
 usr/local/include/wolframe/database/databaseError.hpp
 usr/local/include/wolframe/database/databaseLanguage.hpp
-usr/local/include/wolframe/database/loadTransactionProgram.hpp
 usr/local/include/wolframe/database/transaction.hpp
 usr/local/include/wolframe/database/transactionExecStatemachine.hpp
 usr/local/include/wolframe/database/vmTransactionInput.hpp
@@ -220,6 +220,7 @@ usr/local/include/wolframe/filter/filterbase.hpp
 usr/local/include/wolframe/filter/filterdef.hpp
 usr/local/include/wolframe/filter/inputfilter.hpp
 usr/local/include/wolframe/filter/inputfilterScope.hpp
+usr/local/include/wolframe/filter/joinfilter.hpp
 usr/local/include/wolframe/filter/null_filter.hpp
 usr/local/include/wolframe/filter/outputfilter.hpp
 usr/local/include/wolframe/filter/ptreefilter.hpp
@@ -230,7 +231,6 @@ usr/local/include/wolframe/filter/typedfilter.hpp
 usr/local/include/wolframe/filter/typedfilterScope.hpp
 usr/local/include/wolframe/filter/typingfilter.hpp
 @dirrm usr/local/include/wolframe/filter
-usr/local/include/wolframe/types/authorizationFunction.hpp
 usr/local/include/wolframe/types/base64.h
 usr/local/include/wolframe/types/base64.hpp
 usr/local/include/wolframe/types/byte2hex.h
@@ -275,7 +275,6 @@ usr/local/include/wolframe/prgbind/ddlProgram.hpp
 usr/local/include/wolframe/prgbind/normalizeProgram.hpp
 usr/local/include/wolframe/prgbind/program.hpp
 usr/local/include/wolframe/prgbind/programLibrary.hpp
-usr/local/include/wolframe/prgbind/transactionProgram.hpp
 @dirrm usr/local/include/wolframe/prgbind
 usr/local/include/wolframe/crypto/AES256.h
 usr/local/include/wolframe/crypto/HMAC.h
