@@ -404,6 +404,11 @@ here.
 
 If you want ICU support you will also need the 'libicu-devel' package.
 
+RedHat/Centos/Scientific Linux 7 and similar Linux distributions
+
+You need the 'boost-devel' package. This package contains also the boost-locale
+and ICU backend.
+
 Fedora and similar Linux distributions
 
 You need the 'boost-devel' package. This package contains also the boost-locale
@@ -619,7 +624,7 @@ RedHat/Centos/Scientific Linux 5 and similar Linux distributions
 The official Sqlite package is too old, use the embedded version of Sqlite with
 'WITH_SYSTEM_SQLITE3=1'.
 
-RedHat/Centos/Scientific Linux 6, Fedora and similar Linux distributions
+RedHat/Centos/Scientific Linux 6 and 7, Fedora and similar Linux distributions
 
 You need the 'sqlite-devel' package.
 
@@ -699,7 +704,8 @@ For running the Postgresql tests you need a fully functional
 'postgresql-server' with a db user 'wolfusr' (password: 'wolfpwd') owning a
 database called 'wolframe'.
 
-Setting up a test user in PostgreSQL is done with:
+Setting up a test user in PostgreSQL on version 7 of Centos/RHEL/SciLi and
+Fedora is done with:
 
         postgresql-setup initdb
         systemctl start postgresql.service
@@ -981,7 +987,7 @@ If you don't need working iconv support for non-UTF8 character sets you may
 also try to use the provided packages 'libxml2-devel' and 'libxslt-devel' but
 we cannot recommend this.
 
-RedHat/Centos/Scientific Linux 6, Fedora and similar Linux distributions
+RedHat/Centos/Scientific Linux 6 and 7, Fedora and similar Linux distributions
 
 You need the 'libxml2-devel' and 'libxslt-devel' packages.
 
@@ -1087,7 +1093,7 @@ separately:
 Normally you should not change those flags by hand and rely on the results of
 the 'python-config' script.
 
-RedHat/Centos/Scientific Linux 5 and 6 and similar Linux distributions
+RedHat/Centos/Scientific Linux 5, 6 and 7 and similar Linux distributions
 
 There are no official Python packages for version 3 of Python. Build your own
 version of Python. Make sure the location of 'python3-config' is in your path.
