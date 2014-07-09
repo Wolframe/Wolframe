@@ -1,0 +1,4 @@
+modularized    - for platform with split module packages (RHEL/Fedora, SUSE, Debian,
+                 Ubuntu)
+monolythic     - for platforms where there is one 'wolframe' package (Slackware,
+                 FreeBSD, NetBSD, Solaris)
