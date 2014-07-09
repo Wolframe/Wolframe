@@ -71,6 +71,7 @@ f none opt/csw/lib/wolframe/modules/mod_normalize_base64.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_normalize_string.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_normalize_locale.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_print_harupdf.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_command_tdl.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_command_directmap.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_command_lua.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_command_python.so 0775 root staff

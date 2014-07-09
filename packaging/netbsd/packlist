@@ -61,6 +61,7 @@ usr/pkg/lib/wolframe/modules/mod_doctype_xml.so
 usr/pkg/lib/wolframe/modules/mod_doctype_json.so
 usr/pkg/lib/wolframe/modules/mod_graphix.so
 usr/pkg/lib/wolframe/modules/mod_print_harupdf.so
+usr/pkg/lib/wolframe/modules/mod_command_tdl.so
 @dirrm usr/pkg/lib/wolframe/modules
 usr/pkg/lib/wolframe/libwolframe_client.a
 usr/pkg/lib/wolframe/libwolframe_client.so.0.0.0

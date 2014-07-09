@@ -1393,6 +1393,8 @@ fi
 
 %{_libdir}/wolframe/modules/mod_command_aamap.so
 
+%{_libdir}/wolframe/modules/mod_command_tdl.so
+
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
 
