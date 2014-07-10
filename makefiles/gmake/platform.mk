@@ -294,6 +294,11 @@ ifeq "$(LINUX_REV)" "6"
 XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
 endif
 
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
+endif
+
 endif
 
 endif
@@ -475,6 +480,16 @@ BOOST_LIBRARY_TAG ?=
 endif
 endif
 
+# RHEL7
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "7"
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+endif
+
 # FreeBSD
 
 ifeq "$(PLATFORM)" "FREEBSD"
@@ -627,6 +642,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 OPENSSL_DIR ?=
 OPENSSL_INCLUDE_DIR ?=
 OPENSSL_INCLUDE_DIRS ?=
@@ -881,6 +906,14 @@ PAM_LIB_DIR ?= /lib
 PAM_LIBS ?= -lpam
 endif
 
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
@@ -1016,6 +1049,14 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
@@ -1203,6 +1244,14 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+SQLITE3_DIR ?= /usr
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
@@ -1454,6 +1503,22 @@ ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
 ORACLE_LIBS ?= -lclntsh
 endif
 
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+ORACLE_VERSION ?= 12.1
+ifeq "$(ARCH)" "x86_64"
+ORACLE_CLIENT_ARCH=client64
+else
+ORACLE_CLIENT_ARCH=client
+endif
+ORACLE_DIR ?= /usr/lib/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIR ?= /usr/include/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
+ORACLE_LIB_DIR ?= $(ORACLE_DIR)/lib
+ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
+ORACLE_LIBS ?= -lclntsh
+endif
+
 endif
 
 
@@ -1613,6 +1678,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
@@ -1833,6 +1908,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+LIBXML2_DIR ?= /usr
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
@@ -2069,6 +2154,16 @@ LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
 LIBXSLT_LIBS ?= -lxslt
 endif
 
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+LIBXSLT_DIR ?= /usr
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
 LIBXSLT_DIR ?= /usr
@@ -2248,6 +2343,11 @@ endif
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
 $(warning no recent enough libhpdf package on RHEL6, use WITH_LOCAL_LIBHPDF=1 instead)
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+$(warning no recent enough libhpdf package on RHEL7, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 # Fedora 19
@@ -2457,6 +2557,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+LIBPNG_DIR ?= /usr
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
+LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
+LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
+LIBPNG_LIBS ?= -lpng
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 LIBPNG_DIR ?= /usr
 LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
 LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
@@ -2693,6 +2803,16 @@ LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
 LIBZ_LIBS ?= -lz
 endif
 
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+LIBZ_DIR ?= /usr
+LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
+LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
+LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
+LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
+LIBZ_LIBS ?= -lz
+endif
+
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
 LIBZ_DIR ?= /usr
@@ -2913,6 +3033,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+ICU_DIR ?= /usr
+ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
+ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
+ICU_LIB_DIR ?= $(ICU_DIR)/lib
+ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
+ICU_LIBS ?=
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 ICU_DIR ?= /usr
 ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
 ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
@@ -3160,6 +3290,11 @@ endif
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
 $(warning no recent enough FreeImage package on RHEL6, use WITH_LOCAL_FREEIMAGE=1 instead)
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+$(warning no recent enough FreeImage package on RHEL7, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # Fedora 19
