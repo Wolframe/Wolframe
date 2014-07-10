@@ -9,6 +9,7 @@
 %define rhel 0
 %define rhel5 0
 %define rhel6 0
+%define rhel7 0
 %if 0%{?rhel_version} >= 500 && 0%{?rhel_version} <= 599
 %define dist rhel5
 %define rhel 1
@@ -18,6 +19,11 @@
 %define dist rhel6
 %define rhel 1
 %define rhel6 1
+%endif
+%if 0%{?rhel_version} >= 700 && 0%{?rhel_version} <= 799
+%define dist rhel7
+%define rhel 1
+%define rhel7 1
 %endif
 
 %define centos 0
@@ -35,6 +41,13 @@
 %define centos6 1
 %endif
 
+%define centos7 0
+%if 0%{?centos_version} >= 700 && 0%{?centos_version} <= 799
+%define dist centos7
+%define centos 1
+%define centos7 1
+%endif
+
 %define scilin 0
 %define scilin5 0
 %if 0%{?scilin_version} >= 500 && 0%{?scilin_version} <= 599
@@ -48,6 +61,13 @@
 %define dist scilin6
 %define scilin 1
 %define scilin6 1
+%endif
+
+%define scilin7 0
+%if 0%{?scilin_version} >= 700 && 0%{?scilin_version} <= 799
+%define dist scilin7
+%define scilin 1
+%define scilin7 1
 %endif
 
 %define fedora 0
@@ -125,9 +145,11 @@
 
 %define build_boost 0
 %if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel5} || %{centos5} || %{scilin5} || %{rhel6} || %{centos6} || %{scilin6} || %{sles}
 %define build_boost 1
 %define boost_version 1.48.0
 %define boost_underscore_version 1_48_0
+%endif
 %endif
 
 # icu for boost-locale is available natively only on a few platforms,
@@ -149,8 +171,8 @@
 %if %{build_boost}
 %define with_icu	1
 %if %{rhel}
-%if %{rhel6}
-# No icu-devel on RHEL6 on OSC due to license issues from Redhat!
+%if %{rhel6} || %{rhel7}
+# No icu-devel on RHEL6/7 on OSC due to license issues from Redhat!
 %define with_icu	0
 %endif
 %endif
@@ -161,14 +183,8 @@
 
 %if %{with_libxml2}
 %define build_libxml2 0
-%if %{rhel}
-%if %{rhel5}
-%define build_libxml2 1
-%define libxml2_version 2.9.1
-%endif
-%endif
-%if %{centos} || %{scilin}
-%if %{centos5} || %{scilin5}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel5} || %{centos5} || %{scilin5}
 %define build_libxml2 1
 %define libxml2_version 2.9.1
 %endif
@@ -180,14 +196,8 @@
 
 %if %{with_libxslt}
 %define build_libxslt 0
-%if %{rhel}
-%if %{rhel5}
-%define build_libxslt 1
-%define libxslt_version 1.1.28
-%endif
-%endif
-%if %{centos} || %{scilin}
-%if %{centos5} || %{scilin5}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel5} || %{centos5} || %{scilin5}
 %define build_libxslt 1
 %define libxslt_version 1.1.28
 %endif
@@ -198,25 +208,7 @@
 
 %if %{with_python}
 %define build_python 0
-%if %{rhel}
-%if %{rhel5} || %{rhel6}
-%define build_python 1
-%define python_version 3.3.2
-%endif
-%endif
-%if %{centos}
-%if %{centos5} || %{centos6}
-%define build_python 1
-%define python_version 3.3.2
-%endif
-%endif
-%if %{scilin}
-%if %{scilin5} || %{scilin6}
-%define build_python 1
-%define python_version 3.3.2
-%endif
-%endif
-%if %{sles}
+%if %{rhel} || %{centos} || %{scilin} || %{sles}
 %define build_python 1
 %define python_version 3.3.2
 %endif
@@ -224,7 +216,7 @@
 
 # init script to start the daemon
 
-%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel} || %{centos} || %{scilin}
 %define initscript	wolframed.initd.RHEL
 %endif
 %if %{sles}
@@ -305,11 +297,11 @@ BuildRequires: systemd
 
 %if %{build_boost}
 %if %{with_icu}
-%if %{centos} || %{scilin} || %{fedora} 
+%if %{centos} || %{scilin}
 BuildRequires: libicu-devel >= 3.6
 %endif
 %if %{rhel}
-%if !%{rhel6}
+%if !%{rhel6} && |%{rhel7}
 # see http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779
 BuildRequires: libicu-devel >= 3.6
 %endif
@@ -320,7 +312,7 @@ BuildRequires: libicu-devel >= 4.0
 %endif
 %else
 BuildRequires: boost-devel
-%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel} || %{centos} || %{scilin}
 Requires: boost >= 1.48
 Requires: boost-thread >= 1.48
 Requires: boost-date-time >= 1.48
@@ -439,27 +431,12 @@ BuildRequires: postgresql-devel >= 8.3
 %if !%{build_sqlite}
 %if %{with_sqlite}
 %if %{rhel} || %{scilin} || %{centos} || %{fedora}
-%if %{rhel}
-%if %{rhel5} || %{rhel6}
 BuildRequires: sqlite-devel >= 3.0
-# for testing only
 BuildRequires: sqlite >= 3.0
-%endif
-%else
-BuildRequires: sqlite-devel >= 3.0
-# for testing only
-BuildRequires: sqlite >= 3.0
-%endif
 %endif
 %if %{suse} || %{sles}
 BuildRequires: sqlite3-devel >= 3.0
-# for testing only
 BuildRequires: sqlite3 >= 3.0
-%endif
-%endif
-%if %{scilin}
-%if %{scilin6}
-BuildRequires: sqlite >= 3.0
 %endif
 %endif
 %endif
@@ -550,23 +527,11 @@ The Wolframe database module for Sqlite3.
 
 Requires: %{name} >= %{version}-%{release}
 %if %{rhel} || %{centos} || %{fedora}
-%if %{rhel}
-%if %{rhel5} || %{rhel6}
 Requires: sqlite >= 3.0
-%endif
-%else
-Requires: sqlite >= 3.0
-%endif
 %endif
 %if %{suse} || %{sles}
 Requires: sqlite3 >= 3.0
 %endif
-%if %{scilin}
-%if %{scilin6}
-Requires: sqlite >= 3.0
-%endif
-%endif
-
 %endif
 
 %if %{with_oracle}
@@ -802,8 +767,6 @@ cd ../%{name}-%{version}
 %else
 %if %{build_python}
 %setup -T -D -b 0 -b 4
-cd ../boost_%{boost_underscore_version}
-%patch -P 0 -p1
 cd ../%{name}-%{version}
 %else
 %setup
@@ -1205,12 +1168,20 @@ ln -s libxslt.so.%{libxslt_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxslt.s
 cp -P /tmp/Python-%{python_version}/lib/libpython* $RPM_BUILD_ROOT%{_libdir}/wolframe
 %endif
 
-%if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%else
 install -D -m775 packaging/redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
+%endif
 %endif
 
 %if %{fedora}
 install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%endif
+
+%if %{sles}
+install -D -m775 packaging/redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
 %endif
 
 %if %{suse}
@@ -1223,6 +1194,12 @@ install -D -m644 packaging/redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}
 
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/run/wolframe
+
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+install -D -m644 packaging/redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
+%endif
+%endif
 
 %if %{fedora}
 install -D -m644 packaging/redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
@@ -1242,7 +1219,21 @@ getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP}
 %endif
  
 # Don't enable Wolframe server at install time, just inform root how this is done
-%if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+echo
+echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
+echo
+echo "Use 'firewall-cmd --add-service=wolframe' to set the firewall rules"
+echo
+%else
+echo
+echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/chkconfig wolframed on' to enable the"
+echo Wolframe server at startup
+echo
+%endif
+%endif
+%if %{sles}
 echo
 echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/chkconfig wolframed on' to enable the"
 echo Wolframe server at startup
@@ -1274,7 +1265,16 @@ echo
 
 %preun
 if [ "$1" = 0 ]; then
-%if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+    systemctl stop wolframed.service   
+    systemctl disable wolframed.service
+%else
+    /etc/init.d/wolframed stop > /dev/null 2>&1
+    /sbin/chkconfig --del wolframed
+%endif
+%endif
+%if %{sles}
     /etc/init.d/wolframed stop > /dev/null 2>&1
     /sbin/chkconfig --del wolframed
 %endif
@@ -1300,15 +1300,19 @@ fi
 
 %files
 %defattr( -, root, root )
-%if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+%{_unitdir}/wolframed.service
+%else
 %attr( 554, root, root) %{_initrddir}/%{name}d
 %endif
-%if %{suse}
 %endif
-
 %if %{fedora}
 %dir %attr(0755, root, root) %{_unitdir}
 %{_unitdir}/wolframed.service
+%endif
+%if %{sles}
+%attr( 554, root, root) %{_initrddir}/%{name}d
 %endif
 %if %{suse}
 %if %{osu122} || %{osu123} || %{osu131}
@@ -1321,6 +1325,11 @@ fi
 %{_bindir}/wolfwizard
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+%{_prefix}/lib/firewalld/services/wolframe.xml
+%endif
+%endif
 %if %{fedora}
 %{_prefix}/lib/firewalld/services/wolframe.xml
 %endif
