@@ -104,7 +104,24 @@ public:
 	}
 
 	/// \brief Checks if a function tagged with AUTHORIZE( funcname, resource) is allowed to be executed
-	bool checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg);
+	bool checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg, bool allowIfNotExists=false);
+
+	enum BasicAuthorizationFunction
+	{
+		CONNECT,
+		PASSWD
+	};
+	static const char* basicAuthorizationFunctionName( BasicAuthorizationFunction n)
+	{
+		static const char* ar[] = {"CONNECT","PASSWD"};
+		return ar[n];
+	}
+
+	bool checkAuthorization( BasicAuthorizationFunction f)
+	{
+		std::string errmsg;
+		return checkAuthorization( basicAuthorizationFunctionName(f), "", errmsg, true);
+	}
 
 	/// \brief Create a new transaction object
 	db::Transaction* transaction( const std::string& name);
