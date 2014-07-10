@@ -296,6 +296,16 @@ usr/pkg/include/wolframe/crypto/md5.h
 usr/pkg/include/wolframe/crypto/sha1.h
 usr/pkg/include/wolframe/crypto/sha2.h
 @dirrm usr/pkg/include/wolframe/crypto
+usr/pkg/include/wolframe/system/SSLcertificateInfo.hpp
+usr/pkg/include/wolframe/system/addressRestriction.hpp
+usr/pkg/include/wolframe/system/connectionEndpoint.hpp
+usr/pkg/include/wolframe/system/connectionHandler.hpp
+usr/pkg/include/wolframe/system/errorCode.hpp
+usr/pkg/include/wolframe/system/globalRngGen.hpp
+usr/pkg/include/wolframe/system/objectPool.hpp
+usr/pkg/include/wolframe/system/randomGenerator.hpp
+usr/pkg/include/wolframe/system/serverEndpoint.hpp
+@dirrm usr/pkg/include/wolframe/system
 @dirrm usr/pkg/include/wolframe
 usr/pkg/bin/wolfilter
 usr/pkg/bin/wolfwizard

@@ -1476,6 +1476,8 @@ fi
 %{_includedir}/wolframe/module/*.hpp
 %dir %{_includedir}/wolframe/prgbind/
 %{_includedir}/wolframe/prgbind/*.hpp
+%dir %{_includedir}/wolframe/system/
+%{_includedir}/wolframe/system/*.hpp
 
 %if %{with_pgsql}
 %files postgresql
