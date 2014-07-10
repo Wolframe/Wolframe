@@ -55,7 +55,8 @@ server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandl
 	for ( std::list<ServerTCPendpoint>::const_iterator it = conf->address.begin();
 	      it != conf->address.end(); it++ )	{
 		acceptor* acptr = new acceptor( m_IOservice,
-						it->host(), it->port(), it->maxConnections(), it->identifier(),
+						it->host(), it->port(), it->maxConnections(),
+						it->identifier(), it->addressRestriction(),
 						m_globalList,
 						serverHandler );
 		m_acceptors.push_back( acptr );
@@ -70,7 +71,9 @@ server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandl
 						      it->certificate(), it->key(),
 						      it->verifyClientCert(),
 						      it->CAchain(), it->CAdirectory(),
-						      it->host(), it->port(), it->maxConnections(), it->identifier(),
+						      it->host(), it->port(),
+						      it->maxConnections(), it->identifier(),
+						      it->addressRestriction(),
 						      m_globalList,
 						      serverHandler );
 		m_SSLacceptors.push_back( acptr );

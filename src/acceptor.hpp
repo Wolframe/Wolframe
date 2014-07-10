@@ -48,6 +48,7 @@
 
 #include "connection.hpp"
 #include "system/connectionHandler.hpp"
+#include "system/addressRestriction.hpp"
 
 namespace _Wolframe {
 namespace net {
@@ -61,6 +62,7 @@ public:
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, unsigned short port, unsigned maxConnections,
 			   const std::string& socketIdentifier_,
+			   const AddressRestriction& addressRestriction_,
 			   GlobalConnectionList& globalList,
 			   _Wolframe::ServerHandler& srvHandler );
 
@@ -87,6 +89,7 @@ private:
 
 	std::string				m_identifier;	///< ip:port
 	std::string				m_socketIdentifier;	///< identifier in configuration
+	AddressRestriction			m_addressRestriction; ///< configured set of authorization restrictions based on remote end point ip address
 
 	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.
 };
@@ -105,6 +108,7 @@ public:
 			      bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			      const std::string& host, unsigned short port, unsigned maxConnections,
 			      const std::string& socketIdentifier_,
+			      const AddressRestriction& addressRestriction_,
 			      GlobalConnectionList& globalList,
 			      _Wolframe::ServerHandler& srvHandler );
 
@@ -135,6 +139,7 @@ private:
 
 	std::string				m_identifier;	///< ip:port
 	std::string				m_socketIdentifier;	///< identifier in configuration
+	AddressRestriction			m_addressRestriction; ///< configured set of authorization restrictions based on remote end point ip address
 
 	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.
 };

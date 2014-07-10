@@ -40,7 +40,8 @@
 #include "config/valueParser.hpp"
 #include "appProperties.hpp"
 #include "logger-v1.hpp"
-
+#include "system/addressRestriction.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "utils/fileUtils.hpp"
 #include <boost/algorithm/string.hpp>
@@ -58,7 +59,6 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			   const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
-
 	bool threadsDefined, maxConnDefined;
 	threadsDefined = maxConnDefined = false;
 
@@ -80,6 +80,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			unsigned short	maxConn = 0;
 			bool portDefined, connDefined;
 			portDefined = connDefined = false;
+			AddressRestriction restrictions;
 
 			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 			      L2it != L1it->second.end(); L2it++ )	{
@@ -108,6 +109,9 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
 						retVal = false;
 				}
+				else if (boost::algorithm::iequals( L2it->first, "allow" ))	{
+					restrictions.defineAddressAllowed( L2it->second.data());
+				}
 				else
 					LOG_WARNING << logPrefix() << "socket: unknown configuration option: '"
 						    << L2it->first << "'";
@@ -115,7 +119,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			if ( port == 0 )
 				port = net::defaultTCPport();
 
-			net::ServerTCPendpoint lep( host, port, identifier, maxConn );
+			net::ServerTCPendpoint lep( host, port, identifier, maxConn, restrictions );
 			address.push_back( lep );
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "SSLsocket" ))	{
@@ -130,6 +134,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			bool		verify = false;
 			bool portDefined, connDefined, verifyDefined;
 			portDefined = connDefined = verifyDefined = false;
+			AddressRestriction restrictions;
 
 			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 			      L2it != L1it->second.end(); L2it++ )	{
@@ -158,7 +163,9 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
 						retVal = false;
 				}
-
+				else if (boost::algorithm::iequals( L2it->first, "allow" ))	{
+					restrictions.defineAddressAllowed( L2it->second.data());
+				}
 				else if ( boost::algorithm::iequals( L2it->first, "certificate" ))	{
 					bool isDefined = ( ! certFile.empty());
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, certFile, &isDefined ))
@@ -192,7 +199,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			if ( port == 0 )
 				port = net::defaultSSLport();
 
-			net::ServerSSLendpoint lep( host, port, identifier, maxConn,
+			net::ServerSSLendpoint lep( host, port, identifier, maxConn, restrictions,
 						    certFile, keyFile,
 						    verify, CAdirectory, CAchainFile );
 			SSLaddress.push_back( lep );

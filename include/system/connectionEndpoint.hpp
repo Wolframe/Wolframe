@@ -38,6 +38,7 @@
 #define _CONNECTION_ENDPOINT_HPP_INCLUDED
 
 #include <string>
+#include <vector>
 #include <sstream>
 #include <ctime>
 
@@ -87,7 +88,6 @@ private:
 	std::string	m_host;
 	unsigned short	m_port;
 };
-
 
 /// Local connection endpoints
 /// base class for local endpoint
