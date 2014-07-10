@@ -161,6 +161,8 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 			LOG_FATAL << "Impossible remote connection type !";
 			abort();
 	}
+	// Propagate setPeer to the command handler
+	m_cmdHandler.setPeer( remote);
 
 	// Check if the connection is allowed
 	if (( m_authorization = m_globalCtx.aaaa().authorizer()))	{
@@ -180,8 +182,13 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		LOG_WARNING << "Authorization not available";
 		//		abort();
 	}
-	// Propagate setPeer to the command handler
-	m_cmdHandler.setPeer( remote);
+	if (!m_execContext.checkAuthorization( proc::ExecContext::CONNECT))
+	{
+		LOG_DEBUG << "Connection from " << m_remoteEP->toString()
+			  << " to " << m_localEP->toString() << " not authorized (CONNECT)";
+		// close the connection
+		m_state = FORBIDDEN;
+	}
 }
 
 static void logNetwork( const char* title, const void* ptr, std::size_t size)

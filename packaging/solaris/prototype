@@ -306,6 +306,16 @@ f none opt/csw/include/wolframe/crypto/PBKDF2.hpp 0644 root staff
 f none opt/csw/include/wolframe/crypto/md5.h 0644 root staff
 f none opt/csw/include/wolframe/crypto/sha1.h 0644 root staff
 f none opt/csw/include/wolframe/crypto/sha2.h 0644 root staff
+d none opt/csw/include/wolframe/system 0755 root root
+f none opt/csw/include/wolframe/system/SSLcertificateInfo.hpp 0644 root staff
+f none opt/csw/include/wolframe/system/addressRestriction.hpp 0644 root staff
+f none opt/csw/include/wolframe/system/connectionEndpoint.hpp 0644 root staff
+f none opt/csw/include/wolframe/system/connectionHandler.hpp 0644 root staff
+f none opt/csw/include/wolframe/system/errorCode.hpp 0644 root staff
+f none opt/csw/include/wolframe/system/globalRngGen.hpp 0644 root staff
+f none opt/csw/include/wolframe/system/objectPool.hpp 0644 root staff
+f none opt/csw/include/wolframe/system/randomGenerator.hpp 0644 root staff
+f none opt/csw/include/wolframe/system/serverEndpoint.hpp 0644 root staff
 d none opt/csw/bin ? ? ?
 f none opt/csw/bin/wolfpasswd 0775 root staff
 f none opt/csw/bin/wolfilter 0775 root staff

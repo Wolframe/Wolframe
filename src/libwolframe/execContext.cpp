@@ -52,7 +52,7 @@ db::Transaction* ExecContext::transaction( const std::string& name)
 	}
 }
 
-bool ExecContext::checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg)
+bool ExecContext::checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg, bool allowIfNotExists)
 {
 	if (funcname.empty()) return true;
 	try
@@ -60,6 +60,7 @@ bool ExecContext::checkAuthorization( const std::string& funcname, const std::st
 		const langbind::AuthorizationFunction* func = m_provider->authorizationFunction( funcname);
 		if (func == 0)
 		{
+			if (allowIfNotExists) return true;
 			errmsg = std::string("authorization function '") + funcname + "' is not defined";
 			return false;
 		}

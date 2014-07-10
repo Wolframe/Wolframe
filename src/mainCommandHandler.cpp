@@ -53,7 +53,8 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 	{
 		Unauthenticated,
 		Authentication,
-		Authenticated
+		Authenticated,
+		Authenticated_passwd
 	};
 
 	MainSTM()
@@ -68,6 +69,12 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 				.cmd< &MainCommandHandler::doQuit >( "QUIT")
 				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
 			[Authenticated]
+				.cmd< &MainCommandHandler::doRequest >( "REQUEST")
+				.cmd< &MainCommandHandler::doInterface >( "INTERFACE")
+				.cmd< &MainCommandHandler::doAuth >( "AUTH")
+				.cmd< &MainCommandHandler::doQuit >( "QUIT")
+				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
+			[Authenticated_passwd]
 				.cmd< &MainCommandHandler::doRequest >( "REQUEST")
 				.cmd< &MainCommandHandler::doInterface >( "INTERFACE")
 				.cmd< &MainCommandHandler::doAuth >( "AUTH")
@@ -176,7 +183,14 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 		{
 			out << "OK authenticated" << endl();
 			execContext()->setUser( usr);
-			return MainSTM::Authenticated;
+			if (execContext()->checkAuthorization( proc::ExecContext::PASSWD))
+			{
+				return MainSTM::Authenticated_passwd;
+			}
+			else
+			{
+				return MainSTM::Authenticated;
+			}
 		}
 		else
 		{
