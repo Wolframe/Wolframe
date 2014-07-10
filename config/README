@@ -1,0 +1,15 @@
+modularized    - for platform with split module packages (RHEL/Fedora, SUSE, Debian,
+                 Ubuntu)
+monolythic     - for platforms where there is one 'wolframe' package (Slackware,
+                 FreeBSD, NetBSD, Solaris)
+
+style guide:
+- visible on 79x24 terminal
+- no tabs, use 4 spaces
+- minimal documentation, main documentation goes to man page,
+  explanations and examples got to Wolfbook
+- default options and modules should require as little external
+  libraries as possible, for instance mod_db_sqlite3 should not
+  be enabled by default neither in the monolythic nor in the
+  modularized confiugration (the later has a separate config snippet,
+  the former is per default commented out)

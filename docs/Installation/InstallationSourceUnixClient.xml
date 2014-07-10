@@ -76,7 +76,7 @@
 </sect3>
 
 <sect3>
-	<title>RedHat/Centos/Scientific Linux 6 and similar Linux distributions</title>
+	<title>RedHat/Centos/Scientific Linux 6 and 7 or similar Linux distributions</title>
 	
 	<para>
 		For Qt 4 you need the 'qt4-devel' package.

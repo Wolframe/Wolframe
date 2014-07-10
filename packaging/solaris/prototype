@@ -71,6 +71,7 @@ f none opt/csw/lib/wolframe/modules/mod_normalize_base64.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_normalize_string.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_normalize_locale.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_print_harupdf.so 0775 root staff
+f none opt/csw/lib/wolframe/modules/mod_command_tdl.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_command_directmap.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_command_lua.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_command_python.so 0775 root staff
@@ -142,7 +143,8 @@ f none opt/csw/include/wolframe/version.hpp 0644 root staff
 f none opt/csw/include/wolframe/platform.hpp 0644 root staff
 f none opt/csw/include/wolframe/wolframe.hpp 0644 root staff
 d none opt/csw/include/wolframe/langbind 0755 root root
-f none opt/csw/include/wolframe/langbind/authorization.hpp 0644 root staff
+f none opt/csw/include/wolframe/langbind/auditFunction.hpp 0644 root staff
+f none opt/csw/include/wolframe/langbind/authorizationFunction.hpp 0644 root staff
 f none opt/csw/include/wolframe/langbind/ddlCompilerInterface.hpp 0644 root staff
 f none opt/csw/include/wolframe/langbind/formFunction.hpp 0644 root staff
 f none opt/csw/include/wolframe/langbind/input.hpp 0644 root staff
@@ -168,7 +170,6 @@ f none opt/csw/include/wolframe/database/baseStatement.hpp 0644 root staff
 f none opt/csw/include/wolframe/database/database.hpp 0644 root staff
 f none opt/csw/include/wolframe/database/databaseError.hpp 0644 root staff
 f none opt/csw/include/wolframe/database/databaseLanguage.hpp 0644 root staff
-f none opt/csw/include/wolframe/database/loadTransactionProgram.hpp 0644 root staff
 f none opt/csw/include/wolframe/database/statement.hpp 0644 root staff
 f none opt/csw/include/wolframe/database/substitutingStatement.hpp 0644 root staff
 f none opt/csw/include/wolframe/database/transaction.hpp 0644 root staff
@@ -239,6 +240,7 @@ f none opt/csw/include/wolframe/filter/filterbase.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filterdef.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/inputfilter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/inputfilterScope.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/joinfilter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/null_filter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/outputfilter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/ptreefilter.hpp 0644 root staff
@@ -249,7 +251,6 @@ f none opt/csw/include/wolframe/filter/typedfilter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/typedfilterScope.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/typingfilter.hpp 0644 root staff
 d none opt/csw/include/wolframe/types 0755 root root
-f none opt/csw/include/wolframe/types/authorizationFunction.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/base64.h 0644 root staff
 f none opt/csw/include/wolframe/types/base64.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/bignumber.hpp 0644 root staff
@@ -296,7 +297,6 @@ f none opt/csw/include/wolframe/prgbind/ddlProgram.hpp 0644 root staff
 f none opt/csw/include/wolframe/prgbind/normalizeProgram.hpp 0644 root staff
 f none opt/csw/include/wolframe/prgbind/program.hpp 0644 root staff
 f none opt/csw/include/wolframe/prgbind/programLibrary.hpp 0644 root staff
-f none opt/csw/include/wolframe/prgbind/transactionProgram.hpp 0644 root staff
 d none opt/csw/include/wolframe/crypto 0755 root root
 f none opt/csw/include/wolframe/crypto/AES256.h 0644 root staff
 f none opt/csw/include/wolframe/crypto/HMAC.h 0644 root staff

@@ -652,6 +652,15 @@ export PATH
 			</sect4>
 
 			<sect4>
+				<title>RedHat/Centos/Scientific Linux 7 and similar Linux distributions</title>
+				
+				<para>
+					You need the 'boost-devel' package. This package
+					contains also the boost-locale and ICU backend.
+				</para>
+			</sect4>
+
+			<sect4>
 				<title>Fedora and similar Linux distributions</title>
 				
 				<para>
@@ -1041,7 +1050,7 @@ export PATH
 			</sect3>
 
 			<sect3>
-				<title>RedHat/Centos/Scientific Linux 6, Fedora and similar Linux distributions</title>
+				<title>RedHat/Centos/Scientific Linux 6 and 7, Fedora and similar Linux distributions</title>
 				
 				<para>
 					You need the 'sqlite-devel' package.
@@ -1190,7 +1199,8 @@ export PATH
 				</para>
 				
 				<para>
-					Setting up a test user in PostgreSQL is done with:
+					Setting up a test user in PostgreSQL on version 7 of Centos/RHEL/SciLi and Fedora 
+					is done with:
 					<programlisting language='shell'>
 	postgresql-setup initdb
 	systemctl start postgresql.service
@@ -1639,7 +1649,7 @@ export PATH
 			</sect3>
 
 			<sect3>
-				<title>RedHat/Centos/Scientific Linux 6, Fedora and similar Linux distributions</title>
+				<title>RedHat/Centos/Scientific Linux 6 and 7, Fedora and similar Linux distributions</title>
 				
 				<para>
 					You need the 'libxml2-devel' and 'libxslt-devel' packages.
@@ -1845,7 +1855,7 @@ export PATH
 			</para>
 							
 			<sect3>
-				<title>RedHat/Centos/Scientific Linux 5 and 6 and similar Linux distributions</title>
+				<title>RedHat/Centos/Scientific Linux 5, 6 and 7 and similar Linux distributions</title>
 				
 				<para>
 					There are no official Python packages for version 3 of Python.

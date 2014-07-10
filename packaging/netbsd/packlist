@@ -61,6 +61,7 @@ usr/pkg/lib/wolframe/modules/mod_doctype_xml.so
 usr/pkg/lib/wolframe/modules/mod_doctype_json.so
 usr/pkg/lib/wolframe/modules/mod_graphix.so
 usr/pkg/lib/wolframe/modules/mod_print_harupdf.so
+usr/pkg/lib/wolframe/modules/mod_command_tdl.so
 @dirrm usr/pkg/lib/wolframe/modules
 usr/pkg/lib/wolframe/libwolframe_client.a
 usr/pkg/lib/wolframe/libwolframe_client.so.0.0.0
@@ -131,7 +132,8 @@ usr/pkg/include/wolframe/standardConfigs.hpp
 usr/pkg/include/wolframe/version.hpp
 usr/pkg/include/wolframe/platform.hpp
 usr/pkg/include/wolframe/wolframe.hpp
-usr/pkg/include/wolframe/langbind/authorization.hpp
+usr/pkg/include/wolframe/langbind/auditFunction.hpp
+usr/pkg/include/wolframe/langbind/authorizationFunction.hpp
 usr/pkg/include/wolframe/langbind/ddlCompilerInterface.hpp
 usr/pkg/include/wolframe/langbind/formFunction.hpp
 usr/pkg/include/wolframe/langbind/input.hpp
@@ -156,7 +158,6 @@ usr/pkg/include/wolframe/database/DBprovider.hpp
 usr/pkg/include/wolframe/database/database.hpp
 usr/pkg/include/wolframe/database/databaseError.hpp
 usr/pkg/include/wolframe/database/databaseLanguage.hpp
-usr/pkg/include/wolframe/database/loadTransactionProgram.hpp
 usr/pkg/include/wolframe/database/transaction.hpp
 usr/pkg/include/wolframe/database/transactionExecStatemachine.hpp
 usr/pkg/include/wolframe/database/vmTransactionInput.hpp
@@ -230,6 +231,7 @@ usr/pkg/include/wolframe/filter/filterbase.hpp
 usr/pkg/include/wolframe/filter/filterdef.hpp
 usr/pkg/include/wolframe/filter/inputfilter.hpp
 usr/pkg/include/wolframe/filter/inputfilterScope.hpp
+usr/pkg/include/wolframe/filter/joinfilter.hpp
 usr/pkg/include/wolframe/filter/null_filter.hpp
 usr/pkg/include/wolframe/filter/outputfilter.hpp
 usr/pkg/include/wolframe/filter/ptreefilter.hpp
@@ -240,7 +242,6 @@ usr/pkg/include/wolframe/filter/typedfilter.hpp
 usr/pkg/include/wolframe/filter/typedfilterScope.hpp
 usr/pkg/include/wolframe/filter/typingfilter.hpp
 @dirrm usr/pkg/include/wolframe/filter
-usr/pkg/include/wolframe/types/authorizationFunction.hpp
 usr/pkg/include/wolframe/types/base64.h
 usr/pkg/include/wolframe/types/base64.hpp
 usr/pkg/include/wolframe/types/byte2hex.h
@@ -285,7 +286,6 @@ usr/pkg/include/wolframe/prgbind/ddlProgram.hpp
 usr/pkg/include/wolframe/prgbind/normalizeProgram.hpp
 usr/pkg/include/wolframe/prgbind/program.hpp
 usr/pkg/include/wolframe/prgbind/programLibrary.hpp
-usr/pkg/include/wolframe/prgbind/transactionProgram.hpp
 @dirrm usr/pkg/include/wolframe/prgbind
 usr/pkg/include/wolframe/crypto/AES256.h
 usr/pkg/include/wolframe/crypto/HMAC.h
