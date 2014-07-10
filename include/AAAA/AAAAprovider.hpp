@@ -65,6 +65,7 @@ public:
 	void setCanonicalPathes( const std::string& referencePath );
 private:
 	std::string					m_randomDevice;
+	bool						m_authzConfigDefined;
 	std::list< config::NamedConfiguration* >	m_authConfig;
 	bool						m_authzDefault;
 	std::list< config::NamedConfiguration* >	m_authzConfig;
