@@ -285,6 +285,16 @@ usr/local/include/wolframe/crypto/md5.h
 usr/local/include/wolframe/crypto/sha1.h
 usr/local/include/wolframe/crypto/sha2.h
 @dirrm usr/local/include/wolframe/crypto
+usr/local/include/wolframe/system/SSLcertificateInfo.hpp
+usr/local/include/wolframe/system/addressRestriction.hpp
+usr/local/include/wolframe/system/connectionEndpoint.hpp
+usr/local/include/wolframe/system/connectionHandler.hpp
+usr/local/include/wolframe/system/errorCode.hpp
+usr/local/include/wolframe/system/globalRngGen.hpp
+usr/local/include/wolframe/system/objectPool.hpp
+usr/local/include/wolframe/system/randomGenerator.hpp
+usr/local/include/wolframe/system/serverEndpoint.hpp
+@dirrm usr/local/include/wolframe/system
 @dirrm usr/local/include/wolframe
 usr/local/bin/wolfilter
 usr/local/bin/wolfwizard

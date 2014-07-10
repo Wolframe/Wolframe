@@ -287,6 +287,15 @@ files:
  /usr/local/include/wolframe/crypto/md5.h: 'sha256sum'
  /usr/local/include/wolframe/crypto/sha1.h: 'sha256sum'
  /usr/local/include/wolframe/crypto/sha2.h: 'sha256sum'
+ /usr/local/include/wolframe/system/SSLcertificateInfo.hpp: 'sha256sum'
+ /usr/local/include/wolframe/system/addressRestriction.hpp: 'sha256sum'
+ /usr/local/include/wolframe/system/connectionEndpoint.hpp: 'sha256sum'
+ /usr/local/include/wolframe/system/connectionHandler.hpp: 'sha256sum'
+ /usr/local/include/wolframe/system/errorCode.hpp: 'sha256sum'
+ /usr/local/include/wolframe/system/globalRngGen.hpp: 'sha256sum'
+ /usr/local/include/wolframe/system/objectPool.hpp: 'sha256sum'
+ /usr/local/include/wolframe/system/randomGenerator.hpp: 'sha256sum'
+ /usr/local/include/wolframe/system/serverEndpoint.hpp: 'sha256sum'
 dirs:
 - /usr/local/etc
 - /usr/local/etc/wolframe
@@ -313,6 +322,7 @@ dirs:
 - /usr/local/include/wolframe/module
 - /usr/local/include/wolframe/prgbind
 - /usr/local/include/wolframe/crypto
+- /usr/local/include/wolframe/system
 - /usr/local/man/man1
 - /usr/local/man/man5
 - /usr/local/man/man8
