@@ -301,7 +301,7 @@ BuildRequires: systemd
 BuildRequires: libicu-devel >= 3.6
 %endif
 %if %{rhel}
-%if !%{rhel6} && |%{rhel7}
+%if !%{rhel6} && !%{rhel7}
 # see http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779
 BuildRequires: libicu-devel >= 3.6
 %endif
