@@ -1,0 +1,9 @@
+; Wolframe main configuration file
+
+$(eval "echo \"$(cat loadmodules.tmpl)\"")
+
+$(cat global.tmpl)
+
+$(cat daemon.tmpl)
+
+$(eval "echo \"$(cat sqlite.tmpl)\"")

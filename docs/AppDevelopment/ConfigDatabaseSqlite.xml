@@ -45,7 +45,8 @@ in Wolframe.
 			<entry>number</entry>
 			<entry>Number of simultaneous connections to the database.
 			Specifies the size of the pool of connections used
-			for database transactions.</entry>
+			for database transactions. The default number of connections
+			is 3 if not configured.</entry>
 		</row>
 		<row>
 			<entry>ForeignKeys</entry>
