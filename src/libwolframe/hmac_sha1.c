@@ -74,4 +74,8 @@ void hmac_sha1( const unsigned char *key, size_t keyLen,
 	sha1_update( &ctx, pad, HMAC_SHA1_BLOCK_SIZE );
 	sha1_update( &ctx, intermediateHash, HMAC_SHA1_HASH_SIZE );
 	sha1_final( &ctx, hash );
+
+	memset( pad, 0, HMAC_SHA1_BLOCK_SIZE );
+	memset( normalizedKey, 0, HMAC_SHA1_BLOCK_SIZE );
+	memset( intermediateHash, 0, HMAC_SHA1_BLOCK_SIZE );
 }
