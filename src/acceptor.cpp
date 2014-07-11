@@ -51,15 +51,15 @@ namespace net {
 
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port, unsigned maxConnections,
-		    const std::string& socketIdentifier_,
+		    const net::LocalEndpointConfig& localEndpointConfig_,
 		    const AddressRestriction& addressRestriction_,
 		    GlobalConnectionList& globalList,
 		    _Wolframe::ServerHandler& srvHandler ) :
 	m_IOservice( IOservice ),
 	m_strand( m_IOservice ),
 	m_acceptor( m_IOservice ),
-	m_connList ( maxConnections, globalList ),
-	m_socketIdentifier ( socketIdentifier_ ),
+	m_connList( maxConnections, globalList ),
+	m_localEndpointConfig( localEndpointConfig_ ),
 	m_addressRestriction( addressRestriction_ ),
 	m_srvHandler( srvHandler )
 {
@@ -76,7 +76,7 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	}
 	endpoint.port( port );
 
-	ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( host, port, m_socketIdentifier.c_str()));
+	ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( host, port, m_localEndpointConfig));
 	m_newConnection = connection_ptr( new connection( m_IOservice, &m_connList, handler ));
 
 	try	{
@@ -115,7 +115,8 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 			m_newConnection->start();
 	
 			ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( m_acceptor.local_endpoint().address().to_string(),
-												   m_acceptor.local_endpoint().port() ));
+												   m_acceptor.local_endpoint().port(),
+												   m_localEndpointConfig));
 			m_newConnection.reset( new connection( m_IOservice, &m_connList, handler ));
 		}
 		else
@@ -162,7 +163,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  const std::string& certFile, const std::string& keyFile,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			  const std::string& host, unsigned short port, unsigned maxConnections,
-			  const std::string& socketIdentifier_,
+			  const net::LocalEndpointConfig& localEndpointConfig_,
 			  const AddressRestriction& addressRestriction_,
 			  GlobalConnectionList& globalList,
 			  _Wolframe::ServerHandler& srvHandler) :
@@ -170,8 +171,8 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	m_strand( m_IOservice ),
 	m_acceptor( m_IOservice ),
 	m_SSLcontext( m_IOservice, boost::asio::ssl::context::sslv23 ),
-	m_connList ( maxConnections, globalList ),
-	m_socketIdentifier ( socketIdentifier_ ),
+	m_connList( maxConnections, globalList ),
+	m_localEndpointConfig( localEndpointConfig_ ),
 	m_addressRestriction( addressRestriction_ ),
 	m_srvHandler( srvHandler )
 {
@@ -236,7 +237,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
-	ConnectionHandler *handler = m_srvHandler.newConnection( LocalSSLendpoint( host, port, m_socketIdentifier.c_str()));
+	ConnectionHandler *handler = m_srvHandler.newConnection( LocalSSLendpoint( host, port, m_localEndpointConfig));
 	m_newConnection = SSLconnection_ptr( new SSLconnection( m_IOservice, m_SSLcontext, &m_connList, handler ));
 
 	m_acceptor.open( endpoint.protocol() );
@@ -266,7 +267,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 
 		ConnectionHandler *handler = m_srvHandler.newConnection( LocalSSLendpoint( m_acceptor.local_endpoint().address().to_string(),
 											   m_acceptor.local_endpoint().port(),
-											   m_socketIdentifier.c_str()));
+											   m_localEndpointConfig));
 		m_newConnection.reset( new SSLconnection( m_IOservice, m_SSLcontext, &m_connList, handler ));
 		m_acceptor.async_accept( m_newConnection->socket().lowest_layer(),
 					 m_strand.wrap( boost::bind( &SSLacceptor::handleAccept,

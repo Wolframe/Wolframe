@@ -84,7 +84,7 @@ Auditor* AAAAprovider::auditor() const
 AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* conf,
 						    const module::ModulesDirectory* modules )
 	: m_authenticator( conf->m_authConfig, modules ),
-	  m_authorizer( conf->m_authzConfig, conf->m_authzDefault || !conf->m_authzConfigDefined, modules ),
+	  m_authorizer( conf->m_authzConfig, conf->m_authzDefault, modules ),
 	  m_auditor( conf->m_auditConfig, modules )
 {
 	// initialize the global rnd generator

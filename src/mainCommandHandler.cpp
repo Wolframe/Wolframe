@@ -183,7 +183,8 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 		{
 			out << "OK authenticated" << endl();
 			execContext()->setUser( usr);
-			if (execContext()->checkAuthorization( proc::ExecContext::PASSWD))
+			if (execContext()->hasCapability( net::LocalEndpointConfig::PasswordChange)
+			&& execContext()->checkAuthorization( proc::ExecContext::PASSWD))
 			{
 				return MainSTM::Authenticated_passwd;
 			}

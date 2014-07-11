@@ -52,10 +52,10 @@ class ExecContext
 public:
 	/// \brief Default Constructor
 	ExecContext()
-		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0),m_remoteEndpoint(0),m_localEndpoint(0){}
+		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0),m_remoteEndpoint(0),m_localEndpoint(0),m_capabilities(0){}
 	/// \brief Constructor
 	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a)
-		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0){}
+		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0),m_remoteEndpoint(0),m_localEndpoint(0),m_capabilities(0){}
 
 	/// \brief Get the processor provider interface
 	const ProcessorProviderInterface* provider() const	{return m_provider;}
@@ -77,7 +77,7 @@ public:
 	void setDefaultTimeout( unsigned int timeout_sec_)	{m_default_timeout = timeout_sec_;}
 
 	/// \brief Get the socket identifier for authorization checks
-	const char* socketIdentifier() const			{return m_localEndpoint?m_localEndpoint->socketIdentifier():0;}
+	const char* socketIdentifier() const			{return m_localEndpoint?m_localEndpoint->config().socketIdentifier.c_str():0;}
 	/// \brief Get the remote endpoint for authorization checks
 	const net::RemoteEndpoint* remoteEndpoint() const	{return m_remoteEndpoint;}
 	/// \brief Get the local endpoint for authorization checks
@@ -90,6 +90,20 @@ public:
 	{
 		m_remoteEndpoint = remoteEndpoint_;
 		m_localEndpoint = localEndpoint_;
+		m_capabilities |= m_localEndpoint->config().capabilities;
+	}
+
+	typedef net::LocalEndpointConfig::ProtocolCapability Capability;
+
+	/// \brief Set a capability for this execution context
+	void setCapability( Capability c)
+	{
+		m_capabilities |= (1 << (unsigned char)c);
+	}
+	/// \brief Ask for a capability for this execution context
+	bool hasCapability( Capability c) const
+	{
+		return 0!=(m_capabilities & (1 << (unsigned char)c));
 	}
 
 	/// \brief Get an authenticator
@@ -106,17 +120,20 @@ public:
 	/// \brief Checks if a function tagged with AUTHORIZE( funcname, resource) is allowed to be executed
 	bool checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg, bool allowIfNotExists=false);
 
+	/// \brief Hardcoded basic authorization function enumeration
 	enum BasicAuthorizationFunction
 	{
 		CONNECT,
 		PASSWD
 	};
+	/// \brief Get the name of a basic function
 	static const char* basicAuthorizationFunctionName( BasicAuthorizationFunction n)
 	{
 		static const char* ar[] = {"CONNECT","PASSWD"};
 		return ar[n];
 	}
 
+	/// \brief Checks authorization for a basic function
 	bool checkAuthorization( BasicAuthorizationFunction f)
 	{
 		std::string errmsg;
@@ -144,6 +161,7 @@ private:
 	const net::RemoteEndpoint* m_remoteEndpoint;		///< remote end point of the connection
 	const net::LocalEndpoint* m_localEndpoint;		///< local end point of the connection
 	std::vector<std::string> m_dbstack;			///< stack for implementing current database as scope
+	unsigned int m_capabilities;				///< configured capability set
 };
 
 }} //namespace

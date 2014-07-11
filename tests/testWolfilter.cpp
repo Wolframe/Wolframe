@@ -152,7 +152,8 @@ TEST_P( WolfilterTest, tests)
 		AAAA::User* fakeuser = new AAAA::User( "WolfilterAuth", "NONE", "wolfilter", "Wolfilter");
 
 		execContext.setUser( fakeuser);
-		net::LocalTCPendpoint localEndPointFake( "localhost", 9876, "fakeSocketIdentifier");
+		net::LocalEndpointConfig localEndpointConfig( "fakeSocketIdentifier");
+		net::LocalTCPendpoint localEndPointFake( "localhost", 9876, localEndpointConfig);
 		net::RemoteTCPendpoint remoteEndPointFake( "123.123.123.123", 9876);
 		
 		execContext.setConnectionData( &remoteEndPointFake, &localEndPointFake);

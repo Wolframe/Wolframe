@@ -698,6 +698,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 								if (tok.empty()) throw std::runtime_error( "illegal file name in include directive");
 
 								std::vector<std::string> files = getIncludeFiles( getCanonicalPath( tok, includepath), filename);
+								std::sort( files.begin(), files.end());
 								std::vector<std::string>::const_iterator di = files.begin(), de = files.end();
 								for (; di != de; ++di)
 								{

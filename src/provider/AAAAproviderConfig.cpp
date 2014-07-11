@@ -47,7 +47,7 @@ namespace AAAA {
 /// constructor
 AAAAconfiguration::AAAAconfiguration()
 	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
-	  m_authzConfigDefined( false ), m_authzDefault( false ), m_mandatoryAudit( true )
+	  m_authzDefault( false ), m_mandatoryAudit( true )
 {}
 
 /// destructor
@@ -107,7 +107,6 @@ bool AAAAconfiguration::parse( const config::ConfigurationNode& pt, const std::s
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "Authorization" ))	{
-			m_authzConfigDefined = true;
 			std::string logStr = logPrefix() + "authorization: ";
 			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
