@@ -43,7 +43,8 @@ namespace _Wolframe	{
 	const char*	applicationName()			{ return "Wolframe"; }
 	const Version	applicationVersion()			{ return Version( WOLFRAME_MAJOR_VERSION,
 										  WOLFRAME_MINOR_VERSION,
-										  WOLFRAME_REVISION
+										  WOLFRAME_REVISION,
+										  WOLFRAME_BUILD
 										  ); }
 
 	const char*	config::defaultMainConfig()		{ return "/etc/wolframe.conf"; }
