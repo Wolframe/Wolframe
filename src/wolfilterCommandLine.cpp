@@ -155,9 +155,9 @@ struct WolfilterOptionStruct
 };
 
 #if defined( DEFAULT_MODULE_LOAD_DIR)
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir)
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined)
 #else
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool )
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool, bool useDefaultConfigIfNotDefined)
 #endif
 	:m_printhelp(false)
 	,m_printversion(false)
@@ -218,7 +218,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 #if !defined(_WIN32)
 		const char* defaultConfigFile = getDefaultConfigFile();
-		if (defaultConfigFile)
+		if (defaultConfigFile && useDefaultConfigIfNotDefined)
 		{
 			LOG_DEBUG << "No configuration file specified on command line. Using default configuration file '" << defaultConfigFile << "'";
 			configfile = defaultConfigFile;

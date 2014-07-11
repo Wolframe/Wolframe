@@ -62,7 +62,7 @@ int main( int argc, char **argv )
 			config::WolfilterCommandLine::print( std::cerr);
 			return 0;
 		}
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), "", true);
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), "", true, true);
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";

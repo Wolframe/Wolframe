@@ -133,7 +133,7 @@ TEST_P( WolfilterTest, tests)
 	std::string outstr;
 	{
 		LOG_DATA2 << "wolfilter parses its command line to get the test execution options";
-		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), false);
+		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), false, false);
 
 		// [2.5] Call iostreamfilter
 		if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;
