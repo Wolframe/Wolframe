@@ -1236,10 +1236,14 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-SQLITE3_DIR ?= /usr
+ifdef SQLITE3_DIR
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
+endif
+ifndef SQLITE3_DIR
+$(warning no recent enough sqlite3 package on RHEL 5, compile your own version and set SQLITE3_DIR accordingly)
+endif
 endif
 
 # RHEL6
