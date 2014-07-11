@@ -109,21 +109,19 @@ acceptor::~acceptor()
 void acceptor::handleAccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
+		LOG_TRACE << "Received new connection on " << m_identifier;
 		if (m_addressRestriction.isAllowed( m_newConnection->socket().remote_endpoint().address()))
 		{
-			LOG_TRACE << "Received new connection on " << m_identifier;
 			m_newConnection->start();
-	
-			ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( m_acceptor.local_endpoint().address().to_string(),
-												   m_acceptor.local_endpoint().port(),
-												   m_localEndpointConfig));
-			m_newConnection.reset( new connection( m_IOservice, &m_connList, handler ));
 		}
 		else
 		{
 			m_newConnection->deny_connection();
-			LOG_ERROR << "Denied new connection on " << m_identifier << " from " << m_newConnection->socket().remote_endpoint().address().to_string();
 		}
+		ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( m_acceptor.local_endpoint().address().to_string(),
+											   m_acceptor.local_endpoint().port(),
+											   m_localEndpointConfig));
+		m_newConnection.reset( new connection( m_IOservice, &m_connList, handler ));
 		m_acceptor.async_accept( m_newConnection->socket(),
 					 m_strand.wrap( boost::bind( &acceptor::handleAccept,
 								     this,
@@ -264,7 +262,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
 		LOG_DEBUG << "Received new connection on " << m_identifier;
-		if (!m_addressRestriction.isAllowed( m_newConnection->socket().lowest_layer().remote_endpoint().address()))
+		if (m_addressRestriction.isAllowed( m_newConnection->socket().lowest_layer().remote_endpoint().address()))
 		{
 			m_newConnection->start();
 		}
