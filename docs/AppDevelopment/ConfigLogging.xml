@@ -100,8 +100,8 @@ Example configuration:
 <programlisting language='text'>
 Logging
 {
-    stderr {
-        level INFO
+    Stderr {
+        Level INFO
     }
 }
 </programlisting>
@@ -112,15 +112,15 @@ Logging
 			<para>For defining the backend to log to a file, we
 			have to configure a subsection <code>LogFile</code> of the
 			<code>Logging</code> section. For logging to file we 
-			can define the logging level with <code>level</code>
-			and the file name with <code>filename</code>.
+			can define the logging level with <code>Level</code>
+			and the file name with <code>Filename</code>.
 Example configuration:
 <programlisting language='text'>
 Logging
 {
     LogFile {
-        filename  /var/log/wolframed.log
-        level     NOTICE
+        Filename /var/log/wolframed.log
+        Level NOTICE
     }
 }
 </programlisting>
@@ -129,19 +129,19 @@ Logging
 		<sect3>
 			<title>Backend syslog</title>
 			<para>For defining the backend to log to syslog, we
-			have to configure a subsection <code>syslog</code> of the
+			have to configure a subsection <code>Syslog</code> of the
 			<code>Logging</code> section. For logging to syslog we 
-			can define the logging level with <code>level</code>,
-			the syslog facility with <code>facility</code>
-			and the identifier with <code>ident</code>.
+			can define the logging level with <code>Level</code>,
+			the syslog facility with <code>Facility</code>
+			and the identifier with <code>Ident</code>.
 Example configuration:
 <programlisting language='text'>
 Logging
 {
-    syslog {
-        ident    wolframed
-        facility LOCAL2
-        level    INFO
+    Syslog {
+        Ident wolframed
+        Facility LOCAL2
+        Level INFO
     }
 }
 </programlisting>
@@ -151,19 +151,19 @@ Logging
 			<title>Backend eventlog</title>
 			<para>On Windows we can also log to eventlog.
 			For defining the backend to log to eventlog, we
-			have to configure a subsection <code>eventlog</code> of the
+			have to configure a subsection <code>Eventlog</code> of the
 			<code>Logging</code> section. For logging to eventlog we 
-			can define the logging level with <code>level</code>,
-			the eventlog source with <code>source</code>
-			and the identifier with <code>name</code>.
+			can define the logging level with <code>Level</code>,
+			the eventlog source with <code>Source</code>
+			and the identifier with <code>Name</code>.
 Example configuration:
 <programlisting language='text'>
 Logging
 {
-    eventlog	{
-        name   Wolframe
-        source wolframed
-        level  WARNING
+    Eventlog {
+        Name Wolframe
+        Source wolframed
+        Level WARNING
     }
 }
 </programlisting>

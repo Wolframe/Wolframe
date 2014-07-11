@@ -60,7 +60,13 @@ using namespace _Wolframe::config;
 #define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
 
 //TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a src/libwolframed.a -> Issue #95)
-static const char* defaultMainConfig()		{ return "/etc/wolframe.conf"; }
+static const char* defaultMainConfig()		{
+#ifdef DEFAULT_MAIN_CONFIGURATION_FILE
+		return DEFAULT_MAIN_CONFIGURATION_FILE;
+#else
+		return "/etc/wolframe/wolframe.conf";
+#endif
+	}
 static const char* defaultUserConfig()		{ return "~/wolframe.conf"; }
 static const char* defaultLocalConfig()		{ return "./wolframe.conf"; }
 static const char* getDefaultConfigFile()

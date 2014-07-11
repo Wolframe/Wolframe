@@ -52,6 +52,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	prefix=/opt/csw \
 	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	help
 
@@ -69,6 +70,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	prefix=/opt/csw \
 	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	config
 	
@@ -86,6 +88,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	prefix=/opt/csw \
 	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	config
 
@@ -103,6 +106,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	prefix=/opt/csw \
 	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man
 check_for_errors
 
@@ -120,6 +124,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	prefix=/opt/csw \
 	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	testreport
 check_for_errors
@@ -138,6 +143,7 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	prefix=/opt/csw \
 	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION \
 	install

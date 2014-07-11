@@ -91,9 +91,9 @@ Listener
 {
     Socket
     {
-        address     localhost
-        port        7662
-        identifier  "Interface 1"
+        Address localhost
+        Port 7661
+        Identifier "Interface 1"
     }
 }
 	</programlisting>
@@ -155,7 +155,7 @@ Listener
 				<entry>SSL CA chain file</entry>
 			</row>
 			<row>
-				<entry>verify</entry>
+				<entry>Verify</entry>
 				<entry>ON/OFF switch to enabe/disable client certificate verification</entry>
 			</row>
 		</tbody>
@@ -167,14 +167,14 @@ Listener
 {
     SslSocket
     {
-        address        localhost
-        port           7662
-        identifier     "Interface 1"
-        maxConnections 2
-        certificate    SSL/wolframed.crt
-        key            SSL/wolframed.key
-        CAchainFile    SSL/CAchain.pem
-        verify         OFF
+        Address localhost
+        Port 7961
+        Identifier "Interface 1"
+        MaxConnections 2
+        Certificate SSL/wolframed.crt
+        key SSL/wolframed.key
+        CAchainFile SSL/CAchain.pem
+        Verify Off
     }
 }
 	</programlisting>
