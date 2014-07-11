@@ -45,43 +45,43 @@ to the global configuration section
 .PP
 The following directives are valid in this section:
 .PP
-\fBidentifier \fR\fB\fIidentifier\fR\fR
+\fBIdentifier \fR\fB\fIidentifier\fR\fR
 .RS 4
 Register the configured database connection with name
 \fIidentifier\fR\&. You can later reference it by that name when an identifier of a database connection is needed\&. This parameter is required\&.
 .RE
 .PP
-\fBhost \fR\fB\fIhostname\fR\fR
+\fBHost \fR\fB\fIhostname\fR\fR
 .RS 4
 Address of the PostgreSQL database server\&.
 .RE
 .PP
-\fBport \fR\fB\fIport\fR\fR
+\fBPort \fR\fB\fIport\fR\fR
 .RS 4
 Port of the PostgreSQL database server\&. The default is 5432\&.
 .RE
 .PP
-\fBdatabase \fR\fB\fIdatabasename\fR\fR
+\fBDatabase \fR\fB\fIdatabasename\fR\fR
 .RS 4
 Name of the database to connect to\&.
 .RE
 .PP
-\fBuser \fR\fB\fIuser\fR\fR
+\fBUser \fR\fB\fIuser\fR\fR
 .RS 4
 User to connect to the database with\&.
 .RE
 .PP
-\fBpassword \fR\fB\fIpassword\fR\fR
+\fBPassword \fR\fB\fIpassword\fR\fR
 .RS 4
 Password to connect to the database with\&.
 .RE
 .PP
-\fBconnectionTimeout \fR\fB\fIseconds\fR\fR
+\fBConnectionTimeout \fR\fB\fIseconds\fR\fR
 .RS 4
 Connection timeout in seconds\&.
 .RE
 .PP
-\fBconnections \fR\fB\fIconnections\fR\fR
+\fBConnections \fR\fB\fIconnections\fR\fR
 .RS 4
 Number of parallel connections used to connect to the database\&. This creates a pool of size
 \fIconnections\fR
@@ -98,7 +98,7 @@ Maximum time allowed to acquire a database connection in seconds\&.
 The maximum allowed time to execute a statement in milliseconds\&.
 .RE
 .PP
-\fBsslMode \fR\fB\fIdisabled\fR\fR\fB | \fR\fB\fIallow\fR\fR\fB | \fR\fB\fIprefer\fR\fR\fB | \fR\fB\fIrequire\fR\fR\fB | \fR\fB\fIverify\-ca\fR\fR\fB \fR
+\fBSslMode \fR\fB\fIdisabled\fR\fR\fB | \fR\fB\fIallow\fR\fR\fB | \fR\fB\fIprefer\fR\fR\fB | \fR\fB\fIrequire\fR\fR\fB | \fR\fB\fIverify\-ca\fR\fR\fB \fR
 .RS 4
 Possible values are:
 .PP
@@ -134,22 +134,22 @@ Only try an SSL connection, verify that the server certificate is issued by a tr
 .sp
 .RE
 .PP
-\fBsslCert \fR\fB\fIfilename\fR\fR
+\fBSslCert \fR\fB\fIfilename\fR\fR
 .RS 4
 The file name of the client SSL certificate in case of an SSL connection to the database\&.
 .RE
 .PP
-\fBsslKey \fR\fB\fIfilename\fR\fR
+\fBSslKey \fR\fB\fIfilename\fR\fR
 .RS 4
 The file with the secret key used for the client certificate in case of an SSL connection to the database\&.
 .RE
 .PP
-\fBsslRootCert \fR\fB\fIfilename\fR\fR
+\fBSslRootCert \fR\fB\fIfilename\fR\fR
 .RS 4
 The File name of the root SSL CA certificate in case of an SSL connection to the database\&.
 .RE
 .PP
-\fBsslCRL \fR\fB\fIfilename\fR\fR
+\fBSslCRL \fR\fB\fIfilename\fR\fR
 .RS 4
 The File name of the SSL certificate revocation list (CRL) in case of an SSL connection to the database\&.
 .RE

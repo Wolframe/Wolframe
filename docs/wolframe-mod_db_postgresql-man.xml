@@ -98,41 +98,6 @@
 			to the global configuration section <emphasis role="bold">database</emphasis>.
 		</para>
 		
-<!--
-	PostgreSQL	{					; PostgreSQL database.
-		identifier	pgdb				; Database identifier. Used by other definitions.
-		host		localhost			; Database host. Uses the unix socket if not defined.
-		port		5432				; Database port. Uses the default port if not defined.
-		database	wolframe			; Database name.
-		user		wolfusr				; Database user.
-		password	wolfpwd				; Password for the database user.
-		connectionTimeout 10				; connection timeout in seconds
-								; 0 to disable, default 30s
-		connections	4				; number of parallel connections to the database
-								; Default is 4
-		acquireTimeout	10				; maximum allowed time to acquire a database
-								; connection in seconds.
-		sslMode		prefer				; how should a SSL TCP/IP connection be negotiated with the server
-								; Possible values:
-								;   disable	only try a non-SSL connection
-								;   allow	first try a non-SSL connection;
-								;		if that fails, try an SSL connection
-								;   prefer 	default. first try an SSL connection;
-								;		if that fails, try a non-SSL connection
-								;   require	only try an SSL connection.
-								;		If a root CA file is present, verify the certificate
-								;   verify-ca	only try an SSL connection, and verify that the server
-								;		certificate is issued by a trusted CA
-								;   verify-full	only try an SSL connection, verify that the server
-								;		certificate is issued by a trusted CA and that
-								;		the server hostname matches that in the certificate
-		sslCert		../tests/SSL/wolframed.crt	; the file name of the client SSL certificate
-		sslKey		../tests/SSL/wolframed.key	; the secret key used for the client certificate
-		sslRootCert	../tests/SSL/CAchain.pem	; file name of the root SSL CA certificate
-;		sslCRL						; file name of the SSL certificate revocation list (CRL)
-;		statementTimeout 30000				; maximum allowed time to execute a statement
-								; NOTE: this timeout is in milliseconds
--->
 		<refsect2 id="PostgreSQL">
 			<title>PostgreSQL</title>
 		
@@ -141,7 +106,7 @@
 			<variablelist>
 				<varlistentry>
 					<term>
-						<option>identifier <replaceable>identifier</replaceable></option>
+						<option>Identifier <replaceable>identifier</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -155,7 +120,7 @@
 
 				<varlistentry>
 					<term>
-						<option>host <replaceable>hostname</replaceable></option>
+						<option>Host <replaceable>hostname</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -166,7 +131,7 @@
 
 				<varlistentry>
 					<term>
-						<option>port <replaceable>port</replaceable></option>
+						<option>Port <replaceable>port</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -178,7 +143,7 @@
 
 				<varlistentry>
 					<term>
-						<option>database <replaceable>databasename</replaceable></option>
+						<option>Database <replaceable>databasename</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -189,7 +154,7 @@
 
 				<varlistentry>
 					<term>
-						<option>user <replaceable>user</replaceable></option>
+						<option>User <replaceable>user</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -200,7 +165,7 @@
 
 				<varlistentry>
 					<term>
-						<option>password <replaceable>password</replaceable></option>
+						<option>Password <replaceable>password</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -211,7 +176,7 @@
 
 				<varlistentry>
 					<term>
-						<option>connectionTimeout <replaceable>seconds</replaceable></option>
+						<option>ConnectionTimeout <replaceable>seconds</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -222,7 +187,7 @@
 
 				<varlistentry>
 					<term>
-						<option>connections <replaceable>connections</replaceable></option>
+						<option>Connections <replaceable>connections</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -257,7 +222,7 @@
 
 				<varlistentry>
 					<term>
-						<option>sslMode
+						<option>SslMode
 						<replaceable>disabled</replaceable> | <replaceable>allow</replaceable> | <replaceable>prefer</replaceable> | <replaceable>require</replaceable> | <replaceable>verify-ca</replaceable>
 						</option>
 					</term>
@@ -326,7 +291,7 @@
 
 				<varlistentry>
 					<term>
-						<option>sslCert <replaceable>filename</replaceable></option>
+						<option>SslCert <replaceable>filename</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -337,7 +302,7 @@
 
 				<varlistentry>
 					<term>
-						<option>sslKey <replaceable>filename</replaceable></option>
+						<option>SslKey <replaceable>filename</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -348,7 +313,7 @@
 
 				<varlistentry>
 					<term>
-						<option>sslRootCert <replaceable>filename</replaceable></option>
+						<option>SslRootCert <replaceable>filename</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -359,7 +324,7 @@
 
 				<varlistentry>
 					<term>
-						<option>sslCRL <replaceable>filename</replaceable></option>
+						<option>SslCRL <replaceable>filename</replaceable></option>
 					</term>
 					<listitem>
 						<para>

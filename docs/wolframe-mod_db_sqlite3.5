@@ -45,36 +45,36 @@ to the global configuration section
 .PP
 The following directives are valid in this section:
 .PP
-\fBidentifier \fR\fB\fIidentifier\fR\fR
+\fBIdentifier \fR\fB\fIidentifier\fR\fR
 .RS 4
 Register the configured database connection with name
 \fIidentifier\fR\&. You can later reference it by that name when an identifier of a database connection is needed\&. This parameter is required\&.
 .RE
 .PP
-\fBfile \fR\fB\fIfilename\fR\fR
+\fBFile \fR\fB\fIfilename\fR\fR
 .RS 4
 Store the SQLite database into
 \fIfilename\fR\&. This parameter is required\&.
 .RE
 .PP
-\fBconnections \fR\fB\fIconnections\fR\fR
+\fBConnections \fR\fB\fIconnections\fR\fR
 .RS 4
 Number of parallel connections used to connect to the database\&. This creates a pool of size
 \fIconnections\fR
 of database connections available to the business layer\&.
 .RE
 .PP
-\fBforeignKeys \fR\fB\fIyes\fR\fR\fB | \fR\fB\fIno\fR\fR\fB \fR
+\fBForeignKeys \fR\fB\fIyes\fR\fR\fB | \fR\fB\fIno\fR\fR\fB \fR
 .RS 4
 Setting \*(AqforeignKeys\*(Aq to \*(Aqyes\*(Aq enables referential integrity in the database\&. This is actually the same as executing \*(AqPRAGMA foreign_keys=true\*(Aq\&. The default is \*(Aqyes\*(Aq\&.
 .RE
 .PP
-\fBprofiling \fR\fB\fIyes\fR\fR\fB | \fR\fB\fIno\fR\fR\fB \fR
+\fBProfiling \fR\fB\fIyes\fR\fR\fB | \fR\fB\fIno\fR\fR\fB \fR
 .RS 4
 Shows the SQL commands being executed and their execution time in milliseconds\&. Default is \*(Aqno\*(Aq\&.
 .RE
 .PP
-\fBextension \fR\fB\fIfilename\fR\fR
+\fBExtension \fR\fB\fIfilename\fR\fR
 .RS 4
 Loads an SQLite3 extension module named
 \fIfilename\fR\&. This is useful to load native code into SQLite3 imlementing for instance new database functions\&. Have a look at the SQLite3 \*(AqRun\-Time Loadable Extensions\*(Aq section at

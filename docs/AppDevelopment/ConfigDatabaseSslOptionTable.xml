@@ -13,29 +13,29 @@
 	</thead>
 	<tbody>
 		<row>
-			<entry>sslMode</entry>
+			<entry>SslMode</entry>
 			<entry>identifier</entry>
 			<entry>How a SSL TCP/IP connection should be negotiated with the server.
 				Possible values and their explanation can be found in the 
 				SSL Mode table below.</entry>
 		</row>
 		<row>
-			<entry>sslCert</entry>
+			<entry>SslCert</entry>
 			<entry>filename</entry>
 			<entry>The file name of the client SSL certificate in case of an SSL connection to the database.</entry>
 		</row>
 		<row>
-			<entry>sslKey</entry>
+			<entry>SslKey</entry>
 			<entry>filename</entry>
 			<entry>The file with the secret key used for the client certificate in case of an SSL connection to the database.</entry>
 		</row>
 		<row>
-			<entry>sslRootCert</entry>
+			<entry>SslRootCert</entry>
 			<entry>filename</entry>
 			<entry>The File name of the root SSL CA certificate in case of an SSL connection to the database.</entry>
 		</row>
 		<row>
-			<entry>sslCRL</entry>
+			<entry>SslCRL</entry>
 			<entry>filename</entry>
 			<entry>The File name of the SSL certificate revocation list (CRL) in case of an SSL connection to the database.</entry>
 		</row>
