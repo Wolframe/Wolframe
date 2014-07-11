@@ -27,11 +27,14 @@ rm -rf /var/tmp/wolframe-root/
 rm -f wolframe-$VERSION.tar.gz
 rm -f $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
 
+GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
+sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" include/wolframe.hpp
 make \
 	WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
 	WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
 	WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	dist-gz >/dev/null 2>&1
+git checkout include/wolframe.hpp
 
 cp wolframe-$VERSION.tar.gz $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
 cp packaging/redhat/wolframe.spec $RPMBUILD/SPECS/wolframe.spec

@@ -29,10 +29,12 @@ mkdir -p $PKGBUILD $PKGBUILD/BUILD $PKGBUILD/PKG $PKGBUILD/PKGS/$ARCH
 rm -f wolframe-$VERSION.tar.gz
 rm -f $PKGBUILD/BUILD/wolframe_$VERSION.tar.gz
 
+GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
 make distclean
 mkdir /tmp/wolframe-$VERSION
 cp -a * /tmp/wolframe-$VERSION
 cd /tmp
+sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" wolframe-$VERSION/include/wolframe.hpp
 tar zcf wolframe-$VERSION.tar.gz wolframe-$VERSION
 cd -
 mv /tmp/wolframe-$VERSION.tar.gz .
