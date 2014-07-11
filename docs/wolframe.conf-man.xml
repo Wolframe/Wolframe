@@ -110,6 +110,8 @@
 			this module is loaded.
 		</para>			
 
+<!-- global options -->
+
 		<refsect2 id="GlobalOptions">
 			<title>Global configuration options</title>
 			<variablelist>			
@@ -200,10 +202,8 @@
 			</variablelist>
 		</refsect2>
 		
-<!--
-LoadModules	{						; modules to be loaded by the server
-	module mod_db_postgresql
--->
+<!-- LoadModules -->
+
 		<refsect2 id="LoadModules">
 			<title>LoadModules</title>
 		<para>
@@ -220,7 +220,7 @@ LoadModules	{						; modules to be loaded by the server
 			<variablelist>
 				<varlistentry>
 					<term>
-						<option>directory <replaceable>module_directory</replaceable></option>
+						<option>Directory <replaceable>module_directory</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -233,7 +233,7 @@ LoadModules	{						; modules to be loaded by the server
 				<varlistentry>
 
 					<term>
-						<option>module <replaceable>module_name</replaceable></option>
+						<option>Module <replaceable>module_name</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -252,37 +252,17 @@ LoadModules	{						; modules to be loaded by the server
 		</para>
 		</refsect2>
 
-<!--
-; Logging configuration
-logging	{
-	; log level for console (stderr) logging
-	stderr	{
-		level	INFO
-	}
+<!-- Logging -->
 
-	; log level for file logging
-	logFile	{
-		filename	/tmp/wolframed.log
-		level		NOTICE
-	}
-
-	; syslog facility, identifier and log level
-	syslog	{
-		ident		wolframed
-		facility	LOCAL2
-		level		INFO
-	}
-}
--->
 		<refsect2 id="logging">
-			<title>logging</title>
+			<title>Logging</title>
 		<para>
-			In the 'logging' section you can configure ways
+			In the 'Logging' section you can configure ways
 			of the Wolframe server to log.
 		</para>
 		
 		<para>
-			There are logging channels named '<emphasis role="bold">stderr</emphasis>' (for
+			There are logging channels named '<emphasis role="bold">Stderr</emphasis>' (for
 			foreground mode only!), '<emphasis role="bold">logFile</emphasis>' to log to a
 			simple text file and '<emphasis role="bold">syslog</emphasis>' to log to the
 			system log.
@@ -293,7 +273,7 @@ logging	{
 			<variablelist>
 				<varlistentry>
 					<term>
-						<option>level <replaceable>log_level</replaceable></option>
+						<option>Level <replaceable>log_level</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -310,7 +290,7 @@ logging	{
 				
 				<varlistentry>
 					<term>
-						<option>filename (logFile) <replaceable>file_name</replaceable></option>
+						<option>Filename (logFile) <replaceable>file_name</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -322,7 +302,7 @@ logging	{
 
 				<varlistentry>
 					<term>
-						<option>ident (syslog) <replaceable>ident</replaceable></option>
+						<option>Ident (syslog) <replaceable>ident</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -333,7 +313,7 @@ logging	{
 
 				<varlistentry>
 					<term>
-						<option>facility (syslog) <replaceable>ident</replaceable></option>
+						<option>Facility (syslog) <replaceable>ident</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -353,46 +333,20 @@ logging	{
 		
 		</refsect2>
 
-<!--
-
-listen	{
-	maxConnections	3
-	threads		7
-	socket	{
-		name		"Interface1"
-		address		*
-		port		7661
-		maxConnections	2		
-	}
-
-	SSLsocket	{
-		name		"Interface 2"
-		address		0.0.0.0
-		port		7961
-		name		"Interface 1"
-		maxConnections	2				
-		certificate	../tests/SSL/wolframed.crt
-		key		../tests/SSL/wolframed.key
-		CAdirectory	../tests/SSL/CAdir
-		CAchainFile	../tests/SSL/CAchain.pem
-		verify		ON
-		verify		OFF
-	}
-}
--->
+<!-- Listen configuration -->
 
 		<refsect2 id="listen">
-			<title>listen</title>
+			<title>Listen</title>
 		<para>
-			The 'listen' section deals with network settings.
+			The 'Listen' section deals with network settings.
 		</para>
 		<para>
 			You can choose between a plain socket with the
-			'<emphasis role="bold">socket</emphasis>' directive or
-			an encrypted socket with '<emphasis role="bold">SSLsocket</emphasis>'.
+			'<emphasis role="bold">Socket</emphasis>' directive or
+			an encrypted socket with '<emphasis role="bold">SSLSocket</emphasis>'.
 		</para>
 		<para>
-			Note: 'name', 'address', 'port' and 'maxConnections' are
+			Note: 'Name', 'Address', 'Port' and 'MaxConnections' are
 			common directives for both plain and encrypted sockets.
 		</para>
 		<para>
@@ -400,7 +354,7 @@ listen	{
 			<variablelist>
 				<varlistentry>
 					<term>
-						<option>maxConnections <replaceable>max_connections</replaceable></option>
+						<option>MaxConnections <replaceable>max_connections</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -416,7 +370,7 @@ listen	{
 
 				<varlistentry>
 					<term>
-						<option>threads <replaceable>max_threads</replaceable></option>
+						<option>Threads <replaceable>max_threads</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -428,7 +382,7 @@ listen	{
 
 				<varlistentry>
 					<term>
-						<option>address <replaceable>ip_address</replaceable></option>
+						<option>Address <replaceable>ip_address</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -443,7 +397,7 @@ listen	{
 
 				<varlistentry>
 					<term>
-						<option>port <replaceable>port</replaceable></option>
+						<option>Port <replaceable>port</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -457,7 +411,7 @@ listen	{
 
 				<varlistentry>
 					<term>
-						<option>name "<replaceable>interface_name</replaceable>"</option>
+						<option>Name "<replaceable>interface_name</replaceable>"</option>
 					</term>
 					<listitem>
 						<para>
@@ -470,7 +424,7 @@ listen	{
 				
 				<varlistentry>
 					<term>
-						<option>maxConnections <replaceable>max_connections</replaceable></option>
+						<option>MaxConnections <replaceable>max_connections</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -482,7 +436,7 @@ listen	{
 				
 				<varlistentry>
 					<term>
-						<option>certificate <replaceable>server.crt</replaceable></option>
+						<option>Certificate <replaceable>server.crt</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -494,7 +448,7 @@ listen	{
 				
 				<varlistentry>
 					<term>
-						<option>certificate <replaceable>server.key</replaceable></option>
+						<option>Certificate <replaceable>server.key</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -506,7 +460,7 @@ listen	{
 
 				<varlistentry>
 					<term>
-						<option>CAdirectory <replaceable>CA_directory</replaceable></option>
+						<option>CADirectory <replaceable>CA_directory</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -517,7 +471,7 @@ listen	{
 
 				<varlistentry>
 					<term>
-						<option>CAchainFile <replaceable>chain_file</replaceable></option>
+						<option>CAChainFile <replaceable>chain_file</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -531,8 +485,8 @@ listen	{
 
 				<varlistentry>
 					<term>
-						<option>verify</option>
-						<replaceable>ON</replaceable> | <replaceable>OFF</replaceable> 
+						<option>Verify</option>
+						<replaceable>On</replaceable> | <replaceable>Off</replaceable> 
 					</term>
 					<listitem>
 						<para>
@@ -546,18 +500,12 @@ listen	{
 		</para>
 		</refsect2>
 
-<!--
-; Unix daemon parameters. This section is not valid for windows
-daemon {
-;	user		nobody
-;	group		nobody
-	pidFile		/tmp/wolframed.pid
-}
--->		
+<!-- Unix daemon parameters -->	
+	
 		<refsect2 id="daemon">
-			<title>daemon</title>
+			<title>Daemon</title>
 		<para>
-			The 'daemon' section sets the behaviour of the
+			The 'Daemon' section sets the behaviour of the
 			Wolframe server as a Unix daemon.
 		</para>
 		<para>
@@ -565,7 +513,7 @@ daemon {
 			<variablelist>
 				<varlistentry>
 					<term>
-						<option>user <replaceable>user</replaceable></option>
+						<option>User <replaceable>user</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -577,7 +525,7 @@ daemon {
 				
 				<varlistentry>
 					<term>
-						<option>group <replaceable>group</replaceable></option>
+						<option>Group <replaceable>group</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -589,7 +537,7 @@ daemon {
 
 				<varlistentry>
 					<term>
-						<option>pidFile <replaceable>pid_file</replaceable></option>
+						<option>PidFile <replaceable>pid_file</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -604,18 +552,12 @@ daemon {
 		</para>
 		</refsect2>
 
-<!--
-; Database configuration
-database	{
-	<drivername> {
-		identifier	db1
-		<database module specific options>
-	<
--->		
+<!-- Database configuration -->
+
 		<refsect2 id="database">
-			<title>database</title>
+			<title>Database</title>
 		<para>
-			The 'database' section configures databases which
+			The 'Database' section configures databases which
 			can be used in programs, the AAAA layer, etc.
 		</para>
 		
@@ -630,7 +572,7 @@ database	{
 			<variablelist>
 				<varlistentry>
 					<term>
-						<option>identifier <replaceable>identifier</replaceable></option>
+						<option>Identifier <replaceable>identifier</replaceable></option>
 					</term>
 					<listitem>
 						<para>

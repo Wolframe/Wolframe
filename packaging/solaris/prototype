@@ -330,6 +330,7 @@ d none opt/csw/share/man ? ? ?
 d none opt/csw/share/man/man5 ? ? ?
 f none opt/csw/share/man/man5/wolframe.conf.5 0644 root staff
 f none opt/csw/share/man/man5/wolframe-mod_db_sqlite3.5 0644 root staff
+f none opt/csw/share/man/man5/wolframe-mod_db_postgresql.5 0644 root staff
 d none opt/csw/share/man/man8 ? ? ?
 f none opt/csw/share/man/man8/wolframed.8 0644 root staff
 d none opt/csw/share/man/man1 ? ? ?

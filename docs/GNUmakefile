@@ -64,7 +64,8 @@ MAN_PAGES = \
 	wolframed.8 \
 	wolframe.conf.5 \
 	wolfpasswd.1 \
-	wolframe-mod_db_sqlite3.5
+	wolframe-mod_db_sqlite3.5 \
+	wolframe-mod_db_postgresql.5
 	
 man: $(MAN_PAGES)
 
@@ -338,6 +339,10 @@ endif
 ifneq "$(PLATFORM)" "SUNOS"
 	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5
 endif
+	$(INSTALL) -m 0644 wolframe-mod_db_postgresql.5 $(DESTDIR)$(mandir)/man5
+ifneq "$(PLATFORM)" "SUNOS"
+	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_postgresql.5
+endif
 	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(mandir)/man8
 ifneq "$(PLATFORM)" "SUNOS"
 	gzip -f $(DESTDIR)$(mandir)/man8/wolframed.8
@@ -358,6 +363,7 @@ local_uninstall:
 	@-rmdir $(DESTDIR)$(mandir)/man8
 	@-rm $(DESTDIR)$(mandir)/man5/wolframe.conf.5*
 	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5*
+	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_posgresql.5*
 	@-rmdir $(DESTDIR)$(mandir)/man5
 	@-rmdir $(DESTDIR)$(mandir)
 

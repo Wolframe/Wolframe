@@ -87,6 +87,7 @@ files:
  /usr/local/man/man8/wolframed.8.gz: 'sha256sum'
  /usr/local/man/man1/wolfpasswd.1.gz: 'sha256sum'
  /usr/local/man/man5/wolframe-mod_db_sqlite3.5.gz: 'sha256sum'
+ /usr/local/man/man5/wolframe-mod_db_postgresql.5.gz: 'sha256sum'
  /usr/local/etc/wolframe/wolframe.conf: 'sha256sum'
  /usr/local/include/wolframe/libhpdf/hpdf_3dmeasure.h: 'sha256sum'
  /usr/local/include/wolframe/libhpdf/hpdf_annotation.h: 'sha256sum'
