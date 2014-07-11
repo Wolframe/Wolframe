@@ -75,7 +75,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "socket" ))	{
 			std::string	host;
-			std::string	identifier;
+			net::LocalEndpointConfig localEndpointConfig;
 			unsigned short	port = 0;
 			unsigned short	maxConn = 0;
 			bool portDefined, connDefined;
@@ -101,9 +101,11 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "identifier" ))	{
-					bool isDefined = ( ! identifier.empty());
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, identifier, &isDefined ))
+					bool isDefined = ( ! localEndpointConfig.socketIdentifier.empty());
+					std::string val;
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, val, &isDefined ))
 						retVal = false;
+					localEndpointConfig.socketIdentifier = val;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
@@ -119,12 +121,12 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			if ( port == 0 )
 				port = net::defaultTCPport();
 
-			net::ServerTCPendpoint lep( host, port, identifier, maxConn, restrictions );
+			net::ServerTCPendpoint lep( host, port, maxConn, localEndpointConfig, restrictions );
 			address.push_back( lep );
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "SSLsocket" ))	{
 			std::string	host;
-			std::string	identifier;
+			net::LocalEndpointConfig localEndpointConfig;
 			unsigned short	port = 0;
 			unsigned short	maxConn = 0;
 			std::string	certFile;
@@ -155,9 +157,11 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 						retVal = false;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "identifier" ))	{
-					bool isDefined = ( ! identifier.empty());
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, identifier, &isDefined ))
+					bool isDefined = ( ! localEndpointConfig.socketIdentifier.empty());
+					std::string val;
+					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, val, &isDefined ))
 						retVal = false;
+					localEndpointConfig.socketIdentifier = val;
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
@@ -199,7 +203,8 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			if ( port == 0 )
 				port = net::defaultSSLport();
 
-			net::ServerSSLendpoint lep( host, port, identifier, maxConn, restrictions,
+			net::ServerSSLendpoint lep( host, port, maxConn,
+						    localEndpointConfig, restrictions,
 						    certFile, keyFile,
 						    verify, CAdirectory, CAchainFile );
 			SSLaddress.push_back( lep );
@@ -236,13 +241,13 @@ void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 
 	if ( address.size() > 0 )	{
 		std::list<net::ServerTCPendpoint>::const_iterator it = address.begin();
-		os << "   Unencrypted: " << it->toString() << ", identifier '" << it->identifier() << "'";
+		os << "   Unencrypted: " << it->toString() << ", identifier '" << it->config().socketIdentifier << "'";
 		if ( it->maxConnections() != 0 )
 			os << ", maximum " << it->maxConnections() << " client connections";
 		os << std::endl;
 
 		for ( ++it; it != address.end(); ++it )	{
-			os << "                " << it->toString() << ", identifier '" << it->identifier() << "'";
+			os << "                " << it->toString() << ", identifier '" << it->config().socketIdentifier << "'";
 			if ( it->maxConnections() != 0 )
 				os << ", maximum " << it->maxConnections() << " client connections";
 			os << std::endl;
@@ -251,7 +256,7 @@ void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 #ifdef WITH_SSL
 	if ( SSLaddress.size() > 0 )	{
 		std::list<net::ServerSSLendpoint>::const_iterator it = SSLaddress.begin();
-		os << "           SSL: " << it->toString() << ", identifier '" << it->identifier() << "'";
+		os << "           SSL: " << it->toString() << ", identifier '" << it->config().socketIdentifier << "'";
 		if ( it->maxConnections() != 0 )
 			os << ", maximum " << it->maxConnections() << " client connections";
 		os << std::endl;
@@ -262,7 +267,7 @@ void Configuration::print( std::ostream& os, size_t /* indent */ ) const
 		os << "                   CA chain file: " << (it->CAchain().empty() ? "(none)" : it->CAchain()) << std::endl;
 		os << "                   verify client certificate: " << (it->verifyClientCert() ? "yes" : "no") << std::endl;
 		for ( ++it; it != SSLaddress.end(); ++it )	{
-			os << "                " << it->toString() << ", identifier '" << it->identifier() << "'";
+			os << "                " << it->toString() << ", identifier '" << it->config().socketIdentifier << "'";
 			if ( it->maxConnections() != 0 )
 				os << ", maximum " << it->maxConnections() << " client connections";
 			os << std::endl;

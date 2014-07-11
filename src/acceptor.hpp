@@ -61,7 +61,7 @@ public:
 	/// Constructor
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, unsigned short port, unsigned maxConnections,
-			   const std::string& socketIdentifier_,
+			   const net::LocalEndpointConfig& localEndpointConfig_,
 			   const AddressRestriction& addressRestriction_,
 			   GlobalConnectionList& globalList,
 			   _Wolframe::ServerHandler& srvHandler );
@@ -88,7 +88,7 @@ private:
 	SocketConnectionList< connection_ptr >	m_connList;	///< List of active connections
 
 	std::string				m_identifier;	///< ip:port
-	std::string				m_socketIdentifier;	///< identifier in configuration
+	net::LocalEndpointConfig		m_localEndpointConfig;	///< configuration of the local endpoint
 	AddressRestriction			m_addressRestriction; ///< configured set of authorization restrictions based on remote end point ip address
 
 	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.
@@ -107,7 +107,7 @@ public:
 			      const std::string& certFile, const std::string& keyFile,
 			      bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			      const std::string& host, unsigned short port, unsigned maxConnections,
-			      const std::string& socketIdentifier_,
+			      const net::LocalEndpointConfig& localEndpointConfig_,
 			      const AddressRestriction& addressRestriction_,
 			      GlobalConnectionList& globalList,
 			      _Wolframe::ServerHandler& srvHandler );
@@ -138,7 +138,7 @@ private:
 	SocketConnectionList< SSLconnection_ptr > m_connList;	///< List of active connections
 
 	std::string				m_identifier;	///< ip:port
-	std::string				m_socketIdentifier;	///< identifier in configuration
+	net::LocalEndpointConfig		m_localEndpointConfig;	///< configuration of the local endpoint
 	AddressRestriction			m_addressRestriction; ///< configured set of authorization restrictions based on remote end point ip address
 
 	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.

@@ -89,13 +89,57 @@ private:
 	unsigned short	m_port;
 };
 
+/// Local connection endpoint configuration for authorization, connection based timeout, etc.
+struct LocalEndpointConfig
+{
+	enum ProtocolCapability
+	{
+		PasswordChange=0x1,	///< the user is allowed to change his password
+		Request=0x2		///< the user is allowed make requests
+	};
+	static const char* protocolCapabilityName( ProtocolCapability c)
+	{
+		static const char* ar[] = {0,"PasswordChange","Request"};
+		return ar[c];
+	}
+
+	unsigned int capabilities;
+	std::string socketIdentifier;
+
+	/// \brief Default constructor
+	LocalEndpointConfig()
+		:capabilities(0){}
+	/// \brief Copy constructor
+	LocalEndpointConfig( const LocalEndpointConfig& o)
+		:capabilities(o.capabilities),socketIdentifier(o.socketIdentifier){}
+	/// \brief Constructor
+	explicit LocalEndpointConfig( const std::string& socketIdentifier_)
+		:capabilities(0xFFFF),socketIdentifier(socketIdentifier_){}
+
+	/// \brief Reset capabilities
+	void resetCapabilities()
+	{
+		capabilities = 0;
+	}
+	/// \brief Set a capability for this local endpoint configuration
+	void setCapability( ProtocolCapability c)
+	{
+		capabilities |= (1 << (unsigned char)c);
+	}
+	/// \brief Ask for a capability for this local endpoint configuration
+	bool hasCapability( ProtocolCapability c) const
+	{
+		return 0!=(capabilities & (1 << (unsigned char)c));
+	}
+};
+
 /// Local connection endpoints
 /// base class for local endpoint
 class LocalEndpoint : public ConnectionEndpoint
 {
 public:
-	LocalEndpoint( const std::string& Host, unsigned short Port, const char* socketIdentifier_=0)
-		: ConnectionEndpoint( Host, Port ), m_socketIdentifier(socketIdentifier_)
+	LocalEndpoint( const std::string& Host, unsigned short Port, const LocalEndpointConfig& Config=LocalEndpointConfig())
+		: ConnectionEndpoint( Host, Port ), m_config( Config )
 	{
 		m_creationTime = time( NULL );
 	}
@@ -103,10 +147,10 @@ public:
 	virtual ConnectionType type() const = 0;
 	EndPoint endpoint() const			{ return LOCAL_ENDPOINT; }
 	time_t creationTime() const			{ return m_creationTime; }
-	const char* socketIdentifier() const		{ return m_socketIdentifier; }
+	const LocalEndpointConfig& config() const	{ return m_config; }
 
 private:
-	const char* m_socketIdentifier;			///< reference to name in configuration (listen.socket.identifier)
+	LocalEndpointConfig m_config;			///< configuration for authorization checks
 	time_t	m_creationTime;				///< time when object has been constructed
 };
 
@@ -114,8 +158,8 @@ private:
 class LocalTCPendpoint : public LocalEndpoint
 {
 public:
-	LocalTCPendpoint( const std::string& Host, unsigned short Port, const char* socketIdentifier_=0)
-		: LocalEndpoint( Host, Port, socketIdentifier_)		{}
+	LocalTCPendpoint( const std::string& Host, unsigned short Port, const LocalEndpointConfig& Config=LocalEndpointConfig())
+		: LocalEndpoint( Host, Port, Config )		{}
 
 	ConnectionType type() const			{ return TCP; }
 };
@@ -125,8 +169,8 @@ public:
 class LocalSSLendpoint : public LocalEndpoint
 {
 public:
-	LocalSSLendpoint( const std::string& Host, unsigned short Port, const char* socketIdentifier_=0)
-		: LocalEndpoint( Host, Port, socketIdentifier_)		{}
+	LocalSSLendpoint( const std::string& Host, unsigned short Port, const LocalEndpointConfig& Config=LocalEndpointConfig())
+		: LocalEndpoint( Host, Port, Config )		{}
 
 	ConnectionType type() const			{ return SSL; }
 };

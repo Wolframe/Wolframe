@@ -427,7 +427,8 @@ TEST_F( MainProtocolTest, tests)
 			for (oo=0; oo<obarsize; oo++)
 			{
 				net::RemoteTCPendpoint client( "127.0.0.1", 7661);
-				net::LocalTCPendpoint localEndPoint( "127.0.0.1", 7661, "test");
+				net::LocalEndpointConfig localEndpointConfig( "test");
+				net::LocalTCPendpoint localEndPoint( "127.0.0.1", 7661, localEndpointConfig);
 				proc::MainCommandHandler cmdhandler;
 				cmdhandler.setPeer( client);
 				cmdhandler.setLocalEndPoint( localEndPoint);

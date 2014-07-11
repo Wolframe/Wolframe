@@ -111,30 +111,12 @@ private:
 		return names[ state ];
 	}
 
-	///\enum Commands
-	///\brief Enumeration of commands in the protocol at first FSM level
-	enum Command	{
-		EMPTY,				///< empty line (to not get an error for no command)
-		CAPABILITIES,			///< get the protocol capabilities
-		HELP,				///< print a help text to the client
-		QUIT				///< BYE and terminate
-	};
-
-	///\brief Returns the command name as string for instantiating the protocol command parser
-	static const char* commandName( Command cmd )
-	{
-		const char* names[] = { "EMPTY", "CAPABILITIES", "HELP", "QUIT", NULL };
-		return names[ cmd ];
-	}
-
 	/// Back link to global context
 	const WolframeHandler&		m_globalCtx;
-///*************
+
 	AAAA::Authenticator*		m_authentication;
 	AAAA::Authorizer*		m_authorization;
 	AAAA::Auditor*			m_audit;
-//	AAAA::Accountant*		m_accounting;
-///*************
 
 	const net::LocalEndpoint*	m_localEP;		///< local endpoint
 	const net::RemoteEndpoint*	m_remoteEP;		///< remote endpoint

@@ -46,14 +46,14 @@ namespace net	{
 	{
 	public:
 		ServerTCPendpoint( const std::string& Host, unsigned short Port,
-				   const std::string& Identifier, unsigned short maxConn,
-				   const AddressRestriction& addressRestriction_)
-			: LocalTCPendpoint( Host, Port ),
-			  m_identifier( Identifier ), m_maxConn( maxConn ),
-			  m_addressRestriction( addressRestriction_ )	{}
+				   unsigned short maxConn,
+				   const LocalEndpointConfig& Config,
+				   const AddressRestriction& AddressRestriction)
+			: LocalTCPendpoint( Host, Port, Config ),
+			  m_maxConn( maxConn ),
+			  m_addressRestriction( AddressRestriction )	{}
 
 		unsigned short maxConnections() const			{ return m_maxConn; }
-		const std::string& identifier() const			{ return m_identifier; }
 		const AddressRestriction& addressRestriction() const	{ return m_addressRestriction; }
 
 	private:
@@ -70,12 +70,13 @@ namespace net	{
 		friend class server;
 	public:
 		ServerSSLendpoint( const std::string& Host, unsigned short Port,
-				   const std::string& Identifier, unsigned short maxConn,
+				   unsigned short maxConn,
+				   const LocalEndpointConfig& Config,
 				   const AddressRestriction& addressRestriction_,
 				   const std::string& Certificate, const std::string& Key,
 				   bool verify, const std::string& CAdir, const std::string& CAchainFile )
-			: LocalSSLendpoint( Host, Port ),
-			  m_identifier( Identifier ), m_maxConn( maxConn ),
+			: LocalSSLendpoint( Host, Port, Config ),
+			  m_maxConn( maxConn ),
 			  m_addressRestriction( addressRestriction_ )
 		{
 			m_cert = Certificate;
@@ -87,7 +88,6 @@ namespace net	{
 
 		const AddressRestriction& addressRestriction() const	{ return m_addressRestriction; }
 		unsigned short maxConnections() const	{ return m_maxConn; }
-		const std::string& identifier() const	{ return m_identifier; }
 		const std::string& certificate() const	{ return m_cert; }
 		const std::string& key() const		{ return m_key; }
 		const std::string& CAdirectory() const	{ return m_CAdir; }

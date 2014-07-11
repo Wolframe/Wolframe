@@ -47,7 +47,13 @@ namespace _Wolframe	{
 										  WOLFRAME_BUILD
 										  ); }
 
-	const char*	config::defaultMainConfig()		{ return "/etc/wolframe.conf"; }
+	const char*	config::defaultMainConfig()		{
+#ifdef DEFAULT_MAIN_CONFIGURATION_FILE
+		return DEFAULT_MAIN_CONFIGURATION_FILE;
+#else
+		return "/etc/wolframe/wolframe.conf";
+#endif
+	}
 	const char*	config::defaultUserConfig()		{ return "~/wolframe.conf"; }
 	const char*	config::defaultLocalConfig()		{ return "./wolframe.conf"; }
 
