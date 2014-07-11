@@ -19,10 +19,10 @@ set outmsg [lindex $argv 2]		;# 3rd script argument
 
 puts "Configuration file: $config, expecting exit code $expected and message \"$outmsg\""
 
-set timeout 3
+set timeout 5
 spawn ../../src/wolframed -c $config -t
 # maybe allow the server to start
-# sleep 2
+sleep 5
 
 expect 	{
 	timeout		{ send_user "Process timed out.\n" }

@@ -44,7 +44,8 @@ the PostgreSQL SSL configuration settings and the table with configurable SSL mo
 		<row>
 			<entry>Port</entry>
 			<entry>number</entry>
-			<entry>Port of the PostgreSQL database server</entry>
+			<entry>Port of the PostgreSQL database server.
+			       The default is 5432.</entry>
 		</row>
 		<row>
 			<entry>Database</entry>
@@ -62,7 +63,7 @@ the PostgreSQL SSL configuration settings and the table with configurable SSL mo
 			<entry>Password to connect to the database with</entry>
 		</row>
 		<row>
-			<entry>ConnectionTimeout</entry>
+			<entry>connectionTimeout</entry>
 			<entry>number</entry>
 			<entry>Connection timeout in seconds</entry>
 		</row>

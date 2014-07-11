@@ -20,12 +20,14 @@ mkdir -p $PKGBUILD/BUILD/wolframe-$VERSION $PKGBUILD/PKG/wolframe-$VERSION $PKGB
 rm -f wolframe-$VERSION.tar.Z
 rm -f $PKGBUILD/BUILD/wolframe_$VERSION.tar.Z
 
+GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
 gmake BOOST_DIR=/opt/csw/boost-1.55.0 distclean
 rm -rf /tmp/wolframe-$VERSION
 mkdir /tmp/wolframe-$VERSION
 cp -R * /tmp/wolframe-$VERSION
 OLDPWD=$PWD
 cd /tmp
+sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" wolframe-$VERSION/include/wolframe.hpp
 tar cf - wolframe-$VERSION | compress -c > wolframe-$VERSION.tar.Z
 cd $OLDPWD
 mv /tmp/wolframe-$VERSION.tar.Z .

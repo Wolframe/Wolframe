@@ -7,10 +7,17 @@ if test "x$TMPDIR" = "x"; then
 	TMPDIR=/tmp
 fi
 
+# build number injection into package
+GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
+sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" include/wolframe.hpp
+
 # the original source tarball for RHEL/Centos/OpenSUSE
 rm -f wolframe-$VERSION.tar.gz
 make dist-gz
 cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.tar.gz
+
+# revert build number in include/wolframe.hpp
+git checkout include/wolframe.hpp
 
 # the original source tarball for Debian/Ubuntu
 cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.orig.tar.gz
@@ -34,7 +41,7 @@ cp packaging/obs/wolframe*.dsc $OSC_HOME
 # there is a difference for a specific version of Debian/Ubuntu.
 # Patch 'debian/changelog' and Version in dsc file to have a build number
 # and avoid funny problems as mentioned in issue #89)
-GIT_COMMIT_COUNT=`git rev-list HEAD --count`
+GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
 for i in `ls $OSC_HOME/wolframe-*.dsc`; do
 	echo " $CHKSUM $SIZE wolframe_$VERSION.orig.tar.gz" >> $i
 	OS_ORIG=`echo $i | cut -f 2 -d '-' | sed 's/\.dsc$//'`

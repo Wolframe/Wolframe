@@ -7,18 +7,18 @@ package require Expect
 
 set config iproc.conf
 
-set timeout 3
+set timeout 5
 set serverpid [spawn ./iprocd -c $config -f]
 
 puts "wolframe echo with protocol started with configuration file: $config (pid: $serverpid)"
 # allow the server to start
-sleep 2
+sleep 5
 
 set message "One Short Line With üèöéäà°§"
 set messageLow "one short line with üèöéäà°§"
 set messageUp "ONE SHORT LINE WITH üèöéäà°§"
 
-set timeout 3
+set timeout 5
 if { [catch {
 	spawn telnet localhost 7661
 
