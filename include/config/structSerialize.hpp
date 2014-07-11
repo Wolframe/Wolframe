@@ -52,7 +52,7 @@ void parseConfigStructure( Structure& st, const ConfigurationNode& pt)
 	langbind::PropertyTreeInputFilter* filter;
 	langbind::TypedInputFilterR inp( filter=new langbind::PropertyTreeInputFilter( pt));
 	serialize::StructParser parser( (void*)&st, st.getStructDescription());
-	parser.init( inp);
+	parser.init( inp, serialize::Flags::CaseInsensitiveCompare);
 	try
 	{
 		if (!parser.call()) throw std::runtime_error( "illegal state in structure parser");

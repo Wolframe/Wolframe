@@ -49,7 +49,7 @@ public:
 	StructParser( void* obj, const StructDescriptionBase* descr);
 	/// \brief Constructor
 	StructParser( const ObjectReference& obj, const StructDescriptionBase* descr);
-	/// \brief Copy cnstructor
+	/// \brief Copy constructor
 	StructParser( const StructParser& o);
 	/// \brief Destructor
 	virtual ~StructParser(){}
