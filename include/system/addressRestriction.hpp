@@ -37,6 +37,7 @@
 #define _Wolframe_SYSTEM_ADDRESS_RESTRICTION_HPP_INCLUDED
 #include <vector>
 #include <boost/asio/ip/address.hpp>
+#include <boost/cstdint.hpp>
 
 namespace _Wolframe {
 namespace net {
@@ -47,31 +48,53 @@ class AddressRestriction
 {
 public:
 	/// \brief Default constructor
-	AddressRestriction(){}
+	AddressRestriction()
+		:m_order(Allow_Deny){}
 	/// \brief Copy constructor
 	AddressRestriction( const AddressRestriction& o)
-		:m_allowedar(o.m_allowedar){}
+		:m_order(o.m_order),m_allowedar(o.m_allowedar),m_deniedar(o.m_deniedar){}
+
+	enum Order
+	{
+		Deny_Allow,
+		Allow_Deny
+	};
+	void defineOrder( const Order& order_);
 
 	/// \brief Define an explicitely allowed address
-	void defineAddressAllowed( const std::string& adr)
-	{
-		m_allowedar.push_back( boost::asio::ip::address::from_string( adr));
-	}
+	void defineAddressAllowed( const std::string& adr);
+	/// \brief Define an explicitely denied address
+	void defineAddressDenied( const std::string& adr);
+	/// \brief Define all addresses as allowed
+	void defineAllowedAll();
+	/// \brief Define all addresses as denied
+	void defineDeniedAll();
 
 	/// \brief Check if an address belongs to the set of allowed
-	bool isAllowed( const boost::asio::ip::address& adr) const
-	{
-		if (m_allowedar.empty()) return true;
-		std::vector<boost::asio::ip::address>::const_iterator ai = m_allowedar.begin(), ae = m_allowedar.end();
-		for (; ai != ae; ++ai)
-		{
-			if (*ai == adr) return true;
-		}
-		return false;
-	}
+	bool isAllowed( const boost::asio::ip::address& adr) const;
 
 private:
-	std::vector<boost::asio::ip::address> m_allowedar;
+	typedef boost::asio::ip::address IPAddress;
+
+	struct Element
+	{
+		IPAddress ip;
+		boost::uint32_t ipv4NetMask;
+
+		Element( const Element& o)
+			:ip(o.ip),ipv4NetMask(o.ipv4NetMask){}
+		Element()
+			:ip(),ipv4NetMask(0){}
+	};
+
+	static Element parseAddress( const std::string& adr);
+	static boost::uint32_t parseNetworkMask( const char* str);
+	static bool matches( const std::vector<Element>& ar, const IPAddress& addr);
+
+private:
+	Order m_order;
+	std::vector<Element> m_allowedar;
+	std::vector<Element> m_deniedar;
 };
 
 }}//namespace

@@ -90,6 +90,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	appConfig.o \
 	jobScheduler.o \
 	acceptor.o \
+	addressRestriction.o \
 	serverEndpoint.o \
 	connection.o \
 	serverConfig.o \
