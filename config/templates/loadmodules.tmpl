@@ -1,11 +1,3 @@
-; Wolframe main configuration file
-
-; Modules installed via packages, loaded in those code snippets
-.include modules.d/*.conf
-
-; Configuration of modules in packages
-.include conf.d/*.conf
-
 ; Modules to be loaded (bundled with the wolframe core package)
 LoadModules {
 
@@ -14,12 +6,12 @@ LoadModules {
 ; if relative it has this configuration file as basis to compute the path
 ;    Directory modules
 
-
+$(if test $VARIANT = "monolythic"; then cat dbmodules.tmpl; fi)
 
 ; authentication modules
     Module mod_auth_textfile
     Module mod_auth_database
-
+$(if test $VARIANT = "monolythic"; then cat authmodules.tmpl; fi)
 
 ; authorization modules
     Module mod_authz_database
@@ -34,8 +26,8 @@ LoadModules {
     Module mod_doctype_json
 
 ; modules for XML processing
-
-
+$(if test $VARIANT = "monolythic"; then cat xmlmodules.tmpl; fi)
+$(if test $VARIANT = "monolythic"; then cat jsonmodules.tmpl; fi)
     
     Module mod_normalize_locale
     Module mod_normalize_string
@@ -53,27 +45,4 @@ LoadModules {
     Module mod_filter_blob
     
     Module mod_job_schedule_db
-}
-
-; Print the application name and version in the initial greeting
-; allowed values are: ProductOnly, Major, Minor, Revision, OS, None
-; Default: None
-ServerTokens OS					
-
-; Print the name of the server as first element of the greeting
-; Default: empty
-ServerSignature "Wolframe"
-
-; Unix daemon parameters
-
-Daemon {
-
-; user and group to run the daemon
-
-    User wolframe
-    Group wolframe
-
-; daemon lockfile
-
-    PidFile /var/run/wolframe/wolframed.pid
 }
