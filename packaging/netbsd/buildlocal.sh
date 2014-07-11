@@ -57,6 +57,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/pkg/etc/wolframe/wolframe.conf \
 	mandir=/usr/pkg/man \
 	help
 
@@ -69,6 +70,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/pkg/etc/wolframe/wolframe.conf \
 	mandir=/usr/pkg/man \
 	config
 
@@ -81,6 +83,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/pkg/etc/wolframe/wolframe.conf \
 	mandir=/usr/pkg/man
 check_for_errors
 
@@ -94,6 +97,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/pkg/etc/wolframe/wolframe.conf \
 	mandir=/usr/pkg/man \
 	testreport 
 check_for_errors
@@ -107,6 +111,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	prefix=/usr/pkg \
 	sysconfdir=/usr/pkg/etc libdir=/usr/pkg/lib \
 	libdir=/usr/pkg/lib DEFAULT_MODULE_LOAD_DIR=/usr/pkg/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/pkg/etc/wolframe/wolframe.conf \
 	mandir=/usr/pkg/man \
 	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION \
 	install

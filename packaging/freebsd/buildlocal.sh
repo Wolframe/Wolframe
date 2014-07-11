@@ -88,6 +88,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man \
 	help
 
@@ -99,6 +100,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man \
 	config
 
@@ -110,6 +112,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man
 check_for_errors
 
@@ -121,6 +124,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man \
 	testreport 
 check_for_errors
@@ -135,6 +139,7 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man \
 	install
 check_for_errors
