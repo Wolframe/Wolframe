@@ -15,18 +15,26 @@ config-monolythic:
 		../expand_template.sh wolframe-monolythic.tmpl \
 		../monolythic/wolframe.conf
 
-MODULELARIZED_CONFIG_FILES = \
+MODULARIZED_CONFIG_FILES = \
 	modularized/wolframe.conf \
-	modularized/conf.d/mod_db_sqlite3.conf
-	
-config-modularized: $(MODULELARIZED_CONFIG_FILES)
+	modularized/conf.d/mod_db_sqlite3.conf \
+	modularized/conf.d/mod_db_postgresql.conf
 
-modularized/conf.d/mod_db_sqlite3.conf: templates/sqlite.tmpl
+.PHONY: $(MODULARIZED_CONFIG_FILES)
+	
+config-modularized: $(MODULARIZED_CONFIG_FILES)
+
+modularized/wolframe.conf:
+	cd templates; VARIANT=modularized \
+		../expand_template.sh wolframe-modularized.tmpl \
+		../modularized/wolframe.conf
+
+modularized/conf.d/mod_db_sqlite3.conf:
 	cd templates; VARIANT=modularized \
 		../expand_template.sh sqlite.tmpl \
 		../modularized/conf.d/mod_db_sqlite3.conf 
 	
-modularized/wolframe.conf: templates/wolframe-modularized.tmpl
+modularized/conf.d/mod_db_postgresql.conf:
 	cd templates; VARIANT=modularized \
-		../expand_template.sh wolframe-modularized.tmpl \
-		../modularized/wolframe.conf
+		../expand_template.sh postgresql.tmpl \
+		../modularized/conf.d/mod_db_postgresql.conf 
