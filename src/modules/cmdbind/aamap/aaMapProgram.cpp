@@ -162,7 +162,12 @@ public:
 
 	const std::string& getElement( const std::string& ar, char delim, std::size_t idx)
 	{
-		if (!delim) return ar;
+		if (!delim)
+		{
+			m_elembuf.clear();
+			m_elembuf.append( ar);
+			return m_elembuf;
+		}
 		const char* cc = ar.c_str();
 		const char* ee = std::strchr( cc, delim);
 		for (; idx > 1 && ee != 0; --idx,cc=ee+1,ee=std::strchr(cc,delim)){}

@@ -2911,16 +2911,6 @@ bool LuaModuleMap::getLuaModule( const std::string& name, LuaModule& rt) const
 	return true;
 }
 
-LuaFunctionMap::~LuaFunctionMap()
-{
-	std::vector<LuaScript*>::iterator ii=m_ar.begin(),ee=m_ar.end();
-	while (ii != ee)
-	{
-		delete *ii;
-		++ii;
-	}
-}
-
 void LuaFunctionMap::defineLuaFunction( const std::string& name, const LuaScript& script)
 {
 	std::string nam( name);
@@ -2943,7 +2933,7 @@ void LuaFunctionMap::defineLuaFunction( const std::string& name, const LuaScript
 	else
 	{
 		scriptId = m_ar.size();
-		m_ar.push_back( new LuaScript( script));
+		m_ar.push_back( LuaScriptR( new LuaScript( script)));
 		m_pathmap[ script.path()] = scriptId;
 	}
 	m_procmap[ nam] = scriptId;
@@ -2956,7 +2946,7 @@ bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScrip
 
 	std::map<std::string,std::size_t>::const_iterator ii=m_procmap.find( nam),ee=m_procmap.end();
 	if (ii == ee) return false;
-	rt = LuaScriptInstanceR( new LuaScriptInstance( m_ar[ ii->second], m_modulemap));
+	rt = LuaScriptInstanceR( new LuaScriptInstance( m_ar[ ii->second].get(), m_modulemap));
 	return true;
 }
 

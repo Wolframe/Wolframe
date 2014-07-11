@@ -82,6 +82,8 @@ private:
 	boost::shared_ptr<LuaDump> m_content;	//< binary dump of the script
 };
 
+typedef boost::shared_ptr<LuaScript> LuaScriptR;
+
 
 ///\class LuaModuleMap
 ///\brief Map of available Lua functions
@@ -165,7 +167,7 @@ public:
 		:m_modulemap(modulemap_){}
 
 	///\brief Destructor
-	virtual ~LuaFunctionMap();
+	virtual ~LuaFunctionMap(){}
 
 	///\brief Define a lua function
 	///\param[in] procname name of the function
@@ -181,7 +183,7 @@ private:
 	LuaFunctionMap( const LuaFunctionMap&){}	//non copyable
 
 private:
-	std::vector<LuaScript*> m_ar;
+	std::vector<LuaScriptR> m_ar;
 	std::map<std::string,std::size_t> m_pathmap;
 	std::map<std::string,std::size_t> m_procmap;
 	const LuaModuleMap* m_modulemap;
