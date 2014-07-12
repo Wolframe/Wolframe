@@ -129,6 +129,7 @@ private:
 	std::size_t			m_dataSize;
 
 	std::string			m_outMsg;		///< output buffer for initial handshake messages
+	std::string			m_endDataSessionMarker;	///< buffer for message to interrupt data session for the client
 
 	proc::ExecContext		m_execContext;		///< execution context of the connection
 	proc::MainCommandHandler	m_cmdHandler;		///< command handler
