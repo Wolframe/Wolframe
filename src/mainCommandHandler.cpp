@@ -131,6 +131,14 @@ int MainCommandHandler::doQuit( int argc, const char**, std::ostream& out)
 
 int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
+	/*[-]*/if (!m_localEndpoint)
+	/*[-]*/{
+	/*[-]*/	throw std::logic_error( "no local endpoint set");
+	/*[-]*/}
+	/*[-]*/if (!m_remoteEndpoint)
+	/*[-]*/{
+	/*[-]*/	throw std::logic_error( "no remote endpoint set");
+	/*[-]*/}
 	execContext()->setConnectionData( m_remoteEndpoint, m_localEndpoint);
 
 	if (!m_authenticator.get())
@@ -183,6 +191,11 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 		{
 			out << "OK authenticated" << endl();
 			execContext()->setUser( usr);
+
+			/*[-]*/bool hc = execContext()->hasCapability( net::LocalEndpointConfig::PasswordChange);
+			/*[-]*/bool ca = execContext()->checkAuthorization( proc::ExecContext::PASSWD);
+			/*[-]*/LOG_DEBUG << (hc?"HAS CAPABILITY":"NO CAPABILITY") << " " << (ca?"HAS AUTHZ":"NO AUTHZ");
+
 			if (execContext()->hasCapability( net::LocalEndpointConfig::PasswordChange)
 			&& execContext()->checkAuthorization( proc::ExecContext::PASSWD))
 			{

@@ -108,7 +108,7 @@ struct LocalEndpointConfig
 
 	/// \brief Default constructor
 	LocalEndpointConfig()
-		:capabilities(0){}
+		:capabilities(0xFFFF){}
 	/// \brief Copy constructor
 	LocalEndpointConfig( const LocalEndpointConfig& o)
 		:capabilities(o.capabilities),socketIdentifier(o.socketIdentifier){}

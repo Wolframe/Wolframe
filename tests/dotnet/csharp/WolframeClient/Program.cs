@@ -91,6 +91,12 @@ namespace WolframeClient
                     password = "bork123",
                     username = "gunibert"
                 };
+                string pwdError;
+                // if (!Session.ChangePassword(cfg, "bork124", out pwdError))
+                // {
+                //     Console.WriteLine("Error changing password: {0}", pwdError);
+                // }
+
                 Session session = new Session( cfg, ProcessAnswer);
                 if (!session.Connect())
                 {
