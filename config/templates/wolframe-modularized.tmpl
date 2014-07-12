@@ -1,0 +1,14 @@
+; Wolframe main configuration file
+
+; Modules installed via packages, loaded in those code snippets
+.include modules.d/*.conf
+
+; Configuration of modules in packages
+.include conf.d/*.conf
+
+$(eval "echo \"$(cat loadmodules.tmpl)\"")
+
+$(cat global.tmpl)
+
+$(cat daemon.tmpl)
+

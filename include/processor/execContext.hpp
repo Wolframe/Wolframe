@@ -90,7 +90,7 @@ public:
 	{
 		m_remoteEndpoint = remoteEndpoint_;
 		m_localEndpoint = localEndpoint_;
-		m_capabilities |= m_localEndpoint->config().capabilities;
+		m_capabilities |= m_localEndpoint?m_localEndpoint->config().capabilities:0;
 	}
 
 	typedef net::LocalEndpointConfig::ProtocolCapability Capability;

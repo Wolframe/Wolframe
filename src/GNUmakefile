@@ -90,6 +90,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	appConfig.o \
 	jobScheduler.o \
 	acceptor.o \
+	addressRestriction.o \
 	serverEndpoint.o \
 	connection.o \
 	serverConfig.o \
@@ -118,9 +119,14 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-# # set default module load directory for configuration option 'directory' in 'LoadModules'
+# set default module load directory for configuration option 'directory' in 'LoadModules'
 ifdef DEFAULT_MODULE_LOAD_DIR
 INCLUDE_CXXFLAGS += -DDEFAULT_MODULE_LOAD_DIR=$(DEFAULT_MODULE_LOAD_DIR)
+endif
+
+# set default main configuration file location
+ifdef DEFAULT_MAIN_CONFIGURATION_FILE
+INCLUDE_CXXFLAGS += -DDEFAULT_MAIN_CONFIGURATION_FILE=$(DEFAULT_MAIN_CONFIGURATION_FILE)
 endif
 
 libwfsingleton: libwolframe

@@ -81,6 +81,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			bool portDefined, connDefined;
 			portDefined = connDefined = false;
 			AddressRestriction restrictions;
+			restrictions.defineAllowedAll();
 
 			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 			      L2it != L1it->second.end(); L2it++ )	{
@@ -137,6 +138,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 			bool portDefined, connDefined, verifyDefined;
 			portDefined = connDefined = verifyDefined = false;
 			AddressRestriction restrictions;
+			restrictions.defineAllowedAll();
 
 			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 			      L2it != L1it->second.end(); L2it++ )	{
