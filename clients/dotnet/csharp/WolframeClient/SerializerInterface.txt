@@ -20,4 +20,3 @@ public static byte[] Serializer.getRequestContent(string doctype, string root, T
 /// \return the answer object deserialized
 public static object Serializer.getResult(byte[] content, Type type);
 
-
