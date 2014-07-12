@@ -83,6 +83,67 @@ namespace WolframeClient
             }
         }
 
+        /* Fake method for change password session */
+        private static void FakeProcessAnswer(Answer answer) { }
+
+        /* Change the password */
+        private bool DoChangePassword( string oldpassword, string newpassword)
+        {
+		    // 1. The client asks to open the password change dialog:
+		    m_connection.WriteLine( "PASSWD");
+		    // 2. The server accepts or not:
+            byte[] ln = m_connection.ReadLine();
+            if (ln == null)
+            {
+                SetState(State.Terminated, "server closed connection");
+                return false;
+            }
+            if (Protocol.IsCommand("ERR", ln))
+            {
+                SetState(State.Terminated, "password change refused: " + Protocol.CommandArg("ERR", ln));
+                return false;
+            }
+            else if (!Protocol.IsCommand("OK", ln))
+            {
+                SetState(State.Terminated, "protocol error initiating password change");
+                return false;
+            }
+		    // 3. The server sends a challenge:
+            byte[] challenge = m_connection.ReadContent();
+            if (challenge == null)
+            {
+                SetState(State.Terminated, "server closed connection");
+                return false;
+            }
+		    // 4. The client returns a message with the password 
+		    //	pair (old, new) encrypted with the challenge:
+		    m_connection.WriteContent(
+                Encoding.ASCII.GetBytes( 
+                    PasswordChange.Message( oldpassword, Encoding.ASCII.GetString(challenge), newpassword)));
+
+		    // 5. The server accepts the password change or not:
+            ln = m_connection.ReadLine();
+            if (ln == null)
+            {
+                SetState(State.Terminated, "server closed connection");
+                return false;
+            }
+            if (Protocol.IsCommand("OK", ln))
+            {
+                return true;
+            }
+            else if (Protocol.IsCommand("ERR", ln))
+            {
+                SetState(State.Terminated, "password change error: " + Protocol.CommandArg("ERR", ln));
+                return false;
+            }
+            else
+            {
+                SetState(State.Terminated, "protocol error in password change");
+                return false;
+            }
+        }
+
         private bool AuthMechWolframeCram()
         {
 		    // 1. The client sends a 256 bit seed followed by a HMAC-SHA1 of the (seed, username)
@@ -122,7 +183,7 @@ namespace WolframeClient
             }
             else
             {
-                SetState(State.Terminated, "protocol error in authorization");
+                SetState(State.Terminated, "protocol error in authentication");
                 return false;
             }
         }
@@ -304,6 +365,24 @@ namespace WolframeClient
                     SetState(State.Terminated, "server closed connection");
                     return false;
                 }
+                if (Protocol.IsCommand("ERR", ln))
+                {
+                    string msg = Protocol.CommandArg("ERR", ln);
+                    SetState(State.Terminated, "Failed to connect to server: " + msg);
+                    return false;
+                }
+                if (Protocol.IsCommand("BAD", ln))
+                {
+                    string msg = Protocol.CommandArg("BAD", ln);
+                    SetState(State.Terminated, "Cannot connect to server: " + msg);
+                    return false;
+                }
+                if (Protocol.IsCommand("BYE", ln))
+                {
+                    string msg = Protocol.CommandArg("BYE", ln);
+                    SetState(State.Terminated, "Server terminated connection: " + msg);
+                    return false;
+                }
                 string banner = Encoding.UTF8.GetString(ln);
                 if (m_config.banner != null && m_config.banner != banner)
                 {
@@ -411,6 +490,25 @@ namespace WolframeClient
                 m_lasterror = null;
                 return err;
             }
+        }
+
+        public static bool ChangePassword(Configuration config_, string newPassword, out string error)
+        {
+            Session session = new Session( config_, FakeProcessAnswer);
+            if (!session.Connect())
+            {
+                error = session.GetLastError();
+                return false;
+            }
+            if (!session.DoChangePassword( config_.password, newPassword))
+            {
+                error = session.GetLastError();
+                return false;
+            }
+            session.Shutdown();
+            session.Close();
+            error = null;
+            return true;
         }
     };
 }

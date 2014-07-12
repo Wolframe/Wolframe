@@ -61,6 +61,11 @@ class Session extends Connection
 	{
 		parent::__construct( $address, $port, $sslopt);
 		$this->banner = $this->readline();
+		$firstline = explode( " ", $this->banner, 2);
+		if ($firstline[0] == "ERR") throw $this->protocol_exception( "server error: " . $firstline[1]);
+		if ($firstline[0] == "BAD") throw $this->protocol_exception( "protocol error: " . $firstline[1]);
+		if ($firstline[0] == "BYE") throw $this->protocol_exception( "server terminated session: " . $firstline[1]);
+
 		$this->getline( "OK");
 		$this->writeline( "AUTH");
 		$mechs = $this->getline( "MECHS");

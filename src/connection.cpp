@@ -49,8 +49,8 @@
 namespace _Wolframe {
 namespace net {
 
-static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
-static const char* DENY_MSG = "Server denied connection.\n";
+static const char* REFUSE_MSG = "ERR Server is busy. Please try again later.\n";
+static const char* DENY_MSG = "BAD Server denied connection.\n";
 
 void GlobalConnectionList::addList( SocketConnectionList< connection_ptr >* lst )
 {

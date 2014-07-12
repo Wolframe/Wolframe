@@ -2,12 +2,11 @@
 
 namespace WolframeClient
 {
-	class PasswordChangeMessage
+	class PasswordChange
 	{
-		private byte[]	message = new byte[64];
-
-		public PasswordChangeMessage( string oldPassword, string challenge, string newPassword )
+		public static string Message( string oldPassword, string challenge, string newPassword )
 		{
+    		byte[] message = new byte[64];
 			// process the challenge
 			if ( challenge[0] != '$' )
 				throw new System.ArgumentException( "Challenge does not begin with a \"$\"" );
@@ -50,11 +49,7 @@ namespace WolframeClient
 			ICryptoTransform encryptor = myAes.CreateEncryptor();
 			encryptor.TransformBlock( msg, 0, 48, message, 0 );
 			encryptor.TransformBlock( md5.Hash, 0, 16, message, 48 );
-		}
-
-		public string outString()
-		{
-			return System.Convert.ToBase64String( message );
+            return System.Convert.ToBase64String(message);
 		}
 	}
 }
