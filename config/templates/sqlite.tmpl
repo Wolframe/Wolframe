@@ -2,11 +2,14 @@
 
 Database {
     SQLite {
+
+; the database name for referencing in other configuration options
+    
         Identifier db
 
 ; SQLite database file
 
-        File ${DATADIR}
+        File ${DATADIR}/data.db
         
 ; enable / disable referential integrity
 ; Default: yes
@@ -24,6 +27,7 @@ Database {
         Connections 4
         
 ; extensions to be loaded
+
 ;        Extension extension_module.so
 
     }

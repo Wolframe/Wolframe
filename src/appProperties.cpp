@@ -38,6 +38,10 @@
 #include "wolframe.hpp"
 #include "version.hpp"
 
+//\brief Macros to stringify compile options
+#define DO_STRINGIFY2(x) #x
+#define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
+
 namespace _Wolframe	{
 
 	const char*	applicationName()			{ return "Wolframe"; }
@@ -49,7 +53,7 @@ namespace _Wolframe	{
 
 	const char*	config::defaultMainConfig()		{
 #ifdef DEFAULT_MAIN_CONFIGURATION_FILE
-		return DEFAULT_MAIN_CONFIGURATION_FILE;
+		return DO_STRINGIFY( DEFAULT_MAIN_CONFIGURATION_FILE );
 #else
 		return "/etc/wolframe/wolframe.conf";
 #endif

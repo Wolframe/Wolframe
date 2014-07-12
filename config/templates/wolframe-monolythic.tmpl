@@ -6,6 +6,6 @@ $(cat global.tmpl)
 
 $(cat daemon.tmpl)
 
-$(eval "echo \"$(cat sqlite.tmpl)\"")
+$(eval "echo \"$(cat sqlite.tmpl | sed 's/^\(.*\)/;\1/g')\"")
 
-$(eval "echo \"$(cat postgresql.tmpl)\"")
+$(eval "echo \"$(cat postgresql.tmpl | sed 's/^\(.*\)/;\1/g')\"")
