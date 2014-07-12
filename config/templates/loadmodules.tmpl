@@ -44,7 +44,8 @@ $(if test $VARIANT = "monolythic"; then cat jsonmodules.tmpl; fi)
     Module mod_ddlcompiler_simpleform
     Module mod_command_tdl
 
-; module for parsing BLOBs
+; various filtering modules
+$(if test $VARIANT = "monolythic"; then cat textwolfmodules.tmpl; fi)
     Module mod_filter_blob
 
 ; scheduling modules    
