@@ -149,6 +149,7 @@ tests/bignum/libgmp/testlibgmp
 tests/bignum/testbignum
 tests/temp/
 tests/testProtocolLFdotEscaping
+tests/testAddressRestriction
 tests/testWolfilter
 tests/testWolfilter.sh
 tests/testDatabaseProcessorVM

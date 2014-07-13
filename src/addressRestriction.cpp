@@ -34,6 +34,8 @@
 /// \brief Implementation of configured IP address restrictions (deny,allow)
 #include "system/addressRestriction.hpp"
 #include <vector>
+#include <sstream>
+#include <iostream>
 #include <cstring>
 #include <boost/asio/ip/address.hpp>
 #include <boost/lexical_cast.hpp>
@@ -46,7 +48,7 @@ boost::uint32_t AddressRestriction::parseNetworkMask( const char* pp)
 	boost::uint32_t rt;
 	if (std::strchr( pp, '.'))
 	{
-		IPAddress maskadr = IPAddress::from_string( pp+1);
+		IPAddress maskadr = IPAddress::from_string( pp);
 		if (!maskadr.is_v4())
 		{
 			throw std::runtime_error( "not a valid IPv4 network mask after the slash '/'");
@@ -72,7 +74,7 @@ boost::uint32_t AddressRestriction::parseNetworkMask( const char* pp)
 		unsigned int shift;
 		try
 		{
-			shift = boost::lexical_cast<unsigned int>( std::string(pp+1));
+			shift = boost::lexical_cast<unsigned int>( std::string(pp));
 		}
 		catch (const std::bad_cast& e)
 		{
@@ -133,6 +135,30 @@ void AddressRestriction::defineDeniedAll()
 	m_deniedar.push_back( elem);
 }
 
+static void printElementVector( std::ostringstream& out, const std::vector<AddressRestriction::Element>& ar)
+{
+	out << "{";
+	std::vector<AddressRestriction::Element>::const_iterator ai = ar.begin(), ae = ar.end();
+	for (int idx=0; ai != ae; ++ai,++idx)
+	{
+		if (idx) out << ", ";
+		if (ai->ipv4NetMask)
+		{
+			out << ai->ip.to_v4().to_string()
+				<< "/" << boost::asio::ip::address_v4(ai->ipv4NetMask).to_string();
+		}
+		else if (ai->ip.to_v4().to_ulong() == 0)
+		{
+			out << "*";
+		}
+		else
+		{
+			out << ai->ip.to_string();
+		}
+	}
+	out << "}";
+}
+
 bool AddressRestriction::matches( const std::vector<Element>& ar, const IPAddress& addr)
 {
 	std::vector<Element>::const_iterator ai = ar.begin(), ae = ar.end();
@@ -191,4 +217,22 @@ bool AddressRestriction::isAllowed( const boost::asio::ip::address& addr) const
 	}
 	return false;
 }
+
+std::string AddressRestriction::tostring() const
+{
+	std::ostringstream rt;
+	switch (m_order)
+	{
+		case Deny_Allow:
+			rt << "denied="; printElementVector( rt, m_deniedar);
+			rt << ", allowed="; printElementVector( rt, m_allowedar);
+			break;
+		case Allow_Deny:
+			rt << "allowed="; printElementVector( rt, m_allowedar);
+			rt << ", denied="; printElementVector( rt, m_deniedar);
+			break;
+	}
+	return rt.str();
+}
+
 
