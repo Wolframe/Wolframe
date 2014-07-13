@@ -14,9 +14,16 @@ namespace WolframeClient
 			string[] parts = challenge.Split( '$' );
 			if ( parts.Length != 3 )
 				throw new System.ArgumentException( "Invalid challenge format" );
-			byte[] salt = System.Convert.FromBase64String( parts[1] );
-			byte[] chlng = System.Convert.FromBase64String( parts[2] );
-			if ( chlng.Length != 64 )
+
+            string saltBase64 = parts[1];
+            while (saltBase64.Length % 4 != 0) saltBase64 += "=";
+            byte[] salt = System.Convert.FromBase64String(saltBase64);
+
+            string chlngBase64 = parts[2];
+            while (chlngBase64.Length % 4 != 0) chlngBase64 += "=";
+            byte[] chlng = System.Convert.FromBase64String(chlngBase64);
+
+            if ( chlng.Length != 64 )
 				throw new System.ArgumentException( "Invalid challenge length" );
 			Rfc2898DeriveBytes pwdHash = new Rfc2898DeriveBytes( oldPassword, salt, 10589 );
 			byte[] passwd = pwdHash.GetBytes( 48 );

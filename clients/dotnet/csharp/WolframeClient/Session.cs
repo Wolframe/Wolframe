@@ -89,7 +89,16 @@ namespace WolframeClient
         /* Change the password */
         private bool DoChangePassword( string oldpassword, string newpassword)
         {
-		    // 1. The client asks to open the password change dialog:
+            m_connection.WriteLine("CAPABILITIES");
+            byte[] fln = m_connection.ReadLine();
+            if (fln == null)
+            {
+                SetState(State.Terminated, "server closed connection");
+                return false;
+            }
+            Console.WriteLine( "CAPABILITIES {0}", Encoding.UTF8.GetString(fln));
+
+            // 1. The client asks to open the password change dialog:
 		    m_connection.WriteLine( "PASSWD");
 		    // 2. The server accepts or not:
             byte[] ln = m_connection.ReadLine();
