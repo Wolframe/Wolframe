@@ -514,6 +514,19 @@ public:
 				{
 					return OP_READ();
 				}
+				// Check if an error occurred before the banner has been sent:
+				getLineSplit_space( arg, line, 2);
+				if (!arg.size) continue;
+				if (isequal( arg.ptr[0], "ERR")
+				||	isequal( arg.ptr[0], "BAD")
+				||	isequal( arg.ptr[0], "BYE"))
+				{
+					msg = (arg.size == 1)?"rejected connection":arg.ptr[1];
+					notifyError( msg);
+					state( ProtocolState::CLOSED);
+					return OP_CLOSE();
+				}
+				// Read the banner:
 				getLineSplit_space( arg, line, 1);
 				if (!arg.size) continue;
 				notifyAttribute( "banner", arg.ptr[0]);

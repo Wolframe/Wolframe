@@ -49,8 +49,8 @@
 namespace _Wolframe {
 namespace net {
 
-static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
-static const char* DENY_MSG = "Server denied connection.\n";
+static const char* REFUSE_MSG = "ERR Server is busy. Please try again later.\n";
+static const char* DENY_MSG = "BAD Server denied connection.\n";
 
 void GlobalConnectionList::addList( SocketConnectionList< connection_ptr >* lst )
 {
@@ -185,8 +185,6 @@ void SSLconnection::start()
 		    + ":" + boost::lexical_cast<std::string>( m_SSLsocket.lowest_layer().remote_endpoint().port() )
 		    + " (SSL)");
 	LOG_TRACE << "Starting connection to " << identifier();
-	m_connHandler->setPeer( RemoteTCPendpoint( socket().lowest_layer().remote_endpoint().address().to_string(),
-						   socket().lowest_layer().remote_endpoint().port()));
 
 	m_SSLsocket.async_handshake( boost::asio::ssl::stream_base::server,
 				     m_strand.wrap( boost::bind( &SSLconnection::handleHandshake,

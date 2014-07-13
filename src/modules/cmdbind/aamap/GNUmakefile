@@ -12,11 +12,13 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(TOPDIR)/src/libwfsingleton
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwfsingleton \
+	-lwolframe_langbind \
+	-lwfsingleton
 
 DYNAMIC_MODULE = mod_command_aamap.so
 

@@ -12,3 +12,6 @@ $(cat global.tmpl)
 
 $(cat daemon.tmpl)
 
+$(eval "echo \"$(cat logging.tmpl)\"")
+
+$(eval "echo \"$(cat listen.tmpl)\"")

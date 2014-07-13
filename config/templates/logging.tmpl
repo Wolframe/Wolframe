@@ -1,0 +1,27 @@
+; Logging
+
+Logging {
+
+; logging to stderr (console) is active only in forground (-f) mode
+
+    Stderr {
+        Level INFO
+    }
+
+; logging to a file
+
+    Logfile {
+        Filename ${LOGDIR}/wolframed.log
+        Level INFO
+    }
+
+; logging to syslog (traditionally), on systemd-enabled system logging
+; to the journal
+             
+    Syslog {
+        Ident wolframed
+        Facility LOCAL2
+        Level INFO
+    }
+
+}

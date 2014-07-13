@@ -28,21 +28,26 @@ $(if test $VARIANT = "monolythic"; then cat authmodules.tmpl; fi)
 ; modules for XML processing
 $(if test $VARIANT = "monolythic"; then cat xmlmodules.tmpl; fi)
 $(if test $VARIANT = "monolythic"; then cat jsonmodules.tmpl; fi)
-    
+
+; data normalization modules   
     Module mod_normalize_locale
     Module mod_normalize_string
     Module mod_normalize_base64
     Module mod_normalize_number
-	
+
+; data types modules	
     Module mod_datatype_datetime
     Module mod_datatype_bcdnumber
 	
+; business layer modules
     Module mod_command_directmap
     Module mod_ddlcompiler_simpleform
     Module mod_command_tdl
 
-; module for parsing BLOBs
+; various filtering modules
+$(if test $VARIANT = "monolythic"; then cat textwolfmodules.tmpl; fi)
     Module mod_filter_blob
-    
+
+; scheduling modules    
     Module mod_job_schedule_db
 }
