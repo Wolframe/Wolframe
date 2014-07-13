@@ -6,12 +6,12 @@ LoadModules {
 ; if relative it has this configuration file as basis to compute the path
 ;    Directory modules
 
-$(if test $VARIANT = "monolythic"; then cat dbmodules.tmpl; fi)
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat dbmodules.tmpl)\""; fi)
 
 ; authentication modules
     Module mod_auth_textfile
     Module mod_auth_database
-$(if test $VARIANT = "monolythic"; then cat authmodules.tmpl; fi)
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat authmodules.tmpl)\""; fi)
 
 ; authorization modules
     Module mod_authz_database

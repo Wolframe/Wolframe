@@ -1,3 +1,3 @@
 ; enable or disable the authentication methods you need
-;    Module mod_auth_pam
-;    Module mod_auth_sasl
+$(if test "x$WITH_PAM" = "x1"; then echo ";    Module mod_auth_pam"; fi)
+$(if test "x$WITH_SASL" = "x1"; then echo ";    Module mod_auth_sasl"; fi)

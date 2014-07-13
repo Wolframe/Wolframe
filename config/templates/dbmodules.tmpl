@@ -1,3 +1,5 @@
 ; database modules
-;    Module mod_db_postgresql
-;    Module mod_db_sqlite3
+WITH_SQLITE3: '${WITH_SQLITE3}'
+WITH_PGSQL: '$WITH_PGSQL'
+$(if test "x$WITH_SQLITE3" = "x1"; then echo ";    Module mod_db_sqlite3"; fi)
+$(if test "x$WITH_PGSQL" = "x1"; then echo ";    Module mod_db_postgresql"; fi)
