@@ -10,19 +10,6 @@ local_all: config
 
 config: config-monolythic config-modularized
 
-config-monolythic:
-	cd templates; VARIANT=monolythic \
-		../expand_template.sh wolframe-monolythic.tmpl \
-		../monolythic/wolframe.conf
-
-MODULARIZED_CONFIG_FILES = \
-	modularized/wolframe.conf \
-	modularized/conf.d/mod_db_sqlite3.conf \
-	modularized/conf.d/mod_db_postgresql.conf
-
-
-.PHONY: $(MODULARIZED_CONFIG_FILES)
-
 # openssl
 VARIABLES := $(VARIABLES) WITH_SSL=$(WITH_SSL)
 
@@ -64,6 +51,18 @@ VARIABLES := $(VARIABLES) WITH_LIBHPDF=$(WITH_LIBHPDF)
 
 # FreeImage
 VARIABLES := $(VARIABLES) WITH_FREEIMAGE=$(WITH_FREEIMAGE)
+
+config-monolythic:
+	cd templates; VARIANT=monolythic \
+		../expand_template.sh wolframe-monolythic.tmpl \
+		../monolythic/wolframe.conf
+
+MODULARIZED_CONFIG_FILES = \
+	modularized/wolframe.conf \
+	modularized/conf.d/mod_db_sqlite3.conf \
+	modularized/conf.d/mod_db_postgresql.conf
+
+.PHONY: $(MODULARIZED_CONFIG_FILES)
 
 config-modularized: $(MODULARIZED_CONFIG_FILES)
 
