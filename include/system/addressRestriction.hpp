@@ -73,7 +73,9 @@ public:
 	/// \brief Check if an address belongs to the set of allowed
 	bool isAllowed( const boost::asio::ip::address& adr) const;
 
-private:
+	std::string tostring() const;
+
+public:
 	typedef boost::asio::ip::address IPAddress;
 
 	struct Element
@@ -87,6 +89,7 @@ private:
 			:ip(),ipv4NetMask(0){}
 	};
 
+private:
 	static Element parseAddress( const std::string& adr);
 	static boost::uint32_t parseNetworkMask( const char* str);
 	static bool matches( const std::vector<Element>& ar, const IPAddress& addr);

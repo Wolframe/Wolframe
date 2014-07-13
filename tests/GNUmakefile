@@ -119,6 +119,7 @@ TEST_CPP_BINS = \
 	versionTest$(EXE) \
 	platformTest$(EXE) \
 	resolvePathTest$(EXE) \
+	testAddressRestriction$(EXE) \
 	testBoostPath$(EXE) \
 	testFiletypeRecognition$(EXE) \
 	byte2hexTest$(EXE) \
@@ -140,8 +141,7 @@ TEST_CPP_BINS = \
 	testString$(EXE) \
 	testDateTime$(EXE) \
 	testBigNumber$(EXE) \
-# DISABLED (moved to .Attic) unitLibraryTest$(EXE)
-#	stringNormalizationTest$(EXE) \
+
 # DISABLED (only for memory corruption checks)	testTestAllocator$(EXE) \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -217,6 +217,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./resolvePathTest
 	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testAddressRestriction
+	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBoostPath
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testFiletypeRecognition
@@ -251,11 +253,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testIntegers
 	@echo
-#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
-#	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
-	@echo
-## DISABLED (moved to .Attic) @LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./unitLibraryTest
 	@echo
 	@echo
 endif
