@@ -1,0 +1,36 @@
+; Authentication, authorization, auditing and accounting configuration
+
+; simple setup, allow access from everywhere and everybody
+
+AAAA {
+
+    Authentication {
+
+; random device
+; default: system default, usually /dev/urandom
+
+        RandomDevice /dev/urandom
+                
+    }
+    
+    Authorization {
+
+; Allow all operations
+    
+        Default allow
+        
+    }
+
+    Audit {
+
+; operations only succeed when auditing was successfull
+; default: no
+
+;        Mandatory yes
+								    
+    }
+
+; There is no configuration for accounting as it
+; should be derived from audit information
+     
+}
