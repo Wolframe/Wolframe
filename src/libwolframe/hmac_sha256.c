@@ -74,7 +74,7 @@ void hmac_sha256( const unsigned char *key, size_t keyLen,
 	sha256_update( &ctx, intermediateHash, HMAC_SHA256_HASH_SIZE );
 	sha256_final( &ctx, hash );
 
-	memset( pad, 0, HMAC_SHA256_BLOCK_SIZE );
-	memset( normalizedKey, 0, HMAC_SHA256_BLOCK_SIZE );
-	memset( intermediateHash, 0, HMAC_SHA256_BLOCK_SIZE );
+	memset( pad, 0, sizeof( pad ));
+	memset( normalizedKey, 0, sizeof( normalizedKey ));
+	memset( intermediateHash, 0, sizeof( intermediateHash ));
 }
