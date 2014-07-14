@@ -48,7 +48,7 @@
 
 #include "connection.hpp"
 #include "system/connectionHandler.hpp"
-#include "system/addressRestriction.hpp"
+#include "types/addressRestriction.hpp"
 
 namespace _Wolframe {
 namespace net {
@@ -62,7 +62,7 @@ public:
 	explicit acceptor( boost::asio::io_service& IOservice,
 			   const std::string& host, unsigned short port, unsigned maxConnections,
 			   const net::LocalEndpointConfig& localEndpointConfig_,
-			   const AddressRestriction& addressRestriction_,
+			   const types::AddressRestriction& addressRestriction_,
 			   GlobalConnectionList& globalList,
 			   _Wolframe::ServerHandler& srvHandler );
 
@@ -89,7 +89,7 @@ private:
 
 	std::string				m_identifier;	///< ip:port
 	net::LocalEndpointConfig		m_localEndpointConfig;	///< configuration of the local endpoint
-	AddressRestriction			m_addressRestriction; ///< configured set of authorization restrictions based on remote end point ip address
+	types::AddressRestriction		m_addressRestriction; ///< configured set of authorization restrictions based on remote end point ip address
 
 	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.
 };
@@ -108,7 +108,7 @@ public:
 			      bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			      const std::string& host, unsigned short port, unsigned maxConnections,
 			      const net::LocalEndpointConfig& localEndpointConfig_,
-			      const AddressRestriction& addressRestriction_,
+			      const types::AddressRestriction& addressRestriction_,
 			      GlobalConnectionList& globalList,
 			      _Wolframe::ServerHandler& srvHandler );
 
@@ -139,7 +139,7 @@ private:
 
 	std::string				m_identifier;	///< ip:port
 	net::LocalEndpointConfig		m_localEndpointConfig;	///< configuration of the local endpoint
-	AddressRestriction			m_addressRestriction; ///< configured set of authorization restrictions based on remote end point ip address
+	types::AddressRestriction		m_addressRestriction; ///< configured set of authorization restrictions based on remote end point ip address
 
 	_Wolframe::ServerHandler&		m_srvHandler;	///< The handler for all incoming requests.
 };

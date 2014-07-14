@@ -42,6 +42,7 @@ TYPE_OBJS = \
 	types\bignumber.obj \
 	types\datetime.obj \
 	types\customDataType.obj \
+	types\addressRestriction.obj \
 	types\variant.obj \
 	types\variantStructDescription.obj \
 	types\variantStruct.obj \

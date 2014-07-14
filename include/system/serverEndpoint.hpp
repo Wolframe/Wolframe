@@ -36,7 +36,7 @@
 
 #include <string>
 #include "system/connectionEndpoint.hpp"
-#include "system/addressRestriction.hpp"
+#include "types/addressRestriction.hpp"
 
 namespace _Wolframe	{
 namespace net	{
@@ -48,18 +48,18 @@ namespace net	{
 		ServerTCPendpoint( const std::string& Host, unsigned short Port,
 				   unsigned short maxConn,
 				   const LocalEndpointConfig& Config,
-				   const AddressRestriction& AddressRestriction)
+				   const types::AddressRestriction& AddressRestriction)
 			: LocalTCPendpoint( Host, Port, Config ),
 			  m_maxConn( maxConn ),
-			  m_addressRestriction( AddressRestriction )	{}
+			  m_addressRestriction( AddressRestriction )		{}
 
-		unsigned short maxConnections() const			{ return m_maxConn; }
-		const AddressRestriction& addressRestriction() const	{ return m_addressRestriction; }
+		unsigned short maxConnections() const				{ return m_maxConn; }
+		const types::AddressRestriction& addressRestriction() const	{ return m_addressRestriction; }
 
 	private:
 		const std::string	m_identifier;
 		const unsigned short	m_maxConn;
-		AddressRestriction	m_addressRestriction;
+		types::AddressRestriction	m_addressRestriction;
 	};
 
 
@@ -72,7 +72,7 @@ namespace net	{
 		ServerSSLendpoint( const std::string& Host, unsigned short Port,
 				   unsigned short maxConn,
 				   const LocalEndpointConfig& Config,
-				   const AddressRestriction& addressRestriction_,
+				   const types::AddressRestriction& addressRestriction_,
 				   const std::string& Certificate, const std::string& Key,
 				   bool verify, const std::string& CAdir, const std::string& CAchainFile )
 			: LocalSSLendpoint( Host, Port, Config ),
@@ -86,7 +86,7 @@ namespace net	{
 			m_CAchain = CAchainFile;
 		}
 
-		const AddressRestriction& addressRestriction() const	{ return m_addressRestriction; }
+		const types::AddressRestriction& addressRestriction() const	{ return m_addressRestriction; }
 		unsigned short maxConnections() const	{ return m_maxConn; }
 		const std::string& certificate() const	{ return m_cert; }
 		const std::string& key() const		{ return m_key; }
@@ -99,7 +99,7 @@ namespace net	{
 	private:
 		const std::string	m_identifier;
 		const unsigned short	m_maxConn;
-		AddressRestriction	m_addressRestriction;
+		types::AddressRestriction	m_addressRestriction;
 		std::string		m_cert;
 		std::string		m_key;
 		std::string		m_CAdir;

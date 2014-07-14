@@ -52,7 +52,7 @@ namespace net {
 acceptor::acceptor( boost::asio::io_service& IOservice,
 		    const std::string& host, unsigned short port, unsigned maxConnections,
 		    const net::LocalEndpointConfig& localEndpointConfig_,
-		    const AddressRestriction& addressRestriction_,
+		    const types::AddressRestriction& addressRestriction_,
 		    GlobalConnectionList& globalList,
 		    _Wolframe::ServerHandler& srvHandler ) :
 	m_IOservice( IOservice ),
@@ -163,7 +163,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 			  bool verify, const std::string& CAchainFile, const std::string& CAdirectory,
 			  const std::string& host, unsigned short port, unsigned maxConnections,
 			  const net::LocalEndpointConfig& localEndpointConfig_,
-			  const AddressRestriction& addressRestriction_,
+			  const types::AddressRestriction& addressRestriction_,
 			  GlobalConnectionList& globalList,
 			  _Wolframe::ServerHandler& srvHandler) :
 	m_IOservice( IOservice ),

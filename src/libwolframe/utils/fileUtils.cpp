@@ -728,7 +728,7 @@ static types::PropertyTree::Node readInfoPropertyTreeFile_( const std::string& f
 						std::string restline( utils::parseLine( cl, ce));
 						cl = restline.begin();
 						char rch = utils::gotoNextToken( cl, restline.end());
-						if (rch && rch != ';')
+						if (rch && rch != ';'/*comment*/)
 						{
 							throw std::runtime_error( std::string("unexpected token on rest of line: '") + restline + "' - values containing spaces have to be quoted");
 						}

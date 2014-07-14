@@ -91,7 +91,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	appConfig.obj \
 	jobScheduler.obj \
 	acceptor.obj \
-	addressRestriction.obj \
 	connection.obj \
 	serverConfig.obj \
 	loggerConfig.obj \

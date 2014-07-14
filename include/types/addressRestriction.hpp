@@ -30,17 +30,17 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file system/addressRestriction.hpp
-/// \brief Interface to configured ip based authorization checks
+/// \file types/addressRestriction.hpp
+/// \brief Interface for a map for configured ip based authorization checks
 
-#ifndef _Wolframe_SYSTEM_ADDRESS_RESTRICTION_HPP_INCLUDED
-#define _Wolframe_SYSTEM_ADDRESS_RESTRICTION_HPP_INCLUDED
+#ifndef _Wolframe_TYPES_ADDRESS_RESTRICTION_HPP_INCLUDED
+#define _Wolframe_TYPES_ADDRESS_RESTRICTION_HPP_INCLUDED
 #include <vector>
 #include <boost/asio/ip/address.hpp>
 #include <boost/cstdint.hpp>
 
 namespace _Wolframe {
-namespace net {
+namespace types {
 
 /// \class AddressRestriction
 /// \brief Structure to define and check configured ip based authorization
@@ -81,17 +81,17 @@ public:
 	struct Element
 	{
 		IPAddress ip;
-		boost::uint32_t ipv4NetMask;
+		boost::uint8_t netMask;
 
 		Element( const Element& o)
-			:ip(o.ip),ipv4NetMask(o.ipv4NetMask){}
+			:ip(o.ip),netMask(o.netMask){}
 		Element()
-			:ip(),ipv4NetMask(0){}
+			:ip(),netMask(0){}
 	};
 
 private:
 	static Element parseAddress( const std::string& adr);
-	static boost::uint32_t parseNetworkMask( const char* str);
+	static boost::uint8_t parseNetworkMask( bool isIPv6, const char* str);
 	static bool matches( const std::vector<Element>& ar, const IPAddress& addr);
 
 private:

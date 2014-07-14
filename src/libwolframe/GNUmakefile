@@ -48,6 +48,7 @@ TYP_OBJS = \
 	types/bignumber.o \
 	types/datetime.o \
 	types/customDataType.o \
+	types/addressRestriction.o \
 	types/variant.o \
 	types/variantStructDescription.o \
 	types/variantStruct.o \
