@@ -26,14 +26,16 @@ $(if test $VARIANT = "monolythic"; then eval "echo \"$(cat authmodules.tmpl)\"";
     Module mod_doctype_json
 
 ; modules for XML processing
-$(if test $VARIANT = "monolythic"; then cat xmlmodules.tmpl; fi)
-$(if test $VARIANT = "monolythic"; then cat jsonmodules.tmpl; fi)
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat xmlmodules.tmpl)\""; fi)
+
+; modules for JSON processing
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat jsonmodules.tmpl)\""; fi)
 
 ; data normalization modules   
-    Module mod_normalize_locale
     Module mod_normalize_string
     Module mod_normalize_base64
     Module mod_normalize_number
+$(if test "x$WITH_ICU" = "x1"; then echo ";    Module mod_normalize_locale"; fi)
 
 ; data types modules	
     Module mod_datatype_datetime
@@ -43,6 +45,9 @@ $(if test $VARIANT = "monolythic"; then cat jsonmodules.tmpl; fi)
     Module mod_command_directmap
     Module mod_ddlcompiler_simpleform
     Module mod_command_tdl
+
+; scripting language modules
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat scriptingmodules.tmpl)\""; fi)
 
 ; various filtering modules
 $(if test $VARIANT = "monolythic"; then cat textwolfmodules.tmpl; fi)

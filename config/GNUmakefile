@@ -22,12 +22,7 @@ VARIABLES += WITH_PAM=$(WITH_PAM)
 VARIABLES += WITH_SASL=$(WITH_SASL)
 
 # Sqlite
-ifeq ($(WITH_SYSTEM_SQLITE3),1)
-VARIABLES += WITH_SQLITE3=1
-endif
-ifeq ($(WITH_LOCAL_SQLITE3),1)
-VARIABLES += WITH_SQLITE3=1
-endif
+VARIABLES += WITH_SQLITE3=$(WITH_SQLITE3)
 
 # PostgreSQL
 VARIABLES += WITH_PGSQL=$(WITH_PGSQL)
@@ -59,19 +54,24 @@ VARIABLES += WITH_LIBHPDF=$(WITH_LIBHPDF)
 # FreeImage
 VARIABLES += WITH_FREEIMAGE=$(WITH_FREEIMAGE)
 
-config-monolythic:
-	cd templates; VARIANT=monolythic \
-		../expand_template.sh wolframe-monolythic.tmpl \
-		../monolythic/wolframe.conf
-
 MODULARIZED_CONFIG_FILES = \
 	modularized/wolframe.conf \
 	modularized/conf.d/mod_db_sqlite3.conf \
-	modularized/conf.d/mod_db_postgresql.conf
+	modularized/conf.d/mod_db_postgresql.conf \
+	modularized/conf.d/mod_db_oracle.conf
 
-.PHONY: $(MODULARIZED_CONFIG_FILES)
+MONOLYTHIC_CONFIG_FILES = \
+	monolythic/wolframe.conf
+	
+.PHONY: $(MODULARIZED_CONFIG_FILES) $(MONOLYTHIC_CONFIG_FILES)
 
 config-modularized: $(MODULARIZED_CONFIG_FILES)
+
+config-monolythic:
+	cd templates; VARIANT=monolythic \
+		$(VARIABLES) \
+		../expand_template.sh wolframe-monolythic.tmpl \
+		../monolythic/wolframe.conf
 
 modularized/wolframe.conf:
 	cd templates; VARIANT=modularized \
@@ -91,3 +91,8 @@ modularized/conf.d/mod_db_postgresql.conf:
 		../expand_template.sh postgresql.tmpl \
 		../modularized/conf.d/mod_db_postgresql.conf 
 
+modularized/conf.d/mod_db_oracle.conf:
+	cd templates; VARIANT=modularized \
+		$(VARIABLES) \
+		../expand_template.sh oracle.tmpl \
+		../modularized/conf.d/mod_db_oracle.conf 
