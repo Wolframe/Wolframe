@@ -53,6 +53,8 @@ $(if test $VARIANT = "monolythic"; then eval "echo \"$(cat scriptingmodules.tmpl
 $(if test $VARIANT = "monolythic"; then cat textwolfmodules.tmpl; fi)
     Module mod_filter_blob
 
-; scheduling modules    
+; various other modules
     Module mod_job_schedule_db
+$(if test "x$WITH_LIBHPDF" = "x1"; then echo ";    Module mod_print_harupdf"; fi)
+$(if test "x$WITH_FREEIMAGE" = "x1"; then echo ";    Module mod_graphix"; fi)
 }

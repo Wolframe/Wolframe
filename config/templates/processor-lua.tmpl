@@ -1,0 +1,11 @@
+; command handlers written in Lua
+
+;        Lua {
+        
+;            Program program/example.lua
+
+$(if test "x$WITH_TEXTWOLF" = "x1"; then echo ";            Filter XML=textwolf"; fi)
+$(if test "x$WITH_LIBXML2" = "x1"; then echo ";            Filter XML=libxml2"; fi)
+$(if test "x$WITH_CJSON" = "x1"; then echo ";            Filter XML=cjson"; fi)
+            
+;        }
