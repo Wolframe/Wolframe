@@ -20,8 +20,8 @@ Processor {
 
 ; implementation of functions in various scripting languages
 
-;    Program program/example.lua
-;    Program program/example.py
+$(if test "x$WITH_LUA" = "x1"; then echo ";    Program program/example.lua"; fi)
+$(if test "x$WITH_PYTHON" = "x1"; then echo ";    Program program/example.py"; fi)
     
 ; command handler program mapping requests to functions handling them
 
@@ -38,22 +38,14 @@ Processor {
 ; filter to use for serialization of data (format and implementation
 ; of the filter)
 
-            Filter XML=textwolf
-;            Filter XML=libxml2
-;            Filter JSON=cjson            
+$(if test "x$WITH_TEXTWOLF" = "x1"; then echo "            Filter XML=textwolf"; fi)
+$(if test "x$WITH_LIBXML2" = "x1"; then echo ";            Filter XML=libxml2"; fi)
+$(if test "x$WITH_CJSON" = "x1"; then echo ";            Filter XML=cjson"; fi)
         }
  
 ; command handlers written in scripting languages
 
-;        Lua {
-        
-;            Program program/example.lua
-
-;            Filter XML=textwolf
-;            Filter XML=libxml2
-;            Filter JSON=cjson            
-            
-;        }
+$(if test "x$WITH_LUA" = "x1"; then eval "echo \"$(cat processor-lua.tmpl)\""; fi)
 
     }
 }

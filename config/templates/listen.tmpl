@@ -39,6 +39,6 @@ Listen {
 
     }
 
-$(if test $WITH_SSL = 1; then eval "echo \"$(cat listen-ssl.tmpl | sed 's/^\(.*\)/;\1/g' )\""; fi)
+$(if test "x$WITH_SSL" = "x1"; then eval "echo \"$(cat listen-ssl.tmpl | sed 's/^\(.*\)/;\1/g' )\""; fi)
     
 }

@@ -1,3 +1,1 @@
-
-; JSON processing using cjson
-    Module mod_filter_cjson
+$(if test "x$WITH_CJSON" = "x1"; then eval "echo \"$(cat jsonmodule-cjson.tmpl)\""; fi)

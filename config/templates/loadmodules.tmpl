@@ -6,12 +6,12 @@ LoadModules {
 ; if relative it has this configuration file as basis to compute the path
 ;    Directory modules
 
-$(if test $VARIANT = "monolythic"; then cat dbmodules.tmpl; fi)
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat dbmodules.tmpl)\""; fi)
 
 ; authentication modules
     Module mod_auth_textfile
     Module mod_auth_database
-$(if test $VARIANT = "monolythic"; then cat authmodules.tmpl; fi)
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat authmodules.tmpl)\""; fi)
 
 ; authorization modules
     Module mod_authz_database
@@ -26,14 +26,16 @@ $(if test $VARIANT = "monolythic"; then cat authmodules.tmpl; fi)
     Module mod_doctype_json
 
 ; modules for XML processing
-$(if test $VARIANT = "monolythic"; then cat xmlmodules.tmpl; fi)
-$(if test $VARIANT = "monolythic"; then cat jsonmodules.tmpl; fi)
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat xmlmodules.tmpl)\""; fi)
+
+; modules for JSON processing
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat jsonmodules.tmpl)\""; fi)
 
 ; data normalization modules   
-    Module mod_normalize_locale
     Module mod_normalize_string
     Module mod_normalize_base64
     Module mod_normalize_number
+$(if test "x$WITH_ICU" = "x1"; then echo ";    Module mod_normalize_locale"; fi)
 
 ; data types modules	
     Module mod_datatype_datetime
@@ -44,10 +46,15 @@ $(if test $VARIANT = "monolythic"; then cat jsonmodules.tmpl; fi)
     Module mod_ddlcompiler_simpleform
     Module mod_command_tdl
 
+; scripting language modules
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat scriptingmodules.tmpl)\""; fi)
+
 ; various filtering modules
 $(if test $VARIANT = "monolythic"; then cat textwolfmodules.tmpl; fi)
     Module mod_filter_blob
 
-; scheduling modules    
+; various other modules
     Module mod_job_schedule_db
+$(if test "x$WITH_LIBHPDF" = "x1"; then echo ";    Module mod_print_harupdf"; fi)
+$(if test "x$WITH_FREEIMAGE" = "x1"; then echo ";    Module mod_graphix"; fi)
 }

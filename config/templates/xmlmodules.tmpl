@@ -1,7 +1,4 @@
+$(if test "x$WITH_TEXTWOLF" = "x1"; then eval "echo \"$(cat xmlmodule-textwolf.tmpl)\""; fi)
 
-; XML processing using textwolf
-    Module mod_filter_textwolf
-
-; XML processing using libxml2
-;    Module mod_filter_libxml2
+$(if test "x$WITH_LIBXML2" = "x1"; then eval "echo \"$(cat xmlmodule-libxml2.tmpl)\""; fi)
 
