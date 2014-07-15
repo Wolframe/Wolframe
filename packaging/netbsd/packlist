@@ -242,6 +242,7 @@ usr/pkg/include/wolframe/filter/typedfilter.hpp
 usr/pkg/include/wolframe/filter/typedfilterScope.hpp
 usr/pkg/include/wolframe/filter/typingfilter.hpp
 @dirrm usr/pkg/include/wolframe/filter
+usr/pkg/include/wolframe/types/addressRestriction.hpp
 usr/pkg/include/wolframe/types/base64.h
 usr/pkg/include/wolframe/types/base64.hpp
 usr/pkg/include/wolframe/types/byte2hex.h
@@ -297,7 +298,6 @@ usr/pkg/include/wolframe/crypto/sha1.h
 usr/pkg/include/wolframe/crypto/sha2.h
 @dirrm usr/pkg/include/wolframe/crypto
 usr/pkg/include/wolframe/system/SSLcertificateInfo.hpp
-usr/pkg/include/wolframe/system/addressRestriction.hpp
 usr/pkg/include/wolframe/system/connectionEndpoint.hpp
 usr/pkg/include/wolframe/system/connectionHandler.hpp
 usr/pkg/include/wolframe/system/errorCode.hpp
