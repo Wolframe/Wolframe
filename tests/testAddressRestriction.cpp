@@ -70,6 +70,7 @@ static const TestDescription testDescription[] =
 
 	{types::AddressRestriction::Allow_Deny, {"192.168.19.123/24",0}, {"192.168.19.124",0}, "192.168.19.123", true},
 	{types::AddressRestriction::Allow_Deny, {"192.168.19.123/24",0}, {"192.168.19.124",0}, "192.168.19.124", false},
+	{types::AddressRestriction::Allow_Deny, {"192.168.19.123/24",0}, {"192.168.19.124","192.168.19.125","192.168.19.126",0}, "192.168.19.125", false},
 	{types::AddressRestriction::Allow_Deny, {"192.168.19.123/255.255.255.248",0}, {"192.168.19.122",0}, "192.168.19.122", false},
 	{types::AddressRestriction::Allow_Deny, {0},{0},0,false}
 };

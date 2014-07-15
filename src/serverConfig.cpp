@@ -54,7 +54,7 @@ namespace net {
 
 static const unsigned short DEFAULT_NOF_THREADS = 4;
 
-static bool parseAddressRestriction( types::AddressRestriction& restr, const config::ConfigurationNode& pt)
+static bool parseAddressRestriction( types::AddressRestriction& restr, const config::ConfigurationNode& pt, const char* logprefix)
 {
 	bool success = true;
 	bool orderDefined = false;
@@ -80,7 +80,7 @@ static bool parseAddressRestriction( types::AddressRestriction& restr, const con
 				catch (const std::runtime_error& e)
 				{
 					success = false;
-					LOG_ERROR << "Error in deny address restriction " << L1it->second.position().logtext() << ": " << e.what();
+					LOG_ERROR << logprefix << "Error in deny address restriction " << L1it->second.position().logtext() << ": " << e.what();
 				}
 			}
 		}
@@ -101,7 +101,7 @@ static bool parseAddressRestriction( types::AddressRestriction& restr, const con
 				catch (const std::runtime_error& e)
 				{
 					success = false;
-					LOG_ERROR << "Error in deny address restriction " << L1it->second.position().logtext() << ": " << e.what();
+					LOG_ERROR << logprefix << "Error in deny address restriction " << L1it->second.position().logtext() << ": " << e.what();
 				}
 			}
 		}
@@ -128,7 +128,7 @@ static bool parseAddressRestriction( types::AddressRestriction& restr, const con
 			else
 			{
 				success = false;
-				LOG_ERROR << "unknown value specified for order (neither 'deny,allow' nor 'allow,deny'): '" << orderval << "' " << L1it->second.position().logtext();
+				LOG_ERROR << logprefix << "Unknown value specified for order (neither 'deny,allow' nor 'allow,deny'): '" << orderval << "' " << L1it->second.position().logtext();
 			}
 		}
 	}
@@ -137,7 +137,7 @@ static bool parseAddressRestriction( types::AddressRestriction& restr, const con
 		if (denyDefined)
 		{
 			success = false;
-			LOG_ERROR << "restrictions with 'deny' defined but without 'order' " << pt.position().logtext();
+			LOG_ERROR << logprefix << "Restrictions with 'deny' defined but without 'order' " << pt.position().logtext();
 		}
 		if (allowDefined)
 		{
@@ -146,10 +146,114 @@ static bool parseAddressRestriction( types::AddressRestriction& restr, const con
 	}
 	if (!allowDefined)
 	{
-		LOG_WARNING << "restrictions without allow will exclude all " << pt.position().logtext();
+		LOG_WARNING << logprefix << "Restrictions without allow will exclude all " << pt.position().logtext();
 	}
 	return success;
 }
+
+struct ConnectionProperties
+{
+	enum Defined {D_host,D_identifier,D_port,D_maxConn,D_restrictions};
+	unsigned int definedFlags;
+
+	std::string host;
+	net::LocalEndpointConfig localEndpointConfig;
+	unsigned short port;
+	unsigned short maxConn;
+	types::AddressRestriction restrictions;
+	const char* logprefix;
+
+	ConnectionProperties( const char* logprefix_)
+		:definedFlags(0),port(0),maxConn(0),logprefix(logprefix_){}
+	ConnectionProperties( const ConnectionProperties& o)
+		:definedFlags(o.definedFlags),host(o.host),localEndpointConfig(o.localEndpointConfig),port(o.port),maxConn(o.maxConn),restrictions(o.restrictions),logprefix(o.logprefix){}
+
+	bool defined( Defined f)
+	{
+		bool rt = (0!=(definedFlags & (1 << f)));
+		definedFlags |= (1 << f);
+		return rt;
+	}
+
+	bool parse( const config::ConfigurationNode::const_iterator& itr, bool& retVal)
+	{
+		types::PropertyTree::Position position = itr->second.position();
+		if (boost::algorithm::iequals( itr->first, "address" ))	{
+			bool isDefined = defined( D_host);
+			if ( ! config::Parser::getValue( logprefix, *itr, host, &isDefined ))
+			{
+				LOG_ERROR << logprefix << "Error in configuration file " << position.logtext();
+				retVal = false;
+			}
+			else	{
+				if ( host == "*" )
+					host = "0.0.0.0";
+			}
+		}
+		else if ( boost::algorithm::iequals( itr->first, "port" ))	{
+			bool isDefined = defined( D_port);
+			if ( ! config::Parser::getValue( logprefix, *itr, port,
+						config::Parser::RangeDomain<unsigned short>( 1 ),
+						&isDefined ))
+			{
+				LOG_ERROR << logprefix << "Error in configuration file " << position.logtext();
+				retVal = false;
+			}
+		}
+		else if ( boost::algorithm::iequals( itr->first, "identifier" ))	{
+			bool isDefined = defined( D_identifier);
+			std::string val;
+			if ( ! config::Parser::getValue( logprefix, *itr, val, &isDefined ))
+			{
+				LOG_ERROR << logprefix << "Error in configuration file " << position.logtext();
+				retVal = false;
+			}
+			localEndpointConfig.socketIdentifier = val;
+		}
+		else if ( boost::algorithm::iequals( itr->first, "maxConnections" ))	{
+			bool isDefined = defined( D_maxConn);
+			if ( ! config::Parser::getValue( logprefix, *itr, maxConn, &isDefined ))
+			{
+				LOG_ERROR << logprefix << "Error in configuration file " << position.logtext();
+				retVal = false;
+			}
+		}
+		else if (boost::algorithm::iequals( itr->first, "restrictions" ))	{
+			if (defined( D_restrictions))
+			{
+				LOG_ERROR << logprefix << "Duplicate definition of restrictions in socket definition " << position.logtext();
+				retVal = false;
+			}
+			retVal &= parseAddressRestriction( restrictions, itr->second, logprefix);
+		}
+		else
+		{
+			return false;
+		}
+		return true;
+	}
+
+	bool setDefaults( const types::PropertyTree::Position& position)
+	{
+		bool rt = true;
+		if (!defined( D_port))
+		{
+			LOG_ERROR << logprefix << "No port defined for listener socket, using default " << position.logtext();
+			port = net::defaultTCPport();
+		}
+		if (!defined( D_restrictions))
+		{
+			LOG_WARNING << logprefix << "No restrictions defined for socket " << position.logtext() << " setting default to allow all " << position.logtext();
+			restrictions.defineAllowedAll();
+		}
+		if (!defined( D_maxConn))
+		{
+			LOG_WARNING << logprefix << "No maxConnections defined for socket (using default) " << position.logtext();
+		}
+		return rt;
+	}
+};
+
 
 /// Parse the configuration
 bool Configuration::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
@@ -173,147 +277,43 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "socket" ))	{
-			std::string	host;
-			net::LocalEndpointConfig localEndpointConfig;
-			unsigned short	port = 0;
-			unsigned short	maxConn = 0;
-			bool portDefined, connDefined;
-			portDefined = connDefined = false;
-			types::AddressRestriction restrictions;
-			bool restrictionsDefined = false;
+			ConnectionProperties connprops( logPrefix().c_str());
 
 			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 			      L2it != L1it->second.end(); L2it++ )	{
 
 				position = L2it->second.position();
-				if ( boost::algorithm::iequals( L2it->first, "host" ) ||
-						boost::algorithm::iequals( L2it->first, "address" ))	{
-					bool isDefined = ( ! host.empty());
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, host, &isDefined ))
-					{
-						LOG_ERROR << "Error in configuration file " << position.logtext();
-						retVal = false;
-					}
-					else	{
-						if ( host == "*" )
-							host = "0.0.0.0";
-					}
-				}
-				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, port,
-								config::Parser::RangeDomain<unsigned short>( 1 ),
-								&portDefined ))
-					{
-						LOG_ERROR << "Error in configuration file " << position.logtext();
-						retVal = false;
-					}
-				}
-				else if ( boost::algorithm::iequals( L2it->first, "identifier" ))	{
-					bool isDefined = ( ! localEndpointConfig.socketIdentifier.empty());
-					std::string val;
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, val, &isDefined ))
-					{
-						LOG_ERROR << "Error in configuration file " << position.logtext();
-						retVal = false;
-					}
-					localEndpointConfig.socketIdentifier = val;
-				}
-				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
-					{
-						LOG_ERROR << "Error in configuration file " << position.logtext();
-						retVal = false;
-					}
-				}
-				else if (boost::algorithm::iequals( L2it->first, "restrictions" ))	{
-					if (restrictionsDefined)
-					{
-						LOG_ERROR << "Duplicate definition of restrictions in socket definition " << position.logtext();
-						retVal = false;
-					}
-					restrictionsDefined = true;
-					retVal &= parseAddressRestriction( restrictions, L2it->second);
-				}
-				else
+				if (!connprops.parse( L2it, retVal))
+				{
 					LOG_WARNING << logPrefix() << "socket: unknown configuration option: '"
 						    << L2it->first << "' " << position.logtext();
+				}
 			}
-			if ( port == 0 )
-				port = net::defaultTCPport();
-			if (!restrictionsDefined)
+			if (!connprops.setDefaults( position))
 			{
-				LOG_WARNING << "No restrictions defined for socket " << position.logtext() << " setting default to allow all " << position.logtext();
-				restrictions.defineAllowedAll();
+				retVal = false;
 			}
-			net::ServerTCPendpoint lep( host, port, maxConn, localEndpointConfig, restrictions );
+			net::ServerTCPendpoint lep( connprops.host,
+						    connprops.port,
+						    connprops.maxConn,
+						    connprops.localEndpointConfig,
+						    connprops.restrictions );
 			address.push_back( lep );
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "SSLsocket" ))	{
-			std::string	host;
-			net::LocalEndpointConfig localEndpointConfig;
-			unsigned short	port = 0;
-			unsigned short	maxConn = 0;
 			std::string	certFile;
 			std::string	keyFile;
 			std::string	CAdirectory;
 			std::string	CAchainFile;
 			bool		verify = false;
-			bool portDefined, connDefined, verifyDefined;
-			portDefined = connDefined = verifyDefined = false;
-			types::AddressRestriction restrictions;
-			bool restrictionsDefined;
+			bool		verifyDefined = false;
+			ConnectionProperties connprops( logPrefix().c_str());
 
 			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
 			      L2it != L1it->second.end(); L2it++ )	{
 				position = L2it->second.position();
-				if ( boost::algorithm::iequals( L2it->first, "host" ) ||
-						boost::algorithm::iequals( L2it->first, "address" ))	{
-					bool isDefined = ( ! host.empty());
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, host, &isDefined ))
-					{
-						LOG_ERROR << "Error in configuration file " << position.logtext();
-						retVal = false;
-					}
-					else	{
-						if ( host == "*" )
-							host = "0.0.0.0";
-					}
-				}
-				else if ( boost::algorithm::iequals( L2it->first, "port" ))	{
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, port,
-								config::Parser::RangeDomain<unsigned short>( 1 ),
-								&portDefined ))
-					{
-						LOG_ERROR << "Error in configuration file " << position.logtext();
-						retVal = false;
-					}
-				}
-				else if ( boost::algorithm::iequals( L2it->first, "identifier" ))	{
-					bool isDefined = ( ! localEndpointConfig.socketIdentifier.empty());
-					std::string val;
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, val, &isDefined ))
-					{
-						LOG_ERROR << "Error in configuration file " << position.logtext();
-						retVal = false;
-					}
-					localEndpointConfig.socketIdentifier = val;
-				}
-				else if ( boost::algorithm::iequals( L2it->first, "maxConnections" ))	{
-					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, maxConn, &connDefined ))
-					{
-						LOG_ERROR << "Error in configuration file " << position.logtext();
-						retVal = false;
-					}
-				}
-				else if (boost::algorithm::iequals( L2it->first, "restrictions" ))	{
-					if (restrictionsDefined)
-					{
-						LOG_ERROR << "Duplicate definition of restrictions in socket definition " << position.logtext();
-						retVal = false;
-					}
-					restrictionsDefined = true;
-					retVal &= parseAddressRestriction( restrictions, L2it->second);
-				}
+				if (connprops.parse( L2it, retVal))
+				{}
 				else if ( boost::algorithm::iequals( L2it->first, "certificate" ))	{
 					bool isDefined = ( ! certFile.empty());
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, certFile, &isDefined ))
@@ -359,16 +359,15 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 						    << L2it->first << "'" << position.logtext();
 			}
 #ifdef WITH_SSL
-			if ( port == 0 )
-				port = net::defaultSSLport();
-			if (!restrictionsDefined)
+			if (!connprops.setDefaults( position))
 			{
-				LOG_WARNING << "No restrictions defined for socket at " << position.logtext() << " setting default to allow all " << position.logtext();
-				restrictions.defineAllowedAll();
+				retVal = false;
 			}
-
-			net::ServerSSLendpoint lep( host, port, maxConn,
-						    localEndpointConfig, restrictions,
+			net::ServerSSLendpoint lep( connprops.host,
+						    connprops.port,
+						    connprops.maxConn,
+						    connprops.localEndpointConfig,
+						    connprops.restrictions,
 						    certFile, keyFile,
 						    verify, CAdirectory, CAchainFile );
 			SSLaddress.push_back( lep );

@@ -4,10 +4,15 @@
 	<title>Step 4 - Implement server side customer list</title>	
 
 	<para>
-		We want to store the customer data in an Sqlite database, so we have to
-		tell the server to load the database module for Sqlite:
+		We want to store the customer data in a database.
+		As language to describe this transaction we use TDL
+		(Transaction Definition Language) and as database
+		we use Sqlite. So we have to
+		tell the server to load the TDL module and the
+		database module for Sqlite:
 		<programlisting language='shell'>
 LoadModules {
+    <emphasis role="bold">module mod_command_tdl</emphasis>
     <emphasis role="bold">module mod_db_sqlite3</emphasis>
 }
 		</programlisting>
@@ -87,6 +92,7 @@ LoadModules {
 		<programlisting language='shell'>
 ..
 Module files to load:
+  /usr/lib/wolframe/modules/mod_command_tdl
   /usr/lib/wolframe/modules/mod_db_sqlite3
   /usr/lib/wolframe/modules/mod_doctype_xml
   /usr/lib/wolframe/modules/mod_filter_libxml2
@@ -102,6 +108,7 @@ Module files to load:
 
 		<programlisting language='shell'>
 LoadModules {
+    module mod_command_tdl
     module mod_db_sqlite3
     module mod_doctype_xml
     module mod_filter_libxml2
@@ -185,6 +192,7 @@ END
 
 		<programlisting language='shell'>
 LoadModules {
+    module mod_command_tdl
     module mod_db_sqlite3
     module mod_doctype_xml
     module mod_filter_libxml2
