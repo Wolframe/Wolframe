@@ -22,6 +22,22 @@
 
         MaxConnections 4
 
+; Access restriction by IP
+; Default: Allow all
+
+        Restrictions {
+        
+; Allow <IP>
+
+            Allow all
+
+; Deny <IP>
+
+;            Deny 127.0.0.1
+        }
+        
+    }
+
 ; Server certificate file (PEM)
 
         Certificate ${CERTDIR}/wolframed.crt

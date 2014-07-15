@@ -37,6 +37,20 @@ Listen {
 
         MaxConnections 4
 
+; Access restriction by IP
+; Default: Allow all
+
+        Restrictions {
+        
+; Allow <IP>
+
+            Allow all
+
+; Deny <IP>
+
+;            Deny 127.0.0.1
+        }
+        
     }
 
 $(if test "x$WITH_SSL" = "x1"; then eval "echo \"$(cat listen-ssl.tmpl | sed 's/^\(.*\)/;\1/g' )\""; fi)
