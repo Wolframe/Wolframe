@@ -1,5 +1,5 @@
 <sect1>
-	<title>Service / Daemon</title>
+	<title>Service or daemon configuration</title>
 	<para>
 	The service configuration is depending on the platform you run 
 	the Wolframe server. We show the configuration for Windows and 

@@ -42,7 +42,6 @@ using namespace _Wolframe;
 
 struct TestDescription
 {
-	types::AddressRestriction::Order order;
 	const char* restriction1[8];
 	const char* restriction2[8];
 	const char* in;
@@ -50,29 +49,29 @@ struct TestDescription
 };
 static const TestDescription testDescription[] =
 {
-	{types::AddressRestriction::Deny_Allow, {"all",0}, {"192.168.0.0",0}, "192.168.0.0", true},
-	{types::AddressRestriction::Deny_Allow, {"all",0}, {"192.168.0.1",0}, "192.168.0.0", false},
-	{types::AddressRestriction::Deny_Allow, {"all",0}, {"192.168.0.1/24",0}, "192.168.0.0", true},
-	{types::AddressRestriction::Deny_Allow, {"all",0}, {"192.168.0.1/31",0}, "192.168.0.0", true},
-	{types::AddressRestriction::Deny_Allow, {"all",0}, {"192.168.0.1/16",0}, "192.168.123.123", true},
-	{types::AddressRestriction::Deny_Allow, {"all",0}, {"2607:f0d0:1002:5100::/56",0}, "2607:f0d0:1002:5100::4",true},
-	{types::AddressRestriction::Deny_Allow, {"all",0}, {"2607:f0d0:1002:5100::/56",0}, "2607:f0d0:1002:5200::1",false},
+	{{"192.168.0.0",0},{0}, "192.168.0.0", true},
+	{{"192.168.0.1",0},{0}, "192.168.0.0", false},
+	{{"192.168.0.1/24",0},{0}, "192.168.0.0", true},
+	{{"192.168.0.1/31",0},{0}, "192.168.0.0", true},
+	{{"192.168.0.1/16",0},{0}, "192.168.123.123", true},
+	{{"2607:f0d0:1002:5100::/56",0},{0}, "2607:f0d0:1002:5100::4",true},
+	{{"2607:f0d0:1002:5100::/56",0},{0}, "2607:f0d0:1002:5200::1",false},
 
-	{types::AddressRestriction::Deny_Allow, {"192.168.19.123/24",0}, {"192.168.19.124",0}, "192.168.19.123", false},
-	{types::AddressRestriction::Deny_Allow, {"192.168.19.123/24",0}, {"192.168.19.124",0}, "192.168.19.124", true},
-	{types::AddressRestriction::Deny_Allow, {"192.168.19.123/255.255.255.248",0}, {"192.168.19.122",0}, "192.168.19.122", true},
+	{{"192.168.19.123/24",0}, {"192.168.19.123",0}, "192.168.19.123", false},
+	{{"192.168.19.123/24",0}, {"192.168.19.123",0}, "192.168.19.124", true},
+	{{"192.168.19.123/255.255.255.248",0}, {"192.168.19.122",0}, "192.168.19.122", false},
 
-	{types::AddressRestriction::Allow_Deny, {"all",0}, {"192.168.0.0",0}, "192.168.0.0", false},
-	{types::AddressRestriction::Allow_Deny, {"all",0}, {"192.168.0.1",0}, "192.168.0.0", true},
-	{types::AddressRestriction::Allow_Deny, {"all",0}, {"192.168.0.1/24",0}, "192.168.0.0", false},
-	{types::AddressRestriction::Allow_Deny, {"all",0}, {"192.168.0.1/31",0}, "192.168.0.0", false},
-	{types::AddressRestriction::Allow_Deny, {"all",0}, {"192.168.0.1/16",0}, "192.168.123.123", false},
+	{{"all",0}, {"192.168.0.0",0}, "192.168.0.0", false},
+	{{"all",0}, {"192.168.0.1",0}, "192.168.0.0", true},
+	{{"all",0}, {"192.168.0.1/24",0}, "192.168.0.0", false},
+	{{"all",0}, {"192.168.0.1/31",0}, "192.168.0.0", false},
+	{{"all",0}, {"192.168.0.1/16",0}, "192.168.123.123", false},
 
-	{types::AddressRestriction::Allow_Deny, {"192.168.19.123/24",0}, {"192.168.19.124",0}, "192.168.19.123", true},
-	{types::AddressRestriction::Allow_Deny, {"192.168.19.123/24",0}, {"192.168.19.124",0}, "192.168.19.124", false},
-	{types::AddressRestriction::Allow_Deny, {"192.168.19.123/24",0}, {"192.168.19.124","192.168.19.125","192.168.19.126",0}, "192.168.19.125", false},
-	{types::AddressRestriction::Allow_Deny, {"192.168.19.123/255.255.255.248",0}, {"192.168.19.122",0}, "192.168.19.122", false},
-	{types::AddressRestriction::Allow_Deny, {0},{0},0,false}
+	{{"192.168.19.123/24",0}, {"192.168.19.124",0}, "192.168.19.123", true},
+	{{"192.168.19.123/24",0}, {"192.168.19.124",0}, "192.168.19.124", false},
+	{{"192.168.19.123/24",0}, {"192.168.19.124","192.168.19.125","192.168.19.126",0}, "192.168.19.125", false},
+	{{"192.168.19.123/255.255.255.248",0}, {"192.168.19.122",0}, "192.168.19.122", false},
+	{{0},{0},0,false}
 };
 
 
@@ -91,35 +90,19 @@ protected:
 		for (unsigned int tt=0; testDescription[tt].in; tt++)
 		{
 			types::AddressRestriction restriction;
-			restriction.defineOrder( testDescription[tt].order);
 
 			const char* rstr = 0;
 			for (unsigned int ii=0; 0!=(rstr=testDescription[tt].restriction1[ii]); ii++)
 			{
 				try
 				{
-					switch (testDescription[tt].order)
+					if (0==std::strcmp( rstr, "all"))
 					{
-						case types::AddressRestriction::Allow_Deny:
-							if (0==std::strcmp( rstr, "all"))
-							{
-								restriction.defineAllowedAll();
-							}
-							else
-							{
-								restriction.defineAddressAllowed( rstr);
-							}
-							break;
-						case types::AddressRestriction::Deny_Allow:
-							if (0==std::strcmp( rstr, "all"))
-							{
-								restriction.defineDeniedAll();
-							}
-							else
-							{
-								restriction.defineAddressDenied( rstr);
-							}
-							break;
+						restriction.defineAllowedAll();
+					}
+					else
+					{
+						restriction.defineAddressAllowed( rstr);
 					}
 				}
 				catch (const std::runtime_error& e)
@@ -131,28 +114,13 @@ protected:
 			{
 				try
 				{
-					switch (testDescription[tt].order)
+					if (0==std::strcmp( rstr, "all"))
 					{
-						case types::AddressRestriction::Deny_Allow:
-							if (0==std::strcmp( rstr, "all"))
-							{
-								restriction.defineAllowedAll();
-							}
-							else
-							{
-								restriction.defineAddressAllowed( rstr);
-							}
-							break;
-						case types::AddressRestriction::Allow_Deny:
-							if (0==std::strcmp( rstr, "all"))
-							{
-								restriction.defineDeniedAll();
-							}
-							else
-							{
-								restriction.defineAddressDenied( rstr);
-							}
-							break;
+						restriction.defineDeniedAll();
+					}
+					else
+					{
+						restriction.defineAddressDenied( rstr);
 					}
 				}
 				catch (const std::runtime_error& e)

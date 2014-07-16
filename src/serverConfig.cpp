@@ -57,9 +57,7 @@ static const unsigned short DEFAULT_NOF_THREADS = 4;
 static bool parseAddressRestriction( types::AddressRestriction& restr, const config::ConfigurationNode& pt, const char* logprefix)
 {
 	bool success = true;
-	bool orderDefined = false;
 	bool allowDefined = false;
-	bool denyDefined = false;
 
 	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )
 	{
@@ -86,7 +84,6 @@ static bool parseAddressRestriction( types::AddressRestriction& restr, const con
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "deny" ))
 		{
-			denyDefined = true;
 			if (boost::algorithm::iequals( L1it->second.data(), "all")
 			||	boost::algorithm::iequals( L1it->second.data(), "*"))
 			{
@@ -105,48 +102,11 @@ static bool parseAddressRestriction( types::AddressRestriction& restr, const con
 				}
 			}
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "order" ))
-		{
-			orderDefined = true;
-			std::string orderval;
-			std::string::const_iterator vi = L1it->second.data().begin(), ve = L1it->second.data().end();
-			for (; vi != ve; ++vi)
-			{
-				if ((unsigned char)*vi > 32)
-				{
-					orderval.push_back( *vi);
-				}
-			}
-			if (boost::algorithm::iequals( orderval, "allow,deny"))
-			{
-				restr.defineOrder( types::AddressRestriction::Allow_Deny);
-			}
-			else if (boost::algorithm::iequals( orderval, "deny,allow"))
-			{
-				restr.defineOrder( types::AddressRestriction::Deny_Allow);
-			}
-			else
-			{
-				success = false;
-				LOG_ERROR << logprefix << "Unknown value specified for order (neither 'deny,allow' nor 'allow,deny'): '" << orderval << "' " << L1it->second.position().logtext();
-			}
-		}
-	}
-	if (!orderDefined)
-	{
-		if (denyDefined)
-		{
-			success = false;
-			LOG_ERROR << logprefix << "Restrictions with 'deny' defined but without 'order' " << pt.position().logtext();
-		}
-		if (allowDefined)
-		{
-			restr.defineOrder( types::AddressRestriction::Allow_Deny);
-		}
 	}
 	if (!allowDefined)
 	{
-		LOG_WARNING << logprefix << "Restrictions without allow will exclude all " << pt.position().logtext();
+		restr.defineAllowedAll();
+		LOG_WARNING << logprefix << "Restrictions without allow directive will allow all not explicitely excluded with 'deny'" << pt.position().logtext();
 	}
 	return success;
 }

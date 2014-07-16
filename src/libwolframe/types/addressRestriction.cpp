@@ -282,36 +282,15 @@ bool AddressRestriction::matches( const std::vector<Element>& ar, const IPAddres
 	return false;
 }
 
-void AddressRestriction::defineOrder( const Order& order_)
-{
-	m_order = order_;
-}
-
 bool AddressRestriction::isAllowed( const boost::asio::ip::address& addr) const
 {
-	switch (m_order)
+	if (matches( m_allowedar, addr))
 	{
-		case Deny_Allow:
-			if (matches( m_deniedar, addr))
-			{
-				if (matches( m_allowedar, addr))
-				{
-					return true;
-				}
-				return false;
-			}
-			return true;
-
-		case Allow_Deny:
-			if (matches( m_allowedar, addr))
-			{
-				if (matches( m_deniedar, addr))
-				{
-					return false;
-				}
-				return true;
-			}
+		if (matches( m_deniedar, addr))
+		{
 			return false;
+		}
+		return true;
 	}
 	return false;
 }
@@ -319,17 +298,8 @@ bool AddressRestriction::isAllowed( const boost::asio::ip::address& addr) const
 std::string AddressRestriction::tostring() const
 {
 	std::ostringstream rt;
-	switch (m_order)
-	{
-		case Deny_Allow:
-			rt << "denied="; printElementVector( rt, m_deniedar);
-			rt << ", allowed="; printElementVector( rt, m_allowedar);
-			break;
-		case Allow_Deny:
-			rt << "allowed="; printElementVector( rt, m_allowedar);
-			rt << ", denied="; printElementVector( rt, m_deniedar);
-			break;
-	}
+	rt << "allowed="; printElementVector( rt, m_allowedar);
+	rt << ", denied="; printElementVector( rt, m_deniedar);
 	return rt.str();
 }
 

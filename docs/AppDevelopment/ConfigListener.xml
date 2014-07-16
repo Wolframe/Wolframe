@@ -33,9 +33,9 @@
 		</tbody>
 		</tgroup>
 	</table>
-	Here is an example configuration of the global settings:
+	Here is an example configuration of the server global settings:
 	<programlisting language='text'>
-Listener
+Server
 {
     MaxConnections 12
     Threads 7
@@ -100,8 +100,9 @@ Listener
 				<entry>Defines the subsection containing IP
 					restrictions on the connection. If not 
 					defined, the connection is allowed 
-					from everywhere. We will describe
-					IP restrictions later.</entry>
+					from everywhere. The configuration
+					of IP restrictions will be defined in the
+					<link linkend='sectionIpRestrictions'>section IP restrictions</link>.</entry>
 			</row>
 		</tbody>
 		</tgroup>
@@ -176,8 +177,9 @@ Server
 				<entry>Defines the subsection containing 
 					IP restrictions on the connection. 
 					If not defined, the connection is 
-					allowed from everywhere. We will
-					describe IP restrictions later.</entry>
+					allowed from everywhere. The configuration
+					of IP restrictions will be defined in the
+					<link linkend='sectionIpRestrictions'>section IP restrictions</link>.</entry>
 			</row>
 			<row>
 				<entry>Certificate</entry>
@@ -224,6 +226,53 @@ Server
 	</programlisting>
 	</para>
 	</sect2>
+ 
+	<sect2 id='sectionIpRestrictions'>
+	<title>IP restrictions</title>
+	<para>IP restrictions are defined as sub section <code>restrictions</code>
+	of the socket configurations (<code>Listener</code> and <code>ListenerSSL</code>)
+	in the server configuration.
+	</para>
+	<table frame="all" width="100%">
+		<title>Restrictions settings</title>
+		<tgroup cols="2">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="3*"/>
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
 
+		<tbody>
+			<row>
+				<entry>Allow</entry>
+				<entry>Define an IP or network address
+				as allowed to connect from, if not explicitely
+				defined by a <code>Deny</code> directive.
+				If no <code>allow</code> is specified then 
+				all IPs are allowed to connect from, if not
+				explicitely excluded by a <code>deny</code>
+				directive. So no <code>allow</code> is equivalent
+				to <code>allow all</code>
+				</entry>
+			</row>
+			<row>
+				<entry>Deny</entry>
+				<entry>Define an IP or network address
+				as forbidden to connect from. If a
+				<code>deny</code> directive refers to
+				an IP explictely defined or part of an
+				<code>allow</code> then the <code>deny</code>
+				is stronger and overrides the <code>allow</code>
+				declaration.
+				</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+
+	</sect2>
 </sect1>
 

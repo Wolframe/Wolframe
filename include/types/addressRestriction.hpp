@@ -48,18 +48,10 @@ class AddressRestriction
 {
 public:
 	/// \brief Default constructor
-	AddressRestriction()
-		:m_order(Allow_Deny){}
+	AddressRestriction(){}
 	/// \brief Copy constructor
 	AddressRestriction( const AddressRestriction& o)
-		:m_order(o.m_order),m_allowedar(o.m_allowedar),m_deniedar(o.m_deniedar){}
-
-	enum Order
-	{
-		Deny_Allow,
-		Allow_Deny
-	};
-	void defineOrder( const Order& order_);
+		:m_allowedar(o.m_allowedar),m_deniedar(o.m_deniedar){}
 
 	/// \brief Define an explicitely allowed address
 	void defineAddressAllowed( const std::string& adr);
@@ -95,7 +87,6 @@ private:
 	static bool matches( const std::vector<Element>& ar, const IPAddress& addr);
 
 private:
-	Order m_order;
 	std::vector<Element> m_allowedar;
 	std::vector<Element> m_deniedar;
 };
