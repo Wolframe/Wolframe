@@ -33,6 +33,7 @@ CPP_OBJS = \
 	inputfilterScope.obj \
 	joinfilter.obj \
 	null_filter.obj \
+	execContextInputFilter.obj \
 	cmdbind_lineCommandHandler.obj \
 	cmdbind_IOFilterCommandHandlerEscDLF.obj
 

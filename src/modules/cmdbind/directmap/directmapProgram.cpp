@@ -35,6 +35,7 @@
 #include "directmapProgram.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/parseUtils.hpp"
+#include "filter/execContextInputFilter.hpp"
 #include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <stdexcept>
@@ -53,53 +54,6 @@ bool DirectmapProgram::is_mine( const std::string& filename) const
 	}
 	if (boost::iequals( ext, ".dmap")) return true;
 	return false;
-}
-
-static void parseMetaData( types::DocMetaData& metadata, std::string::const_iterator& si, const std::string::const_iterator& se)
-{
-	static const utils::CharTable keytab( "a..zA..Z_0..9.:-");
-	static const utils::CharTable optab( "=,{}");
-	char ch = utils::gotoNextToken( si, se);
-	if (ch != '{') throw std::logic_error("illegal call of parseMetaData");
-	++si;
-	std::map<std::string,bool> defmap;
-	for (;;)
-	{
-		ch = utils::gotoNextToken( si, se);
-		if (ch == '}') break;
-		if (!ch) throw std::runtime_error("unexpected end of file parsing return document meta data");
-		std::string key;
-		ch = utils::parseNextToken( key, si, se, optab, keytab);
-		if (optab[ch]) throw std::runtime_error("identifier expected, key of document meta data attribute");
-		if (key.empty()) throw std::runtime_error("non empty key of document meta data attribute expected");
-		ch = utils::gotoNextToken( si, se);
-		if (!ch) throw std::runtime_error("unexpected end of file parsing return document meta data");
-		if (ch != '=') throw std::runtime_error("unexpected token, assignment operator '=' of document meta data attribute expected");
-		++si;
-		std::string val;
-		ch = utils::parseNextToken( val, si, se, optab, keytab);
-		if (!ch) throw std::runtime_error("unexpected end of file parsing return document meta data");
-		if (optab[ch]) throw std::runtime_error("string or identifier expected as value of document meta data attribute");
-		if (defmap.find(key) != defmap.end())
-		{
-			throw std::runtime_error( std::string("duplicate definition of attribute '") + key + "'");
-		}
-		defmap[ key] = true;
-		if (ch != '"' && ch != '\'' && val == "NULL")
-		{
-			metadata.deleteAttribute( key);
-		}
-		else
-		{
-			metadata.setAttribute( key, val);
-		}
-		ch = utils::gotoNextToken( si, se);
-		if (ch == '}') break;
-		if (!ch) throw std::runtime_error("unexpected end of file parsing return document meta data");
-		if (ch != ',') std::runtime_error("unexpected token, separating comma ',' or end structure '}' of document meta data attribute expected");
-		++si;
-	}
-	++si;
 }
 
 static bool isAlphaNum( char ch)
@@ -122,8 +76,8 @@ static std::string errorToken( char ch, const std::string& tok)
 static const utils::CharTable g_fchartab( "a..zA..Z_0..9.");
 static const utils::CharTable g_fcharoptab( ";#(){}=,");
 
-static const char* g_directmap_ids[] = {"SKIP","FILTER","RETURN","CALL","AUTHORIZE",0};
-enum DirectmapKeyword{ d_NONE, d_SKIP,d_FILTER,d_RETURN,d_CALL,d_AUTHORIZE };
+static const char* g_directmap_ids[] = {"SKIP","FILTER","RETURN","CALL","CONTEXT","AUTHORIZE",0};
+enum DirectmapKeyword{ d_NONE, d_SKIP,d_FILTER,d_RETURN,d_CALL,d_CONTEXT,d_AUTHORIZE };
 static const utils::IdentifierTable g_directmap_idtab( false, g_directmap_ids);
 
 
@@ -181,6 +135,109 @@ bool parseKeyword( std::string::const_iterator& si, std::string::const_iterator 
 	si = start;
 	return false;
 }
+
+static const utils::CharTable g_set_keytab( "a..zA..Z_0..9.:-");
+static const utils::CharTable g_set_optab( "=,{}");
+
+static void parseMetaData( types::DocMetaData& metadata, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	char ch = gotoNextToken( si, se);
+	if (ch != '{') throw std::logic_error("illegal call of parseMetaData");
+	++si;
+	std::map<std::string,bool> defmap;
+	for (;;)
+	{
+		ch = gotoNextToken( si, se);
+		if (ch == '}') break;
+		if (!ch) throw std::runtime_error("unexpected end of file parsing return document meta data");
+		std::string key;
+		gotoNextToken( si, se);
+		ch = parseNextToken( key, si, se, g_set_optab, g_set_keytab);
+		if (g_set_optab[ch]) throw std::runtime_error("identifier expected, key of document meta data attribute");
+		if (key.empty()) throw std::runtime_error("non empty key of document meta data attribute expected");
+		ch = gotoNextToken( si, se);
+		if (!ch) throw std::runtime_error("unexpected end of file parsing return document meta data");
+		if (ch != '=') throw std::runtime_error("unexpected token, assignment operator '=' of document meta data attribute expected");
+		++si;
+		std::string val;
+		gotoNextToken( si, se);
+		ch = utils::parseNextToken( val, si, se, g_set_optab, g_set_keytab);
+		if (!ch) throw std::runtime_error("unexpected end of file parsing return document meta data");
+		if (g_set_optab[ch]) throw std::runtime_error("string or identifier expected as value of document meta data attribute");
+		if (defmap.find(key) != defmap.end())
+		{
+			throw std::runtime_error( std::string("duplicate definition of attribute '") + key + "'");
+		}
+		defmap[ key] = true;
+		if (ch != '"' && ch != '\'' && val == "NULL")
+		{
+			metadata.deleteAttribute( key);
+		}
+		else
+		{
+			metadata.setAttribute( key, val);
+		}
+		ch = gotoNextToken( si, se);
+		if (ch == '}') break;
+		if (!ch) throw std::runtime_error("unexpected end of file parsing return document meta data");
+		if (ch != ',') std::runtime_error("unexpected token, separating comma ',' or end structure '}' of document meta data attribute expected");
+		++si;
+	}
+	++si;
+}
+
+static void parseExecContextElementSet( std::vector<langbind::ExecContextElement>& elements, std::string::const_iterator& si, const std::string::const_iterator& se)
+{
+	char ch = gotoNextToken( si, se);
+	if (ch != '{') throw std::logic_error("illegal call of parseExecContextElementSet");
+	++si;
+	std::map<std::string,bool> defmap;
+	for (;;)
+	{
+		ch = gotoNextToken( si, se);
+		if (ch == '}') break;
+		if (!ch) throw std::runtime_error("unexpected end of file parsing execution context parameter");
+		std::string key;
+		gotoNextToken( si, se);
+		ch = utils::parseNextToken( key, si, se, g_set_optab, g_set_keytab);
+		if (g_set_optab[ch]) throw std::runtime_error("identifier expected, key of execution context parameter");
+		if (key.empty()) throw std::runtime_error("non empty key of execution context parameter expected");
+		ch = gotoNextToken( si, se);
+		if (!ch) throw std::runtime_error("unexpected end of file parsing execution context parameter");
+		if (ch != '=') throw std::runtime_error("unexpected token, assignment operator '=' of execution context parameter expected");
+		++si;
+		std::string val;
+		gotoNextToken( si, se);
+		ch = utils::parseNextToken( val, si, se, g_set_optab, g_set_keytab);
+		if (!ch) throw std::runtime_error("unexpected end of file parsing execution context parameter");
+		if (g_set_optab[ch]) throw std::runtime_error("string or identifier expected as value of an execution context parameter");
+		if (defmap.find(key) != defmap.end())
+		{
+			throw std::runtime_error( std::string("duplicate definition of execution context parameter name '") + key + "'");
+		}
+		defmap[ key] = true;
+		if (ch == '"' || ch == '\'')
+		{
+			elements.push_back( langbind::ExecContextElement( key, val));
+		}
+		else
+		{
+			langbind::ExecContextElement::Value vv = langbind::ExecContextElement::valueFromId( val);
+			if (vv == langbind::ExecContextElement::Resource)
+			{
+				throw std::runtime_error( std::string( "unknown identifier for value in expression: ") + val);
+			}
+			elements.push_back( langbind::ExecContextElement( key, vv));
+		}
+		ch = gotoNextToken( si, se);
+		if (ch == '}') break;
+		if (!ch) throw std::runtime_error("unexpected end of file parsing execution context parameter");
+		if (ch != ',') std::runtime_error("unexpected token, separating comma ',' or end structure '}' of execution context parameter expected");
+		++si;
+	}
+	++si;
+}
+
 
 struct CommandHeader
 {
@@ -299,6 +356,8 @@ static DirectmapCommandDescriptionR parseCommandDescription( std::string::const_
 
 		bool skipvalidation_input = false;	//... true if input is not validated
 		bool skipvalidation_output = false;	//... true if output is not validated
+		bool hasCONTEXT = false;
+		bool hasAUTHORIZE = false;
 
 		while ((ch = gotoNextToken( si, se)) != 0 && ch != ';')
 		{
@@ -384,15 +443,32 @@ static DirectmapCommandDescriptionR parseCommandDescription( std::string::const_
 				}
 				case d_CALL:
 				{
-					if (rt->function) throw std::runtime_error( "duplicate defintion of the form function to implement the request");
+					if (rt->function) throw std::runtime_error( "duplicate definition of the form function to implement the request");
 					rt->functionname = parseName( si, se, "(form function name) after CALL");
 					
 					rt->function = provider->formFunction( rt->functionname);
 					if (!rt->function) throw std::runtime_error( std::string("referenced undefined form function to implement the request'") + rt->functionname + "'");
 					break;
 				}
+				case d_CONTEXT:
+				{
+					if (hasCONTEXT) throw std::runtime_error( "duplicate definition of the context parameter set");
+					hasCONTEXT = true;
+					ch = gotoNextToken( si, se);
+					if (!ch)
+					{
+						throw std::runtime_error( "unexpected end of file");
+					}
+					if (ch != '{')
+					{
+						throw std::runtime_error( "unexpected token, set of execution context elements in curly brackets {..} expected after CONTEXT");
+					}
+					parseExecContextElementSet( rt->execContextElements, si, se);
+				}
 				case d_AUTHORIZE:
 				{
+					if (hasAUTHORIZE) throw std::runtime_error( "duplicate definition of an authorize function (only one allowed for a command handler command)");
+					hasAUTHORIZE = true;
 					AuthFunction authfunc = AuthFunction::parse( si, se);
 					rt->authfunction = authfunc.name;
 					rt->authresource = authfunc.resource;

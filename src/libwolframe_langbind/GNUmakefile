@@ -39,6 +39,7 @@ CPP_OBJS = \
 	joinfilter.o \
 	tostringfilter.o \
 	ptreefilter.o \
+	execContextInputFilter.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_ioFilterCommandHandlerEscDLF.o
 
