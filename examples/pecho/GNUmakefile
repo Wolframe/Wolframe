@@ -95,3 +95,6 @@ endif
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./pechod -c pecho.conf -f
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

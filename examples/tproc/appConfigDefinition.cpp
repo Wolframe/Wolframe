@@ -56,7 +56,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 	addConfig( "service", serviceCfg );
 	addConfig( "daemon", serviceCfg);
 
-	addConfig( "listen", serverCfg );
+	addConfig( "server", serverCfg );
 	addConfig( "logging", loggerCfg );
 	addConfig( "application", handlerCfg->m_appConfig );
 }
