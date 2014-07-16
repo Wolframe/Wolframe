@@ -1,0 +1,6 @@
+{
+	-doctype: "UserData.simpleform",
+	data: "bla",
+	command: "exec"
+}
+

@@ -84,7 +84,7 @@ class ExecContextInputFilter
 	:public langbind::TypedInputFilter
 {
 public:
-	explicit ExecContextInputFilter( const std::vector<ExecContextElement>& params_, const proc::ExecContext& ctx_, const std::string& authorizationResource_);
+	explicit ExecContextInputFilter( const std::vector<ExecContextElement>& params_, const proc::ExecContext& ctx_, const std::string& resource_);
 	ExecContextInputFilter( const ExecContextInputFilter& o);
 	virtual ~ExecContextInputFilter(){}
 

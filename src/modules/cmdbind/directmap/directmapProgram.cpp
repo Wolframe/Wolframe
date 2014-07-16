@@ -204,13 +204,20 @@ static void parseExecContextElementSet( std::vector<langbind::ExecContextElement
 		if (key.empty()) throw std::runtime_error("non empty key of execution context parameter expected");
 		ch = gotoNextToken( si, se);
 		if (!ch) throw std::runtime_error("unexpected end of file parsing execution context parameter");
-		if (ch != '=') throw std::runtime_error("unexpected token, assignment operator '=' of execution context parameter expected");
-		++si;
 		std::string val;
-		gotoNextToken( si, se);
-		ch = utils::parseNextToken( val, si, se, g_set_optab, g_set_keytab);
-		if (!ch) throw std::runtime_error("unexpected end of file parsing execution context parameter");
-		if (g_set_optab[ch]) throw std::runtime_error("string or identifier expected as value of an execution context parameter");
+		if (ch != '=')
+		{
+			ch = key[0];
+			val = key;
+		}
+		else
+		{
+			++si;
+			gotoNextToken( si, se);
+			ch = utils::parseNextToken( val, si, se, g_set_optab, g_set_keytab);
+			if (!ch) throw std::runtime_error("unexpected end of file parsing execution context parameter");
+			if (g_set_optab[ch]) throw std::runtime_error("string or identifier expected as value of an execution context parameter");
+		}
 		if (defmap.find(key) != defmap.end())
 		{
 			throw std::runtime_error( std::string("duplicate definition of execution context parameter name '") + key + "'");

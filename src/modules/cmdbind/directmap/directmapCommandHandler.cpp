@@ -36,6 +36,8 @@ Project Wolframe.
 #include "types/docmetadata.hpp"
 #include "types/variant.hpp"
 #include "filter/typingfilter.hpp"
+#include "filter/execContextInputFilter.hpp"
+#include "filter/joinfilter.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
@@ -132,6 +134,13 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			case 3:
 				// Initialize the function execution context:
 				m_functionclosure.reset( m_cmd->function->createClosure());
+				if (m_cmd->execContextElements.size())
+				{
+					//... if we have execution context arguments we have to join them with the input as new input:
+					TypedInputFilterR ecinput( new langbind::ExecContextInputFilter( m_cmd->execContextElements, *execContext(), ""));
+					TypedInputFilterR joinedinput( new langbind::JoinInputFilter( "dmapinput", ecinput, m_input));
+					m_input = joinedinput;
+				}
 				m_functionclosure->init( execContext(), m_input);
 				m_state = 4;
 				/* no break here ! */

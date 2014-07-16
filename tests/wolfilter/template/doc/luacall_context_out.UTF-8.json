@@ -1,0 +1,8 @@
+{
+	-doctype: "UserData.simpleform",
+	uname: "wolfilter",
+	host: "123.123.123.123",
+	data: "bla",
+	command: "exec"
+}
+

@@ -1,0 +1,9 @@
+FORM UserData
+	:root doc
+{
+	uname string
+	host string
+	data string
+	command string
+}
+
