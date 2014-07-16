@@ -80,3 +80,6 @@ endif
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./luad -c luad.conf -f -d DATA
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

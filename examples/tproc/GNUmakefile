@@ -125,9 +125,14 @@ local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
 	mkdir -p tests/temp
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) tests/tprocHandlerTest$(EXE)
+ifeq ($(WITH_EXPECT),1)
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) tests/testTProc
+endif
 endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe tproc example..."
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./tprocd -c tproc.conf -f
 
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

@@ -1,0 +1,52 @@
+#!/usr/bin/expect
+#
+# Start a wolframe daemon and communicate with it
+#
+
+package require Expect
+
+set config tproc.conf
+
+set timeout 5
+set serverpid [spawn ./tprocd -c $config -f]
+
+puts "wolframe tproc with protocol started with configuration file: $config (pid: $serverpid)"
+# allow the server to start
+sleep 5
+
+set timeout 5
+if { [catch {
+	spawn telnet localhost 7661
+
+	set timeout 1
+	send "cmdxx\r"
+	expect 	{
+		timeout	{ return "--> oops. timeout waiting for error / prompt\n" }
+		eof	{ return "--> EOF after bad input\n" }
+		"ERR unknown command\r\n"
+	}
+
+	set timeout 1
+	send "cmd1a\r"
+	expect 	{
+		timeout	{ return "--> oops. timeout waiting for error / prompt\n" }
+		eof	{ return "--> EOF after bad input\n" }
+		"OK CMD1A ?\r\n"
+	}
+
+	set timeout 1
+	send "quit\r"
+	expect 	{
+		"BYE"	{ send_user " --> Session terminated\n"}
+		timeout	{ send_user " --> oops. timeout waiting for BYE\n"; return 1 }
+		eof	{ send_user " --> Connection closed. OK\n" }
+	}
+	set timeout 1
+	expect 	{
+		timeout	{ send_user " --> oops. timeout waiting for EOF"; return 1 }
+		eof	{ send_user " --> Connection closed. OK\n" }
+	}
+} reason] } {
+	send_user "Error: $reason\n"
+	exit 1
+}
