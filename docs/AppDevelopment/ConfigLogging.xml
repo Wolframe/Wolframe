@@ -1,5 +1,5 @@
 <sect1>
-	<title>Logger Configuration</title>
+	<title>Logger configuration</title>
 	<para>
 	The logger configuration is defined in the <code>Logging</code>
 	section. The logger is defined for different backends.

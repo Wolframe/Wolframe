@@ -22,10 +22,10 @@ logging {
 }
 
 ; one connection, one thread is enough
-listen {
+server {
     maxConnections 1
     threads 1
-    socket {
+    listen {
         address	*
         port 7661
         maxConnections 1

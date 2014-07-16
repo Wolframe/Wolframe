@@ -1,8 +1,18 @@
 <sect1>
-	<title>AAAA Configuration</title>
-	<para>The aspects of authentication,authotization,auditing and accounting
-	are configured in the section <code>AAAA</code> of the 
-	server configuration.
+	<title>AAAA configuration</title>
+	<para>The aspects of authentication,authorization,auditing and accounting
+	are defined in different sections of the configuration.
+	Connection based authorization for example that defines from where we can
+	connect is configured as part of the listener configurations
+	as IP restrictions (see chapter 'Server configuration').
+	An other example are authorization functions that a called in the 
+	processing engine to determine wheter a user is allowed to execute a 
+	function, to access a resource, etc. These functions are defined in
+	programs configured in the Processing section.
+	</para>
+	<para>
+	For defining the units and resources involved in AAAA, we define the 
+	section <code>AAAA</code> of the server configuration.
 	The following example shows an empty <code>AAAA</code> configuration
 	section:
 	<programlisting language='text'>

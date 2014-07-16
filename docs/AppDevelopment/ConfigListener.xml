@@ -1,13 +1,16 @@
 <sect1>
-	<title>Listener Configuration</title>
+	<title>Server configuration</title>
 	<para>
-	The listener configuration is defined in the <code>Listener</code>
-	section. The listener specifies the set of accepted connections
-	and their attributes. It also defines some global settings listed
-	in the following table:
+	The server configuration is defined in the <code>Server</code>
+	section. The server specifies the set of sockets a client can
+	connect to. It defines rules for how and from where a client
+	can connect and the properties of the connection. 
+	</para>
+	<para>
+	It also defines some global settings listed in the following table:
 
 	<table frame="all" width="100%">
-		<title>Global listener settings</title>
+		<title>Global server settings</title>
 		<tgroup cols="2">
 		<colspec colnum="1" colname="col1" colwidth="1*"/>
 		<colspec colnum="2" colname="col2" colwidth="3*"/>
@@ -38,22 +41,23 @@ Listener
     Threads 7
 }
 	</programlisting>
-	The listener allows 2 different types of connections to configure.
-	The types are also the section names where they are configured in
-	the listener configuration. One is <code>Socket</code> that describes 
-	a plain connection. The other is <code>SslSsocket</code> that describes 
-	a connection with transport layer encryption based on SSL/TLS. In the 
-	following 2 sections they are introduced:
+	The server has two types of sockets to configure in the
+	sections <code>Listen</code> and <code>ListenSSL</code>.
+	<code>ListenSSL</code> is describing a secure connection 
+	with a transport layer encryption based on SSL/TLS. 
+	<code>Listen</code> on the other hand is describing a plain 
+	TCP/IP connection.
+	In the following two sections they are introduced:
 	</para>
 
 	<sect2>
-	<title>Socket</title>
-	<para>In subsections <code>Socket</code> of the section <code>Listener</code>
-	of the configuration we describe plain connections based on TCP.
-	The follwing table describes the attributes you can set for plain TCP
-	connections:
+	<title>Listen</title>
+	<para>In the subsections named <code>Listen</code> of the server
+	configuration we define sockets providing plain connections based 
+	on TCP/IP. The following table describes the attributes you can set 
+	for plain TCP/IP connections:
 	<table frame="all" width="100%">
-		<title>Socket settings</title>
+		<title>Listen settings</title>
 		<tgroup cols="2">
 		<colspec colnum="1" colname="col1" colwidth="1*"/>
 		<colspec colnum="2" colname="col2" colwidth="3*"/>
@@ -67,8 +71,13 @@ Listener
 		<tbody>
 			<row>
 				<entry>Address</entry>
-				<entry>Listening address (IPv4 or IPv6) of the server. '127.0.0.1' and '::1' stand for the loopback address (IPv4 an IPv6 respectively).
-				       The listener wildcards '*' or '0.0.0.0' (IPv4) or '::' (IPv6) are also accepted.</entry>
+				<entry>Listening address (IPv4 or IPv6) 
+					of the server. '127.0.0.1' and '::1' 
+					stand for the loopback address 
+					(IPv4 an IPv6 respectively).
+					The listener wildcards '*' 
+					or '0.0.0.0' (IPv4) or '::' (IPv6) 
+					are also accepted.</entry>
 			</row>
 			<row>
 				<entry>Port</entry>
@@ -76,20 +85,33 @@ Listener
 			</row>
 			<row>
 				<entry>Identifier</entry>
-				<entry>Identifier that can be reference in authorization functions to classify connections and do authorization based on it.</entry>
+				<entry>Identifier that can be referenced
+					in authorization functions to 
+					classify connections and to define
+					authorization based on it.</entry>
 			</row>
 			<row>
 				<entry>MaxConnections</entry>
-				<entry>The maximum number of simultaneus connections for this port.</entry>
+				<entry>The maximum number of simultaneus 
+					connections for this socket.</entry>
+			</row>
+			<row>
+				<entry>Restrictions</entry>
+				<entry>Defines the subsection containing IP
+					restrictions on the connection. If not 
+					defined, the connection is allowed 
+					from everywhere. We will describe
+					IP restrictions later.</entry>
 			</row>
 		</tbody>
 		</tgroup>
 	</table>
-	The following configuration shows an example plain TCP connection definition:
+	The following <code>Listen</code> configuration shows an example plain TCP/IP
+	connection definition:
 	<programlisting language='text'>
-Listener
+Server
 {
-    Socket
+    Listen
     {
         Address localhost
         Port 7661
@@ -102,14 +124,16 @@ Listener
 
 
 	<sect2>
-	<title>SslSocket</title>
-	<para>In subsections <code>SslSocket</code> of the section <code>Listener</code>
-	of the configuration we describe connections connection with transport 
-	layer encryption based on SSL/TLS.
-	The follwing table describes the attributes you can set for SSL/TLS
-	connections. The first 4 attributes are the same as for TCP/IP plain:
+	<title>ListenSSL</title>
+	<para>In the subsections named <code>ListenSSL</code> of the 
+	server configuration we define sockets providing secured connections
+	with full transport layer encryption based on SSL/TLS.
+	The following table describes the attributes you can set for secured
+	connections. The first five attributes are the same as for
+	sockets configured as plain TCP/IP (<code>Listen</code>) 
+	as shown before:
 	<table frame="all" width="100%">
-		<title>SslSocket settings</title>
+		<title>ListenSSL settings</title>
 		<tgroup cols="2">
 		<colspec colnum="1" colname="col1" colwidth="1*"/>
 		<colspec colnum="2" colname="col2" colwidth="3*"/>
@@ -123,8 +147,13 @@ Listener
 		<tbody>
 			<row>
 				<entry>Address</entry>
-				<entry>Listening address (IPv4 or IPv6) of the server. '127.0.0.1' and '::1' stand for the loopback address (IPv4 an IPv6 respectively).
-				       The listener wildcards '*' or '0.0.0.0'/'::' (IPv4 or IPv6) are also accepted.</entry>
+				<entry>Listening address (IPv4 or IPv6) of 
+					the server. '127.0.0.1' and '::1'
+					stand for the loopback address 
+					(IPv4 an IPv6 respectively).
+					The listener wildcards '*'
+					or '0.0.0.0' (IPv4) or '::' (IPv6)
+					are also accepted.</entry>
 			</row>
 			<row>
 				<entry>Port</entry>
@@ -132,11 +161,23 @@ Listener
 			</row>
 			<row>
 				<entry>Identifier</entry>
-				<entry>Identifier that can be reference in authorization functions to classify connections and do authorization based on it.</entry>
+				<entry>Identifier that can be referenced
+					in authorization functions to classify 
+					connections and to define authorization
+					based on it.</entry>
 			</row>
 			<row>
 				<entry>MaxConnections</entry>
-				<entry>The maximum number of simultaneus connections for this port.</entry>
+				<entry>The maximum number of simultaneus
+					connections for this port.</entry>
+			</row>
+			<row>
+				<entry>Restrictions</entry>
+				<entry>Defines the subsection containing 
+					IP restrictions on the connection. 
+					If not defined, the connection is 
+					allowed from everywhere. We will
+					describe IP restrictions later.</entry>
 			</row>
 			<row>
 				<entry>Certificate</entry>
@@ -148,7 +189,8 @@ Listener
 			</row>
 			<row>
 				<entry>CAdirectory</entry>
-				<entry>Directory holding the CA certificate files</entry>
+				<entry>Directory holding the CA certificate
+					files.</entry>
 			</row>
 			<row>
 				<entry>CAchainFile</entry>
@@ -156,16 +198,18 @@ Listener
 			</row>
 			<row>
 				<entry>Verify</entry>
-				<entry>ON/OFF switch to enabe/disable client certificate verification</entry>
+				<entry>ON/OFF switch to enabe/disable 
+					client certificate verification.</entry>
 			</row>
 		</tbody>
 		</tgroup>
 	</table>
-	The following configuration shows an example SSL connection definition:
+	The following configuration shows an example <code>ListenSSL</code>
+	definition:
 	<programlisting language='text'>
-Listener
+Server
 {
-    SslSocket
+    ListenSSL
     {
         Address localhost
         Port 7961
