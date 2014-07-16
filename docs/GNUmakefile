@@ -65,7 +65,8 @@ MAN_PAGES = \
 	wolframe.conf.5 \
 	wolfpasswd.1 \
 	wolframe-mod_db_sqlite3.5 \
-	wolframe-mod_db_postgresql.5
+	wolframe-mod_db_postgresql.5 \
+	wolframe-mod_db_oracle.5
 	
 man: $(MAN_PAGES)
 
@@ -343,6 +344,10 @@ endif
 ifneq "$(PLATFORM)" "SUNOS"
 	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_postgresql.5
 endif
+	$(INSTALL) -m 0644 wolframe-mod_db_oracle.5 $(DESTDIR)$(mandir)/man5
+ifneq "$(PLATFORM)" "SUNOS"
+	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_oracle.5
+endif
 	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(mandir)/man8
 ifneq "$(PLATFORM)" "SUNOS"
 	gzip -f $(DESTDIR)$(mandir)/man8/wolframed.8
@@ -363,14 +368,21 @@ local_uninstall:
 	@-rmdir $(DESTDIR)$(mandir)/man8
 	@-rm $(DESTDIR)$(mandir)/man5/wolframe.conf.5*
 	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5*
-	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_posgresql.5*
+	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_postgresql.5*
+	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_oracle.5*
 	@-rmdir $(DESTDIR)$(mandir)/man5
 	@-rmdir $(DESTDIR)$(mandir)
 
 check:
 	xmllint --noout --xinclude --postvalid WolfBook.xml
 	xmllint --noout --xinclude --postvalid Tutorial.xml
-	xmllint --noout --xinclude --postvalid Installation.xml
+	xmllint --noout --xinclude --postvalid InstallationUnix.xml
+	xmllint --noout --xinclude --postvalid InstallationWindows.xml
+	xmllint --noout --xinclude --postvalid InstallationUnixClient.xml
+	xmllint --noout --xinclude --postvalid InstallationWindowsClient.xml
 	xmllint --noout --xinclude --postvalid wolframe.conf-man.xml
+	xmllint --noout --xinclude --postvalid wolframe-mod_db_sqlite3-man.xml
+	xmllint --noout --xinclude --postvalid wolframe-mod_db_postgresql-man.xml
+	xmllint --noout --xinclude --postvalid wolframe-mod_db_oracle-man.xml
 	xmllint --noout --xinclude --postvalid wolframed-man.xml
 	xmllint --noout --xinclude --postvalid wolfpasswd-man.xml

@@ -35,14 +35,7 @@
 		&WolframeLegalNotice;
 	</bookinfo>
 
-	<sect1>
-		<title>Prerequisites</title>
-		
-		&InstallationSourceUnixClientPrereq;
-	</sect1>
-
-	<sect1>
-		&InstallationSourceUnixClient;
-	</sect1>
+	&InstallationSourceUnixClientPrereq;
+	&InstallationSourceUnixClient;
 	
 </book>

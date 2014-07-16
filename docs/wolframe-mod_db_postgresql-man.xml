@@ -75,7 +75,7 @@
 	</refnamediv>
 	<refsynopsisdiv>
 		<cmdsynopsis>
-			<command>/etc/wolframe/wolframe.conf</command>
+			<command>/etc/wolframe/wolframe.conf, /etc/wolframe/conf.d/mod_db_postgresql.conf</command>
 		</cmdsynopsis>
 	</refsynopsisdiv>
 
