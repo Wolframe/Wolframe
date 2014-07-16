@@ -70,6 +70,7 @@
 			<simplelist type="horiz" columns="1">
 			<member>COMMAND</member>
 			<member>CALL</member>
+			<member>CONTEXT</member>
 			<member>RETURN</member>
 			<member>SKIP</member>
 			<member>FILTER</member>
@@ -211,6 +212,35 @@
 				<listitem><para><code>AUTHORIZE &lt;authfunc&gt;</code> or</para></listitem>
 				<listitem><para><code>AUTHORIZE &lt;authfunc&gt; &lt;resource&gt;</code></para></listitem>
 				</itemizedlist>
+			</para>
+		</sect4>
+		<sect4>
+			<title>Adding parameters from the execution context</title>
+			<para>
+				Wolframe functions that are written in a language
+				other than C++ are usually pure data in / data out
+				functions. So the input document defines the input.
+				But sometimes we need to include data from the
+				user context into processing, for example for
+				inserting or editing some personal data.
+				Wolframe gives us the possibility to include
+				data from the execution context into the input
+				document. We do this with the directive CONTEXT
+				followed by a list of comma ',' separated 
+				assignments in curly brackets '{' '}'.
+				The following example adds an element 'uname'
+				that does not exist yet in the input to the 
+				input document before validation and
+				execution. The value of the add 'uname' element
+				is the user name of the user issuing the request.
+				<programlisting language='text'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_with_context.directmap" parse="text" />
+				</programlisting>
+				This way we keep the processing functions as pure
+				data functions. We are in certain cases able 
+				to inject some login dependent data in a controlled way,
+				without exposing an API to all language bindings
+				for being able to access everything from everywhere.
 			</para>
 		</sect4>
 		<sect4>
