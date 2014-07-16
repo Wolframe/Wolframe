@@ -1,6 +1,6 @@
 ; network configuration
 
-Listen {
+Server {
 
 ; Maximum number of simultaneous connections (clients).
 ; Default is the OS limit. This is the global (total) value.
@@ -13,7 +13,7 @@ Listen {
     
     Threads 4
 
-    Socket {
+    Listen {
 
 ; Interfaces can be named for later reference
 
