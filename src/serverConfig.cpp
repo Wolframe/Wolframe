@@ -206,10 +206,6 @@ struct ConnectionProperties
 			LOG_WARNING << logprefix << "No restrictions defined for socket " << position.logtext() << " setting default to allow all " << position.logtext();
 			restrictions.defineAllowedAll();
 		}
-		if (!defined( D_maxConn))
-		{
-			LOG_WARNING << logprefix << "No maxConnections defined for socket (using default) " << position.logtext();
-		}
 		return rt;
 	}
 };
