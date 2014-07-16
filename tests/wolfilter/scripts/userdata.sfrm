@@ -1,5 +1,5 @@
 FORM UserData
-	:root doc
+	-root doc
 {
 	uname string
 	host string

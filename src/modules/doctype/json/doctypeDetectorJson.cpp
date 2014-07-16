@@ -159,6 +159,10 @@ public:
 						m_endbrk = ch;
 						setState( ParseJSONHeaderStringKeyDash);
 					}
+					else if (ch == '-')
+					{
+						setState( ParseJSONHeaderIdentKey);
+					}
 					else if (isAlpha(ch))
 					{
 						m_itembuf.push_back( ch|32);

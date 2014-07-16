@@ -102,7 +102,7 @@ bool JoinInputFilter::getNext( ElementType& type, types::VariantConst& element)
 			}
 			else
 			{
-				setState( m_inputfilter2->state(), m_inputfilter1->getError());
+				setState( m_inputfilter2->state(), m_inputfilter2->getError());
 				return false;
 			}
 

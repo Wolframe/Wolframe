@@ -25,10 +25,13 @@ Processor
 	}
 }
 **file: test.dmap
-COMMAND (echo UserData) CALL run CONTEXT {uname=UserName, host=RemoteHost} RETURN SKIP doc {standalone='yes'};
+COMMAND (echo UserData) CALL run CONTEXT {uname=UserName, host=RemoteHost} RETURN UserData;
 **file:userdata.sfrm
-`cat ../scripts/userdata.sfrm`"
+`cat ../scripts/userdata.sfrm`
 **file:echo_input_table.lua
-`cat ../scripts/echo_input_table.lua`"
+function run( input)
+	return input:get()
+end
+"
 . ./output_tst_all.sh
 

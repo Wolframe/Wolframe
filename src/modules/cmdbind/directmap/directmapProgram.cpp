@@ -471,6 +471,7 @@ static DirectmapCommandDescriptionR parseCommandDescription( std::string::const_
 						throw std::runtime_error( "unexpected token, set of execution context elements in curly brackets {..} expected after CONTEXT");
 					}
 					parseExecContextElementSet( rt->execContextElements, si, se);
+					break;
 				}
 				case d_AUTHORIZE:
 				{

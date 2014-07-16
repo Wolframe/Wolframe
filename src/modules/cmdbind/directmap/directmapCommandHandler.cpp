@@ -103,6 +103,13 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				initcall();
 				/* no break here ! */
 			case 1:
+				if (m_cmd->execContextElements.size())
+				{
+					//... if we have execution context arguments we have to join them with the input as new input structure:
+					TypedInputFilterR ecinput( new langbind::ExecContextInputFilter( m_cmd->execContextElements, *execContext(), ""));
+					TypedInputFilterR joinedinput( new langbind::JoinInputFilter( "dmapinput", ecinput, m_input));
+					m_input = joinedinput;
+				}
 				if (m_inputform.get())
 				{
 					m_inputform_parser.reset( new serialize::DDLStructParser( m_inputform.get()));
@@ -134,13 +141,6 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			case 3:
 				// Initialize the function execution context:
 				m_functionclosure.reset( m_cmd->function->createClosure());
-				if (m_cmd->execContextElements.size())
-				{
-					//... if we have execution context arguments we have to join them with the input as new input:
-					TypedInputFilterR ecinput( new langbind::ExecContextInputFilter( m_cmd->execContextElements, *execContext(), ""));
-					TypedInputFilterR joinedinput( new langbind::JoinInputFilter( "dmapinput", ecinput, m_input));
-					m_input = joinedinput;
-				}
 				m_functionclosure->init( execContext(), m_input);
 				m_state = 4;
 				/* no break here ! */
