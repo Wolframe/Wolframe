@@ -58,19 +58,19 @@ Project Wolframe.
 	<!--	Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
 		Let's use 7660 for unencrypted connections and 7960 for SSL connections.
 		Note that 7654 seems to be used by Winamp. -->
-	<listen>
+	<server>
 		<maxConnections>3</maxConnections>	<!--	Maximum number of simultaneous connections (clients).
 								Default is the OS limit. This is the global (total) value.
 								Set it to 0 to disable (to use the system limit) -->
 		<threads>7</threads>			<!--	Number of threads for serving client connections.
 								Default is 4 -->
-		<socket>
+		<listen>
 			<address>*</address>
 			<port>7661</port>
 			<maxConnections>2</maxConnections><!--	Maximum number of simultaneous connections (clients)
 								for this socket. Default is the OS limit. -->
-		</socket>
-	</listen>
+		</listen>
+	</server>
 
 
 	<!--	Database configuration, get added here by the installer -->
