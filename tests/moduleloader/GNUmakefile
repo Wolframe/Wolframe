@@ -28,7 +28,7 @@ INCLUDE_LIBS = \
 	-lwolframe -lwfsingleton \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system \
-	$(LIBS_DL) $(LIBS_LT)
+	$(LIBS_DL) $(LIBS_LT) $(LIBS_NET)
 
 TEST_OBJS =
 
