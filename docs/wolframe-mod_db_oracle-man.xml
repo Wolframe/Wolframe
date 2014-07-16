@@ -7,7 +7,7 @@
 <!-- TITLE should be something like "User commands" or similar (see
 	http://www.tldp.org/HOWTO/Man-Page/q2.html). --><!ENTITY dhtitle "Wolframe User Manual">
 <!ENTITY dhucpackage "wolframe">
-<!ENTITY dhpackage "wolframe-mod_db_sqlite3">
+<!ENTITY dhpackage "wolframe-mod_db_oracle">
 ]>
 <!--
 ************************************************************************
@@ -71,11 +71,11 @@
 	</refmeta>
 	<refnamediv>
 		<refname>&dhpackage;</refname>
-		<refpurpose>Wolframe database module for Sqlite3</refpurpose>
+		<refpurpose>Wolframe database module for Oracle</refpurpose>
 	</refnamediv>
 	<refsynopsisdiv>
 		<cmdsynopsis>
-			<command>/etc/wolframe/wolframe.conf, /etc/wolframe/conf.d/mod_db_sqlite3.conf</command>
+			<command>/etc/wolframe/wolframe.conf, /etc/wolframe/conf.d/mod_db_oracle.conf</command>
 		</cmdsynopsis>
 	</refsynopsisdiv>
 
@@ -83,7 +83,7 @@
 		<title>DESCRIPTION</title>
 		<para>
 			This manual page documents briefly the configuration
-			option available for the SQLite3 database module of the 
+			option available for the Oracle database module of the 
 			Wolframe system.
 		</para>
 	</refsect1>
@@ -94,12 +94,12 @@
 		<title>OPTIONS</title>
 		
 		<para>
-			The module adds a new directive <emphasis role="bold">SQLite</emphasis>
+			The module adds a new directive <emphasis role="bold">Oracle</emphasis>
 			to the global configuration section <emphasis role="bold">database</emphasis>.
 		</para>
 		
-		<refsect2 id="SQLite">
-			<title>SQLite</title>
+		<refsect2 id="PostgreSQL">
+			<title>Oracle</title>
 		
 		<para>
 			The following directives are valid in this section:
@@ -120,12 +120,59 @@
 
 				<varlistentry>
 					<term>
-						<option>File <replaceable>filename</replaceable></option>
+						<option>Host <replaceable>hostname</replaceable></option>
 					</term>
 					<listitem>
 						<para>
-							Store the SQLite database into <replaceable>filename</replaceable>.
-							This parameter is required.
+							Address of the Oracle database server.
+						</para>
+					</listitem>
+				</varlistentry>
+
+				<varlistentry>
+					<term>
+						<option>Port <replaceable>port</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Port of the PostgreSQL database server.
+							The default is 1521.
+						</para>
+					</listitem>
+				</varlistentry>
+
+				<varlistentry>
+					<term>
+						<option>Database <replaceable>databasename</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Name of the database to connect to. If the <replaceable>hostname</replaceable>
+							and <replaceable>port</replaceable> are empty the <replaceable>databasename</replaceable>
+							is interpreted as database link name (which has to be listed
+							in tnsnames.ora).
+						</para>
+					</listitem>
+				</varlistentry>
+
+				<varlistentry>
+					<term>
+						<option>User <replaceable>user</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							User to connect to the database with.
+						</para>
+					</listitem>
+				</varlistentry>
+
+				<varlistentry>
+					<term>
+						<option>Password <replaceable>password</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Password to connect to the database with.
 						</para>
 					</listitem>
 				</varlistentry>
@@ -145,51 +192,14 @@
 
 				<varlistentry>
 					<term>
-						<option>ForeignKeys
-						<replaceable>yes</replaceable> | <replaceable>no</replaceable> 
-						</option>
+						<option>AcquireTimeout <replaceable>seconds</replaceable></option>
 					</term>
 					<listitem>
 						<para>
-							Setting 'foreignKeys' to 'yes'
-							enables referential integrity in the database.
-							This is actually the same as executing 'PRAGMA foreign_keys=true'.
-							The default is 'yes'.
+							Maximum time allowed to acquire a database connection in seconds.
 						</para>
 					</listitem>
 				</varlistentry>
-
-				<varlistentry>
-					<term>
-						<option>Profiling
-						<replaceable>yes</replaceable> | <replaceable>no</replaceable> 
-						</option>
-					</term>
-					<listitem>
-						<para>
-							Shows the SQL commands being executed and their execution
-							time in milliseconds. Default is 'no'.
-						</para>
-					</listitem>
-				</varlistentry>
-				
-				<varlistentry>
-					<term>
-						<option>Extension <replaceable>filename</replaceable></option>
-					</term>
-					<listitem>
-						<para>
-							Loads an SQLite3 extension module named
-							<replaceable>filename</replaceable>. This is useful
-							to load native code into SQLite3 imlementing for
-							instance new database functions.
-							Have a look at the SQLite3 'Run-Time Loadable Extensions'
-							section at
-							<ulink url="http://www.sqlite.org/loadext.html"/>.							
-						</para>
-					</listitem>
-				</varlistentry>
-				
 
 			</variablelist>
 		</para>

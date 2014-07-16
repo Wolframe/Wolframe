@@ -35,14 +35,7 @@
 		&WolframeLegalNotice;
 	</bookinfo>
 
-	<sect1>
-		<title>Prerequisites</title>
-		
-		&InstallationSourceWindowsClientPrereq;
-	</sect1>
-	
-	<sect1>
-		&InstallationSourceWindowsClient;
-	</sect1>
+	&InstallationSourceWindowsClientPrereq;
+	&InstallationSourceWindowsClient;
 
 </book>

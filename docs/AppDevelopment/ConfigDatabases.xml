@@ -7,9 +7,6 @@
 
 	&AppConfigDatabasePostgreSQL;
 	&AppConfigDatabaseSqlite;
-
-<!--	
 	&AppConfigDatabaseOracle;
--->
 </sect1>
 

@@ -68,6 +68,7 @@ DEBUG: SQLite database unit 'sqlitedb' created with 3 connections to file 'tutor
 
 		<programlisting language='shell'>
 LoadModules {
+    module mod_command_tdl
     module mod_db_sqlite3
     <emphasis role="bold">module mod_doctype_xml</emphasis>
     <emphasis role="bold">module mod_filter_libxml2</emphasis>
