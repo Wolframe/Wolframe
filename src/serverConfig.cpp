@@ -238,7 +238,7 @@ struct ConnectionProperties
 		bool rt = true;
 		if (!defined( D_port))
 		{
-			LOG_ERROR << logprefix << "No port defined for listener socket, using default " << position.logtext();
+			LOG_ERROR << logprefix << "No port defined for socket, using default " << position.logtext();
 			port = net::defaultTCPport();
 		}
 		if (!defined( D_restrictions))
@@ -276,7 +276,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 						 &maxConnDefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "socket" ))	{
+		else if ( boost::algorithm::iequals( L1it->first, "Listen" ))	{
 			ConnectionProperties connprops( logPrefix().c_str());
 
 			for ( config::ConfigurationNode::const_iterator L2it = L1it->second.begin();
@@ -285,7 +285,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 				position = L2it->second.position();
 				if (!connprops.parse( L2it, retVal))
 				{
-					LOG_WARNING << logPrefix() << "socket: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "Listen: unknown configuration option: '"
 						    << L2it->first << "' " << position.logtext();
 				}
 			}
@@ -300,7 +300,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 						    connprops.restrictions );
 			address.push_back( lep );
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "SSLsocket" ))	{
+		else if ( boost::algorithm::iequals( L1it->first, "ListenSSL" ))	{
 			std::string	certFile;
 			std::string	keyFile;
 			std::string	CAdirectory;
@@ -355,7 +355,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 					}
 				}
 				else
-					LOG_WARNING << logPrefix() << "SSLsocket: unknown configuration option: '"
+					LOG_WARNING << logPrefix() << "ListenSSL: unknown configuration option: '"
 						    << L2it->first << "'" << position.logtext();
 			}
 #ifdef WITH_SSL
@@ -372,7 +372,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 						    verify, CAdirectory, CAchainFile );
 			SSLaddress.push_back( lep );
 #else
-			LOG_WARNING << logPrefix() << "configuration of SSLsocket ignored (SSL support not enabled)";
+			LOG_WARNING << logPrefix() << "configuration of ListenSSL ignored (SSL support not enabled)";
 #endif // WITH_SSL
 		}
 		else	{

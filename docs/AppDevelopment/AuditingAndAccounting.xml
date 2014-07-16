@@ -1,5 +1,5 @@
 <sect1>
-	<title>Auditing And Accounting</title>
+	<title>Auditing and accounting</title>
 	<para>The aspect of auditing and accounting is configured in the 
 	subsection <code>Audit</code> of the <code>AAAA</code> section
 	in the server configuration. Accounting is a sub aspect of

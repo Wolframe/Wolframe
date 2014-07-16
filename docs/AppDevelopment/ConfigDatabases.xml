@@ -1,5 +1,5 @@
 <sect1>
-	<title>Database Configuration</title>
+	<title>Database configuration</title>
 	<para>
 	The Databases for Wolframe are configured in the <code>Database</code>
 	section of the configuration.

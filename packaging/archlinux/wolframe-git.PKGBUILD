@@ -22,7 +22,7 @@ source=(
   'wolframed.service'
 )
 md5sums=('SKIP'
-         'c1d7409b23d435ab134e98357c38d296'
+         '7ca61b42a6bd2486bf564ab537800d46'
          'cc146a28908aad55f156860340934095')
 
 pkgver() {
