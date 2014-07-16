@@ -31,7 +31,7 @@ INCLUDE_LIBS = \
 	-lwolftest \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_program_options \
-	$(LIBS_LT)
+	$(LIBS_LT) $(LIBS_NET)
 
 CPP_OBJS = \
 	compileTdlFiles.o

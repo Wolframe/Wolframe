@@ -18,7 +18,7 @@ fi
 TEMPLATE=$1
 FILE=$2
 
-. $base/../makefiles/gmake/platform.vars
+#. $base/../makefiles/gmake/platform.vars
 . $base/settings.conf
 
 eval "echo \"$(cat $TEMPLATE)\"" > $FILE
