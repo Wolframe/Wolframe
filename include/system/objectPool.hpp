@@ -111,7 +111,8 @@ private:
 };
 
 
-///\ Simple template to use ObjectPool objects.
+/// \brief Simple template to use ObjectPool objects.
+/// \class PoolObject
 template < typename objectType >
 class PoolObject
 {

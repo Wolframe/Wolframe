@@ -74,10 +74,6 @@ install: build
 		sysconfdir=/etc \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe
 
-	# provide our own wolframe configuration file
-	cp packaging/debian/wolframe.conf \
-		/usr/src/packages/BUILD/debian/wolframe/etc/wolframe/.
-
 	# database modules depend on the database client library, each of them in its own package
 	cd src/modules/database; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \

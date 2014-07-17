@@ -16,12 +16,10 @@ backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(
   "http://sourceforge.net/projects/wolframe/files/${pkgname}/${pkgname}-${pkgver}.tar.gz"
-  'wolframe.conf'
   'wolframed.service'
 )
 
 md5sums=('ff2d5db70d6910d0060a3cab3a11bacf'
-         '7ca61b42a6bd2486bf564ab537800d46'
          'cc146a28908aad55f156860340934095')
 
 package() {
@@ -38,8 +36,6 @@ package() {
     sysconfdir=/etc \
     install
 
-  install -D -m644 ${srcdir}/wolframe.conf \
-    ${pkgdir}/etc/wolframe/wolframe.conf
   install -D -m644 ${srcdir}/wolframed.service \
     ${pkgdir}/usr/lib/systemd/system/wolframed.service
 }

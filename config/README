@@ -2,14 +2,19 @@ modularized    - for platform with split module packages (RHEL/Fedora, SUSE, Deb
                  Ubuntu)
 monolythic     - for platforms where there is one 'wolframe' package (Slackware,
                  FreeBSD, NetBSD, Solaris)
+redhat
+debian, etc.   - per distribution configuration files, installed with 'make install'
 
 style guide:
 - visible on 79x24 terminal
 - no tabs, use 4 spaces
 - minimal documentation, main documentation goes to man page,
-  explanations and examples got to Wolfbook
+  explanations and examples go to Wolfbook
 - default options and modules should require as little external
   libraries as possible, for instance mod_db_sqlite3 should not
   be enabled by default neither in the monolythic nor in the
   modularized confiugration (the later has a separate config snippet,
   the former is per default commented out)
+- the configuration is generated from templates on request not as
+  part of the building process! Regeneration of configuration files
+  per platform required extensive testing afterwards..

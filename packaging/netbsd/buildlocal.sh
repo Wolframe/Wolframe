@@ -125,7 +125,6 @@ cp packaging/netbsd/description $PKGBUILD/PKG/wolframe-$VERSION/.
 cp packaging/netbsd/packlist $PKGBUILD/PKG/wolframe-$VERSION/.
 cp packaging/netbsd/iscript $PKGBUILD/PKG/wolframe-$VERSION/.
 cp packaging/netbsd/dscript $PKGBUILD/PKG/wolframe-$VERSION/.
-cp packaging/netbsd/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/etc/wolframe/.
 mkdir -p $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d
 cp packaging/netbsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d/.
 chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d/wolframed
