@@ -235,6 +235,7 @@ f none opt/csw/include/wolframe/processor/procProviderInterface.hpp 0644 root st
 f none opt/csw/include/wolframe/processor/procProviderConfig.hpp 0644 root staff
 d none opt/csw/include/wolframe/filter 0755 root root
 f none opt/csw/include/wolframe/filter/bufferingfilter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/execContextInputFilter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filterbase.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filterdef.hpp 0644 root staff

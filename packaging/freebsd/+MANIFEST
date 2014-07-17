@@ -224,6 +224,7 @@ files:
  /usr/local/include/wolframe/module/moduleInterface.hpp: 'sha256sum'
  /usr/local/include/wolframe/processor/procProvider.hpp: 'sha256sum'
  /usr/local/include/wolframe/filter/bufferingfilter.hpp: 'sha256sum'
+ /usr/local/include/wolframe/filter/execContextInputFilter.hpp: 'sha256sum'
  /usr/local/include/wolframe/filter/filter.hpp: 'sha256sum'
  /usr/local/include/wolframe/filter/filterbase.hpp: 'sha256sum'
  /usr/local/include/wolframe/filter/filterdef.hpp: 'sha256sum'

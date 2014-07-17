@@ -226,6 +226,7 @@ usr/pkg/include/wolframe/module/moduleInterface.hpp
 usr/pkg/include/wolframe/processor/procProvider.hpp
 @dirrm usr/pkg/include/wolframe/processor
 usr/pkg/include/wolframe/filter/bufferingfilter.hpp
+usr/pkg/include/wolframe/filter/execContextInputFilter.hpp
 usr/pkg/include/wolframe/filter/filter.hpp
 usr/pkg/include/wolframe/filter/filterbase.hpp
 usr/pkg/include/wolframe/filter/filterdef.hpp
