@@ -61,7 +61,14 @@
 			for TDL keywords. It makes the source more readable.
 		</para>
 	</sect3>
-
+	<sect3>
+		<title>Some internals</title>
+		<para>TDL is compiled to a code for a virtual machine.
+		Setting the log level to DATA will print the symbolic 
+		representation of the code as log output.
+		The internals of the virtual machine will be discussed
+		in a different chapter of this book.</para>
+	</sect3>
 	<sect3>
 	<title>Configuration</title>
 		<para>

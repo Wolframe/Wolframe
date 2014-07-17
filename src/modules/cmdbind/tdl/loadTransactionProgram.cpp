@@ -707,7 +707,10 @@ EXITLOOP:
 		}
 
 		vm::ProgramR program = prg.createProgram();
-		tfunc.reset( new TdlTransactionFunction( transactionFunctionName, resultfilter, authorizations, preproc.build(program.get()), auditsteps, program));
+		TdlTransactionFunction* fp = new TdlTransactionFunction( transactionFunctionName, resultfilter, authorizations, preproc.build(program.get()), auditsteps, program);
+		tfunc.reset( fp);
+
+		LOG_DATA << "TDL program loaded:\n" << fp->tostring();
 	}
 	posinfo.update( posinfo_si, si);
 	return isValidDatabase;

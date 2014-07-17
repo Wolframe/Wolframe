@@ -45,7 +45,7 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
-using namespace _Wolframe::proc;
+using namespace _Wolframe::cmdbind;
 
 struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler>
 {

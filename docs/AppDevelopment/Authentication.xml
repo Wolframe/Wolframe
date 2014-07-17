@@ -1,6 +1,8 @@
 <sect1>
 	<title>Authentication</title>
-	<para>The aspect of authentication is configured in the 
+	<para>The identitiy of a user is authenticated after his login.
+	The identity and the method he was 
+	The aspect of authentication is configured in the 
 	subsection <code>Authentication</code> of the <code>AAAA</code> section
 	in the server configuration.
 	</para>

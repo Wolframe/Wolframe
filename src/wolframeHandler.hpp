@@ -132,7 +132,7 @@ private:
 	std::string			m_endDataSessionMarker;	///< buffer for message to interrupt data session for the client
 
 	proc::ExecContext		m_execContext;		///< execution context of the connection
-	proc::MainCommandHandler	m_cmdHandler;		///< command handler
+	cmdbind::MainCommandHandler	m_cmdHandler;		///< command handler
 };
 
 /// The server handler container

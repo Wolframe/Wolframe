@@ -31,6 +31,7 @@
 
 ************************************************************************/
 /// \brief Processor Provider configuration
+/// \file processor/procProviderConfig.hpp
 
 #ifndef _PROCESSOR_PROVIDER_CONFIG_HPP_INCLUDED
 #define _PROCESSOR_PROVIDER_CONFIG_HPP_INCLUDED

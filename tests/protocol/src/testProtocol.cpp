@@ -429,7 +429,7 @@ TEST_F( MainProtocolTest, tests)
 				net::RemoteTCPendpoint client( "127.0.0.1", 7661);
 				net::LocalEndpointConfig localEndpointConfig( "test");
 				net::LocalTCPendpoint localEndPoint( "127.0.0.1", 7661, localEndpointConfig);
-				proc::MainCommandHandler cmdhandler;
+				cmdbind::MainCommandHandler cmdhandler;
 				cmdhandler.setPeer( client);
 				cmdhandler.setLocalEndPoint( localEndPoint);
 				processingContext.resetExecContext();

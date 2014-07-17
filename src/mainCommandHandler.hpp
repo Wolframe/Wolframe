@@ -44,7 +44,7 @@
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace proc {
+namespace cmdbind {
 
 class MainCommandHandler
 	:public cmdbind::LineCommandHandlerTemplate<MainCommandHandler>

@@ -26,10 +26,9 @@
 	your data. It is lowering the hurdles to use another 
 	specific programming language to implement a component.
 
-
 == Application Integration 
 === Integration capabilities of web services
-	To get an idea of the capabilities to integration existing
+	To get an idea of the capabilities to integrate in existing
 	software, we have to have a look at web services.
 	Web services had a big success also because they allow to 
 	integrate existing software, even legacy systems. Wolframe 
@@ -71,7 +70,6 @@
 	be traced to find out problems. In contrary to other systems 
 	offering this level of interconnectivity there is no code 
 	generation involved here at all.
-
 
 == Separation of aspects
 === Separate tasks by roles, developer skills and authorization

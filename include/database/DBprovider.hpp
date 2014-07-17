@@ -40,9 +40,9 @@
 
 namespace _Wolframe {
 
-/// Opaque definitions for ModulesDirectory
-namespace module { class ModulesDirectory; }
-
+namespace module {
+	class ModulesDirectory;
+}
 namespace db {
 
 /// database configuration

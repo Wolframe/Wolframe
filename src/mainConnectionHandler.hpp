@@ -45,14 +45,14 @@ namespace _Wolframe {
 namespace proc {
 
 /// The connection handler
-class Connection : public net::ConnectionHandler
+class MainConnectionHandler : public net::ConnectionHandler
 {
 public:
 	///\brief Constructor
-	Connection( const net::LocalEndpoint& local);
+	MainConnectionHandler( const net::LocalEndpoint& local);
 
 	///\brief Destructor
-	virtual ~Connection();
+	virtual ~MainConnectionHandler();
 
 	///\brief Set the remote peer and indicate that the connection is up now.
 	///\param [in] remote remote peer
@@ -80,7 +80,7 @@ private:
 	void initSessionExceptionBYE();
 
 private:
-	MainCommandHandler m_cmdhandler;		//< top level instance executing commands
+	cmdbind::MainCommandHandler m_cmdhandler;	//< top level instance executing commands
 	protocol::InputBlock m_input;			//< buffer for network read messages
 	protocol::OutputBlock m_output;			//< buffer for network write messages
 	bool m_terminated;				//< true, if a termination signal came from the network

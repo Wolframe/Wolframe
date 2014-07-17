@@ -118,6 +118,7 @@ public:
 		:m_name(name_),m_resultfilter(rf),m_authorizations(az),m_preproc(pp),m_audit(au),m_program(prg){}
 
 	void print( std::ostream& out) const;
+	std::string tostring() const;
 
 	const std::string& name() const					{return m_name;}
 	const std::string& resultfilter() const				{return m_resultfilter;}

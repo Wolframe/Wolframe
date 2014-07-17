@@ -44,26 +44,30 @@ namespace _Wolframe {
 namespace proc {
 /// \brief Forward declaration
 class ExecContext;
-}//namespace proc
+}
 
 namespace db {
 namespace vm {
-///\brief Forward declaration
+/// \brief Forward declaration
 class TagTable;
-///\brief Forward declaration
+/// \brief Forward declaration
 class InputStructure;
 }//namespace vm
 
+/// \class TdlTransactionPreprocStep
+/// \brief Preprocessing step of a transaction
 class TdlTransactionPreprocStep
 {
 public:
+	/// \class Argument
+	/// \brief Argument of a preprocessing step
 	struct Argument
 	{
 		enum Type
 		{
-			SelectorPath,
-			LoopCounter,
-			Constant
+			SelectorPath,	///< path pointing to an input element
+			LoopCounter,	///< counter in the FOREACH loop
+			Constant	///< constant value
 		};
 
 		Type type;

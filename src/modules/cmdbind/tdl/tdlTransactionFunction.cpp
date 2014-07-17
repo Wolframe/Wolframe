@@ -43,6 +43,8 @@
 #include "logger-v1.hpp"
 #include <string>
 #include <vector>
+#include <sstream>
+#include <iostream>
 #include <boost/scoped_ptr.hpp>
 
 #undef _Wolframe_LOWLEVEL_DEBUG
@@ -296,6 +298,12 @@ TdlTransactionFunctionClosure* TdlTransactionFunction::createClosure() const
 	return new TdlTransactionFunctionClosure( this);
 }
 
+std::string TdlTransactionFunction::tostring() const
+{
+	std::ostringstream rt;
+	print( rt);
+	return rt.str();
+}
 
 void TdlTransactionFunction::print( std::ostream& out) const
 {

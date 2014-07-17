@@ -24,11 +24,11 @@
 		<tbody>
 			<row>
 				<entry>MaxConnections</entry>
-				<entry>The maximum number of total simultaneous connections (clients). When set to 0 then the default is used. The Default is the operating system limit.</entry>
+				<entry>The maximum number of total simultaneous connections (clients). If not specified the default is used. The default is the operating system limit.</entry>
 			</row>
 			<row>
 				<entry>Threads</entry>
-				<entry>Number of threads for serving client connections</entry>
+				<entry>Number of threads for serving client connections.</entry>
 			</row>
 		</tbody>
 		</tgroup>
@@ -92,12 +92,12 @@ Server
 			</row>
 			<row>
 				<entry>MaxConnections</entry>
-				<entry>The maximum number of simultaneus 
+				<entry>(optional) The maximum number of simultaneus 
 					connections for this socket.</entry>
 			</row>
 			<row>
 				<entry>Restrictions</entry>
-				<entry>Defines the subsection containing IP
+				<entry>(optional) Defines the subsection containing IP
 					restrictions on the connection. If not 
 					defined, the connection is allowed 
 					from everywhere. The configuration
@@ -117,6 +117,9 @@ Server
         Address localhost
         Port 7661
         Identifier "Interface 1"
+        Restrictions {
+            allow 192.168.201.0/24
+        }
     }
 }
 	</programlisting>
@@ -235,12 +238,14 @@ Server
 	</para>
 	<table frame="all" width="100%">
 		<title>Restrictions settings</title>
-		<tgroup cols="2">
+		<tgroup cols="3">
 		<colspec colnum="1" colname="col1" colwidth="1*"/>
-		<colspec colnum="2" colname="col2" colwidth="3*"/>
+		<colspec colnum="2" colname="col2" colwidth="1*"/>
+		<colspec colnum="3" colname="col3" colwidth="3*"/>
 		<thead>
 			<row>
 				<entry>Name</entry>
+				<entry>Argument</entry>
 				<entry>Description</entry>
 			</row>
 		</thead>
@@ -248,6 +253,7 @@ Server
 		<tbody>
 			<row>
 				<entry>Allow</entry>
+				<entry>IP address with optional network mask</entry>
 				<entry>Define an IP or network address
 				as allowed to connect from, if not explicitely
 				defined by a <code>Deny</code> directive.
@@ -260,6 +266,7 @@ Server
 			</row>
 			<row>
 				<entry>Deny</entry>
+				<entry>IP address with optional network mask</entry>
 				<entry>Define an IP or network address
 				as forbidden to connect from. If a
 				<code>deny</code> directive refers to

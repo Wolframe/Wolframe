@@ -40,7 +40,7 @@
 #include <string>
 
 namespace _Wolframe {
-namespace proc {
+namespace cmdbind {
 
 class InterfaceCommandHandler :public cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>
 {
