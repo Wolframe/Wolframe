@@ -16,7 +16,6 @@ backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(
   "${pkgname}_${pkgver}.tar.gz"
-  'wolframe.conf'
   'wolframed.service'
 )
 
@@ -34,8 +33,6 @@ package() {
     sysconfdir=/etc \
     install
 
-  install -D -m644 ${srcdir}/wolframe.conf \
-    ${pkgdir}/etc/wolframe/wolframe.conf
   install -D -m644 ${srcdir}/wolframed.service \
     ${pkgdir}/usr/lib/systemd/system/wolframed.service
   install -d -m775 -g nobody -o nobody \

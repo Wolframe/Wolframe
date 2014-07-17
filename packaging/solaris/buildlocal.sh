@@ -170,10 +170,6 @@ ARCH="$OSARCH"
 EOF
 
 mkdir -p $PKGBUILD/PKG/wolframe-$VERSION/etc/opt/csw/wolframe
-cp packaging/solaris/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/etc/opt/csw/wolframe/.
-#mkdir -p $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d
-#cp packaging/netbsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d/.
-#chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d/wolframed
 
 BOOST_VERSION=1.55.0
 for i in \

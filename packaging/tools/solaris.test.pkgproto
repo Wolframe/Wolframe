@@ -44,11 +44,6 @@ ARCH="$OSARCH"
 EOF
 
 mkdir -p $PKGBUILD/PKG/wolframe-$VERSION/etc/opt/csw/wolframe
-cp packaging/solaris/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/etc/opt/csw/wolframe/.
-#rm -rf $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
-#mkdir $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
-#cp packaging/freebsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/.
-#chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/wolframed
 
 BOOST_VERSION=1.55.0
 for i in \
