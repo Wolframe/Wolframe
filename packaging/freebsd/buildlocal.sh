@@ -148,7 +148,6 @@ check_for_errors
 #cd docs; gmake DESTDIR=$PKGBUILD/PKG doc-doxygen; cd ..
 #check_for_errors
 
-cp packaging/freebsd/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/wolframe/.
 mkdir $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
 cp packaging/freebsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/.
 chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/wolframed

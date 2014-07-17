@@ -223,8 +223,6 @@
 %define initscript	wolframed.initd.SuSE
 %endif
 
-%define configuration	wolframe.conf
-
 %define systemctl_configuration wolframed.service
 
 %define firewalld_configuration wolframe-firewalld.xml
@@ -1190,8 +1188,6 @@ install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_u
 %endif
 %endif
 
-install -D -m644 packaging/redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
-
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/run/wolframe
 
@@ -1324,7 +1320,9 @@ fi
 %{_bindir}/wolfpasswd
 %{_bindir}/wolfwizard
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
-%config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
+%dir %attr(0755, root, root) %{_sysconfdir}/wolframe/modules.d
+%dir %attr(0755, root, root) %{_sysconfdir}/wolframe/conf.d
 %if %{rhel} || %{centos} || %{scilin}
 %if %{rhel7} || %{centos7} || %{scilin7}
 %{_prefix}/lib/firewalld/services/wolframe.xml
@@ -1485,6 +1483,8 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_db_postgresql.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_db_postgresql.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_db_postgresql.conf
 %if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
 %endif
@@ -1497,6 +1497,8 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_db_sqlite3.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_db_sqlite3.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_db_sqlite3.conf
 %if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
 %endif
@@ -1509,6 +1511,8 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_db_oracle.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_db_oracle.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_db_oracle.conf
 %if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
 %endif
@@ -1521,6 +1525,8 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_auth_pam.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_auth_pam.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_auth_pam.conf
 %endif
 
 %if %{with_sasl}
@@ -1529,6 +1535,8 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_auth_sasl.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_auth_sasl.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_auth_sasl.conf
 %endif
 
 %if %{with_textwolf}
@@ -1541,6 +1549,7 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_line.so
 %{_libdir}/wolframe/modules/mod_filter_token.so
 %{_libdir}/wolframe/modules/mod_normalize_string.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_filter_textwolf.conf
 %endif
 
 %if %{with_libxml2}
@@ -1549,6 +1558,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_filter_libxml2.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_filter_libxml2.conf
 %if %{build_libxml2}
 %{_libdir}/wolframe/libxml2.so.%{libxml2_version}
 %{_libdir}/wolframe/libxml2.so.2
@@ -1566,6 +1576,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_command_lua.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_command_lua.conf
 %{_libdir}/wolframe/liblua.so.5.2.0
 %{_libdir}/wolframe/liblua.so.5
 
@@ -1586,6 +1597,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_command_python.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_command_python.conf
 %if %{build_python}
 %{_libdir}/wolframe/libpython*
 %endif
@@ -1597,6 +1609,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_print_harupdf.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_print_harupdf.conf
 %if %{build_libhpdf}
 %{_libdir}/wolframe/libhpdf.so.2.2.1
 %{_libdir}/wolframe/libhpdf.so.2
@@ -1608,6 +1621,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_graphix.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_graphix.conf
 %if %{build_freeimage}
 %{_libdir}/wolframe/libfreeimage.so.3.15.4
 %{_libdir}/wolframe/libfreeimage.so.3
@@ -1622,6 +1636,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_filter_cjson.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_filter_cjson.conf
 
 %files cjson-devel
 %defattr( -, root, root )

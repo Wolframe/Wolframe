@@ -18,11 +18,9 @@ backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(
   'git://github.com/Wolframe/Wolframe.git'
-  'wolframe.conf'
   'wolframed.service'
 )
 md5sums=('SKIP'
-         '7ca61b42a6bd2486bf564ab537800d46'
          'cc146a28908aad55f156860340934095')
 
 pkgver() {
@@ -44,8 +42,6 @@ package() {
     sysconfdir=/etc \
     install
 
-  install -D -m644 ${srcdir}/wolframe.conf \
-    ${pkgdir}/etc/wolframe/wolframe.conf
   install -D -m644 ${srcdir}/wolframed.service \
     ${pkgdir}/usr/lib/systemd/system/wolframed.service
 }

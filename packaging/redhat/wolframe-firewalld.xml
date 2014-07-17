@@ -3,7 +3,5 @@
   <short>Wolframe</short>
   <description>Wolframe protocol</description>
   <port protocol="tcp" port="7661"/>
-  <port protocol="tcp" port="7662"/>
   <port protocol="tcp" port="7961"/>
-  <port protocol="tcp" port="7962"/>
 </service>

@@ -102,7 +102,6 @@ check_for_errors
 mkdir $PKGBUILD/PKG/install
 cp packaging/slackware/slack-desc $PKGBUILD/PKG/install/.
 cp packaging/slackware/doinst.sh $PKGBUILD/PKG/install/.
-cp packaging/slackware/wolframe.conf $PKGBUILD/PKG/etc/wolframe/.
 mkdir $PKGBUILD/PKG/etc/rc.d
 cp packaging/slackware/rc.wolframed $PKGBUILD/PKG/etc/rc.d/.
 chmod 0775 $PKGBUILD/PKG/etc/rc.d/rc.wolframed
