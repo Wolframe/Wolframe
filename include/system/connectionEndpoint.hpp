@@ -175,8 +175,7 @@ public:
 #endif // WITH_SSL
 
 
-/// Remote connection endpoints
-/// base class for remote endpoint
+/// \brief Remote connection endpoint
 class RemoteEndpoint : public ConnectionEndpoint
 {
 public:

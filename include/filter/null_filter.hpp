@@ -46,6 +46,8 @@ Filter createNullFilter();
 /// \brief Create a new null filter (with new, to be destroyed with delete)
 Filter* createNullFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg);
 
+/// \brief Null filter, a filter representing an empty structure
+/// \class NullFilterType
 class NullFilterType :public FilterType
 {
 public:

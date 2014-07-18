@@ -44,7 +44,7 @@
 namespace _Wolframe {
 namespace module {
 
-/// The modules directory.
+/// \brief The modules directory.
 /// This directory is used by the constructors of the providers to build themselves.
 class ModulesDirectory
 {

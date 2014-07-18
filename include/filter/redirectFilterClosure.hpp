@@ -42,6 +42,7 @@ namespace _Wolframe {
 namespace langbind {
 
 /// \class RedirectFilterClosure
+/// \brief Closure of a map from an input filter to an output filter
 class RedirectFilterClosure
 	:public virtual utils::TypeSignature
 {

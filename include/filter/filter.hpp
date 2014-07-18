@@ -100,7 +100,7 @@ typedef boost::shared_ptr<Filter> FilterR;
 
 typedef std::pair<std::string,std::string> FilterArgument;
 
-/// \class Filter
+/// \class FilterType
 /// \brief Structure defining a type of a filter (used as virtual constructor to create filter instances)
 class FilterType
 {

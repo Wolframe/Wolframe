@@ -61,7 +61,8 @@ public:
 /// \brief Shared ownership reference to normalization function for atomic values (variant type)
 typedef boost::shared_ptr<NormalizeFunction> NormalizeFunctionR;
 
-
+/// \class NormalizeResourceHandle
+/// \brief Base class for resources for normalization functions
 class NormalizeResourceHandle
 {
 public:

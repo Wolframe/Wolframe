@@ -55,7 +55,9 @@ public:
 //	virtual const char* what() const throw();
 };
 
-// the object pool
+/// \class ObjectPool
+/// \tparam objectType type of object stored in the pool
+/// \brief Class represening a pool of objects
 template < typename objectType >
 class ObjectPool	{
 public:

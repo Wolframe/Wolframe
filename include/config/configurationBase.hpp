@@ -118,7 +118,7 @@ private:
 };
 
 
-/// A named configuration is a normal configuration that provides
+/// \brief A named configuration is a normal configuration that provides
 /// also an className function.
 class NamedConfiguration : public ConfigurationBase
 {
