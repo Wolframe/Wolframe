@@ -81,7 +81,11 @@ Server
 			</row>
 			<row>
 				<entry>Port</entry>
-				<entry>Connection port</entry>
+				<entry>Connection port. Ports 7649-7671 and 7934-7966 
+				are unassigned according to IANA (last updated 2010-03-11).
+				The default ports are 7661 for unencrypted connections and
+				7961 for SSL connections. Note that 7654 seems to be used by Winamp.
+				</entry>
 			</row>
 			<row>
 				<entry>Identifier</entry>
@@ -161,7 +165,11 @@ Server
 			</row>
 			<row>
 				<entry>Port</entry>
-				<entry>Connection port</entry>
+				<entry>Connection port. Ports 7649-7671 and 7934-7966 
+				are unassigned according to IANA (last updated 2010-03-11).
+				The default ports are 7661 for unencrypted connections and
+				7961 for SSL connections. Note that 7654 seems to be used by Winamp.
+				</entry>
 			</row>
 			<row>
 				<entry>Identifier</entry>
