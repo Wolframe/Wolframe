@@ -57,8 +57,7 @@ public:
 	typedef OutputFilter Parent;
 
 	explicit OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData)
-		:utils::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
-		,OutputFilter("cjson", inheritedMetaData)
+		:OutputFilter("cjson", inheritedMetaData)
 		,m_elemitr(0)
 		,m_headerprinted(false)
 		,m_flushing(false)
@@ -69,8 +68,7 @@ public:
 	}
 
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:utils::TypeSignature("langbind::OutputFilterImpl (cjson)", __LINE__)
-		,OutputFilter(o)
+		:OutputFilter(o)
 		,m_attribname(o.m_attribname)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)

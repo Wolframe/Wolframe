@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file pythonFunctionProgramType.cpp
-///\brief Implementation of the function to create a form function program type object for python scripts
+/// \file pythonFunctionProgramType.cpp
+/// \brief Implementation of the function to create a form function program type object for python scripts
 #include "pythonInterpreter.hpp"
 #include "pythonFunctionProgramType.hpp"
 #include "pythonStructureBuilder.hpp"
@@ -51,15 +51,14 @@ using namespace _Wolframe::langbind;
 
 namespace {
 
-///\class PythonResult
-///\brief Structure representing the result of a function call
+/// \class PythonResult
+/// \brief Structure representing the result of a function call
 class PythonResult
 	:public TypedInputFilter
 {
 public:
 	PythonResult( const python::StructureR& data_)
-		:utils::TypeSignature("langbind::PythonResult", __LINE__)
-		,TypedInputFilter("pythonresult")
+		:TypedInputFilter("pythonresult")
 		,m_data(data_)
 		,m_bufidx(0)
 	{
@@ -74,8 +73,7 @@ public:
 	}
 
 	PythonResult( const PythonResult& o)
-		:utils::TypeSignature("langbind::PythonResult", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_data(o.m_data)
 		,m_buf(o.m_buf)
 		,m_bufidx(o.m_bufidx)

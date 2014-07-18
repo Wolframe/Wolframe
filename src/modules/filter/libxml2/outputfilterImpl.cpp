@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file outputfilterImpl.cpp
-///\brief Implementaion of output filter abstraction for the libxml2 library
+/// \file outputfilterImpl.cpp
+/// \brief Implementaion of output filter abstraction for the libxml2 library
 #include "outputfilterImpl.hpp"
 #include "logger-v1.hpp"
 
@@ -38,8 +38,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
 OutputFilterImpl::OutputFilterImpl( const XsltMapper& xsltMapper_, const types::DocMetaDataR& inheritMetaData_)
-	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-	,OutputFilter("libxslt", inheritMetaData_)
+	:OutputFilter("libxslt", inheritMetaData_)
 	,m_xsltMapper(xsltMapper_)
 	,m_taglevel(0)
 	,m_trailerPrinted(false)
@@ -47,16 +46,14 @@ OutputFilterImpl::OutputFilterImpl( const XsltMapper& xsltMapper_, const types::
 	{}
 
 OutputFilterImpl::OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
-	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-	,OutputFilter("libxml2", inheritMetaData_)
+	:OutputFilter("libxml2", inheritMetaData_)
 	,m_taglevel(0)
 	,m_trailerPrinted(false)
 	,m_elemitr(0)
 	{}
 
 OutputFilterImpl::OutputFilterImpl( const OutputFilterImpl& o)
-	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-	,OutputFilter(o)
+	:OutputFilter(o)
 	,m_doc(o.m_doc)
 	,m_xsltMapper(o.m_xsltMapper)
 	,m_taglevel(o.m_taglevel)

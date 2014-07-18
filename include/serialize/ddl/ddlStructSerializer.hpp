@@ -47,13 +47,13 @@ namespace serialize {
 
 /// \class DDLStructSerializer
 /// \brief Iterator on a DDL structure (serializer of VariantStruct)
-class DDLStructSerializer :public langbind::TypedInputFilter
+class DDLStructSerializer
+	:public langbind::TypedInputFilter
 {
 public:
 	/// \brief Default constructor
 	DDLStructSerializer()
-		:utils::TypeSignature("serialize::DDLStructSerializer", __LINE__)
-		,langbind::TypedInputFilter("serializer"){}
+		:langbind::TypedInputFilter("serializer"){}
 	/// \brief Constructor
 	explicit DDLStructSerializer( const types::VariantStruct* st);
 

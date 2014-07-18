@@ -531,8 +531,7 @@ public:
 
 	///\brief Default constructor
 	InputFilter()
-		:utils::TypeSignature("db::InputStructure::InputFilter", __LINE__)
-		,langbind::TypedInputFilter("dbpreprocin")
+		:langbind::TypedInputFilter("dbpreprocin")
 		,m_structure(0)
 		,m_elementitr(0)
 	{
@@ -541,8 +540,7 @@ public:
 
 	///\brief Copy constructor
 	InputFilter( const InputFilter& o)
-		:utils::TypeSignature("db::InputStructure::InputFilter", __LINE__)
-		,langbind::TypedInputFilter(o)
+		:langbind::TypedInputFilter(o)
 		,m_structure(o.m_structure)
 		,m_nodelist(o.m_nodelist)
 		,m_stack(o.m_stack)
@@ -554,8 +552,7 @@ public:
 
 	///\brief Constructor
 	InputFilter( const InputStructure* structure_, const std::vector<NodeAssignment>& nodelist_)
-		:utils::TypeSignature("db::InputStructure::InputFilter", __LINE__)
-		,langbind::TypedInputFilter("dbpreprocin")
+		:langbind::TypedInputFilter("dbpreprocin")
 		,m_structure(structure_)
 		,m_nodelist(nodelist_)
 		,m_elementitr(0)
@@ -779,8 +776,7 @@ class OutputFilter
 public:
 	///\brief Default constructor
 	OutputFilter()
-		:utils::TypeSignature("db::InputStructure::OutputFilter", __LINE__)
-		,langbind::TypedOutputFilter("dbpreprocout")
+		:langbind::TypedOutputFilter("dbpreprocout")
 		,m_structure(0)
 		,m_lasttype( langbind::TypedInputFilter::Value)
 		,m_taglevel(0)
@@ -788,8 +784,7 @@ public:
 
 	///\brief Copy constructor
 	OutputFilter( const OutputFilter& o)
-		:utils::TypeSignature("db::InputStructure::OutputFilter", __LINE__)
-		,langbind::TypedOutputFilter(o)
+		:langbind::TypedOutputFilter(o)
 		,m_structure(o.m_structure)
 		,m_visitor(o.m_visitor)
 		,m_lasttype(o.m_lasttype)
@@ -799,8 +794,7 @@ public:
 
 	///\brief Constructor
 	OutputFilter( InputStructure* structure_, const InputNodeVisitor& visitor_, const std::map<int, bool>& sourccetagmap_)
-		:utils::TypeSignature("db::InputStructure::OutputFilter", __LINE__)
-		,langbind::TypedOutputFilter("dbpreprocout")
+		:langbind::TypedOutputFilter("dbpreprocout")
 		,m_structure(structure_)
 		,m_visitor(visitor_)
 		,m_lasttype( langbind::TypedInputFilter::Value)

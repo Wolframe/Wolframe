@@ -32,7 +32,7 @@
 ************************************************************************/
 
 /// \brief Interface to substitute parameters in embedded SQL statements
-/// \file database/statement.hpp
+/// \file database/baseStatement.hpp
 
 #ifndef _DATABASE_BASE_STATEMENT_HPP_INCLUDED
 #define _DATABASE_BASE_STATEMENT_HPP_INCLUDED

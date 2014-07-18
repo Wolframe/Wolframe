@@ -50,8 +50,7 @@ class PropertyTreeInputFilter :public TypedInputFilter
 public:
 	/// \brief Constructor
 	PropertyTreeInputFilter( const types::PropertyTree::Node& pt)
-		:utils::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
-		,TypedInputFilter("ptree")
+		:TypedInputFilter("ptree")
 		,m_state(0)
 	{
 		State st;
@@ -63,8 +62,7 @@ public:
 	/// \brief Copy constructor
 	/// \param[in] o input filter to copy
 	PropertyTreeInputFilter( const PropertyTreeInputFilter& o)
-		:utils::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_stk(o.m_stk)
 		,m_state(o.m_state){}
 

@@ -44,8 +44,7 @@ using namespace _Wolframe;
 using namespace serialize;
 
 StructSerializer::StructSerializer( const ObjectReference& obj, const StructDescriptionBase* descr_)
-	:utils::TypeSignature("serialize::StructSerializer", __LINE__)
-	,TypedInputFilter("serializer")
+	:TypedInputFilter("serializer")
 	,m_ptr(obj.get())
 	,m_obj(obj)
 	,m_descr(descr_)
@@ -55,8 +54,7 @@ StructSerializer::StructSerializer( const ObjectReference& obj, const StructDesc
 }
 
 StructSerializer::StructSerializer( const void* obj, const StructDescriptionBase* descr_)
-	:utils::TypeSignature("serialize::StructSerializer", __LINE__)
-	,TypedInputFilter("serializer")
+	:TypedInputFilter("serializer")
 	,m_ptr(obj)
 	,m_descr(descr_)
 	,m_ctx()
@@ -68,8 +66,7 @@ StructSerializer::StructSerializer( const void* obj, const StructDescriptionBase
 }
 
 StructSerializer::StructSerializer( const StructSerializer& o)
-	:utils::TypeSignature(o)
-	,TypedInputFilter(o)
+	:TypedInputFilter(o)
 	,m_ptr(o.m_ptr)
 	,m_obj(o.m_obj)
 	,m_descr(o.m_descr)

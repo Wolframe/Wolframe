@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file moduleDirectory.hpp
-///
+/// \file module/moduleDirectory.hpp
+/// \brief Module loader
 
 #ifndef _MODULE_DIRECTORY_HPP_INCLUDED
 #define _MODULE_DIRECTORY_HPP_INCLUDED

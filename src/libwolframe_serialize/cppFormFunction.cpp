@@ -39,8 +39,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::serialize;
 
 ApiFormData::ApiFormData( const serialize::StructDescriptionBase* descr_)
-	:utils::TypeSignature("langbind::ApiFormData", __LINE__)
-	,m_descr(descr_)
+	:m_descr(descr_)
 	,m_data(std::calloc( descr_->size(), 1), std::free)
 {
 	void* ptr = m_data.get();
@@ -61,8 +60,7 @@ ApiFormData::~ApiFormData()
 
 
 CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunction& f)
-	:utils::TypeSignature("langbind::CppFormFunctionClosure", __LINE__)
-	,m_func(&f)
+	:m_func(&f)
 	,m_state(0)
 	,m_param_data(f.api_param())
 	,m_result_data(f.api_result())
@@ -73,8 +71,7 @@ CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunction& f)
 }
 
 CppFormFunctionClosure::CppFormFunctionClosure( const CppFormFunctionClosure& o)
-	:utils::TypeSignature(o)
-	,m_func(o.m_func)
+	:m_func(o.m_func)
 	,m_state(0)
 	,m_param_data(o.m_param_data)
 	,m_result_data(o.m_result_data)

@@ -45,13 +45,11 @@ namespace langbind {
 /// \class Input
 /// \brief Input as seen from the application processor program
 class Input
-	:public virtual utils::TypeSignature
 {
 public:
 	/// \brief Constructor
 	Input()
-		:utils::TypeSignature("langbind::Input", __LINE__)
-		,m_used(false){}
+		:m_used(false){}
 
 	/// \brief Copy constructor
 	/// \param[in] o copied item

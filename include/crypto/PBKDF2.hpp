@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// Standard PBKDF2-HMAC-SHA1 C++ interface
-///
+/// \file crypto/PBKDF2.hpp
+/// \brief Standard PBKDF2-HMAC-SHA1 C++ interface
 
 #ifndef _PBKDF2_HPP_INCLUDED
 #define _PBKDF2_HPP_INCLUDED

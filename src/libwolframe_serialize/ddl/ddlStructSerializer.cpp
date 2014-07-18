@@ -302,8 +302,7 @@ bool DDLStructSerializer::setFlags( Flags f)
 }
 
 DDLStructSerializer::DDLStructSerializer( const types::VariantStruct* st)
-	:utils::TypeSignature("serialize::DDLStructSerializer", __LINE__)
-	,langbind::TypedInputFilter("serializer")
+	:langbind::TypedInputFilter("serializer")
 	,m_st(st)
 {
 	if (!m_st) throw std::runtime_error( "empty form passed to serializer");
@@ -311,8 +310,7 @@ DDLStructSerializer::DDLStructSerializer( const types::VariantStruct* st)
 }
 
 DDLStructSerializer::DDLStructSerializer( const DDLStructSerializer& o)
-	:utils::TypeSignature(o)
-	,TypedInputFilter(o)
+	:TypedInputFilter(o)
 	,m_st(o.m_st)
 	,m_ctx(o.m_ctx)
 	,m_out(o.m_out)
@@ -320,7 +318,6 @@ DDLStructSerializer::DDLStructSerializer( const DDLStructSerializer& o)
 
 DDLStructSerializer& DDLStructSerializer::operator =( const DDLStructSerializer& o)
 {
-	utils::TypeSignature::operator=(o);
 	TypedInputFilter::operator=(o);
 	m_st = o.m_st;
 	m_ctx = o.m_ctx;

@@ -257,8 +257,7 @@ struct InputFilterImpl
 
 	/// \brief Constructor
 	InputFilterImpl()
-		:utils::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
-		,InputFilter("textwolf")
+		:InputFilter("textwolf")
 		,m_encoding(UTF8)
 		,m_codepage(0)
 		,m_withEmpty(true)
@@ -275,8 +274,7 @@ struct InputFilterImpl
 	/// \brief Copy constructor
 	/// \param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:utils::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
-		,InputFilter(o)
+		:InputFilter(o)
 		,m_encoding(o.m_encoding)
 		,m_codepage(o.m_codepage)
 		,m_withEmpty(o.m_withEmpty)
@@ -947,8 +945,7 @@ struct OutputFilterImpl :public OutputFilter
 
 	/// \brief Constructor
 	OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
-		:utils::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
-		,OutputFilter("textwolf", inheritMetaData_)
+		:OutputFilter("textwolf", inheritMetaData_)
 		,m_encoding(UTF8)
 		,m_codepage(0)
 		,m_printer(0)
@@ -959,8 +956,7 @@ struct OutputFilterImpl :public OutputFilter
 	/// \brief Copy constructor
 	/// \param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:utils::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
-		,OutputFilter(o)
+		:OutputFilter(o)
 		,m_encoding(o.m_encoding)
 		,m_codepage(o.m_codepage)
 		,m_printer(0)

@@ -31,7 +31,7 @@
 
 ************************************************************************/
 /// \file user.hpp
-/// \brief Basic user information
+/// \brief Basic user login information
 
 #ifndef _USER_HPP_INCLUDED
 #define _USER_HPP_INCLUDED

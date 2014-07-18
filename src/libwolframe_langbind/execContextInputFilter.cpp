@@ -53,8 +53,7 @@ ExecContextElement::Value ExecContextElement::valueFromId( const std::string& v)
 }
 
 ExecContextInputFilter::ExecContextInputFilter( const std::vector<ExecContextElement>& params_, const proc::ExecContext& ctx_, const std::string& authorizationResource_)
-	:utils::TypeSignature("langbind::ExecContextInputFilter", __LINE__)
-	,langbind::TypedInputFilter("authzarg")
+	:langbind::TypedInputFilter("authzarg")
 	,m_state(0)
 	,m_paramidx(0)
 	,m_params(&params_)
@@ -63,8 +62,7 @@ ExecContextInputFilter::ExecContextInputFilter( const std::vector<ExecContextEle
 	{}
 
 ExecContextInputFilter::ExecContextInputFilter( const ExecContextInputFilter& o)
-	:utils::TypeSignature("langbind::ExecContextInputFilter", __LINE__)
-	,langbind::TypedInputFilter(o)
+	:langbind::TypedInputFilter(o)
 	,m_state(o.m_state)
 	,m_paramidx(o.m_paramidx)
 	,m_params(o.m_params)

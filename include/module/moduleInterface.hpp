@@ -31,7 +31,7 @@
 
 ************************************************************************/
 /// \brief Basic interface classes that to build objects and the Wolframe module interface
-/// \file moduleInterface.hpp
+/// \file module/moduleInterface.hpp
 ///
 
 #ifndef _MODULE_INTERFACE_HPP_INCLUDED
@@ -47,6 +47,7 @@
 namespace _Wolframe {
 namespace module {
 
+/// \class BuilderBase
 /// Base class of all builders
 class BuilderBase
 {
@@ -58,7 +59,8 @@ public:
 	virtual ObjectConstructorBase* constructor() = 0;
 };
 
-///
+/// \class SimpleBuilder
+/// \brief Base class for builders of objects without configuration
 class SimpleBuilder
 	:public BuilderBase
 {
