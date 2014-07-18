@@ -1220,7 +1220,7 @@ getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP}
 echo
 echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
 echo
-echo "Use 'firewall-cmd --add-service=wolframe' to set the firewall rules"
+echo "Use 'firewall-cmd --reload' then 'firewall-cmd --add-service=wolframe' to set the firewall rules"
 echo
 %else
 echo
@@ -1239,7 +1239,7 @@ echo
 echo
 echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
 echo
-echo "Use 'firewall-cmd --add-service=wolframe' to set the firewall rules"
+echo "Use 'firewall-cmd --reload' then 'firewall-cmd --add-service=wolframe' to set the firewall rules"
 echo
 %endif
 %if %{suse}
