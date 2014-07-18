@@ -30,12 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/doctypeModuleMacros.hpp
-///\brief Macros for a document type/format module definition
+/// \file appdevel/doctypeModuleMacros.hpp
+/// \brief Macros for a document type/format module definition
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/doctypeDetectorBuilder.hpp"
 
-///\brief Defines a Wolframe document format with a document type detector after the module includes section.
+/// \brief Defines a Wolframe document format with a document type detector after the module includes section.
 #define WF_DOCUMENT_FORMAT( DOCFORMATNAME, CREATE_DOCTYPE_DETECTOR)\
 {\
 	struct Constructor\

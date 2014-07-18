@@ -65,11 +65,14 @@ public:
 	/// \brief Check if an address belongs to the set of allowed
 	bool isAllowed( const boost::asio::ip::address& adr) const;
 
+	/// \brief Get all the restriction definitions defined in this structure as string
 	std::string tostring() const;
 
 public:
 	typedef boost::asio::ip::address IPAddress;
 
+	/// \class Element
+	/// \brief One element of a list of address restrictions (deny or allow)
 	struct Element
 	{
 		IPAddress ip;
@@ -87,8 +90,8 @@ private:
 	static bool matches( const std::vector<Element>& ar, const IPAddress& addr);
 
 private:
-	std::vector<Element> m_allowedar;
-	std::vector<Element> m_deniedar;
+	std::vector<Element> m_allowedar;	///< array of allowed addresses/networks 
+	std::vector<Element> m_deniedar;	///< array of denied addresses/networks
 };
 
 }}//namespace

@@ -49,6 +49,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
+/// Configuration for AAAA (Authentication, Authorization, Audit, Accounting)
 class AAAAconfiguration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
@@ -72,6 +73,7 @@ private:
 	std::list< config::NamedConfiguration* >	m_auditConfig;
 };
 
+/// Global provider interface to create AAAA related objects
 class AAAAprovider : public boost::noncopyable
 {
 public:

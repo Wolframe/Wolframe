@@ -33,7 +33,6 @@
 ///\brief Implementation of programs for a sqlite3 database
 ///\file modules/database/sqlite3/SQLiteProgram.cpp
 #include "SQLiteProgram.hpp"
-#include "config/programBase.hpp"
 #include "sqlite3.h"
 #include <boost/algorithm/string.hpp>
 

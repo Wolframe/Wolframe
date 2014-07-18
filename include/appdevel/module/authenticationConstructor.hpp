@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/module/authenticationConstructor.hpp
-///\brief Interface to constructors of authenticators
+/// \file appdevel/module/authenticationConstructor.hpp
+/// \brief Interface to constructors of authenticators
 #ifndef _Wolframe_MODULE_AUTHENTICATION_CONSTRUCTOR_HPP_INCLUDED
 #define _Wolframe_MODULE_AUTHENTICATION_CONSTRUCTOR_HPP_INCLUDED
 #include "module/constructor.hpp"
@@ -44,8 +44,8 @@
 namespace _Wolframe {
 namespace module {
 
-///\class AuthenticationConstructor
-///\brief Constructor of an authentication unit
+/// \class AuthenticationConstructor
+/// \brief Constructor of an authentication unit
 template<class UNIT, class CONFIG>
 class AuthenticationConstructor
 	:public _Wolframe::ConfiguredObjectConstructor<AAAA::AuthenticationUnit>

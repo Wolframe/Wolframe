@@ -30,13 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/filterModuleMacros.hpp
-///\brief Macros for a filter modules
+/// \file appdevel/filterModuleMacros.hpp
+/// \brief Macros for a filter modules
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/filterBuilder.hpp"
 #include "appdevel/module/programTypeBuilder.hpp"
 
-///\brief Defines a Wolframe filter module after the includes section.
+/// \brief Defines a Wolframe filter module after the includes section.
 #define WF_FILTER_TYPE( FILTERNAME, CREATE_FILTERTYPE)\
 {\
 	struct Constructor\

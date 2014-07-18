@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/filterdef.hpp
-///\brief Interface for parsing filter definitions
+/// \file filter/filterdef.hpp
+/// \brief Interface for parsing filter definitions
 
 #ifndef _Wolframe_FILTER_FILTERDEF_HPP_INCLUDED
 #define _Wolframe_FILTER_FILTERDEF_HPP_INCLUDED
@@ -43,6 +43,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+/// \class FilterDef
+/// \brief Definition of a filter with methods to parse it from a source
 struct FilterDef
 {
 	const langbind::FilterType* filtertype;

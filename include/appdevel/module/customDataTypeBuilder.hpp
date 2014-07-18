@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/module/customDataTypeBuilder.hpp
-///\brief Interface template for object builder of form functions
+/// \file appdevel/module/customDataTypeBuilder.hpp
+/// \brief Interface template for object builder of form functions
 #ifndef _Wolframe_MODULE_CUSTOM_DATA_TYPE_BUILDER_HPP_INCLUDED
 #define _Wolframe_MODULE_CUSTOM_DATA_TYPE_BUILDER_HPP_INCLUDED
 #include "module/moduleInterface.hpp"
@@ -45,6 +45,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
+/// \class CustomDataTypeConstructor
+/// \brief Constructor of a custom data type for language bindings
 class CustomDataTypeConstructor :public SimpleObjectConstructor<types::CustomDataType>
 {
 public:
@@ -85,6 +87,8 @@ private:
 typedef boost::shared_ptr<CustomDataTypeConstructor> CustomDataTypeConstructorR;
 
 
+/// \class CustomDataTypeBuilder
+/// \brief Builder of a custom data type constructor for language bindings
 class CustomDataTypeBuilder :public SimpleBuilder
 {
 public:

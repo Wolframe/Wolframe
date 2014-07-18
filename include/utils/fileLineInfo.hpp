@@ -42,6 +42,8 @@
 namespace _Wolframe {
 namespace utils {
 
+/// \class FileLineInfo
+/// \brief Source line info with filename reference for error messages
 class FileLineInfo
 	:public SourceLineInfo
 {

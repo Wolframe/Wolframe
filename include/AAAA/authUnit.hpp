@@ -49,8 +49,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// AuthenticationUnit Unit
-/// This is the base class for the authentication unit implementations
+/// \class AuthenticationUnit
+/// \brief This is the base class for the authentication unit implementations
 class AuthenticationUnit
 {
 public:

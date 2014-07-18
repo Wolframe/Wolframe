@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/normalizeModuleMacros.hpp
-///\brief Macros for defining normalization and validaton function module
+/// \file appdevel/normalizeModuleMacros.hpp
+/// \brief Macros for defining normalization and validaton function module
 #include "appdevel/module/normalizeFunctionBuilder.hpp"
 #include <boost/shared_ptr.hpp>
 
@@ -49,7 +49,7 @@ struct macro__WF_NORMALIZER_RESOURCE__ ## RESOURCECLASS\
 	}\
 };\
 
-///\brief Defines normalization function
+/// \brief Defines normalization function
 #define WF_NORMALIZER(NAME,CONSTRUCTOR)\
 {\
 	struct Constructor\
@@ -62,7 +62,7 @@ struct macro__WF_NORMALIZER_RESOURCE__ ## RESOURCECLASS\
 	(*this)(&Constructor ::impl);\
 }
 
-///\brief Defines normalization function
+/// \brief Defines normalization function
 #define WF_NORMALIZER_WITH_RESOURCE(NAME,CONSTRUCTOR,RESOURCECLASS)\
 {\
 	struct Constructor\

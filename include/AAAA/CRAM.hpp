@@ -55,6 +55,7 @@ static const size_t CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
 static const size_t CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 static const size_t CRAM_SALT_SIZE = PASSWORD_SALT_SIZE;
 
+/// Challenge for the authentication mech "Wolframe-CRAM"
 class CRAMchallenge
 {
 public:
@@ -79,6 +80,7 @@ private:
 };
 
 
+/// Response for the authentication mech "Wolframe-CRAM"
 class CRAMresponse
 {
 public:

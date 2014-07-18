@@ -47,6 +47,7 @@ namespace AAAA {
 static const size_t PASSWORD_HASH_SIZE = 384 / 8;
 static const size_t PASSWORD_SALT_SIZE = 128 / 8;
 
+/// Password hash
 class PasswordHash
 {
 public:

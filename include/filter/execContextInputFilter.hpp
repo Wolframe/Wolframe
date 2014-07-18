@@ -41,6 +41,8 @@
 namespace _Wolframe {
 namespace langbind {
 
+/// \class ExecContextElement
+/// \brief One element of an execution context input filter definition
 struct ExecContextElement
 {
 	enum Value
@@ -80,6 +82,8 @@ struct ExecContextElement
 		:name(name_),value(value_),value_delim(value_delim_),value_idx(value_idx_){}
 };
 
+/// \class ExecContextInputFilter
+/// \brief Filter for passing seleced elements of an execution context as parameters to a function
 class ExecContextInputFilter
 	:public langbind::TypedInputFilter
 {

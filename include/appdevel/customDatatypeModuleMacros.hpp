@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/customDataTypeModuleMacros.hpp
-///\brief Macros for defining a custom datatype module
+/// \file appdevel/customDataTypeModuleMacros.hpp
+/// \brief Macros for defining a custom datatype module
 #include "appdevel/module/customDataTypeBuilder.hpp"
 
-///\brief Defines a custom datatype in the CUSTOM_DATATYPE_MODULE section
+/// \brief Defines a custom datatype in the CUSTOM_DATATYPE_MODULE section
 #define WF_CUSTOM_DATATYPE(NAME,CONSTRUCTOR)\
 	{\
 		struct Constructor\

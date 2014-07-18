@@ -50,7 +50,6 @@
 #include "utils/fileLineInfo.hpp"
 #include "types/conversions.hpp"
 #include "logger-v1.hpp"
-#include "config/programBase.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
@@ -859,11 +858,8 @@ static void load( const std::string& filename, const std::string& source, const 
 	}
 	catch (const std::runtime_error& e)
 	{
-		config::PositionalErrorMessageBase base(source);
-		base.getError( si, e.what());
-		
-		config::PositionalFileError err( base.getError( si, e.what()), filename);
-		throw config::PositionalFileErrorException( err);
+		posinfo.update( posinfo_si, si);
+		throw std::runtime_error( std::string( e.what()) + " " + posinfo.logtext());
 	}
 }
 
@@ -883,14 +879,9 @@ static void includeFile( const std::string& mainfilename, const std::string& inc
 		}
 		load( incfilename, src, databaseId, databaseClassName, langdescr, subroutineMap, transactionFunctionList);
 	}
-	catch (const config::PositionalFileErrorException& e)
-	{
-		LOG_ERROR << "error loading program from file '" << mainfilename << " when including file '" << incfilename << "'";
-		throw e;
-	}
 	catch (const std::runtime_error& e)
 	{
-		LOG_ERROR << "error loading program from file '" << mainfilename << " when including file '" << incfilename << "'";
+		LOG_ERROR << "error including file from " << mainfilename << ": " << e.what();
 		throw e;
 	}
 }
@@ -908,18 +899,14 @@ TdlTransactionFunctionList
 		SubroutineMap subroutineMap;
 		load( filename, utils::readSourceFileContent( filename), databaseId, databaseClassName, langdescr, subroutineMap, rt);
 	}
-	catch (const config::PositionalFileErrorException& e)
-	{
-		throw e;
-	}
 	catch (const std::runtime_error& e)
 	{
-		LOG_ERROR << "error loading program from file '" << filename << "'";
+		LOG_ERROR << "error loading transaction program: " << e.what();
 		throw e;
 	}
 	catch (const std::exception& e)
 	{
-		LOG_FATAL << "uncaught exception loading program from file '" << filename << "':" << e.what();
+		LOG_FATAL << "uncaught exception loading transaction program: " << e.what();
 		throw e;
 	}
 	return rt;

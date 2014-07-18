@@ -35,7 +35,6 @@
 //
 
 #include "logger-v1.hpp"
-#include "logger/logObject.hpp"
 #include "Oracle.hpp"
 #include "utils/fileUtils.hpp"
 #include "OracleTransactionExecStatemachine.hpp"

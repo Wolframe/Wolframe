@@ -30,14 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/runtimeEnvironmentModuleMacros.hpp
-///\brief Macros for a module for a configurable runtime environment for a binding language or a binding language universe
+/// \file appdevel/runtimeEnvironmentModuleMacros.hpp
+/// \brief Macros for a module for a configurable runtime environment for a binding language or a binding language universe
 #include "appdevel/module/runtimeEnvironmentConstructor.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <boost/lexical_cast.hpp>
 
-///\brief Defines a program type with a runtime environment (e.g. program with shared resource context)
+/// \brief Defines a program type with a runtime environment (e.g. program with shared resource context)
 #define WF_RUNTIME_ENVIRONMENT(TITLE,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,INITFUNCTION) \
 {\
 	class RuntimeEnvConstructor\

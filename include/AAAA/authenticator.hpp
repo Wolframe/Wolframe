@@ -45,7 +45,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// Authenticator interface
+/// \class Authenticator
+/// \brief Authenticator interface
 /// This the only interface to be used by the system. All other interfaces
 /// are internal to the authentication objects.
 ///

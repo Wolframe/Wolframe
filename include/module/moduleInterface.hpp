@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///
+/// \brief Basic interface classes that to build objects and the Wolframe module interface
 /// \file moduleInterface.hpp
 ///
 
@@ -47,6 +47,7 @@
 namespace _Wolframe {
 namespace module {
 
+/// Base class of all builders
 class BuilderBase
 {
 public:
@@ -76,19 +77,19 @@ protected:
 	const char* m_className;
 };
 
-///
+/// \class ConfiguredBuilder
+/// \brief Builder for objects with configuration
 class ConfiguredBuilder
 	:public BuilderBase
 {
 	friend class ModulesDirectory;
 public:
-	/// \class ConfiguredBuilder
-	/// \brief builder for objects with configuration
+	/// \brief Constructor
 	/// \param title	string used for printing purposes, usually logging.
 	/// \param section	configuration section (parent node)
 	/// \param keyword	keyword in the configuration section. The object configuration
 	///			is bind to the section, keyword pair
-	///\param className	the name of the class that the built constructor will build
+	/// \param className	the name of the class that the built constructor will build
 	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
 			   const char* className )
 		: m_title( title ), m_section( section ), m_keyword( keyword ),
@@ -119,7 +120,10 @@ protected:
 };
 
 
-/// Template for constructing a configured builder.
+/// \class ConfiguredBuilderDescription
+/// \tparam Tconstructor
+/// \tparam Tconf
+/// \brief Template for constructing a configured builder.
 template < class Tconstructor, class Tconf >
 class ConfiguredBuilderDescription : public ConfiguredBuilder
 {
@@ -146,12 +150,13 @@ private:
 
 //*********** Module interface *********
 
-///\brief Function that constructs a builder.
-//	This function is specific for each of the configured builders in the module.
+/// \brief Function that constructs a builder.
+///	This function is specific for each of the configured builders in the module.
 typedef BuilderBase* (*createBuilderFunc)();
 
 
-/// The module entry point structure. Only one entry point per module.
+/// \class ModuleEntryPoint
+/// \brief The module entry point structure. Only one entry point per module.
 struct ModuleEntryPoint
 {
 	enum	SignSize	{

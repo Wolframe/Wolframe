@@ -44,7 +44,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-// virtual base (interface) for auditor classes
+/// Virtual base (interface) for auditor classes
 class Auditor {
 public:
 	virtual ~Auditor()				{}

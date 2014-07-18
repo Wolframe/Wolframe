@@ -48,6 +48,7 @@
 namespace _Wolframe {
 namespace log {
 
+/// Logger abstraction configurable to print to multiple backends
 class Logger {
 public:
 	/// create a logger and connect it to a backend, typically
@@ -80,7 +81,7 @@ private:
 };
 
 
-/// template functions for logging, default is we search for the << operator
+/// \brief template functions for logging, default is we search for the << operator
 /// and log with this one..
 template <typename T>
 Logger& operator<< ( Logger& logger, T t )

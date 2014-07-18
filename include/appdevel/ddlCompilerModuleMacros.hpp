@@ -30,12 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/ddlCompilerModuleMacros.hpp
-///\brief Macros for a module implementing a DDL compiler
+/// \file appdevel/ddlCompilerModuleMacros.hpp
+/// \brief Macros for a module implementing a DDL compiler
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/ddlcompilerBuilder.hpp"
 
-///\brief Defines a Wolframe DDL compiler
+/// \brief Defines a Wolframe DDL compiler
 #define WF_DDLCOMPILER( LANGUAGE, CREATE_COMPILER)\
 {\
 	struct Constructor\

@@ -30,14 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/authenticationModuleMacros.hpp
-///\brief Macros for a module for defining an authentication mechanism
+/// \file appdevel/authenticationModuleMacros.hpp
+/// \brief Macros for a module for defining an authentication mechanism
 #include "appdevel/module/authenticationConstructor.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include <boost/lexical_cast.hpp>
 
-///\brief Defines a an authentication mechanism
+/// \brief Defines a an authentication mechanism
 #define WF_AUTHENTICATOR(NAME) \
 {\
 	struct Builder \

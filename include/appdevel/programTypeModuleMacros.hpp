@@ -30,12 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/programTypeModuleMacros.hpp
-///\brief Macros for a module for a program type for a binding language
+/// \file appdevel/programTypeModuleMacros.hpp
+/// \brief Macros for a module for a program type for a binding language
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/programTypeBuilder.hpp"
 
-///\brief Defines a Wolframe program type
+/// \brief Defines a Wolframe program type
 #define WF_PROGRAM_TYPE( LANGNAME, CREATEPRGFUNC)\
 {\
 	struct Constructor\

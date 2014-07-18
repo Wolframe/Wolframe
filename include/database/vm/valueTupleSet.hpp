@@ -59,8 +59,10 @@ public:
 	ValueTupleSet( const ValueTupleSet& o)
 		:m_colnames(o.m_colnames),m_ar(o.m_ar){}
 
-	/// \brief Iterator on this set of value tuples
 	friend class const_iterator;
+
+	/// \class const_iterator
+	/// \brief Iterator on this set of value tuples
 	class const_iterator
 	{
 	public:

@@ -111,10 +111,6 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/ );
 
-	virtual void addProgram( const std::string& source);
-	virtual void loadProgram( const std::string& filename);
-	virtual void loadAllPrograms(){}
-
 	const std::string& outfilename() const
 	{
 		return m_outfilename;
@@ -158,18 +154,6 @@ public:
 	{
 		return &m_db;
 	}
-
-	virtual void addProgram( const std::string& source)
-	{
-		m_db.addProgram( source);
-	}
-
-	virtual void loadProgram( const std::string& filename)
-	{
-		m_db.loadProgram( filename);
-	}
-
-	virtual void loadAllPrograms(){}
 
 private:
 	std::string m_id;

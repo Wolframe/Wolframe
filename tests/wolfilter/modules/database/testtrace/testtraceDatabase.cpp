@@ -35,7 +35,6 @@
 #include "logger-v1.hpp"
 #include "testtraceDatabase.hpp"
 #include "testtraceTransaction.hpp"
-#include "config/programBase.hpp"
 #include "serialize/struct/structDescription.hpp"
 #include "config/structSerialize.hpp"
 #include "utils/fileUtils.hpp"
@@ -132,48 +131,5 @@ TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string&
 Transaction* TesttraceDatabase::transaction(const std::string& /*name*/ )
 {
 	return new TesttraceTransaction( this, m_result);
-}
-
-void TesttraceDatabase::addProgram( const std::string& source)
-{
-	config::PositionalErrorMessageBase ERROR(source);
-	config::PositionalErrorMessageBase::Message MSG;
-	static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
-	std::string::const_iterator si = source.begin(), se = source.end();
-	char ch;
-	std::string tok;
-	const char* commentopr = "--";
-
-	while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
-	{
-		if (ch == commentopr[0])
-		{
-			std::size_t ci = 1;
-			while (!commentopr[ci] && commentopr[ci] == *si)
-			{
-				ci++;
-				si++;
-			}
-			if (!commentopr[ci])
-			{
-				// skip to end of line
-				while (si != se && *si != '\n') ++si;
-			}
-		}
-		else if (g_optab[ch])
-		{
-			throw ERROR( si, MSG << "unexpected token '" << ch << "'");
-		}
-		else
-		{
-			throw ERROR( si, MSG << "unexpected token in DB source '" << tok << "'");
-		}
-	}
-}
-
-void TesttraceDatabase::loadProgram( const std::string& filename)
-{
-	std::string dbsource = utils::readSourceFileContent( filename);
-	addProgram( dbsource);
 }
 

@@ -48,7 +48,7 @@ struct PrintFormat;
 
 namespace db {
 
-/// \class TransactionOutput
+/// \class VmTransactionOutput
 /// \brief Output of a transaction
 class VmTransactionOutput
 {

@@ -30,13 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/cppFormFunctionModuleMacros.hpp
-///\brief Macros and templates for building C++ an application form function module
+/// \file appdevel/cppFormFunctionModuleMacros.hpp
+/// \brief Macros and templates for building C++ an application form function module
 
 #include "appdevel/module/cppFormFunctionTemplate.hpp"
 #include "appdevel/module/cppFormFunctionBuilder.hpp"
 
-///\brief Defines normalization function
+/// \brief Defines normalization function
 #define WF_FORM_FUNCTION(NAME,FUNCTION,OUTPUT,INPUT)\
 {\
 	struct Constructor\
@@ -50,7 +50,7 @@
 	(*this)(&Constructor ::impl);\
 }
 
-///\brief Defines normalization function without return value (empty result)
+/// \brief Defines normalization function without return value (empty result)
 #define WF_FORM_PROCEDURE(NAME,PROCEDURE,INPUT)\
 {\
 	struct Constructor\

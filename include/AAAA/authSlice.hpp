@@ -46,8 +46,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// AuthenticatorSlice
-/// This is the base class for authenticator slices implementations
+/// \class AuthenticatorSlice
+/// \brief This is the base class for authenticator slices implementations
 /// An authenticator has (usually) several authenticator slices
 /// The AuthenticatorSlice(s) are provided by the their respective
 /// AuthenticationUnit(s) in the AAAA provider

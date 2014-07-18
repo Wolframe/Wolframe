@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/module/filterBuilder.hpp
-///\brief Interface template for object builder of filters
+/// \file appdevel/module/filterBuilder.hpp
+/// \brief Interface template for object builder of filters
 #ifndef _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "filter/filter.hpp"
@@ -41,6 +41,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
+/// \class FilterConstructor
+/// \brief Constructor of a filter type
 class FilterConstructor
 	:public SimpleObjectConstructor<langbind::Filter>
 {
@@ -76,6 +78,8 @@ private:
 typedef types::CountedReference<FilterConstructor> FilterConstructorR;
 
 
+/// \class FilterBuilder
+/// \brief Builder of a filter type constructor
 class FilterBuilder
 	:public SimpleBuilder
 {

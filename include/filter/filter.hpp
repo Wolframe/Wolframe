@@ -45,6 +45,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+/// \class Filter
+/// \brief Structure defining filter for input and output as unit
 class Filter
 {
 public:

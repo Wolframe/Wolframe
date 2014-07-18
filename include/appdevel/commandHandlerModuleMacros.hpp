@@ -30,15 +30,15 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/commandHandlerModuleMacros.hpp
-///\brief Macros for a module for a configurable command handler and program type for a binding language
+/// \file appdevel/commandHandlerModuleMacros.hpp
+/// \brief Macros for a module for a configurable command handler and program type for a binding language
 #include "module/moduleInterface.hpp"
 #include "module/programTypeBuilder.hpp"
 #include "cmdbind/commandHandlerConstructor.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 
-///\brief Defines a Wolframe command handler module after the includes section.
+/// \brief Defines a Wolframe command handler module after the includes section.
 #define WF_COMMAND_HANDLER(TITLE,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF)\
 {\
 	class CommandHandlerConstructor\

@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/module/runtimeEnvironmentConstructor.hpp
-///\brief Interface to constructors of runtime environment for executing functions that need it
+/// \file appdevel/module/runtimeEnvironmentConstructor.hpp
+/// \brief Interface to constructors of runtime environment for executing functions that need it
 #ifndef _Wolframe_MODULE_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
 #define _Wolframe_MODULE_RUNTIME_ENVIRONMENT_CONSTRUCTOR_HPP_INCLUDED
 #include "module/constructor.hpp"
@@ -42,22 +42,22 @@
 
 namespace _Wolframe {
 namespace proc {
-	///\brief Forward declaration
+	/// \brief Forward declaration
 	class ProcessorProvider;
 }
 namespace module {
 
-///\class RuntimeEnvironmentConstructor
-///\brief Constructor of a runtime environment for executing functions
+/// \class RuntimeEnvironmentConstructor
+/// \brief Constructor of a runtime environment for executing functions
 class RuntimeEnvironmentConstructor
 	:public ConfiguredObjectConstructor<langbind::RuntimeEnvironment>
 {
 public:
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~RuntimeEnvironmentConstructor(){}
 
-	///\brief Get the module object type
-	///\return the object type
+	/// \brief Get the module object type
+	/// \return the object type
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
 		return ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT;

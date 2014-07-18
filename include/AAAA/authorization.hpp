@@ -47,7 +47,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-// interface for all authorization mechanisms
+/// Interface for all authorization mechanisms
 class Authorizer {
 public:
 	virtual ~Authorizer()		{}

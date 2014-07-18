@@ -43,6 +43,8 @@
 namespace _Wolframe {
 namespace langbind {
 
+/// \class PropertyTreeInputFilter
+/// \brief Filter for property tree structures
 class PropertyTreeInputFilter :public TypedInputFilter
 {
 public:
@@ -88,6 +90,8 @@ public:
 	}
 
 private:
+	/// \class State
+	/// \brief State of property tree input filter
 	struct State
 	{
 		types::PropertyTree::Node::const_iterator itr;
@@ -122,6 +126,8 @@ public:
 	const types::PropertyTree::Node& content() const	{return m_stk.back().m_node;}
 
 private:
+	/// \class State
+	/// \brief State of property tree output filter
 	struct State
 	{
 		State(){}

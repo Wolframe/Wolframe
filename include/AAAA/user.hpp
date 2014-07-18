@@ -43,6 +43,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
+/// \class User
+/// \brief Data structure containing all login data of a user
 class User
 {
 public:
