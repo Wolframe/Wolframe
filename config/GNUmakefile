@@ -69,7 +69,10 @@ config-modularized: $(MODULARIZED_CONFIG_FILES)
 
 PACKAGING_CONFIG_FILES = \
 	redhat/wolframe.conf \
+	sles/wolframe.conf \
+	suse/wolframe.conf \
 	debian/wolframe.conf \
+	ubuntu/wolframe.conf \
 	arch/wolframe.conf \
 	slackware/wolframe.conf \
 	freebsd/wolframe.conf \
@@ -80,10 +83,13 @@ PACKAGING_CONFIG_FILES = \
 
 config-packaging: $(PACKAGING_CONFIG_FILES)
 
-.PHONY: redhat debian arch slackware freebsd netbsd solaris
+.PHONY: redhat sles suse debian ubuntu arch slackware freebsd netbsd solaris
 
 redhat: redhat/wolframe.conf
+sles: sles/wolframe.conf
+suse: suse/wolframe.conf
 debian: debian/wolframe.conf
+ubuntu: ubuntu/wolframe.conf
 arch: arch/wolframe.conf
 slackware: slackware/wolframe.conf
 freebsd: freebsd/wolframe.conf
@@ -157,6 +163,50 @@ redhat/wolframe.conf:
 		../expand_template.sh oracle.tmpl \
 		../redhat/conf.d/mod_db_oracle.conf 
 
+sles/wolframe.conf:
+	cd templates; VARIANT=modularized \
+		../expand_template.sh wolframe-modularized.tmpl \
+		../sles/wolframe.conf
+	cp modularized/conf.d/* sles/conf.d/.
+	cp modularized/modules.d/* sles/modules.d/.
+	cd templates; VARIANT=modularized \
+		PLATFORM=LINUX LINUX_DIST=sles \
+		$(REDHAT_VARIABLES) \
+		../expand_template.sh sqlite.tmpl \
+		../sles/conf.d/mod_db_sqlite3.conf 	
+	cd templates; VARIANT=modularized \
+		PLATFORM=LINUX LINUX_DIST=sles \
+		$(REDHAT_VARIABLES) \
+		../expand_template.sh postgresql.tmpl \
+		../sles/conf.d/mod_db_postgresql.conf 
+	cd templates; VARIANT=modularized \
+		PLATFORM=LINUX LINUX_DIST=sles \
+		$(REDHAT_VARIABLES) \
+		../expand_template.sh oracle.tmpl \
+		../sles/conf.d/mod_db_oracle.conf 
+
+suse/wolframe.conf:
+	cd templates; VARIANT=modularized \
+		../expand_template.sh wolframe-modularized.tmpl \
+		../suse/wolframe.conf
+	cp modularized/conf.d/* suse/conf.d/.
+	cp modularized/modules.d/* suse/modules.d/.
+	cd templates; VARIANT=modularized \
+		PLATFORM=LINUX LINUX_DIST=suse \
+		$(REDHAT_VARIABLES) \
+		../expand_template.sh sqlite.tmpl \
+		../suse/conf.d/mod_db_sqlite3.conf 	
+	cd templates; VARIANT=modularized \
+		PLATFORM=LINUX LINUX_DIST=suse \
+		$(REDHAT_VARIABLES) \
+		../expand_template.sh postgresql.tmpl \
+		../suse/conf.d/mod_db_postgresql.conf 
+	cd templates; VARIANT=modularized \
+		PLATFORM=LINUX LINUX_DIST=suse \
+		$(REDHAT_VARIABLES) \
+		../expand_template.sh oracle.tmpl \
+		../suse/conf.d/mod_db_oracle.conf 
+
 debian/wolframe.conf:
 	cd templates; VARIANT=modularized \
 		../expand_template.sh wolframe-modularized.tmpl \
@@ -165,19 +215,41 @@ debian/wolframe.conf:
 	cp modularized/modules.d/* debian/modules.d/.
 	cd templates; VARIANT=modularized \
 		PLATFORM=LINUX LINUX_DIST=debian \
-		$(REDHAT_VARIABLES) \
+		$(DEBIAN_VARIABLES) \
 		../expand_template.sh sqlite.tmpl \
 		../debian/conf.d/mod_db_sqlite3.conf 	
 	cd templates; VARIANT=modularized \
 		PLATFORM=LINUX LINUX_DIST=debian \
-		$(REDHAT_VARIABLES) \
+		$(DEBIAN_VARIABLES) \
 		../expand_template.sh postgresql.tmpl \
 		../debian/conf.d/mod_db_postgresql.conf 
 	cd templates; VARIANT=modularized \
 		PLATFORM=LINUX LINUX_DIST=debian \
-		$(REDHAT_VARIABLES) \
+		$(DEBIAN_VARIABLES) \
 		../expand_template.sh oracle.tmpl \
 		../debian/conf.d/mod_db_oracle.conf 
+
+ubuntu/wolframe.conf:
+	cd templates; VARIANT=modularized \
+		../expand_template.sh wolframe-modularized.tmpl \
+		../ubuntu/wolframe.conf
+	cp modularized/conf.d/* ubuntu/conf.d/.
+	cp modularized/modules.d/* ubuntu/modules.d/.
+	cd templates; VARIANT=modularized \
+		PLATFORM=LINUX LINUX_DIST=ubuntu \
+		$(DEBIAN_VARIABLES) \
+		../expand_template.sh sqlite.tmpl \
+		../ubuntu/conf.d/mod_db_sqlite3.conf 	
+	cd templates; VARIANT=modularized \
+		PLATFORM=LINUX LINUX_DIST=ubuntu \
+		$(DEBIAN_VARIABLES) \
+		../expand_template.sh postgresql.tmpl \
+		../ubuntu/conf.d/mod_db_postgresql.conf 
+	cd templates; VARIANT=modularized \
+		PLATFORM=LINUX LINUX_DIST=ubuntu \
+		$(DEBIAN_VARIABLES) \
+		../expand_template.sh oracle.tmpl \
+		../ubuntu/conf.d/mod_db_oracle.conf 
 
 arch/wolframe.conf:
 	cd templates; VARIANT=monolythic \
