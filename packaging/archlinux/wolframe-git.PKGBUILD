@@ -1,7 +1,7 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
 # Maintainer: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe-git
-pkgver=release_0.0.2.r145.gb4e281e
+pkgver=release_0.0.2.r319.g0c7abd2
 pkgrel=1
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
@@ -63,6 +63,10 @@ check() {
 
 build() {
   cd ${srcdir}/Wolframe
+
+  msg "Patching build number in software.."
+  GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
+  sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" ${srcdir}/Wolframe/include/wolframe.hpp
   
   msg "Generating dependencies..."
   make depend \

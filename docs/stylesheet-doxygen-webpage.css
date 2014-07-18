@@ -1,4 +1,4 @@
-/* The standard CSS for doxygen 1.8.5 */
+/* The standard CSS for doxygen 1.8.7 */
 
 /*
 body, table, div, p, dl {
@@ -45,7 +45,6 @@ h1, h2, h3, h4, h5, h6 {
 */
 }
 
-
 h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
 	text-shadow: 0 0 15px cyan;
 }
@@ -61,8 +60,12 @@ div.multicol {
 	-webkit-column-count: 3;
 }
 
-p.startli, p.startdd, p.starttd {
+p.startli, p.startdd {
 	margin-top: 2px;
+}
+
+p.starttd {
+	margin-top: 0px;
 }
 
 p.endli {
@@ -325,7 +328,6 @@ img.footer {
 	vertical-align: middle;
 }
 
-
 /* @group Code Colorization */
 
 span.keyword {
@@ -381,7 +383,6 @@ blockquote {
 
 /* @end */
 
-
 /*
 .search {
 	color: #003399;
@@ -425,7 +426,6 @@ hr {
 hr.footer {
 	height: 1px;
 }
-
 
 /* @group Member Descriptions */
 
@@ -488,8 +488,6 @@ table.memberdecls {
 }
 
 /* @end */
-
-
 
 /* @group Member Details */
 
@@ -678,7 +676,7 @@ span.mlabel {
 
 /* @end */
 
-/* these are for tree view when not used as main index */
+/* these are for tree view inside a (index) page */
 
 div.directory {
         margin: 10px 0px;
@@ -741,6 +739,80 @@ div.directory {
         padding-right: 2px;
 	color: #3D578C;
 }
+
+.arrow {
+    color: #9CAFD4;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    font-size: 80%;
+    display: inline-block;
+    width: 16px;
+    height: 22px;
+}
+
+.icon {
+    font-family: Arial, Helvetica;
+    font-weight: bold;
+    font-size: 12px;
+    height: 14px;
+    width: 16px;
+    display: inline-block;
+    background-color: #728DC1;
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.icona {
+    width: 24px;
+    height: 22px;
+    display: inline-block;
+}
+
+.iconfopen {
+    width: 24px;
+    height: 18px;
+    margin-bottom: 4px;
+    background-image:url('ftv2folderopen.png');
+    background-position: 0px -4px;
+    background-repeat: repeat-y;
+    vertical-align:top;
+    display: inline-block;
+}
+
+.iconfclosed {
+    width: 24px;
+    height: 18px;
+    margin-bottom: 4px;
+    background-image:url('ftv2folderclosed.png');
+    background-position: 0px -4px;
+    background-repeat: repeat-y;
+    vertical-align:top;
+    display: inline-block;
+}
+
+.icondoc {
+    width: 24px;
+    height: 18px;
+    margin-bottom: 4px;
+    background-image:url('ftv2doc.png');
+    background-position: 0px -4px;
+    background-repeat: repeat-y;
+    vertical-align:top;
+    display: inline-block;
+}
+
+table.directory {
+    font: 400 14px Roboto,sans-serif;
+}
+
+/* @end */
 
 div.dynheader {
         margin-top: 8px;
@@ -953,7 +1025,6 @@ dl
         padding: 0 0 0 10px;
 }
 
-
 /* dl.note, dl.warning, dl.attention, dl.pre, dl.post, dl.invariant, dl.deprecated, dl.todo, dl.test, dl.bug */
 dl.section
 {
@@ -1078,6 +1149,11 @@ dl.section dd {
         text-align: center;
 }
 
+.diagraph
+{
+        text-align: center;
+}
+
 .caption
 {
 	font-weight: bold;
@@ -1177,7 +1253,6 @@ tr.heading h2 {
         margin-top: 12px;
         margin-bottom: 4px;
 }
-
 
 /* tooltip related style info */
 
@@ -1350,7 +1425,6 @@ tr.heading h2 {
 	margin-top: -11px;
 }
 
-
 @media print
 {
   #top { display: none; }
@@ -1369,6 +1443,4 @@ tr.heading h2 {
     display:inline;
   }
 }
-
-
 
