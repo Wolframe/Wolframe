@@ -168,14 +168,12 @@ usr/pkg/include/wolframe/database/substitutingStatement.hpp
 @dirrm usr/pkg/include/wolframe/database
 usr/pkg/include/wolframe/config/configurationTree.hpp
 usr/pkg/include/wolframe/config/configurationBase.hpp
-usr/pkg/include/wolframe/config/programBase.hpp
 usr/pkg/include/wolframe/config/structSerialize.hpp
 usr/pkg/include/wolframe/config/valueParser.hpp
 @dirrm usr/pkg/include/wolframe/config
 usr/pkg/include/wolframe/logger/logBackend.hpp
 usr/pkg/include/wolframe/logger/logError.hpp
 usr/pkg/include/wolframe/logger/logLevel.hpp
-usr/pkg/include/wolframe/logger/logObject.hpp
 usr/pkg/include/wolframe/logger/logSyslogFacility.hpp
 @dirrm usr/pkg/include/wolframe/logger
 usr/pkg/include/wolframe/utils/asciiCharParser.hpp

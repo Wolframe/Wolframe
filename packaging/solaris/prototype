@@ -179,14 +179,12 @@ f none opt/csw/include/wolframe/database/vmTransactionOutput.hpp 0644 root staff
 d none opt/csw/include/wolframe/config 0755 root root
 f none opt/csw/include/wolframe/config/configurationBase.hpp 0644 root staff
 f none opt/csw/include/wolframe/config/configurationTree.hpp 0644 root staff
-f none opt/csw/include/wolframe/config/programBase.hpp 0644 root staff
 f none opt/csw/include/wolframe/config/structSerialize.hpp 0644 root staff
 f none opt/csw/include/wolframe/config/valueParser.hpp 0644 root staff
 d none opt/csw/include/wolframe/logger 0755 root root
 f none opt/csw/include/wolframe/logger/logBackend.hpp 0644 root staff
 f none opt/csw/include/wolframe/logger/logError.hpp 0644 root staff
 f none opt/csw/include/wolframe/logger/logLevel.hpp 0644 root staff
-f none opt/csw/include/wolframe/logger/logObject.hpp 0644 root staff
 f none opt/csw/include/wolframe/logger/logSyslogFacility.hpp 0644 root staff
 d none opt/csw/include/wolframe/utils 0755 root root
 f none opt/csw/include/wolframe/utils/asciiCharParser.hpp 0644 root staff

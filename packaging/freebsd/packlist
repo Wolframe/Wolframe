@@ -157,14 +157,12 @@ usr/local/include/wolframe/database/substitutingStatement.hpp
 @dirrm usr/local/include/wolframe/database
 usr/local/include/wolframe/config/configurationTree.hpp
 usr/local/include/wolframe/config/configurationBase.hpp
-usr/local/include/wolframe/config/programBase.hpp
 usr/local/include/wolframe/config/structSerialize.hpp
 usr/local/include/wolframe/config/valueParser.hpp
 @dirrm usr/local/include/wolframe/config
 usr/local/include/wolframe/logger/logBackend.hpp
 usr/local/include/wolframe/logger/logError.hpp
 usr/local/include/wolframe/logger/logLevel.hpp
-usr/local/include/wolframe/logger/logObject.hpp
 usr/local/include/wolframe/logger/logSyslogFacility.hpp
 @dirrm usr/local/include/wolframe/logger
 usr/local/include/wolframe/utils/asciiCharParser.hpp
