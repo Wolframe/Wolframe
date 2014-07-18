@@ -46,8 +46,7 @@ class JoinInputFilter
 public:
 	/// \brief Constructor
 	explicit JoinInputFilter( const char* name_, const TypedInputFilterR& f1, const TypedInputFilterR& f2)
-		:utils::TypeSignature("langbind::JoinInputFilter", __LINE__)
-		,TypedInputFilter(name_)
+		:TypedInputFilter(name_)
 		,m_inputfilter1(f1)
 		,m_inputfilter2(f2)
 		,m_joinstate(Init)
@@ -60,8 +59,7 @@ public:
 	/// \brief Copy constructor
 	/// \param[in] o input filter to copy
 	JoinInputFilter( const JoinInputFilter& o)
-		:utils::TypeSignature(o)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_inputfilter1(o.m_inputfilter1)
 		,m_inputfilter2(o.m_inputfilter2)
 		,m_joinstate(o.m_joinstate)

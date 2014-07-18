@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file luafilter.cpp
-///\brief Implementation of lua filters (serialization/deserialization of lua tables)
+/// \file luafilter.cpp
+/// \brief Implementation of lua filters (serialization/deserialization of lua tables)
 #include "luafilter.hpp"
 #include "luaObjectTemplate.hpp"
 #include "luaDebug.hpp"
@@ -115,8 +115,7 @@ bool wrap_lua_toboolean( lua_State* ls, int arg)			{LOG_DATA2 << "[lua operation
 
 
 LuaTableInputFilter::LuaTableInputFilter( const LuaTableInputFilter& o)
-	:utils::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
-	,TypedInputFilter(o)
+	:TypedInputFilter(o)
 	,LuaExceptionHandlerScope(o)
 	,m_ls(o.m_ls)
 	,m_stk(o.m_stk)
@@ -132,8 +131,7 @@ LuaTableInputFilter::LuaTableInputFilter( const LuaTableInputFilter& o)
 }
 
 LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
-	:utils::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
-	,TypedInputFilter("lua")
+	:TypedInputFilter("lua")
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA2)
@@ -501,8 +499,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, types::VariantConst& eleme
 
 
 LuaTableOutputFilter::LuaTableOutputFilter( lua_State* ls)
-	:utils::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
-	,TypedOutputFilter("lua")
+	:TypedOutputFilter("lua")
 	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 	,m_type(OpenTag)
@@ -510,8 +507,7 @@ LuaTableOutputFilter::LuaTableOutputFilter( lua_State* ls)
 	,m_logtrace(_Wolframe::log::LogBackend::instance().minLogLevel() == _Wolframe::log::LogLevel::LOGLEVEL_DATA2){}
 
 LuaTableOutputFilter::LuaTableOutputFilter( const LuaTableOutputFilter& o)
-	:utils::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
-	,TypedOutputFilter(o)
+	:TypedOutputFilter(o)
 	,LuaExceptionHandlerScope(o)
 	,m_ls(o.m_ls)
 	,m_type(o.m_type)

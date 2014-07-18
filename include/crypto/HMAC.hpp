@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// Standard HMAC-SHA256 C++ interface
+/// \file crypto/HMAC.hpp
+/// \brief Standard HMAC-SHA256 C++ interface
 ///
 
 #ifndef _HMAC_HPP_INCLUDED

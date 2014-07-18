@@ -33,7 +33,7 @@
 ///\file mod_datatype_datetime.cpp
 ///\brief Module for date and datetime arithmetic
 #include "appdevel/moduleFrameMacros.hpp"
-#include "appdevel/customDatatypeModuleMacros.hpp"
+#include "appdevel/customDataTypeModuleMacros.hpp"
 #include "datatypeDate.hpp"
 
 WF_MODULE_BEGIN( "datetime", "custom data types for date and time arithmetics")

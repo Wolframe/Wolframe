@@ -32,7 +32,6 @@ Project Wolframe.
 ///\file vmTransactionOutput.cpp
 #include "database/vmTransactionOutput.hpp"
 #include "utils/printFormats.hpp"
-#include "utils/typeSignature.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -114,15 +113,13 @@ class VmTransactionInputFilter
 {
 public:
 	explicit VmTransactionInputFilter( const vm::OutputR& output_, std::size_t index)
-		:utils::TypeSignature("db::VmTransactionInputFilter", __LINE__)
-		,langbind::TypedInputFilter("vmTransactionOutput")
+		:langbind::TypedInputFilter("vmTransactionOutput")
 		,m_done(false),m_output(output_),m_itr(output_->begin(index)),m_end(output_->end(index))
 	{
 		setFlags( langbind::TypedInputFilter::PropagateNoCase);
 	}
 	VmTransactionInputFilter( const VmTransactionInputFilter& o)
-		:utils::TypeSignature("db::VmTransactionInputFilter", __LINE__)
-		,langbind::TypedInputFilter(o)
+		:langbind::TypedInputFilter(o)
 		,m_done(o.m_done),m_output(o.m_output),m_itr(o.m_itr),m_end(o.m_end)
 	{}
 	virtual ~VmTransactionInputFilter(){}

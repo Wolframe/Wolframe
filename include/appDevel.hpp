@@ -41,7 +41,7 @@
 #include "appdevel/authenticationModuleMacros.hpp"	///< modules implementing an authentification mechanism
 #include "appdevel/cppFormFunctionModuleMacros.hpp"	///< modules implementing a set of form functions written in C++
 #include "appdevel/normalizeModuleMacros.hpp"		///< modules implementing a set of basic normalizer functions
-#include "appdevel/customDatatypeModuleMacros.hpp"	///< modules implementing a set of custom data types
+#include "appdevel/customDataTypeModuleMacros.hpp"	///< modules implementing a set of custom data types
 #include "appdevel/runtimeEnvironmentModuleMacros.hpp"	///< modules implementing a program type needing a configurable runtime environment
 #include "appdevel/commandHandlerModuleMacros.hpp"	///< modules implementing a command handler and optionally also a program type without configuration
 #include "appdevel/programTypeModuleMacros.hpp"		///< modules implementing a program type without configuration

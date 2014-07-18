@@ -51,7 +51,6 @@ class CppFormFunction;
 /// \class ApiFormData
 /// \brief Structure to hold an arbitrary C++ structure as owner defined by a serialization definition
 class ApiFormData
-	:public virtual utils::TypeSignature
 {
 public:
 	/// \brief Constructor
@@ -73,8 +72,7 @@ private:
 /// \class CppFormFunctionClosure
 /// \brief Closure with calling state of called CppFormFunction
 class CppFormFunctionClosure
-	:public virtual utils::TypeSignature
-	,public langbind::FormFunctionClosure
+	:public langbind::FormFunctionClosure
 {
 public:
 	/// \brief Constructor

@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file passwordChanger.hpp
+/// \file crypto/passwordChanger.hpp
 /// \brief Password changer interface definition
 
 #ifndef _PASSWORD_CHANGER_HPP_INCLUDED
@@ -41,7 +41,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// Password changer interface
+/// \class PasswordChanger
+/// \brief Password changer interface
 /// This the only interface to be used by the system. All other interfaces
 /// are internal to the authentication objects.
 ///

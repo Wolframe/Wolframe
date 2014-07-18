@@ -40,6 +40,8 @@
 namespace _Wolframe {
 namespace crypto {
 
+/// \class RandomGenerator
+/// \brief Random Generator interface class
 class RandomGenerator
 {
 public:

@@ -47,8 +47,7 @@ class ToStringFilter :public TypedOutputFilter
 public:
 	/// \brief Constructor
 	explicit ToStringFilter( const std::string indentstr_="")
-		:utils::TypeSignature("langbind::ToStringFilter", __LINE__)
-		,TypedOutputFilter("tostring")
+		:TypedOutputFilter("tostring")
 		,m_lasttype(FilterBase::OpenTag)
 		,m_indentstr(indentstr_)
 		,m_taglevel(0){}
@@ -56,8 +55,7 @@ public:
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter to copy
 	ToStringFilter( const ToStringFilter& o)
-		:utils::TypeSignature("langbind::ToStringFilter", __LINE__)
-		,TypedOutputFilter(o)
+		:TypedOutputFilter(o)
 		,m_content(o.m_content)
 		,m_lasttype(o.m_lasttype)
 		,m_indent(o.m_indent)

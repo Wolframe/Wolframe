@@ -38,8 +38,7 @@ using namespace _Wolframe;
 using namespace langbind;
 
 Input::Input( const Input& o)
-	:utils::TypeSignature(o)
-	,m_used(o.m_used)
+	:m_used(o.m_used)
 	,m_inputfilter(o.m_inputfilter)
 	,m_docformat(o.m_docformat)
 	,m_content(o.m_content)
@@ -48,8 +47,7 @@ Input::Input( const Input& o)
 {}
 
 Input::Input( const InputFilterR& inputfilter_, const std::string& docformat_)
-	:utils::TypeSignature("langbind::Input", __LINE__)
-	,m_used(false)
+	:m_used(false)
 	,m_inputfilter(inputfilter_)
 	,m_docformat(docformat_)
 	,m_contentsize(0)
@@ -57,8 +55,7 @@ Input::Input( const InputFilterR& inputfilter_, const std::string& docformat_)
 {}
 
 Input::Input( const std::string& docformat_, const std::string& content_)
-	:utils::TypeSignature("langbind::Input", __LINE__)
-	,m_used(false)
+	:m_used(false)
 	,m_docformat(docformat_)
 	,m_contentsize(0)
 	,m_isProcessorInput(false)

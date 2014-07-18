@@ -70,7 +70,7 @@ public:
 
 	/// \brief Constructor
 	/// \param[in] ptr object pointer
-	explicit CountedReference( OBJ* ptr=0)
+	CountedReference( OBJ* ptr=0)
 		:m_ref(boost::shared_ptr<Pointer>( new Pointer( ptr))){}
 
 	/// \brief Destructor

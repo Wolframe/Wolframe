@@ -46,7 +46,8 @@ namespace langbind {
 
 /// \class TypedInputFilter
 /// \brief Input filter with atomic values having a type
-class TypedInputFilter :public FilterBase
+class TypedInputFilter
+	:public FilterBase
 {
 public:
 	typedef InputFilter::State State;
@@ -61,16 +62,14 @@ public:
 
 	/// \brief Constructor
 	explicit TypedInputFilter( const char* name_)
-		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
-		,FilterBase(name_)
+		:FilterBase(name_)
 		,m_state(InputFilter::Start)
 		,m_data(0){}
 
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)
-		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
-		,FilterBase(o)
+		:FilterBase(o)
 		,m_state(o.m_state)
 		,m_data(o.m_data?o.m_data->copy():0){}
 
@@ -124,15 +123,13 @@ public:
 
 	/// \brief Constructor
 	explicit TypedOutputFilter( const char* name_)
-		:utils::TypeSignature("langbind::TypedOutputFilter", __LINE__)
-		,FilterBase(name_)
+		:FilterBase(name_)
 		,m_state(OutputFilter::Start) {}
 
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter to copy
 	TypedOutputFilter( const TypedOutputFilter& o)
-		:utils::TypeSignature(o)
-		,FilterBase(o)
+		:FilterBase(o)
 		,m_state(o.m_state){}
 
 	/// \brief Destructor

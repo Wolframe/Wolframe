@@ -1,3 +1,6 @@
+/// \file docs/cpp/namespaces.hpp
+/// \brief File used by doxygen to generate the documentation of namespaces
+
 /// Toplevel Wolframe namespace
 namespace _Wolframe {
 /// Authentication, authorization, auditing and accounting

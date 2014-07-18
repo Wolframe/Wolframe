@@ -34,7 +34,6 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_OUTPUT_HPP_INCLUDED
 #define _Wolframe_langbind_OUTPUT_HPP_INCLUDED
 #include "filter/filter.hpp"
-#include "utils/typeSignature.hpp"
 
 namespace _Wolframe {
 namespace langbind {
@@ -42,26 +41,22 @@ namespace langbind {
 /// \class Output
 /// \brief Output as seen from scripting language binding
 class Output
-	:public virtual utils::TypeSignature
 {
 public:
 	/// \brief Constructor
 	Output()
-		:utils::TypeSignature("langbind::Output", __LINE__)
-		,m_state(0)
+		:m_state(0)
 		,m_called(false){}
 	/// \brief Copy constructor
 	/// \param[in] o copied item
 	Output( const Output& o)
-		:utils::TypeSignature(o)
-		,m_outputfilter(o.m_outputfilter)
+		:m_outputfilter(o.m_outputfilter)
 		,m_state(o.m_state)
 		,m_called(o.m_called){}
 	/// \brief Constructor by output filter
 	/// \param[in] flt output filter reference
 	Output( const OutputFilterR& flt)
-		:utils::TypeSignature("langbind::Output", __LINE__)
-		,m_outputfilter(flt)
+		:m_outputfilter(flt)
 		,m_state(0)
 		,m_called(false){}
 	/// \brief Destructor

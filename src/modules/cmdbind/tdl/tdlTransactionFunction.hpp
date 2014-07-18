@@ -62,8 +62,7 @@ class TdlTransactionFunction;
 /// \class TdlTransactionFunctionClosure
 /// \brief Closure (execution context) of a transaction function based on TDL
 class TdlTransactionFunctionClosure
-	:public utils::TypeSignature
-	,public langbind::FormFunctionClosure
+	:public langbind::FormFunctionClosure
 {
 public:
 	/// \brief Constructor

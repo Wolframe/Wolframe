@@ -55,8 +55,7 @@ struct InputFilterImpl :public InputFilter
 	typedef InputFilter Parent;
 
 	InputFilterImpl()
-		:utils::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
-		,InputFilter("cjson")
+		:InputFilter("cjson")
 		,m_firstnode(0)
 		,m_done(false)
 	{
@@ -64,8 +63,7 @@ struct InputFilterImpl :public InputFilter
 	}
 
 	InputFilterImpl( const InputFilterImpl& o)
-		:utils::TypeSignature("langbind::InputFilterImpl (cjson)", __LINE__)
-		,InputFilter(o)
+		:InputFilter(o)
 		,m_content(o.m_content)
 		,m_encattr(o.m_encattr)
 		,m_root(o.m_root)

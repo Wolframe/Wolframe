@@ -47,13 +47,11 @@ class TypedInputFilterScope :public TypedInputFilter
 public:
 	/// \brief Constructor
 	TypedInputFilterScope()
-		:utils::TypeSignature("langbind::TypedInputFilterScope", __LINE__)
-		,TypedInputFilter("scope")
+		:TypedInputFilter("scope")
 		,m_taglevel(0){}
 
 	explicit TypedInputFilterScope( const TypedInputFilterR& i)
-		:utils::TypeSignature("langbind::TypedInputFilterScope", __LINE__)
-		,TypedInputFilter(i->name())
+		:TypedInputFilter(i->name())
 		,m_inputfilter(i)
 		,m_taglevel(1)
 	{
@@ -64,8 +62,7 @@ public:
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter scope to copy
 	TypedInputFilterScope( const TypedInputFilterScope& o)
-		:utils::TypeSignature("langbind::TypedInputFilterScope", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_inputfilter(o.m_inputfilter)
 		,m_taglevel(o.m_taglevel){}
 

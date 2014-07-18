@@ -56,8 +56,7 @@ struct InputFilterImpl :public InputFilter
 
 	/// \brief Constructor
 	explicit InputFilterImpl( const char* encoding, const IOCharset& iocharset_=IOCharset())
-		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
-		,InputFilter("char")
+		:InputFilter("char")
 		,m_charset(iocharset_)
 		,m_itr(iocharset_)
 		,m_output(AppCharset())
@@ -73,8 +72,7 @@ struct InputFilterImpl :public InputFilter
 
 	/// \brief Constructor
 	explicit InputFilterImpl( const types::DocMetaData& md, const IOCharset& iocharset_=IOCharset())
-		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
-		,InputFilter("char",md)
+		:InputFilter("char",md)
 		,m_charset(iocharset_)
 		,m_itr(iocharset_)
 		,m_output(AppCharset())
@@ -90,8 +88,7 @@ struct InputFilterImpl :public InputFilter
 	/// \brief Copy constructor
 	/// \param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:utils::TypeSignature("langbind::InputFilterImpl (char)", __LINE__)
-		,InputFilter( o)
+		:InputFilter( o)
 		,m_charset(o.m_charset)
 		,m_itr(o.m_itr)
 		,m_output(o.m_output)
@@ -194,16 +191,14 @@ struct OutputFilterImpl :public OutputFilter
 {
 	/// \brief Constructor
 	OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData, const IOCharset& iocharset_=IOCharset())
-		:utils::TypeSignature("langbind::OutputFilterImpl (char)", __LINE__)
-		,OutputFilter("char", inheritedMetaData)
+		:OutputFilter("char", inheritedMetaData)
 		,m_elemitr(0)
 		,m_output(iocharset_){}
 
 	/// \brief Copy constructor
 	/// \param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:utils::TypeSignature("langbind::OutputFilterImpl (char)", __LINE__)
-		,OutputFilter(o)
+		:OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
 		,m_output(o.m_output){}

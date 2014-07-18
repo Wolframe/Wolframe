@@ -56,8 +56,7 @@ struct InputFilterImpl :public InputFilter
 {
 	/// \brief Constructor
 	explicit InputFilterImpl( const XsltMapper& xsltMapper_, bool withEmpty_=false)
-		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
-		,InputFilter("libxslt")
+		:InputFilter("libxslt")
 		,m_xsltMapper(xsltMapper_)
 		,m_node(0)
 		,m_value(0)
@@ -70,8 +69,7 @@ struct InputFilterImpl :public InputFilter
 
 	/// \brief Default constructor
 	InputFilterImpl()
-		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
-		,InputFilter("libxml2")
+		:InputFilter("libxml2")
 		,m_node(0)
 		,m_value(0)
 		,m_prop(0)
@@ -83,8 +81,7 @@ struct InputFilterImpl :public InputFilter
 
 	/// \brief Copy constructor
 	InputFilterImpl( const InputFilterImpl& o)
-		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
-		,InputFilter(o)
+		:InputFilter(o)
 		,m_doc(o.m_doc)
 		,m_xsltMapper(o.m_xsltMapper)
 		,m_node(o.m_node)

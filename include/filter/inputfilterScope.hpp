@@ -48,14 +48,12 @@ class InputFilterScope :public InputFilter
 public:
 	/// \brief Constructor
 	InputFilterScope()
-		:utils::TypeSignature("langbind::InputFilterScope", __LINE__)
-		,InputFilter("scope")
+		:InputFilter("scope")
 		,m_taglevel(0){}
 
 	/// \brief Constructor
 	explicit InputFilterScope( const InputFilterR& i)
-		:utils::TypeSignature("langbind::InputFilterScope", __LINE__)
-		,InputFilter(i->name())
+		:InputFilter(i->name())
 		,m_inputfilter(i)
 		,m_taglevel(1)
 	{
@@ -66,8 +64,7 @@ public:
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter scope to copy
 	InputFilterScope( const InputFilterScope& o)
-		:utils::TypeSignature("langbind::InputFilterScope", __LINE__)
-		,InputFilter(o)
+		:InputFilter(o)
 		,m_inputfilter(o.m_inputfilter)
 		,m_taglevel(o.m_taglevel){}
 

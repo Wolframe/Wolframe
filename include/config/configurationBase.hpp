@@ -30,6 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
+/// \file configurationBase.hpp
+/// \brief Base classes for the configuration structures
 
 #ifndef _CONFIGURATION_BASE_HPP_INCLUDED
 #define _CONFIGURATION_BASE_HPP_INCLUDED
