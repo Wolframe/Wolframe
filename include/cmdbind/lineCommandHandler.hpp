@@ -48,7 +48,8 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \brief State machine definition of a LineCommandHandler
+/// \class LineCommandHandlerSTM
+/// \brief State machine definition for a LineCommandHandler
 class LineCommandHandlerSTM
 {
 public:
@@ -99,6 +100,8 @@ private:
 };
 
 
+/// \class LineCommandHandler
+/// \brief Command handler for text-line based protocols
 class LineCommandHandler :public CommandHandler
 {
 public:

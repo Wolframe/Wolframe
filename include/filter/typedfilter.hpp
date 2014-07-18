@@ -50,6 +50,8 @@ class TypedInputFilter :public FilterBase
 {
 public:
 	typedef InputFilter::State State;
+	/// \class Data
+	/// \brief Private object bound to this filter to hold some data to be freed with the release of this filter (to solve some object life time dependency problems)
 	struct Data
 	{
 		Data(){}

@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// database.hpp - Wolframe base database class
-//
+/// \file database.hpp
+/// \brief Wolframe base database class
 
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED

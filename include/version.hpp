@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// Header file for the Version class
-///
+/// \file version.hpp
+/// \brief Header file for the Version class
 
 #ifndef _VERSION_HPP_INCLUDED
 #define _VERSION_HPP_INCLUDED

@@ -31,8 +31,7 @@
 
 ************************************************************************/
 /// \file AAAA/authenticator.hpp
-///
-/// Authenticator interface definition
+/// \brief Authenticator interface definition
 
 #ifndef _AUTHENTICATOR_HPP_INCLUDED
 #define _AUTHENTICATOR_HPP_INCLUDED

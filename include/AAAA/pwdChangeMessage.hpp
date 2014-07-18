@@ -31,8 +31,7 @@
 
 ************************************************************************/
 /// \file pwdChangeMessage.hpp
-///
-/// Password changer data structure
+/// \brief Password changer data structure
 
 #ifndef _PASSWORD_CHANGE_MESSAGE_HPP_INCLUDED
 #define _PASSWORD_CHANGE_MESSAGE_HPP_INCLUDED

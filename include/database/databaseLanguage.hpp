@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file databaseLanguage.hpp
+/// \file database/databaseLanguage.hpp
 /// \brief Language definitions for embedded commands in transactions
 #ifndef _DATABASE_LANGUAGE_HPP_INCLUDED
 #define _DATABASE_LANGUAGE_HPP_INCLUDED

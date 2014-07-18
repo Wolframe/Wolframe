@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// connectionHandler.hpp
-//
+/// \brief Base class for the connection handler and related objects
+/// \file connectionHandler.hpp
 
 #ifndef _CONNECTION_HANDLER_HPP_INCLUDED
 #define _CONNECTION_HANDLER_HPP_INCLUDED

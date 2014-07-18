@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file serialize/ddl/ddlStructParse.hpp
+/// \file serialize/ddl/ddlStructParser.hpp
 /// \brief Defines the DDL structure deserialization
 
 #ifndef _Wolframe_SERIALIZE_DDL_STRUCT_PARSER_HPP_INCLUDED

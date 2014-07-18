@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// connectionEndpoint.hpp
-//
+/// \brief Classes for network endpoints
+/// \file connectionEndpoint.hpp
 
 #ifndef _CONNECTION_ENDPOINT_HPP_INCLUDED
 #define _CONNECTION_ENDPOINT_HPP_INCLUDED
@@ -134,7 +133,6 @@ struct LocalEndpointConfig
 };
 
 /// Local connection endpoints
-/// base class for local endpoint
 class LocalEndpoint : public ConnectionEndpoint
 {
 public:
@@ -154,7 +152,7 @@ private:
 	time_t	m_creationTime;				///< time when object has been constructed
 };
 
-/// local unencrypted endpoint
+/// Local unencrypted endpoint
 class LocalTCPendpoint : public LocalEndpoint
 {
 public:
@@ -165,7 +163,7 @@ public:
 };
 
 #ifdef WITH_SSL
-/// local SSL connection endpoint
+/// Local SSL connection endpoint
 class LocalSSLendpoint : public LocalEndpoint
 {
 public:
@@ -197,7 +195,7 @@ private:
 	time_t	m_connectionTime;
 };
 
-/// remote unencrypted endpoint
+/// Remote unencrypted endpoint
 class RemoteTCPendpoint : public RemoteEndpoint
 {
 public:

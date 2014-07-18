@@ -30,7 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-
+/// \file database/substitutingStatement.hpp
+/// \brief Interface to an abstract database statement class
 
 #ifndef _DATABASE_SUBSTITUTING_STATEMENT_HPP_INCLUDED
 #define _DATABASE_SUBSTITUTING_STATEMENT_HPP_INCLUDED

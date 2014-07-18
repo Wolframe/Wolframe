@@ -32,6 +32,7 @@
 ************************************************************************/
 
 /// \file database/statement.hpp
+/// \brief The interface of an SQL statement parameter substutution class
 
 #ifndef _DATABASE_STATEMENET_HPP_INCLUDED
 #define _DATABASE_STATEMENET_HPP_INCLUDED

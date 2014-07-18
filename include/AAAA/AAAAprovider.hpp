@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// AAAA provider interface
-//
+/// \file AAAA/AAAAprovider.hpp
+/// \brief AAAA provider interface
 
 #ifndef _AAAA_PROVIDER_HPP_INCLUDED
 #define _AAAA_PROVIDER_HPP_INCLUDED

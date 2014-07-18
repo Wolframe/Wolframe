@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// thread capable pool of objects
-//
+/// \brief Thread capable pool of objects
+/// \file system/objectPool.hpp
 
 #ifndef _OBJECT_POOL_HPP_INCLUDED
 #define _OBJECT_POOL_HPP_INCLUDED
@@ -45,6 +44,7 @@
 
 namespace _Wolframe {
 
+/// Timeout exception for object pool
 class ObjectPoolTimeout : public std::exception
 {
 public:

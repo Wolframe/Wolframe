@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// standard configuration structures
-//
+/// \file standardConfigs.hpp
+/// \brief standard configuration structures
 
 #ifndef _STANDARD_CONFIGS_HPP_INCLUDED
 #define _STANDARD_CONFIGS_HPP_INCLUDED

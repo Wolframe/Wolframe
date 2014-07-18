@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file utils/fileUtils.hpp
+/// \file utils/parseUtils.hpp
 /// \brief Utility functions for parsing, tokenization and positional error handling
 
 #ifndef _WOLFRAME_PARSE_UTILS_HPP_INCLUDED

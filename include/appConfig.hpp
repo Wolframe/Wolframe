@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// appConfig.hpp
-//
+/// \file appConfig.hpp
+/// \brief Application configuration
 
 #ifndef _APP_CONFIG_HPP_INCLUDED
 #define _APP_CONFIG_HPP_INCLUDED

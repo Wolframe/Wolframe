@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///
-/// \file AAAAinformation.hpp
-/// Header file for the objects used for AAAA information.
+/// \file AAAA/AAAAinformation.hpp
+/// \brief Header file for the objects used for AAAA information.
 ///
 
 #include "system/connectionEndpoint.hpp"

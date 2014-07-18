@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// application properties
-//
+/// \file appProperties.hpp
+/// \brief application wide singleton for the application properties
 
 #ifndef _APP_PROPERTIES_HPP_INCLUDED
 #define _APP_PROPERTIES_HPP_INCLUDED

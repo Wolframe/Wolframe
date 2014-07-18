@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// application wide singleton
-//
+/// \file appInfo.hpp
+/// \brief Application wide singleton for the application info
 
 #ifndef _APP_INFO_HPP_INCLUDED
 #define _APP_INFO_HPP_INCLUDED
@@ -47,6 +46,8 @@
 
 namespace _Wolframe	{
 
+/// \class ApplicationInfo
+/// \brief Application wide singleton for the application info
 class ApplicationInfo
 {
 public:

@@ -46,6 +46,8 @@ namespace serialize {
 class Context
 {
 public:
+	/// \class ElementBuffer
+	/// \brief Buffer for one element fetched
 	struct ElementBuffer
 	{
 		langbind::FilterBase::ElementType m_type;

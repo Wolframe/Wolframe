@@ -46,7 +46,7 @@ namespace _Wolframe {
 namespace langbind {
 
 /// \class Filter
-/// \brief Structure defining filter for input and output as unit
+/// \brief Structure defining a filter for input and output as unit
 class Filter
 {
 public:
@@ -100,6 +100,8 @@ typedef boost::shared_ptr<Filter> FilterR;
 
 typedef std::pair<std::string,std::string> FilterArgument;
 
+/// \class Filter
+/// \brief Structure defining a type of a filter (used as virtual constructor to create filter instances)
 class FilterType
 {
 public:

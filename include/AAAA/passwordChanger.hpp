@@ -31,8 +31,7 @@
 
 ************************************************************************/
 /// \file passwordChanger.hpp
-///
-/// Password changer interface definition
+/// \brief Password changer interface definition
 
 #ifndef _PASSWORD_CHANGER_HPP_INCLUDED
 #define _PASSWORD_CHANGER_HPP_INCLUDED

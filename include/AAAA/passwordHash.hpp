@@ -30,10 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
 /// \file passwordHash.hpp
-/// Wolframe password hashes
-///
+/// \brief Wolframe password hashes
 
 #ifndef _PASSWORD_HPP_INCLUDED
 #define _PASSWORD_HPP_INCLUDED

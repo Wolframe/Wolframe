@@ -30,10 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file authorization.hpp
-/// \brief top-level header file for authorization interface
-///
+
+/// \file AAAA/authorization.hpp
+/// \brief Top-level header file for authorization interface
 
 #ifndef _AUTHORIZATION_HPP_INCLUDED
 #define _AUTHORIZATION_HPP_INCLUDED

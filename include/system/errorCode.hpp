@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// Error codes
-//
+/// \brief Error codes
+/// \file system/errorCode.hpp
 
 #ifndef _ERROR_CODES_HPP_INCLUDED
 #define _ERROR_CODES_HPP_INCLUDED

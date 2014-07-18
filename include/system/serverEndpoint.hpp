@@ -30,6 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
+/// \file serverEndpoint.hpp
+/// \brief Server endpoint classes
 
 #ifndef _SERVER_ENDPOINT_HPP_INCLUDED
 #define _SERVER_ENDPOINT_HPP_INCLUDED
