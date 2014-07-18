@@ -299,6 +299,7 @@ solaris/wolframe.conf:
 # layout to install per platform
 
 ifeq "$(PLATFORM)" "LINUX"
+SOURCEDIR = $(LINUX_DIST)
 ifeq "$(LINUX_DIST)" "redhat"
 local_install: install_common install_modularized
 endif
@@ -322,12 +323,15 @@ local_install: install_common
 endif
 endif
 ifeq "$(PLATFORM)" "FREEBSD"
+SOURCEDIR = freebsd
 local_install: install_common
 endif
 ifeq "$(PLATFORM)" "NETBSD"
+SOURCEDIR = netbsd
 local_install: install_common
 endif
 ifeq "$(PLATFORM)" "SUNOS"
+SOURCEDIR = solaris
 local_install: install_common
 endif
 
