@@ -121,6 +121,7 @@ usr/local/include/wolframe/standardConfigs.hpp
 usr/local/include/wolframe/version.hpp
 usr/local/include/wolframe/platform.hpp
 usr/local/include/wolframe/wolframe.hpp
+usr/local/include/wolframe/OSdefaults.hpp
 usr/local/include/wolframe/langbind/auditFunction.hpp
 usr/local/include/wolframe/langbind/authorizationFunction.hpp
 usr/local/include/wolframe/langbind/ddlCompilerInterface.hpp

@@ -141,6 +141,7 @@ files:
  /usr/local/include/wolframe/version.hpp: 'sha256sum'
  /usr/local/include/wolframe/platform.hpp: 'sha256sum'
  /usr/local/include/wolframe/wolframe.hpp: 'sha256sum'
+ /usr/local/include/wolframe/OSdefaults.hpp: 'sha256sum'
  /usr/local/include/wolframe/langbind/auditFunction.hpp: 'sha256sum'
  /usr/local/include/wolframe/langbind/authorizationFunction.hpp: 'sha256sum'
  /usr/local/include/wolframe/langbind/ddlCompilerInterface.hpp: 'sha256sum'

@@ -142,6 +142,7 @@ f none opt/csw/include/wolframe/standardConfigs.hpp 0644 root staff
 f none opt/csw/include/wolframe/version.hpp 0644 root staff
 f none opt/csw/include/wolframe/platform.hpp 0644 root staff
 f none opt/csw/include/wolframe/wolframe.hpp 0644 root staff
+f none opt/csw/include/wolframe/OSdefaults.hpp 0644 root staff
 d none opt/csw/include/wolframe/langbind 0755 root root
 f none opt/csw/include/wolframe/langbind/auditFunction.hpp 0644 root staff
 f none opt/csw/include/wolframe/langbind/authorizationFunction.hpp 0644 root staff
