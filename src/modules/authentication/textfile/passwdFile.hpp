@@ -31,22 +31,17 @@
 
 ************************************************************************/
 //
-//
-//
+/// \file passwdFile.hpp
+/// \brief Password file manipulation header file
 
 #ifndef _PASSWDFILE_HPP_INCLUDED
 #define _PASSWDFILE_HPP_INCLUDED
 
 #include <string>
+#include "OSdefaults.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
-
-#ifndef _WIN32
-static const bool	USERNAME_DEFAULT_CASE_SENSIVE = true;
-#else
-static const bool	USERNAME_DEFAULT_CASE_SENSIVE = false;
-#endif
 
 struct PwdFileUser	{
 	std::string	user;
