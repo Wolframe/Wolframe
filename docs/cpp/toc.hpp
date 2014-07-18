@@ -3,7 +3,7 @@
 
 /*! \mainpage Wolframe, a modular, 3-tier application server written in C++
  *
- * \section FilterModule Writing a content filter module for anoher format than XML or JSON
+ * \section FilterModule Writing a content filter module for another format than XML or JSON
  *
  * \code
 
@@ -22,7 +22,7 @@ WF_MODULE_END
 
  * \endcode
  *
- * \section FormFunctionModule Writing a form function (struct in, struct out) in C++
+ * \section FormFunctionModule Writing a module for a form function (struct in, struct out) as function, that is callable by Wolframe and any language binding in your application
  *
  * \code
 

@@ -30,6 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
+//
 /// \file passwordHash.hpp
 /// \brief Wolframe password hashes
 

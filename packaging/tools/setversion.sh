@@ -26,6 +26,10 @@ sed -i "s/^#define WOLFRAME_MINOR_VERSION.*/#define WOLFRAME_MINOR_VERSION	$MINO
 sed -i "s/^#define WOLFRAME_REVISION.*/#define WOLFRAME_REVISION	$REVISION/g" include/wolframe.hpp
 sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD		$BUILD/g" include/wolframe.hpp
 
+# doxygen
+sed -i "s/^PROJECT_NUMBER.*=.*/PROJECT_NUMBER = $VERSION/g" docs/doxygen.conf
+sed -i "s/^PROJECT_NUMBER.*=.*/PROJECT_NUMBER = $VERSION/g" docs/doxygen-webpage.conf
+
 # package metadata
 sed -i "s/pkgver=.*/pkgver=$VERSION/g" packaging/archlinux/PKGBUILD
 sed -i "s/^Version:.*/Version: $VERSION/g" packaging/redhat/wolframe.spec
@@ -67,8 +71,6 @@ sed -i "s/^VERSION=.*/VERSION=$VERSION/g" packaging/obs/release_local_binaries.s
 
 # documentation
 echo $VERSION > docs/WolframeVersion.txt
-echo $VERSION > docs/InstallationVersion.txt
 
-echo $DATE > docs/InstallationDate.txt
 echo $DATE > docs/TutorialDate.txt
 echo $DATE > docs/WolfBookDate.txt

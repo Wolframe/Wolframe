@@ -41,7 +41,7 @@ namespace _Wolframe {
 namespace types {
 
 /// \class CountedReference
-/// \brief Shared reference to an object exchangeable in a single thread context
+/// \brief Shared reference to an object exchangeable for all owners in a single thread context
 /// \tparam OBJ object type referenced
 template <class OBJ>
 class CountedReference

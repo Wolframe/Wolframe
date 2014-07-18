@@ -173,7 +173,7 @@ private:
 };
 
 /// \typedef InputFilterR
-/// \brief Shared input filter reference
+/// \brief Shared input filter (langbind::InputFilter) reference 
 typedef types::CountedReference<InputFilter> InputFilterR;
 
 

@@ -73,7 +73,7 @@ cp packaging/archlinux/wolframe.install $OSC_HOME/wolframe.install
 
 CHKSUM2=`md5sum $OSC_HOME/wolframed.service | cut -f 1 -d' '`
 
-echo "md5sums=('$CHKSUM' '$CHKSUM3')" >> $OSC_HOME/PKGBUILD
+echo "md5sums=('$CHKSUM' '$CHKSUM2')" >> $OSC_HOME/PKGBUILD
 
 # the revision of the git branch we are currently building (master hash at the moment)
 git rev-parse HEAD > $OSC_HOME/GIT_VERSION

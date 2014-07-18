@@ -223,7 +223,7 @@ private:
 };
 
 /// \typedef OutputFilterR
-/// \brief Shared output filter reference
+/// \brief Shared output filter (langbind::OutputFilter) reference
 typedef types::CountedReference<OutputFilter> OutputFilterR;
 
 }}//namespace

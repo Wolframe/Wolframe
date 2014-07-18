@@ -104,12 +104,12 @@ public:
 	void setData( Data* data_)			{if (m_data) delete m_data; m_data = data_;}
 
 private:
-	State m_state;			//< state
-	Data* m_data;			//< data bound to the filter
+	State m_state;			///< state
+	Data* m_data;			///< data bound to the filter
 };
 
 /// \typedef TypedInputFilterR
-/// \brief Shared input filter reference
+/// \brief Shared input filter (langbind::TypedInputFilter) reference
 typedef boost::shared_ptr<TypedInputFilter> TypedInputFilterR;
 
 
@@ -160,7 +160,7 @@ private:
 };
 
 /// \typedef TypedOutputFilterR
-/// \brief Shared output filter reference
+/// \brief Shared output filter (langbind::TypedOutputFilter) reference
 typedef boost::shared_ptr<TypedOutputFilter> TypedOutputFilterR;
 
 
