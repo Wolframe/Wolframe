@@ -120,12 +120,12 @@ install: build
 		cd ../../../..
 		
 	# the Lua cmdbind module should go in a separate package
-	cd src/modules/cmdbind/lua;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+	cd src/modules/cmdbind/lua; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
 
 	# the Python3 cmdbind module depends own Python libraries, separate package
-	cd src/modules/cmdbind/python;  $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+	cd src/modules/cmdbind/python; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
 	
@@ -156,6 +156,12 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-sqlite3/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-sqlite3/DEBIAN
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-sqlite3/etc/wolframe/conf.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/conf.d/mod_db_sqlite3.conf \
+		/usr/src/packages/BUILD/debian/wolframe-sqlite3/etc/wolframe/conf.d/.
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-sqlite3/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_db_sqlite3.conf \
+		/usr/src/packages/BUILD/debian/wolframe-sqlite3/etc/wolframe/modules.d/.
 
 	# module database postgresql
 	cd src/modules/database/postgresql; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -163,6 +169,12 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-postgresql/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-postgresql/DEBIAN
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-postgresql/etc/wolframe/conf.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/conf.d/mod_db_postgresql.conf \
+		/usr/src/packages/BUILD/debian/wolframe-postgresql/etc/wolframe/conf.d/.
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-postgresql/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_db_postgresql.conf \
+		/usr/src/packages/BUILD/debian/wolframe-postgresql/etc/wolframe/modules.d/.
 
 	# module database oracle
 	cd src/modules/database/oracle; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -170,6 +182,12 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/conf.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/conf.d/mod_db_oracle.conf \
+		/usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/conf.d/.
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_db_oracle.conf \
+		/usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/modules.d/.
 
 	# authentication module for PAM
 	cd src/modules/authentication/pam; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -177,6 +195,12 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-pam/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-pam/DEBIAN
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-pam/etc/wolframe/conf.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/conf.d/mod_auth_pam.conf \
+		/usr/src/packages/BUILD/debian/wolframe-pam/etc/wolframe/conf.d/.
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-pam/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_auth_pam.conf \
+		/usr/src/packages/BUILD/debian/wolframe-pam/etc/wolframe/modules.d/.
 
 	# authentication module for Sasl
 	cd src/modules/authentication/sasl; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -184,6 +208,12 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-sasl/etc/wolframe/conf.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/conf.d/mod_auth_sasl.conf \
+		/usr/src/packages/BUILD/debian/wolframe-sasl/etc/wolframe/conf.d/.
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-sasl/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_auth_sasl.conf \
+		/usr/src/packages/BUILD/debian/wolframe-sasl/etc/wolframe/modules.d/.
 
 	# the textwolf filtering module and charset detection deserve
 	# their own package, same applies for modules based on textwolf
@@ -204,6 +234,9 @@ install: build
 		cd ../../../..		
 	mkdir /usr/src/packages/BUILD/debian/wolframe-textwolf/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-textwolf/DEBIAN
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-textwolf/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_filter_textwolf.conf \
+		/usr/src/packages/BUILD/debian/wolframe-textwolf/etc/wolframe/modules.d/.
 
 	# filter module libxml2
 	cd src/modules/filter/libxml2; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -211,6 +244,9 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-libxml2/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_filter_libxml2.conf \
+		/usr/src/packages/BUILD/debian/wolframe-libxml2/etc/wolframe/modules.d/.
 	
 	# lua cmdbind module
 	cd src/modules/cmdbind/lua; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -221,6 +257,9 @@ install: build
 		/usr/src/packages/BUILD/debian/wolframe-lua/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
 	mkdir /usr/src/packages/BUILD/debian/wolframe-lua/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-lua/DEBIAN	
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-lua/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_command_lua.conf \
+		/usr/src/packages/BUILD/debian/wolframe-lua/etc/wolframe/modules.d/.
 
 	# python 3 cmdbind module
 	cd src/modules/cmdbind/python; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -228,6 +267,9 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-python/DEBIAN
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-python/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_command_python.conf \
+		/usr/src/packages/BUILD/debian/wolframe-python/etc/wolframe/modules.d/.
 	
 	# printing module for libhpdf
 	cd src/modules/prnt/harupdfprint; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -238,6 +280,9 @@ install: build
 		cd ../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-libhpdf/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-libhpdf/DEBIAN
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-libhpdf/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_print_harupdf.conf \
+		/usr/src/packages/BUILD/debian/wolframe-libhpdf/etc/wolframe/modules.d/.
 
 	# image manipulation module with freeimage
 	cd src/modules/functions/graphix; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -246,11 +291,17 @@ install: build
 	cd 3rdParty/freeimage; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-freeimage; \
 		cd ../..
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-freeimage/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_graphix.conf \
+		/usr/src/packages/BUILD/debian/wolframe-freeimage/etc/wolframe/modules.d/.
 
 	# filtering with cjson
 	cd src/modules/filter/cjson; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-cjson; \
 		cd ../../../..
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-cjson/etc/wolframe/modules.d
+	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_filter_cjson.conf \
+		/usr/src/packages/BUILD/debian/wolframe-cjson/etc/wolframe/modules.d/.
 
 	# client library package
 	cd clients/lib; $(MAKE) install $(WOLFRAME_PARAMS) \
