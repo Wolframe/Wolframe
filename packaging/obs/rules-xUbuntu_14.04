@@ -177,17 +177,17 @@ install: build
 		/usr/src/packages/BUILD/debian/wolframe-postgresql/etc/wolframe/modules.d/.
 
 	# module database oracle
-	cd src/modules/database/oracle; $(MAKE) install $(WOLFRAME_PARAMS) \
-		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-oracle; \
-		cd ../../../..
-	mkdir /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
-	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
-	mkdir -p /usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/conf.d
-	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/conf.d/mod_db_oracle.conf \
-		/usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/conf.d/.
-	mkdir -p /usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/modules.d
-	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_db_oracle.conf \
-		/usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/modules.d/.
+#	cd src/modules/database/oracle; $(MAKE) install $(WOLFRAME_PARAMS) \
+#		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-oracle; \
+#		cd ../../../..
+#	mkdir /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
+#	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-oracle/DEBIAN
+#	mkdir -p /usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/conf.d
+#	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/conf.d/mod_db_oracle.conf \
+#		/usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/conf.d/.
+#	mkdir -p /usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/modules.d
+#	mv /usr/src/packages/BUILD/debian/wolframe/etc/wolframe/modules.d/mod_db_oracle.conf \
+#		/usr/src/packages/BUILD/debian/wolframe-oracle/etc/wolframe/modules.d/.
 
 	# authentication module for PAM
 	cd src/modules/authentication/pam; $(MAKE) install $(WOLFRAME_PARAMS) \
