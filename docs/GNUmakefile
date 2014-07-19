@@ -242,7 +242,17 @@ WOLFBOOK_SOURCE_FILES = \
 	Installation/InstallationSourceUnix.xml \
 	Installation/InstallationSourceUnixClient.xml \
 	Installation/InstallationSourceWindows.xml \
-	Installation/InstallationSourceWindowsClient.xml
+	Installation/InstallationSourceWindowsClient.xml \
+	examples/AppDevelop/cfg_command_dotnet.conf \
+	examples/AppDevelop/cfg_command_lua.conf \
+	examples/AppDevelop/cfg_filter_JSON.conf \
+	examples/AppDevelop/cfg_filter_libxml2.conf \
+	examples/AppDevelop/cfg_filter_textwolf.conf \
+	examples/AppDevelop/cfg_normalize_number_string.conf \
+	examples/AppDevelop/cfg_program_dotnet.conf \
+	examples/AppDevelop/cfg_program_wnmp.conf \
+	examples/AppDevelop/cfg_program_xslt.conf \
+	examples/AppDevelop/standardCommandHandler.conf
 
 WolfBook.html: $(WOLFBOOK_SOURCE_FILES)
 
