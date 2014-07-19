@@ -27,7 +27,8 @@ mkdir /tmp/wolframe-$VERSION
 cp -R * /tmp/wolframe-$VERSION
 OLDPWD=$PWD
 cd /tmp
-sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" wolframe-$VERSION/include/wolframe.hpp
+sed "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" wolframe-$VERSION/include/wolframe.hpp > _tmp
+mv -f _tmp wolframe-$VERSION/include/wolframe.hpp
 tar cf - wolframe-$VERSION | compress -c > wolframe-$VERSION.tar.Z
 cd $OLDPWD
 mv /tmp/wolframe-$VERSION.tar.Z .
