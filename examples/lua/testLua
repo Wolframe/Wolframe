@@ -5,7 +5,7 @@
 
 package require Expect
 
-set config luad.conf
+set config lua.conf
 
 set timeout 5
 set serverpid [spawn ./luad -c $config -f]
