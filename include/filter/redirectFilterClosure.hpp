@@ -34,7 +34,6 @@ Project Wolframe.
 #ifndef _Wolframe_filter_REDIRECT_FILTER_CLOSURE_HPP_INCLUDED
 #define _Wolframe_filter_REDIRECT_FILTER_CLOSURE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "utils/typeSignature.hpp"
 #include "types/variant.hpp"
 #include <boost/shared_ptr.hpp>
 
@@ -44,13 +43,11 @@ namespace langbind {
 /// \class RedirectFilterClosure
 /// \brief Closure of a map from an input filter to an output filter
 class RedirectFilterClosure
-	:public virtual utils::TypeSignature
 {
 public:
 	/// \brief Default constructor
 	explicit RedirectFilterClosure( bool doPrintFinalClose)
-		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
-		,m_state(0)
+		:m_state(0)
 		,m_taglevel(0)
 		,m_do_print_final_close(doPrintFinalClose)
 		,m_elemtype(InputFilter::Value)
@@ -58,8 +55,7 @@ public:
 
 	/// \brief Constructor
 	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o, bool doPrintFinalClose)
-		:utils::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
-		,m_state(0)
+		:m_state(0)
 		,m_taglevel(0)
 		,m_do_print_final_close(doPrintFinalClose)
 		,m_inputfilter(i)
@@ -71,8 +67,7 @@ public:
 
 	/// \brief Copy constructor
 	RedirectFilterClosure( const RedirectFilterClosure& o)
-		:utils::TypeSignature(o)
-		,m_state(o.m_state)
+		:m_state(o.m_state)
 		,m_taglevel(o.m_taglevel)
 		,m_do_print_final_close(o.m_do_print_final_close)
 		,m_inputfilter(o.m_inputfilter)

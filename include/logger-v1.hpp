@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file logger.hpp
-/// \brief Top-level include file for logging
+/// \file logger-v1.hpp
+/// \brief Top-level include file for logging (version 1)
 
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED

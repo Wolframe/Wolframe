@@ -44,8 +44,7 @@ struct InputFilterImpl :public InputFilter
 {
 	//\brief Constructor
 	InputFilterImpl()
-		:utils::TypeSignature("langbind::InputFilterImpl (null_filter)", __LINE__)
-		,InputFilter("null")
+		:InputFilter("null")
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false){}
@@ -53,8 +52,7 @@ struct InputFilterImpl :public InputFilter
 	//\brief Copy constructor
 	//\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:utils::TypeSignature("langbind::InputFilterImpl (null_filter)", __LINE__)
-		,InputFilter( o)
+		:InputFilter( o)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend){}
@@ -111,14 +109,12 @@ struct OutputFilterImpl :public OutputFilter
 {
 	//\brief Constructor
 	OutputFilterImpl()
-		:utils::TypeSignature("langbind::OutputFilterImpl (null_filter)", __LINE__)
-		,OutputFilter("null"){}
+		:OutputFilter("null"){}
 
 	//\brief Copy constructor
 	//\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:utils::TypeSignature("langbind::OutputFilterImpl (null_filter)", __LINE__)
-		,OutputFilter(o){}
+		:OutputFilter(o){}
 
 	//\brief self copy
 	//\return copy of this

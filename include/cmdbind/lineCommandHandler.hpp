@@ -55,6 +55,8 @@ class LineCommandHandlerSTM
 public:
 	/// \return -1 for terminate or a valid state in the state machine definition
 	typedef int (*RunCommand)( void* obj, int argc, const char** argv, std::ostream& out);
+	/// \class State
+	/// \brief State of the line command handler statemachine
 	struct State
 	{
 		protocol::CmdParser<std::string> m_parser;

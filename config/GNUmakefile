@@ -338,63 +338,63 @@ endif
 # install only configuration files for things which are actually built
 
 ifeq ($(WITH_PAM),1)  
-MODCONF += $(LINUX_DIST)/conf.d/mod_auth_pam.conf
-LOADCONF += $(LINUX_DIST)/modules.d/mod_auth_pam.conf
+MODCONF += $(SOURCEDIR)/conf.d/mod_auth_pam.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_auth_pam.conf
 endif
 
 ifeq ($(WITH_SASL),1)
-MODCONF += $(LINUX_DIST)/conf.d/mod_auth_sasl.conf
-LOADCONF += $(LINUX_DIST)/modules.d/mod_auth_sasl.conf
+MODCONF += $(SOURCEDIR)/conf.d/mod_auth_sasl.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_auth_sasl.conf
 endif
 
 ifeq ($(WITH_SQLITE3),1)
-MODCONF += $(LINUX_DIST)/conf.d/mod_db_sqlite3.conf
-LOADCONF += $(LINUX_DIST)/modules.d/mod_db_sqlite3.conf
+MODCONF += $(SOURCEDIR)/conf.d/mod_db_sqlite3.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_db_sqlite3.conf
 endif
 
 ifeq ($(WITH_PGSQL),1)
-MODCONF += $(LINUX_DIST)/conf.d/mod_db_postgresql.conf
-LOADCONF += $(LINUX_DIST)/modules.d/mod_db_postgresql.conf
+MODCONF += $(SOURCEDIR)/conf.d/mod_db_postgresql.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_db_postgresql.conf
 endif
 
 ifeq ($(WITH_ORACLE),1)
-MODCONF += $(LINUX_DIST)/conf.d/mod_db_oracle.conf
-LOADCONF += $(LINUX_DIST)/modules.d/mod_db_oracle.conf
+MODCONF += $(SOURCEDIR)/conf.d/mod_db_oracle.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_db_oracle.conf
 endif
 
 ifeq ($(WITH_TEXTWOLF),1)
-LOADCONF += $(LINUX_DIST)/modules.d/mod_filter_textwolf.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_filter_textwolf.conf
 endif
 
 ifeq ($(WITH_LIBXML2),1)
-LOADCONF += $(LINUX_DIST)/modules.d/mod_filter_libxml2.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_filter_libxml2.conf
 endif
 
 ifeq ($(WITH_CJSON),1)
-LOADCONF += $(LINUX_DIST)/modules.d/mod_filter_cjson.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_filter_cjson.conf
 endif
 
 ifeq ($(WITH_LUA),1)
-LOADCONF += $(LINUX_DIST)/modules.d/mod_command_lua.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_command_lua.conf
 endif
 
 ifeq ($(WITH_PYTHON),1)
-LOADCONF += $(LINUX_DIST)/modules.d/mod_command_python.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_command_python.conf
 endif
 
 ifeq ($(WITH_LIBHPDF),1)
-LOADCONF += $(LINUX_DIST)/modules.d/mod_print_harupdf.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_print_harupdf.conf
 endif
 
 ifeq ($(WITH_FREEIMAGE),1)
-LOADCONF += $(LINUX_DIST)/modules.d/mod_graphix.conf
+LOADCONF += $(SOURCEDIR)/modules.d/mod_graphix.conf
 endif
 
 .PHONY: install_common install_modularized
 
 install_common:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sysconfdir)/wolframe
-	$(INSTALL) -m 0664 $(LINUX_DIST)/wolframe.conf $(DESTDIR)$(sysconfdir)/wolframe
+	$(INSTALL) -m 0664 $(SOURCEDIR)/wolframe.conf $(DESTDIR)$(sysconfdir)/wolframe
 
 install_modularized:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sysconfdir)/wolframe/conf.d

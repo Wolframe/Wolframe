@@ -33,7 +33,6 @@ Project Wolframe.
 ///\brief Interface to DDL form serialization
 #ifndef _Wolframe_serialize_DDL_FORM_SERIALIZER_HPP_INCLUDED
 #define _Wolframe_serialize_DDL_FORM_SERIALIZER_HPP_INCLUDED
-#include "utils/typeSignature.hpp"
 #include "types/form.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
@@ -46,30 +45,25 @@ namespace serialize {
 /// \class DDLFormSerializer
 /// \brief Serializer of a form defined by a DDL
 class DDLFormSerializer
-	:public virtual utils::TypeSignature
-	,public serialize::DDLStructSerializer
+	:public serialize::DDLStructSerializer
 {
 public:
 	/// \brief Default constructor
-	DDLFormSerializer()
-		:utils::TypeSignature("langbind::DDLFormSerializer", __LINE__){}
+	DDLFormSerializer(){}
 
 	/// \brief Constructor
 	explicit DDLFormSerializer( const types::FormR& form_)
-		:utils::TypeSignature("langbind::DDLFormSerializer", __LINE__)
-		,DDLStructSerializer(form_.get())
+		:DDLStructSerializer(form_.get())
 		,m_form(form_){}
 
 	/// \brief Constructor
 	explicit DDLFormSerializer( const types::FormR& form_, const types::VariantStruct* substructure)
-		:utils::TypeSignature("langbind::DDLFormSerializer", __LINE__)
-		,DDLStructSerializer(substructure)
+		:DDLStructSerializer(substructure)
 		,m_form(form_){}
 
 	/// \brief Copy constructor
 	DDLFormSerializer( const DDLFormSerializer& o)
-		:utils::TypeSignature(o)
-		,DDLStructSerializer(o)
+		:DDLStructSerializer(o)
 		,m_form(o.m_form){}
 	/// \brief Destructor
 	virtual ~DDLFormSerializer(){}
@@ -77,7 +71,6 @@ public:
 	/// \brief Assignment operator
 	DDLFormSerializer& operator =( const DDLFormSerializer& o)
 	{
-		utils::TypeSignature::operator=( o);
 		DDLStructSerializer::operator=( o);
 		m_form = o.m_form;
 		return *this;

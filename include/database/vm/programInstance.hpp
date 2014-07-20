@@ -58,11 +58,13 @@ class ProgramInstance
 	:public InstructionSet
 {
 public:
+	/// \class LogTraceContext
+	/// \brief Callback context structure for logging VM instructions in transaction execution
 	struct LogTraceContext;
 	typedef void (*LogTraceCallBack)( const LogTraceContext* prgcontext, unsigned int ip_);
 
 public:
-	/// \brief Copy constructor
+	/// \brief Default constructor
 	ProgramInstance()
 		:m_db_stm(0)
 		,m_ip(0)
@@ -95,28 +97,35 @@ public:
 	unsigned int ip() const				{return m_ip;}
 
 private:
+	/// \class ResultFlags
+	/// \brief Flags defined in the database command between DO and the statement (NONEMPTY,UNIQUE)
 	struct ResultFlags
 	{
-		bool is_first;		//< true, if there has been no result set added to the set (result is created)
-		bool unique;		//< UNIQUE flag
-		bool nonempty;		//< NONEMPTY flag
+		bool is_first;		///< true, if there has been no result set added to the set (result is created)
+		bool unique;		///< UNIQUE flag
+		bool nonempty;		///< NONEMPTY flag
 
+		/// \brief Copy constructor
 		ResultFlags( const ResultFlags& o)
 			:is_first(o.is_first),unique(o.unique),nonempty(o.nonempty){}
+		/// \brief Constructor
 		ResultFlags( bool unique_=false, bool nonempty_=false)
 			:is_first(true),unique(unique_),nonempty(nonempty_){}
+		/// \brief Reset flags
 		void clear()
 		{
 			is_first = true;
 			unique = false;
 			nonempty = false;
 		}
+		/// \brief Initialize flags
 		void init( bool unique_, bool nonempty_)
 		{
 			is_first = true;
 			unique = unique_;
 			nonempty = nonempty_;
 		}
+		/// \brief Get and set of the first result flag
 		bool touched()
 		{
 			bool rt = !is_first;
@@ -125,19 +134,24 @@ private:
 		}
 	};
 
+	/// \class StackElement
+	/// \brief State stack element of the virtual machine executing a transaction
 	struct StackElement
 	{
+		/// \brief Default constructor
 		StackElement()
 			:m_return_ip(0)
 			,m_bindidx(0)
 			,m_hintidx(0)
 		{}
+		/// \brief Constructor
 		StackElement( Address return_ip_, const ValueTupleSetR& parameter_)
 			:m_return_ip(return_ip_)
 			,m_bindidx(0)
 			,m_hintidx(0)
 			,m_parameter(parameter_)
 		{}
+		/// \brief Copy constructor
 		StackElement( const StackElement& o)
 			:m_return_ip(o.m_return_ip)
 			,m_bindidx(o.m_bindidx)

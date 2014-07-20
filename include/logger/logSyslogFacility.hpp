@@ -50,6 +50,8 @@
 namespace _Wolframe {
 namespace log {
 
+/// \brief Facility (sink) for syslog
+/// \class SyslogFacility
 class WOLFRAME_EXPORT SyslogFacility {
 public:
 	enum Facility	{

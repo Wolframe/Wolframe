@@ -36,7 +36,6 @@
 #include "tdlTransactionInput.hpp"
 #include "database/transaction.hpp"
 #include "vm/inputStructure.hpp"
-#include "utils/typeSignature.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/auditFunction.hpp"
 #include "processor/procProviderInterface.hpp"
@@ -88,16 +87,14 @@ private:
 
 
 TdlTransactionFunctionClosure::InputStructure::InputStructure( const TdlTransactionFunction* func_)
-	:utils::TypeSignature("db::TdlTransactionFunctionInput", __LINE__)
-	,langbind::TypedOutputFilter("transactionFunctionInput")
+	:langbind::TypedOutputFilter("transactionFunctionInput")
 	,m_structure(new vm::InputStructure( func_->program()->pathset.tagtab()))
 	,m_func(func_)
 	,m_lasttype(langbind::TypedInputFilter::CloseTag)
 {}
 
 TdlTransactionFunctionClosure::InputStructure::InputStructure( const InputStructure& o)
-	:utils::TypeSignature("db::TdlTransactionFunctionInput", __LINE__)
-	,langbind::TypedOutputFilter(o)
+	:langbind::TypedOutputFilter(o)
 	,m_structure(o.m_structure)
 	,m_func(o.m_func)
 	,m_lasttype(o.m_lasttype)
@@ -362,8 +359,7 @@ void TdlTransactionFunction::print( std::ostream& out) const
 
 
 TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransactionFunction* f)
-	:utils::TypeSignature("prgbind::TransactionFunctionClosure", __LINE__)
-	,m_context(0)
+	:m_context(0)
 	,m_func(f)
 	,m_state(0)
 	,m_input(false/*doPrintFinalClose*/)
@@ -372,8 +368,7 @@ TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransacti
 	{}
 
 TdlTransactionFunctionClosure::TdlTransactionFunctionClosure( const TdlTransactionFunctionClosure& o)
-	:utils::TypeSignature(o)
-	,m_context(o.m_context)
+	:m_context(o.m_context)
 	,m_func(o.m_func)
 	,m_state(o.m_state)
 	,m_input(o.m_input)

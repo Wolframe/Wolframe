@@ -64,23 +64,20 @@ public:
 
 	/// \brief Constructor
 	explicit InputFilter( const char* name_)
-		:utils::TypeSignature("langbind::InputFilter", __LINE__)
-		,FilterBase(name_)
+		:FilterBase(name_)
 		,m_state(Start)
 		,m_metadata( new types::DocMetaData()){}
 
 	/// \brief Constructor
 	InputFilter( const char* name_, const types::DocMetaData& metadata)
-		:utils::TypeSignature("langbind::InputFilter", __LINE__)
-		,FilterBase(name_)
+		:FilterBase(name_)
 		,m_state(Start)
 		,m_metadata( new types::DocMetaData( metadata)){}
 
 	/// \brief Copy constructor
 	/// \param[in] o input filter to copy
 	InputFilter( const InputFilter& o)
-		:utils::TypeSignature(o)
-		,FilterBase(o)
+		:FilterBase(o)
 		,m_state(o.m_state)
 		,m_metadata( new types::DocMetaData( *o.m_metadata)){}
 
@@ -176,7 +173,7 @@ private:
 };
 
 /// \typedef InputFilterR
-/// \brief Shared input filter reference
+/// \brief Shared input filter (langbind::InputFilter) reference 
 typedef types::CountedReference<InputFilter> InputFilterR;
 
 

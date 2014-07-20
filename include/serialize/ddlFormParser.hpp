@@ -46,26 +46,22 @@ namespace serialize {
 /// \class DDLFormParser
 /// \brief Parser of a form from a serialization defined by a DDL
 class DDLFormParser
-	:public virtual utils::TypeSignature
-	,public serialize::DDLStructParser
+	:public serialize::DDLStructParser
 {
 public:
 	/// \brief Constructor
 	explicit DDLFormParser( const types::FormR& form_)
-		:utils::TypeSignature("langbind::DDLFormParser", __LINE__)
-		,DDLStructParser(form_.get())
+		:DDLStructParser(form_.get())
 		,m_form(form_){}
 
 	/// \brief Constructor
 	DDLFormParser( const types::FormR& form_, types::VariantStruct* substructure)
-		:utils::TypeSignature("langbind::DDLFormParser", __LINE__)
-		,DDLStructParser(substructure)
+		:DDLStructParser(substructure)
 		,m_form(form_){}
 
 	/// \brief Copy constructor
 	DDLFormParser( const DDLFormParser& o)
-		:utils::TypeSignature(o)
-		,DDLStructParser(o)
+		:DDLStructParser(o)
 		,m_form(o.m_form){}
 
 	/// \brief Destructor
@@ -74,7 +70,6 @@ public:
 	/// \brief Assignment operator
 	DDLFormParser& operator=( const DDLFormParser& o)
 	{
-		utils::TypeSignature::operator=( o);
 		DDLStructParser::operator=( o);
 		m_form = o.m_form;
 		return *this;

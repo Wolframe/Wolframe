@@ -45,16 +45,14 @@ class SingleElementInputFilter :public TypedInputFilter
 public:
 	/// \brief Constructor
 	explicit SingleElementInputFilter( const types::VariantConst& e)
-		:utils::TypeSignature("langbind::SingleElementInputFilter", __LINE__)
-		,TypedInputFilter("single")
+		:TypedInputFilter("single")
 		,m_element(e)
 		,m_consumed(false){}
 
 	/// \brief Copy constructor
 	/// \param[in] o input filter to copy
 	SingleElementInputFilter( const SingleElementInputFilter& o)
-		:utils::TypeSignature(o)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_element(o.m_element)
 		,m_consumed(o.m_consumed){}
 

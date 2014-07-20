@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// Processor Provider
+/// \file processor/procProvider.hpp
+/// \brief Processor provider for language bindings and database
 //
 
 #ifndef _PROCESSOR_PROVIDER_HPP_INCLUDED

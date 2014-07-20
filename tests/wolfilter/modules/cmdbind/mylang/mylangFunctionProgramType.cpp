@@ -57,8 +57,7 @@ class MyLangResult
 {
 public:
 	MyLangResult( const mylang::StructureR& data_)
-		:utils::TypeSignature("langbind::MyLangResult", __LINE__)
-		,TypedInputFilter("mylangresult")
+		:TypedInputFilter("mylangresult")
 		,m_data(data_)
 		,m_bufidx(0)
 	{
@@ -66,8 +65,7 @@ public:
 	}
 
 	MyLangResult( const MyLangResult& o)
-		:utils::TypeSignature("langbind::MyLangResult", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_data(o.m_data)
 		,m_buf(o.m_buf)
 		,m_bufidx(o.m_bufidx)

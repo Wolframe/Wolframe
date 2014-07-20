@@ -32,7 +32,7 @@
 ************************************************************************/
 //
 /// \file AAAA/CRAM.hpp
-/// Challenge Response Authentication Mechanism classes
+/// \brief Challenge Response Authentication Mechanism classes
 ///
 /// \note This implementation of a CRAM mechanism is specific to the Wolframe Project.
 /// It is not supposed to be compatible to other implementations.
