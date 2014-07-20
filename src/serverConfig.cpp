@@ -203,7 +203,7 @@ struct ConnectionProperties
 		}
 		if (!defined( D_restrictions))
 		{
-			//~ LOG_WARNING << logprefix << "No restrictions defined for socket " << position.logtext() << " setting default to allow all " << position.logtext();
+			LOG_DEBUG << logprefix << "No restrictions defined for socket " << position.logtext() << " setting default to allow all " << position.logtext();
 			restrictions.defineAllowedAll();
 		}
 		return rt;
