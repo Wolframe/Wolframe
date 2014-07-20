@@ -13,42 +13,52 @@ WF_MODULE_BEGIN( "MyModule", "this text is a short, one line description of the 
 WF_MODULE_END
  * \endcode
  * \subsection ModuleObjTypeList Module component types in Wolframe
-    - Command handler
-          - A command handler implements a sub part ot the client server protocol. Command handlers are the central processing units also refered to as processors. They are declared in the section Processor of the main configuration. Currently there exist only two types of command handlers:
-               -# the standard command handler also called direct map. The standard command handler delegates the requests to functions to execute. It uses the filter modules to get an iterator on the input to pass to functions to execute. It uses forms declared to validate input and output.
-               -# the lua command handler
-    - Document type detection
-          - For each document format processed you need a document type detection. A document type detection recognizes a document format and declares is as its own. Additionally it extracts the document type identifier needed by a command handler to associate a document with a function to execute. Currently there are two document type detection modules implemented:
-               -# XML
-               -# JSON
-    - Filter type
-    - Form Function
-    - Program type
-    - DDL compiler
-    - Custom data type
-    - Normalization function
+    - \b Command \b handler: 
+          A command handler (_Wolframe::cmdbind::CommandHandler) implements a sub part of the client server protocol. They are declared in the section Processor of the main configuration. Currently there exist only two types of command handlers:
+            - the standard command handler also called direct map. The standard command handler delegates the requests to functions to execute. It uses the filter modules to get an iterator on the input to pass to functions to execute. It uses forms declared to validate input and output.
+            - the lua command handler
+    - \b Document \b type \b detection:
+          We need for each document format processed a document type detection (_Wolframe::cmdbind::DoctypeDetector) that extracts the document type information (_Wolframe::types::DoctypeInfo). This info structure is needed by command handlers to associate a document with a function to execute. Currently there are two document type detection modules implemented:
+            - XML
+            - JSON
+    - \b Filter \b type:
+          Filters (_Wolframe::langbind::Filter) are used to parse a document and to create a unified representation for processing it and contrarywise map the unified representation to a document. Hence a filter consist of two parts, an input filter (_Wolframe::langbind::InputFilter) and an output filter (_Wolframe::langbind::OutputFilter). The unified representation for filters is a structure with the document meta data as key/value pairs and a sequence of content elements of the following types:
+            - OpenTag: Open a substructure. The value is the name of the structure opened
+            - CloseTag: Close a substructure or marking the end of content (final close)
+            - Value: Defines an atomic element
+            - Attribute: Defines an attribute name, the following value is the attribute value.
+    - \b Form \b Function:
+          Form functions (_Wolframe::langbind::FormFunction) are functions with a structure as input and a structure as output. The input structure is represented by an iterator implementing the filter interface (iterator on OpenTag,CloseTag,Attribute,Value elements). In Wolframe any function in any language used for processing is implemented as form function. With this object type it is also possible to implement form functions in C++ (_Wolframe::serialize::CppFormFunction).
+    - \b Program \b type:
+          Program types define the loading of objects into the program library (_Wolframe::prgbind::ProgramLibrary). Each program type declares a file type to be of its own and loads every file of this type configured with 'program' in the 'Processor' section of the configuration.
+    - \b DDL \b compiler:
+          DDL (data definition language) compilers are compilers for forms used to validate input and output. Currently only 'simpleform' is implemented.
+    - \b Custom \b data \b type:
+          Custom data types (_Wolframe::types::CustomDataType) define arithmetic types with some methods. The idea is to define arithmetic data types for things like date/time or currency only once and not for every language binding. Custom data types can be used in normalization programs and so in data forms to validate and normalize atomic elements.
+    - \b Normalization \b function:
+          Normalization functions (_Wolframe::types::NormalizeFunction) are besides custom data types the basic bricks to define atomic data types in forms. This component type lets you define your own normalization functions.
 
  * \subsection ModuleTypeList Special module types in Wolframe
  *  The following module types do not have yet macros defined to declare them as the components introduced in the previous section. We have to refer to examples for the time being.
-    - Authentication
-         - An authentication module implements the object authentication unit and authenticator slice. An authentication unit declares one or more authentication mechs that can be chosen by the client for authentication when the module is loaded and configured in the section AAAA of the configuration. When more than one authentication unit implements an authentication mech then the first one in the configuration is chosen. The authentication slice is an instance created to do the authentication procedure. The result of authentication is a User (_Wolframe::AAAA::User) object in the execution context (_Wolframe::proc::ExecContext) that is the base for authorization to do anything (user privileges). The authorization module type does not yet have the constructors declared in the section before. We have to declare four classes involved:
-              -# configuration (implements _Wolframe::config::NamedConfiguration)
-              -# authentication unit (implements _Wolframe::AAAA::AuthenticationUnit)
-              -# authenticator slice (implements _Wolframe::AAAA::AuthenticatorSlice)
-              -# password changer (implements _Wolframe::AAAA::PasswordChanger)
-         - Have a look at the standard textfile authenticator implementing the mech WOLFRAME-CRAM as example in src/modules/authentication/textfile/TextFileAuth.hpp
-    - Database
-         - A database module is a quite complex component. The following interfaces have to be implemented:
-              -# configuration (implements _Wolframe::config::NamedConfiguration)
-              -# database language description (implements _Wolframe::db::LanguageDescription)
-              -# database unit (implements _Wolframe::db::DatabaseUnit)
-              -# database (implements _Wolframe::db::Database)
-              -# transaction (implements _Wolframe::db::Transaction)
-              -# transaction execution statemachine (implements _Wolframe::db::TransactionExecStatemachine)
-         - Have a look at the database modules currently implemented in src/modules/database as examples
+    - \b Authentication:
+         An authentication module implements the object authentication unit and authenticator slice. An authentication unit declares one or more authentication mechs that can be chosen by the client for authentication when the module is loaded and configured in the section AAAA of the configuration. When more than one authentication unit implements an authentication mech then the first one in the configuration is chosen. The authentication slice is an instance created to do the authentication procedure. The result of authentication is a User (_Wolframe::AAAA::User) object in the execution context (_Wolframe::proc::ExecContext) that is the base for authorization to do anything (user privileges). The authorization module type does not yet have the constructors declared in the section before. We have to declare four classes involved:
+              - configuration (implements _Wolframe::config::NamedConfiguration)
+              - authentication unit (implements _Wolframe::AAAA::AuthenticationUnit)
+              - authenticator slice (implements _Wolframe::AAAA::AuthenticatorSlice)
+              - password changer (implements _Wolframe::AAAA::PasswordChanger)
+    - \b Database:
+         A database module is a quite complex component. The following interfaces have to be implemented:
+              - configuration (implements _Wolframe::config::NamedConfiguration)
+              - database language description (implements _Wolframe::db::LanguageDescription)
+              - database unit (implements _Wolframe::db::DatabaseUnit)
+              - database (implements _Wolframe::db::Database)
+              - transaction (implements _Wolframe::db::Transaction)
+              - transaction execution statemachine (implements _Wolframe::db::TransactionExecStatemachine)
+    - \b Runtime \b environment:
+         A runtime environment (_Wolframe::langbind::RuntimeEnvironment) is a configurable environment for functions that need a context for execution. The only case where a runtime environment is currently used in Wolframe is for .NET (Windows only).
 
  * \section ModuleExamples Example modules for Wolframe
- * \subsection FilterModule Writing a content filter module for another format than XML or JSON
+ * \subsection FilterModule Writing a filter module for another format than XML or JSON
  *
  * \code
 
