@@ -1,45 +1,45 @@
 FORM CustomerListRequest
-	-root customer
+    -root customer
 {
 }
 
 FORM CustomerList
-	-root list
+    -root list
 {
-	customer []
-	{
-		id !@string
-		name string
-		address string
-	}
+    customer []
+    {
+        id !@string
+        name string
+        address string
+    }
 }
 
 FORM CustomerRequest
-	-root customer
+    -root customer
 {
-	id !@string
+    id !@string
 }
 
 FORM Customer
-	-root customer
+    -root customer
 {
-	id !@string
-	name string
-	address string
+    id !@string
+    name string
+    address string
 }
 
 FORM CustomerUpdate
-	-root customer
+    -root customer
 {
-	id !@string
-	name string
-	address string
+    id !@string
+    name string
+    address string
 }
 
 FORM CustomerCreate
-	-root customer
+    -root customer
 {
-	name string
-	address string
+    name string
+    address string
 }
 
