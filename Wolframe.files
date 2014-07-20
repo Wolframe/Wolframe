@@ -1785,6 +1785,7 @@ include/AAAA/passwordChanger.hpp
 include/AAAA/passwordHash.hpp
 include/AAAA/pwdChangeMessage.hpp
 include/AAAA/user.hpp
+include/AAAA/usernameHash.hpp
 include/appConfig.hpp
 include/appdevel/authenticationModuleMacros.hpp
 include/appdevel/commandHandlerModuleMacros.hpp
@@ -2137,6 +2138,7 @@ src/libwolframe/types/variant.cpp
 src/libwolframe/types/variantStruct.cpp
 src/libwolframe/types/variantStructDescription.cpp
 src/libwolframe/user.cpp
+src/libwolframe/usernameHash.cpp
 src/libwolframe/utils/allocators.cpp
 src/libwolframe/utils/asciiCharParser.cpp
 src/libwolframe/utils/fileLineInfo.cpp
