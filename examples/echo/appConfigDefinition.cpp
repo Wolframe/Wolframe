@@ -54,12 +54,12 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	// add sections, the parse function will select the
 	// appropriate action
-	addConfig( "service", serviceCfg );
-	addConfig( "daemon", serviceCfg );
+	addConfig( "Service", serviceCfg );
+	addConfig( "Daemon", serviceCfg );
 
-	addConfig( "server", serverCfg );
-	addConfig( "logging", loggerCfg );
-	addConfig( "timeout", handlerCfg->echoConfig );
+	addConfig( "Server", serverCfg );
+	addConfig( "Logging", loggerCfg );
+	addConfig( "Timeout", handlerCfg->echoConfig );
 }
 
 ApplicationConfiguration::~ApplicationConfiguration()

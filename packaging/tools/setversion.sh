@@ -71,6 +71,7 @@ sed -i "s/^VERSION=.*/VERSION=$VERSION/g" packaging/obs/release_local_binaries.s
 
 # documentation
 echo $VERSION > docs/WolframeVersion.txt
+echo $VERSION > docs/WolfBookVersion.txt
 
 echo $DATE > docs/TutorialDate.txt
 echo $DATE > docs/WolfBookDate.txt

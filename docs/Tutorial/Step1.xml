@@ -15,20 +15,20 @@ cd ~/tutorial/server
 
 		<programlisting language='shell'>
 ; we install a verbose default logger to the shell
-logging {
-    stderr {
-        level DEBUG
+Logging {
+    Stderr {
+        Level DEBUG
     }
 }
 
 ; one connection, one thread is enough
-server {
-    maxConnections 1
-    threads 1
-    listen {
-        address	*
-        port 7661
-        maxConnections 1
+Server {
+    MaxConnections 1
+    Threads 1
+    Listen {
+        Address	*
+        Port 7661
+        MaxConnections 1
     }
 }
 		</programlisting>
@@ -38,7 +38,7 @@ server {
 		We can start the server now in the shell foreground with:
 
 		<programlisting language='shell'>
-usr/sbin/wolframed -f -c tutorial.conf
+/usr/sbin/wolframed -f -c tutorial.conf
 		</programlisting>
 	</para>
 	
