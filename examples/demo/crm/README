@@ -1,0 +1,12 @@
+server:
+
+cd Wolframe/examples/demo/crm/server
+sqlite3 crm.db < sqlite_schema.sql 
+sqlite3 crm.db < sqlite_testdata.sql 
+/usr/sbin/wolframed -f -c wolframe.conf
+
+client:
+
+cd qtclient
+wolfclient crmclient.conf
+

@@ -1,4 +1,4 @@
 int=integer;
 uint=unsigned;
-#float=float;
+float=floatingpoint;
 name=latinword,totitle;

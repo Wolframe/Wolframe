@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>customer</class>
+ <widget class="QWidget" name="customer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>493</width>
+    <height>315</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Edit Customer</string>
+  </property>
+  <property name="action" stdset="0">
+   <string>GetCustomer customer {id={id}}</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <item row="0" column="1">
+    <widget class="QLabel" name="editCustomerLabel">
+     <property name="text">
+      <string>Edit Customer..</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_name">
+     <property name="text">
+      <string>Name:</string>
+     </property>
+     <property name="buddy">
+      <cstring>name</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="name">
+     <property name="initialFocus" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_description">
+     <property name="text">
+      <string>Description:</string>
+     </property>
+     <property name="buddy">
+      <cstring>description</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="description"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_addr_line1">
+     <property name="text">
+      <string>Address Line 1:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_line1</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="addr_line1"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_addr_line2">
+     <property name="text">
+      <string>Address Line 2:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_line2</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="addr_line2"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_addr_postalcode">
+     <property name="text">
+      <string>Address Postal Code:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_postalcode</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="addr_postalcode"/>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_addr_district">
+     <property name="text">
+      <string>Address District:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_district</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLineEdit" name="addr_district"/>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_addr_country">
+     <property name="text">
+      <string>Address Country:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_country</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="addr_country"/>
+   </item>
+   <item row="9" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="update">
+       <property name="text">
+        <string>Update</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">UpdateCustomer customer {id={customer.id},name{{customer.name}},description{{customer.description}},addr_line1{{customer.addr_line1}},addr_line2{{customer.addr_line2}},addr_postalcode{{customer.addr_postalcode}},addr_district{{customer.addr_district}},addr_country{{customer.addr_country}}}</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">_CLOSE_</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">_CLOSE_</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>name</tabstop>
+  <tabstop>description</tabstop>
+  <tabstop>addr_line1</tabstop>
+  <tabstop>addr_line2</tabstop>
+  <tabstop>addr_postalcode</tabstop>
+  <tabstop>addr_district</tabstop>
+  <tabstop>addr_country</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>name</sender>
+   <signal>returnPressed()</signal>
+   <receiver>description</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>description</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_line1</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addr_line1</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_line2</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addr_line2</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_postalcode</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addr_postalcode</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_district</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addr_district</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_country</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addr_country</sender>
+   <signal>returnPressed()</signal>
+   <receiver>update</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
