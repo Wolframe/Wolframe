@@ -58,7 +58,7 @@ Database {
 		When we restart the server we see:
 
 		<programlisting language='shell'>
-DEBUG: SQLite database unit 'sqlitedb' created with 3 connections to file 'tutorial.db'
+DEBUG: SQLite database unit 'db' created with 3 connections to file 'tutorial.db'
 		</programlisting>
 	</para>
 	
@@ -68,10 +68,10 @@ DEBUG: SQLite database unit 'sqlitedb' created with 3 connections to file 'tutor
 
 		<programlisting language='shell'>
 LoadModules {
-    module mod_command_tdl
-    module mod_db_sqlite3
-    <emphasis role="bold">module mod_doctype_xml</emphasis>
-    <emphasis role="bold">module mod_filter_libxml2</emphasis>
+    Module mod_command_tdl
+    Module mod_db_sqlite3
+    <emphasis role="bold">Module mod_doctype_xml</emphasis>
+    <emphasis role="bold">Module mod_filter_libxml2</emphasis>
 }
 		</programlisting>
 	</para>
@@ -109,21 +109,21 @@ Module files to load:
 
 		<programlisting language='shell'>
 LoadModules {
-    module mod_command_tdl
-    module mod_db_sqlite3
-    module mod_doctype_xml
-    module mod_filter_libxml2
-    <emphasis role="bold">module mod_command_directmap</emphasis>
+    Module mod_command_tdl
+    Module mod_db_sqlite3
+    Module mod_doctype_xml
+    Module mod_filter_libxml2
+    <emphasis role="bold">Module mod_command_directmap</emphasis>
 }
 		</programlisting>
 		and a new section 'Processor' on the same level as 'LoadModules'
 		<programlisting language='shell'>
 Processor {
-    database sqlitedb
-    cmdhandler {
-	directmap {
-	    filter XML=libxml2
-	    program tutorial.dmap
+    Database db
+    CmdHandler {
+        Directmap {
+            Program tutorial.dmap
+            Filter XML=libxml2
 	}
     }
 }
@@ -164,14 +164,14 @@ COMMAND CustomerListRequest
 
 		<programlisting language='shell'>
 Processor {
-    database sqlitedb
-    cmdhandler {
-        directmap {
-            filter XML=libxml2
-            program tutorial.dmap
-        }
+    Database db
+    CmdHandler {
+        Directmap {
+            Program tutorial.dmap
+            Filter XML=libxml2
+	}
     }
-    <emphasis role="bold">program Customer.tdl</emphasis>
+    <emphasis role="bold">Program Customer.tdl</emphasis>
 }
 		</programlisting>
 
@@ -193,24 +193,24 @@ END
 
 		<programlisting language='shell'>
 LoadModules {
-    module mod_command_tdl
-    module mod_db_sqlite3
-    module mod_doctype_xml
-    module mod_filter_libxml2
-    module mod_command_directmap
-    <emphasis role="bold">module mod_ddlcompiler_simpleform</emphasis>
+    Module mod_command_tdl
+    Module mod_db_sqlite3
+    Module mod_doctype_xml
+    Module mod_filter_libxml2
+    Module mod_command_directmap
+    <emphasis role="bold">Module mod_ddlcompiler_simpleform</emphasis>
 }
 
 Processor {
-    database sqlitedb
-    cmdhandler {
-        directmap {
-            filter XML=libxml2
-            program tutorial.dmap
-        }
+    Database db
+    CmdHandler {
+        Directmap {
+            Program tutorial.dmap
+            Filter XML=libxml2
+	}
     }
-    program Customer.tdl
-    <emphasis role="bold">program Customer.sfrm</emphasis>	
+    Program Customer.tdl
+    <emphasis role="bold">Program Customer.sfrm</emphasis>	
 }
 		</programlisting>
 
@@ -280,8 +280,8 @@ netcat -v localhost 7661 &lt; CustomerListRequest.netcat
 
 		<programlisting language='shell'>
 cat > data.sql
-insert into customer(name,address) values('Dr Who','Blue Police Box');
-insert into customer(name,address) values('John Smith','The Wheel in Space');
+INSERT INTO Customer(name,address) values('Dr Who','Blue Police Box');
+INSERT INTO Customer(name,address) values('John Smith','The Wheel in Space');
 Ctrl-D
 
 sqlite3 tutorial.db &lt; data.sql
