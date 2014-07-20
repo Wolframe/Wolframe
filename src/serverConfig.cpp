@@ -201,11 +201,11 @@ struct ConnectionProperties
 			LOG_ERROR << logprefix << "No port defined for socket, using default " << position.logtext();
 			port = net::defaultTCPport();
 		}
-		if (!defined( D_restrictions))
-		{
-			LOG_WARNING << logprefix << "No restrictions defined for socket " << position.logtext() << " setting default to allow all " << position.logtext();
-			restrictions.defineAllowedAll();
-		}
+		//~ if (!defined( D_restrictions))
+		//~ {
+			//~ LOG_WARNING << logprefix << "No restrictions defined for socket " << position.logtext() << " setting default to allow all " << position.logtext();
+			//~ restrictions.defineAllowedAll();
+		//~ }
 		return rt;
 	}
 };
