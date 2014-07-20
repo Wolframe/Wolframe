@@ -139,7 +139,7 @@ public:
 		}
 	}
 
-	/// \brief get the termination marker to send for an abort of a running data session
+	/// \brief Get the termination marker to send for an abort of a running data session
 	virtual const char* interruptDataSessionMarker() const	{return "";}
 
 protected:
