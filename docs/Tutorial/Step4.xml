@@ -12,8 +12,8 @@
 		database module for Sqlite:
 		<programlisting language='shell'>
 LoadModules {
-    <emphasis role="bold">module mod_command_tdl</emphasis>
-    <emphasis role="bold">module mod_db_sqlite3</emphasis>
+    <emphasis role="bold">Module mod_command_tdl</emphasis>
+    <emphasis role="bold">Module mod_db_sqlite3</emphasis>
 }
 		</programlisting>
 	</para>
@@ -43,11 +43,11 @@ sqlite3 tutorial.db &lt; schema.sql
 		Now we have to tell server to use this sqlite database file:
 
 		<programlisting language='shell'>
-database {
+Database {
     SQLite {
-        identifier     sqlitedb
-        file           tutorial.db
-        foreignKeys    yes
+        Identifier db
+        File tutorial.db
+        ForeignKeys yes
     }
 }
 		</programlisting>

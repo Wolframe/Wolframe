@@ -10,7 +10,7 @@
 ; dummy authorization
 AAAA {
     Authorization {
-        default allow
+        Default allow
     }
 }
 		</programlisting>
