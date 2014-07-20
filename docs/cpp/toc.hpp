@@ -37,6 +37,8 @@ WF_MODULE_END
           Custom data types (_Wolframe::types::CustomDataType) define arithmetic types with some methods. The idea is to define arithmetic data types for things like date/time or currency only once and not for every language binding. Custom data types can be used in normalization programs and so in data forms to validate and normalize atomic elements.
     - \b Normalization \b function:
           Normalization functions (_Wolframe::types::NormalizeFunction) are besides custom data types the basic bricks to define atomic data types in forms. This component type lets you define your own normalization functions.
+    - \b Runtime \b environment:
+	 A runtime environment (_Wolframe::langbind::RuntimeEnvironment) is a configurable environment for functions that need a context for execution. The only case where a runtime environment is currently used in Wolframe is for .NET (Windows only).
 
  * \subsection ModuleTypeList Special module types in Wolframe
  *  The following module types do not have yet macros defined to declare them as the components introduced in the previous section. We have to refer to examples for the time being.
@@ -54,8 +56,6 @@ WF_MODULE_END
               - database (implements _Wolframe::db::Database)
               - transaction (implements _Wolframe::db::Transaction)
               - transaction execution statemachine (implements _Wolframe::db::TransactionExecStatemachine)
-    - \b Runtime \b environment:
-         A runtime environment (_Wolframe::langbind::RuntimeEnvironment) is a configurable environment for functions that need a context for execution. The only case where a runtime environment is currently used in Wolframe is for .NET (Windows only).
 
  * \section ModuleExamples Example modules for Wolframe
  * \subsection FilterModule Writing a filter module for another format than XML or JSON
@@ -156,6 +156,40 @@ class MyCommandHandlerUnit
 
 WF_MODULE_BEGIN( "MyCommandHandler", "my command handler short description")
  WF_COMMAND_HANDLER( "MyCommandHandler", "cmdhandler", "mycmd", _Wolframe::cmdbind::CommandHandlerUnit, config::NamedConfiguration)
+WF_MODULE_END
+* \endcode
+*
+*
+* \subsection RuntimeEnvModule Define a runtime environment host structure and its programs
+*
+* \code
+#include "appdevel/runtimeEnvironmentModuleMacros.hpp"
+
+static initMyRuntimeEnvironment()
+{
+    // ... put your global initializations here
+}
+
+class MyRuntimeEnvironmentConfig
+	:public config::NamedConfiguration
+{
+	// ... put your runtime environment configuration here
+}
+
+class MyRuntimeEnvironment
+	:public langbind::RuntimeEnvironment
+{
+public:
+	// ... put your runtime environment host structures here
+
+	MyRuntimeEnvironment( const MyRuntimeEnvironmentConfig* cfg)
+	{
+		// ... create your runtime environment from its configuration here
+	}
+}
+
+WF_MODULE_BEGIN( "MyRuntimeEnvironment", "runtime environment for my programs")
+ WF_RUNTIME_ENVIRONMENT( "my runtime environment", "runtimeenv", "myrunenv", MyRuntimeEnvironment, MyRuntimeEnvironmentConfig, initMyRuntimeEnvironment)
 WF_MODULE_END
 * \endcode
 *
