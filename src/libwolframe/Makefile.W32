@@ -73,6 +73,7 @@ CPP_OBJS = \
 	HMAC.obj \
 	PBKDF2.obj \
 	passwordHash.obj \
+	usernameHash.obj \
 	CRAM.obj \
 	pwdChangeMessage.obj
 

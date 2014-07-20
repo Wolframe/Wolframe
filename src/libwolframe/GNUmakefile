@@ -79,6 +79,7 @@ CPP_OBJS = \
 	HMAC.o \
 	PBKDF2.o \
 	passwordHash.o \
+	usernameHash.o \
 	CRAM.o \
 	pwdChangeMessage.o
 
