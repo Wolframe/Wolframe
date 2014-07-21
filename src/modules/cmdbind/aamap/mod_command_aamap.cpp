@@ -32,7 +32,6 @@
 ************************************************************************/
 ///\file mod_command_aamap.cpp
 ///\brief Module for aamap language binding (language to define mappings of authorization/audit calls to form functions)
-#include "appdevel/module/programTypeBuilder.hpp"
 #include "appdevel/programTypeModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
 #include "aaMapProgramType.hpp"

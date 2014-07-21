@@ -79,6 +79,7 @@ class FormFunction
 {
 public:
 	virtual ~FormFunction(){}
+	virtual bool initializeContext(){return true;}
 	virtual FormFunctionClosure* createClosure() const=0;
 };
 

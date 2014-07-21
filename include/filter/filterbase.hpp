@@ -123,10 +123,10 @@ public:
 
 	enum Flags
 	{
-		None=0x00,
-		SerializeWithIndices=0x01,		//< do serialization with array index elements, if implemented
-		PropagateNoCase=0x02,			//< true, if the result is propagated to be case insensitive
-		PropagateNoAttr=0x04			//< true, if the result is propagated to have no attribute support (only open/close tag and value)
+		None=0x00,				///< no flags set
+		SerializeWithIndices=0x01,		///< do serialization with array index elements, if implemented
+		PropagateNoCase=0x02,			///< true, if the result is propagated to be case insensitive
+		PropagateNoAttr=0x04			///< true, if the result is propagated to have no attribute support (only open/close tag and value)
 	};
 
 	/// \brief Query a flag (or a set of flags)

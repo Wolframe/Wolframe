@@ -244,7 +244,7 @@ public:
 	{
 		LOG_DEBUG << "Loading programs";
 
-		// Loading programs enclosed in a runtime environment
+		// Loading programs enclosed in a runtime environment:
 		std::vector<langbind::RuntimeEnvironmentR>::const_iterator ri = m_runtimeEnvironmentList.begin(), re = m_runtimeEnvironmentList.end();
 		for (; ri != re; ++ri)
 		{
@@ -257,7 +257,7 @@ public:
 			}
 		}
 
-		// Loading scripts
+		// Locate all programs to load:
 		std::vector< std::pair<Program*, std::string> > typed_filenames;
 
 		std::vector<std::string>::const_iterator fi = filenames.begin(), fe = filenames.end();
@@ -277,6 +277,7 @@ public:
 				throw std::runtime_error( std::string("unknown type of program '") + *fi + "'");
 			}
 		}
+		// Load programs in the order of their dependency level:
 		std::sort( typed_filenames.begin(), typed_filenames.end(), programOrderAsc);
 
 		std::vector< std::pair<Program*, std::string> >::const_iterator ti = typed_filenames.begin(), te = typed_filenames.end();
@@ -284,6 +285,16 @@ public:
 		{
 			LOG_DEBUG << "Loading program '" << ti->second << "'";
 			ti->first->loadProgram( library, transactionDB, m_curfile=ti->second);
+		}
+
+		// Initialize context of form functions:
+		types::keymap<langbind::FormFunctionR>::const_iterator gi = m_formFunctionMap.begin(), ge = m_formFunctionMap.end();
+		for (; gi != ge; ++gi)
+		{
+			if (!gi->second->initializeContext())
+			{
+				LOG_ERROR << "Initializing context of form function '" << gi->first << "' failed";
+			}
 		}
 	}
 };

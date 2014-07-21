@@ -237,13 +237,13 @@ struct InputFilterImpl :public InputFilter
 		,m_linecomplete(o.m_linecomplete)
 		,m_eolnread(o.m_eolnread){}
 
-	//\brief Implement InputFilter::copy()
+	/// \brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	//\brief Implement InputFilter::initcopy()
+	/// \brief Implement InputFilter::initcopy()
 	virtual InputFilter* initcopy() const
 	{
 		return new InputFilterImpl( *getMetaDataRef(), m_charset);
