@@ -280,6 +280,7 @@ usr/pkg/include/wolframe/AAAA/passwordHash.hpp
 usr/pkg/include/wolframe/AAAA/passwordChanger.hpp
 usr/pkg/include/wolframe/AAAA/pwdChangeMessage.hpp
 usr/pkg/include/wolframe/AAAA/user.hpp
+usr/pkg/include/wolframe/AAAA/usernameHash.hpp
 @dirrm usr/pkg/include/wolframe/AAAA
 usr/pkg/include/wolframe/module/constructor.hpp
 @dirrm usr/pkg/include/wolframe/module
