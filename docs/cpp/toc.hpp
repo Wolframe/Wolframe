@@ -35,9 +35,9 @@ WF_MODULE_END
          for filters is a structure with the document meta data as key/value
          pairs and a sequence of content elements of the following types:
             - OpenTag: Open a substructure. The value is the name of the structure opened or if empty, defining a new array element
-            - CloseTag: Close a substructure or array element or marking the end of content (final close)
+            - CloseTag: Close a substructure or an array element or it is marking the end of content (final close)
             - Value: Defines an atomic element
-            - Attribute: Defines an attribute name, the following value is the attribute value.
+            - Attribute: Defines an attribute name, the following element is the attribute value (as type value).
             .
          Filters define flags (_Wolframe::langbind::FilterBase::Flags)
          to level out language differences between producer and consumer of
@@ -64,7 +64,7 @@ WF_MODULE_END
               \code
                OpenTag "Colors",Value "Red",CloseTag,OpenTag "Colors",Value "Blue",CloseTag
               \endcode
-              the following sequence is produced
+              the following sequence has to be produced
               \code
                OpenTag "Colors",OpenTag,Value "Red",CloseTag,OpenTag,Value "Blue",CloseTag,CloseTag
               \endcode
@@ -126,6 +126,7 @@ WF_MODULE_END
  * \code
 #include "appdevel/commandHandlerModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
+#include "cmdbind/commandHandlerUnit.hpp"
 
 class MyCommandHandlerConfig
 	:public _Wolframe::config::NamedConfiguration
@@ -140,6 +141,20 @@ class MyCommandHandlerUnit
 	MyCommandHandlerUnit( const MyCommandHandlerConfig* cfg)
 	{
 		// ... required constructor from configuration
+	}
+	virtual bool loadPrograms( const _Wolframe::proc::ProcessorProviderInterface* provider)
+	{
+		// ... load your command handler programs here
+	}
+
+	virtual std::vector<std::string> commands() const
+	{
+		// ... return the commands of the command handler here
+	}
+
+	virtual _Wolframe::cmdbind::CommandHandler* createCommandHandler( const std::string& cmdname, const std::string& docformat)
+	{
+		// ... create and return an instance of a command handler for executing the command cmdname here
 	}
 }
 

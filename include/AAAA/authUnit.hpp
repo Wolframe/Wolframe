@@ -65,17 +65,17 @@ public:
 						{ return true; }
 	virtual const char* className() const = 0;
 
-	/// The list of mechs implemented by this unit
+	/// \brief The list of mechs implemented by this unit
 	/// \note	The authentication unit returns the mechs as an
 	///		array of strings. The array ends with a NULL
 	///		Be aware that the other interfaces use a vector instead.
 	virtual const char** mechs() const = 0;
 
-	/// An AuthenticatorSlice for the required mech (or NULL)
+	/// \brief An AuthenticatorSlice for the required mech (or NULL)
 	virtual AuthenticatorSlice* slice( const std::string& mech,
 					   const net::RemoteEndpoint& client ) = 0;
 
-	/// A PasswordChanger for the user (or NULL)
+	/// \brief A PasswordChanger for the user (or NULL)
 	virtual PasswordChanger* passwordChanger( const User& /*user*/,
 						  const net::RemoteEndpoint& /*client*/ )
 						{ return NULL; }
