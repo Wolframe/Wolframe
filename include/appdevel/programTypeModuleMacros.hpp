@@ -36,13 +36,17 @@
 #include "appdevel/module/programTypeBuilder.hpp"
 
 /// \brief Defines a Wolframe program type
-#define WF_PROGRAM_TYPE( LANGNAME, CREATEPRGFUNC)\
+#define WF_PROGRAM_TYPE( LANGNAME, PROGRAMCLASS)\
 {\
 	struct Constructor\
 	{\
+		static _Wolframe::prgbind::Program* create()\
+		{\
+			return new PROGRAMCLASS();\
+		}\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			return new _Wolframe::module::ProgramTypeBuilder( LANGNAME "ProgramType", LANGNAME "Language", CREATEPRGFUNC);\
+			return new _Wolframe::module::ProgramTypeBuilder( LANGNAME "ProgramType", LANGNAME "Language", create);\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\

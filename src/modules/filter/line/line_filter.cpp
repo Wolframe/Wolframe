@@ -436,22 +436,12 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 	return encoding;
 }
 
-class LineFilterType :public FilterType
+Filter* LineFilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	LineFilterType()
-		:FilterType("line"){}
-	virtual ~LineFilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		return new LineFilter( getArgumentEncoding( arg));
-	}
-};
-
-FilterType* _Wolframe::langbind::createLineFilterType()
-{
-	return new LineFilterType();
+	return new LineFilter( getArgumentEncoding( arg));
 }
+
+
+
 
 

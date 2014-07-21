@@ -92,22 +92,9 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 	return encoding;
 }
 
-class CJsonFilterType :public FilterType
+Filter* CJsonFilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	CJsonFilterType()
-		:FilterType("cjson"){}
-	virtual ~CJsonFilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		return new CJsonFilter( getArgumentEncoding( arg));
-	}
-};
-
-FilterType* _Wolframe::langbind::createCJsonFilterType()
-{
-	return new CJsonFilterType();
+	return new CJsonFilter( getArgumentEncoding( arg));
 }
 
 

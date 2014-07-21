@@ -36,13 +36,17 @@
 #include "appdevel/module/ddlcompilerBuilder.hpp"
 
 /// \brief Defines a Wolframe DDL compiler
-#define WF_DDLCOMPILER( LANGUAGE, CREATE_COMPILER)\
+#define WF_DDLCOMPILER( LANGUAGE, COMPILERCLASS)\
 {\
 	struct Constructor\
 	{\
+		static _Wolframe::langbind::DDLCompiler* create()\
+		{\
+			return new COMPILERCLASS();\
+		}\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			return new _Wolframe::module::DDLCompilerBuilder( "DDLCompiler_" #LANGUAGE, #LANGUAGE, CREATE_COMPILER);\
+			return new _Wolframe::module::DDLCompilerBuilder( "DDLCompiler_" #LANGUAGE, #LANGUAGE, create);\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\

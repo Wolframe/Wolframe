@@ -32,23 +32,11 @@
 ************************************************************************/
 ///\file mod_command_python.cpp
 ///\brief Module for command handler executing python code
-#include "appdevel/module/programTypeBuilder.hpp"
+#include "appdevel/programTypeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "pythonFunctionProgramType.hpp"
-#include "logger-v1.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+WF_MODULE_BEGIN( "Python", "python program module")
+ WF_PROGRAM_TYPE( "Python", _Wolframe::langbind::PythonProgramType)
+WF_MODULE_END
 
-static BuilderBase* pythonProgramTypeBuilder()
-{
-	return new ProgramTypeBuilder( "PythonProgramType", "pythonformfunc", langbind::createPythonProgramType);
-}
-
-static BuilderBase* (*builder[])() =
-{
-	pythonProgramTypeBuilder, NULL
-};
-
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python", builder );
-}

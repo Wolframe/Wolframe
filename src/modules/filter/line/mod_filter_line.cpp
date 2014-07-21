@@ -37,5 +37,5 @@
 #include "line_filter.hpp"
 
 WF_MODULE_BEGIN( "lineFilter", "unicode line by line filter")
- WF_FILTER_TYPE( "line", _Wolframe::langbind::createLineFilterType)
+ WF_FILTER_TYPE( "line", _Wolframe::langbind::LineFilterType)
 WF_MODULE_END

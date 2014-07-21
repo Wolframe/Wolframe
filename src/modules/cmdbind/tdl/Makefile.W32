@@ -45,7 +45,6 @@ VM_CPP_OBJS = \
 CPP_OBJS = \
 	$(TDL_CPP_OBJS) \
 	$(VM_CPP_OBJS) \
-	tdlFunctionProgramType.obj \
 	tdlTransactionFunction.obj \
 	tdlTransactionInput.obj \
 	tdlTransactionPreprocStep.obj \

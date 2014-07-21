@@ -50,26 +50,34 @@ struct macro__WF_NORMALIZER_RESOURCE__ ## RESOURCECLASS\
 };\
 
 /// \brief Defines normalization function
-#define WF_NORMALIZER(NAME,CONSTRUCTOR)\
+#define WF_NORMALIZER(NAME,NORMALIZERCLASS)\
 {\
 	struct Constructor\
 	{\
+		static _Wolframe::types::NormalizeFunction* create( _Wolframe::types::NormalizeResourceHandle*, const std::vector<_Wolframe::types::Variant>& arg)\
+		{\
+			return new NORMALIZERCLASS( arg);\
+		}\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			return new _Wolframe::module::NormalizeFunctionBuilder( "NormalizeFunction_" #NAME, NAME, CONSTRUCTOR);\
+			return new _Wolframe::module::NormalizeFunctionBuilder( "NormalizeFunction_" #NAME, NAME, create);\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\
 }
 
 /// \brief Defines normalization function
-#define WF_NORMALIZER_WITH_RESOURCE(NAME,CONSTRUCTOR,RESOURCECLASS)\
+#define WF_NORMALIZER_WITH_RESOURCE(NAME,NORMALIZERCLASS,RESOURCECLASS)\
 {\
 	struct Constructor\
 	{\
+		static _Wolframe::types::NormalizeFunction* create( _Wolframe::types::NormalizeResourceHandle* reshnd, const std::vector<_Wolframe::types::Variant>& arg)\
+		{\
+			return new NORMALIZERCLASS( reshnd, arg);\
+		}\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			return new _Wolframe::module::NormalizeFunctionBuilder( "NormalizeFunction_" #NAME, NAME, CONSTRUCTOR, macro__WF_NORMALIZER_RESOURCE__ ## RESOURCECLASS::get());\
+			return new _Wolframe::module::NormalizeFunctionBuilder( "NormalizeFunction_" #NAME, NAME, create, macro__WF_NORMALIZER_RESOURCE__ ## RESOURCECLASS::get());\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\

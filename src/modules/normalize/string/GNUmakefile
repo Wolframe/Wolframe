@@ -23,7 +23,6 @@ DYNAMIC_MODULE = mod_normalize_string.so
 CPP_OBJS = \
 	trimNormalizeFunction.o \
 	asciiNormalizeFunction.o \
-	stringNormalize.o \
 	mod_normalize_string.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

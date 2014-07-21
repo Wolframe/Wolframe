@@ -388,43 +388,24 @@ private:
 	const python::Interpreter* m_interpreter;
 	std::string m_name;
 };
-
-///\class PythonProgramType
-///\brief Program type of python programs
-class PythonProgramType
-	:public prgbind::Program
-{
-public:
-	PythonProgramType()
-		:prgbind::Program( prgbind::Program::Function){}
-
-	virtual ~PythonProgramType(){}
-
-	virtual bool is_mine( const std::string& filename) const
-	{
-		boost::filesystem::path p( filename);
-		return p.extension().string() == ".mlg";
-	}
-
-	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
-	{
-		std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
-		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
-		for (; fi != fe; ++fi)
-		{
-			langbind::FormFunctionR ff( new PythonFormFunction( &m_interpreter, *fi));
-			library.defineFormFunction( *fi, ff);
-		}
-	}
-
-private:
-	python::Interpreter m_interpreter;
-};
 }//anonymous namespace
 
-prgbind::Program* langbind::createPythonProgramType()
+
+bool PythonProgramType::is_mine( const std::string& filename) const
 {
-	return new PythonProgramType();
+	boost::filesystem::path p( filename);
+	return p.extension().string() == ".mlg";
+}
+
+void PythonProgramType::loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
+{
+	std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
+	std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
+	for (; fi != fe; ++fi)
+	{
+		langbind::FormFunctionR ff( new PythonFormFunction( &m_interpreter, *fi));
+		library.defineFormFunction( *fi, ff);
+	}
 }
 
 

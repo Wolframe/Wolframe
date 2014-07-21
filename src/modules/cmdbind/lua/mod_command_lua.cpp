@@ -41,7 +41,7 @@
 #include "luaFunctionProgramType.hpp"
 
 WF_MODULE_BEGIN( "LuaCommandHandler", "lua program and command handler module")
- WF_PROGRAM_TYPE( "Lua", _Wolframe::langbind::createLuaProgramType)
+ WF_PROGRAM_TYPE( "Lua", _Wolframe::langbind::LuaProgramType)
  WF_COMMAND_HANDLER( "lua command handler", "cmdhandler", "lua", _Wolframe::cmdbind::LuaCommandHandlerUnit, _Wolframe::cmdbind::LuaCommandHandlerConfig)
 WF_MODULE_END
 

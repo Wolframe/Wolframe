@@ -44,11 +44,7 @@ namespace langbind {
 class IntegerNormalizeFunction :public types::NormalizeFunction
 {
 public:
-	IntegerNormalizeFunction( bool sign_, std::size_t size_, types::Variant::Data::UInt max_)
-		:m_max(max_)
-		,m_size(size_)
-		,m_sign(sign_)
-		{}
+	IntegerNormalizeFunction( const std::vector<types::Variant>& arg);
 	IntegerNormalizeFunction( const IntegerNormalizeFunction& o)
 		:m_max(o.m_max)
 		,m_size(o.m_size)
@@ -59,12 +55,20 @@ public:
 	virtual const char* name() const {return m_sign?"integer":"unsigned";}
 	virtual types::NormalizeFunction* copy() const {return new IntegerNormalizeFunction(*this);}
 
-private:
+protected:
 	types::Variant::Data::UInt m_max;
 	std::size_t m_size;
 	bool m_sign;
 };
 
+class UnsignedNormalizeFunction
+	:public IntegerNormalizeFunction
+{
+public:
+	UnsignedNormalizeFunction( const std::vector<types::Variant>& arg);
+	UnsignedNormalizeFunction( const UnsignedNormalizeFunction& o)
+		:IntegerNormalizeFunction(o){}
+};
 }}
 #endif
 

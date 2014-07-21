@@ -34,14 +34,13 @@
 ///\brief Module for string normalization and validating functions without using ICU
 #include "appdevel/normalizeModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "stringNormalize.hpp"
-
-using namespace _Wolframe::langbind;
+#include "asciiNormalizeFunction.hpp"
+#include "trimNormalizeFunction.hpp"
 
 WF_MODULE_BEGIN( "StringNormalizer", "basic string normalizers not using ICU or another library")
- WF_NORMALIZER( "trim",  createTrimNormalizeFunction)
- WF_NORMALIZER( "ucname", createUcnameNormalizeFunction)
- WF_NORMALIZER( "lcname", createLcnameNormalizeFunction)
- WF_NORMALIZER( "convdia", createConvdiaNormalizeFunction)
+ WF_NORMALIZER( "trim",  _Wolframe::langbind::TrimNormalizeFunction)
+ WF_NORMALIZER( "ucname", _Wolframe::langbind::UppercaseNameNormalizeFunction)
+ WF_NORMALIZER( "lcname", _Wolframe::langbind::LowercaseNameNormalizeFunction)
+ WF_NORMALIZER( "convdia", _Wolframe::langbind::ConvDiaNormalizeFunction)
 WF_MODULE_END
 

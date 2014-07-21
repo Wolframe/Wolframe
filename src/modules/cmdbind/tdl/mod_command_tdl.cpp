@@ -32,23 +32,11 @@
 ************************************************************************/
 ///\file mod_command_tdl.cpp
 ///\brief Module for TDL binding
-#include "appdevel/module/programTypeBuilder.hpp"
-#include "tdlFunctionProgramType.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/programTypeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "transactionProgram.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+WF_MODULE_BEGIN( "TdlProgramType", "tdl program module")
+ WF_PROGRAM_TYPE( "TDL", _Wolframe::prgbind::TransactionDefinitionProgram)
+WF_MODULE_END
 
-static BuilderBase* tdlProgramTypeBuilder()
-{
-	return new ProgramTypeBuilder( "TdlProgramType", "tdlformfunc", prgbind::createTdlProgramType);
-}
-
-static BuilderBase* (*builder[])() =
-{
-	tdlProgramTypeBuilder, NULL
-};
-
-extern "C" {
-	ModuleEntryPoint entryPoint( 0, "form function handler for TDL", builder );
-}

@@ -37,6 +37,6 @@
 #include "blob_filter.hpp"
 
 WF_MODULE_BEGIN( "blobFilter", "filter module for processing content as single blob value")
- WF_FILTER_TYPE( "blob", _Wolframe::langbind::createBlobFilterType)
+ WF_FILTER_TYPE( "blob", _Wolframe::langbind::BlobFilterType)
 WF_MODULE_END
 

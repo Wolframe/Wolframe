@@ -22,7 +22,6 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 CPP_OBJS = \
-	aaMapProgramType.obj \
 	aaMapProgram.obj \
 	mod_command_aamap.obj
 

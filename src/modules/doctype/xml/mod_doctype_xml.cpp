@@ -37,6 +37,6 @@
 #include "doctypeDetectorXml.hpp"
 
 WF_MODULE_BEGIN( "xmlDocformat", "document type/format detection for XML")
- WF_DOCUMENT_FORMAT( "XML", _Wolframe::cmdbind::createDoctypeDetectorXml)
+ WF_DOCUMENT_FORMAT( "XML", _Wolframe::cmdbind::DoctypeDetectorXml)
 WF_MODULE_END
 

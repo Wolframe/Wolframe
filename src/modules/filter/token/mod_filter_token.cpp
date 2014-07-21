@@ -37,6 +37,6 @@
 #include "token_filter.hpp"
 
 WF_MODULE_BEGIN( "tokenFilter", "unicode token by token filter with element type info as character prefix in every token")
- WF_FILTER_TYPE( "token", _Wolframe::langbind::createTokenFilterType)
+ WF_FILTER_TYPE( "token", _Wolframe::langbind::TokenFilterType)
 WF_MODULE_END
 

@@ -445,9 +445,5 @@ std::vector<types::FormDescriptionR> SimpleFormCompiler::compile( const std::str
 	return rt;
 }
 
-DDLCompiler* langbind::createSimpleFormCompilerFunc()
-{
-	return new SimpleFormCompiler();
-}
 
 

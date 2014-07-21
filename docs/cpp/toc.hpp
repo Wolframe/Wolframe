@@ -26,30 +26,56 @@ WF_MODULE_END
             .
          See \ref DoctypeDetectionModule.
     - \b Filter \b type:
-         Filters (_Wolframe::langbind::Filter) are used to parse a document and to create a unified representation for processing it and contrarywise map the unified representation to a document. Hence a filter consist of two parts, an input filter (_Wolframe::langbind::InputFilter) and an output filter (_Wolframe::langbind::OutputFilter). The unified representation for filters is a structure with the document meta data as key/value pairs and a sequence of content elements of the following types:
+         Filters (_Wolframe::langbind::Filter) are used to parse a document 
+         and to create a unified representation for processing it and 
+         contrarywise map the unified representation to a document. 
+         Hence a filter consist of two parts, an input filter 
+         (_Wolframe::langbind::InputFilter) and an output filter
+         (_Wolframe::langbind::OutputFilter). The unified representation 
+         for filters is a structure with the document meta data as key/value
+         pairs and a sequence of content elements of the following types:
             - OpenTag: Open a substructure. The value is the name of the structure opened or if empty, defining a new array element
             - CloseTag: Close a substructure or array element or marking the end of content (final close)
             - Value: Defines an atomic element
             - Attribute: Defines an attribute name, the following value is the attribute value.
             .
-         Because of different language models there exist different 
-         variants for filters. The behaviour of a filter is steared by 
-         a contract between producer and consumer that is established by 
-         flags defined for the input filter. An input filter implementation 
-         has to listen on a flag _Wolframe::langbind::FilterBase::SerializeWithIndices.
-         If this flag is set then the filter has to produce a different sequence 
-         of elements than without. It means that if set, the consumer cannot
-         determine if a single element is an array with one element. 
-         Therefore the producer has to build a sequence of elements that 
-         contains one naming tag for an array and an index tag (empty) for 
-         every element. If the flag is not set then the producer is asked to 
-         create a sequence without a tag for the whole array and with one 
-         named tag per array element. If the producer cannot create a sequence
-         with array indices (for example an XML filter) it can refuse it by
-         a setFlags method returning false when the flag is set.
-         The other flags are set by the producer to inform the consumer about
-         the source language properties (see _Wolframe::langbind::FilterBase::Flags).
-         The contract established by these flags helps to level out language differences.
+         Filters define flags (_Wolframe::langbind::FilterBase::Flags)
+         to level out language differences between producer and consumer of
+         the filter element sequence.
+         The initialization of the flags define a contract between producer and 
+         consumer. The idea behind is that not the weakest peer involved defines
+         globally what information is transmitted with an filter. The 
+         consumer and the producer set some flags of the filter that describe the
+         requirements of the consumer and the capabilities of the producer.
+         There are two flags set by the producer:
+            - PropagateNoCase tells the consumer that the tag names used are case insensitive
+            - PropagateNoAttr tells the consumer that producer does not know about attributes (only OpenTag,CloseTag,Value are used)
+            .
+         There is one flag set by the consumer:
+            - SerializeWithIndices tells the producer that the consumer has no 
+              structure description that helps to distinguish between an array
+              with one element or a single element. Therefore the consumer has
+              to produce a sequence that contains the information if an element
+              belongs to an array. This is done by having one named tag for
+              the array structure and one tag without name for every array element.
+              Lets take an array with name "Colors" two atomic elements "Red" and 
+              "Blue" as example. Instead of producing a sequence like this, 
+              if SerializeWithIndices is not set
+              \code
+               OpenTag "Colors",Value "Red",CloseTag,OpenTag "Colors",Value "Blue",CloseTag
+              \endcode
+              the following sequence is produced
+              \code
+               OpenTag "Colors",OpenTag,Value "Red",CloseTag,OpenTag,Value "Blue",CloseTag,CloseTag
+              \endcode
+            .
+         Unfortunately we cannot define a format with array indices as
+         unified format, because there are languages that do not have the
+         capability to produce this information (like for example XML).
+         So we take the weakest form as base and provide an upgrade if required 
+         and if the model behind allows it. 
+         The method _Wolframe::langbind::InputFilter::setFlags( Flags f)
+         can return false if it cannot provide the required information.
          See \ref FilterModule
     - \b Form \b Function:
          Form functions (_Wolframe::langbind::FormFunction) are functions with a structure 
@@ -157,13 +183,8 @@ public:
 	}
 };
 
-static DoctypeDetector* createDoctypeDetectorMyFormat()
-{
-	return new DoctypeDetectorMyFormat();
-}
-
 WF_MODULE_BEGIN( "myDocformat", "document type/format detection for MyFormat")
- WF_DOCUMENT_FORMAT( "MYFM", createDoctypeDetectorMyFormat)
+ WF_DOCUMENT_FORMAT( "MYFM", DoctypeDetectorMyFormat)
 WF_MODULE_END
 
  * \endcode
@@ -198,25 +219,25 @@ class MyInputFilter
 		// ... get the unprocessed input here
 	}
 
-	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+	virtual bool getNext( typename _Wolframe::langbind::InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		// ... get the next element produced by this input filter here
 		// ... return false on error or end of buffer (state)
 		// ... return true, if we returned a valid element in type,element,elementsize
 	}
 
-	virtual bool setFlags( Flags f)
+	virtual bool setFlags( _Wolframe::langbind::FilterBase::Flags f)
 	{
 		// ... check if you can fulfill the requirements imposed by the flags and set them if yes
 		// ... return false, if the requirements imposed by the flags cannot be met
 	}
 
-	virtual bool checkSetFlags( Flags f)const
+	virtual bool checkSetFlags( _Wolframe::langbind::FilterBase::Flags f)const
 	{
 		// ... check, if the requirements imposed by the flags can be met
 	}
 
-	virtual const types::DocMetaData* getMetaData()
+	virtual const _Wolframe::types::DocMetaData* getMetaData()
 	{
 		// ... get the document meta data if possible
 		// ... return false on error, or if another input chunk is needed
@@ -226,12 +247,12 @@ class MyInputFilter
 class MyOutputFilter
 	:public _Wolframe::langbind::OutputFilter
 {
-	virtual OutputFilter* copy() const
+	virtual _Wolframe::langbind::OutputFilter* copy() const
 	{
 		// ... create a copy of this output filter here
 	}
 
-	virtual bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
+	virtual bool print( typename _Wolframe::langbind::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		// ... do the output of one element here
 		// ... use the method write( const void*, std::size_t) for writing to sink
@@ -248,7 +269,7 @@ class MyFilter
 	:public _Wolframe::langbind::Filter
 {
 	MyFilter()
-		:_Wolframe::langbind::Filter( new InputFilter(), new OutputFilter()){}
+		:_Wolframe::langbind::Filter( new _Wolframe::langbind::InputFilter(), new _Wolframe::langbind::OutputFilter()){}
 };
 
 class MyFilterType
@@ -258,19 +279,14 @@ public:
 	MyFilterType()
 		:_Wolframe::langbind::FilterType("myfilter"){}
 
-	virtual _Wolframe::langbind::Filter* create( const std::vector<FilterArgument>&) const
+	virtual _Wolframe::langbind::Filter* create( const std::vector<_Wolframe::langbind::FilterArgument>&) const
 	{
 		return new MyFilter();
 	}
 };
 
-static _Wolframe::langbind::FilterType* createMyFilterType()
-{
-	// ... here we create our own filter type object
-}
-
 WF_MODULE_BEGIN( "MyFilter", "my content filter")
- WF_FILTER_TYPE( "myfilter", createMyFilterType)
+ WF_FILTER_TYPE( "myfilter", MyFilterType)
 WF_MODULE_END
 
  * \endcode
@@ -358,13 +374,8 @@ public:
 	}
 };
 
-_Wolframe::prgbind::Program* createMyProgramType()
-{
-	return new MyProgram();
-}
-
 WF_MODULE_BEGIN( "MyProgramTypeModule", "my program type module")
- WF_PROGRAM_TYPE( "MyProgram", createMyProgramType)
+ WF_PROGRAM_TYPE( "MyProgram", MyProgram)
 WF_MODULE_END
 
 * \endcode
@@ -389,13 +400,8 @@ public:
 	}
 };
 
-_Wolframe::langbind::DDLCompiler* createMyDDLCompilerFunc()
-{
-	return new MyDDLCompiler();
-}
-
 WF_MODULE_BEGIN( "MyDDLCompiler", "compiler for my language describing data forms")
- WF_DDLCOMPILER( "MyDDL", createMyDDLCompiler)
+ WF_DDLCOMPILER( "MyDDL", MyDDLCompiler)
 WF_MODULE_END
 * \endcode
 *
@@ -421,7 +427,6 @@ public:
 		return new MyInitializer( arg);
 	}
 };
-
 
 class MyValue
 	:public _Wolframe::types::CustomDataValue
@@ -463,7 +468,6 @@ public:
 		// ... create a default value from initializer (can be NULL) here
 	}
 };
-
 
 class MyType
 	:public _Wolframe::types::CustomDataType
@@ -512,6 +516,11 @@ class MyNormalizeFunction
 	:_Wolframe::types::NormalizeFunction
 {
 public:
+	MyNormalizeFunction( const std::vector<_Wolframe::types::Variant>& arg)
+	{
+		// ... the WF_NORMALIZER* template needs a constructor with this signature
+	}
+
 	virtual const char* name() const
 	{
 		// ... return the identifier of the function here
@@ -526,13 +535,8 @@ public:
 	}
 };
 
-_Wolframe::types::NormalizeFunction* createMyNormalizeFunction( _Wolframe::types::NormalizeResourceHandle*, const std::vector<_Wolframe::types::Variant>& arg)
-{
-	// ... return a new instance of your normalizer function here
-}
-
 WF_MODULE_BEGIN( "My normalizer", "my normalizer module")
- WF_NORMALIZER( "mynormalize",  createMyNormalizeFunction)
+ WF_NORMALIZER( "mynormalize",  MyNormalizeFunction)
 WF_MODULE_END
 * \endcode
 *
@@ -545,18 +549,21 @@ class MyResources
 	// ... put your common data structure (normalizer resources) decrarations here
 };
 * \endcode
-* The createMyNormalizeFunction can then use a dynamic_cast to get the resource object:
+* The MyNormalizeFunction has a slighly different constructor signature required.
+The first parameter is the base resource handle reference. The consructor can use a 
+dynamic_cast to get his resource object:
+:
 * \code
-_Wolframe::types::NormalizeFunction* createMyNormalizeFunction( _Wolframe::types::NormalizeResourceHandle* reshnd, const std::vector<_Wolframe::types::Variant>& arg)
+MyNormalizeFunction::MyNormalizeFunction( _Wolframe::types::NormalizeResourceHandle* reshnd, const std::vector<_Wolframe::types::Variant>& arg)
 {
 	MyResources* myreshnd = dynamic_cast<MyResources*>(reshnd);
-	// ... return a new instance of your normalizer function with a reference to the resources here
+	// ... do other initializations
 }
 * \endcode
 * We then declare the resources and the function with the following macro after WF_MODULE_BEGIN:
 * \code
 WF_NORMALIZER_RESOURCE( MyResources)
-WF_NORMALIZER_WITH_RESOURCE( "mynormalize",  createMyNormalizeFunction, MyResources)
+WF_NORMALIZER_WITH_RESOURCE( "mynormalize",  MyNormalizeFunction, MyResources)
 * \endcode
 * \page RuntimeEnvironmentModule Runtime environment host structure module
 *

@@ -116,21 +116,9 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 	return encoding;
 }
 
-class Libxml2FilterType :public FilterType
+Filter* Libxml2FilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	Libxml2FilterType()
-		:FilterType("libxml2"){}
-	virtual ~Libxml2FilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		return new Libxml2Filter( getArgumentEncoding( arg));
-	}
-};
-
-FilterType* _Wolframe::langbind::createLibxml2FilterType()
-{
-	return new Libxml2FilterType();
+	return new Libxml2Filter( getArgumentEncoding( arg));
 }
+
 

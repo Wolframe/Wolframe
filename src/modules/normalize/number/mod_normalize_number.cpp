@@ -34,13 +34,12 @@
 ///\brief Module for number normalization and validation functions
 #include "appdevel/normalizeModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "numberNormalize.hpp"
-
-using namespace _Wolframe::langbind;
+#include "integerNormalizeFunction.hpp"
+#include "floatNormalizeFunction.hpp"
 
 WF_MODULE_BEGIN( "NumberNormalizer", "normalizers and validators for numbers")
- WF_NORMALIZER( "integer", createIntegerNormalizeFunction)
- WF_NORMALIZER( "unsigned", createUnsignedNormalizeFunction)
- WF_NORMALIZER( "floatingpoint", createFloatNormalizeFunction)
+ WF_NORMALIZER( "integer", _Wolframe::langbind::IntegerNormalizeFunction)
+ WF_NORMALIZER( "unsigned", _Wolframe::langbind::UnsignedNormalizeFunction)
+ WF_NORMALIZER( "floatingpoint", _Wolframe::langbind::FloatNormalizeFunction)
 WF_MODULE_END
 

@@ -44,10 +44,7 @@ namespace langbind {
 class FloatNormalizeFunction :public types::NormalizeFunction
 {
 public:
-	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_, double max_)
-		:m_sizeG(sizeG_)
-		,m_sizeF(sizeF_)
-		,m_max(max_){}
+	FloatNormalizeFunction( const std::vector<types::Variant>& arg);
 	FloatNormalizeFunction( const FloatNormalizeFunction& o)
 		:m_sizeG(o.m_sizeG)
 		,m_sizeF(o.m_sizeF)

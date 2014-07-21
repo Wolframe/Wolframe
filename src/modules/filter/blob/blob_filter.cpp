@@ -230,23 +230,10 @@ struct BlobFilter :public Filter
 	}
 };
 
-class BlobFilterType :public FilterType
+Filter* BlobFilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	BlobFilterType()
-		:FilterType("blob"){}
-	virtual ~BlobFilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		if (arg.size()) throw std::runtime_error( "unexpected arguments for blob filter");
-		return new BlobFilter();
-	}
-};
-
-FilterType* _Wolframe::langbind::createBlobFilterType()
-{
-	return new BlobFilterType();
+	if (arg.size()) throw std::runtime_error( "unexpected arguments for blob filter");
+	return new BlobFilter();
 }
 
 

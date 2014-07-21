@@ -39,8 +39,18 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-/// \brief Create a new char (unicode character by character) filter type (with new, to be destroyed with delete)
-FilterType* createCharFilterType();
+/// \class CharFilterType
+/// \brief Character by character filter type
+class CharFilterType
+	:public FilterType
+{
+public:
+	CharFilterType()
+		:FilterType("char"){}
+	virtual ~CharFilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const;
+};
 
 
 }}//namespace

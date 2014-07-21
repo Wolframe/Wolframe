@@ -530,21 +530,8 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 	return encoding;
 }
 
-class TokenFilterType :public FilterType
+Filter* TokenFilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	TokenFilterType()
-		:FilterType("token"){}
-	virtual ~TokenFilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		return new TokenFilter( getArgumentEncoding( arg));
-	}
-};
-
-FilterType* _Wolframe::langbind::createTokenFilterType()
-{
-	return new TokenFilterType();
+	return new TokenFilter( getArgumentEncoding( arg));
 }
 

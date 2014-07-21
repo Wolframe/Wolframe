@@ -37,6 +37,6 @@
 #include "char_filter.hpp"
 
 WF_MODULE_BEGIN( "charFilter", "unicode character by character filter")
- WF_FILTER_TYPE( "char", _Wolframe::langbind::createCharFilterType)
+ WF_FILTER_TYPE( "char", _Wolframe::langbind::CharFilterType)
 WF_MODULE_END
 

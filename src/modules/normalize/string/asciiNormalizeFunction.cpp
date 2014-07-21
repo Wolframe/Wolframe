@@ -218,6 +218,11 @@ types::Variant ConvDiaNormalizeFunction::execute( const types::Variant& inp) con
 	}
 }
 
+ConvDiaNormalizeFunction::ConvDiaNormalizeFunction( const std::vector<types::Variant>& arg)
+{
+	if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'convdia'");
+}
+
 static std::string nameString( const std::string& str)
 {
 	const utils::CharTable optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
@@ -263,6 +268,11 @@ types::Variant UppercaseNameNormalizeFunction::execute( const types::Variant& in
 	}
 }
 
+UppercaseNameNormalizeFunction::UppercaseNameNormalizeFunction( const std::vector<types::Variant>& arg)
+{
+	if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'ucname'");
+}
+
 types::Variant LowercaseNameNormalizeFunction::execute( const types::Variant& inp) const
 {
 	if (inp.type() == types::Variant::String)
@@ -273,5 +283,10 @@ types::Variant LowercaseNameNormalizeFunction::execute( const types::Variant& in
 	{
 		return inp;
 	}
+}
+
+LowercaseNameNormalizeFunction::LowercaseNameNormalizeFunction( const std::vector<types::Variant>& arg)
+{
+	if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'lcname'");
 }
 

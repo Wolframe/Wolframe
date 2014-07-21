@@ -34,12 +34,10 @@
 ///\brief Module for number normalization and validating functions
 #include "appdevel/normalizeModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "base64Normalize.hpp"
-
-using namespace _Wolframe::langbind;
+#include "base64NormalizeFunction.hpp"
 
 WF_MODULE_BEGIN( "Base64Normalizer", "base 64 encoding/decoding as normalization functions")
- WF_NORMALIZER(	"base64encode",	createEncodeNormalizeFunction)
- WF_NORMALIZER(	"base64decode",	createDecodeNormalizeFunction)
+ WF_NORMALIZER(	"base64encode",	_Wolframe::langbind::Base64EncodeFunction)
+ WF_NORMALIZER(	"base64decode",	_Wolframe::langbind::Base64DecodeFunction)
 WF_MODULE_END
 

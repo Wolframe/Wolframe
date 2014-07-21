@@ -37,13 +37,17 @@
 #include "appdevel/module/programTypeBuilder.hpp"
 
 /// \brief Defines a Wolframe filter module after the includes section.
-#define WF_FILTER_TYPE( FILTERNAME, CREATE_FILTERTYPE)\
+#define WF_FILTER_TYPE( FILTERNAME, FILTERTYPECLASS)\
 {\
 	struct Constructor\
 	{\
+		static _Wolframe::langbind::FilterType* create()\
+		{\
+			return new FILTERTYPECLASS();\
+		}\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			return new _Wolframe::module::FilterBuilder( FILTERNAME "Filter", FILTERNAME, CREATE_FILTERTYPE);\
+			return new _Wolframe::module::FilterBuilder( FILTERNAME "Filter", FILTERNAME, create);\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\

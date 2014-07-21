@@ -34,9 +34,9 @@
 ///\brief Module for aamap language binding (language to define mappings of authorization/audit calls to form functions)
 #include "appdevel/programTypeModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "aaMapProgramType.hpp"
+#include "aaMapProgram.hpp"
 
 WF_MODULE_BEGIN( "AaFunctionMap", "module to map authorization/audit calls to form functions")
- WF_PROGRAM_TYPE( "AaMap", _Wolframe::prgbind::createAaMapProgramType)
+ WF_PROGRAM_TYPE( "AaMap", _Wolframe::prgbind::AaMapProgram)
 WF_MODULE_END
 

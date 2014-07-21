@@ -37,6 +37,6 @@
 #include "simpleFormCompiler.hpp"
 
 WF_MODULE_BEGIN( "SimpleformCompiler", "compiler for the simpleform language (DDL)")
- WF_DDLCOMPILER( "simpleform", _Wolframe::langbind::createSimpleFormCompilerFunc)
+ WF_DDLCOMPILER( "simpleform", _Wolframe::langbind::SimpleFormCompiler)
 WF_MODULE_END
 

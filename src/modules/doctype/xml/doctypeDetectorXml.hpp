@@ -34,17 +34,101 @@ Project Wolframe.
 
 #ifndef _Wolframe_CMDBIND_DOCTYPE_DETECTOR_XML_HPP_INCLUDED
 #define _Wolframe_CMDBIND_DOCTYPE_DETECTOR_XML_HPP_INCLUDED
+#include "cmdbind/doctypeDetector.hpp"
+#include "types/doctypeinfo.hpp"
+#include "types/docmetadata.hpp"
+#include "utils/asciiCharParser.hpp"
 #include <string>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \brief Forward declaration
-class DoctypeDetector;
+class DoctypeDetectorXml
+	:public DoctypeDetector
+{
+public:
+	enum State
+	{
+		ParseStart,
+		ParseXMLHeader0,
+		ParseXMLHeader,
+		SearchXMLDoctypeTag,
+		ParseXMLDoctype0,
+		ParseXMLDoctype1,
+		ParseXMLDoctype2,
+		ParseXMLDoctype,
+		SkipXMLComment,
+		SearchXMLRootName,
+		ParseXMLRootName,
+		SearchXMLRootAttrib,
+		ParseXMLRootAttrib,
+		SearchXMLRootAttribAssign,
+		SearchXMLRootAttribQuote,
+		ParseXMLRootAttribValueSQ,
+		ParseXMLRootAttribValueDQ,
+		Done
+	};
+	
+	static const char* stateName( State st)
+	{
+		static const char* ar[] = {
+			"ParseStart",
+			"ParseXMLHeader0",
+			"ParseXMLHeader",
+			"SearchXMLDoctypeTag",
+			"ParseXMLDoctype0",
+			"ParseXMLDoctype1",
+			"ParseXMLDoctype2",
+			"ParseXMLDoctype",
+			"SkipXMLComment",
+			"SearchXMLRootName",
+			"ParseXMLRootName",
+			"SearchXMLRootAttrib",
+			"ParseXMLRootAttrib",
+			"SearchXMLRootAttribAssign",
+			"SearchXMLRootAttribQuote",
+			"ParseXMLRootAttribValueSQ",
+			"ParseXMLRootAttribValueDQ",
+			"Done"};
+		return ar[ (int)st];
+	}
 
-/// \brief Create a document type/format detector for XML
-DoctypeDetector* createDoctypeDetectorXml();
+public:
+	DoctypeDetectorXml()
+		:m_state(ParseStart),m_isDoctypeAttrib(false),m_lastchar(0){}
+
+	/// \brief Destructor
+	virtual ~DoctypeDetectorXml(){}
+
+	virtual void putInput( const char* chunk, std::size_t chunksize)
+	{
+		m_charparser.putInput( chunk, chunksize);
+	}
+
+	void setState( State state_);
+
+	virtual bool run();
+
+	virtual const char* lastError() const
+	{
+		return m_lasterror.empty()?0:m_lasterror.c_str();
+	}
+
+	virtual const types::DoctypeInfoR& info() const
+	{
+		return m_info;
+	}
+
+private:
+	types::DoctypeInfoR m_info;			///< the result of doctype detection
+	std::string m_lasterror;			///< the last error occurred
+	State m_state;					///< processing state machine state
+	bool m_isDoctypeAttrib;				///< true, if the attribute found is a doctype attrib
+	utils::AsciiCharParser m_charparser;		///< character by caracter parser for source
+	std::string m_itembuf;				///< value item parsed (value depending on state)
+	unsigned char m_lastchar;			///< the last character parsed
+};
 
 }}//namespace
 #endif

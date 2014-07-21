@@ -400,21 +400,8 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 	return encoding;
 }
 
-class CharFilterType :public FilterType
+Filter* CharFilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	CharFilterType()
-		:FilterType("char"){}
-	virtual ~CharFilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		return new CharFilter( getArgumentEncoding( arg));
-	}
-};
-
-FilterType* _Wolframe::langbind::createCharFilterType()
-{
-	return new CharFilterType();
+	return new CharFilter( getArgumentEncoding( arg));
 }
 

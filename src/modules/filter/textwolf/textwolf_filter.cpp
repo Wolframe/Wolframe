@@ -1339,21 +1339,9 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 	return encoding;
 }
 
-class TextwolfXmlFilterType :public FilterType
+Filter* TextwolfXmlFilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	TextwolfXmlFilterType()
-		:FilterType("textwolf"){}
-	virtual ~TextwolfXmlFilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		return new TextwolfXmlFilter( getArgumentEncoding( arg));
-	}
-};
-
-FilterType* _Wolframe::langbind::createTextwolfXmlFilterType()
-{
-	return new TextwolfXmlFilterType();
+	return new TextwolfXmlFilter( getArgumentEncoding( arg));
 }
+
 
