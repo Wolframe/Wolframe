@@ -105,15 +105,28 @@ WF_MODULE_END
          See \ref RuntimeEnvironmentModule
 
  * \subsection ModuleTypeList Special module types
- *  The following module types do not have yet macros defined to declare them as the components introduced in the previous section. We have to refer to examples for the time being.
+ *  The following module types are more complex.
+    We have to refer to examples for the time being.
     - \b Authentication:
-         An authentication module implements the object authentication unit and authenticator slice. An authentication unit declares one or more authentication mechs that can be chosen by the client for authentication when the module is loaded and configured in the section AAAA of the configuration. When more than one authentication unit implements an authentication mech then the first one in the configuration is chosen. The authentication slice is an instance created to do the authentication procedure. The result of authentication is a User (_Wolframe::AAAA::User) object in the execution context (_Wolframe::proc::ExecContext) that is the base for authorization to do anything (user privileges). The authorization module type does not yet have the constructors declared in the section before. We have to declare four classes involved:
+         An authentication module implements a configurable authentication unit. 
+         An authentication unit declares one or more authentication mechs that 
+         can be chosen by the client for authentication when the module is
+         loaded and configured in the section AAAA of the configuration. 
+         When more than one authentication unit implements an authentication 
+         mech then the first one in the configuration is chosen.
+         The authentication slice is an instance created to do the authentication
+         procedure. The result of authentication is a User (_Wolframe::AAAA::User)
+         object in the execution context (_Wolframe::proc::ExecContext) that 
+         is the base for authorization to do anything (user privileges).
+         The authorization module type does not yet have the constructors
+         declared in the section before. We have to declare four classes involved:
               - configuration (implements _Wolframe::config::NamedConfiguration)
               - authentication unit (implements _Wolframe::AAAA::AuthenticationUnit)
               - authenticator slice (implements _Wolframe::AAAA::AuthenticatorSlice)
               - password changer (implements _Wolframe::AAAA::PasswordChanger)
+	      - the constructor that builds the the authentication unit derived from _Wolframe::ConfiguredObjectConstructor< _Wolframe::AAAA::AuthenticationUnit >
     - \b Database:
-         A database module is a quite complex component. The following interfaces have to be implemented:
+         The following interfaces have to be implemented for a database handler:
               - configuration (implements _Wolframe::config::NamedConfiguration)
               - database language description (implements _Wolframe::db::LanguageDescription)
               - database unit (implements _Wolframe::db::DatabaseUnit)
