@@ -2,7 +2,3 @@ COMMAND insertNumber CALL insertNumber;
 COMMAND updateNumber CALL updateNumber;
 COMMAND selectNumber CALL selectNumber RETURN Number;
 COMMAND deleteNumber CALL deleteNumber;
-#insertNumber=insertNumber(xml);
-#updateNumber=updateNumber(xml);
-#selectNumber=selectNumber(xml);
-#deleteNumber=deleteNumber(xml);
