@@ -52,7 +52,15 @@ WF_MODULE_END
          The contract established by these flags helps to level out language differences.
          See \ref FilterModule
     - \b Form \b Function:
-         Form functions (_Wolframe::langbind::FormFunction) are functions with a structure as input and a structure as output. The input structure is represented by an iterator implementing the filter interface (iterator on OpenTag,CloseTag,Attribute,Value elements). In Wolframe any function in any language used for processing is implemented as form function. With this object type it is also possible to implement form functions in C++ (_Wolframe::serialize::CppFormFunction).
+         Form functions (_Wolframe::langbind::FormFunction) are functions with a structure 
+         as input and a structure as output. The input structure is represented by an 
+         iterator implementing the input filter interface
+         (iterator on OpenTag,CloseTag,Attribute,Value elements) with typed 
+         values instead of strings (_Wolframe::langbind::TypedInputFilter). 
+         In Wolframe any function in any language used for processing is 
+         implemented as form function. With this object type it is also 
+         possible to implement form functions in C++
+         (_Wolframe::serialize::CppFormFunction).
          See \ref FormFunctionModule
     - \b Program \b type:
          Program types define the loading of objects into the program library (_Wolframe::prgbind::ProgramLibrary). Each program type declares a file type to be of its own and loads every file of this type configured with 'program' in the 'Processor' section of the configuration.
@@ -91,6 +99,7 @@ WF_MODULE_END
  *
  * \code
 #include "appdevel/commandHandlerModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 
 class MyCommandHandlerConfig
 	:public _Wolframe::config::NamedConfiguration
@@ -553,6 +562,7 @@ WF_NORMALIZER_WITH_RESOURCE( "mynormalize",  createMyNormalizeFunction, MyResour
 *
 * \code
 #include "appdevel/runtimeEnvironmentModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 
 static initMyRuntimeEnvironment()
 {
