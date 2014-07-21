@@ -51,7 +51,7 @@ class UsernameHash
 {
 public:
 	UsernameHash( const crypto::RandomGenerator& rndGen, const std::string& username );
-	UsernameHash( const unsigned char *seed, std::size_t seedSize,
+	UsernameHash( const unsigned char *slt, std::size_t sltSize,
 		      const std::string& username );
 	UsernameHash( const std::string& hashString );
 

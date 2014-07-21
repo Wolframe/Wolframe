@@ -65,12 +65,12 @@ UsernameHash::UsernameHash( const crypto::RandomGenerator& rndGen,
 		     username.length(), m_hash );
 }
 
-UsernameHash::UsernameHash( const unsigned char *seed, std::size_t seedSize,
+UsernameHash::UsernameHash( const unsigned char *slt, std::size_t sltSize,
 			    const std::string& username )
 {
 	memset( m_salt, 0, sizeof( m_salt ) );
-	m_saltSize = seedSize > sizeof( m_salt ) ? sizeof( m_salt ) : seedSize;
-	memcpy( m_salt, seed, m_saltSize );
+	m_saltSize = sltSize > sizeof( m_salt ) ? sizeof( m_salt ) : sltSize;
+	memcpy( m_salt, slt, m_saltSize );
 	hmac_sha256( m_salt, m_saltSize, (const unsigned char *)username.data(),
 		     username.length(), m_hash );
 }
@@ -80,8 +80,8 @@ UsernameHash::UsernameHash( const std::string& hashString )
 	memset( m_salt, 0, sizeof( m_salt ));
 	memset( m_hash, 0, sizeof( m_hash ));
 
-	int saltSize;
-	int hashSize;
+	int sltSize;
+	int hshSize;
 
 	std::string s = boost::algorithm::trim_copy( hashString );
 	if ( s[ 0 ] == '$' )	{
@@ -90,22 +90,22 @@ UsernameHash::UsernameHash( const std::string& hashString )
 			std::string errMsg = "'" + s + "' is not a valid username hash string";
 			throw std::runtime_error( errMsg );
 		}
-		if (( saltSize = base64::decode( s.substr( 1, hashStart - 1 ),
+		if (( sltSize = base64::decode( s.substr( 1, hashStart - 1 ),
 						 m_salt, sizeof( m_salt ) )) < 0 )	{
 			std::string errMsg = "'" + s + "' is not a valid username hash string (salt error)";
 			throw std::runtime_error( errMsg );
 		}
-		m_saltSize = ( std::size_t )saltSize;
-		if (( hashSize = base64::decode( s.substr( hashStart + 1 ),
+		m_saltSize = ( std::size_t )sltSize;
+		if (( hshSize = base64::decode( s.substr( hashStart + 1 ),
 						 m_hash, sizeof( m_hash ) )) < 0 )	{
 			std::string errMsg = "'" + s + "' is not a valid username hash string (hash error)";
 			throw std::runtime_error( errMsg );
 		}
-		if ( (size_t)hashSize != sizeof( m_hash ) )	{
+		if ( (size_t)hshSize != sizeof( m_hash ) )	{
 			std::string errMsg = "'" + s + "' is not a valid challenge string (expected "
 					     + boost::lexical_cast<std::string>( sizeof( m_hash ) )
 					     + " bytes, got "
-					     + boost::lexical_cast<std::string>( hashSize ) + ")";
+					     + boost::lexical_cast<std::string>( hshSize ) + ")";
 			throw std::runtime_error( errMsg );
 		}
 	}
