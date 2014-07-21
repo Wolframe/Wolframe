@@ -289,6 +289,7 @@ f none opt/csw/include/wolframe/AAAA/passwordHash.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/passwordChanger.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/pwdChangeMessage.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/user.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/usernameHash.hpp 0644 root staff
 d none opt/csw/include/wolframe/module 0755 root root
 f none opt/csw/include/wolframe/module/constructor.hpp 0644 root staff
 f none opt/csw/include/wolframe/module/moduleDirectory.hpp 0644 root staff

@@ -269,6 +269,7 @@ usr/local/include/wolframe/AAAA/passwordHash.hpp
 usr/local/include/wolframe/AAAA/passwordChanger.hpp
 usr/local/include/wolframe/AAAA/pwdChangeMessage.hpp
 usr/local/include/wolframe/AAAA/user.hpp
+usr/local/include/wolframe/AAAA/usernameHash.hpp
 @dirrm usr/local/include/wolframe/AAAA
 usr/local/include/wolframe/module/constructor.hpp
 @dirrm usr/local/include/wolframe/module

@@ -1,0 +1,4 @@
+COMMAND insertNumber CALL insertNumber;
+COMMAND updateNumber CALL updateNumber;
+COMMAND selectNumber CALL selectNumber RETURN Number;
+COMMAND deleteNumber CALL deleteNumber;

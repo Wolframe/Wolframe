@@ -16,17 +16,17 @@
 		<tbody>
 			<row>
 				<entry>ServerTokens</entry>
-				<entry>One of None, ProductOnly, Major, Minor, Revision, OS</entry>
+				<entry>One of None, ProductOnly, Major, Minor, Revision, Build, OS</entry>
 				<entry>Define what to print in the initial greeting of the protocol (first message of the server). Every token above prints
 				       more information as the previous one, staring from 'None' which prints nothing, to
-				       'OS' which prints 'Wolframe version 1.4.5, Linux, Ubuntu 14.04'. The default is 'None'.</entry>
+				       'OS' which prints 'Wolframe version 1.4.5.22, Linux, Ubuntu 14.04'. The default is 'None'.</entry>
 			</row>
 			<row>
 				<entry>ServerSignature</entry>
 				<entry>string</entry>
 				<entry>Define the string to be printed in the initial greeting of the protocol (first message of the server).
 				       The server signature gets added to the greeting string in brackets, for instance
-				       'Wolframe version 1.4.5, Linux, Ubuntu 14.04 (CRM)'. The default is an empty string.</entry>
+				       'Wolframe version 1.4.5.22, Linux, Ubuntu 14.04 (CRM)'. The default is an empty string.</entry>
 			</row>
 		</tbody>
 		</tgroup>
