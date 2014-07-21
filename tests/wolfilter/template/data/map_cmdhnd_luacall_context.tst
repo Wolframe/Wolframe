@@ -25,7 +25,7 @@ Processor
 	}
 }
 **file: test.dmap
-COMMAND (echo UserData) CALL run CONTEXT {uname=UserName, host=RemoteHost} RETURN UserData;
+COMMAND (echo UserData) CALL run CONTEXT {uname=UserName, host=RemoteHost} RETURN UserDataWithLogin;
 **file:userdata.sfrm
 `cat ../scripts/userdata.sfrm`
 **file:echo_input_table.lua

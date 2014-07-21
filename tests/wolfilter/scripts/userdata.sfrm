@@ -1,9 +1,15 @@
 FORM UserData
 	-root doc
 {
-	uname string
-	host string
 	data string
 	command string
+}
+
+FORM UserDataWithLogin
+	-root doc
+{
+	_ UserData
+	uname string
+	host string
 }
 

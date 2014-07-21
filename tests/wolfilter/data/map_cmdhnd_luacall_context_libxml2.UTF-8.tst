@@ -26,15 +26,21 @@ Processor
 	}
 }
 **file: test.dmap
-COMMAND (echo UserData) CALL run CONTEXT {uname=UserName, host=RemoteHost} RETURN UserData;
+COMMAND (echo UserData) CALL run CONTEXT {uname=UserName, host=RemoteHost} RETURN UserDataWithLogin;
 **file:userdata.sfrm
 FORM UserData
 	-root doc
 {
-	uname string
-	host string
 	data string
 	command string
+}
+
+FORM UserDataWithLogin
+	-root doc
+{
+	_ UserData
+	uname string
+	host string
 }
 **file:echo_input_table.lua
 function run( input)
@@ -43,5 +49,5 @@ end
 
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE doc SYSTEM "UserData.simpleform"><doc><uname>wolfilter</uname><host>123.123.123.123</host><data>bla</data><command>exec</command></doc>
+<!DOCTYPE doc SYSTEM "UserDataWithLogin.simpleform"><doc><data>bla</data><command>exec</command><uname>wolfilter</uname><host>123.123.123.123</host></doc>
 **end

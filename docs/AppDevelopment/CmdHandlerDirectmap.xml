@@ -230,14 +230,15 @@
 				assignments in curly brackets '{' '}'.
 				The following example adds an element 'uname'
 				that does not exist yet in the input to the 
-				input document before validation and
-				execution. The value of the add 'uname' element
-				is the user name of the user issuing the request.
+				input document before
+				execution (after validation). The value of the 
+				add 'uname' element is the user name of the 
+				user issuing the request.
 				<programlisting language='text'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_with_context.directmap" parse="text" />
 				</programlisting>
 				This way we keep the processing functions as pure
-				data functions. We are in certain cases able 
+				data functions. We are in certain cases able
 				to inject some login dependent data in a controlled way,
 				without exposing an API to all language bindings
 				for being able to access everything from everywhere.
