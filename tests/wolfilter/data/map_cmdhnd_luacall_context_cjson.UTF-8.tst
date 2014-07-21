@@ -30,15 +30,21 @@ Processor
 	}
 }
 **file: test.dmap
-COMMAND (echo UserData) CALL run CONTEXT {uname=UserName, host=RemoteHost} RETURN UserData;
+COMMAND (echo UserData) CALL run CONTEXT {uname=UserName, host=RemoteHost} RETURN UserDataWithLogin;
 **file:userdata.sfrm
 FORM UserData
 	-root doc
 {
-	uname string
-	host string
 	data string
 	command string
+}
+
+FORM UserDataWithLogin
+	-root doc
+{
+	_ UserData
+	uname string
+	host string
 }
 **file:echo_input_table.lua
 function run( input)
@@ -47,10 +53,10 @@ end
 
 **output
 {
-	"-doctype":	"UserData",
-	"uname":	"wolfilter",
-	"host":	"123.123.123.123",
+	"-doctype":	"UserDataWithLogin",
 	"data":	"bla",
-	"command":	"exec"
+	"command":	"exec",
+	"uname":	"wolfilter",
+	"host":	"123.123.123.123"
 }
 **end

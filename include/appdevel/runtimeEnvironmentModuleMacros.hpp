@@ -38,7 +38,7 @@
 #include <boost/lexical_cast.hpp>
 
 /// \brief Defines a program type with a runtime environment (e.g. program with shared resource context)
-#define WF_RUNTIME_ENVIRONMENT(TITLE,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,INITFUNCTION) \
+#define WF_RUNTIME_ENVIRONMENT(DESCRIPTION,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF,INITFUNCTION) \
 {\
 	class RuntimeEnvConstructor\
 		:public _Wolframe::module::RuntimeEnvironmentConstructor\
@@ -46,11 +46,11 @@
 	public:\
 		RuntimeEnvConstructor(){}\
 		virtual ~RuntimeEnvConstructor(){}\
-		virtual DotnetRuntimeEnvironment* object( const _Wolframe::config::NamedConfiguration& cfgi)\
+		virtual CLASSDEF* object( const _Wolframe::config::NamedConfiguration& cfgi)\
 		{\
 			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
 			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to runtime environment constructor " CONFIG_TITLE);\
-			DotnetRuntimeEnvironment* rt = new DotnetRuntimeEnvironment( cfg);\
+			CLASSDEF* rt = new CLASSDEF( cfg);\
 			return rt;\
 		}\
 		virtual const char* objectClassName() const\
@@ -83,7 +83,7 @@
 		}\
 		virtual _Wolframe::ObjectConstructorBase* constructor()\
 		{\
-			return new Constructor();\
+			return new RuntimeEnvConstructor();\
 		}\
 	};\
 	struct Constructor\
