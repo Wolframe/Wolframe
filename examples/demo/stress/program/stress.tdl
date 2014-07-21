@@ -3,28 +3,28 @@
 --
 TRANSACTION insertNumber
 BEGIN
-	FOREACH /doc DO INSERT INTO Number (numbr,mul,dup,trip) VALUES ($(numbr), $(mul), $(dup), $(trip));
+	FOREACH . DO INSERT INTO Number (numbr,mul,dup,trip) VALUES ($(numbr), $(mul), $(dup), $(trip));
 END
 --
 -- updateNumber
 --
 TRANSACTION updateNumber
 BEGIN
-	FOREACH /doc DO UPDATE Number SET mul=$(mul), dup=$(dup), trip=$(trip) WHERE numbr=$(numbr);
+	FOREACH . DO UPDATE Number SET mul=$(mul), dup=$(dup), trip=$(trip) WHERE numbr=$(numbr);
 END
 --
 -- deleteNumber
 --
 TRANSACTION deleteNumber
 BEGIN
-	FOREACH /doc DO DELETE FROM Number WHERE numbr=$(numbr);
+	FOREACH . DO DELETE FROM Number WHERE numbr=$(numbr);
 END
 --
 -- selectNumber
 --
 TRANSACTION selectNumber
 BEGIN
-	FOREACH /doc INTO doc DO SELECT numbr,mul,dup,trip FROM Number WHERE id=$(id);
+	FOREACH . INTO . DO SELECT id,numbr,mul,dup,trip FROM Number WHERE id=$(id);
 END
 
 
