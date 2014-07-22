@@ -1,6 +1,6 @@
 ID=trim,integer;
 int=trim,integer;
 uint=trim,unsigned;
-float=trim,float;
+float=trim,floatingpoint;
 entityname=trim,ucname;
 enumname=trim,lcname;
