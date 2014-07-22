@@ -550,13 +550,14 @@ bool DirectmapProgram::loadProgram( const std::string& filename, const proc::Pro
 				case k_NONE:
 				{
 					ch = fetchNextToken( tok, si, se);
-					throw std::runtime_error( std::string( "unexpected token (") + g_main_idtab.tostring() + ") expected instead of " + errorToken( ch, tok));
+					throw std::runtime_error( std::string( "unexpected token (") + g_main_idtab.tostring() + " expected instead of " + errorToken( ch, tok) + ")");
 					break;
 				}
 				case k_COMMAND:
 				{
 					posinfo.update( posinfo_si, si);
 					DirectmapCommandDescriptionR dr = parseCommandDescription( si, se, posinfo, provider);
+					posinfo_si = si;
 					if (dr.get())
 					{
 						try
