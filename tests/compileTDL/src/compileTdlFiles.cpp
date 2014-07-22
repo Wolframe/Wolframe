@@ -1,6 +1,5 @@
 #include "tdlTransactionFunction.cpp"
 #include "transactionProgram.cpp"
-#include "tdlFunctionProgramType.cpp"
 #include "tdlTransactionInput.cpp"
 #include "loadTransactionProgram.cpp"
 #include "tdlTransactionPreprocStep.cpp"
