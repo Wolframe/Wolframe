@@ -37,5 +37,5 @@
 #include "mylangFunctionProgramType.hpp"
 
 WF_MODULE_BEGIN( "MylangProgramType", "example language binding")
- WF_PROGRAM_TYPE( "mylang", _Wolframe::langbind::createMylangProgramType)
+ WF_PROGRAM_TYPE( "mylang", _Wolframe::langbind::MylangProgramType)
 WF_MODULE_END
