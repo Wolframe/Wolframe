@@ -103,36 +103,24 @@ WF_MODULE_END
     - \b Runtime \b environment:
          A runtime environment (_Wolframe::langbind::RuntimeEnvironment) is a configurable environment for functions that need a context for execution. The only case where a runtime environment is currently used in Wolframe is for .NET (Windows only).
          See \ref RuntimeEnvironmentModule
-
- * \subsection ModuleTypeList Special module types
- *  The following module types are more complex.
-    We have to refer to examples for the time being.
-    - \b Authentication:
-         An authentication module implements a configurable authentication unit. 
-         An authentication unit declares one or more authentication mechs that 
-         can be chosen by the client for authentication when the module is
-         loaded and configured in the section AAAA of the configuration. 
-         When more than one authentication unit implements an authentication 
-         mech then the first one in the configuration is chosen.
-         The authentication slice is an instance created to do the authentication
-         procedure. The result of authentication is a User (_Wolframe::AAAA::User)
-         object in the execution context (_Wolframe::proc::ExecContext) that 
-         is the base for authorization to do anything (user privileges).
-         The authorization module type does not yet have the constructors
-         declared in the section before. We have to declare four classes involved:
-              - configuration (implements _Wolframe::config::NamedConfiguration)
-              - authentication unit (implements _Wolframe::AAAA::AuthenticationUnit)
-              - authenticator slice (implements _Wolframe::AAAA::AuthenticatorSlice)
-              - password changer (implements _Wolframe::AAAA::PasswordChanger)
-	      - the constructor that builds the the authentication unit derived from _Wolframe::ConfiguredObjectConstructor< _Wolframe::AAAA::AuthenticationUnit >
-    - \b Database:
-         The following interfaces have to be implemented for a database handler:
+    - \b Authenticator \b unit:
+         An authenticator unit (_Wolframe::AAAA::AuthenticatorUnit) implements one
+         or more authentication mechanisms. An authentication unit is chosen
+         for authentication of the client if it is the first configured authentication
+         unit in the configuration section AAAA that implements the mechanism chosen.
+         The class processing the authentication is called authentication slice (_Wolframe::AAAA::AuthenticatorSlice).
+         See \ref AuthenticatorModule
+    - \b Database \b interface:
+         Wolframe has interfaces to execute queries on Sqlite3 and PostgreSQL databases. 
+         To define a new database interface, we have to implement the following interfaces:
               - configuration (implements _Wolframe::config::NamedConfiguration)
               - database language description (implements _Wolframe::db::LanguageDescription)
               - database unit (implements _Wolframe::db::DatabaseUnit)
               - database (implements _Wolframe::db::Database)
-              - transaction (implements _Wolframe::db::Transaction)
               - transaction execution statemachine (implements _Wolframe::db::TransactionExecStatemachine)
+              .
+         The database unit and the configuration are the objects you have to declare when implementing
+         a database module. See \ref DatabaseModule.
 
  * \page CommandHandlerModule Command handler module
  *
@@ -624,6 +612,230 @@ public:
 
 WF_MODULE_BEGIN( "MyRuntimeEnvironment", "runtime environment for my programs")
  WF_RUNTIME_ENVIRONMENT( "my runtime environment", "runtimeenv", "myrunenv", MyRuntimeEnvironment, MyRuntimeEnvironmentConfig, initMyRuntimeEnvironment)
+WF_MODULE_END
+* \endcode
+*
+* \page AuthenticatorModule Authenticator module
+* \code
+class MyAuthenticationConfig
+	:public config::NamedConfiguration
+{
+	// ... define your authentication configuration here (derived from config::NamedConfiguration)
+};
+
+class MyAuthenticatorSlice
+	:public _Wolframe::AAAA::AuthenticatorSlice
+{
+public:
+	virtual void dispose()
+	{
+		// ... destroy the object accordingly to the method is was created by the unit method _Wolframe::AAAA::AuthenticatorUnit::slice( const std::string&, const _Wolframe::net::RemoteEndpoint&)
+	}
+
+	virtual const char* className() const
+	{
+		return "MyAuthenticatorSlice";
+	}
+
+	virtual const std::string& identifier() const
+	{
+		// ... return the identifier of the authenticator
+	}
+
+	virtual void messageIn( const std::string& msg)
+	{
+		// ... process the message requested by 'status()const' here
+	}
+
+	virtual std::string messageOut()
+	{
+		// ... return the message to be sent announced by 'status()const' here
+	}
+
+	virtual _Wolframe::AAAA::Authenticator::Status status() const
+	{
+		// ... return the current status of the authenticator slice
+	}
+
+	virtual bool inputReusable() const
+	{
+		// ... return true, if the last message processed can be forwarded to another slice of the same mech
+	}
+
+	virtual User* user()
+	{
+		// ... 	return the authenticated user or NULL if not authenticated here
+	}
+};
+
+class MyAuthenticationUnit
+	:public _Wolframe::AAAA::AuthenticationUnit
+{
+public:
+	MyAuthenticationUnit( const MyAuthenticationConfig& cfg);
+
+	virtual const char* className() const
+	{
+		return "MyAuthentication";
+	}
+
+	const char** mechs() const
+	{
+		// ... return the mechs implemented by this authenticator unit here
+	}
+
+	MyAuthenticatorSlice* slice( const std::string& mech, const _Wolframe::net::RemoteEndpoint& client)
+	{
+		// ... create and return a new instance of an authenticator slice here
+	}
+};
+
+WF_MODULE_BEGIN( "MyAuthenticator", "my authenticator module")
+ WF_AUTHENTICATOR( "my authenticator", MyAuthenticatorUnit, MyAuthenticatorConfig)
+WF_MODULE_END
+* \endcode
+
+* \page DatabaseModule Database interface module
+* \code
+
+class MyDatabaseUnit;
+
+class MyDatabaseConfig
+	:public _Wolframe::config::NamedConfiguration
+{
+	// ... define your database configuration structure here
+};
+
+class MyTransactionExecStatemachine
+	:public _Wolframe::db::TransactionExecStatemachine
+{
+public:
+	MyTransactionExecStatemachine( MyDatabaseUnit* unit)
+	{
+		// ... create a statemachine for one transaction on a database of 'unit' that will start with the next call of begin()
+	}
+
+	virtual const std::string& databaseID() const
+	{
+		// ... return the configuration identifier of your database here ...
+	}
+
+	virtual bool begin()
+	{
+		// ... begin of the current transaction
+	}
+
+	virtual bool commit()
+	{
+		// ... commit of the current transaction
+	}
+
+	virtual bool rollback()
+	{
+		// ... rollback of the current transaction
+	}
+
+	virtual bool start( const std::string& statement)=0;
+	{
+		// ... create a new statement instance from string
+	}
+
+	virtual bool bind( std::size_t idx, const types::VariantConst& value)
+	{
+		// ... bind a parameter (idx >= 1) of the current statement instance
+	}
+
+	virtual bool execute()
+	{
+		// ... execute the built instance of the current statement
+	}
+
+	virtual std::size_t nofColumns()
+	{
+		// ... get the number of columns of the last result, 0 if there was no result
+	}
+
+	virtual const char* columnName( std::size_t idx)
+	{
+		// ... get the name of a column by index (idx >= 1) of the last result
+	}
+
+	virtual types::VariantConst get( std::size_t idx)
+	{
+		// ... get the value of a column by index (idx >= 1) of the last result
+	}
+
+	virtual bool next()
+	{
+		// ... skip to the next result, return false, if there is no result left
+	}
+
+	virtual bool hasResult()
+	{
+		// ... return true, if the last database statement returned at least one result row
+	}
+
+	virtual const db::DatabaseError* getLastError()
+	{
+		// ... return the last database error as structure here
+	}
+
+	virtual bool isCaseSensitive()
+	{
+		// ... return true, if the database language is case sensitive (SQL is case insensitive)
+	}
+};
+
+class MyDatabase
+	:public _Wolframe::db::Database
+{
+public:
+	virtual const std::string& ID() const
+	{
+		// ... return the identifier of the database here
+	}
+
+	virtual const char* className() const
+	{
+		return "MyDatabase";
+	}
+
+	virtual _Wolframe::db::Transaction* transaction( const std::string& name_)
+	{
+		return new _Wolframe::db::Transaction( name_, new MyTransactionExecStatemachine( this));
+	}
+
+	virtual const LanguageDescription* getLanguageDescription() const
+	{
+		static _Wolframe::db::LanguageDescription langdescr;
+		return &langdescr;
+	}
+};
+
+class MyDatabaseUnit
+{
+public:
+	MyDatabaseUnit( const MyDatabaseConfig& config)
+	{
+		// ... create the database unit from configuration here
+	}
+
+	virtual const char* className() const
+	{
+		return "MyDatabaseUnit";
+	}
+
+	virtual const std::string& ID() const
+	{
+	}
+
+	virtual Database* database()
+	{
+	}
+};
+
+WF_MODULE_BEGIN( "MyDatabase", "my database module")
+ WF_DATABASE("MyDB",MyDatabaseUnit,MyDatabaseConfig)
 WF_MODULE_END
 * \endcode
 *

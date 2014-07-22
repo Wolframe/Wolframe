@@ -30,24 +30,39 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file appdevel/authenticationModuleMacros.hpp
-/// \brief Macros for a module for defining an authentication mechanism
+/// \file appdevel/databaseModuleMacros.hpp
+/// \brief Macros for a module for defining a database interface
 #include "appdevel/module/authenticationConstructor.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include <boost/lexical_cast.hpp>
 
-/// \brief Defines a an authentication mechanism
-#define WF_AUTHENTICATOR(NAME,UNITCLASS,CONFIGCLASS) \
+/// \brief Defines a database interface
+#define WF_DATABASE(NAME,UNITCLASS,CONFIGCLASS) \
 {\
+	class Constructor :public _Wolframe::ConfiguredObjectConstructor<UNITCLASS>\
+	{\
+	public:\
+		_Wolframe::ObjectConstructorBase::ObjectType objectType() const\
+		{\
+			return DATABASE_OBJECT;\
+		}\
+		const char* objectClassName() const\
+		{\
+			return NAME "Database";\
+		}\
+		UNITCLASS* object( const config::NamedConfiguration& cfgi);\
+		{\
+			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
+			return new UNITCLASS(*cfg);\
+		}\
+	};\
 	struct Builder \
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			static _Wolframe::module::ConfiguredBuilderDescription<\
-					_Wolframe::module::AuthenticationConstructor<UNITCLASS, CONFIGCLASS>,\
-					CONFIGCLASS >\
-				mod( "Authentication " #NAME, "Authentication", #NAME, #NAME "Authentication");\
+			static _Wolframe::module::ConfiguredBuilderDescription<Constructor,CONFIGCLASS>\
+				mod( "Database interface to " NAME, "Database", NAME, NAME "Database");\
 			return &mod;\
 		}\
 	};\

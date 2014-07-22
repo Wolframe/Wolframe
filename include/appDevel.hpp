@@ -49,5 +49,6 @@
 #include "appdevel/filterModuleMacros.hpp"		///< modules implementing a filer
 #include "appdevel/doctypeModuleMacros.hpp"		///< modules implementing a document type/format detector
 #include "appdevel/moduleFrameMacros.hpp"		///< frame (begin,end) for a wolframe module
+#include "appdevel/databaseModuleMacros.hpp"		///< module implementing a database interface
 #endif
 
