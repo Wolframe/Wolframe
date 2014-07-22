@@ -13,9 +13,15 @@ COMMAND Get Language SKIP RETURN LanguageResult;
 #GetLanguage( xml) :LanguageResult;
 COMMAND Get LanguageTree RETURN LanguageListResult;
 #GetLanguageTree( xml) :LanguageListResult;
-GetLanguageTreeStructure( xml) :LanguageRefTree;
+COMMAND GetLanguageTreeStructure SKIP CALL GetLanguageTreeStructure RETURN LanguageRefTree;
+#GetLanguageTreeStructure( xml) :LanguageRefTree;
 
-GetSelectedLanguageList( xml)	:LanguageSelectionList;
-SaveSelectedLanguageList( xml);
-GetStoredLanguageList( xml)	:LanguageSelectionList;
+# getting ERROR: error in standard command handler in file 'lgtree.dmap' at line 68 column 63: referenced undefined form function to implement the request'SelectedLanguageList',
+# though I'm specyfing SKIP here?
+COMMAND GetSelectedLanguageList SKIP CALL SelectedLanguageList RETURN LanguageSelectionList;
+#GetSelectedLanguageList( xml)	:LanguageSelectionList;
+COMMAND SaveSelectedLanguageList SKIP CALL SaveSelectedLanguageList;
+#SaveSelectedLanguageList( xml);
+COMMAND GetStoredLanguageList SKIP CALL GetStoredLanguageList RETURN LanguageSelectionList;
+#GetStoredLanguageList( xml)	:LanguageSelectionList;
 
