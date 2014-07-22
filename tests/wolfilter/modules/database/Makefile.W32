@@ -19,7 +19,7 @@ SUBDIRS = \
 # sqlite3
 !IFDEF WITH_SQLITE3
 SUBDIRS = \
-	$(SUBDIRS) sqlite3
+	$(SUBDIRS) sqlite3 sqlite3simple
 !ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

@@ -1,0 +1,51 @@
+TOPDIR = ..\..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I"$(TOPDIR)\3rdParty\sqlite3"
+
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
+	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	$(TOPDIR)\3rdParty\sqlite3\sqlite3.lib \
+	kernel32.lib advapi32.lib Ws2_32.lib
+
+DYNAMIC_MODULE = \
+	mod_db_sqlite3.dll
+
+CPP_OBJS = \
+	SQLite.obj \
+	SQLiteConfig.obj \
+	SQLiteTransactionExecStatemachine.obj \
+	SQLiteStatement.obj \
+	mod_db_sqlite3.obj
+
+all: $(DYNAMIC_MODULE)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+$(DYNAMIC_MODULE): $(CPP_OBJS)
+	$(LINK) /dll /def:SQLiteModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:

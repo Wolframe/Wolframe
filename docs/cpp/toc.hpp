@@ -111,16 +111,16 @@ WF_MODULE_END
          The class processing the authentication is called authentication slice (_Wolframe::AAAA::AuthenticatorSlice).
          See \ref AuthenticatorModule
     - \b Database \b interface:
-         Wolframe has interfaces to execute queries on Sqlite3 and PostgreSQL databases. 
-         To define a new database interface, we have to implement the following interfaces:
+         Wolframe has interfaces to execute queries on Sqlite3 and PostgreSQL databases.
+         To define a new database interface, we have to implement at least the following interfaces:
               - configuration (implements _Wolframe::config::NamedConfiguration)
-              - database language description (implements _Wolframe::db::LanguageDescription)
-              - database unit (implements _Wolframe::db::DatabaseUnit)
+              - database language description (override the methods you want from _Wolframe::db::LanguageDescription, that describes SQL)
               - database (implements _Wolframe::db::Database)
               - transaction execution statemachine (implements _Wolframe::db::TransactionExecStatemachine)
               .
-         The database unit and the configuration are the objects you have to declare when implementing
-         a database module. See \ref DatabaseModule.
+         The database and the configuration are the objects you have to declare when implementing
+         a database module. 
+         See \ref DatabaseModule.
 
  * \page CommandHandlerModule Command handler module
  *
@@ -696,9 +696,8 @@ WF_MODULE_END
 * \endcode
 
 * \page DatabaseModule Database interface module
+This example shows the simplest case of a database. The macro for its declaration is called WF_SIMPLE_DATABASE because of that. The base classes allow more complex configurations.
 * \code
-
-class MyDatabaseUnit;
 
 class MyDatabaseConfig
 	:public _Wolframe::config::NamedConfiguration
@@ -812,29 +811,8 @@ public:
 	}
 };
 
-class MyDatabaseUnit
-{
-public:
-	MyDatabaseUnit( const MyDatabaseConfig& config)
-	{
-		// ... create the database unit from configuration here
-	}
-
-	virtual const char* className() const
-	{
-		return "MyDatabaseUnit";
-	}
-
-	virtual const std::string& ID() const
-	{
-	}
-
-	virtual Database* database()
-	{
-	}
-};
-
 WF_MODULE_BEGIN( "MyDatabase", "my database module")
+ WF_SIMPLE_DATABASE( "MyDB", MyDatabase, SQLiteConfig)
  WF_DATABASE("MyDB",MyDatabaseUnit,MyDatabaseConfig)
 WF_MODULE_END
 * \endcode
