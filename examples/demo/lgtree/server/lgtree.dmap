@@ -1,10 +1,18 @@
 #--- Language
-InsertLanguageTree( xml: LanguageTree);
-InsertLanguage( xml) :LanguageInsertResult;
-UpdateLanguage( xml);
-DeleteLanguage( xml);
-GetLanguage( xml) :LanguageResult;
-GetLanguageTree( xml) :LanguageListResult;
+COMMAND Insert LanguageTree CALL InsertLanguage; 
+#InsertLanguageTree( xml: LanguageTree);
+# LanguageInsertResult was never defined?
+#COMMAND InsertLanguage CALL InsertLanguage RETURN LanguageInsertResult;
+#InsertLanguage( xml) :LanguageInsertResult;
+# UpdateLanguage is not defined?
+#COMMAND Update Language SKIP CALL ;
+#UpdateLanguage( xml);
+COMMAND Delete Language SKIP;
+#DeleteLanguage( xml);
+COMMAND Get Language SKIP RETURN LanguageResult;
+#GetLanguage( xml) :LanguageResult;
+COMMAND Get LanguageTree RETURN LanguageListResult;
+#GetLanguageTree( xml) :LanguageListResult;
 GetLanguageTreeStructure( xml) :LanguageRefTree;
 
 GetSelectedLanguageList( xml)	:LanguageSelectionList;
