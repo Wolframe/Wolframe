@@ -32,31 +32,11 @@
 ************************************************************************/
 ///\file floatNormalizeFunction.cpp
 #include "floatNormalizeFunction.hpp"
+#include "normalizeFunctionUtils.hpp"
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
-
-static types::Variant::Data::UInt getMax( std::size_t digits)
-{
-	typedef types::Variant::Data::UInt UInt;
-	UInt mm = 1, pp = 1;
-	std::size_t dd = 0;
-	for (; dd < digits; ++dd)
-	{
-		mm *= 10;
-		if (mm < pp) break;
-		pp = mm;
-	}
-	if (dd == digits)
-	{
-		return mm;
-	}
-	else
-	{
-		return std::numeric_limits<UInt>::max();
-	}
-}
 
 static void getFractionDimArgument( const std::vector<types::Variant>& arg, std::size_t& sizeG, std::size_t& sizeF)
 {

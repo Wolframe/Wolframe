@@ -44,6 +44,12 @@ namespace langbind {
 class IntegerNormalizeFunction :public types::NormalizeFunction
 {
 public:
+	IntegerNormalizeFunction( std::size_t size_,
+				  types::Variant::Data::UInt max_)
+		:m_max(max_)
+		,m_size(size_)
+		,m_sign(true){}
+
 	IntegerNormalizeFunction( const std::vector<types::Variant>& arg);
 	IntegerNormalizeFunction( const IntegerNormalizeFunction& o)
 		:m_max(o.m_max)
@@ -65,6 +71,10 @@ class UnsignedNormalizeFunction
 	:public IntegerNormalizeFunction
 {
 public:
+	UnsignedNormalizeFunction( std::size_t size_,
+				  types::Variant::Data::UInt max_)
+		:IntegerNormalizeFunction(size_,max_)
+		{m_sign = false;}
 	UnsignedNormalizeFunction( const std::vector<types::Variant>& arg);
 	UnsignedNormalizeFunction( const UnsignedNormalizeFunction& o)
 		:IntegerNormalizeFunction(o){}

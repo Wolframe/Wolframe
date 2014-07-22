@@ -30,40 +30,30 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file floatNormalizeFunction.hpp
-///\brief Normalizer for floating point numbers
-#ifndef _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "types/normalizeFunction.hpp"
-#include "types/variant.hpp"
-#include <string>
+///\file normalizeFunctionUtils.cpp
+///\brief Common functions for the number normalizers
+#include "normalizeFunctionUtils.hpp"
 
-namespace _Wolframe {
-namespace langbind {
+using namespace _Wolframe;
+using namespace _Wolframe::langbind;
 
-class FloatNormalizeFunction :public types::NormalizeFunction
+types::Variant::Data::UInt langbind::getMax( std::size_t digits)
 {
-public:
-	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_, double max_)
-		:m_sizeG(sizeG_)
-		,m_sizeF(sizeF_)
-		,m_max(max_){}
-	FloatNormalizeFunction( const std::vector<types::Variant>& arg);
-	FloatNormalizeFunction( const FloatNormalizeFunction& o)
-		:m_sizeG(o.m_sizeG)
-		,m_sizeF(o.m_sizeF)
-		,m_max(o.m_max){}
-
-	virtual types::Variant execute( const types::Variant& inp) const;
-	virtual const char* name() const {return "float";}
-	virtual types::NormalizeFunction* copy() const {return new FloatNormalizeFunction(*this);}
-
-private:
-	std::size_t m_sizeG;
-	std::size_t m_sizeF;
-	double m_max;
-};
-
-}}
-#endif
-
+	typedef types::Variant::Data::UInt UInt;
+	UInt mm = 1, pp = 1;
+	std::size_t dd = 0;
+	for (; dd < digits; ++dd)
+	{
+		mm *= 10;
+		if (mm < pp) break;
+		pp = mm;
+	}
+	if (dd == digits)
+	{
+		return mm;
+	}
+	else
+	{
+		return std::numeric_limits<UInt>::max();
+	}
+}

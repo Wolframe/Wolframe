@@ -30,40 +30,17 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file floatNormalizeFunction.hpp
-///\brief Normalizer for floating point numbers
-#ifndef _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "types/normalizeFunction.hpp"
+///\file normalizeFunctionUtils.hpp
+///\brief Common functions for the number normalizers
+#ifndef _LANGBIND_NORMALIZE_FUNCTION_UTILS_HPP_INCLUDED
+#define _LANGBIND_NORMALIZE_FUNCTION_UTILS_HPP_INCLUDED
 #include "types/variant.hpp"
-#include <string>
 
 namespace _Wolframe {
 namespace langbind {
 
-class FloatNormalizeFunction :public types::NormalizeFunction
-{
-public:
-	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_, double max_)
-		:m_sizeG(sizeG_)
-		,m_sizeF(sizeF_)
-		,m_max(max_){}
-	FloatNormalizeFunction( const std::vector<types::Variant>& arg);
-	FloatNormalizeFunction( const FloatNormalizeFunction& o)
-		:m_sizeG(o.m_sizeG)
-		,m_sizeF(o.m_sizeF)
-		,m_max(o.m_max){}
+types::Variant::Data::UInt getMax( std::size_t digits);
 
-	virtual types::Variant execute( const types::Variant& inp) const;
-	virtual const char* name() const {return "float";}
-	virtual types::NormalizeFunction* copy() const {return new FloatNormalizeFunction(*this);}
-
-private:
-	std::size_t m_sizeG;
-	std::size_t m_sizeF;
-	double m_max;
-};
-
-}}
+}}//namespace
 #endif
 
