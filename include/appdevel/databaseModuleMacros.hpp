@@ -122,7 +122,7 @@
 		{}\
 		virtual _Wolframe::config::NamedConfiguration* configuration( const char* logPrefix )\
 		{\
-			return new CONFIGCLASS( m_title, logPrefix, m_keyword );\
+			return new CONFIGCLASS( m_title, logPrefix);\
 		}\
 		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
 		{\

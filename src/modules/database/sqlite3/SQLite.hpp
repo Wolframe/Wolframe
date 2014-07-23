@@ -41,7 +41,7 @@
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
 #include "config/configurationBase.hpp"
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
 #include "types/keymap.hpp"
 #include "module/constructor.hpp"
 #include "SQLiteProgram.hpp"

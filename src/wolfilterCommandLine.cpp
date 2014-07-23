@@ -40,9 +40,9 @@
 #include "config/configurationTree.hpp"
 #include "types/propertyTree.hpp"
 #include "serialize/structOptionParser.hpp"
+#include "serialize/configSerialize.hpp"
 #include "utils/fileUtils.hpp"
 #include "filter/redirectFilterClosure.hpp"
-#include "config/structSerialize.hpp"
 #include "logger-v1.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>

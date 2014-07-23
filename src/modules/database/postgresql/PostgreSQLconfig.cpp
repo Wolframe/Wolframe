@@ -144,7 +144,7 @@ bool PostgreSQLconfig::parse( const config::ConfigurationNode& pt, const std::st
 {
 	try
 	{
-		config::parseConfigStructure( *static_cast<PostgreSQLconfigStruct*>(this), pt);
+		serialize::parseConfigStructure( *static_cast<PostgreSQLconfigStruct*>(this), pt);
 		m_config_pos = pt.position();
 		return mapValueDomains();
 	}

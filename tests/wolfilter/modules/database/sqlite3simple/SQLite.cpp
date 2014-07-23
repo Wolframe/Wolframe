@@ -68,25 +68,19 @@ SQLiteDatabase::SQLiteDatabase(
 	,m_filename(filename_)
 	,m_extensionFiles(extensionFiles_)
 {
-	SQLiteConfigStruct config;
-	config.m_ID = id_;
-	config.m_filename = filename_;
-	config.m_foreignKeys = foreignKeys_;
-	config.m_profiling = profiling_;
-	config.m_connections = connections_;
-	config.m_extensionFiles = extensionFiles_;
+	SQLiteConfig config( id_, filename_, foreignKeys_, profiling_, connections_, extensionFiles_);
 	init( config);
 }
 
-void SQLiteDatabase::init( const SQLiteConfigStruct& config)
+void SQLiteDatabase::init( const SQLiteConfig& config)
 {
 	bool	checked = false;
 	int	dbFlags = SQLITE_OPEN_READWRITE;
-	int	connections = config.m_connections;
+	int	connections = config.connections();
 
 	if ( ! sqlite3_threadsafe() )	{
 		if ( connections != 1 )	{
-			LOG_WARNING << "SQLite database '" << config.m_ID
+			LOG_WARNING << "SQLite database '" << config.ID()
 				    << "' has not been compiled without the SQLITE_THREADSAFE parameter."
 				    << " Using only 1 connection instead of " << connections << ".";
 			connections = 1;
@@ -130,7 +124,7 @@ void SQLiteDatabase::init( const SQLiteConfigStruct& config)
 			}
 
 			// enable foreign keys
-			if ( config.m_foreignKeys )	{
+			if ( config.foreignKeys() )	{
 				res = sqlite3_exec( handle, "PRAGMA foreign_keys=true", NULL, NULL, &err );
 				if( res != SQLITE_OK ) {
 					LOG_ALERT << "Unable to enforce integrity checks in '" << m_filename
@@ -141,7 +135,7 @@ void SQLiteDatabase::init( const SQLiteConfigStruct& config)
 				}
 			}
 			// enable tracing and profiling of commands
-			if ( config.m_profiling )
+			if ( config.profiling() )
 				sqlite3_profile( handle, profiling_callback, NULL );
 
 			// enable extensions in every connection

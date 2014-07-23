@@ -36,7 +36,7 @@
 #include "iprocHandlerConfig.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
 #include "serialize/struct/structDescription.hpp"
 #include <sstream>
 #include <boost/algorithm/string.hpp>
@@ -72,7 +72,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 	try
 	{
 		ConfigurationStruct data;
-		config::parseConfigStructure( data, pt);
+		serialize::parseConfigStructure( data, pt);
 
 		std::vector<std::string>::const_iterator itr=data.cmd.begin();
 		while (itr != data.cmd.end())

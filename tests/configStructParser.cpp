@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file configStructParser.cpp
 ///\brief test for configuration parser with wolframe example configuration
 
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
 #include "utils/fileUtils.hpp"
 #include "serialize/struct/structDescription.hpp"
 #include <boost/filesystem.hpp>
@@ -441,7 +441,7 @@ int main( int argc, const char** argv)
 	try
 	{
 		config::ConfigurationTree pt = utils::readPropertyTreeFile( configfile);
-		config::parseConfigStructure( cfg, pt.root());
+		serialize::parseConfigStructure( cfg, pt.root());
 		std::cout << config::structureToString( cfg) << std::endl;
 	}
 	catch (std::exception& e)

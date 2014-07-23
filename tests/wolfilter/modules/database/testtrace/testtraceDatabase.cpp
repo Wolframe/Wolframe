@@ -36,7 +36,7 @@
 #include "testtraceDatabase.hpp"
 #include "testtraceTransaction.hpp"
 #include "serialize/struct/structDescription.hpp"
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/stringUtils.hpp"
@@ -69,7 +69,7 @@ bool TesttraceDatabaseConfig::parse( const config::ConfigurationNode& pt, const 
 {
 	try
 	{
-		config::parseConfigStructure( m_data, (const config::ConfigurationNode&)pt);
+		serialize::parseConfigStructure( m_data, (const config::ConfigurationNode&)pt);
 		return true;
 	}
 	catch (std::exception& e)
@@ -98,7 +98,7 @@ void TesttraceDatabaseConfig::print( std::ostream& os, size_t indent) const
 {
 	std::string indentstr( indent+1, '\t');
 	indentstr[0] = '\n';
-	std::string rt( config::structureToString( m_data));
+	std::string rt( serialize::structureToString( m_data));
 	boost::replace_all( rt, "\n", indentstr);
 	os << rt;
 }

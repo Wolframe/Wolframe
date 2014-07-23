@@ -29,12 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file config/structSerialize.hpp
-///\brief Defines a configuration structure parser
-#ifndef _Wolframe_CONFIG_STRUCT_SERIALIZE_HPP_INCLUDED
-#define _Wolframe_CONFIG_STRUCT_SERIALIZE_HPP_INCLUDED
+///\file serialize/configSerialize.hpp
+///\brief Defines functions for serialization/deserialization of configuration
+#ifndef _Wolframe_SERIALIZE_CONFIG_SERIALIZE_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_CONFIG_SERIALIZE_HPP_INCLUDED
 #include "filter/ptreefilter.hpp"
-#include "filter/tostringfilter.hpp"
 #include "filter/typedfilter.hpp"
 #include "serialize/struct/structSerializer.hpp"
 #include "serialize/struct/structParser.hpp"
@@ -44,27 +43,14 @@ Project Wolframe.
 #include "config/configurationTree.hpp"
 
 namespace _Wolframe {
-namespace config {
+namespace serialize {
+
+void parseConfigStructureVP( void* stptr, const serialize::StructDescriptionBase* descr, const config::ConfigurationNode& pt);
 
 template <class Structure>
-void parseConfigStructure( Structure& st, const ConfigurationNode& pt)
+void parseConfigStructure( Structure& st, const config::ConfigurationNode& pt)
 {
-	langbind::PropertyTreeInputFilter* filter;
-	langbind::TypedInputFilterR inp( filter=new langbind::PropertyTreeInputFilter( pt));
-	serialize::StructParser parser( (void*)&st, st.getStructDescription());
-	parser.init( inp, serialize::Flags::CaseInsensitiveCompare);
-	try
-	{
-		if (!parser.call()) throw std::runtime_error( "illegal state in structure parser");
-	}
-	catch (const std::bad_alloc& e)
-	{
-		throw e;
-	}
-	catch (const std::runtime_error& e)
-	{
-		throw std::runtime_error( std::string("configuration error ") + filter->posLogText() + ": " + e.what());
-	}
+	parseConfigStructureVP( (void*)&st, st.getStructDescription(), pt);
 }
 
 template <class Structure>
@@ -78,15 +64,12 @@ types::PropertyTree::Node structureToPropertyTree( const Structure& st)
 	return res->content();
 }
 
+std::string structureToStringVP( const void* stptr, const serialize::StructDescriptionBase* descr);
+
 template <class Structure>
 std::string structureToString( const Structure& st)
 {
-	langbind::ToStringFilter* res;
-	langbind::TypedOutputFilterR out( res = new langbind::ToStringFilter( "\t"));
-	serialize::StructSerializer serializer( (const void*)&st, st.getStructDescription());
-	serializer.init( out);
-	if (!serializer.call()) throw std::runtime_error( "illegal state in structure serializer");
-	return res->content();
+	return structureToStringVP( (const void*)&st, st.getStructDescription());
 }
 
 }}//namespace

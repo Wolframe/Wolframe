@@ -45,7 +45,7 @@
 #include "database/transaction.hpp"
 #include "PostgreSQLserverSettings.hpp"
 #include "config/configurationBase.hpp"
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
 

@@ -40,7 +40,7 @@
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
 #include "config/configurationBase.hpp"
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
 #include "logger-v1.hpp"

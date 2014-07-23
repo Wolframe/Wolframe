@@ -38,45 +38,63 @@
 #define _SQLITE_CONFIG_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
+#include "serialize/descriptiveConfiguration.hpp"
 #include <vector>
 
 namespace _Wolframe {
 namespace db {
 
 static const char* SQLite_DB_CLASS_NAME = "SQLite";
+enum {DEFAULT_SQLITE_CONNECTIONS = 4};
 
 struct SQLiteConfigStruct
 {
 	SQLiteConfigStruct();
 
-	std::string	m_ID;
-	std::string	m_filename;
-	bool		m_foreignKeys;
-	bool		m_profiling;
-	unsigned short	m_connections;
-	std::vector< std::string > m_extensionFiles;	///< list of Sqlite extension modules to load
-
-	/// \brief Structure description for serialization/parsing
-	static const serialize::StructDescriptionBase* getStructDescription();
 };
+
 
 /// \brief SQLite database configuration
 class SQLiteConfig
-	:public config::NamedConfiguration
-	,public SQLiteConfigStruct
+	:public _Wolframe::serialize::DescriptiveConfiguration
 {
 public:
 	const char* className() const				{ return SQLite_DB_CLASS_NAME; }
 
-	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	~SQLiteConfig(){}
+	SQLiteConfig()
+		:_Wolframe::serialize::DescriptiveConfiguration(SQLite_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
+		,m_foreignKeys(true)
+		,m_profiling(false)
+		,m_connections(DEFAULT_SQLITE_CONNECTIONS)
+	{
+		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
+	}
 
-	bool parse( const config::ConfigurationNode& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
+	SQLiteConfig( const std::string& id_, const std::string& filename_,
+			bool foreignKeys_, bool profiling_,
+			unsigned short connections_,
+			const std::vector<std::string>& extensionFiles_ )
+		:_Wolframe::serialize::DescriptiveConfiguration(SQLite_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
+		,m_ID(id_)
+		,m_filename(filename_)
+		,m_foreignKeys(foreignKeys_)
+		,m_profiling(profiling_)
+		,m_connections(connections_)
+		,m_extensionFiles(extensionFiles_){}
+
+	SQLiteConfig( const char* title, const char* logprefix)
+		:_Wolframe::serialize::DescriptiveConfiguration( title, "database", logprefix, getStructDescription())
+		,m_foreignKeys(true)
+		,m_profiling(false)
+		,m_connections(DEFAULT_SQLITE_CONNECTIONS)
+	{
+		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
+	}
+
+	virtual bool check() const;
+	virtual void print( std::ostream& os, size_t indent ) const;
+	virtual void setCanonicalPathes( const std::string& referencePath );
 
 	const std::string& ID() const				{ return m_ID; }
 	const std::string& filename() const			{ return m_filename; }
@@ -84,7 +102,19 @@ public:
 	bool profiling() const					{ return m_profiling; }
 	unsigned short connections() const			{ return m_connections; }
 	const std::vector< std::string > extensionFiles() const	{ return m_extensionFiles; }
+
+public:
+	/// \brief Structure description for serialization/parsing
+	static const serialize::StructDescriptionBase* getStructDescription();
+
 private:
+	std::string	m_ID;
+	std::string	m_filename;
+	bool		m_foreignKeys;
+	bool		m_profiling;
+	unsigned short	m_connections;
+	std::vector< std::string > m_extensionFiles;	///< list of Sqlite extension modules to load
+
 	config::ConfigurationTree::Position m_config_pos;
 };
 

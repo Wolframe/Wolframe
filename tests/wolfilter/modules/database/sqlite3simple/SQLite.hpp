@@ -99,7 +99,7 @@ public:
 	PoolObject<sqlite3*>* newConnection()	{return new PoolObject<sqlite3*>( m_connPool);}
 
 private:
-	void init( const SQLiteConfigStruct& config);
+	void init( const SQLiteConfig& config);
 
 private:
 	const std::string	m_ID;
