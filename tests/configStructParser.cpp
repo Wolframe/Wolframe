@@ -442,7 +442,7 @@ int main( int argc, const char** argv)
 	{
 		config::ConfigurationTree pt = utils::readPropertyTreeFile( configfile);
 		serialize::parseConfigStructure( cfg, pt.root());
-		std::cout << config::structureToString( cfg) << std::endl;
+		std::cout << serialize::structureToString( cfg) << std::endl;
 	}
 	catch (std::exception& e)
 	{
