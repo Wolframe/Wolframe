@@ -42,6 +42,7 @@
 #include "database/database.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 #include "cmdbind/doctypeDetector.hpp"
+#include "cmdbind/protocolHandler.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "types/keymap.hpp"
 #include <list>
@@ -149,6 +150,7 @@ private:
 	std::vector<CommandHandlerDef> m_cmd;				///< list of defined command handlers
 	types::keymap<std::size_t> m_cmdMap;				///< map of command names to indices in 'm_cmd'
 
+	types::keymap<cmdbind::ProtocolHandlerUnitR> m_protocols;	///< map protocol identifiers to handler units
 	std::vector<cmdbind::DoctypeDetectorType> m_doctypes;		///< list of document type detectors loaded from modules
 	std::vector<std::string> m_programfiles;			///< list of all programs to load
 	prgbind::ProgramLibrary* m_programs;				///< program library

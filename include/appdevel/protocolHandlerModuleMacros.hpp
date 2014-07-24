@@ -30,65 +30,57 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file appdevel/commandHandlerModuleMacros.hpp
-/// \brief Macros for a module for a configurable command handler
+/// \file appdevel/protocolHandlerModuleMacros.hpp
+/// \brief Macros for a module for a protocol handler
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
-#include "cmdbind/commandHandlerUnit.hpp"
-#include "cmdbind/commandHandler.hpp"
+#include "cmdbind/protocolHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 
-/// \brief Defines a Wolframe command handler module after the includes section.
-#define WF_COMMAND_HANDLER(TITLE,CONFIG_SECTION,CONFIG_TITLE,CLASSDEF,CONFIGDEF)\
+/// \brief Defines a Wolframe protocol handler module after the includes section.
+#define WF_PROTOCOL_HANDLER(NAME,CLASSDEF)\
 {\
-	class CommandHandlerConstructor\
-		:public _Wolframe::ConfiguredObjectConstructor<_Wolframe::cmdbind::CommandHandlerUnit>\
+	class ProtocolHandlerConstructor\
+		:public _Wolframe::SimpleObjectConstructor<_Wolframe::cmdbind::ProtocolHandlerUnit>\
 	{\
 	public:\
-		CommandHandlerConstructor(){}\
-		virtual ~CommandHandlerConstructor(){}\
-		virtual _Wolframe::cmdbind::CommandHandlerUnit* object( const _Wolframe::config::NamedConfiguration& cfgi)\
+		ProtocolHandlerConstructor(){}\
+		virtual ~ProtocolHandlerConstructor(){}\
+		virtual _Wolframe::cmdbind::ProtocolHandlerUnit* object()\
 		{\
-			const CONFIGDEF* cfg = dynamic_cast<const CONFIGDEF*>(&cfgi);\
-			if (!cfg) throw std::logic_error( "internal: wrong configuration interface passed to " CONFIG_TITLE " command handler constructor");\
-			CLASSDEF* rt = new CLASSDEF(cfg);\
-			return rt;\
+			return new CLASSDEF();\
 		}\
 		virtual const char* objectClassName() const\
 		{\
-			return CONFIG_TITLE "CommandHandler";\
+			return NAME "ProtocolHandler";\
 		}\
 		virtual ObjectConstructorBase::ObjectType objectType() const\
 		{\
 			return ObjectConstructorBase::CMD_HANDLER_OBJECT;\
 		}\
 	};\
-	class CommandHandlerBuilder\
-		:public _Wolframe::module::ConfiguredBuilder\
+	class ProtocolHandlerBuilder\
+		:public _Wolframe::module::SimpleBuilder\
 	{\
 	public:\
-		CommandHandlerBuilder()\
-			:_Wolframe::module::ConfiguredBuilder( TITLE, CONFIG_SECTION, CONFIG_TITLE, CONFIG_TITLE "CommandHandler")\
+		ProtocolHandlerBuilder()\
+			:_Wolframe::module::SimpleBuilder(NAME)\
 		{}\
-		virtual ~CommandHandlerBuilder(){}\
+		virtual ~ProtocolHandlerBuilder(){}\
 		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
 		{\
-			return _Wolframe::ObjectConstructorBase::CMD_HANDLER_OBJECT;\
-		}\
-		virtual _Wolframe::config::NamedConfiguration* configuration( const char* logPrefix)\
-		{\
-			return new CONFIGDEF( CONFIG_TITLE "CommandHandler", m_title, logPrefix, m_keyword);\
+			return _Wolframe::ObjectConstructorBase::PROTOCOL_HANDLER_OBJECT;\
 		}\
 		virtual _Wolframe::ObjectConstructorBase* constructor()\
 		{\
-			return new CommandHandlerConstructor();\
+			return new ProtocolHandlerConstructor();\
 		}\
 	};\
 	struct Constructor\
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			static CommandHandlerBuilder rt;\
+			static ProtocolHandlerBuilder rt;\
 			return &rt;\
 		}\
 	};\

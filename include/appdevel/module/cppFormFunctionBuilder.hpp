@@ -82,6 +82,11 @@ public:
 		return m_function;
 	}
 
+	serialize::CppFormFunction* object() const
+	{
+		return new serialize::CppFormFunction( m_function);
+	}
+
 private:
 	std::string m_classname;
 	std::string m_name;

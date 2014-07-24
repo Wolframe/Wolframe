@@ -36,7 +36,6 @@
 
 #include "processor/procProvider.hpp"
 #include "database/DBprovider.hpp"
-#include "cmdbind/commandHandlerConstructor.hpp"
 #include "appdevel/module/runtimeEnvironmentConstructor.hpp"
 #include "appdevel/module/filterBuilder.hpp"
 #include "appdevel/module/ddlcompilerBuilder.hpp"
@@ -189,7 +188,8 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 		{
 			if (builder->objectType() == ObjectConstructorBase::CMD_HANDLER_OBJECT)
 			{
-				cmdbind::CommandHandlerConstructorR constructor( dynamic_cast<cmdbind::CommandHandlerConstructor*>( builder->constructor()));
+				typedef ConfiguredObjectConstructor<cmdbind::CommandHandlerUnit> ThisConstructor;
+				boost::shared_ptr<ThisConstructor> constructor( dynamic_cast<ThisConstructor*>( builder->constructor()));
 
 				if (!constructor.get())	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << builder->objectClassName()
@@ -232,6 +232,24 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 	for ( module::ModulesDirectory::simpleBuilder_iterator it = modules->objectsBegin();
 								it != modules->objectsEnd(); it++ )	{
 		switch( it->objectType() )	{
+			case ObjectConstructorBase::PROTOCOL_HANDLER_OBJECT:
+			{
+				typedef SimpleObjectConstructor<cmdbind::ProtocolHandlerUnit> ThisConstructor;
+				boost::shared_ptr<ThisConstructor> constructor( dynamic_cast<ThisConstructor*>( it->constructor()));
+
+				if (!constructor.get())	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << it->objectClassName()
+						  << "' is not a protocol handler";
+					throw std::logic_error( "Object is not a protocolHandler. See log." );
+				}
+				else
+				{
+					cmdbind::ProtocolHandlerUnitR unit( constructor->object());
+					std::string name( unit->protocol());
+					m_protocols.insert( name, unit);
+				}
+				break;
+			}
 			case ObjectConstructorBase::DOCTYPE_DETECTOR_OBJECT:
 			{
 				// object defines a document type/format detector
@@ -390,7 +408,8 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 				else
 				{
 					try {
-						m_programs->defineCustomDataType( constructor->identifier(), constructor->object());
+						types::CustomDataTypeR dt( constructor->object());
+						m_programs->defineCustomDataType( constructor->identifier(), dt);
 						LOG_TRACE << "registered '" << constructor->objectClassName() << "' custom data type '" << constructor->identifier() << "'";
 					}
 					catch (const std::runtime_error& e)

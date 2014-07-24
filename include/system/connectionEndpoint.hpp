@@ -31,7 +31,7 @@
 
 ************************************************************************/
 /// \brief Classes for network endpoints
-/// \file connectionEndpoint.hpp
+/// \file system/connectionEndpoint.hpp
 
 #ifndef _CONNECTION_ENDPOINT_HPP_INCLUDED
 #define _CONNECTION_ENDPOINT_HPP_INCLUDED

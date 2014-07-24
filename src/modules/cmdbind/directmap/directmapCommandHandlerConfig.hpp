@@ -37,7 +37,6 @@ Project Wolframe.
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "cmdbind/commandHandlerConstructor.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "config/configurationTree.hpp"
 #include "module/moduleInterface.hpp"

@@ -47,7 +47,8 @@ namespace module {
 
 /// \class CustomDataTypeConstructor
 /// \brief Constructor of a custom data type for language bindings
-class CustomDataTypeConstructor :public SimpleObjectConstructor<types::CustomDataType>
+class CustomDataTypeConstructor
+	:public SimpleObjectConstructor<types::CustomDataType>
 {
 public:
 	CustomDataTypeConstructor( const char* classname_, const std::string& identifier_, types::CreateCustomDataType createFunc_)
@@ -74,9 +75,9 @@ public:
 		return m_classname;
 	}
 
-	const types::CustomDataTypeR& object()
+	virtual types::CustomDataType* object() const
 	{
-		return m_datatype;
+		return new types::CustomDataType( *m_datatype);
 	}
 
 private:

@@ -45,7 +45,7 @@ namespace module {
 /// \class NormalizeFunctionConstructor
 /// \brief Constructor of a normalization function type
 class NormalizeFunctionConstructor
-	:public SimpleObjectConstructor< types::NormalizeFunction >
+	:public SimpleObjectConstructor< types::NormalizeFunctionType >
 {
 public:
 	NormalizeFunctionConstructor( const char* classname_, const std::string& identifier_, const types::NormalizeFunctionType& function_)
@@ -75,6 +75,11 @@ public:
 	const types::NormalizeFunctionType& function() const
 	{
 		return m_function;
+	}
+
+	types::NormalizeFunctionType* object() const
+	{
+		return new types::NormalizeFunctionType( m_function);
 	}
 
 private:

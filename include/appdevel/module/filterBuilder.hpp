@@ -44,7 +44,7 @@ namespace module {
 /// \class FilterConstructor
 /// \brief Constructor of a filter type
 class FilterConstructor
-	:public SimpleObjectConstructor<langbind::Filter>
+	:public SimpleObjectConstructor<langbind::FilterType>
 {
 public:
 	FilterConstructor( const std::string& name_, langbind::CreateFilterType createFilterType_)

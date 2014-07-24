@@ -56,6 +56,7 @@ public:
 		CUSTOM_DATA_TYPE_OBJECT		=0x0430,
 		DOCTYPE_DETECTOR_OBJECT		=0x0510,
 		CMD_HANDLER_OBJECT		=0x0610,
+		PROTOCOL_HANDLER_OBJECT		=0x0620,
 		PROGRAM_TYPE_OBJECT		=0x0710,
 		DDL_COMPILER_OBJECT		=0x0720,
 		RUNTIME_ENVIRONMENT_OBJECT	=0x0730,
@@ -77,6 +78,7 @@ public:
 			case CUSTOM_DATA_TYPE_OBJECT: return "Custom Data Type";
 			case DOCTYPE_DETECTOR_OBJECT: return "Document Type/Format Detector";
 			case CMD_HANDLER_OBJECT: return "Command Handler";
+			case PROTOCOL_HANDLER_OBJECT: return "Protocol Handler";
 			case PROGRAM_TYPE_OBJECT: return "Program Type";
 			case DDL_COMPILER_OBJECT: return "DLL Compiler";
 			case RUNTIME_ENVIRONMENT_OBJECT: return "Runtime Environment";
@@ -115,10 +117,7 @@ class SimpleObjectConstructor : public ObjectConstructorBase
 {
 public:
 	virtual ~SimpleObjectConstructor()	{}
-
-// One of these functions should be here in order to have a real contract
-//	virtual T* object() const = 0;
-//	virtual T* object( std::string& arg ) const = 0;
+	virtual T* object() const = 0;
 };
 
 } // namespace _Wolframe
