@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.0.1
+VERSION=0.0.2
 PKGBUILD=$HOME/bsdbuild
 ORIG_ARCH=`uname -m`
 OS_VERSION=`uname -r`
@@ -64,10 +64,12 @@ mkdir -p $PKGBUILD $PKGBUILD/BUILD/wolframe-$VERSION $PKGBUILD/PKG/wolframe-$VER
 rm -f wolframe-$VERSION.tar.gz
 rm -f $PKGBUILD/BUILD/wolframe_$VERSION.tar.gz
 
+GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
 gmake distclean
 mkdir /tmp/wolframe-$VERSION
 cp -a * /tmp/wolframe-$VERSION
 cd /tmp
+sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" wolframe-$VERSION/include/wolframe.hpp
 tar zcf wolframe-$VERSION.tar.gz wolframe-$VERSION
 cd -
 mv /tmp/wolframe-$VERSION.tar.gz .
@@ -83,9 +85,10 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man \
 	help
 
@@ -94,9 +97,10 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man \
 	config
 
@@ -105,9 +109,10 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man
 check_for_errors
 
@@ -116,9 +121,10 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man \
 	testreport 
 check_for_errors
@@ -128,11 +134,12 @@ gmake WITH_SSL=1 WITH_SASL=1 WITH_LOCAL_SQLITE3=1 \
 	WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 $FREEIMAGE \
 	WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 RELEASE=1 \
 	CC="$CC" CXX="$CXX" \
-	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe" \
+	LDFLAGS="-Wl,-rpath=/usr/local/lib/wolframe,--enable-new-dtags" \
 	prefix=/usr/local \
 	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION \
 	sysconfdir=/usr/local/etc \
 	libdir=/usr/local/lib DEFAULT_MODULE_LOAD_DIR=/usr/local/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/usr/local/etc/wolframe/wolframe.conf \
 	mandir=/usr/local/man \
 	install
 check_for_errors
@@ -141,7 +148,6 @@ check_for_errors
 #cd docs; gmake DESTDIR=$PKGBUILD/PKG doc-doxygen; cd ..
 #check_for_errors
 
-cp packaging/freebsd/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/wolframe/.
 mkdir $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
 cp packaging/freebsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/.
 chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/wolframed

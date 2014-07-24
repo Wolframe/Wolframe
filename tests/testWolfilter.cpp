@@ -133,7 +133,7 @@ TEST_P( WolfilterTest, tests)
 	std::string outstr;
 	{
 		LOG_DATA2 << "wolfilter parses its command line to get the test execution options";
-		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), false);
+		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string(), refpath.string(), false, false);
 
 		// [2.5] Call iostreamfilter
 		if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;
@@ -149,6 +149,14 @@ TEST_P( WolfilterTest, tests)
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &prglib);
 
 		proc::ExecContext execContext( &processorProvider, &aaaaProvider);
+		AAAA::User* fakeuser = new AAAA::User( "WolfilterAuth", "NONE", "wolfilter", "Wolfilter");
+
+		execContext.setUser( fakeuser);
+		net::LocalEndpointConfig localEndpointConfig( "fakeSocketIdentifier");
+		net::LocalTCPendpoint localEndPointFake( "localhost", 9876, localEndpointConfig);
+		net::RemoteTCPendpoint remoteEndPointFake( "123.123.123.123", 9876);
+		
+		execContext.setConnectionData( &remoteEndPointFake, &localEndPointFake);
 
 		if (!processorProvider.resolveDB( databaseProvider))
 		{

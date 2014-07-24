@@ -37,6 +37,6 @@
 #include "cjson_filter.hpp"
 
 WF_MODULE_BEGIN( "jsonFilter", "JSON filter based on cJSON")
- WF_FILTER_TYPE( "cjson", _Wolframe::langbind::createCJsonFilterType)
+ WF_FILTER_TYPE( "cjson", _Wolframe::langbind::CJsonFilterType)
 WF_MODULE_END
 

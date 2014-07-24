@@ -62,7 +62,8 @@ public:
 		return m_program.getkeys< std::vector<std::string> >();
 	}
 
-	virtual bool loadPrograms( const proc::ProcessorProviderInterface*);
+	/// \brief Load all configured programs
+	virtual bool loadPrograms( const proc::ProcessorProviderInterface* provider);
 
 private:
 	const DirectmapCommandHandlerConfig* m_config;

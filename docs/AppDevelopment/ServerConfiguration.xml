@@ -1,0 +1,16 @@
+<!-- AAAA -->
+<chapter id="chapterServerConfiguration">
+	<title>Configuration</title>
+	<para>
+	This chapter describes the configuration of the wolframe server besides 
+	the data processing described in the section <link linkend="chapterDataProcessing">data processing</link>
+	and the AAAA backends described in the section <link linkend="chapterAAAA">AAAA</link>.
+	</para>
+	&AppConfigService;
+	&AppConfigListener;
+	&AppConfigLogging;
+	&AppConfigModules;
+	&AppConfigGlobalSettings;
+	&AppConfigDatabases;
+</chapter>
+

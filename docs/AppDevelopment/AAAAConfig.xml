@@ -1,0 +1,19 @@
+<sect1>
+	<title>AAAA configuration</title>
+	<para>
+		The configuration section <code>AAAA</code> bundles the
+		definition of mechanisms and resources needed for AAAA.
+	</para>
+	<para>
+	The following example shows an empty <code>AAAA</code> configuration
+	section:
+	<programlisting language='text'>
+AAAA
+{
+    ;... configuration for
+    ;    authentication,authorization,auditing and accounting
+}
+	</programlisting>
+	</para>
+</sect1>
+

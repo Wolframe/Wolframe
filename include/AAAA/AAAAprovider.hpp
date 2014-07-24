@@ -30,16 +30,17 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// AAAA provider interface
-//
+/// \file AAAA/AAAAprovider.hpp
+/// \brief AAAA provider interface
 
 #ifndef _AAAA_PROVIDER_HPP_INCLUDED
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
 #include "authenticator.hpp"
+#include "passwordChanger.hpp"
 #include "authorization.hpp"
 #include "audit.hpp"
+#include "user.hpp"
 #include "config/configurationBase.hpp"
 #include "system/connectionEndpoint.hpp"
 #include <boost/noncopyable.hpp>
@@ -47,6 +48,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
+/// Configuration for AAAA (Authentication, Authorization, Audit, Accounting)
 class AAAAconfiguration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
@@ -70,6 +72,7 @@ private:
 	std::list< config::NamedConfiguration* >	m_auditConfig;
 };
 
+/// Global provider interface to create AAAA related objects
 class AAAAprovider : public boost::noncopyable
 {
 public:
@@ -80,6 +83,8 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	Authenticator* authenticator( const net::RemoteEndpoint& client ) const;
+	PasswordChanger* passwordChanger( const User& user,
+					  const net::RemoteEndpoint& client ) const;
 	Authorizer* authorizer() const;
 	Auditor* auditor() const;
 private:

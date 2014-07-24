@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// Sort of a pseudo-singleton
-//
+/// \file system/globalRngGen.hpp
+/// \brief Global random generator 
 
 #ifndef _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 #define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
@@ -48,6 +47,8 @@
 
 namespace _Wolframe	{
 
+/// \class GlobalRandomGenerator
+/// \brief Global random generator (sort of a pseudo-singleton)
 class GlobalRandomGenerator : public crypto::RandomGenerator
 {
 public:

@@ -41,6 +41,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
+/// \class DDLCompilerConstructor
+/// \brief Constructor of a DDL compiler for defining data forms
 class DDLCompilerConstructor :public SimpleObjectConstructor< langbind::DDLCompiler >
 {
 public:
@@ -82,6 +84,8 @@ typedef boost::shared_ptr<DDLCompilerConstructor> DDLCompilerConstructorR;
 
 
 
+/// \class DDLCompilerBuilder
+/// \brief Builder of a DDL compiler constructor for defining data forms
 class DDLCompilerBuilder :public SimpleBuilder
 {
 public:

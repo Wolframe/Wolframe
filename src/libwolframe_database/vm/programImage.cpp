@@ -33,7 +33,6 @@
 ///\file vm/programImage.cpp
 ///\brief Implementation of methods of the program executing database transactions
 #include "database/vm/programImage.hpp"
-#include "vm/program.hpp"
 #include <sstream>
 #include <iostream>
 
@@ -188,28 +187,5 @@ void ProgramImage::printInstruction( std::ostream& out, const Instruction& instr
 			out << " COLIDX " << ai;
 			break;
 	}
-}
-
-ProgramImage::ProgramImage( const Program& program)
-{
-	code = program.code;
-	constants = program.constants;
-	colnames = program.colnametab.array();
-	tagnames = program.tagnametab.array();
-	resultnames = program.resultnametab.array();
-	statements = program.statements;
-	ErrorHintTable::const_iterator hi = program.hinttab.begin(), he = program.hinttab.end();
-	for (; hi != he; ++hi)
-	{
-		errorhints.push_back( ProgramImage::ErrorHintList());
-
-		ErrorHintTable::HintList::const_iterator ei = hi->begin(), ee = hi->end();
-		for (; ei != ee; ++ei)
-		{
-			errorhints.back().push_back( ProgramImage::ErrorHint( ei->errorclass, ei->message));
-		}
-	}
-	signatures = program.signatures;
-	tuplesets = program.tuplesets;
 }
 

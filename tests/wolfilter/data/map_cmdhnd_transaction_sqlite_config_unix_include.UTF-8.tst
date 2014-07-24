@@ -38,6 +38,7 @@ COMMAND schema_select_task_by_id  CALL test_transaction  RETURN SKIP doc {standa
 LoadModules	{						; modules to be loaded by the server
 	module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test
 	module ../../src/modules/normalize/number/mod_normalize_number
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../../src/modules/cmdbind/directmap/mod_command_directmap
 	module ../../src/modules/audit/database/mod_audit_database
 	module ../../src/modules/audit/textfile/mod_audit_textfile
@@ -62,26 +63,26 @@ ServerSignature		On					; print the name of the server as
 
 .include ./daemon.conf
 
-listen	{
+server	{
 	maxConnections	3					; Maximum number of simultaneous connections (clients).
 								; Default is the OS limit. This is the global (total) value.
 								; Set it to 0 to disable (to use the system limit)
 	threads		7					; Number of threads for serving client connections.
 								; Default 4
-	socket	{
+	listen	{
 		address		*
 		port		7661
 		maxConnections	2				; Maximum number of simultaneous connections (clients)
 								; for this socket. Default is the OS limit.
 	}
-	socket	{
+	listen	{
 		address		localhost
 ;		address		::1
 		port		7662
 		identifier	"Interface 1"			; Interfaces can be named for AAA purposes
 	}
 
-	SSLsocket	{
+	listenSSL	{
 		address		0.0.0.0
 		port		7961
 		identifier	"Interface 1"			; Many interfaces can have the same identifier and
@@ -93,7 +94,7 @@ listen	{
 		CAchainFile	../SSL/CAchain.pem		; SSL CA chain file
 		verify		ON				; Require and verify client certificate
 	}
-	SSLsocket	{
+	listenSSL	{
 		address		127.0.0.1
 		port		7962
 		identifier	"Interface 2"
@@ -108,7 +109,7 @@ listen	{
 
 .include database.conf
 .include logging.conf
-
+.include patter*.conf
 
 ; Authentication, authorization, auditing and accounting configuration
 AAAA	{
@@ -176,6 +177,11 @@ Processor
 		}
 	}
 }
+**file:pattern1.conf
+; hula hop
+**file:pattern2.conf
+; birim zoe
+**file:pattern3.conf
 **file:logging.conf
 ; Logging configuration
 logging	{

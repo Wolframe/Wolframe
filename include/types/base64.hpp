@@ -56,7 +56,8 @@ inline int encode( const void* data, size_t dataSize,
 
 std::string encode( const void* data, size_t dataSize, unsigned short lineLength );
 
-
+/// \class Encoder
+/// \brief Base64 encoder class for chunkwise encoding
 class Encoder
 {
 	static const size_t BUFFERSIZE = 512;
@@ -109,6 +110,8 @@ inline int decode( const std::string encoded, void* data, size_t dataMaxSize )
 }
 
 
+/// \class Decoder
+/// \brief Base64 decoder class for chunkwise decoding
 class Decoder
 {
 	static const size_t BUFFERSIZE = 512;

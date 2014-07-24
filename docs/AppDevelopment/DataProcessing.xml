@@ -1,0 +1,22 @@
+<!-- Data processing -->
+<chapter id="chapterDataProcessing">
+	<title>Data processing</title>
+	<para>
+		In the this chapter we will see how application
+		server requests look like.
+		We will have a look at the <application>Wolframe</application>
+		standard command handler that handles the requests 
+		and how it is configured.
+		Then we will show how to write programs that declare the functions 
+		executing the requests and how you link them to your application.
+		Finally we will describe the tools available in Wolframe
+		for defect handling and testing.
+	</para>
+	&AppProcessorConfig;
+	&AppApplicationServerRequests;
+	&AppCmdhandlers;
+	&AppFunctions;
+	&AppForms;
+	&AppFilters;
+	&AppTesting;
+</chapter>

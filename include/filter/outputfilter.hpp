@@ -39,6 +39,7 @@ Project Wolframe.
 #include "filter/filterbase.hpp"
 #include <string>
 #include <cstring>
+#include <stdexcept>
 
 namespace _Wolframe {
 namespace langbind {
@@ -61,8 +62,7 @@ public:
 
 	/// \brief Constructor
 	OutputFilter( const char* name_, const types::DocMetaDataR& inheritMetadata_)
-		:utils::TypeSignature("langbind::OutputFilter", __LINE__)
-		,FilterBase(name_)
+		:FilterBase(name_)
 		,m_state(Start)
 		,m_buf(0)
 		,m_size(0)
@@ -72,8 +72,7 @@ public:
 
 	/// \brief Constructor
 	explicit OutputFilter( const char* name_)
-		:utils::TypeSignature("langbind::OutputFilter", __LINE__)
-		,FilterBase(name_)
+		:FilterBase(name_)
 		,m_state(Start)
 		,m_buf(0)
 		,m_size(0)
@@ -83,8 +82,7 @@ public:
 	/// \brief Copy constructor
 	/// \param[in] o output filter to copy
 	OutputFilter( const OutputFilter& o)
-		:utils::TypeSignature(o)
-		,FilterBase(o)
+		:FilterBase(o)
 		,m_state(o.m_state)
 		,m_buf(o.m_buf)
 		,m_size(o.m_size)
@@ -225,7 +223,7 @@ private:
 };
 
 /// \typedef OutputFilterR
-/// \brief Shared output filter reference
+/// \brief Shared output filter (langbind::OutputFilter) reference
 typedef types::CountedReference<OutputFilter> OutputFilterR;
 
 }}//namespace

@@ -45,14 +45,19 @@ namespace types {
 /// \brief Document meta data representation.
 struct DocMetaData
 {
+	/// \class Attribute
+	/// \brief One document meta data attribute.
 	struct Attribute
 	{
-		std::string name;
-		std::string value;
+		std::string name;	///< name of the attribute
+		std::string value;	///< value of the attribute
 
+		/// \brief Default constructor
 		Attribute(){}
+		/// \brief Constructor
 		Attribute( const std::string& n, const std::string& v)
 			:name(n),value(v){}
+		/// \brief Copy constructor
 		Attribute( const Attribute& o)
 			:name(o.name),value(o.value){}
 	};

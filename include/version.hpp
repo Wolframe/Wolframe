@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// Header file for the Version class
-///
+/// \file version.hpp
+/// \brief Header file for the Version class
 
 #ifndef _VERSION_HPP_INCLUDED
 #define _VERSION_HPP_INCLUDED
@@ -85,7 +84,6 @@ public:
 	Version( unsigned short M, unsigned short m, unsigned short r );
 	Version( unsigned short M, unsigned short m, unsigned short r, unsigned b );
 
-	// Aba: clashes on FreeBSD with sys/types.h major and minor
 	/// Returns the major number of the version.
 	unsigned short Major() const		{ return m_major; }
 	/// Returns the minor number of the version.

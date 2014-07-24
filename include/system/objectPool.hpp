@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// thread capable pool of objects
-//
+/// \brief Thread capable pool of objects
+/// \file system/objectPool.hpp
 
 #ifndef _OBJECT_POOL_HPP_INCLUDED
 #define _OBJECT_POOL_HPP_INCLUDED
@@ -45,6 +44,7 @@
 
 namespace _Wolframe {
 
+/// Timeout exception for object pool
 class ObjectPoolTimeout : public std::exception
 {
 public:
@@ -55,7 +55,9 @@ public:
 //	virtual const char* what() const throw();
 };
 
-// the object pool
+/// \class ObjectPool
+/// \tparam objectType type of object stored in the pool
+/// \brief Class represening a pool of objects
 template < typename objectType >
 class ObjectPool	{
 public:
@@ -111,7 +113,8 @@ private:
 };
 
 
-///\ Simple template to use ObjectPool objects.
+/// \brief Simple template to use ObjectPool objects.
+/// \class PoolObject
 template < typename objectType >
 class PoolObject
 {

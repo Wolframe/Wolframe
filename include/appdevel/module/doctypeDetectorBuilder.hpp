@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/module/doctypeDetectorBuilder.hpp
-///\brief Interface template for object builder of filters
+/// \file appdevel/module/doctypeDetectorBuilder.hpp
+/// \brief Interface template for object builder of filters
 #ifndef _Wolframe_MODULE_DOCYPE_DETECTOR_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_DOCYPE_DETECTOR_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "cmdbind/doctypeDetector.hpp"

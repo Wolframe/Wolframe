@@ -34,7 +34,6 @@ Project Wolframe.
 #ifndef _Wolframe_TYPING_FILTER_HPP_INCLUDED
 #define _Wolframe_TYPING_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "types/variant.hpp"
 #include <vector>
 
 namespace _Wolframe {
@@ -47,8 +46,7 @@ class TypingInputFilter :public TypedInputFilter
 public:
 	/// \brief Constructor
 	explicit TypingInputFilter( const InputFilterR& inp)
-		:utils::TypeSignature("langbind::TypingInputFilter", __LINE__)
-		,TypedInputFilter(inp->name())
+		:TypedInputFilter(inp->name())
 		,m_inputfilter(inp)
 	{
 		setFlags( inp->flags());
@@ -57,8 +55,7 @@ public:
 	/// \brief Copy constructor
 	/// \param[in] o input filter to copy
 	TypingInputFilter( const TypingInputFilter& o)
-		:utils::TypeSignature(o)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_inputfilter(o.m_inputfilter)
 		,m_stack(o.m_stack){}
 
@@ -79,7 +76,7 @@ public:
 	virtual bool checkSetFlags( Flags f) const;
 
 private:
-	InputFilterR m_inputfilter;
+	/// \brief Stack element of the input filter state stack
 	struct StackElement
 	{
 		bool isArrayElem;
@@ -90,6 +87,7 @@ private:
 		StackElement()
 			:isArrayElem(false),cnt(0){}
 	};
+	InputFilterR m_inputfilter;
 	std::vector<StackElement> m_stack;
 };
 
@@ -100,8 +98,7 @@ class TypingOutputFilter :public TypedOutputFilter
 public:
 	/// \brief Constructor
 	explicit TypingOutputFilter( const OutputFilterR& outp)
-		:utils::TypeSignature("langbind::TypingOutputFilter", __LINE__)
-		,TypedOutputFilter(outp->name())
+		:TypedOutputFilter(outp->name())
 		,m_outputfilter(outp)
 	{
 		setFlags( outp->flags());
@@ -110,8 +107,7 @@ public:
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter to copy
 	TypingOutputFilter( const TypingOutputFilter& o)
-		:utils::TypeSignature(o)
-		,TypedOutputFilter(o)
+		:TypedOutputFilter(o)
 		,m_outputfilter(o.m_outputfilter){}
 
 	/// \brief Destructor

@@ -45,6 +45,7 @@ namespace audit {
 
 struct Mutation
 {
+	std::string user;
 	std::string operation;
 	unsigned int id;
 	std::string oldvalue;

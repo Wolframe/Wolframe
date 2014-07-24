@@ -32,7 +32,7 @@
 ************************************************************************/
 //
 /// \file randomGenerator.hpp
-/// Random Generator interface class
+/// \brief Random Generator interface class
 
 #ifndef _RANDOM_GENERATOR_HPP_INCLUDED
 #define _RANDOM_GENERATOR_HPP_INCLUDED
@@ -40,6 +40,8 @@
 namespace _Wolframe {
 namespace crypto {
 
+/// \class RandomGenerator
+/// \brief Random Generator interface class
 class RandomGenerator
 {
 public:

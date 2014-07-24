@@ -20,38 +20,12 @@ INCLUDE_LIBS =
 LIBRARIES = \
 	wolframe_database.lib
 
-TDL_CPP_OBJS = \
-	tdl\elementReference.obj \
-	tdl\embeddedStatement.obj \
-	tdl\parseUtils.obj \
-	tdl\auditCallStatement.obj \
-	tdl\auditElementReference.obj \
-	tdl\preprocCallStatement.obj \
-	tdl\preprocElementReference.obj \
-	tdl\preprocBlock.obj \
-	tdl\subroutineCallStatement.obj \
-	tdl\commandDefinition.obj
-
-VM_CPP_OBJS = \
-	vm\tagTable.obj \
-	vm\inputStructure.obj \
-	vm\selectorPath.obj \
-	vm\selectorPathSet.obj \
-	vm\subroutine.obj \
-	vm\program.obj \
-	vm\programImage.obj \
-	vm\programInstance.obj
-
 CPP_OBJS = \
-	$(TDL_CPP_OBJS) \
-	$(VM_CPP_OBJS) \
+	vm/programImage.obj \
+	vm/programInstance.obj \
 	transaction.obj \
-	tdlTransactionPreprocStep.obj \
-	tdlTransactionFunction.obj \
 	vmTransactionInput.obj \
 	vmTransactionOutput.obj \
-	tdl2vmTranslator.obj \
-	loadTransactionProgram.obj \
 	databaseLanguage.obj \
 	baseStatement.obj \
 	substitutingStatement.obj

@@ -36,6 +36,7 @@
 #ifndef _PRGBIND_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -59,7 +60,8 @@ struct Program
 		Core=10,
 		FormType=20,
 		Form=30,
-		Function=40
+		Function=40,
+		SuperFunction=50
 	};
 
 	explicit Program( Category category_)

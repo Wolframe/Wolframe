@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// standard configuration structures
-//
+/// \file standardConfigs.hpp
+/// \brief standard configuration structures
 
 #ifndef _STANDARD_CONFIGS_HPP_INCLUDED
 #define _STANDARD_CONFIGS_HPP_INCLUDED
@@ -133,7 +132,6 @@ public:
 	std::string		user;
 	std::string		group;
 	std::string		pidFile;
-	std::string		serviceName;
 #endif
 #if defined( _WIN32 )
 	// Windows service configuration
@@ -171,6 +169,7 @@ public:
 		VERSION_MAJOR,
 		VERSION_MINOR,
 		VERSION_REVISION,
+		VERSION_BUILD,
 		PRODUCT_OS,
 		NONE,
 		UNDEFINED

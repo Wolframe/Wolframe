@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/module/cppFunctionTemplate.hpp
-///\brief Template for declaring C++ form function
+/// \file appdevel/module/cppFormFunctionTemplate.hpp
+/// \brief Template for declaring C++ form function
 
 #ifndef _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_appdevel_CPPFUNCTION_TEMPLATE_HPP_INCLUDED
@@ -43,8 +43,8 @@
 namespace _Wolframe {
 namespace appdevel {
 
-///\class CppFormFunction
-///\brief Application development template for form functions written in C++
+/// \class CppFormFunction
+/// \brief Application development template for form functions written in C++
 template <class OutputType, class InputType, int (*Function)( proc::ExecContext* ctx, OutputType&, const InputType&)>
 struct CppFormFunction
 {

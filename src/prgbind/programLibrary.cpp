@@ -36,9 +36,10 @@
 #include "types/customDataNormalizer.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "prgbind/program.hpp"
-#include "prgbind/transactionProgram.hpp"
 #include "prgbind/ddlProgram.hpp"
 #include "prgbind/normalizeProgram.hpp"
+#include "filter/null_filter.hpp"
+#include "filter/filter.hpp"
 #include "types/normalizeFunction.hpp"
 #include "langbind/formFunction.hpp"
 #include "logger-v1.hpp"
@@ -70,6 +71,8 @@ private:
 class ProgramLibrary::Impl
 {
 public:
+	types::keymap<langbind::AuthorizationFunctionR> m_authorizationFunctionMap;
+	types::keymap<langbind::AuditFunctionR> m_auditFunctionMap;
 	types::keymap<types::NormalizeFunctionType> m_normalizeFunctionTypeMap;
 	types::keymap<types::CustomDataTypeR> m_customDataTypeMap;
 	NormalizeFunctionMap m_normalizeFunctionMap;
@@ -84,19 +87,41 @@ public:
 	virtual ~Impl(){}
 	Impl()
 	{
-		m_programTypes.push_back( ProgramR( new TransactionDefinitionProgram()));
 		m_programTypes.push_back( ProgramR( new NormalizeProgram()));
+		m_filterTypeMap.insert( "null", langbind::FilterTypeR( new langbind::NullFilterType()));
 	}
 
 	Impl( const Impl& o)
-		:m_programTypes(o.m_programTypes){}
+		:m_authorizationFunctionMap(o.m_authorizationFunctionMap)
+		,m_auditFunctionMap(o.m_auditFunctionMap)
+		,m_normalizeFunctionTypeMap(o.m_normalizeFunctionTypeMap)
+		,m_customDataTypeMap(o.m_customDataTypeMap)
+		,m_normalizeFunctionMap(o.m_normalizeFunctionMap)
+		,m_formFunctionMap(o.m_formFunctionMap)
+		,m_runtimeEnvironmentList(o.m_runtimeEnvironmentList)
+		,m_filterTypeMap(o.m_filterTypeMap)
+		,m_formMap(o.m_formMap)
+		,m_privateFormList(o.m_privateFormList)
+		,m_programTypes(o.m_programTypes)
+		,m_curfile(o.m_curfile)
+		{}
 
+	void defineAuthorizationFunction( const std::string& name, const langbind::AuthorizationFunctionR& f)
+	{
+		m_authorizationFunctionMap.insert( name, f);
+	}
+	
+	void defineAuditFunction( const std::string& name, const langbind::AuditFunctionR& f)
+	{
+		m_auditFunctionMap.insert( name, f);
+	}
+	
 	void defineCppFormFunction( const std::string& name, const serialize::CppFormFunction& f)
 	{
 		m_formFunctionMap.insert( name, langbind::FormFunctionR( new serialize::CppFormFunction( f)));
 	}
 
-	void defineFormFunction( const std::string& name, const langbind::FormFunctionR f)
+	void defineFormFunction( const std::string& name, const langbind::FormFunctionR& f)
 	{
 		m_formFunctionMap.insert( name, f);
 	}
@@ -159,6 +184,20 @@ public:
 		return m_formMap.getkeys< std::vector<std::string> >();
 	}
 
+	const langbind::AuthorizationFunction* getAuthorizationFunction( const std::string& name) const
+	{
+		types::keymap<langbind::AuthorizationFunctionR>::const_iterator fi = m_authorizationFunctionMap.find( name);
+		if (fi == m_authorizationFunctionMap.end()) return 0;
+		return fi->second.get();
+	}
+	
+	const langbind::AuditFunction* getAuditFunction( const std::string& name) const
+	{
+		types::keymap<langbind::AuditFunctionR>::const_iterator fi = m_auditFunctionMap.find( name);
+		if (fi == m_auditFunctionMap.end()) return 0;
+		return fi->second.get();
+	}
+	
 	const langbind::FormFunction* getFormFunction( const std::string& name) const
 	{
 		types::keymap<langbind::FormFunctionR>::const_iterator fi = m_formFunctionMap.find( name);
@@ -205,7 +244,7 @@ public:
 	{
 		LOG_DEBUG << "Loading programs";
 
-		// Loading programs enclosed in a runtime environment
+		// Loading programs enclosed in a runtime environment:
 		std::vector<langbind::RuntimeEnvironmentR>::const_iterator ri = m_runtimeEnvironmentList.begin(), re = m_runtimeEnvironmentList.end();
 		for (; ri != re; ++ri)
 		{
@@ -218,7 +257,7 @@ public:
 			}
 		}
 
-		// Loading scripts
+		// Locate all programs to load:
 		std::vector< std::pair<Program*, std::string> > typed_filenames;
 
 		std::vector<std::string>::const_iterator fi = filenames.begin(), fe = filenames.end();
@@ -238,6 +277,7 @@ public:
 				throw std::runtime_error( std::string("unknown type of program '") + *fi + "'");
 			}
 		}
+		// Load programs in the order of their dependency level:
 		std::sort( typed_filenames.begin(), typed_filenames.end(), programOrderAsc);
 
 		std::vector< std::pair<Program*, std::string> >::const_iterator ti = typed_filenames.begin(), te = typed_filenames.end();
@@ -245,6 +285,16 @@ public:
 		{
 			LOG_DEBUG << "Loading program '" << ti->second << "'";
 			ti->first->loadProgram( library, transactionDB, m_curfile=ti->second);
+		}
+
+		// Initialize context of form functions:
+		types::keymap<langbind::FormFunctionR>::const_iterator gi = m_formFunctionMap.begin(), ge = m_formFunctionMap.end();
+		for (; gi != ge; ++gi)
+		{
+			if (!gi->second->initializeContext())
+			{
+				LOG_ERROR << "Initializing context of form function '" << gi->first << "' failed";
+			}
 		}
 	}
 };
@@ -262,12 +312,22 @@ ProgramLibrary::~ProgramLibrary()
 	delete m_impl;
 }
 
+void ProgramLibrary::defineAuthorizationFunction( const std::string& name, const langbind::AuthorizationFunctionR& f)
+{
+	m_impl->defineAuthorizationFunction( name, f);
+}
+
+void ProgramLibrary::defineAuditFunction( const std::string& name, const langbind::AuditFunctionR& f)
+{
+	m_impl->defineAuditFunction( name, f);
+}
+
 void ProgramLibrary::defineCppFormFunction( const std::string& name, const serialize::CppFormFunction& f)
 {
 	m_impl->defineCppFormFunction( name, f);
 }
 
-void ProgramLibrary::defineFormFunction( const std::string& name, langbind::FormFunctionR f)
+void ProgramLibrary::defineFormFunction( const std::string& name, const langbind::FormFunctionR& f)
 {
 	m_impl->defineFormFunction( name, f);
 }
@@ -320,6 +380,16 @@ void ProgramLibrary::defineProgramType( const ProgramR& prg)
 const types::NormalizeFunctionMap* ProgramLibrary::formtypemap() const
 {
 	return m_impl->formtypemap();
+}
+
+const langbind::AuthorizationFunction* ProgramLibrary::getAuthorizationFunction( const std::string& name) const
+{
+	return m_impl->getAuthorizationFunction( name);
+}
+
+const langbind::AuditFunction* ProgramLibrary::getAuditFunction( const std::string& name) const
+{
+	return m_impl->getAuditFunction( name);
 }
 
 const types::CustomDataType* ProgramLibrary::getCustomDataType( const std::string& name) const

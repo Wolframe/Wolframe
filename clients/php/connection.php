@@ -31,7 +31,14 @@ class Connection
 	{
 		if ($this->socket === FALSE) return new \Exception( "connection failed");
 		$err = socket_last_error( $this->socket);
-		$str = $msg . "(" . $err . ": " . socket_strerror($err) .")";
+		if ($err)
+		{
+			$str = $msg . "(" . $err . ": " . socket_strerror($err) .")";
+		}
+		else
+		{
+			$str = $msg;
+		}
 		$this->alive = FALSE;
 		return new \Exception( $str);
 	}
@@ -52,8 +59,7 @@ class Connection
 			}
 		}
 		$this->socket = stream_socket_client("$protocol://{$address}:{$port}", $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $this->context);
-		if ($this->socket === FALSE) throw $this->conn_exception( "socket creation failed");
-
+		if (!$this->socket) throw $this->conn_exception( "socket creation failed");
 		$this->alive = TRUE;
 	}
 
@@ -72,7 +78,11 @@ class Connection
 	/* Read a data chunk on the socket and throw if it fails */
 	public function readchunk()
 	{
-		if (($rt = fread( $this->socket, 4096)) === FALSE) throw $this->conn_exception( "read failed");
+		if (($rt = fread( $this->socket, 4096)) == FALSE)
+		{
+			throw $this->conn_exception( "connection closed");
+		}
+		error_log( "READ CHUNK: $rt", 3,"/tmp/mychunk.txt");
 		return $rt;
 	}
 

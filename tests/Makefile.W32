@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty crypto modules database authentication wolfilter simpleFormCompiler compileTDL protocol
+SUBDIRS = 3rdParty crypto modules moduleloader database authentication wolfilter simpleFormCompiler compileTDL protocol doxygen_examples
 
 # all broken on windows due to working telnet
 #!IFDEF WITH_EXPECT
@@ -54,8 +54,10 @@ TEST_CPP_BINS = \
 	testNamedRetVal.exe \
 	testVirtualInheritance.exe \
 	versionTest.exe \
+	platformTest.exe \
 	testMethodMemberPointerTemplate.exe \
 	resolvePathTest.exe \
+	testAddressRestriction.exe \
 	testFiletypeRecognition.exe \
 	testBoostPath.exe \
 	byte2hexTest.exe \
@@ -78,9 +80,7 @@ TEST_CPP_BINS = \
 	testVariantTypes.exe \
 	testIntegers.exe \
 	testArrayDoublingAllocator.exe
-#DISABLED (moved to .Attic) unitLibraryTest.exe
-
-#	stringNormalizationTest.exe \
+	
 # DISABLED (only for memory corruption checks):	testTestAllocator.exe \
 
 
@@ -94,7 +94,9 @@ testNamedRetVal.exe: testNamedRetVal.obj
 testVirtualInheritance.exe: testVirtualInheritance.obj
 testMethodMemberPointerTemplate.exe: testMethodMemberPointerTemplate.obj
 versionTest.exe: versionTest.obj
+platformTest.exe: platformTest.obj
 resolvePathTest.exe: resolvePathTest.obj
+testAddressRestriction.exe :testAddressRestriction.obj
 testBoostPath.exe: testBoostPath.obj
 testFiletypeRecognition.exe : testFiletypeRecognition.obj
 poolTest.exe: poolTest.obj
@@ -118,7 +120,6 @@ testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj
 testVariantTypes.exe: testVariantTypes.obj $(TOPDIR)\src\wolframe.lib
 testIntegers.exe: testIntegers.obj $(TOPDIR)\src\wolframe.lib
-#DISABLED (moved to .Attic) unitLibraryTest.exe: unitLibraryTest.obj
 
 local_all:
 
@@ -162,8 +163,10 @@ local_test:
 # DISABLED (only for memory corruption checks):	@-testTestAllocator 
 	@-logTest 
 	@-versionTest 
+	@-platformTest
 	@-counterTest 
 	@-resolvePathTest 
+	@-testAddressRestriction
 	@-testBoostPath 
 	@-byte2hexTest 
 	@-base64Test 
@@ -179,8 +182,6 @@ local_test:
 	@-testVariantTypes
 	@-testIntegers 
 	@-testWolfilter 
-#	@-stringNormalizationTest 
-#DISABLED (moved to .Attic) 	@-unitLibraryTest 
 
 local_longtest:
 	@-poolTest 

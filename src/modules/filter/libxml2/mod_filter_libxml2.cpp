@@ -41,14 +41,14 @@
 #include "appdevel/programTypeModuleMacros.hpp"
 
 WF_MODULE_BEGIN( "libxml2Filter", "xml/xslt filter module based on libxml2")
-WF_PROGRAM_TYPE( "xslt", _Wolframe::langbind::createXsltProgramType)
-WF_FILTER_TYPE( "libxml2", _Wolframe::langbind::createLibxml2FilterType)
+WF_PROGRAM_TYPE( "xslt", _Wolframe::langbind::XsltProgramType)
+WF_FILTER_TYPE( "libxml2", _Wolframe::langbind::Libxml2FilterType)
 WF_MODULE_END
 
 #else
 
 WF_MODULE_BEGIN( "libxml2Filter", "xml filter module based on libxml2")
-WF_FILTER_TYPE( "libxml2", _Wolframe::langbind::createLibxml2FilterType)
+WF_FILTER_TYPE( "libxml2", _Wolframe::langbind::Libxml2FilterType)
 WF_MODULE_END
 #endif
 

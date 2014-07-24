@@ -34,18 +34,96 @@ Project Wolframe.
 
 #ifndef _Wolframe_CMDBIND_DOCTYPE_DETECTOR_JSON_HPP_INCLUDED
 #define _Wolframe_CMDBIND_DOCTYPE_DETECTOR_JSON_HPP_INCLUDED
+#include "cmdbind/doctypeDetector.hpp"
+#include "types/doctypeinfo.hpp"
+#include "types/docmetadata.hpp"
+#include "utils/asciiCharParser.hpp"
 #include <string>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \brief Forward declaration
-class DoctypeDetector;
+/// \class DoctypeDetectorJson
+/// \brief Document type and format detection for JSON.
+class DoctypeDetectorJson
+	:public DoctypeDetector
+{
+public:
+	enum State
+	{
+		ParseStart,
+		ParseJSONHeaderStart,
+		ParseJSONHeaderStringKeyDash,
+		ParseJSONHeaderStringKey,
+		ParseJSONHeaderSeekAssign,
+		ParseJSONHeaderAssign,
+		ParseJSONHeaderIdentKey,
+		ParseJSONHeaderIdentValue,
+		ParseJSONHeaderStringValue,
+		ParseJSONHeaderSeekDelim,
+		Done
+	};
+	
+	static const char* stateName( State st)
+	{
+		static const char* ar[] = {
+			"ParseStart",
+			"ParseJSONHeaderStart",
+			"ParseJSONHeaderStringKeyDash",
+			"ParseJSONHeaderStringKey",
+			"ParseJSONHeaderSeekAssign",
+			"ParseJSONHeaderAssign",
+			"ParseJSONHeaderIdentKey",
+			"ParseJSONHeaderIdentValue",
+			"ParseJSONHeaderStringValue",
+			"ParseJSONHeaderSeekDelim",
+			"Done"};
+		return ar[ (int)st];
+	}
+	enum KeyType
+	{
+		KeyNone, KeyDoctype, KeyEncoding
+	};
 
-/// \brief Create a document type/format detector for JSON
-DoctypeDetector* createDoctypeDetectorJson();
+public:
+	DoctypeDetectorJson()
+		:m_state(ParseStart),m_endbrk(0),m_lastchar(0){}
 
+	/// \brief Destructor
+	virtual ~DoctypeDetectorJson(){}
+
+	virtual void putInput( const char* chunk, std::size_t chunksize)
+	{
+		m_charparser.putInput( chunk, chunksize);
+	}
+
+	void setState( State state_);
+
+	virtual bool run();
+
+	virtual const char* lastError() const
+	{
+		return m_lasterror.empty()?0:m_lasterror.c_str();
+	}
+
+	virtual const types::DoctypeInfoR& info() const
+	{
+		return m_info;
+	}
+
+private:
+	types::DoctypeInfoR m_info;			///< the result of doctype detection
+	std::string m_lasterror;			///< the last error occurred
+	State m_state;					///< processing state machine state
+	utils::AsciiCharParser m_charparser;		///< character by caracter parser for source
+	KeyType m_keytype;				///< type of meta data attribute value parsed
+	std::string m_itembuf;				///< value item parsed
+	unsigned char m_endbrk;				///< end quote in state parsing string
+	unsigned char m_lastchar;			///< the last character parsed
+	bool m_escapestate;				///< true if the last character was a backslash, so the next character is escaped
+};
 }}//namespace
 #endif
+
 

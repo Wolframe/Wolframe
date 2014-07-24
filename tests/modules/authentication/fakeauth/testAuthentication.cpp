@@ -36,7 +36,7 @@
 #include "testAuthentication.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/stringUtils.hpp"
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
 #include "serialize/struct/structDescription.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
@@ -70,7 +70,7 @@ bool TestAuthenticationConfig::parse( const config::ConfigurationNode& pt, const
 {
 	try
 	{
-		config::parseConfigStructure( structure, pt);
+		serialize::parseConfigStructure( structure, pt);
 		m_config_pos = pt.position();
 		return true;
 	}
@@ -199,7 +199,7 @@ void TestAuthenticatorSlice::messageIn( const std::string& msg)
 			{
 				if (m_user) delete m_user;
 				m_user = 0;
-				m_user = new User( "Test", m_username, m_username);
+				m_user = new User( identifier(), "TEST", m_username, m_username);
 				m_username.clear();
 			}
 			setState( Done);

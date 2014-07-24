@@ -168,7 +168,7 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 
 	encodedSize = base64_encodedChunkSize( state, dataSize );
 	if ( encodedMaxSize < encodedSize )
-		return BUFFER_OVERFLOW;
+		return BASE64_BUFFER_OVERFLOW;
 
 	bytes = ( const unsigned char *)data;
 	output = encoded;
@@ -268,7 +268,7 @@ int base64_encodeEndChunk( base64_EncodeState* state, char* encoded, size_t enco
 	if ( state->bytesLeft )	{
 		if ( state->newLinePending )	{
 			if ( encodedMaxSize < 6 )
-				return BUFFER_OVERFLOW;
+				return BASE64_BUFFER_OVERFLOW;
 			*encoded++ = '\n';
 			encodeEndBytes( state->carryBytes, state->bytesLeft, encoded );
 			encoded[ 4 ] = 0;
@@ -276,7 +276,7 @@ int base64_encodeEndChunk( base64_EncodeState* state, char* encoded, size_t enco
 		}
 		else	{
 			if ( encodedMaxSize < 5 )
-				return BUFFER_OVERFLOW;
+				return BASE64_BUFFER_OVERFLOW;
 			encodeEndBytes( state->carryBytes, state->bytesLeft, encoded );
 			encoded[ 4 ] = 0;
 			return 4;
@@ -284,7 +284,7 @@ int base64_encodeEndChunk( base64_EncodeState* state, char* encoded, size_t enco
 	}
 	else	{
 		if ( encodedMaxSize < 1 )
-			return BUFFER_OVERFLOW;
+			return BASE64_BUFFER_OVERFLOW;
 		*encoded = 0;
 		return 0;
 	}
@@ -301,7 +301,7 @@ int base64_encode( const void* data, size_t dataSize,
 	size_t encodedSize;
 	encodedSize = base64_encodedSize( dataSize, lineLength );
 	if ( encodedMaxSize <= encodedSize )
-		return BUFFER_OVERFLOW;
+		return BASE64_BUFFER_OVERFLOW;
 
 	bytes = ( const unsigned char *)data;
 	output = encoded;

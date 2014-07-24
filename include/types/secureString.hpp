@@ -34,13 +34,14 @@
 /// \brief String constant definition with the intention to hold sensitive data
 #ifndef _WOLFRAME_TYPES_SECURE_STRING_HPP_INCLUDED
 #define _WOLFRAME_TYPES_SECURE_STRING_HPP_INCLUDED
+#include <string>
 
 namespace _Wolframe {
 namespace types {
 
 /// \class SecureString
 /// \brief String definition with the intention to hold sensitive data
-/// \note Standard string implementation with erasing of its data when releasing it
+/// \note Standard STL string implementation wipes out all of its data before releasing it
 class SecureString
 	:public std::string
 {
@@ -48,6 +49,7 @@ public:
 	SecureString(){}
 	SecureString( const std::string& o)
 		:std::string(o){}
+
 	~SecureString()
 	{
 		eraseContent();

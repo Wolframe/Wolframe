@@ -78,7 +78,7 @@ bool DirectmapCommandHandlerConfig::parse( const config::ConfigurationNode& pt, 
 		}
 		if (!filterDefied)
 		{
-			LOG_WARNING << "no filter defined in directmap command handler. cannot process anything (" << pi->second.position().logtext() << ")";
+			LOG_WARNING << "no filter defined in directmap command handler";
 		}
 	}
 	catch (std::runtime_error& e)

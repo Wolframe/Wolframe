@@ -50,6 +50,7 @@
 namespace _Wolframe	{
 namespace log	{
 
+/// Logger levels describing the severity of the logged message
 class WOLFRAME_EXPORT LogLevel
 {
 public:
@@ -74,7 +75,7 @@ public:
 };
 
 
-/// output loglevel to an output stream
+/// Output loglevel to an output stream
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s,
 							  LogLevel::Level l )

@@ -26,7 +26,6 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	base64NormalizeFunction.obj \
-	base64Normalize.obj \
 	mod_normalize_base64.obj
 
 all: $(DYNAMIC_MODULE)

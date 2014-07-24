@@ -177,6 +177,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 						++nof_docattributes;
 						if (doctypeParsed) throw std::runtime_error("duplicate 'doctype' definition");
 						setDoctype( m_firstnode->valuestring);
+						setAttribute( "doctype", m_firstnode->valuestring);
 						m_firstnode = m_firstnode->next;
 						continue;
 					}

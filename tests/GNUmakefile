@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = 3rdParty crypto modules database authentication simpleFormCompiler wolfilter compileTDL protocol
+SUBDIRS = 3rdParty crypto modules moduleloader database authentication simpleFormCompiler wolfilter compileTDL protocol doxygen_examples
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -48,7 +48,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_program_options \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(LIBS_DL)
+	$(LIBS_DL) $(LIBS_NET)
 
 # openssl
 
@@ -117,7 +117,9 @@ TEST_CPP_BINS = \
 	testVirtualInheritance$(EXE) \
 	testArrayDoublingAllocator$(EXE) \
 	versionTest$(EXE) \
+	platformTest$(EXE) \
 	resolvePathTest$(EXE) \
+	testAddressRestriction$(EXE) \
 	testBoostPath$(EXE) \
 	testFiletypeRecognition$(EXE) \
 	byte2hexTest$(EXE) \
@@ -139,8 +141,7 @@ TEST_CPP_BINS = \
 	testString$(EXE) \
 	testDateTime$(EXE) \
 	testBigNumber$(EXE) \
-# DISABLED (moved to .Attic) unitLibraryTest$(EXE)
-#	stringNormalizationTest$(EXE) \
+
 # DISABLED (only for memory corruption checks)	testTestAllocator$(EXE) \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -212,7 +213,11 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./versionTest
 	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./platformTest
+	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./resolvePathTest
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testAddressRestriction
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBoostPath
 	@echo
@@ -248,11 +253,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testIntegers
 	@echo
-#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
-#	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
-	@echo
-## DISABLED (moved to .Attic) @LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./unitLibraryTest
 	@echo
 	@echo
 endif

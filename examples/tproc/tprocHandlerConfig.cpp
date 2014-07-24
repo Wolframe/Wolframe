@@ -36,7 +36,7 @@
 #include "tprocHandlerConfig.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
 #include "serialize/struct/structDescription.hpp"
 #include <string>
 #include <vector>
@@ -74,7 +74,7 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 	try
 	{
 		ConfigurationStruct data;
-		config::parseConfigStructure( data, pt);
+		serialize::parseConfigStructure( data, pt);
 
 		std::vector<std::string>::const_iterator itr=data.cmd.begin();
 		while (itr != data.cmd.end())

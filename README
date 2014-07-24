@@ -1,4 +1,4 @@
-Wolframe is a modular 3-tier application server framework.
+Wolframe is a modular 3-tier application server framework written in C++.
 
 It runs natively on Windows, Linux, Mac OSX, BSDs and Solaris.
 

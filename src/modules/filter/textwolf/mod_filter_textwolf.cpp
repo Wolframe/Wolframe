@@ -37,5 +37,5 @@
 #include "textwolf_filter.hpp"
 
 WF_MODULE_BEGIN( "textwolfFilter", "xml filter based on textwolf")
- WF_FILTER_TYPE( "textwolf", _Wolframe::langbind::createTextwolfXmlFilterType)
+ WF_FILTER_TYPE( "textwolf", _Wolframe::langbind::TextwolfXmlFilterType)
 WF_MODULE_END

@@ -36,7 +36,6 @@ Project Wolframe.
 #define _Wolframe_FILTER_FILTERBASE_HPP_INCLUDED
 #include <string>
 #include <cstring>
-#include "utils/typeSignature.hpp"
 
 namespace _Wolframe {
 namespace langbind {
@@ -44,20 +43,17 @@ namespace langbind {
 /// \class FilterBase
 /// \brief Base of input/ouput filter
 class FilterBase
-	:public virtual utils::TypeSignature
 {
 public:
 	explicit FilterBase( const char* name_)
-		:utils::TypeSignature("langbind::FilterBase", __LINE__)
-		,m_flags(None)
+		:m_flags(None)
 		,m_name(name_)
 	{
 		m_errorbuf[0] = '\0';
 	}
 
 	FilterBase( const FilterBase& o)
-		:utils::TypeSignature("langbind::FilterBase", __LINE__)
-		,m_flags(o.m_flags)
+		:m_flags(o.m_flags)
 		,m_name(o.m_name)
 	{
 		setError( o.m_errorbuf);
@@ -69,10 +65,10 @@ public:
 	/// \brief Content element type that describes the role of the element in the structured input
 	enum ElementType
 	{
-		OpenTag,	//< open new hierarchy level
-		Attribute,	//< attribute name
-		Value,		//< content or attribute value
-		CloseTag	//< close current hierarchy level
+		OpenTag,	///< open new hierarchy level
+		Attribute,	///< attribute name
+		Value,		///< content or attribute value
+		CloseTag	///< close current hierarchy level
 	};
 	/// \brief Get the name of an ElementType as string
 	/// \param[in] i an ElementType identifier
@@ -127,10 +123,10 @@ public:
 
 	enum Flags
 	{
-		None=0x00,
-		SerializeWithIndices=0x01,		//< do serialization with array index elements, if implemented
-		PropagateNoCase=0x02,			//< true, if the result is propagated to be case insensitive
-		PropagateNoAttr=0x04			//< true, if the result is propagated to have no attribute support (only open/close tag and value)
+		None=0x00,				///< no flags set
+		SerializeWithIndices=0x01,		///< do serialization with array index elements, if implemented
+		PropagateNoCase=0x02,			///< true, if the result is propagated to be case insensitive
+		PropagateNoAttr=0x04			///< true, if the result is propagated to have no attribute support (only open/close tag and value)
 	};
 
 	/// \brief Query a flag (or a set of flags)

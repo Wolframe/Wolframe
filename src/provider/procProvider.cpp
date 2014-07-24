@@ -35,6 +35,7 @@
 //
 
 #include "processor/procProvider.hpp"
+#include "database/DBprovider.hpp"
 #include "cmdbind/commandHandlerConstructor.hpp"
 #include "appdevel/module/runtimeEnvironmentConstructor.hpp"
 #include "appdevel/module/filterBuilder.hpp"
@@ -50,7 +51,6 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <ostream>
 #include <string>
 #include <vector>
@@ -173,9 +173,8 @@ private:
 ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 					const module::ModulesDirectory* modules,
 					prgbind::ProgramLibrary* programs_)
-	:m_programs(programs_),m_referencePath(conf->referencePath())
+	:m_db(0),m_dbProvider(0),m_programs(programs_),m_referencePath(conf->referencePath())
 {
-	m_db = NULL;
 	if ( !conf->m_dbLabel.empty())
 	{
 		m_dbLabel = conf->m_dbLabel;
@@ -482,7 +481,18 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 			return false;
 		}
 	}
+	m_dbProvider = &db;
 	return rt;
+}
+
+const langbind::AuthorizationFunction* ProcessorProvider::authorizationFunction( const std::string& name) const
+{
+	return m_programs->getAuthorizationFunction( name);
+}
+
+const langbind::AuditFunction* ProcessorProvider::auditFunction( const std::string& name) const
+{
+	return m_programs->getAuditFunction( name);
 }
 
 const types::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
@@ -557,6 +567,18 @@ db::Transaction* ProcessorProvider::transaction( const std::string& name ) const
 		LOG_ALERT << "No database defined for the processor provider";
 		return NULL;
 	}
+}
+
+db::Transaction* ProcessorProvider::transaction( const std::string& dbname, const std::string& name) const
+{
+	db::Database* altdb = m_dbProvider->database( dbname);
+	if (!altdb)
+	{
+		LOG_ERROR << "No database defined with name '" << dbname << "'";
+		return 0;
+	}
+	LOG_TRACE << "[provider] get transaction '" << name << "' on database '" << dbname << "'";
+	return altdb->transaction( name);
 }
 
 const std::string& ProcessorProvider::referencePath() const

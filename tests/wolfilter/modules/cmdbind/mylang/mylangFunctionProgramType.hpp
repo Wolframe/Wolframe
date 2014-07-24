@@ -34,12 +34,29 @@ Project Wolframe.
 #ifndef _Wolframe_Mylang_FUNCTION_PROGRAM_TYPE_HPP_INCLUDED
 #define _Wolframe_Mylang_FUNCTION_PROGRAM_TYPE_HPP_INCLUDED
 #include "prgbind/program.hpp"
+#include "mylangInterpreter.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-///\brief Program type constructor
-prgbind::Program* createMylangProgramType();
+///\class MylangProgramType
+///\brief Program type of mylang programs
+class MylangProgramType
+	:public prgbind::Program
+{
+public:
+	MylangProgramType()
+		:prgbind::Program( prgbind::Program::Function){}
+
+	virtual ~MylangProgramType(){}
+
+	virtual bool is_mine( const std::string& filename) const;
+
+	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename);
+
+private:
+	mylang::Interpreter m_interpreter;
+};
 
 }} //namespace
 #endif

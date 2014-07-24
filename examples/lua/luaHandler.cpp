@@ -2,6 +2,20 @@
 // luaHandler.cpp
 //
 
+// Aba: for snprintf, maybe better to use ostringstream?
+// IMPORTANT: Must be first includes in this file. Something
+// below draws in an unsave include of inttypes.h not defining
+// the C99 PRIxPTR macro (at least on NetBSD that is). No clue
+// where the offending include originates from..
+#ifndef _WIN32
+#define __STDC_FORMAT_MACROS
+#include <cstdio>
+#include <inttypes.h>
+#else
+#define snprintf _snprintf
+#define PRIxPTR "%p"
+#endif
+
 #include "luaHandler.hpp"
 #include "logger-v1.hpp"
 #include "system/SSLcertificateInfo.hpp"
@@ -18,16 +32,6 @@ extern "C" {
 #include "lualib.h"
 #include "lauxlib.h"
 }
-
-// Aba: for snprintf, maybe better to use ostringstream?
-#ifndef _WIN32
-#define __STDC_FORMAT_MACROS
-#include <cstdio>
-#include <inttypes.h>
-#else
-#define snprintf _snprintf
-#define PRIxPTR "%p"
-#endif
 
 namespace _Wolframe {
 

@@ -1,4 +1,4 @@
-<chapter>
+<sect1>
 <title>Functions</title>
 <para>This chapter describes how functions are linked to the logic tier. 
 It gives an overview on the language bindings available for Wolframe.
@@ -25,4 +25,4 @@ configuration of <application>Wolframe</application> has to be extended for its 
 	&AppProgramPython;
 	&AppProgramLua;
 	&AppProgramCpp;
-</chapter>
+</sect1>

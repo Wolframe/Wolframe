@@ -12,15 +12,15 @@
 #
 # author: Andreas Baumann, abaumann at yahoo dot com
 
-ifdef MAKEDEPS
+ifdef MAKEDEPEND
 
 %.d : %.c
 	@echo Generating dependencies for $<
-	@$(MAKEDEPS) $(@:.d=.o) $(ALL_CFLAGS) $< > $@
+	@$(MAKEDEPEND) $(@:.d=.o) $(ALL_CFLAGS) $< > $@
 
 %.d : %.cpp
 	@echo Generating dependencies for $<
-	@$(MAKEDEPS) $(@:.d=.o) $(ALL_CFLAGS) $< > $@
+	@$(MAKEDEPEND) $(@:.d=.o) $(ALL_CFLAGS) $< > $@
 
 else
 

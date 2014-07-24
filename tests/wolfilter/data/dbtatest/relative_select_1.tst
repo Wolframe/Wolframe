@@ -9,6 +9,7 @@
 LoadModules
 {
 	module ../../src/modules/filter/textwolf/mod_filter_textwolf
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 }
 Database
@@ -30,6 +31,8 @@ TRANSACTION testcall BEGIN
 END
 **outputfile:DBOUT
 **output
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<doc/>
 Code:
 [0] RESULT_SET_INIT
 [1] DBSTM_START STM (SELECT run( $1))

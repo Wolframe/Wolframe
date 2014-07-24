@@ -63,7 +63,6 @@ PROVIDER_OBJS = \
 	provider\procProvider.obj
 
 PROGRAM_OBJS = \
-	prgbind\transactionProgram.obj \
 	prgbind\normalizeProgram.obj \
 	prgbind\ddlProgram.obj \
 	prgbind\programLibrary.obj
@@ -72,6 +71,8 @@ CMDHANDLER_OBJS =\
 	mainCommandHandler.obj \
 	interfaceCommandHandler.obj \
 	doctypeFilterCommandHandler.obj \
+	baseCryptoCommandHandler.obj \
+	passwordChangeCommandHandler.obj \
 	authCommandHandler.obj
 
 LOCAL_STATIC_LIB_OBJS = \

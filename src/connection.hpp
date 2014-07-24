@@ -228,6 +228,9 @@ public:
 	/// Start the first asynchronous operation for the connection.
 	void start();
 
+	/// Send a denial message and shut the connection down
+	void deny_connection();
+
 	/// Unregister the connection from the list of active connections
 	void unregister()	{
 		if ( m_connList )	{
@@ -274,6 +277,9 @@ public:
 	/// Start the first asynchronous operation for the connection.
 	void start();
 
+	/// Send a denial message and shut the connection down
+	void deny_connection();
+
 	/// Unregister the connection from the list of active connections
 	void unregister()	{
 		if ( m_connList )	{
@@ -298,6 +304,7 @@ private:
 
 	/// List of connections to which it belongs
 	SocketConnectionList< SSLconnection_ptr >* m_connList;
+	bool m_connection_denied;
 };
 
 #endif // WITH_SSL

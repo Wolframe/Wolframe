@@ -1,0 +1,4 @@
+int=integer;
+uint=unsigned;
+float=floatingpoint;
+name=latinword,totitle;

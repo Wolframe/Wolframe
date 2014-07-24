@@ -77,3 +77,6 @@ endif
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./echod -c echo.conf -f
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

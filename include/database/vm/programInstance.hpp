@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file database/vm/programInstance.hpp
-///\brief Interface for state of a program executing database transactions
+/// \file database/vm/programInstance.hpp
+/// \brief Interface for state of a program executing database transactions
 #ifndef _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
 #define _DATABASE_VM_PROGRAM_INSTANCE_HPP_INCLUDED
 #include "database/vm/programImage.hpp"
@@ -49,17 +49,22 @@
 namespace _Wolframe {
 namespace db {
 namespace vm {
-///\brief Forward Declaration
+/// \brief Forward Declaration
 class Program;
 
+/// \class ProgramInstance
+/// \brief Instance of a program with statevariables
 class ProgramInstance
 	:public InstructionSet
 {
 public:
+	/// \class LogTraceContext
+	/// \brief Callback context structure for logging VM instructions in transaction execution
 	struct LogTraceContext;
 	typedef void (*LogTraceCallBack)( const LogTraceContext* prgcontext, unsigned int ip_);
 
 public:
+	/// \brief Default constructor
 	ProgramInstance()
 		:m_db_stm(0)
 		,m_ip(0)
@@ -67,6 +72,7 @@ public:
 		,m_logTraceCallBack(0)
 		,m_logTraceContext(0)
 	{}
+	/// \brief Copy constructor
 	ProgramInstance( const ProgramInstance& o)
 		:m_program(o.m_program)
 		,m_db_stm(o.m_db_stm)
@@ -78,36 +84,48 @@ public:
 		,m_logTraceContext(o.m_logTraceContext)
 	{}
 
+	/// \brief Constructor
 	ProgramInstance( const ProgramImage& program_, TransactionExecStatemachine* db_stm_, LogTraceCallBack logTraceCallBack_=0, const LogTraceContext* logTraceContext_=0);
 
+	/// \brief Execute the program
 	bool execute();
+	/// \brief Get the output of the executed program
 	const OutputR& output() const			{return m_output;}
+	/// \brief Get the last error of the executed program
 	const DatabaseError* lastError() const		{return &m_lastError;}
+	/// \brief Get the current IP of program execution (instruction pointer)
 	unsigned int ip() const				{return m_ip;}
 
 private:
+	/// \class ResultFlags
+	/// \brief Flags defined in the database command between DO and the statement (NONEMPTY,UNIQUE)
 	struct ResultFlags
 	{
-		bool is_first;		//< true, if there has been no result set added to the set (result is created)
-		bool unique;		//< UNIQUE flag
-		bool nonempty;		//< NONEMPTY flag
+		bool is_first;		///< true, if there has been no result set added to the set (result is created)
+		bool unique;		///< UNIQUE flag
+		bool nonempty;		///< NONEMPTY flag
 
+		/// \brief Copy constructor
 		ResultFlags( const ResultFlags& o)
 			:is_first(o.is_first),unique(o.unique),nonempty(o.nonempty){}
+		/// \brief Constructor
 		ResultFlags( bool unique_=false, bool nonempty_=false)
 			:is_first(true),unique(unique_),nonempty(nonempty_){}
+		/// \brief Reset flags
 		void clear()
 		{
 			is_first = true;
 			unique = false;
 			nonempty = false;
 		}
+		/// \brief Initialize flags
 		void init( bool unique_, bool nonempty_)
 		{
 			is_first = true;
 			unique = unique_;
 			nonempty = nonempty_;
 		}
+		/// \brief Get and set of the first result flag
 		bool touched()
 		{
 			bool rt = !is_first;
@@ -116,19 +134,24 @@ private:
 		}
 	};
 
+	/// \class StackElement
+	/// \brief State stack element of the virtual machine executing a transaction
 	struct StackElement
 	{
+		/// \brief Default constructor
 		StackElement()
 			:m_return_ip(0)
 			,m_bindidx(0)
 			,m_hintidx(0)
 		{}
+		/// \brief Constructor
 		StackElement( Address return_ip_, const ValueTupleSetR& parameter_)
 			:m_return_ip(return_ip_)
 			,m_bindidx(0)
 			,m_hintidx(0)
 			,m_parameter(parameter_)
 		{}
+		/// \brief Copy constructor
 		StackElement( const StackElement& o)
 			:m_return_ip(o.m_return_ip)
 			,m_bindidx(o.m_bindidx)
@@ -143,17 +166,17 @@ private:
 			,m_valueEnd(o.m_valueEnd)
 		{}
 
-		Address m_return_ip;					//< IP to set o RETURN
-		std::size_t m_bindidx;					//< current bind index
-		ArgumentIndex m_hintidx;				//< current database statement hint index
-		ValueTupleSetR m_parameter;				//< parameter structure
-		ValueTupleSetR m_lastResult;				//< last call result
-		ResultFlags m_resultFlags;				//< conditions to be meet for each element of the next result
-		std::map<ArgumentIndex,ValueTupleSetR> m_resultMap;	//< KEEP result map
-		ValueTupleSetR m_selectedSet;				//< selected value set
-		ValueTupleSetR m_valueSet;				//< currently iterated value set
-		ValueTupleSet::const_iterator m_valueIter;		//< iterator on value set
-		ValueTupleSet::const_iterator m_valueEnd;		//< end of value set
+		Address m_return_ip;					///< IP to set o RETURN
+		std::size_t m_bindidx;					///< current bind index
+		ArgumentIndex m_hintidx;				///< current database statement hint index
+		ValueTupleSetR m_parameter;				///< parameter structure
+		ValueTupleSetR m_lastResult;				///< last call result
+		ResultFlags m_resultFlags;				///< conditions to be meet for each element of the next result
+		std::map<ArgumentIndex,ValueTupleSetR> m_resultMap;	///< KEEP result map
+		ValueTupleSetR m_selectedSet;				///< selected value set
+		ValueTupleSetR m_valueSet;				///< currently iterated value set
+		ValueTupleSet::const_iterator m_valueIter;		///< iterator on value set
+		ValueTupleSet::const_iterator m_valueEnd;		///< end of value set
 	};
 
 private:
@@ -173,16 +196,16 @@ private:
 	void setDatabaseError();
 
 private:
-	ProgramImage m_program;				//< image of program to execute
-	TransactionExecStatemachine* m_db_stm;		//< engine to process database instructions
-	Address m_ip;					//< instruction pointer
-	SubroutineFrame m_subroutine_frame;		//< prepared subroutine call parameter structure
-	bool m_cond;					//< current condition flag for conditional execution ('InstructionSet::CondCode')
-	std::vector<StackElement> m_stack;		//< execution stack
-	OutputR m_output;				//< output
-	DatabaseError m_lastError;			//< last database error reported
-	LogTraceCallBack m_logTraceCallBack;		//< NULL or callback procedure for logging execution that is be called after every instruction executed
-	const LogTraceContext* m_logTraceContext;	//< Context for 'm_logTraceCallBack'
+	ProgramImage m_program;				///< image of program to execute
+	TransactionExecStatemachine* m_db_stm;		///< engine to process database instructions
+	Address m_ip;					///< instruction pointer
+	SubroutineFrame m_subroutine_frame;		///< prepared subroutine call parameter structure
+	bool m_cond;					///< current condition flag for conditional execution ('InstructionSet::CondCode')
+	std::vector<StackElement> m_stack;		///< execution stack
+	OutputR m_output;				///< output
+	DatabaseError m_lastError;			///< last database error reported
+	LogTraceCallBack m_logTraceCallBack;		///< NULL or callback procedure for logging execution that is be called after every instruction executed
+	const LogTraceContext* m_logTraceContext;	///< Context for 'm_logTraceCallBack'
 };
 
 }}}//namespace

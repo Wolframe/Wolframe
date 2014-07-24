@@ -9,6 +9,7 @@ testdata="
 LoadModules
 {
 	module `cmd/MODULE mod_db_postgresqltest`
+	module `cmd/MODULE mod_command_tdl`
 	module `cmd/MODULE mod_command_lua`
 	module `cmd/MODULE mod_normalize_number`
 	module `cmd/MODULE mod_normalize_string`

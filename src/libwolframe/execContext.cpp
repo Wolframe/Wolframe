@@ -34,100 +34,42 @@
 /// \brief Implementation execution context
 #include "processor/execContext.hpp"
 #include "filter/typedfilter.hpp"
-#include "langbind/formFunction.hpp"
+#include "langbind/authorizationFunction.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::proc;
 
-class AuthorizationArg
-	:public langbind::TypedInputFilter
+db::Transaction* ExecContext::transaction( const std::string& name)
 {
-public:
-	explicit AuthorizationArg( const std::string& authorizationResource_)
-		:utils::TypeSignature("proc::AuthorizationArg", __LINE__)
-		,langbind::TypedInputFilter("autharg")
-		,m_iterator(0)
-		,m_authorizationResource(authorizationResource_)
-		{}
-
-	AuthorizationArg( const AuthorizationArg& o)
-		:utils::TypeSignature("proc::AuthorizationArg", __LINE__)
-		,langbind::TypedInputFilter(o)
-		,m_iterator(0)
-		,m_authorizationResource(o.m_authorizationResource)
-		{}
-
-	virtual ~AuthorizationArg(){}
-
-	virtual langbind::TypedInputFilter* copy() const
+	if (m_dbstack.empty())
 	{
-		return new AuthorizationArg(*this);
+		return m_provider->transaction( name);
 	}
-
-	virtual bool getNext( ElementType& type, types::VariantConst& element)
+	else
 	{
-		switch (m_iterator++)
-		{
-			case 0: type = langbind::FilterBase::Attribute; element = "resource"; return true;
-			case 1: type = langbind::FilterBase::Value; element = m_authorizationResource; return true;
-			case 2: type = langbind::FilterBase::CloseTag; element.init(); return true;
-		}
-		return false;
+		return m_provider->transaction( m_dbstack.back(), name);
 	}
+}
 
-	virtual void resetIterator()
-	{
-		m_iterator = 0;
-	}
-
-private:
-	int m_iterator;
-	std::string m_authorizationResource;
-};
-
-bool ExecContext::checkAuthorization( const std::string& authorizationFunction, const std::string& authorizationResource)
+bool ExecContext::checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg, bool allowIfNotExists)
 {
-	if (authorizationFunction.empty()) return true;
+	if (funcname.empty()) return true;
 	try
 	{
-		const langbind::FormFunction* func = m_provider->formFunction( authorizationFunction);
+		const langbind::AuthorizationFunction* func = m_provider->authorizationFunction( funcname);
 		if (func == 0)
 		{
+			if (allowIfNotExists) return true;
+			errmsg = std::string("authorization function '") + funcname + "' is not defined";
 			return false;
 		}
-		langbind::FormFunctionClosureR clos( func->createClosure());
-		langbind::TypedInputFilterR input( new AuthorizationArg( authorizationResource));
-		clos->init( this, input);
-		if (!clos->call())
-		{
-			return false;
-		}
-		langbind::TypedInputFilterR output = clos->result();
-		langbind::FilterBase::ElementType res_type;
-		types::VariantConst res_elem;
-
-		if (output->getNext( res_type, res_elem))
-		{
-			if (res_type == langbind::FilterBase::CloseTag)
-			{
-				//...no result => authotization accepted
-				return true;
-			}
-			if (res_type == langbind::FilterBase::Value)
-			{
-				//...boolean result is interpreted as result of authorization
-				return res_elem.tobool();
-			}
-			return false;
-		}
-		else
-		{
-			//...no result => authotization accepted
-			return true;
-		}
+		std::vector<langbind::AuthorizationFunction::Attribute> attributes;
+		return func->call( this, resource, attributes);
 	}
 	catch (std::runtime_error& e)
 	{
+		errmsg = std::string("authorization function '") + funcname + "' failed: " + e.what();
 		return false;
 	}
 }

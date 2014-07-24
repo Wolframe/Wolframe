@@ -41,6 +41,8 @@
 namespace _Wolframe {
 namespace utils {
 
+/// \class AsciiCharParser
+/// \brief Class for parsing ascii character by character from a source in an unicode based encoding
 class AsciiCharParser
 {
 public:
@@ -48,13 +50,18 @@ public:
 	{
 		NONE,UCS1,UCS2BE,UCS2LE,UCS4BE,UCS4LE
 	};
+	/// \brief Constructor
 	AsciiCharParser()
 		:m_src(0),m_itr(0),m_end(0),m_lastError(0),m_encoding(NONE),m_bufsize(0){}
 
+	/// \brief Feed next input block
+	/// \remark The previous block has been consumed completely
 	void putInput( const char* src, std::size_t srcsize);
 
+	/// \brief Get the next ASCII character or 0, if at the end of the current input block or an error occurred (to check with lastError()const)
 	unsigned char getNext();
 
+	/// \brief Get the last error occurred
 	const char* lastError() const		{return m_lastError;}
 
 private:

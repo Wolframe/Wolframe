@@ -1,0 +1,59 @@
+; Modules to be loaded (bundled with the wolframe core package)
+LoadModules {
+
+; Search also for modules in the following directory additionally to
+; the default load dir (with lower priority). Can be absolute or relative,
+; if relative it has this configuration file as basis to compute the path
+;    Directory modules
+
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat dbmodules.tmpl)\""; fi)
+
+; authentication modules
+    Module mod_auth_textfile
+    Module mod_auth_database
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat authmodules.tmpl)\""; fi)
+
+; authorization modules
+    Module mod_authz_database
+    Module mod_command_aamap
+
+; audit modules    
+    Module mod_audit_textfile
+    Module mod_audit_database
+
+; modules for detecting document types    
+    Module mod_doctype_xml
+    Module mod_doctype_json
+
+; modules for XML processing
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat xmlmodules.tmpl)\""; fi)
+
+; modules for JSON processing
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat jsonmodules.tmpl)\""; fi)
+
+; data normalization modules   
+    Module mod_normalize_base64
+    Module mod_normalize_number
+$(if test "x$WITH_ICU" = "x1"; then echo ";    Module mod_normalize_locale"; fi)
+
+; data types modules	
+    Module mod_datatype_datetime
+    Module mod_datatype_bcdnumber
+	
+; business layer modules
+    Module mod_command_directmap
+    Module mod_ddlcompiler_simpleform
+    Module mod_command_tdl
+
+; scripting language modules
+$(if test $VARIANT = "monolythic"; then eval "echo \"$(cat scriptingmodules.tmpl)\""; fi)
+
+; various filtering modules
+$(if test $VARIANT = "monolythic"; then cat textwolfmodules.tmpl; fi)
+    Module mod_filter_blob
+
+; various other modules
+    Module mod_job_schedule_db
+$(if test "x$WITH_LIBHPDF" = "x1"; then echo ";    Module mod_print_harupdf"; fi)
+$(if test "x$WITH_FREEIMAGE" = "x1"; then echo ";    Module mod_graphix"; fi)
+}

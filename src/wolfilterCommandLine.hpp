@@ -50,7 +50,7 @@ namespace config {
 class WolfilterCommandLine
 {
 public:
-	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir);
+	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined);
 	~WolfilterCommandLine(){}
 
 	bool printhelp() const						{return m_printhelp;}

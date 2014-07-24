@@ -1,4 +1,0 @@
-insertNumber=insertNumber(xml);
-updateNumber=updateNumber(xml);
-selectNumber=selectNumber(xml);
-deleteNumber=deleteNumber(xml);

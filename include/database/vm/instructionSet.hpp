@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file database/vm/instructionSet.hpp
-///\brief Defines the instruction set of the virtual machine defining database transactions
+/// \file database/vm/instructionSet.hpp
+/// \brief Defines the instruction set of the virtual machine defining database transactions
 #ifndef _DATABASE_VIRTUAL_MACHINE_INSTRUCTION_SET_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_INSTRUCTION_SET_HPP_INCLUDED
 #include <stdexcept>
@@ -45,13 +45,13 @@ namespace _Wolframe {
 namespace db {
 namespace vm {
 
-///\class InstructionSet
-///\brief Enumeration of instructions for the transaction VM with some static functions on them
+/// \class InstructionSet
+/// \brief Enumeration of instructions for the transaction VM with some static functions on them
 struct InstructionSet
 {
 public:
-	///\enum OpCode
-	///\brief Implemented operation codes of the VM
+	/// \enum OpCode
+	/// \brief Implemented operation codes of the VM
 	enum OpCode
 	{
 		// Control Flow Instructions:
@@ -191,8 +191,8 @@ public:
 		return ar[i];
 	}
 
-	///\enum ArgumentType
-	///\brief Enumeration of argument types
+	/// \enum ArgumentType
+	/// \brief Enumeration of argument types
 	enum ArgumentType
 	{
 		At_None,			//< no argument
@@ -210,7 +210,7 @@ public:
 		At_IteratorColumnIdx		//< Index of Column in tuple set iterator element
 	};
 
-	///\brief Get the name of an argument type
+	/// \brief Get the name of an argument type
 	static const char* argumentTypeName( ArgumentType i)
 	{
 		static const char* ar[] =
@@ -231,7 +231,7 @@ public:
 		return ar[i];
 	}
 
-	///\brief get the argument type of an operation
+	/// \brief get the argument type of an operation
 	static ArgumentType argumentType( OpCode i)
 	{
 		static ArgumentType ar[] =
@@ -300,8 +300,8 @@ public:
 		return ar[i];
 	}
 
-	///\enum CondCode
-	///\brief Enumeration of conditional codes
+	/// \enum CondCode
+	/// \brief Enumeration of conditional codes
 	enum CondCode
 	{
 		Co_ALWAYS,			//< execute always
@@ -309,7 +309,7 @@ public:
 		Co_NOT_IF_COND			//< execute, if cond flag set to false
 	};
 
-	///\brief Get the name of a conditional code
+	/// \brief Get the name of a conditional code
 	static const char* condCodeName( CondCode i)
 	{
 		static const char* ar[] = 
@@ -320,18 +320,18 @@ public:
 		};
 		return ar[i];
 	}
-	///\brief Index of an argument
+	/// \brief Index of an argument
 	typedef boost::uint32_t ArgumentIndex;
-	///\brief Address in program code
+	/// \brief Address in program code
 	typedef boost::uint32_t Address;
-	///\brief Instruction
+	/// \brief Instruction
 	typedef boost::uint32_t Instruction;
 
-	///\brief Build an instruction from its parts
-	///\brief param[in] cond conditional code (condition for execution)
-	///\brief param[in] opcode instruction operation code
-	///\brief param[in] arg operation argument
-	///\return the instruction
+	/// \brief Build an instruction from its parts
+	/// \brief param[in] cond conditional code (condition for execution)
+	/// \brief param[in] opcode instruction operation code
+	/// \brief param[in] arg operation argument
+	/// \return the instruction
 	static Instruction instruction( CondCode cond, OpCode opcode, unsigned int arg=0)
 	{
 		Instruction rt = 0;
@@ -343,28 +343,28 @@ public:
 		rt |= (arg << Shift_ArgumentIndex);
 		return rt;
 	}
-	///\brief Build an instruction from its parts (no condition -> always executed)
-	///\brief param[in] opcode instruction operation code
-	///\brief param[in] arg operation argument
-	///\return the instruction
+	/// \brief Build an instruction from its parts (no condition -> always executed)
+	/// \brief param[in] opcode instruction operation code
+	/// \brief param[in] arg operation argument
+	/// \return the instruction
 	static Instruction instruction( OpCode opcode, unsigned int arg=0)
 	{
 		return instruction( Co_ALWAYS, opcode, arg);
 	}
 
-	///\brief Get the condition code of an instruction (defining on which condition the instruction is executed)
-	///\brief param[in] instr the instruction to extract the condition code from
+	/// \brief Get the condition code of an instruction (defining on which condition the instruction is executed)
+	/// \brief param[in] instr the instruction to extract the condition code from
 	static CondCode condCode( const Instruction& instr)		{return static_cast<CondCode>((unsigned int)(instr&Mask_CondCode) >> Shift_CondCode);}
-	///\brief Get the operation code of an instruction (defining what is done on execution)
-	///\brief param[in] instr the instruction to extract the operation code from
+	/// \brief Get the operation code of an instruction (defining what is done on execution)
+	/// \brief param[in] instr the instruction to extract the operation code from
 	static OpCode opCode( const Instruction& instr)			{return static_cast<OpCode>((unsigned int)(instr&Mask_OpCode) >> Shift_OpCode);}
-	///\brief Get the argument index of the instruction (addressing the argument depending on the argument type of the instruction)
-	///\brief param[in] instr the instruction to extract the argument index from
+	/// \brief Get the argument index of the instruction (addressing the argument depending on the argument type of the instruction)
+	/// \brief param[in] instr the instruction to extract the argument index from
 	static ArgumentIndex argumentIndex( const Instruction& instr)	{return static_cast<ArgumentIndex>((unsigned int)(instr&Mask_ArgumentIndex) >> Shift_ArgumentIndex);}
 
-	///\brief Print the program code without any symbolic information that is not available here
-	///\brief param[out] out output stream to print to
-	///\brief param[out] prg vector of instructions to print
+	/// \brief Print the program code without any symbolic information that is not available here
+	/// \brief param[out] out output stream to print to
+	/// \brief param[out] prg vector of instructions to print
 	static void printProgramRaw( std::ostream& out, const std::vector<Instruction>& prg)
 	{
 		std::vector<Instruction>::const_iterator pi = prg.begin(), pe = prg.end();
@@ -384,8 +384,8 @@ public:
 		}
 	}
 
-	///\brief Get the instruction as string
-	///\return the instruction as string
+	/// \brief Get the instruction as string
+	/// \return the instruction as string
 	static std::string instructionstr( const Instruction& instr)
 	{
 		std::ostringstream out;

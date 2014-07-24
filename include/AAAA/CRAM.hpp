@@ -31,8 +31,8 @@
 
 ************************************************************************/
 //
-/// \file CRAM.hpp
-/// Challenge Response Authentication Mechanism classes
+/// \file AAAA/CRAM.hpp
+/// \brief Challenge Response Authentication Mechanism classes
 ///
 /// \note This implementation of a CRAM mechanism is specific to the Wolframe Project.
 /// It is not supposed to be compatible to other implementations.
@@ -53,7 +53,9 @@ static const size_t CRAM_BLOCK_SIZE = 512 / 8;
 static const size_t CRAM_DIGEST_SIZE = 256 / 8;
 static const size_t CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
 static const size_t CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
+static const size_t CRAM_SALT_SIZE = PASSWORD_SALT_SIZE;
 
+/// Challenge for the authentication mech "Wolframe-CRAM"
 class CRAMchallenge
 {
 public:
@@ -78,6 +80,7 @@ private:
 };
 
 
+/// Response for the authentication mech "Wolframe-CRAM"
 class CRAMresponse
 {
 public:
@@ -108,6 +111,26 @@ public:
 	bool operator != ( const std::string& rhs )	{ return !( *this == rhs ); }
 private:
 	unsigned char	m_response[ CRAM_RESPONSE_SIZE ];
+};
+
+/// Extract the password seed from the challenge message
+class CRAMsalt
+{
+public:
+	/// \note The challenge string is base64 encoded, including the password salt,
+	///	  with or without end padding.
+	CRAMsalt( const std::string& challenge );
+
+	~CRAMsalt();
+
+	const unsigned char* salt() const		{ return m_salt; }
+	std::size_t size() const			{ return CRAM_SALT_SIZE; }
+
+	std::string toBCD() const;
+	std::string toString() const;
+
+private:
+	unsigned char	m_salt[ CRAM_SALT_SIZE ];
 };
 
 }} // namespace _Wolframe::AAAA

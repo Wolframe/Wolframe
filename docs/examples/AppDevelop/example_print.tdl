@@ -1,7 +1,10 @@
 
 TRANSACTION doPrintX
-RESULT INTO person
 BEGIN
+  INTO person
+  BEGIN
     INTO name PRINT 'jussi';
     INTO id PRINT '1';
+  END
 END
+

@@ -40,8 +40,15 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-/// \brief Create a new blob filter type (with new, to be destroyed with delete)
-FilterType* createBlobFilterType();
+class BlobFilterType :public FilterType
+{
+public:
+	BlobFilterType()
+		:FilterType("blob"){}
+	virtual ~BlobFilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const;
+};
 
 }}//namespace
 #endif

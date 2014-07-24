@@ -8,12 +8,12 @@ package require Expect
 set config ../../examples/pecho/pecho.conf
 set server ../../examples/pecho/pechod
 
-set timeout 3
+set timeout 5
 set serverpid [spawn $server -c $config -f]
 
 puts "pechod started with configuration file: $config (pid: $serverpid)"
 # allow the server to start
-sleep 1
+sleep 5
 
 set timeout 5
 if { [catch {

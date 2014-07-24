@@ -1,0 +1,36 @@
+<sect1>
+	<title>Auditing and accounting</title>
+	<para>The aspect of auditing and accounting is configured in the 
+	subsection <code>Audit</code> of the <code>AAAA</code> section
+	in the server configuration. Accounting is a sub aspect of
+	auditing. The audit (and accounting) calls are implemented as normal
+	Wolframe function calls. The configuration defines additional parameters
+	depending on the authentication status for the audit function calls 
+	and resources to be referenced.
+
+	The following example shows an <code>Audit</code>
+	configuration with the setting use the textfile /var/tmp/wolframe.audit
+	as audit log:
+	<programlisting language='text'>
+AAAA
+{
+    Audit
+    {
+        TextFile
+        {
+            file /var/tmp/wolframe.audit
+        }
+    }
+}
+	</programlisting>
+	</para>
+	<sect2>
+	<title>Development status</title>
+		<para>The mechanism of auditing, the calling of audit functions
+		and their declaration in the transaction layer is implemented
+		and tested. The underlaying methods, for example to log
+		to a text file as configured in the example above is not yet
+		implemented, but is subject of the next release.</para>
+	</sect2>
+</sect1>
+

@@ -9,7 +9,7 @@
 		the following 'action' property:
 
 		<programlisting language='shell'>
-		CustomerDelete customer {id={customer.selected}}
+CustomerDelete customer {id={customer.selected}}
 		</programlisting>
 		
 		We also want to reload the customer list after deletion. For now we
@@ -33,9 +33,8 @@
 		We add another map for the 'CustomerDelete' request in <filename>tutorial.dmap</filename>:
 
 	<programlisting language='shell'>
-	COMMAND CustomerDelete CALL DeleteCustomer;
+COMMAND CustomerDelete CALL DeleteCustomer;
 	</programlisting>
-	
 		We also add a new form 'CustomerDelete' to the simpleform file <filename>Customer.sfrm</filename>
 		which allows us only the specify an 'id' attribute of the customer to delete:
 
@@ -47,10 +46,10 @@
 		in <filename>Customer.tdl</filename>:
 
 	<programlisting language='sql'>
-	TRANSACTION DeleteCustomer
-	BEGIN
-		DO DELETE FROM Customer WHERE id=$(id);
-	END
+TRANSACTION DeleteCustomer
+BEGIN
+    DO DELETE FROM Customer WHERE id=$(id);
+END
 	</programlisting>
 	
 		Executing the request we see in the wolfclient debug output:

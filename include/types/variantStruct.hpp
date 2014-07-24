@@ -259,7 +259,7 @@ private:
 };
 
 
-/// \class VariantStructIndirection
+/// \class VariantIndirection
 /// \brief Variant type as indirection: Variant value is only expanded when referenced
 class VariantIndirection :public Variant
 {

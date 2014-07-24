@@ -116,6 +116,18 @@ Authenticator* AuthenticationFactory::authenticator( const net::RemoteEndpoint& 
 	return new StandardAuthenticator( m_mechs, m_authUnits, client );
 }
 
+PasswordChanger* AuthenticationFactory::passwordChanger( const User& user,
+							 const net::RemoteEndpoint& client )
+{
+	for ( std::list< AuthenticationUnit* >::const_iterator it = m_authUnits.begin();
+								it != m_authUnits.end(); it++ )
+		if ( boost::iequals( (*it)->identifier(), user.authenticator() ))	{
+			PasswordChanger* pwc = (*it)->passwordChanger( user, client );
+			if ( pwc )
+				return pwc;
+		}
+	return NULL;
+}
 
 //*********************************************************************************
 // Standard authenticator
@@ -199,6 +211,8 @@ bool StandardAuthenticator::setMech( const std::string& mech )
 	// in order to do this reasonably correct
 	if ( ! m_slices.empty() )	{
 		m_currentSlice = 0;
+		if ( m_slices.size() == 1 )
+			m_slices[ m_currentSlice ]->lastSlice();
 		LOG_TRACE << "StandardAuthenticator: authentication slice set to '"
 			  << m_slices[ m_currentSlice ]->identifier() << "'";
 		switch ( m_slices[ m_currentSlice ]->status() )	{
@@ -357,7 +371,7 @@ std::string StandardAuthenticator::messageOut()
 			m_status = AUTHENTICATED;
 			LOG_TRACE << "StandardAuthenticator: status is AUTHENTICATED";
 			break;
-// This has to be changed
+// This has to be changed - if there are slices to be used go to the next one
 		case AuthenticatorSlice::USER_NOT_FOUND:
 			// destroy everything that was used for authentication
 			for ( std::vector< AuthenticatorSlice* >::iterator it = m_slices.begin();

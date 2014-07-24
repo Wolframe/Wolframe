@@ -31,8 +31,7 @@
 
 ************************************************************************/
 /// \file AAAA/authenticator.hpp
-///
-/// Authenticator interface definition
+/// \brief Authenticator interface definition
 
 #ifndef _AUTHENTICATOR_HPP_INCLUDED
 #define _AUTHENTICATOR_HPP_INCLUDED
@@ -45,11 +44,12 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// Authenticator interface
+/// \class Authenticator
+/// \brief Authenticator interface
 /// This the only interface to be used by the system. All other interfaces
 /// are internal to the authentication objects.
 ///
-/// \note	The authenticator works ony with complete messages.
+/// \note	The authenticator works only with complete messages.
 ///		Sending a message in multiple parts will most likely
 ///		result in an error. But that depends also on the authentication
 ///		backend.
@@ -91,7 +91,6 @@ public:
 
 	/// Set the authentication mech
 	/// \param [in]	mech	the name of the mech (case-insensitive)
-	/// \param [in] client	reference to the client network endpoint
 	/// \returns		true if the mech could be selected
 	///			false if the mech is not available
 	/// \note	This function works like a reset function

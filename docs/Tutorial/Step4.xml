@@ -4,12 +4,17 @@
 	<title>Step 4 - Implement server side customer list</title>	
 
 	<para>
-		We want to store the customer data in an Sqlite database, so we have to
-		tell the server to load the database module for Sqlite:
+		We want to store the customer data in a database.
+		As language to describe this transaction we use TDL
+		(Transaction Definition Language) and as database
+		we use Sqlite. So we have to
+		tell the server to load the TDL module and the
+		database module for Sqlite:
 		<programlisting language='shell'>
-	LoadModules {
-		<emphasis role="bold">module mod_db_sqlite3</emphasis>
-	}
+LoadModules {
+    <emphasis role="bold">Module mod_command_tdl</emphasis>
+    <emphasis role="bold">Module mod_db_sqlite3</emphasis>
+}
 		</programlisting>
 	</para>
 	
@@ -18,11 +23,11 @@
 		following schema:
 
 		<programlisting language='shell'>
-	CREATE TABLE Customer (
-		id              INTEGER PRIMARY KEY AUTOINCREMENT,
-		name            TEXT    NOT NULL,
-		address         TEXT
-	);
+CREATE TABLE Customer (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    name            TEXT    NOT NULL,
+    address         TEXT
+);
 		</programlisting>
 	</para>
 	
@@ -30,7 +35,7 @@
 		Store this into <filename>schema.sql</filename>. Then execute:
 
 		<programlisting language='shell'>
-	sqlite3 tutorial.db &lt; schema.sql
+sqlite3 tutorial.db &lt; schema.sql
 		</programlisting>
 	</para>
 
@@ -38,13 +43,13 @@
 		Now we have to tell server to use this sqlite database file:
 
 		<programlisting language='shell'>
-	database {
-		SQLite {
-			identifier	sqlitedb
-			file		tutorial.db
-			foreignKeys	yes
-		}
-	}
+Database {
+    SQLite {
+        Identifier db
+        File tutorial.db
+        ForeignKeys yes
+    }
+}
 		</programlisting>
 	
 	</para>
@@ -53,29 +58,32 @@
 		When we restart the server we see:
 
 		<programlisting language='shell'>
-	DEBUG: SQLite database unit 'sqlitedb' created with 3 connections
-		to file 'tutorial.db'
+DEBUG: SQLite database unit 'db' created with 3 connections to file 'tutorial.db'
 		</programlisting>
 	</para>
 	
 	<para>
 		Now we want to use some XML filters to send/receive XML over the protocol,
-		so we have to add the following module to <filename>tutorial.conf</filename>:
+		so we have to add the following modules to <filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
-	LoadModules {
-		module mod_db_sqlite3
-		<emphasis role="bold">module mod_filter_libxml2</emphasis>
-	}
+LoadModules {
+    Module mod_command_tdl
+    Module mod_db_sqlite3
+    <emphasis role="bold">Module mod_doctype_xml</emphasis>
+    <emphasis role="bold">Module mod_filter_libxml2</emphasis>
+}
 		</programlisting>
 	</para>
 
 	<para>
+		The module mod_doctype_xml is there to detect documents of type XML.
+		The module mod_filter_libxml2 is there to process XML documents.
 		In order to see which modules are currently loaded in the wolframed we can
 		use:
 
 		<programlisting language='shell'>
-	/usr/sbin/wolframed -p -c tutorial.conf
+/usr/sbin/wolframed -p -c tutorial.conf
 		</programlisting>
 	</para>
 
@@ -83,11 +91,13 @@
 		We see:
 
 		<programlisting language='shell'>
-	..
-	Module files to load:
-	  /usr/lib/wolframe/modules/mod_db_sqlite3
-	  /usr/lib/wolframe/modules/mod_filter_libxml2
-	..
+..
+Module files to load:
+  /usr/lib/wolframe/modules/mod_command_tdl
+  /usr/lib/wolframe/modules/mod_db_sqlite3
+  /usr/lib/wolframe/modules/mod_doctype_xml
+  /usr/lib/wolframe/modules/mod_filter_libxml2
+..
 		</programlisting>
 		which looks ok.
 	</para>
@@ -98,29 +108,31 @@
 		<filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
-	LoadModules {
-		module mod_db_sqlite3
-		module mod_filter_libxml2
-		<emphasis role="bold">module mod_command_directmap</emphasis>
-	}
+LoadModules {
+    Module mod_command_tdl
+    Module mod_db_sqlite3
+    Module mod_doctype_xml
+    Module mod_filter_libxml2
+    <emphasis role="bold">Module mod_command_directmap</emphasis>
+}
 		</programlisting>
 		and a new section 'Processor' on the same level as 'LoadModules'
 		<programlisting language='shell'>
-	Processor {
-		database sqlitedb
-		cmdhandler {
-			directmap {
-				filter libxml2
-				program tutorial.dmap
-			}
-		}
+Processor {
+    Database db
+    CmdHandler {
+        Directmap {
+            Program tutorial.dmap
+            Filter XML=libxml2
 	}
+    }
+}
 		</programlisting>
 	</para>
 
 	<para>
 		The "filter" directive denotes that the command handler should
-		use the "libxml2" module to parse XML requests.
+		use the "libxml2" module for parsing XML requests.
 	</para>
 		
 	<para>
@@ -128,34 +140,51 @@
 		This file maps the requests to the corresponding transaction definitions:
 
 		<programlisting language='shell'>
-	COMMAND CustomerListRequest
-	       CALL SelectCustomerList
-	       RETURN STANDALONE list;
+COMMAND CustomerListRequest
+    CALL SelectCustomerList
+    RETURN SKIP {standalone="yes", root="list"};
 		</programlisting>
 
-		This is we map the 'CustomerListRequest' request to a function 'SelectCustomerList'
+		We map the 'CustomerListRequest' request to a function 'SelectCustomerList'
 		that is executed to perform the request. It will return the document 
-		without a document type assigned to it (standalone) and with the root element 'list'. 
-		The returned content will be a list of customers. The function will be implemented 
-		in a TDL program in the server. We first add the
-		TDL program declaration to a new 'Processor' configuration section:
+		without validation (SKIP). The attributes in curly brackets after the 
+		RETURN SKIP define the meta data of the document. Depending of the output 
+		filters used we have to define a set of document meta data.
+		Because we do not declare the meta data as part of the document type 
+		description as we will do later, we have to declare them here in the command.
+		The meta data attribute standalone='yes' tells the XML filter not to
+		include any document type declaration. The declaration root='list' 
+		declares the root element for the XML output.
+		In our example we need to define the root element because we use XML for
+		output and XML needs a root element to be defined. 
+		The returned content will be a list of customers. 
+		The function will be implemented in a TDL program in the server.
+		We first add the TDL program declaration to the 'Processor' configuration 
+		section:
 
 		<programlisting language='shell'>
-	Processor {
-		program Customer.tdl
+Processor {
+    Database db
+    CmdHandler {
+        Directmap {
+            Program tutorial.dmap
+            Filter XML=libxml2
 	}
+    }
+    <emphasis role="bold">Program Customer.tdl</emphasis>
+}
 		</programlisting>
 
-		The <filename>Customer.tdl</filename> file contains the database transaction 'SelectCustomerList' we want to execute.
-		We only have to specify the enclosing tag 'customer' for each customer record we are going to
-		retrieve with 'INTO customer'. The 'list' tag gets added by the directmap and is specified there as
-		'RETURN STANDALONE list':
+		The <filename>Customer.tdl</filename> file contains the database transaction 'SelectCustomerList' 
+		we want to execute.
+		We only have to specify the enclosing tag 'customer' for each customer record 
+		we are going to retrieve with 'INTO customer'.
 
 		<programlisting language='shell'>
-	TRANSACTION SelectCustomerList
-	BEGIN
-		INTO customer DO SELECT * from Customer;
-	END
+TRANSACTION SelectCustomerList
+BEGIN
+    INTO customer DO SELECT * from Customer;
+END
 		</programlisting>
 
 	We also need a validator for the input when the client sends a 'CustomerListRequest'.
@@ -163,17 +192,26 @@
 	register the simpleform program <filename>Customer.sfrm</filename> to the list of programs in the same file:
 
 		<programlisting language='shell'>
-	LoadModules {
-		module mod_db_sqlite3
-		module mod_filter_libxml2
-		module mod_command_directmap
-		<emphasis role="bold">module mod_ddlcompiler_simpleform</emphasis>
-	}
+LoadModules {
+    Module mod_command_tdl
+    Module mod_db_sqlite3
+    Module mod_doctype_xml
+    Module mod_filter_libxml2
+    Module mod_command_directmap
+    <emphasis role="bold">Module mod_ddlcompiler_simpleform</emphasis>
+}
 
-	Processor {
-		program Customer.tdl
-		<emphasis role="bold">program Customer.sfrm</emphasis>	
+Processor {
+    Database db
+    CmdHandler {
+        Directmap {
+            Program tutorial.dmap
+            Filter XML=libxml2
 	}
+    }
+    Program Customer.tdl
+    <emphasis role="bold">Program Customer.sfrm</emphasis>	
+}
 		</programlisting>
 
 	and we add a simple form file <filename>Customer.sfrm</filename>.
@@ -181,19 +219,18 @@
 	but for the root element 'customer':
 
 		<programlisting language='shell'>
-	FORM CustomerListRequest
-	{
-		customer {
-		}
-	}
+FORM CustomerListRequest
+    -root customer
+{
+}
 		</programlisting>
 	</para>
 	
 	<para>
-		We have to restart the wolframe daemon now and restart it with
+		We have to restart the wolframe daemon now and restart it with:
 		<programlisting language='shell'>
-	pkill wolframed
-	/usr/sbin/wolframed -f -c tutorial.conf			
+pkill wolframed
+/usr/sbin/wolframed -f -c tutorial.conf			
 		</programlisting>	
 	
 		This we have to do <emphasis role="bold">every time</emphasis> we
@@ -207,7 +244,7 @@
 		loaded:
 		
 		<programlisting language='shell'>
-	DEBUG: Loaded transaction function 'SelectCustomerList'
+DEBUG: Loaded transaction function 'SelectCustomerList'
 		</programlisting>
 	</para>
 
@@ -223,7 +260,7 @@
 		This we can execute with:
 
 		<programlisting language='shell'>
-	netcat -v localhost 7661 &lt; CustomerListRequest.netcat
+netcat -v localhost 7661 &lt; CustomerListRequest.netcat
 		</programlisting>
 
 		and we get:
@@ -242,12 +279,12 @@
 		Let's add some customer data now:
 
 		<programlisting language='shell'>
-	cat > data.sql
-	insert into customer(name,address) values('Dr Who','Blue Police Box');
-	insert into customer(name,address) values('John Smith','The Wheel in Space');
-	Ctrl-D
+cat > data.sql
+INSERT INTO Customer(name,address) values('Dr Who','Blue Police Box');
+INSERT INTO Customer(name,address) values('John Smith','The Wheel in Space');
+Ctrl-D
 
-	sqlite3 tutorial.db &lt; data.sql
+sqlite3 tutorial.db &lt; data.sql
 		</programlisting>
 	</para>
 
@@ -263,7 +300,36 @@
 	</para>
 		
 	<para>
+		Instead of using <command>netcat</command> you can also use the
+		<command>wolframec</command> for testing the requests.
+	</para>
+	
+	<para>
+		First create an XML file containing just the request and name
+		it <filename>CustomerListRequest.xml</filename>:
+		<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerListRequest.xml" parse="text" />
+		</programlisting>		
+	</para>
+	
+	<para>
+		The request can be executed by calling:
+		<programlisting language='shell'>
+wolframec -d CustomerListRequest.xml
+		</programlisting>		
+	</para>
+	
+	<para>
+		We can also test the command without even starting the <command>wolframed</command>
+		daemon process. We use the <command>wolfilter</command> program for that in the
+		following way:
+		<programlisting language='shell'>
+cat ~/tutorial/client/CustomerListRequest.xml | \
+    wolfilter -c ~/tutorial/server/tutorial.conf CustomerListRequest
+		</programlisting>
+	</para>
+	
+	<para>
 		We can move now to the wolfclient to make our first request visible.
-
 	</para>
 </sect1>

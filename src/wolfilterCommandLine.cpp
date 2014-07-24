@@ -40,9 +40,9 @@
 #include "config/configurationTree.hpp"
 #include "types/propertyTree.hpp"
 #include "serialize/structOptionParser.hpp"
+#include "serialize/configSerialize.hpp"
 #include "utils/fileUtils.hpp"
 #include "filter/redirectFilterClosure.hpp"
-#include "config/structSerialize.hpp"
 #include "logger-v1.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -60,7 +60,13 @@ using namespace _Wolframe::config;
 #define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
 
 //TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a src/libwolframed.a -> Issue #95)
-static const char* defaultMainConfig()		{ return "/etc/wolframe.conf"; }
+static const char* defaultMainConfig()		{
+#ifdef DEFAULT_MAIN_CONFIGURATION_FILE
+		return DO_STRINGIFY( DEFAULT_MAIN_CONFIGURATION_FILE );
+#else
+		return "/etc/wolframe/wolframe.conf";
+#endif
+	}
 static const char* defaultUserConfig()		{ return "~/wolframe.conf"; }
 static const char* defaultLocalConfig()		{ return "./wolframe.conf"; }
 static const char* getDefaultConfigFile()
@@ -83,19 +89,35 @@ static std::string configurationTree_tostring( const types::PropertyTree::Node& 
 
 config::ConfigurationNode WolfilterCommandLine::getConfigNode( const std::string& name) const
 {
-	return m_config.root().getChild( name);
+	return m_config.root().getChildrenJoined( name);
 }
 
 std::vector<std::string> WolfilterCommandLine::configModules( const std::string& refpath) const
 {
 	std::vector<std::string> rt;
-	types::PropertyTree::Node module_section = getConfigNode( "LoadModules");
+	config::ConfigurationNode module_section = getConfigNode( "LoadModules");
+	std::string directory;
+
 	types::PropertyTree::Node::const_iterator mi = module_section.begin(), me = module_section.end();
+	for (; mi != me; ++mi)
+	{
+		if (boost::algorithm::iequals( mi->first, "directory"))
+		{
+			if (!directory.empty()) throw std::runtime_error( "duplicate definition of 'directory' in section LoadModules");
+			directory = utils::getCanonicalPath( mi->second.data(), refpath);
+			if (directory.empty()) throw std::runtime_error( "empty definition of 'directory' in section LoadModules");
+		}
+	}
+	if (directory.empty())
+	{
+		directory = refpath;
+	}
+	mi = module_section.begin();
 	for (; mi != me; ++mi)
 	{
 		if (boost::algorithm::iequals( mi->first, "module"))
 		{
-			rt.push_back( utils::getCanonicalPath( mi->second.data(), refpath));
+			rt.push_back( utils::getCanonicalPath( mi->second.data(), directory));
 		}
 	}
 	return rt;
@@ -133,9 +155,9 @@ struct WolfilterOptionStruct
 };
 
 #if defined( DEFAULT_MODULE_LOAD_DIR)
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir)
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined)
 #else
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool )
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool, bool useDefaultConfigIfNotDefined)
 #endif
 	:m_printhelp(false)
 	,m_printversion(false)
@@ -196,7 +218,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 #if !defined(_WIN32)
 		const char* defaultConfigFile = getDefaultConfigFile();
-		if (defaultConfigFile)
+		if (defaultConfigFile && useDefaultConfigIfNotDefined)
 		{
 			LOG_DEBUG << "No configuration file specified on command line. Using default configuration file '" << defaultConfigFile << "'";
 			configfile = defaultConfigFile;

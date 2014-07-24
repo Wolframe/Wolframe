@@ -75,7 +75,7 @@
 	</refnamediv>
 	<refsynopsisdiv>
 		<cmdsynopsis>
-			<command>/etc/wolframe/wolframe.conf</command>
+			<command>/etc/wolframe/wolframe.conf, /etc/wolframe/conf.d/mod_db_sqlite3.conf</command>
 		</cmdsynopsis>
 	</refsynopsisdiv>
 
@@ -98,22 +98,6 @@
 			to the global configuration section <emphasis role="bold">database</emphasis>.
 		</para>
 		
-<!--
-database
-{
-}
-
-	SQLite	{
-		identifier	sqlitedb
-		file		sqlite.db
-		foreignKeys	yes
-		profiling	no
-		connections	3
-		program		sqlite.prg
-		extension	sqlite_module.so
-	}
-
--->
 		<refsect2 id="SQLite">
 			<title>SQLite</title>
 		
@@ -122,7 +106,7 @@ database
 			<variablelist>
 				<varlistentry>
 					<term>
-						<option>identifier <replaceable>identifier</replaceable></option>
+						<option>Identifier <replaceable>identifier</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -136,7 +120,7 @@ database
 
 				<varlistentry>
 					<term>
-						<option>file <replaceable>filename</replaceable></option>
+						<option>File <replaceable>filename</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -148,7 +132,7 @@ database
 
 				<varlistentry>
 					<term>
-						<option>connections <replaceable>connections</replaceable></option>
+						<option>Connections <replaceable>connections</replaceable></option>
 					</term>
 					<listitem>
 						<para>
@@ -161,7 +145,7 @@ database
 
 				<varlistentry>
 					<term>
-						<option>foreignKeys
+						<option>ForeignKeys
 						<replaceable>yes</replaceable> | <replaceable>no</replaceable> 
 						</option>
 					</term>
@@ -177,7 +161,7 @@ database
 
 				<varlistentry>
 					<term>
-						<option>profiling
+						<option>Profiling
 						<replaceable>yes</replaceable> | <replaceable>no</replaceable> 
 						</option>
 					</term>
@@ -188,23 +172,10 @@ database
 						</para>
 					</listitem>
 				</varlistentry>
-
-				<varlistentry>
-					<term>
-						<option>program <replaceable>filename</replaceable></option>
-					</term>
-					<listitem>
-						<para>
-							Load SQL statements from program file <replaceable>filename</replaceable>
-							when creating a database connection. This can be used to prepare
-							named statements (TODO: not implemented currently?).
-						</para>
-					</listitem>
-				</varlistentry>
 				
 				<varlistentry>
 					<term>
-						<option>extension <replaceable>filename</replaceable></option>
+						<option>Extension <replaceable>filename</replaceable></option>
 					</term>
 					<listitem>
 						<para>

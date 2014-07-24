@@ -39,7 +39,15 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-FilterType* createLibxml2FilterType();
+class Libxml2FilterType :public FilterType
+{
+public:
+	Libxml2FilterType()
+		:FilterType("libxml2"){}
+	virtual ~Libxml2FilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const;
+};
 
 }}//namespace
 #endif

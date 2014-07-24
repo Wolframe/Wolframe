@@ -29,7 +29,13 @@
 	</glossentry>
 	<glossentry><glossterm>Command Handler</glossterm>
 		<glossdef>
-			<para>Interface for delegating processing of client protocol commands in a hierarchical way. A command handler is created by a connection handler or another command handler. During command execution the input/output of the connection is entirely handled by the command handler. Command Handlers are used to build the communication protocol processing as hierarchical state machine.
+			<para>Interface for delegating processing of client protocol 
+			commands in a hierarchical way. A command handler is 
+			created by a connection handler or another command handler.
+			During command execution the input/output of the connection
+			is entirely handled by the command handler. 
+			Command Handlers are used to build the communication
+			protocol processing as hierarchical state machine.
 			</para>
 		</glossdef>
 	</glossentry>
@@ -48,7 +54,11 @@
 	</glossentry>
 	<glossentry><glossterm>Lua</glossterm>
 		<glossdef>
-			<para>Lua (www.lua.org) is a scripting language. It is used in Wolframe as one language for writing programs. It distinguishes itself by being lightweight. It has to be lightweight because the language context has to be recreated with every start of a clients command execution for security reasons.
+			<para>Lua (www.lua.org) is a scripting language.
+			It is used in Wolframe as one language for writing 
+			programs. Lua integrates nice into a 
+			cooperative system with a single threaded execution
+			model as Wolframe is.
 			</para>
 		</glossdef>
 	</glossentry>

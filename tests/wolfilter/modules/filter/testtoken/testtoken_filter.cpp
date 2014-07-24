@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file testtoken_filter.cpp
-///\brief Filter implementation of a filter for wolfilter test input/output
+/// \file testtoken_filter.cpp
+/// \brief Filter implementation of a filter for wolfilter test input/output
 
 #include "testtoken_filter.hpp"
 #include <string>
@@ -70,36 +70,34 @@ static char getElementTag( OutputFilter::ElementType tp)
 }
 
 
-///\class OutputFilterImpl
+/// \class OutputFilterImpl
 struct OutputFilterImpl :public OutputFilter
 {
-	///\brief Constructor
+	/// \brief Constructor
 	explicit OutputFilterImpl( const types::DocMetaDataR& md)
-		:utils::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
-		,OutputFilter("token", md)
+		:OutputFilter("token", md)
 		,m_elemitr(0)
 		{}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:utils::TypeSignature("langbind::OutputFilterImpl (token)", __LINE__)
-		,OutputFilter(o)
+		:OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
 		{}
 
-	///\brief self copy
-	///\return copy of this
+	/// \brief self copy
+	/// \return copy of this
 	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief print a value with EOL escaped
-	///\param [in] src pointer to attribute value string to print
-	///\param [in] srcsize size of src in bytes
-	///\param [in,out] buf buffer to print to
+	/// \brief print a value with EOL escaped
+	/// \param [in] src pointer to attribute value string to print
+	/// \param [in] srcsize size of src in bytes
+	/// \param [in,out] buf buffer to print to
 	void printToBufferEscEOL( const char* src, std::size_t srcsize, std::string& buf) const
 	{
 		std::size_t srcidx = 0;
@@ -131,11 +129,11 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	///\brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
-	///\param [in] type type of the element to print
-	///\param [in] element pointer to the element to print
-	///\param [in] elementsize size of the element to print in bytes
-	///\return true, if success, false else
+	/// \brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
+	/// \param [in] type type of the element to print
+	/// \param [in] element pointer to the element to print
+	/// \param [in] elementsize size of the element to print in bytes
+	/// \return true, if success, false else
 	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
@@ -164,17 +162,16 @@ struct OutputFilterImpl :public OutputFilter
 	virtual bool close() {return true;}
 
 private:
-	std::string m_elembuf;				//< buffer for the currently printed element
-	std::size_t m_elemitr;				//< iterator to pass it to output
+	std::string m_elembuf;				///< buffer for the currently printed element
+	std::size_t m_elemitr;				///< iterator to pass it to output
 };
 
-///\class InputFilterImpl
+/// \class InputFilterImpl
 struct InputFilterImpl :public InputFilter
 {
-	///\brief Constructor
+	/// \brief Constructor
 	InputFilterImpl()
-		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
-		,InputFilter("token")
+		:InputFilter("token")
 		,m_tag(0)
 		,m_taglevel(0)
 		,m_elemtype(OpenTag)
@@ -185,11 +182,10 @@ struct InputFilterImpl :public InputFilter
 		,m_linecomplete(false)
 		,m_eolnread(false){}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:utils::TypeSignature("langbind::InputFilterImpl (token)", __LINE__)
-		,InputFilter(o)
+		:InputFilter(o)
 		,m_tag(o.m_tag)
 		,m_taglevel(o.m_taglevel)
 		,m_elemtype(o.m_elemtype)
@@ -201,19 +197,19 @@ struct InputFilterImpl :public InputFilter
 		,m_linecomplete(o.m_linecomplete)
 		,m_eolnread(o.m_eolnread){}
 
-	///\brief Implement InputFilterImpl::copy()
+	/// \brief Implement InputFilterImpl::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief Implement InputFilterImpl::initcopy()
+	/// \brief Implement InputFilterImpl::initcopy()
 	virtual InputFilter* initcopy() const
 	{
 		return new InputFilterImpl();
 	}
 
-	///\brief Implement InputFilterImpl::putInput(const void*,std::size_t,bool)
+	/// \brief Implement InputFilterImpl::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_src = (const char*)ptr;
@@ -229,7 +225,7 @@ struct InputFilterImpl :public InputFilter
 		end = m_srcend;
 	}
 
-	///\brief Implement InputFilter::getNext( InputFilter::ElementType&,const void*&,std::size_t&)
+	/// \brief Implement InputFilter::getNext( InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (m_linecomplete)
@@ -362,16 +358,16 @@ struct InputFilterImpl :public InputFilter
 	}
 
 private:
-	char m_tag;			//< tag defining the currently parsed element type
-	int m_taglevel;			//< tag level
-	ElementType m_elemtype;		//< current element type
-	std::string m_elembuf;		//< buffer for current line => current token
-	const char* m_src;		//< pointer to current chunk parsed
-	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes
-	std::size_t m_srcpos;		//< source iterator
-	bool m_srcend;			//< true if end of message is in current chunk parsed
-	bool m_linecomplete;		//< true if the last getNext could complete a line
-	bool m_eolnread;		//< true if the end of line has been read
+	char m_tag;			///< tag defining the currently parsed element type
+	int m_taglevel;			///< tag level
+	ElementType m_elemtype;		///< current element type
+	std::string m_elembuf;		///< buffer for current line => current token
+	const char* m_src;		///< pointer to current chunk parsed
+	std::size_t m_srcsize;		///< size of the current chunk parsed in bytes
+	std::size_t m_srcpos;		///< source iterator
+	bool m_srcend;			///< true if end of message is in current chunk parsed
+	bool m_linecomplete;		///< true if the last getNext could complete a line
+	bool m_eolnread;		///< true if the end of line has been read
 };
 
 }//end anonymous namespace
@@ -449,21 +445,9 @@ static const char* getArgumentEncoding( const std::vector<FilterArgument>& arg)
 	return encoding;
 }
 
-class TokenFilterType :public FilterType
+Filter* TokenFilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	TokenFilterType()
-		:FilterType("token"){}
-	virtual ~TokenFilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		return new TokenFilter( getArgumentEncoding( arg));
-	}
-};
-
-FilterType* _Wolframe::langbind::createTokenFilterType()
-{
-	return new TokenFilterType();
+	return new TokenFilter( getArgumentEncoding( arg));
 }
+
 

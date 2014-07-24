@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file databaseLanguage.hpp
-///\brief Language definitions for embedded commands in transactions
+/// \file database/databaseLanguage.hpp
+/// \brief Language definitions for embedded commands in transactions
 #ifndef _DATABASE_LANGUAGE_HPP_INCLUDED
 #define _DATABASE_LANGUAGE_HPP_INCLUDED
 #include "database/transaction.hpp"
@@ -41,32 +41,41 @@
 namespace _Wolframe {
 namespace db {
 
+/// \brief Interface to properties of the database language (SQL)
+/// \class LanguageDescription
 class LanguageDescription
 {
 public:
+	/// \brief Default constructor
 	LanguageDescription(){}
+	/// \brief Destructor
 	virtual ~LanguageDescription(){}
 
-	///\brief Operator marking the start of an end of line comment.
-	// Default is the SQL standard EOLN comment marker
+	/// \brief Operator marking the start of an end of line comment.
+	/// Default is the SQL standard EOLN comment marker
 	virtual const char* eoln_commentopr() const
 	{
 		return "--";
 	}
 
-	///\brief String used for declaring a reference to an argument by index (starting with 1).
-	// Default is the SQL standard argument reference in embedded database statements.
+	/// \brief String used for declaring a reference to an argument by index (starting with 1).
+	/// Default is the SQL standard argument reference in embedded database statements.
 	virtual std::string stm_argument_reference( int index) const;
 
+	/// \brief Evaluate if the start of the block specified as argument is forming an embedded statement in the database language
 	virtual bool isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const;
 
+	/// \brief Parse an embedded statement in the database language
 	virtual std::string parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
 
+	/// \brief Substitute all template arguments in the specified embedded database statement
+	/// \param[in] cmd embedded database statement
+	/// \param[in] arg template arguments to substitute in the embedded database statement
 	typedef std::pair<std::string,std::string> TemplateArgumentAssignment;
 	virtual std::string substituteTemplateArguments( const std::string& cmd, const std::vector<TemplateArgumentAssignment>& arg) const;
 
-	///\brief Define if a database is case-insensitive. This has influence on TDL parsing
-	// Default is according SQL standard 'false'
+	/// \brief Define if a database is case-insensitive. This has influence on TDL parsing
+	/// Default is according SQL standard 'false'
 	virtual bool isCaseSensitive() const
 	{
 		return false;

@@ -56,31 +56,32 @@ struct InputFilterImpl :public InputFilter
 {
 	/// \brief Constructor
 	explicit InputFilterImpl( const XsltMapper& xsltMapper_, bool withEmpty_=false)
-		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
-		,InputFilter("libxslt")
+		:InputFilter("libxslt")
 		,m_xsltMapper(xsltMapper_)
 		,m_node(0)
 		,m_value(0)
 		,m_prop(0)
 		,m_propvalues(0)
 		,m_taglevel(0)
-		,m_withEmpty(withEmpty_){}
+		,m_withEmpty(withEmpty_)
+		,m_rootAttributeIdx(0)
+		,m_rootAttributeState(0){}
 
 	/// \brief Default constructor
 	InputFilterImpl()
-		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
-		,InputFilter("libxml2")
+		:InputFilter("libxml2")
 		,m_node(0)
 		,m_value(0)
 		,m_prop(0)
 		,m_propvalues(0)
 		,m_taglevel(0)
-		,m_withEmpty(false){}
+		,m_withEmpty(false)
+		,m_rootAttributeIdx(0)
+		,m_rootAttributeState(0){}
 
 	/// \brief Copy constructor
 	InputFilterImpl( const InputFilterImpl& o)
-		:utils::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
-		,InputFilter(o)
+		:InputFilter(o)
 		,m_doc(o.m_doc)
 		,m_xsltMapper(o.m_xsltMapper)
 		,m_node(o.m_node)
@@ -91,6 +92,9 @@ struct InputFilterImpl :public InputFilter
 		,m_nodestk(o.m_nodestk)
 		,m_withEmpty(o.m_withEmpty)
 		,m_elembuf(o.m_elembuf)
+		,m_rootAttributes(o.m_rootAttributes)
+		,m_rootAttributeIdx(o.m_rootAttributeIdx)
+		,m_rootAttributeState(o.m_rootAttributeState)
 		{}
 
 	/// \brief Implements InputFilter::copy()
@@ -132,6 +136,7 @@ struct InputFilterImpl :public InputFilter
 private:
 	std::string getElementString( const xmlChar* str);
 	void getElement( const void*& element, std::size_t& elementsize, const xmlChar* str);
+	void getRootAttribute( FilterBase::ElementType& type, const void*& element, std::size_t& elementsize);
 
 	/// \brief Initializes the document metadata after the complete document has been created
 	void initDocMetaData();
@@ -147,7 +152,24 @@ private:
 	std::vector<xmlNode*> m_nodestk;	//< stack of nodes
 	bool m_withEmpty;			//< return empty tokens as W3C requires too
 	std::string m_elembuf;			//< buffer for current element
+
+	struct RootAttribute
+	{
+		std::string key;
+		std::string value;
+
+		RootAttribute( const std::string& key_, const std::string& value_)
+			:key(key_),value(value_){}
+		RootAttribute( const RootAttribute& o)
+			:key(o.key),value(o.value){}
+		RootAttribute(){}
+	};
+
+	std::vector<RootAttribute> m_rootAttributes;
+	std::size_t m_rootAttributeIdx;
+	int m_rootAttributeState;
 };
 
 }}//namespace
 #endif
+

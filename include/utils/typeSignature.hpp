@@ -91,6 +91,8 @@ private:
 };
 
 #else
+/// \class TypeSignature
+/// \brief Signature of a type for pointer constraint check (disabled)
 class TypeSignature
 {
 public:

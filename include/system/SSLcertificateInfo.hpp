@@ -30,6 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
+/// \file system/SSLcertificateInfo.hpp
+/// \brief Certificate info for SSL
 
 #ifndef _SSL_CERTIFICATE_INFO_HPP_INCLUDED
 #define _SSL_CERTIFICATE_INFO_HPP_INCLUDED

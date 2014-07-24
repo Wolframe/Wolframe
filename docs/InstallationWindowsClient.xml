@@ -12,8 +12,8 @@
 	%CommonEntities;
 
 <!-- book set data -->
-	<!ENTITY BookSetVersion		SYSTEM "InstallationVersion.txt">
-	<!ENTITY BookSetPublicationDate	SYSTEM "InstallationDate.txt">
+	<!ENTITY BookSetVersion		SYSTEM "WolfBookVersion.txt">
+	<!ENTITY BookSetPublicationDate	SYSTEM "WolfBookDate.txt">
 	<!ENTITY WolframeVersion	SYSTEM "WolframeVersion.txt">
 	<!ENTITY WolfclientVersion	SYSTEM "WolfclientVersion.txt">
 
@@ -21,7 +21,7 @@
 
 <book id="book_GettingStarted" lang="en">
 	<title>Wolfclient Installation Windows</title>
-	<subtitle>Installation and Configuration Guide for Windows</subtitle>
+	<subtitle>Installation Guide for Windows</subtitle>
 	<bookinfo>
 		<date>&BookSetPublicationDate;</date>
 		<issuenum>Version &BookSetVersion;</issuenum>
@@ -35,14 +35,7 @@
 		&WolframeLegalNotice;
 	</bookinfo>
 
-	<sect1>
-		<title>Prerequisites</title>
-		
-		&InstallationSourceWindowsClientPrereq;
-	</sect1>
-	
-	<sect1>
-		&InstallationSourceWindowsClient;
-	</sect1>
+	&InstallationSourceWindowsClientPrereq;
+	&InstallationSourceWindowsClient;
 
 </book>

@@ -1,0 +1,51 @@
+; data processing
+
+Processor {
+
+; database to use in all processors as standard database
+
+;    Database db
+
+; normalization program
+
+;    Program program/example.wnmp
+
+; form validation program using simpleform language
+
+;    Program program/example.sfrm
+
+; database transactions using the TDL language
+
+;    Program program/example.tdl
+
+; implementation of functions in various scripting languages
+
+$(if test "x$WITH_LUA" = "x1"; then echo ";    Program program/example.lua"; fi)
+$(if test "x$WITH_PYTHON" = "x1"; then echo ";    Program program/example.py"; fi)
+    
+; command handler program mapping requests to functions handling them
+
+    CmdHandler {
+
+; the standard command handler using the directmap language
+    
+;        Directmap {
+
+; the list of command mappings
+
+;            Program program/example.dmap
+
+; filter to use for serialization of data (format and implementation
+; of the filter)
+
+$(if test "x$WITH_TEXTWOLF" = "x1"; then echo ";            Filter XML=textwolf"; fi)
+$(if test "x$WITH_LIBXML2" = "x1"; then echo ";            Filter XML=libxml2"; fi)
+$(if test "x$WITH_CJSON" = "x1"; then echo ";            Filter JSON=cjson"; fi)
+;        }
+ 
+; command handlers written in scripting languages
+
+$(if test "x$WITH_LUA" = "x1"; then eval "echo \"$(cat processor-lua.tmpl)\""; fi)
+
+    }
+}

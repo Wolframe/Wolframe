@@ -30,34 +30,35 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/cppFormFunctionModuleMacros.hpp
-///\brief Macros and templates for building C++ an application form function module
+/// \file appdevel/cppFormFunctionModuleMacros.hpp
+/// \brief Macros and templates for building C++ an application form function module
 
 #include "appdevel/module/cppFormFunctionTemplate.hpp"
 #include "appdevel/module/cppFormFunctionBuilder.hpp"
+#include "appdevel/module/cppFormFunctionTemplate.hpp"
 
-///\brief Defines normalization function
+/// \brief Defines normalization function
 #define WF_FORM_FUNCTION(NAME,FUNCTION,OUTPUT,INPUT)\
 {\
 	struct Constructor\
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			serialize::CppFormFunction func = appdevel::CppFormFunction<OUTPUT,INPUT,FUNCTION>::declaration();\
+			_Wolframe::serialize::CppFormFunction func = _Wolframe::appdevel::CppFormFunction<OUTPUT,INPUT,FUNCTION>::declaration();\
 			return new _Wolframe::module::CppFormFunctionBuilder( "CppFormFunction_" NAME, NAME, func);\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\
 }
 
-///\brief Defines normalization function without return value (empty result)
+/// \brief Defines normalization function without return value (empty result)
 #define WF_FORM_PROCEDURE(NAME,PROCEDURE,INPUT)\
 {\
 	struct Constructor\
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			serialize::CppFormFunction func = appdevel::CppFormFunction<serialize::EmptyStruct,INPUT,PROCEDURE>::declaration();\
+			_Wolframe::serialize::CppFormFunction func = _Wolframe::appdevel::CppFormFunction<_Wolframe::serialize::EmptyStruct,INPUT,PROCEDURE>::declaration();\
 			return new _Wolframe::module::CppFormFunctionBuilder( "CppFormFunction_" NAME, NAME, func);\
 		}\
 	};\

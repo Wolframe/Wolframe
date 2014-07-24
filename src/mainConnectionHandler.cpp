@@ -46,7 +46,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::proc;
 
-void Connection::initSessionExceptionBYE()
+void MainConnectionHandler::initSessionExceptionBYE()
 {
 	const char* termCommandStr = m_cmdhandler.interruptDataSessionMarker();
 	m_exceptionByeMessage.append( termCommandStr?termCommandStr:"");
@@ -54,7 +54,7 @@ void Connection::initSessionExceptionBYE()
 	m_exceptionByeMessagePtr = m_exceptionByeMessage.c_str();
 }
 
-void Connection::networkInput( const void* dt, std::size_t nofBytes)
+void MainConnectionHandler::networkInput( const void* dt, std::size_t nofBytes)
 {
 	try
 	{
@@ -77,14 +77,14 @@ void Connection::networkInput( const void* dt, std::size_t nofBytes)
 	m_terminated = true;
 }
 
-void Connection::signalOccured( NetworkSignal)
+void MainConnectionHandler::signalOccured( NetworkSignal)
 {
 	LOG_TRACE << "Got signal";
 	// ... on a signal we terminate immediately without sending a session exception BYE message
 	m_terminated = true;
 }
 
-const net::NetworkOperation Connection::nextOperation()
+const net::NetworkOperation MainConnectionHandler::nextOperation()
 {
 	void* inpp;
 	std::size_t inppsize;
@@ -134,22 +134,23 @@ const net::NetworkOperation Connection::nextOperation()
 	return net::SendData( m_exceptionByeMessage.c_str(), m_exceptionByeMessage.size());
 }
 
-Connection::Connection( const net::LocalEndpoint& local)
+MainConnectionHandler::MainConnectionHandler( const net::LocalEndpoint& local)
 	:m_cmdhandler()
 	,m_terminated(false)
 	,m_exceptionByeMessagePtr(0)
 {
 	m_cmdhandler.setInputBuffer( m_input.ptr(), m_input.size());
 	m_cmdhandler.setOutputBuffer( m_output.ptr(), m_output.size());
+	m_cmdhandler.setLocalEndPoint( local);
 	LOG_TRACE << "Created connection handler for " << local.toString();
 }
 
-Connection::~Connection()
+MainConnectionHandler::~MainConnectionHandler()
 {
 	LOG_TRACE << "Connection handler destroyed";
 }
 
-void Connection::setPeer( const net::RemoteEndpoint& remote)
+void MainConnectionHandler::setPeer( const net::RemoteEndpoint& remote)
 {
 	LOG_TRACE << "++++ Peer set to " << remote.toString();
 	m_cmdhandler.setPeer( remote);

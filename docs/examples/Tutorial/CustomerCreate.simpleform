@@ -1,6 +1,6 @@
 FORM CustomerCreate
-	-root customer
+    -root customer
 {
-	name string
-	address string
+    name string
+    address string
 }

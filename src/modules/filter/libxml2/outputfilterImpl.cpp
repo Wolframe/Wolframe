@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file outputfilterImpl.cpp
-///\brief Implementaion of output filter abstraction for the libxml2 library
+/// \file outputfilterImpl.cpp
+/// \brief Implementaion of output filter abstraction for the libxml2 library
 #include "outputfilterImpl.hpp"
 #include "logger-v1.hpp"
 
@@ -38,29 +38,26 @@ using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
 OutputFilterImpl::OutputFilterImpl( const XsltMapper& xsltMapper_, const types::DocMetaDataR& inheritMetaData_)
-	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-	,OutputFilter("libxslt", inheritMetaData_)
+	:OutputFilter("libxslt", inheritMetaData_)
 	,m_xsltMapper(xsltMapper_)
 	,m_taglevel(0)
-	,m_emptyDocument(false)
+	,m_trailerPrinted(false)
 	,m_elemitr(0)
 	{}
 
 OutputFilterImpl::OutputFilterImpl( const types::DocMetaDataR& inheritMetaData_)
-	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-	,OutputFilter("libxml2", inheritMetaData_)
+	:OutputFilter("libxml2", inheritMetaData_)
 	,m_taglevel(0)
-	,m_emptyDocument(false)
+	,m_trailerPrinted(false)
 	,m_elemitr(0)
 	{}
 
 OutputFilterImpl::OutputFilterImpl( const OutputFilterImpl& o)
-	:utils::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
-	,OutputFilter(o)
+	:OutputFilter(o)
 	,m_doc(o.m_doc)
 	,m_xsltMapper(o.m_xsltMapper)
 	,m_taglevel(o.m_taglevel)
-	,m_emptyDocument(o.m_emptyDocument)
+	,m_trailerPrinted(o.m_trailerPrinted)
 	,m_attribname(o.m_attribname)
 	,m_valuestrbuf(o.m_valuestrbuf)
 	,m_elembuf(o.m_elembuf)
@@ -199,11 +196,58 @@ bool OutputFilterImpl::printHeader()
 	return true;
 }
 
+bool OutputFilterImpl::printTrailer()
+{
+	xmlTextWriterPtr xmlout = m_doc.get();
+	if (0>xmlTextWriterEndDocument( xmlout))
+	{
+		setXmlError( "libxml2 write end document error");
+		return false;
+	}
+#if WITH_LIBXSLT
+	if (m_xsltMapper.defined())
+	{
+		m_elembuf = m_xsltMapper.apply( m_doc.getContent());
+	}
+	else
+	{
+		m_elembuf = m_doc.getContent();
+	}
+#else
+	m_elembuf = m_doc.getContent();
+#endif
+	m_elemitr = 0;
+	m_taglevel = 0;
+	m_attribname.clear();
+	m_trailerPrinted = true;
+	return true;
+}
+
 bool OutputFilterImpl::close()
 {
 	if (m_taglevel == 0)
 	{
+		if (!m_doc.get())
+		{
+			// ... document is empty and got close without anything printed yet. So we have to print the header:
+			if (!printHeader())
+			{
+				return false;
+			}
+		}
+		if (!m_trailerPrinted)
+		{
+			if (!printTrailer())
+			{
+				return false;
+			}
+		}
 		return flushBuffer();
+	}
+	if (m_taglevel > 1)
+	{
+		setState( Error, "libxml2 document close but tags not balanced");
+		return false;
 	}
 	if (m_taglevel > 0)
 	{
@@ -219,16 +263,6 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 
 	if (!xmlout)
 	{
-		if (m_emptyDocument)
-		{
-			setState( Error, "libxml2 illegal print operation after final close (empty document)");
-			return false;
-		}
-		if (type == FilterBase::CloseTag)
-		{
-			m_emptyDocument = true;
-			return true;
-		}
 		if (!printHeader())
 		{
 			return false;
@@ -293,27 +327,11 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			m_taglevel -= 1;
 			if (m_taglevel == 0)
 			{
-				if (0>xmlTextWriterEndDocument( xmlout))
+				if (!printTrailer())
 				{
-					setXmlError( "libxml2 write end document error");
 					rt = false;
 					break;
 				}
-#if WITH_LIBXSLT
-				if (m_xsltMapper.defined())
-				{
-					m_elembuf = m_xsltMapper.apply( m_doc.getContent());
-				}
-				else
-				{
-					m_elembuf = m_doc.getContent();
-				}
-#else
-				m_elembuf = m_doc.getContent();
-#endif
-				m_elemitr = 0;
-				m_taglevel = 0;
-				m_attribname.clear();
 				return flushBuffer();
 			}
 			break;

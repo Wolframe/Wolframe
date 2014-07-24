@@ -269,7 +269,7 @@ public:
 				"expected equal",
 				"expected tag attribute",
 				"expected CDATA tag",
-				"internal",
+				"internal (illegal state)",
 				"unexpected end of input",
 				"expected end of line",
 				"expected 2nd '-' to complete marker for start of comment '<!--'"
@@ -1013,7 +1013,7 @@ public:
 	{}
 	/// \brief Constructor
 	/// \param [in] p_src source iterator
-	XMLScanner( const InputIterator& p_src)
+	explicit XMLScanner( const InputIterator& p_src)
 			:state(START),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(0),m_output(OutputCharSet())
 	{}
 	/// \brief Constructor
@@ -1031,7 +1031,7 @@ public:
 	{}
 	/// \brief Constructor
 	/// \param [in] p_charset character set encoding of input in case of non default settings (code page) needed
-	XMLScanner( const InputCharSet& p_charset)
+	explicit XMLScanner( const InputCharSet& p_charset)
 			:state(START),error(Ok),m_src(p_charset),m_entityMap(0)
 	{}
 	/// \brief Default constructor
@@ -1218,13 +1218,23 @@ public:
 			const char* m_content;		///< value string of the element
 			std::size_t m_size;		///< size of the value string in bytes
 		public:
+			/// \brief Check if the element does neither mark the end of document nor reports an error occurred
+			/// \return true, if the element is a valid document element
+			bool valid() const		{return m_type != Exit && m_type != ErrorOccurred;}
+			/// \brief Return the current error
+			/// \return the error string or NULL, if no error occurred
+			const char* error() const	{return m_type == ErrorOccurred ? m_content : 0;}
 			/// \brief Type of the current element as string
+			/// \return the name as C string
 			const char* name() const	{return getElementTypeName( m_type);}
 			/// \brief Type of the current element
+			/// \return the type
 			ElementType type() const	{return m_type;}
 			/// \brief Value of the current element
+			/// \return the value as C string
 			const char* content() const	{return m_content;}
 			/// \brief Size of the value of the current element in bytes
+			/// \return the size in bytes
 			std::size_t size() const	{return m_size;}
 			/// \brief Constructor
 			Element()			:m_type(None),m_content(0),m_size(0) {}

@@ -78,22 +78,29 @@ bool OutputFilterImpl::flushBuffer()
 
 void OutputFilterImpl::printStructToBuffer()
 {
-	char* content = cJSON_Print( m_stk.back().m_node);
-	if (!content) throw std::bad_alloc();
-
-	boost::shared_ptr<char> contentref( content, std::free);
-
-	if (m_encattr.encoding == types::String::UTF8)
+	if (!m_stk.back().m_node)
 	{
-		m_elembuf.append( content);
 		m_elembuf.push_back( '\n');
 	}
 	else
 	{
-		std::string res( content);
-		res.push_back( '\n');
-		types::String convres = types::StringConst( res).translateEncoding( m_encattr.encoding, m_encattr.codepage);
-		m_elembuf.append( (const char*)convres.ptr(), convres.size() * convres.elementSize());
+		char* content = cJSON_Print( m_stk.back().m_node);
+		if (!content) throw std::bad_alloc();
+	
+		boost::shared_ptr<char> contentref( content, std::free);
+	
+		if (m_encattr.encoding == types::String::UTF8)
+		{
+			m_elembuf.append( content);
+			m_elembuf.push_back( '\n');
+		}
+		else
+		{
+			std::string res( content);
+			res.push_back( '\n');
+			types::String convres = types::StringConst( res).translateEncoding( m_encattr.encoding, m_encattr.codepage);
+			m_elembuf.append( (const char*)convres.ptr(), convres.size() * convres.elementSize());
+		}
 	}
 }
 
@@ -312,7 +319,18 @@ void OutputFilterImpl::printHeader()
 	else
 	{
 		std::string doctype = md.doctype();
-		if (!doctype.empty()) addStructValue( "-doctype", doctype);
+		if (doctype.empty())
+		{
+			const char* doctypeattr = md.getAttribute( "doctype");
+			if (doctypeattr)
+			{
+				addStructValue( "-doctype", doctypeattr);
+			}
+		}
+		else
+		{
+			addStructValue( "-doctype", doctype);
+		}
 	}
 	if (m_encattr.codepage) addStructValue( "-encoding", encname);
 
@@ -322,6 +340,10 @@ void OutputFilterImpl::printHeader()
 
 bool OutputFilterImpl::close()
 {
+	if (!m_headerprinted)
+	{
+		printHeader();
+	}
 	if (m_flushing || !m_stk.empty())
 	{
 		return print( FilterBase::CloseTag, 0, 0);

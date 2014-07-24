@@ -118,10 +118,9 @@ ifeq ($(WITH_LUA),1)
 endif
 endif
 
-showenv:
-	@echo "LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)"
-
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./iprocd -c iproc.conf -f
 
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

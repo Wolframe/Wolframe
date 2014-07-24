@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>Functions in .NET</title>
-	<sect2>
+	<sect3>
 		<title>Introduction</title>
 		<para>You can write functions for the logic tier of <application>Wolframe</application> in languages based
 		on <application>.NET</application> (<ulink url="http://www.microsoft.com/net">http://www.microsoft.com/net</ulink>) like for example
@@ -14,9 +14,9 @@
 		to write and configure <application>.NET</application> assemblies for using in 
 		<application>Wolframe</application> on your own after reading this chapter.
 		</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Configuration</title>
 	<para>For enabling <application>.NET</application> you have to declare the loading of the module 'mod_command_dotnet'
 		in the main section of the server configuration file.
@@ -25,12 +25,12 @@
 		</programlisting>
 		For the configuration of the <application>.NET</application> assemblies to be loaded, see section 'Configure .NET Modules'.
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
-		<title>Function Interface</title>
-		<sect3>
-		<title>Function Context</title>
+	<sect3>
+		<title>Function interface</title>
+		<sect4>
+		<title>Function context</title>
 		<para>In <application>.NET</application> the building blocks for functions called by <application>Wolframe</application>
 		are classes and method calls. The way of defining callable items for 
 		<application>Wolframe</application> is restricted either due to the current 
@@ -53,10 +53,10 @@
 			</listitem>
 		</itemizedlist>
 		</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
-		<title>Function Signature</title>
+		<sect4>
+		<title>Function signature</title>
 		<para>
 		Functions callable from <application>Wolframe</application> take an arbitrary 
 		number of arguments as input and return a structure (<code>struct</code>) as 
@@ -73,9 +73,9 @@
 		namespace as additional parameter. We will describe the <code>ProcProvider</code>
 		interface in a separate section of this chapter.
 		</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
+		<sect4>
 		<title>Example</title>
 		<para>The following simple example without provider context is declared 
 		without marshalling and introspection tags. It can therefore not be called
@@ -86,11 +86,11 @@
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/dotnet_ClassStructure.cs" parse="text" />
 		</programlisting>
 		</para>
-		</sect3>
-	</sect2>
+		</sect4>
+	</sect3>
 
-	<sect2>
-	<title>Prepare .NET Assemblies</title>
+	<sect3>
+	<title>Prepare .NET assemblies</title>
 	<para>
 	<application>Wolframe</application> itself is not a <application>.NET</application> application. Therefore it has to call
 	<application>.NET</application> functions via COM/.NET interop interface of a hosted CLR
@@ -98,8 +98,8 @@
 	To make functions written in <application>.NET</application> callable by <application>Wolframe</application>, the following steps
 	have to be performed:
 	</para>
-		<sect3>
-		<title>Make Assemblies COM Visible</title>
+		<sect4>
+		<title>Make assemblies COM visible</title>
 		<para>
 		First the asseblies with the functions exported to <application>Wolframe</application> have to be build COM visible.
 		To make the <application>.NET</application> functions called from <application>Wolframe</application> COM visible, you have to tick
@@ -107,10 +107,10 @@
 		every object and method that is part of the exported API (also objects used as parameters)
 		has to be tagged in the source as COM visible with <code>[ComVisible(true)]</code>.
 		</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
-		<title>Tag Exported Objects with a Guid</title>
+		<sect4>
+		<title>Tag exported objects with a Guid</title>
 		<para>Each object that is part of the exported API has to be tagged with a global unique
 		identifier (Guid) in order to be adressable. Modules with <application>.NET</application> functions will have to be globally
 		registered and the objects need to be identified by the Guid because that's the only way
@@ -119,10 +119,10 @@
 		is not registered for <application>.NET</application>. There are many ways to create a Guid and
 		tag an object like this: <code>[Guid("390E047F-36FD-4F23-8CE8-3A4C24B33AD3")]</code>.
 		</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
-		<title>Add Marshalling Tags to Values</title>
+		<sect4>
+		<title>Add marshalling tags to values</title>
 		<para>For marshalling function calls correctly, <application>Wolframe</application> needs
 		tags for every parameter and member of a sub structure of a parameter
 		of methods exported as functions.
@@ -202,20 +202,20 @@
 		</table>
 		<para>Decimal floating point and numeric types (DECIMAL) are not yet supported, but
 		will soon be available.</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
-		<title>Example with COM Introspection Tags</title>
+		<sect4>
+		<title>Example with COM introspection tags</title>
 		<para>The following C# module definition repeats the example introduced above with the
 		correct tagging for COM visibility and introspection:
 		<programlisting language='C#'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/dotnet_ClassStructureWithTags.cs" parse="text" />
 		</programlisting>
 		</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
-		<title>Create a Type Library</title>
+		<sect4>
+		<title>Create a type library</title>
 		<para>For making the API introspectable by <application>Wolframe</application>, we have to create a TLB
 		(Type Library) file from the assembly (DLL) after build. The type library has
 		to be recreated every time the module interface (API) changes. The type library is
@@ -224,19 +224,19 @@
 		the same directory. They will be referenced for introspection in the 
 		configuration. The configuration of <application>.NET</application> will be explained later.
 		</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
-		<title>Register the Type Library</title>
+		<sect4>
+		<title>Register the type library</title>
 		<para>The type library created with <code>tlbexp</code> has also to be registered.
 		For this you call the program <code>regtlibv12</code> with your type library file
 		(.tlb file) as argument. The type libary fegistration has to be repeated when
 		the the module interface (API) changes.
 		</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
-		<title>Register the Assembly in the GAC</title>
+		<sect4>
+		<title>Register the assembly in the GAC</title>
 		<para><application>Wolframe</application> does not accept local assemblies. In order to be addressable over
 		the type library interface assemblies need to be put into the global assembly cache (GAC).
 		Unfortunately this has to be repeated every time the assembly binary changes.
@@ -247,10 +247,10 @@
 		have to be strongly signed. We refer here to the MSDN documentation for how
 		to sign an application.
 		</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
-		<title>Register the Types in the Assembly</title>
+		<sect4>
+		<title>Register the types in the assembly</title>
 		<para>We have to register the types declared in the assembly
 		to enable <application>Wolframe</application> to create these types.
 		An example could be a provider function returning a structure that is called
@@ -262,11 +262,11 @@
 		as argument. The command <code>regasm</code> has to be called from
 		administrator command line.
 		</para>
-		</sect3>
-	</sect2>
+		</sect4>
+	</sect3>
 
-	<sect2>
-	<title>Calling Wolframe Functions</title>
+	<sect3>
+	<title>Calling Wolframe functions</title>
 	<para>Wolframe functions in <application>.NET</application> calling globally 
 	defined <application>Wolframe</application> 
 	functions need to declare the processor provider interface as an additional parameter.
@@ -296,10 +296,10 @@
 	The objects involved in this example need no more tagging because the provider context and also
 	structures (<code>struct</code>) need no additional mashalling tags.
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
-	<title>Configure .NET Assemblies</title>
+	<sect3>
+	<title>Configure .NET assemblies</title>
 	<para>
 	<application>.NET</application> modules are grouped together in a configuration block that specifies the configuration
 	of the Microsoft Common Language Runtime (CLR) used for <application>.NET</application> interop calls. The configuration
@@ -313,7 +313,8 @@
 	<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_program_dotnet.conf" parse="text" />
 	</programlisting>
 	</para>
-		<sect3>
+		<sect4>
+		<title>Assembly Declaration</title>
 		<table frame="all" width="80%">
 			<title>Attributes of assembly declarations</title>
 			<tgroup cols="2">
@@ -353,9 +354,9 @@
 			</tbody>
 			</tgroup>
 		</table>
-		</sect3>
+		</sect4>
 
-		<sect3>
+		<sect4>
 		<title>Get the PublicKeyToken</title>
 		<para>
 		We already found out that <application>Wolframe</application> <application>.NET</application> modules 
@@ -370,11 +371,11 @@
 		public key to insert as attribute value of <code>PublicKeyToken</code> in the
 		<application>Wolframe</application> configuration for each <application>.NET</application> assembly.
 		</para>
-		</sect3>
-	</sect2>
+		</sect4>
+	</sect3>
 
-	<sect2>
-	<title>Validation Issues</title>
+	<sect3>
+	<title>Validation issues</title>
 	<para>
 	Languages of <application>.NET</application> called via the CLR are strongly typed languages. This means that
 	the input of a function and the output is already validated to be of a strictly
@@ -386,6 +387,6 @@
 	See in the documentation of the standard command handler how validation can be
 	skipped with the attribute <code>SKIP</code>.
 	</para>
-	</sect2>
-</sect1>
+	</sect3>
+</sect2>
 

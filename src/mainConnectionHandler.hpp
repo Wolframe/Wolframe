@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mainConnectionHandler.hpp
+/// \file mainConnectionHandler.hpp
 ///
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
@@ -44,33 +44,33 @@
 namespace _Wolframe {
 namespace proc {
 
-/// The connection handler
-class Connection : public net::ConnectionHandler
+/// \brief The wolframed connection handler
+class MainConnectionHandler : public net::ConnectionHandler
 {
 public:
-	///\brief Constructor
-	Connection( const net::LocalEndpoint& local);
+	/// \brief Constructor
+	MainConnectionHandler( const net::LocalEndpoint& local);
 
-	///\brief Destructor
-	virtual ~Connection();
+	/// \brief Destructor
+	virtual ~MainConnectionHandler();
 
-	///\brief Set the remote peer and indicate that the connection is up now.
-	///\param [in] remote remote peer
+	/// \brief Set the remote peer and indicate that the connection is up now.
+	/// \param [in] remote remote peer
 	virtual void setPeer( const net::RemoteEndpoint& remote);
 
-	///\brief Handle a request and produce a reply (statemachine of the processor)
+	/// \brief Handle a request and produce a reply (statemachine of the processor)
 	virtual const net::NetworkOperation nextOperation();
 
-	///\brief Passes the network input to the processor
-	///\param [in] begin start of the network input block.
-	///\param [in] bytesTransferred number of bytes passed in the input block
-	///\remark Begin is ignored because it points always to the same block as given by the read network message
+	/// \brief Passes the network input to the processor
+	/// \param [in] begin start of the network input block.
+	/// \param [in] bytesTransferred number of bytes passed in the input block
+	/// \remark Begin is ignored because it points always to the same block as given by the read network message
 	virtual void networkInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
+	/// \brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
 	virtual void signalOccured( NetworkSignal);
 
-	///\brief Set the reference to the execution context
+	/// \brief Set the reference to the execution context
 	void setExecContext( proc::ExecContext* context_)
 	{
 		m_cmdhandler.setExecContext( context_);
@@ -80,7 +80,7 @@ private:
 	void initSessionExceptionBYE();
 
 private:
-	MainCommandHandler m_cmdhandler;		//< top level instance executing commands
+	cmdbind::MainCommandHandler m_cmdhandler;	//< top level instance executing commands
 	protocol::InputBlock m_input;			//< buffer for network read messages
 	protocol::OutputBlock m_output;			//< buffer for network write messages
 	bool m_terminated;				//< true, if a termination signal came from the network

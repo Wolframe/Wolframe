@@ -1,0 +1,7 @@
+{
+	"-doctype":	"UserDataWithLogin",
+	"data":	"bla",
+	"command":	"exec",
+	"uname":	"wolfilter",
+	"host":	"123.123.123.123"
+}

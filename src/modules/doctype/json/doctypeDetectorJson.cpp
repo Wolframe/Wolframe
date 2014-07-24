@@ -32,10 +32,6 @@ Project Wolframe.
 /// \file doctypeDetectorJson.cpp
 /// \brief Implementation of document type and format recognition for XML
 #include "doctypeDetectorJson.hpp"
-#include "cmdbind/doctypeDetector.hpp"
-#include "types/doctypeinfo.hpp"
-#include "types/docmetadata.hpp"
-#include "utils/asciiCharParser.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
@@ -44,44 +40,6 @@ Project Wolframe.
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
-
-namespace {
-enum State
-{
-	ParseStart,
-	ParseJSONHeaderStart,
-	ParseJSONHeaderStringKeyDash,
-	ParseJSONHeaderStringKey,
-	ParseJSONHeaderSeekAssign,
-	ParseJSONHeaderAssign,
-	ParseJSONHeaderIdentKey,
-	ParseJSONHeaderIdentValue,
-	ParseJSONHeaderStringValue,
-	ParseJSONHeaderSeekDelim,
-	Done
-};
-
-static const char* stateName( State st)
-{
-	static const char* ar[] = {
-		"ParseStart",
-		"ParseJSONHeaderStart",
-		"ParseJSONHeaderStringKeyDash",
-		"ParseJSONHeaderStringKey",
-		"ParseJSONHeaderSeekAssign",
-		"ParseJSONHeaderAssign",
-		"ParseJSONHeaderIdentKey",
-		"ParseJSONHeaderIdentValue",
-		"ParseJSONHeaderStringValue",
-		"ParseJSONHeaderSeekDelim",
-		"Done"};
-	return ar[ (int)st];
-}
-
-enum KeyType
-{
-	KeyNone, KeyDoctype, KeyEncoding
-};
 
 static bool isAlpha( char ch)
 {
@@ -98,347 +56,304 @@ static bool isSpace( char ch)
 	return ((unsigned char)ch <= 32);
 }
 
-/// \class DoctypeDetectorJson
-/// \brief Document type and format detection for JSON.
-class DoctypeDetectorJson
-	:public DoctypeDetector
+bool DoctypeDetectorJson::run()
 {
-public:
-	DoctypeDetectorJson()
-		:m_state(ParseStart),m_endbrk(0),m_lastchar(0){}
-
-	/// \brief Destructor
-	virtual ~DoctypeDetectorJson(){}
-
-	virtual void putInput( const char* chunk, std::size_t chunksize)
+	unsigned char ch = m_charparser.getNext();
+	for (; ch != 0 && m_state != Done; ch = m_charparser.getNext())
 	{
-		m_charparser.putInput( chunk, chunksize);
-	}
-
-	void setState( State state_)
-	{
-		m_state = state_;
-		LOG_DATA << "STATE DoctypeDetectorJson " << stateName( m_state);
-	}
-
-	virtual bool run()
-	{
-		unsigned char ch = m_charparser.getNext();
-		for (; ch != 0 && m_state != Done; ch = m_charparser.getNext())
+		if (ch == '.' && m_lastchar == '\n')
 		{
-			if (ch == '.' && m_lastchar == '\n')
-			{
-				setState( Done);
-				break;
-			}
-			m_lastchar = ch;
+			setState( Done);
+			break;
+		}
+		m_lastchar = ch;
 
-			switch (m_state)
-			{
-				case ParseStart:
-					if (ch == '{')
+		switch (m_state)
+		{
+			case ParseStart:
+				if (ch == '{')
+				{
+					m_itembuf.clear();
+					setState( ParseJSONHeaderStart);
+				}
+				else if (isSpace( ch))
+				{
+					continue;
+				}
+				else
+				{
+					setState( Done);
+				}
+				break;
+
+			case ParseJSONHeaderStart:
+				if (isSpace( ch))
+				{}
+				else if (ch == '"' || ch == '\'')
+				{
+					m_endbrk = ch;
+					setState( ParseJSONHeaderStringKeyDash);
+				}
+				else if (ch == '-')
+				{
+					setState( ParseJSONHeaderIdentKey);
+				}
+				else if (isAlpha(ch))
+				{
+					m_itembuf.push_back( ch|32);
+					setState( ParseJSONHeaderIdentKey);
+				}
+				else
+				{
+					//... not recognized as a JSON document
+					setState( Done);
+				}
+				break;
+
+			case ParseJSONHeaderStringKeyDash:
+				if (ch == m_endbrk)
+				{
+					m_endbrk = 0;
+					setState( ParseJSONHeaderSeekAssign);
+				}
+				else if (ch == '\\')
+				{
+					setState( ParseJSONHeaderStringKey);
+					m_escapestate = true;
+					continue;
+				}
+				else if (ch == '-')
+				{
+					setState( ParseJSONHeaderStringKey);
+					//... ignoring leading dash in key
+				}
+				else
+				{
+					m_itembuf.push_back( ch);
+				}
+				break;
+			case ParseJSONHeaderStringKey:
+				if (m_escapestate)
+				{
+					m_itembuf.push_back( ch);
+					m_escapestate = false;
+					continue;
+				}
+				if (ch == m_endbrk)
+				{
+					m_endbrk = 0;
+					setState( ParseJSONHeaderSeekAssign);
+				}
+				else if (ch == '\\')
+				{
+					m_escapestate = true;
+					continue;
+				}
+				else
+				{
+					m_itembuf.push_back( ch);
+					continue;
+				}
+				break;
+
+			case ParseJSONHeaderIdentKey:
+				if (isAlphaNum(ch))
+				{
+					m_itembuf.push_back( ch|32);
+				}
+				else if (isSpace( ch))
+				{
+					setState( ParseJSONHeaderSeekAssign);
+				}
+				else if ((unsigned char)ch == ':')
+				{
+					if (boost::algorithm::iequals( m_itembuf, "doctype"))
 					{
 						m_itembuf.clear();
+						m_keytype = KeyDoctype;
+						setState( ParseJSONHeaderAssign);
+					}
+					else if (boost::algorithm::iequals( m_itembuf, "encoding"))
+					{
+						m_itembuf.clear();
+						m_keytype = KeyEncoding;
+						setState( ParseJSONHeaderAssign);
+					}
+					else
+					{
+						m_itembuf.clear();
+						m_keytype = KeyNone;
+						m_info.reset( new types::DoctypeInfo("JSON", ""));
+						setState( Done);
+					}
+				}
+				else
+				{
+					//... not recognized as a JSON document
+					setState( Done);
+				}
+				break;
+
+			case ParseJSONHeaderSeekAssign:
+				if (isSpace( ch))
+				{}
+				else if ((unsigned char)ch == ':')
+				{
+					if (boost::algorithm::iequals( m_itembuf, "doctype"))
+					{
+						m_itembuf.clear();
+						m_keytype = KeyDoctype;
+						setState( ParseJSONHeaderAssign);
+					}
+					else if (boost::algorithm::iequals( m_itembuf, "encoding"))
+					{
+						m_itembuf.clear();
+						m_keytype = KeyEncoding;
+						setState( ParseJSONHeaderAssign);
+					}
+					else
+					{
+						m_itembuf.clear();
+						m_keytype = KeyNone;
+						m_info.reset( new types::DoctypeInfo("JSON", ""));
+						setState( Done);
+					}
+				}
+				else
+				{
+					//... not recognized as a JSON document
+					setState( Done);
+				}
+				break;
+
+			case ParseJSONHeaderAssign:
+				if (isSpace( ch))
+				{}
+				else if (ch == '"' || ch == '\'')
+				{
+					m_endbrk = ch;
+					setState( ParseJSONHeaderStringValue);
+				}
+				else if (isAlphaNum(ch))
+				{
+					m_itembuf.push_back( ch|32);
+					setState( ParseJSONHeaderIdentValue);
+				}
+				else
+				{
+					m_lasterror = "identifier or string exprected for JSON element key";
+					setState( Done);
+				}
+				break;
+
+			case ParseJSONHeaderStringValue:
+				if (m_escapestate)
+				{
+					m_itembuf.push_back( ch);
+					m_escapestate = false;
+					continue;
+				}
+				if (ch == m_endbrk)
+				{
+					m_endbrk = 0;
+					switch (m_keytype)
+					{
+						case KeyNone:
+							m_lasterror = "syntax error in JSON document (document type recognition)";
+							setState( Done);
+							break;
+						case KeyDoctype:
+							m_info.reset( new types::DoctypeInfo("JSON", m_itembuf));
+							m_keytype = KeyNone;
+							setState( Done);
+							break;
+						case KeyEncoding:
+							setState( ParseJSONHeaderSeekDelim);
+							break;
+					}
+					m_itembuf.clear();
+				}
+				else if (ch == '\\')
+				{
+					m_escapestate = true;
+					continue;
+				}
+				else
+				{
+					m_itembuf.push_back( ch);
+					continue;
+				}
+				break;
+
+			case ParseJSONHeaderIdentValue:
+				if (isSpace( ch) || ch == ',' || ch == '}')
+				{
+					switch (m_keytype)
+					{
+						case KeyNone:
+							m_lasterror = "syntax error in JSON document (document type recognition)";
+							setState( Done);
+							break;
+						case KeyDoctype:
+							m_info.reset( new types::DoctypeInfo("JSON", m_itembuf));
+							m_keytype = KeyNone;
+							setState( Done);
+							break;
+						case KeyEncoding:
+							if (ch == '}')
+							{
+								setState( Done);
+							}
+							else if (ch == ',')
+							{
+								setState( ParseJSONHeaderStart);
+							}
+							else
+							{
+								setState( ParseJSONHeaderSeekDelim);
+							}
+							break;
+					}
+					m_itembuf.clear();
+				}
+				else
+				{
+					m_itembuf.push_back( ch|32);
+				}
+				break;
+
+			case ParseJSONHeaderSeekDelim:
+				if (!isSpace( ch))
+				{
+					if (ch == ',')
+					{
 						setState( ParseJSONHeaderStart);
 					}
-					else if (isSpace( ch))
-					{
-						continue;
-					}
 					else
 					{
 						setState( Done);
 					}
-					break;
+				}
+				break;
 
-				case ParseJSONHeaderStart:
-					if (isSpace( ch))
-					{}
-					else if (ch == '"' || ch == '\'')
-					{
-						m_endbrk = ch;
-						setState( ParseJSONHeaderStringKeyDash);
-					}
-					else if (isAlpha(ch))
-					{
-						m_itembuf.push_back( ch|32);
-						setState( ParseJSONHeaderIdentKey);
-					}
-					else
-					{
-						//... not recognized as a JSON document
-						setState( Done);
-					}
-					break;
-
-				case ParseJSONHeaderStringKeyDash:
-					if (ch == m_endbrk)
-					{
-						m_endbrk = 0;
-						setState( ParseJSONHeaderSeekAssign);
-					}
-					else if (ch == '\\')
-					{
-						setState( ParseJSONHeaderStringKey);
-						m_escapestate = true;
-						continue;
-					}
-					else if (ch == '-')
-					{
-						setState( ParseJSONHeaderStringKey);
-						//... ignoring leading dash in key
-					}
-					else
-					{
-						m_itembuf.push_back( ch);
-					}
-					break;
-				case ParseJSONHeaderStringKey:
-					if (m_escapestate)
-					{
-						m_itembuf.push_back( ch);
-						m_escapestate = false;
-						continue;
-					}
-					if (ch == m_endbrk)
-					{
-						m_endbrk = 0;
-						setState( ParseJSONHeaderSeekAssign);
-					}
-					else if (ch == '\\')
-					{
-						m_escapestate = true;
-						continue;
-					}
-					else
-					{
-						m_itembuf.push_back( ch);
-						continue;
-					}
-					break;
-
-				case ParseJSONHeaderIdentKey:
-					if (isAlphaNum(ch))
-					{
-						m_itembuf.push_back( ch|32);
-					}
-					else if (isSpace( ch))
-					{
-						setState( ParseJSONHeaderSeekAssign);
-					}
-					else if ((unsigned char)ch == ':')
-					{
-						if (boost::algorithm::iequals( m_itembuf, "doctype"))
-						{
-							m_itembuf.clear();
-							m_keytype = KeyDoctype;
-							setState( ParseJSONHeaderAssign);
-						}
-						else if (boost::algorithm::iequals( m_itembuf, "encoding"))
-						{
-							m_itembuf.clear();
-							m_keytype = KeyEncoding;
-							setState( ParseJSONHeaderAssign);
-						}
-						else
-						{
-							m_itembuf.clear();
-							m_keytype = KeyNone;
-							m_info.reset( new types::DoctypeInfo("JSON", ""));
-							setState( Done);
-						}
-					}
-					else
-					{
-						//... not recognized as a JSON document
-						setState( Done);
-					}
-					break;
-
-				case ParseJSONHeaderSeekAssign:
-					if (isSpace( ch))
-					{}
-					else if ((unsigned char)ch == ':')
-					{
-						if (boost::algorithm::iequals( m_itembuf, "doctype"))
-						{
-							m_itembuf.clear();
-							m_keytype = KeyDoctype;
-							setState( ParseJSONHeaderAssign);
-						}
-						else if (boost::algorithm::iequals( m_itembuf, "encoding"))
-						{
-							m_itembuf.clear();
-							m_keytype = KeyEncoding;
-							setState( ParseJSONHeaderAssign);
-						}
-						else
-						{
-							m_itembuf.clear();
-							m_keytype = KeyNone;
-							m_info.reset( new types::DoctypeInfo("JSON", ""));
-							setState( Done);
-						}
-					}
-					else
-					{
-						//... not recognized as a JSON document
-						setState( Done);
-					}
-					break;
-
-				case ParseJSONHeaderAssign:
-					if (isSpace( ch))
-					{}
-					else if (ch == '"' || ch == '\'')
-					{
-						m_endbrk = ch;
-						setState( ParseJSONHeaderStringValue);
-					}
-					else if (isAlphaNum(ch))
-					{
-						m_itembuf.push_back( ch|32);
-						setState( ParseJSONHeaderIdentValue);
-					}
-					else
-					{
-						m_lasterror = "identifier or string exprected for JSON element key";
-						setState( Done);
-					}
-					break;
-
-				case ParseJSONHeaderStringValue:
-					if (m_escapestate)
-					{
-						m_itembuf.push_back( ch);
-						m_escapestate = false;
-						continue;
-					}
-					if (ch == m_endbrk)
-					{
-						m_endbrk = 0;
-						switch (m_keytype)
-						{
-							case KeyNone:
-								m_lasterror = "syntax error in JSON document (document type recognition)";
-								setState( Done);
-								break;
-							case KeyDoctype:
-								m_info.reset( new types::DoctypeInfo("JSON", m_itembuf));
-								m_keytype = KeyNone;
-								setState( Done);
-								break;
-							case KeyEncoding:
-								setState( ParseJSONHeaderSeekDelim);
-								break;
-						}
-						m_itembuf.clear();
-					}
-					else if (ch == '\\')
-					{
-						m_escapestate = true;
-						continue;
-					}
-					else
-					{
-						m_itembuf.push_back( ch);
-						continue;
-					}
-					break;
-
-				case ParseJSONHeaderIdentValue:
-					if (isSpace( ch) || ch == ',' || ch == '}')
-					{
-						switch (m_keytype)
-						{
-							case KeyNone:
-								m_lasterror = "syntax error in JSON document (document type recognition)";
-								setState( Done);
-								break;
-							case KeyDoctype:
-								m_info.reset( new types::DoctypeInfo("JSON", m_itembuf));
-								m_keytype = KeyNone;
-								setState( Done);
-								break;
-							case KeyEncoding:
-								if (ch == '}')
-								{
-									setState( Done);
-								}
-								else if (ch == ',')
-								{
-									setState( ParseJSONHeaderStart);
-								}
-								else
-								{
-									setState( ParseJSONHeaderSeekDelim);
-								}
-								break;
-						}
-						m_itembuf.clear();
-					}
-					else
-					{
-						m_itembuf.push_back( ch|32);
-					}
-					break;
-
-				case ParseJSONHeaderSeekDelim:
-					if (!isSpace( ch))
-					{
-						if (ch == ',')
-						{
-							setState( ParseJSONHeaderStart);
-						}
-						else
-						{
-							setState( Done);
-						}
-					}
-					break;
-
-				case Done:
-					break;
-			}
+			case Done:
+				break;
 		}
-		if (ch == 0 && m_state != Done)
+	}
+	if (ch == 0 && m_state != Done)
+	{
+		if (m_charparser.lastError())
 		{
-			if (m_charparser.lastError())
-			{
-				m_lasterror = m_charparser.lastError();
-			}
-			return false;
+			m_lasterror = m_charparser.lastError();
 		}
-		return m_lasterror.empty();
+		return false;
 	}
-
-	virtual const char* lastError() const
-	{
-		return m_lasterror.empty()?0:m_lasterror.c_str();
-	}
-
-	virtual const types::DoctypeInfoR& info() const
-	{
-		return m_info;
-	}
-
-private:
-	types::DoctypeInfoR m_info;			///< the result of doctype detection
-	std::string m_lasterror;			///< the last error occurred
-	State m_state;					///< processing state machine state
-	utils::AsciiCharParser m_charparser;		///< character by caracter parser for source
-	KeyType m_keytype;				///< type of meta data attribute value parsed
-	std::string m_itembuf;				///< value item parsed
-	unsigned char m_endbrk;				///< end quote in state parsing string
-	unsigned char m_lastchar;			///< the last character parsed
-	bool m_escapestate;				///< true if the last character was a backslash, so the next character is escaped
-};
-}//anonymous namespace
-
-
-cmdbind::DoctypeDetector* cmdbind::createDoctypeDetectorJson()
-{
-	return new DoctypeDetectorJson();
+	return m_lasterror.empty();
 }
 
+void DoctypeDetectorJson::setState( State state_)
+{
+	m_state = state_;
+	LOG_DATA << "STATE DoctypeDetectorJson " << stateName( m_state);
+}
 

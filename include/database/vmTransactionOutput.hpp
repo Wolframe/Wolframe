@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Definition of transaction output
-///\file database/vmTransactionOutput.hpp
+/// \brief Definition of transaction output
+/// \file database/vmTransactionOutput.hpp
 #ifndef _DATABASE_VM_TRANSACTION_OUTPUT_HPP_INCLUDED
 #define _DATABASE_VM_TRANSACTION_OUTPUT_HPP_INCLUDED
 #include "database/vm/output.hpp"
@@ -42,36 +42,41 @@
 
 namespace _Wolframe {
 namespace utils {
-///\brief Forward declaration
+/// \brief Forward declaration
 struct PrintFormat;
 }//namespace utils
 
 namespace db {
 
-////\class TransactionOutput
-///\brief Output of a transaction
+/// \class VmTransactionOutput
+/// \brief Output of a transaction
 class VmTransactionOutput
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	VmTransactionOutput(){}
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	VmTransactionOutput( const VmTransactionOutput& o)
 		:m_impl(o.m_impl){}
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	VmTransactionOutput( const vm::OutputR& output)
 		:m_impl(output){}
 
-	///\brief Return the result as readable serialization
+	/// \brief Return the result as readable serialization
 	std::string tostring( const utils::PrintFormat* pformat=0) const;
 
+	/// \brief Print this transaction output
 	void print( std::ostream& out, const utils::PrintFormat* pformat=0) const;
 
+	/// \brief Evaluate if the underlying database is case sensitive
+	/// \return true if yes, false else
 	bool isCaseSensitive() const
 	{
 		return false;
 	}
 
+	/// \brief Get the result of one execution block
+	/// \param[in] index index of the execution block (0=transaction result, 1..=input for audit operations)
 	langbind::TypedInputFilterR get( std::size_t index=0) const;
 
 private:

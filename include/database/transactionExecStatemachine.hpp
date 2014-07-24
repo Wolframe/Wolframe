@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to the standard database transaction execution statemechine
-///\file database/transactionExecStatemachine.hpp
+/// \brief Interface to the standard database transaction execution statemechine
+/// \file database/transactionExecStatemachine.hpp
 #ifndef _DATABASE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/databaseError.hpp"
@@ -43,48 +43,48 @@
 namespace _Wolframe {
 namespace db {
 
-///\class TransactionExecStatemachine
-///\brief Interface to the database transaction execution statemechine.
-///\remark TODO: Provide state transition schema
+/// \class TransactionExecStatemachine
+/// \brief Interface to the database transaction execution statemechine.
+/// \remark TODO: Provide state transition schema
 class TransactionExecStatemachine
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	TransactionExecStatemachine(){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~TransactionExecStatemachine(){}
 
-	///\brief Get database identifier
+	/// \brief Get database identifier
 	virtual const std::string& databaseID() const=0;
 
-	///\brief Begin transaction
+	/// \brief Begin transaction
 	virtual bool begin()=0;
-	///\brief Commit current transaction
+	/// \brief Commit current transaction
 	virtual bool commit()=0;
-	///\brief Rollback current transaction
+	/// \brief Rollback current transaction
 	virtual bool rollback()=0;
 
-	///\brief Start new command statement
-	///\param[in] statement statement string
+	/// \brief Start new command statement
+	/// \param[in] statement statement string
 	virtual bool start( const std::string& statement)=0;
-	///\brief Bind parameter value on current command statement
+	/// \brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const types::VariantConst& value)=0;
-	///\brief Execute instance of current statement
+	/// \brief Execute instance of current statement
 	virtual bool execute()=0;
-	///\brief Get the number of columns of the last result
+	/// \brief Get the number of columns of the last result
 	virtual std::size_t nofColumns()=0;
-	///\brief Get a column title of the last result
+	/// \brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx)=0;
-	///\brief Get a column of the last result
+	/// \brief Get a column of the last result
 	virtual types::VariantConst get( std::size_t idx)=0;
-	///\brief Skip to the next row of the last result
+	/// \brief Skip to the next row of the last result
 	virtual bool next()=0;
-	///\brief Evaluate if there is a result
+	/// \brief Evaluate if there is a result
 	virtual bool hasResult()=0;
-	///\brief Get the last database error as structure
+	/// \brief Get the last database error as structure
 	virtual const db::DatabaseError* getLastError()=0;
-	///\brief Find out if the database is case sensitive or not
+	/// \brief Find out if the database is case sensitive or not
 	virtual bool isCaseSensitive()=0;
 };
 

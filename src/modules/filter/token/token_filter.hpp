@@ -48,7 +48,15 @@ enum TokenType
 	TokenNextLine='.'
 };
 
-FilterType* createTokenFilterType();
+class TokenFilterType :public FilterType
+{
+public:
+	TokenFilterType()
+		:FilterType("token"){}
+	virtual ~TokenFilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const;
+};
 
 }}//namespace
 #endif

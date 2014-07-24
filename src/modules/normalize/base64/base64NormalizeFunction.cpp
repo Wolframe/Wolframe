@@ -52,6 +52,11 @@ types::Variant Base64DecodeFunction::execute( const types::Variant& inp) const
 	return o.str();
 }
 
+Base64DecodeFunction::Base64DecodeFunction( const std::vector<types::Variant>& arg)
+{
+	if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'base64encode'");
+}
+
 types::Variant Base64EncodeFunction::execute( const types::Variant& inp) const
 {
 	base64::Encoder encoder;
@@ -61,4 +66,10 @@ types::Variant Base64EncodeFunction::execute( const types::Variant& inp) const
 	encoder.encode( i, o);
 	return o.str();
 }
+
+Base64EncodeFunction::Base64EncodeFunction( const std::vector<types::Variant>& arg)
+{
+	if (!arg.empty()) std::runtime_error( "no arguments expected for normalizer 'base64decode'");
+}
+
 

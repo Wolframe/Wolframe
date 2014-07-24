@@ -7,14 +7,14 @@ package require Expect
 
 set config wolframe.conf
 
-set timeout 3
+set timeout 5
 set serverpid [spawn ../../src/wolframed -c $config -f]
 
 puts "wolframed started with configuration file: $config (pid: $serverpid)"
 # allow the server to start
-sleep 1
+sleep 5
 
-set timeout 3
+set timeout 5
 if { [catch {
 	spawn telnet localhost 7661
 
@@ -35,7 +35,7 @@ if { [catch {
 	sleep 0.5
 
 	send "quit\r"
-	expect "Bye\r"
+	expect "BYE\r"
 	expect 	{
 		timeout	{ send_user " --> oops. timeout occured\n"; return 1 }
 		eof	{ send_user " --> Connection closed. OK\n" }

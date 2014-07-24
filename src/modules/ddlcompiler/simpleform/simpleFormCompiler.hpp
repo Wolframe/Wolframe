@@ -42,7 +42,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-class SimpleFormCompiler :public DDLCompiler
+class SimpleFormCompiler
+	:public DDLCompiler
 {
 public:
 	SimpleFormCompiler() :DDLCompiler( "simpleform", "sfrm") {}
@@ -50,8 +51,6 @@ public:
 	///\brief Compile a source from a string. See langbind::DDLCompiler::compile( const std::string&, const TypeMap*) const
 	virtual std::vector<types::FormDescriptionR> compile( const std::string& filename, const types::NormalizeFunctionMap* typemap) const;
 };
-
-DDLCompiler* createSimpleFormCompilerFunc();
 
 }}
 #endif

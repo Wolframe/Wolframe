@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Error class for databases
-///\file database/databaseError.hpp
+/// \brief Error class for databases
+/// \file database/databaseError.hpp
 //
 #ifndef _DATABASE_DATABASE_ERROR_HPP_INCLUDED
 #define _DATABASE_DATABASE_ERROR_HPP_INCLUDED
@@ -41,12 +41,16 @@
 namespace _Wolframe {
 namespace db {
 
+/// \class DatabaseError
+/// \brief Class for describing database errors
 class DatabaseError
 {
 public:
+	/// \brief Default constructor
 	DatabaseError()
 		:errorcode(0),ip(0){}
 
+	/// \brief Copy constructor
 	DatabaseError( const DatabaseError& o)
 		:dbname(o.dbname)
 		,errorclass(o.errorclass)
@@ -57,6 +61,7 @@ public:
 		,ip(o.ip)
 		{}
 
+	/// \brief Constructor
 	DatabaseError( const char* errorclass_,
 			int errorcode_,
 			const std::string& errormsg_,
@@ -69,13 +74,13 @@ public:
 		{}
 
 public:
-	std::string dbname;		//< error class identifier
-	std::string errorclass;		//< error class identifier
-	unsigned int errorcode;		//< error code
-	std::string errormsg;		//< error message string
-	std::string errordetail;	//< detailed error message string
-	std::string errorhint;		//< error message hint specified in TDL for the user
-	std::size_t ip;			//< instruction pointer in vm program
+	std::string dbname;		///< error class identifier
+	std::string errorclass;		///< error class identifier
+	unsigned int errorcode;		///< error code
+	std::string errormsg;		///< error message string
+	std::string errordetail;	///< detailed error message string
+	std::string errorhint;		///< error message hint specified in TDL for the user
+	std::size_t ip;			///< instruction pointer in vm program
 };
 
 }}

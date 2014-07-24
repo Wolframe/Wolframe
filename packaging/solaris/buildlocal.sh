@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.0.1
+VERSION=0.0.2
 PKGBUILD=$HOME/solarisbuild
 ORIG_ARCH=`uname -m`
 
@@ -20,12 +20,15 @@ mkdir -p $PKGBUILD/BUILD/wolframe-$VERSION $PKGBUILD/PKG/wolframe-$VERSION $PKGB
 rm -f wolframe-$VERSION.tar.Z
 rm -f $PKGBUILD/BUILD/wolframe_$VERSION.tar.Z
 
+GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
 gmake BOOST_DIR=/opt/csw/boost-1.55.0 distclean
 rm -rf /tmp/wolframe-$VERSION
 mkdir /tmp/wolframe-$VERSION
 cp -R * /tmp/wolframe-$VERSION
 OLDPWD=$PWD
 cd /tmp
+sed "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" wolframe-$VERSION/include/wolframe.hpp > _tmp
+mv -f _tmp wolframe-$VERSION/include/wolframe.hpp
 tar cf - wolframe-$VERSION | compress -c > wolframe-$VERSION.tar.Z
 cd $OLDPWD
 mv /tmp/wolframe-$VERSION.tar.Z .
@@ -48,8 +51,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	sysconfdir=/etc/opt/csw libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	help
 
@@ -65,8 +69,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	sysconfdir=/etc/opt/csw libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	config
 	
@@ -82,8 +87,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	sysconfdir=/etc/opt/csw libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	config
 
@@ -99,8 +105,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	sysconfdir=/etc/opt/csw libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man
 check_for_errors
 
@@ -116,8 +123,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	sysconfdir=/etc/opt/csw libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	testreport
 check_for_errors
@@ -134,8 +142,9 @@ LD_RUN_PATH=/opt/csw/lib:/opt/csw/postgresql/lib \
 	PYTHON_DIR=/opt/csw/python-3.3.2 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	gmake CC='ccache gcc' CXX='ccache g++' CFLAGS='-mcpu=v9' CXXFLAGS='-mcpu=v9' \
 	prefix=/opt/csw \
-	sysconfdir=/opt/csw/etc libdir=/opt/csw/lib \
+	sysconfdir=/etc/opt/csw libdir=/opt/csw/lib \
 	libdir=/opt/csw/lib DEFAULT_MODULE_LOAD_DIR=/opt/csw/lib/wolframe/modules \
+	DEFAULT_MAIN_CONFIGURATION_FILE=/etc/opt/csw/wolframe/wolframe.conf \
 	mandir=/opt/csw/share/man \
 	DESTDIR=$PKGBUILD/PKG/wolframe-$VERSION \
 	install
@@ -162,10 +171,6 @@ ARCH="$OSARCH"
 EOF
 
 mkdir -p $PKGBUILD/PKG/wolframe-$VERSION/etc/opt/csw/wolframe
-cp packaging/solaris/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/etc/opt/csw/wolframe/.
-#mkdir -p $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d
-#cp packaging/netbsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d/.
-#chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/pkg/share/examples/rc.d/wolframed
 
 BOOST_VERSION=1.55.0
 for i in \

@@ -30,23 +30,23 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/authenticationModuleMacros.hpp
-///\brief Macros for a module for defining an authentication mechanism
+/// \file appdevel/authenticationModuleMacros.hpp
+/// \brief Macros for a module for defining an authentication mechanism
 #include "appdevel/module/authenticationConstructor.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
 #include <boost/lexical_cast.hpp>
 
-///\brief Defines a an authentication mechanism
-#define WF_AUTHENTICATOR(NAME) \
+/// \brief Defines a an authentication mechanism
+#define WF_AUTHENTICATOR(NAME,UNITCLASS,CONFIGCLASS) \
 {\
 	struct Builder \
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
 			static _Wolframe::module::ConfiguredBuilderDescription<\
-					_Wolframe::module::AuthenticationConstructor<_Wolframe::AAAA:: NAME ## AuthenticationUnit, _Wolframe::AAAA:: NAME ## AuthenticationConfig>,\
-					_Wolframe::AAAA:: NAME ## AuthenticationConfig >\
+					_Wolframe::module::AuthenticationConstructor<UNITCLASS, CONFIGCLASS>,\
+					CONFIGCLASS >\
 				mod( "Authentication " #NAME, "Authentication", #NAME, #NAME "Authentication");\
 			return &mod;\
 		}\

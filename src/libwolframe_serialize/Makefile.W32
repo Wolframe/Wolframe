@@ -27,6 +27,7 @@ CPP_OBJS = \
 	mapContext.obj \
 	serializationErrorException.obj \
 	cppFormFunction.obj \
+	configSerialize.obj \
 	struct\intrusiveParser.obj \
 	struct\intrusiveSerializer.obj \
 	struct\parseStack.obj \

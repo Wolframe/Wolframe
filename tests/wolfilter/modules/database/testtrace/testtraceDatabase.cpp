@@ -35,9 +35,8 @@
 #include "logger-v1.hpp"
 #include "testtraceDatabase.hpp"
 #include "testtraceTransaction.hpp"
-#include "config/programBase.hpp"
 #include "serialize/struct/structDescription.hpp"
-#include "config/structSerialize.hpp"
+#include "serialize/configSerialize.hpp"
 #include "utils/fileUtils.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/stringUtils.hpp"
@@ -70,7 +69,7 @@ bool TesttraceDatabaseConfig::parse( const config::ConfigurationNode& pt, const 
 {
 	try
 	{
-		config::parseConfigStructure( m_data, (const config::ConfigurationNode&)pt);
+		serialize::parseConfigStructure( m_data, (const config::ConfigurationNode&)pt);
 		return true;
 	}
 	catch (std::exception& e)
@@ -99,7 +98,7 @@ void TesttraceDatabaseConfig::print( std::ostream& os, size_t indent) const
 {
 	std::string indentstr( indent+1, '\t');
 	indentstr[0] = '\n';
-	std::string rt( config::structureToString( m_data));
+	std::string rt( serialize::structureToString( m_data));
 	boost::replace_all( rt, "\n", indentstr);
 	os << rt;
 }
@@ -132,48 +131,5 @@ TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string&
 Transaction* TesttraceDatabase::transaction(const std::string& /*name*/ )
 {
 	return new TesttraceTransaction( this, m_result);
-}
-
-void TesttraceDatabase::addProgram( const std::string& source)
-{
-	config::PositionalErrorMessageBase ERROR(source);
-	config::PositionalErrorMessageBase::Message MSG;
-	static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
-	std::string::const_iterator si = source.begin(), se = source.end();
-	char ch;
-	std::string tok;
-	const char* commentopr = "--";
-
-	while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
-	{
-		if (ch == commentopr[0])
-		{
-			std::size_t ci = 1;
-			while (!commentopr[ci] && commentopr[ci] == *si)
-			{
-				ci++;
-				si++;
-			}
-			if (!commentopr[ci])
-			{
-				// skip to end of line
-				while (si != se && *si != '\n') ++si;
-			}
-		}
-		else if (g_optab[ch])
-		{
-			throw ERROR( si, MSG << "unexpected token '" << ch << "'");
-		}
-		else
-		{
-			throw ERROR( si, MSG << "unexpected token in DB source '" << tok << "'");
-		}
-	}
-}
-
-void TesttraceDatabase::loadProgram( const std::string& filename)
-{
-	std::string dbsource = utils::readSourceFileContent( filename);
-	addProgram( dbsource);
 }
 

@@ -43,13 +43,14 @@
 namespace _Wolframe {
 namespace langbind {
 
+/// \class PropertyTreeInputFilter
+/// \brief Filter for property tree structures
 class PropertyTreeInputFilter :public TypedInputFilter
 {
 public:
 	/// \brief Constructor
 	PropertyTreeInputFilter( const types::PropertyTree::Node& pt)
-		:utils::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
-		,TypedInputFilter("ptree")
+		:TypedInputFilter("ptree")
 		,m_state(0)
 	{
 		State st;
@@ -61,8 +62,7 @@ public:
 	/// \brief Copy constructor
 	/// \param[in] o input filter to copy
 	PropertyTreeInputFilter( const PropertyTreeInputFilter& o)
-		:utils::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_stk(o.m_stk)
 		,m_state(o.m_state){}
 
@@ -88,6 +88,8 @@ public:
 	}
 
 private:
+	/// \class State
+	/// \brief State of property tree input filter
 	struct State
 	{
 		types::PropertyTree::Node::const_iterator itr;
@@ -122,6 +124,8 @@ public:
 	const types::PropertyTree::Node& content() const	{return m_stk.back().m_node;}
 
 private:
+	/// \class State
+	/// \brief State of property tree output filter
 	struct State
 	{
 		State(){}

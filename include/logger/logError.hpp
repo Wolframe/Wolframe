@@ -41,6 +41,7 @@
 namespace _Wolframe {
 namespace log {
 
+/// Logger error
 class LogError {
 public:
 	/// Internal enum representing possible error conversion

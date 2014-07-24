@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file database/vm/valueTupleSet.hpp
-///\brief Defines the structure holding a set of tuples (database results, transaction input, suroutine parameters) and providing an iterator on it
+/// \file database/vm/valueTupleSet.hpp
+/// \brief Defines the structure holding a set of tuples (database results, transaction input, suroutine parameters) and providing an iterator on it
 #ifndef _DATABASE_VIRTUAL_MACHINE_VALUE_TYPLE_SET_HPP_INCLUDED
 #define _DATABASE_VIRTUAL_MACHINE_VALUE_TYPLE_SET_HPP_INCLUDED
 #include "types/variant.hpp"
@@ -45,22 +45,24 @@ namespace _Wolframe {
 namespace db {
 namespace vm {
 
-///\class ValueTupleSet
-///\brief Set of tuples (database results, transaction input, etc.)
+/// \class ValueTupleSet
+/// \brief Set of tuples (database results, transaction input, etc.)
 class ValueTupleSet
 {
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	ValueTupleSet(){}
-	///\brief Constructor
+	/// \brief Constructor
 	explicit ValueTupleSet( const std::vector<std::string>& colnames_)
 		:m_colnames(colnames_){}
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	ValueTupleSet( const ValueTupleSet& o)
 		:m_colnames(o.m_colnames),m_ar(o.m_ar){}
 
-	///\brief Iterator
 	friend class const_iterator;
+
+	/// \class const_iterator
+	/// \brief Iterator on this set of value tuples
 	class const_iterator
 	{
 	public:
@@ -118,30 +120,30 @@ public:
 		const ValueTupleSet* m_ref;	//< reference to visited set of tuples
 	};
 
-	///\brief Get the start tuple set iterator
+	/// \brief Get the start tuple set iterator
 	const_iterator begin() const
 	{
 		return const_iterator( this);
 	}
-	///\brief Get the end tuple set iterator
+	/// \brief Get the end tuple set iterator
 	const_iterator end() const
 	{
 		return const_iterator( this, m_ar.size());
 	}
 
-	///\brief Get the number of columns
+	/// \brief Get the number of columns
 	std::size_t nofColumns() const
 	{
 		return m_colnames.size();
 	}
-	///\brief Get the name of a column numbered starting with 1
+	/// \brief Get the name of a column numbered starting with 1
 	const std::string& columnName( std::size_t i) const
 	{
 		if (i == 0 || i > m_colnames.size()) throw std::runtime_error( "column index out of range");
 		return m_colnames.at(i-1);
 	}
 
-	///\brief Get the index of a column by name numbered starting with 1
+	/// \brief Get the index of a column by name numbered starting with 1
 	std::size_t columnIndex( const std::string& name) const
 	{
 		std::size_t ii=0;
@@ -155,7 +157,7 @@ public:
 		throw std::runtime_error("unknown value set column name");
 	}
 
-	///\brief Add one tuple to the set (checking its size)
+	/// \brief Add one tuple to the set (checking its size)
 	void push( const std::vector<types::VariantConst>& c)
 	{
 		if (c.size() != m_colnames.size()) throw std::runtime_error("pushed result with non matching number of columns");
@@ -165,7 +167,7 @@ public:
 		}
 	}
 
-	///\brief Add one tuple to the set (checking its size)
+	/// \brief Add one tuple to the set (checking its size)
 	void push( const std::vector<types::Variant>& c)
 	{
 		if (c.size() != m_colnames.size()) throw std::runtime_error("pushed result with non matching number of columns");
@@ -175,33 +177,33 @@ public:
 		}
 	}
 
-	///\brief Get the number of tuples in the tuple set
-	///\return the number of tuples
+	/// \brief Get the number of tuples in the tuple set
+	/// \return the number of tuples
 	std::size_t size() const	
 	{
 		return m_ar.size() / m_colnames.size();
 	}
 
-	///\brief Evaluate if the tuple set is empty
-	///\return true, if yes
+	/// \brief Evaluate if the tuple set is empty
+	/// \return true, if yes
 	bool empty() const
 	{
 		return m_ar.empty();
 	}
 
-	///\brief Check the NONEMPTY constaint on this tuple set
+	/// \brief Check the NONEMPTY constaint on this tuple set
 	void checkConstraintNonEmpty() const
 	{
 		if (size() == 0) throw std::runtime_error( "constraint 'set non empty' failed");
 	}
 
-	///\brief Check the UNIQUE constaint on this tuple set
+	/// \brief Check the UNIQUE constaint on this tuple set
 	void checkConstraintUnique() const
 	{
 		if (size() > 1) throw std::runtime_error( "constraint 'set unique' failed");
 	}
 
-	///\brief Append a tuple set (checking number of columns to be equal in both sets)
+	/// \brief Append a tuple set (checking number of columns to be equal in both sets)
 	void append( const ValueTupleSet& ts)
 	{
 		if (ts.m_colnames.size() != m_colnames.size()) throw std::runtime_error("joining incompatible lists");

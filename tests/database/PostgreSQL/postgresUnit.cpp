@@ -32,7 +32,7 @@ TEST_F( PQmoduleFixture, CreatePostgreSQLunit )
 {
 	PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 	ASSERT_STREQ( "PostgreSQL", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
 	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
@@ -43,7 +43,7 @@ TEST_F( PQmoduleFixture, WrongHost )
 	// Aba: questionable! should't this be an exception?
 	PostgreSQLdbUnit db( "testDB", "blabla", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 	ASSERT_STREQ( "PostgreSQL", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
 	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
@@ -53,28 +53,28 @@ TEST_F( PQmoduleFixture, WrongPassword )
 {
 	ASSERT_THROW( PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
 						"wolfusr", "wolfpwdd", "", "", "", "", "",
-						3, 4, 3, 30000, std::vector<std::string>()), std::runtime_error );
+						3, 4, 3, 30000), std::runtime_error );
 }
 
 TEST_F( PQmoduleFixture, WrongUser )
 {
 	ASSERT_THROW( PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
 						"wolfusrr", "wolfpwd", "", "", "", "", "",
-						3, 4, 3, 30000, std::vector<std::string>()), std::runtime_error );
+						3, 4, 3, 30000), std::runtime_error );
 }
 
 TEST_F( PQmoduleFixture, WrongDatabase )
 {
 	ASSERT_THROW( PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframee",
 						"wolfusr", "wolfpwd", "", "", "", "", "",
-						3, 4, 3, 30000, std::vector<std::string>()), std::runtime_error );
+						3, 4, 3, 30000), std::runtime_error );
 }
 
 TEST_F( PQmoduleFixture, Transaction )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
@@ -154,7 +154,7 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -253,7 +253,7 @@ TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -277,7 +277,7 @@ TEST_F( PQmoduleFixture, TooFewBindParameter )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -308,7 +308,7 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -340,7 +340,7 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -371,7 +371,7 @@ TEST_F( PQmoduleFixture, ReusedBindParameter )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 
@@ -408,7 +408,7 @@ TEST_F( PQmoduleFixture, ExpressionWithParametersAndTypeCoercion )
 {
 	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
-				3, 4, 3, 30000, std::vector<std::string>());
+				3, 4, 3, 30000);
 	Database* db = dbUnit.database( );
 	TransactionR trans( db->transaction( "test" ));
 

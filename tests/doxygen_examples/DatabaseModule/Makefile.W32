@@ -1,0 +1,48 @@
+TOPDIR = ..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I$(TOPDIR)\src \
+	/I"$(BOOST_INCLUDE_DIR)"
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Advapi32.lib Ws2_32.lib \
+	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
+
+OBJS = \
+	src.obj
+
+TEST_CPP_BINS =
+
+all: $(OBJS) $(TEST_CPP_BINS)
+
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+src.exe: src.obj $(TOPDIR)\src\wolframe.lib
+
+local_all:
+
+local_clean:
+	@-erase *.obj >NUL 2>NUL
+
+local_distclean:
+
+local_test:
+

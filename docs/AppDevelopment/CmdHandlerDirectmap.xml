@@ -1,6 +1,6 @@
-<sect1>
-<title>The Standard Command Handler</title>
-	<sect2>
+<sect2>
+<title>The standard command handler</title>
+	<sect3>
 	<title>Introduction</title>
 	<para>
 		The <application>Wolframe</application> standard command handler is called <glossterm>directmap</glossterm> and named so
@@ -11,28 +11,34 @@
 		The declarations of the <application>Wolframe</application> Standard Command Handler (<glossterm>directmap</glossterm>)
 		are specified in a program source file with the extension '.dmap' that is declared in the configuration.
 	</para>
-	</sect2>
-	<sect2>
-		<title>Example Configuration</title>
-		<para>The following configuration declares a program <code>example.tdl</code> written in the 
-		transaction definition language (<acronym>TDL</acronym>) to contain the function
-		declarations for the provider that can be called by the command handler. It declares the database with
-		name <application>pgdb</application> to be used as the database for transactions. It loads a description 
-		<code>example.dmap</code> that will declare the mappings of commands to the filters used and functions 
-		called. It specifies the filter with name <application>libxml2</application> to be used for documents of format XML and
-		the filter with name <application>cjson</application> to be used for documents of format JSON, if
-		not specified else in <code>example.dmap</code>.
+	</sect3>
+	<sect3>
+		<title>Example configuration</title>
+		<para>The following annotated configuration example
+		declares (1) a program <code>example.tdl</code> written in the
+		transaction definition language (<acronym>TDL</acronym>)
+		to contain the function declarations that can be called by
+		the command handler. It (2) declares the database with
+		name <application>pgdb</application> to be used as the
+		database for transactions. It (3) loads a description
+		<code>example.dmap</code> that will declare the mappings
+		of commands to the filters used and functions called.
+		It (4) specifies the filter with name <application>libxml2</application>
+		to be used for documents of format XML and
+		(5) the filter with name <application>cjson</application>
+		to be used for documents of format JSON, if not specified
+		else in <code>example.dmap</code>.
 
 		<programlisting language='sql'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/standardCommandHandler.conf" parse="text" />
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/standardCommandHandler.conf" parse="text" />
 		</programlisting>
 		</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
-		<title>Example Command Description</title>
-		<para>The following source example could be one of the <code>example.dmap</code> in the configuration example 
-		introduced above. It defines two commands. The first one links a command "insert" with document type
+	<sect3>
+		<title>Example command description</title>
+		<para>The following source example could be one of the <code>example.dmap</code>
+		in the configuration example introduced above. It defines two commands. The first one links a command "insert" with document type
 		"Customer" as content to a transaction function "doInsertCustomer". The content is validated 
 		automatically against a form named "Customer" if not explicitly defined else. 
 		The command has no result except that it succeeds or fails. The second example command links a 
@@ -42,20 +48,20 @@
 	</para>
 	<para>
 		<programlisting language='text'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/first_example.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/first_example.directmap" parse="text" />
 		</programlisting>
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
-	<title>Command Description Language</title>
+	<sect3>
+	<title>Command description language</title>
 	<para>
 		A command map description file like our example shown consists of instructions started with 
 		<code>COMMAND</code> and terminated by semicolon ';'. The first argument after <code>COMMAND</code> is the name of the
 		command followed by the name of the document type of the input document. The name of the command
 		is optional. If not specified the first argument after <code>COMMAND</code> names the input document type.
 	</para>
-		<sect3>
+		<sect4>
 			<title>Keywords</title>
 			<para>
 			Conflicts with keywords and names are solved by using strings instead
@@ -64,6 +70,7 @@
 			<simplelist type="horiz" columns="1">
 			<member>COMMAND</member>
 			<member>CALL</member>
+			<member>CONTEXT</member>
 			<member>RETURN</member>
 			<member>SKIP</member>
 			<member>FILTER</member>
@@ -72,93 +79,107 @@
 			<member>AUTHORIZE</member>
 			</simplelist>
 			</para>
-		</sect3>
-		<sect3>
-			<title>Simple Document Map</title>
+		</sect4>
+		<sect4>
+			<title>Simple document map</title>
 			<para>
 				The following example shows the simplest possible declaration. It states that documents with the
 				document type "Document" are forwarded to a function with the same name "Document".
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/doctype_only.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/doctype_only.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
-			<title>Command with Action Prefix</title>
+		</sect4>
+		<sect4>
+			<title>Command with action prefix</title>
 			<para>
 				The next example adds a action name to the declaration. The implicit name of the function called is
 				insertDocument:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_only.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_only.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
-			<title>Explicit Function Name Declaration</title>
+		</sect4>
+		<sect4>
+			<title>Explicit function name declaration</title>
 			<para>
 				For declaring the function called explicitly like for example a function <code>doInsertDocument</code> we need to declare it with <code>CALL &lt;functionname&gt;</code>:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
-			<title>Returned Document Declaration</title>
+		</sect4>
+		<sect4>
+			<title>Returned document declaration</title>
 			<para>
 				The document type returned is specified with <code>RETURN &lt;doctype&gt;</code>:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_only_return.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_only_return.directmap" parse="text" />
 				</programlisting>
 				or with explicit naming of a function called
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_return.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_return.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
-			<title>Skipping the Document Validation</title>
+		</sect4>
+		<sect4>
+			<title>Returned document meta data</title>
+			<para>We can define additional document meta data or overload existing
+			document meta or inherited document meta from input or a referenced 
+			form in the output.
+			This is done with a comma separated list of attribute assignments in
+			curly brackets after the document type name like:
+			<programlisting language='text'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_return_with_metadata.directmap" parse="text" />
+			</programlisting>
+			</para>
+		</sect4>
+		<sect4>
+			<title>Skipping the document validation</title>
 			<para>
 				If you want to skip the input document validation, either because you are dealing
 				with legacy software where a strict definition of a schema is not possible or
 				because the function called has strict typing and validates the input on its own (.NET,C++),
 				then you can add a declaration <code>SKIP</code>:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_call_return.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_call_return.directmap" parse="text" />
 				</programlisting>
 				The same you can specify for the output with a <code>SKIP</code> 
 				following the <code>RETURN</code> of the output declaration:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip.directmap" parse="text" />
 				</programlisting>
-				A second optional parameter of the <code>RETURN SKIP</code> declaration
-				specifies the root element of the returned data object. In this case
-				the form definition does not have to exist in a DDL form definition.
-				The output can be built without a form definition defined in a DDL.
+				For being able to skip validation of output of a processed XML 
+				we have additionally to specify the root element as document
+				meta data. This defintion can be part of a form declaration
+				(not used for validation) or it can be specified after 
+				the <code>RETURN SKIP</code> and the document 
+				type identifier in a standard command handler instruction.
 				The following example shows such a definition with 'list' 
 				as root element defined. Such a command definition makes sense
 				for strongly typed languages like .NET or native C++ where data 
 				validation can be delagated completely to the strongly typed 
 				structure definition of the called function.
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip_with_rootelem.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_skip_return_skip_with_rootelem.directmap" parse="text" />
 				</programlisting>
 			</para>
 
-		</sect3>
-		<sect3>
-			<title>Return a Standalone Document</title>
+		</sect4>
+		<sect4>
+			<title>Return a standalone document</title>
 			<para>
 				If we want to return a document as standalone 
 				(standalone="yes" in the header in case of XML) without validation,
 				we have to declare this with explicit document meta data as
 				 <code>RETURN SKIP {standalone='yes',root='root'}</code>.
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_return_standalone.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_return_standalone.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
-			<title>Explicit Filter Definitions for a Command</title>
+		</sect4>
+		<sect4>
+			<title>Explicit filter definitions for a command</title>
 			<para>
 				For most processing it's enough to declare the standard filters in the configuration of the command handler.
 				But in certain cases we want to declare a filter explicitly for a command, for
@@ -174,11 +195,11 @@
 				</itemizedlist>
 				Here is an example:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_filter_call_return.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_filter_call_return.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
-		<sect3>
+		</sect4>
+		<sect4>
 			<title>Authorization checks</title>
 			<para>
 				We can tag a command to be allowed only after an authorization check.
@@ -192,20 +213,49 @@
 				<listitem><para><code>AUTHORIZE &lt;authfunc&gt; &lt;resource&gt;</code></para></listitem>
 				</itemizedlist>
 			</para>
-		</sect3>
-		<sect3>
-			<title>Using Brackets</title>
+		</sect4>
+		<sect4>
+			<title>Adding parameters from the execution context</title>
+			<para>
+				Wolframe functions that are written in a language
+				other than C++ are usually pure data in / data out
+				functions. So the input document defines the input.
+				But sometimes we need to include data from the
+				user context into processing, for example for
+				inserting or editing some personal data.
+				Wolframe gives us the possibility to include
+				data from the execution context into the input
+				document. We do this with the directive CONTEXT
+				followed by a list of comma ',' separated 
+				assignments in curly brackets '{' '}'.
+				The following example adds an element 'uname'
+				that does not exist yet in the input to the 
+				input document before
+				execution (after validation). The value of the 
+				add 'uname' element is the user name of the 
+				user issuing the request.
+				<programlisting language='text'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_call_with_context.directmap" parse="text" />
+				</programlisting>
+				This way we keep the processing functions as pure
+				data functions. We are in certain cases able
+				to inject some login dependent data in a controlled way,
+				without exposing an API to all language bindings
+				for being able to access everything from everywhere.
+			</para>
+		</sect4>
+		<sect4>
+			<title>Using brackets</title>
 			<para>
 				For better readability you can use optional '(' ')' brackets on 
-				the arguments. This way you can distinguish better between 
-				keywords and arguments and also avoid conflicts with keywords:
+				the arguments of the command declaration:
 				<programlisting language='text'>
-				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_with_arg_brackets.directmap" parse="text" />
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/command_with_arg_brackets.directmap" parse="text" />
 				</programlisting>
 			</para>
-		</sect3>
+		</sect4>
 
-		<sect3>
+		<sect4>
 		<title>Overview</title>
 		<para>Each command declaration has as already explained the form
 		<itemizedlist>
@@ -261,13 +311,20 @@
 					<entry>Filter Name</entry>
 					<entry>Specifies that the filter &lt;Name&gt; should be used both as input and output filter</entry>
 				</row>
+				<row>
+					<entry>AUTHORIZE</entry>
+					<entry>func res</entry>
+					<entry>Specifies that the function &lt;func&gt; should be 
+					called with the resource &lt;res&gt; to check if the user is
+					allowed to execute the command.</entry>
+				</row>
 			</tbody>
 			</tgroup>
 		</table>
 
 		</para>
-		</sect3>
-	</sect2>
-</sect1>
+		</sect4>
+	</sect3>
+</sect2>
 
 

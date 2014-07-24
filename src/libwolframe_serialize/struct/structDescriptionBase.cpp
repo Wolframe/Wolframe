@@ -45,13 +45,11 @@ class OneElementTypedInputFilter
 {
 public:
 	OneElementTypedInputFilter( const std::string& value)
-		:utils::TypeSignature("serialize::OneElementTypedInputFilter", __LINE__)
-		,langbind::TypedInputFilter("singlevalue")
+		:langbind::TypedInputFilter("singlevalue")
 		,m_value(value)
 		,m_consumed(false){}
 	OneElementTypedInputFilter( const OneElementTypedInputFilter& o)
-		:utils::TypeSignature(o)
-		,langbind::TypedInputFilter(o)
+		:langbind::TypedInputFilter(o)
 		,m_value(o.m_value)
 		,m_consumed(o.m_consumed){}
 

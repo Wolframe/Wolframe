@@ -1,9 +1,9 @@
 <sect1>
-<title>Programming Server Requests/Answers</title>
+<title>Programming server requests/answers</title>
 <para>
 </para>
 	<sect2>
-	<title>Adressing Widget Data</title>
+	<title>Adressing widget data</title>
 	<para>
 	Widget data elements elements are addressed by using the relative path of the element
 	from the widget where the request or answer was specified. The relative path is 
@@ -11,7 +11,7 @@
 	references are specified in request/answer structure.
 	</para>
 	<sect3>
-	<title>Biggest Common Ancestor Path</title>
+	<title>Biggest common ancestor path</title>
 	<para>
 	The grouping of elements into structures is
 	done by the biggest common ancestor path of all atomic element references in
@@ -22,9 +22,9 @@
 	</para>
 	</sect3>
 	<sect3>
-	<title>Addressing Atomic Elements</title>
+	<title>Addressing atomic elements</title>
 	<table frame="all" width="100%">
-		<title>Basic Elements of Request/Answer</title>
+		<title>Basic elements of request/answer</title>
 		<tgroup cols="2">
 		<thead>
 			<row>
@@ -79,16 +79,16 @@
 	</table>
 	</sect3>
 	<sect3>
-	<title>Special Path Elements</title>
+	<title>Special path elements</title>
 	<para>Variable references can address other widgets than sub widgets of the current widget.
 	</para>
 		<sect4>
-		<title>Addressing the Form Widget</title>
+		<title>Addressing the form widget</title>
 		<para>The reserved path element 'main' addresses the form widget root.</para>
 		</sect4>
 
 		<sect4>
-		<title>Widget Links</title>
+		<title>Widget links</title>
 		<para>A dynamic property with the prefix 'link:' followed by an identifier
 		as name declares the widget with the widget id as dynamic property value of
 		the link definition to be referencable by name. The referencing name 
@@ -108,7 +108,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Data Structures</title>
+	<title>Data structures</title>
 	<para>Structure elements are separated by semicolon ';' and put into '{' brackets '}' 
 	with the name of the structure in front.
 	</para>
@@ -129,7 +129,7 @@
 		<sect3>
 		<title>Description</title>
 		<table frame="all" width="100%">
-			<title>Types of Arrays</title>
+			<title>Types of arrays</title>
 			<tgroup cols="2">
 			<thead>
 				<row>
@@ -174,7 +174,7 @@
 	</sect2>
 
 	<sect2>
-	<title>Indirection and Recursion</title>
+	<title>Indirection and recursion</title>
 	<para>Indirection allows to define recursive structures. Indirection means that an element is 
 	specified as reference that is expanded when the element appears in the data structure to map.
 	The grouping element of the indirection elements is the common ancestor of all non indirection 
@@ -184,7 +184,7 @@
 		<sect3>
 		<title>Description</title>
 		<table frame="all" width="100%">
-			<title>Types of Indirections</title>
+			<title>Types of indirections</title>
 			<tgroup cols="3">
 			<thead>
 				<row>
@@ -211,7 +211,7 @@
 		</sect3>
 
 		<sect3>
-		<title>Example (Arbitrary Tree)</title>
+		<title>Example (arbitrary tree)</title>
 		<para>Example representing a tree with arbitrary number of children per node:
 		</para>
 		<programlisting language='text'>
@@ -219,7 +219,7 @@
 		</programlisting>
 		</sect3>
 		<sect3>
-		<title>Example (Binary Tree)</title>
+		<title>Example (binary tree)</title>
 		<para>Example representing a binary tree:
 		</para>
 		<programlisting language='text'>

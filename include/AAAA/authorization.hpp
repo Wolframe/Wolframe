@@ -30,10 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file authorization.hpp
-/// \brief top-level header file for authorization interface
-///
+
+/// \file AAAA/authorization.hpp
+/// \brief Top-level header file for authorization interface
 
 #ifndef _AUTHORIZATION_HPP_INCLUDED
 #define _AUTHORIZATION_HPP_INCLUDED
@@ -47,7 +46,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-// interface for all authorization mechanisms
+/// \brief Interface for all authorization mechanisms
 class Authorizer {
 public:
 	virtual ~Authorizer()		{}
@@ -60,8 +59,8 @@ public:
 };
 
 
-/// AuthorizationUnit Unit
-/// This is the base class for authorization unit implementations
+/// \class AuthorizationUnit
+/// \brief This is the base class for authorization unit implementations
 class AuthorizationUnit
 {
 public:

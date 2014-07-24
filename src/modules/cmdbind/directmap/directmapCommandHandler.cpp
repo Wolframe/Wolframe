@@ -36,6 +36,8 @@ Project Wolframe.
 #include "types/docmetadata.hpp"
 #include "types/variant.hpp"
 #include "filter/typingfilter.hpp"
+#include "filter/execContextInputFilter.hpp"
+#include "filter/joinfilter.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
@@ -61,9 +63,10 @@ void DirectmapCommandHandler::initcall()
 	// Check if we are allowed to execute the command:
 	if (!m_cmd->authfunction.empty())
 	{
-		if (!execContext()->checkAuthorization( m_cmd->authfunction, m_cmd->authresource))
+		std::string errmsg;
+		if (!execContext()->checkAuthorization( m_cmd->authfunction, m_cmd->authresource, errmsg))
 		{
-			throw std::runtime_error( std::string( "not authorized to execute command '") + m_name + "'");
+			throw std::runtime_error( std::string( "not authorized to execute command '") + m_name + "': " + errmsg);
 		}
 	}
 	// Initialize input form for validation if defined:
@@ -129,6 +132,14 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				/* no break here ! */
 			}
 			case 3:
+				// Join input with additional attributes (CONTEXT)
+				if (m_cmd->execContextElements.size())
+				{
+					//... if we have execution context arguments, we have to join them with the input as new input structure:
+					TypedInputFilterR ecinput( new langbind::ExecContextInputFilter( m_cmd->execContextElements, *execContext(), ""));
+					TypedInputFilterR joinedinput( new langbind::JoinInputFilter( "dmapinput", ecinput, m_input));
+					m_input = joinedinput;
+				}
 				// Initialize the function execution context:
 				m_functionclosure.reset( m_cmd->function->createClosure());
 				m_functionclosure->init( execContext(), m_input);

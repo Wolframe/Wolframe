@@ -1,4 +1,6 @@
 #include "mainCommandHandler.cpp"
+#include "baseCryptoCommandHandler.cpp"
+#include "passwordChangeCommandHandler.cpp"
 #include "authCommandHandler.cpp"
 #include "interfaceCommandHandler.cpp"
 #include "moduleDirectory.cpp"
@@ -16,4 +18,3 @@
 #include "prgbind/programLibrary.cpp"
 #include "prgbind/ddlProgram.cpp"
 #include "prgbind/normalizeProgram.cpp"
-#include "prgbind/transactionProgram.cpp"

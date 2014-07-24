@@ -1,14 +1,21 @@
 <sect1>
-<title>Representation of Structures in Wolframe</title>
+<title>Representation of structures in Wolframe</title>
 	<sect2>
-	<title>Typed Filters</title>
+	<title>Typed filters</title>
 	<para>
-		A structure in Wolframe is described as serialization of it's equivalent as tree (more precisely forest) with depth first left order traversal. The equivalent of a tree is a tree with leaf nodes representing the atomic values of the structure and non leaf nodes representing sub structures labelled by the non leaf node value. 
-		The serialization is a sequence of (element type, element value) tuples with 3 origin element types for describing such a structure. For having a model that is able to cover at least XML there is a 4th element 'Attribute'.
+		A structure in Wolframe is described as serialization sequence of it's equivalent 
+		as tree (more precisely forest) with depth first left order traversal. 
+		The equivalent of a tree is a tree with leaf nodes representing the 
+		atomic values of the structure and non leaf nodes representing sub 
+		structures labelled by the non leaf node value. 
+		The serialization is a sequence of (element type, element value) 
+		tuples with 3 origin element types for describing such a structure. 
+		For having a model that is able to cover at least XML there is a 4th 
+		element 'Attribute'. A final 'Close' terminates the serialization sequence.
 	</para>
 	<para>
 		<table frame="all" width="60%">
-			<title>Serialization Element Types</title>
+			<title>Serialization element types</title>
 			<tgroup cols="3">
 			<thead>
 				<row>
@@ -38,7 +45,17 @@
 			</tgroup>
 		</table>
 	</para>
-	<para>Element values are typed (represented as union of atomic types: bool,uint,int,double,string, etc.. ).
+	<para>Element values are typed (represented as union of atomic types: bool,uint,int,
+	double,string, etc.. ).
+	</para>
+	<para>
+		Each sub structure starts with an <code>Open</code> and ends with a 
+		<code>Close</code>. 
+	</para>
+	<para>
+		The end of the serialization is marked with a final <code>Close</code>. 
+		That means the the serialization has one <code>Close</code> more (the
+		final close) than <code>Open</code> elements.
 	</para>
 	</sect2>
 	<para></para>

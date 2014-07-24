@@ -45,9 +45,9 @@ extern "C" {
 
 #define DEFAULT_BASE64_LINE_LENGTH	76
 
-#define BUFFER_OVERFLOW		-1
-#define INVALID_BUFFER		-2
-#define INVALID_DATA		-3
+#define BASE64_BUFFER_OVERFLOW		-1
+#define BASE64_INVALID_BUFFER		-2
+#define BASE64_INVALID_DATA		-3
 
 /* enconding */
 

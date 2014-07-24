@@ -44,7 +44,7 @@ class ConvDiaNormalizeFunction :public types::NormalizeFunction
 {
 public:
 	ConvDiaNormalizeFunction( const ConvDiaNormalizeFunction&){}
-	ConvDiaNormalizeFunction(){}
+	ConvDiaNormalizeFunction( const std::vector<types::Variant>& arg);
 	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "convdia";}
 	virtual types::NormalizeFunction* copy() const {return new ConvDiaNormalizeFunction(*this);}
@@ -54,7 +54,7 @@ class UppercaseNameNormalizeFunction :public types::NormalizeFunction
 {
 public:
 	UppercaseNameNormalizeFunction( const UppercaseNameNormalizeFunction&){}
-	UppercaseNameNormalizeFunction(){}
+	UppercaseNameNormalizeFunction( const std::vector<types::Variant>& arg);
 	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "ucname";}
 	virtual types::NormalizeFunction* copy() const {return new UppercaseNameNormalizeFunction(*this);}
@@ -63,7 +63,7 @@ public:
 class LowercaseNameNormalizeFunction :public types::NormalizeFunction
 {
 public:
-	LowercaseNameNormalizeFunction(){}
+	LowercaseNameNormalizeFunction( const std::vector<types::Variant>& arg);
 	LowercaseNameNormalizeFunction( const LowercaseNameNormalizeFunction&){}
 	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "lcname";}

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file blob_filter.cpp
-///\brief Filter implementation reading/writing of uninterpreted binary data
+/// \file blob_filter.cpp
+/// \brief Filter implementation reading/writing of uninterpreted binary data
 
 #include "blob_filter.hpp"
 #include <cstring>
@@ -49,16 +49,14 @@ struct InputFilterImpl :public InputFilter
 {
 	///\brief Constructor
 	InputFilterImpl()
-		:utils::TypeSignature("langbind::InputFilterImpl (blob)", __LINE__)
-		,InputFilter("blob")
+		:InputFilter("blob")
 		,m_end(false)
 		,m_done(false){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:utils::TypeSignature("langbind::InputFilterImpl (blob)", __LINE__)
-		,InputFilter( o)
+		:InputFilter( o)
 		,m_elembuf( o.m_elembuf)
 		,m_end(o.m_end)
 		,m_done(o.m_done){}
@@ -146,26 +144,24 @@ private:
 	bool m_done;				//< true if we have finished
 };
 
-///\class OutputFilterImpl
-///\brief output filter filter for data as binary blob
+/// \class OutputFilterImpl
+/// \brief output filter filter for data as binary blob
 struct OutputFilterImpl :public OutputFilter
 {
-	///\brief Constructor
+	/// \brief Constructor
 	OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData)
-		:utils::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
-		,OutputFilter("blob", inheritedMetaData)
+		:OutputFilter("blob", inheritedMetaData)
 		,m_elemitr(0){}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:utils::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
-		,OutputFilter(o)
+		:OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr){}
 
-	///\brief self copy
-	///\return copy of this
+	/// \brief self copy
+	/// \return copy of this
 	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
@@ -184,11 +180,11 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	///\brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
-	///\param [in] type type of the element to print
-	///\param [in] element pointer to the element to print
-	///\param [in] elementsize size of the element to print in bytes
-	///\return true, if success, false else
+	/// \brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
+	/// \param [in] type type of the element to print
+	/// \param [in] element pointer to the element to print
+	/// \param [in] elementsize size of the element to print in bytes
+	/// \return true, if success, false else
 	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
@@ -234,23 +230,10 @@ struct BlobFilter :public Filter
 	}
 };
 
-class BlobFilterType :public FilterType
+Filter* BlobFilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	BlobFilterType()
-		:FilterType("blob"){}
-	virtual ~BlobFilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		if (arg.size()) throw std::runtime_error( "unexpected arguments for blob filter");
-		return new BlobFilter();
-	}
-};
-
-FilterType* _Wolframe::langbind::createBlobFilterType()
-{
-	return new BlobFilterType();
+	if (arg.size()) throw std::runtime_error( "unexpected arguments for blob filter");
+	return new BlobFilter();
 }
 
 

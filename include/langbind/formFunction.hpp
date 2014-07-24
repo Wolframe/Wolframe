@@ -75,10 +75,11 @@ typedef boost::shared_ptr<FormFunctionClosure> FormFunctionClosureR;
 
 /// \class FormFunction
 /// \brief Form function interface
-struct FormFunction
+class FormFunction
 {
 public:
 	virtual ~FormFunction(){}
+	virtual bool initializeContext(){return true;}
 	virtual FormFunctionClosure* createClosure() const=0;
 };
 

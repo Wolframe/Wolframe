@@ -54,16 +54,6 @@ INCLUDE_LIBS += \
 
 endif
 
-# postgres
-ifeq ($(WITH_PGSQL),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_PGSQL
-INCLUDE_DIRS += \
-	$(PGSQL_INCLUDE_DIRS)
-INCLUDE_LIBS += \
-	$(PGSQL_LIBS)
-endif
-
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
@@ -105,3 +95,6 @@ endif
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./pechod -c pecho.conf -f
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

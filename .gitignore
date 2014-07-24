@@ -76,15 +76,19 @@ tests/configStructParser
 tests/database/dbTest
 tests/database/test.db
 tests/3rdParty/libxml2/testlibxml2
-tests/modules/moduleTest
-tests/authentication/textfile/textFileTest
+tests/moduleloader/moduleTest
 tests/authentication/sasl/sasl.db
 tests/authentication/sasl/saslTest
 tests/authentication/pam/pamTest
 tests/authentication/textfile/passwdFileTest
 tests/authentication/textfile/passwdHashTest
+tests/authentication/textfile/textFileTest
+tests/authentication/textfile/textFileThrow
+tests/authentication/textfile/textFileAuthenticator
+tests/authentication/textfile/textFilePwdChange
 tests/testBoostPath
 tests/filter
+tests/modules/moduleTest
 tests/testVariantTypes
 tests/testIntegers
 tests/testVariantStruct
@@ -145,6 +149,7 @@ tests/bignum/libgmp/testlibgmp
 tests/bignum/testbignum
 tests/temp/
 tests/testProtocolLFdotEscaping
+tests/testAddressRestriction
 tests/testWolfilter
 tests/testWolfilter.sh
 tests/testDatabaseProcessorVM
@@ -236,3 +241,4 @@ tests/dotnet/csharp/WolframeClient/Properties/
 tests/dotnet/csharp/WolframeClient/obj/
 tests/dotnet/interop/WolfCLR/WolfCLR/ipch/
 tests/AAAA/pamTest
+tests/platformTest

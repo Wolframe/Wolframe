@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file pythonFunctionProgramType.cpp
-///\brief Implementation of the function to create a form function program type object for python scripts
+/// \file pythonFunctionProgramType.cpp
+/// \brief Implementation of the function to create a form function program type object for python scripts
 #include "pythonInterpreter.hpp"
 #include "pythonFunctionProgramType.hpp"
 #include "pythonStructureBuilder.hpp"
@@ -51,15 +51,14 @@ using namespace _Wolframe::langbind;
 
 namespace {
 
-///\class PythonResult
-///\brief Structure representing the result of a function call
+/// \class PythonResult
+/// \brief Structure representing the result of a function call
 class PythonResult
 	:public TypedInputFilter
 {
 public:
 	PythonResult( const python::StructureR& data_)
-		:utils::TypeSignature("langbind::PythonResult", __LINE__)
-		,TypedInputFilter("pythonresult")
+		:TypedInputFilter("pythonresult")
 		,m_data(data_)
 		,m_bufidx(0)
 	{
@@ -74,8 +73,7 @@ public:
 	}
 
 	PythonResult( const PythonResult& o)
-		:utils::TypeSignature("langbind::PythonResult", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_data(o.m_data)
 		,m_buf(o.m_buf)
 		,m_bufidx(o.m_bufidx)
@@ -390,43 +388,24 @@ private:
 	const python::Interpreter* m_interpreter;
 	std::string m_name;
 };
-
-///\class PythonProgramType
-///\brief Program type of python programs
-class PythonProgramType
-	:public prgbind::Program
-{
-public:
-	PythonProgramType()
-		:prgbind::Program( prgbind::Program::Function){}
-
-	virtual ~PythonProgramType(){}
-
-	virtual bool is_mine( const std::string& filename) const
-	{
-		boost::filesystem::path p( filename);
-		return p.extension().string() == ".mlg";
-	}
-
-	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
-	{
-		std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
-		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
-		for (; fi != fe; ++fi)
-		{
-			langbind::FormFunctionR ff( new PythonFormFunction( &m_interpreter, *fi));
-			library.defineFormFunction( *fi, ff);
-		}
-	}
-
-private:
-	python::Interpreter m_interpreter;
-};
 }//anonymous namespace
 
-prgbind::Program* langbind::createPythonProgramType()
+
+bool PythonProgramType::is_mine( const std::string& filename) const
 {
-	return new PythonProgramType();
+	boost::filesystem::path p( filename);
+	return p.extension().string() == ".mlg";
+}
+
+void PythonProgramType::loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
+{
+	std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
+	std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
+	for (; fi != fe; ++fi)
+	{
+		langbind::FormFunctionR ff( new PythonFormFunction( &m_interpreter, *fi));
+		library.defineFormFunction( *fi, ff);
+	}
 }
 
 

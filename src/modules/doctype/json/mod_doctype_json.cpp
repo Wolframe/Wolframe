@@ -37,6 +37,6 @@
 #include "doctypeDetectorJson.hpp"
 
 WF_MODULE_BEGIN( "jsonDocformat", "document type/format detection for JSON")
- WF_DOCUMENT_FORMAT( "JSON", _Wolframe::cmdbind::createDoctypeDetectorJson)
+ WF_DOCUMENT_FORMAT( "JSON", _Wolframe::cmdbind::DoctypeDetectorJson)
 WF_MODULE_END
 

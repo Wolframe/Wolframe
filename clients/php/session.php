@@ -2,9 +2,10 @@
 namespace Wolframe
 {
 require 'connection.php';
-require 'authentication/textfile.php';
+require 'wolframe_cram.php';
 
 use Wolframe\Connection as Connection;
+use Wolframe\WolframeCram as WolframeCram;
 
 /*
 * Session
@@ -16,7 +17,7 @@ class Session extends Connection
 	private $requesterror = FALSE;
 
 	/* Get a line from socket and check if it starts as expected (success case) */
-	function getline( $expect)
+	private function getline( $expect)
 	{
 		$ln = explode( " ", $this->readline(), 2);
 		if ($ln[0] == $expect)
@@ -31,29 +32,23 @@ class Session extends Connection
 	}
 
 	/* Authentication mechanism WOLFRAME_CRAM */
-	function auth_WOLFRAME_CRAM( $username, $password)
+	private function auth_WOLFRAME_CRAM( $username, $password)
 	{
-		error_log( "START AUTHENTICATION\n");
-
-		// 1. The client sends a 256 bit seed followed by a HMAC-SHA1 of the (seed, username)
-		$this->writedata( userHash( $username)); 
-		error_log( "SEND USER NAME " + $username + "\n", 3, "/var/tmp/mylog.txt");
+		// 1. The client sends a 256 bit seed followed by a HMAC-SHA1 of the (seed, username):
+		$this->writedata( WolframeCram::userHash( $username)); 
 
 		// 2. If the server finds the user it will reply with a seed and a challenge. 
 		//	If the user is not found it will reply with a random challenge for not
 		//	giving any information to the client. The procedure will continue.
 		$challenge = $this->readdata();
-		error_log( "GOT CHALLENGE [" + $challenge + "]\n", 3, "/var/tmp/mylog.txt");
 
 		// 3. The client returns a response. The response is computed from the PBKDF2 
-		//	of the seed and the challenge.
-		$this->writedata( CRAMresponse( $password, $challenge));
-		error_log( "SEND PASSWORD\n", 3, "/var/tmp/mylog.txt");
+		//	of the seed and the challenge:
+		$this->writedata( WolframeCram::CRAMresponse( $password, $challenge));
 
 		// 4. the server tries to authenticate the user and returns "OK" in case
-		//	of success, "ERR" else.
+		//	of success, "ERR" else:
 		$this->getline("OK");
-		error_log( "GOT AUTHENTICATED\n", 3, "/var/tmp/mylog.txt");
 	}
 
 	/** Constructor
@@ -62,10 +57,15 @@ class Session extends Connection
 	* @param[in] sslopt structure with named options for SSL
 	* @param[in] authopt structure with named options for authentication (depending on authentication mech)
 	*/
-	function __construct( $address, $port, $sslopt, $authopt)
+	public function __construct( $address, $port, $sslopt, $authopt)
 	{
 		parent::__construct( $address, $port, $sslopt);
 		$this->banner = $this->readline();
+		$firstline = explode( " ", $this->banner, 2);
+		if ($firstline[0] == "ERR") throw $this->protocol_exception( "server error: " . $firstline[1]);
+		if ($firstline[0] == "BAD") throw $this->protocol_exception( "protocol error: " . $firstline[1]);
+		if ($firstline[0] == "BYE") throw $this->protocol_exception( "server terminated session: " . $firstline[1]);
+
 		$this->getline( "OK");
 		$this->writeline( "AUTH");
 		$mechs = $this->getline( "MECHS");
@@ -116,10 +116,36 @@ class Session extends Connection
 		return $this->requesterror;
 	}
 
+	/* Change the password */
+	public function changePassword( $oldpassword, $newpassword)
+	{
+		if (!$this->isalive())
+		{
+			throw $this->protocol_exception( "connection run away");
+		}
+		// 1. The client asks to open the password change dialog:
+		$this->writeline( "PASSWD");
+		// 2. The server accepts or not:
+		$this->getline("OK");
+		// 3. The server sends a challenge:
+		$challenge = $this->readdata();
+		// 4. The client returns a message with the password 
+		//	pair (old, new) encrypted with the challenge:
+		$this->writedata(
+			WolframeCram::passwordChangeMessage(
+				$oldpassword, $challenge, $newpassword));
+		// 5. The server accepts the password change or not:
+		$this->getline( "OK");
+	}
+
 	/* Send a request to the server */
 	public function request( $command, $query)
 	{
 		$requesterror = FALSE;
+		if (!$this->isalive())
+		{
+			throw $this->protocol_exception( "connection run away");
+		}
 		if ($command == "")
 		{
 			$this->writeline( "REQUEST");

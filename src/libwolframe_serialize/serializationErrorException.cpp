@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serializationErrorException.cpp
-#include "serialize/serializationErrorException.hpp"
+/// \file serializationErrorException.cpp
+#include "serializationErrorException.hpp"
 
 using namespace _Wolframe;
 using namespace serialize;

@@ -41,7 +41,7 @@ namespace _Wolframe {
 namespace types {
 
 /// \class CountedReference
-/// \brief Shared reference to an object exchangeable in a single thread context
+/// \brief Shared reference to an object exchangeable for all owners in a single thread context
 /// \tparam OBJ object type referenced
 template <class OBJ>
 class CountedReference
@@ -70,7 +70,7 @@ public:
 
 	/// \brief Constructor
 	/// \param[in] ptr object pointer
-	explicit CountedReference( OBJ* ptr=0)
+	CountedReference( OBJ* ptr=0)
 		:m_ref(boost::shared_ptr<Pointer>( new Pointer( ptr))){}
 
 	/// \brief Destructor

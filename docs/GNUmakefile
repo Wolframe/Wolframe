@@ -64,7 +64,13 @@ MAN_PAGES = \
 	wolframed.8 \
 	wolframe.conf.5 \
 	wolfpasswd.1 \
-	wolframe-mod_db_sqlite3.5
+	wolframe-mod_db_sqlite3.5 \
+	wolframe-mod_db_postgresql.5 \
+
+ifeq ($(WITH_ORACLE),1)
+MAN_PAGES += \
+	wolframe-mod_db_oracle.5
+endif
 	
 man: $(MAN_PAGES)
 
@@ -75,22 +81,22 @@ doc-doxygen-webpage:
 	@-mkdir doxygen/html-webpage
 	cd $(TOPDIR); doxygen docs/doxygen-webpage.conf
 
-doc-html: WolfBook.html Tutorial.html Installation.html
+doc-html: WolfBook.html Tutorial.html
 
 doc-txt: InstallationUnix.txt
 
-doc-html-chunked: html/index.html html-tutorial/index.html html-installation/index.html
+doc-html-chunked: html/index.html html-tutorial/index.html
 
-doc-html-webpage: html-webpage/index.html html-tutorial-webpage/index.html html-installation-webpage/index.html
+doc-html-webpage: html-webpage/index.html html-tutorial-webpage/index.html
 
-doc-html-webpage-chunked: html-webpage-chunked/index.html html-tutorial-webpage-chunked/index.html html-installation-webpage-chunked/index.html
+doc-html-webpage-chunked: html-webpage-chunked/index.html html-tutorial-webpage-chunked/index.html
 
-doc-pdf: WolfBook.pdf Tutorial.pdf Installation.pdf
+doc-pdf: WolfBook.pdf Tutorial.pdf
 
 .PHONY: depend
 depend:
 
-doc-epub: WolfBook.epub Tutorial.epub Installation.epub
+doc-epub: WolfBook.epub Tutorial.epub
 
 doc-towordml: WolfBook.docx
 
@@ -114,79 +120,48 @@ doc-towordml: WolfBook.docx
 	@sed 's/Copyright ?/Copyright (C)/g' $@ > _tmp
 	@mv -f _tmp $@ 
 
-# Installation Guide
-
-INSTALLATION_FILES = \
-	Installation.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
-	Installation/Preface.xml \
-	Installation/InstallationSource.xml \
-	Installation/InstallationSourceUnix.xml \
-	Installation/InstallationSourceUnixClient.xml \
-	Installation/InstallationSourceWindows.xml \
-	Installation/InstallationSourceWindowsClient.xml \
-	Installation/InstallationBinary.xml \
-	WolframeVersion.txt \
-	WolfclientVersion.txt
+# Installation files 'INSTALL.Unix' and 'Install.Windows' are generated
+# from the corresponding source sections of the Wolfbook, both for the
+# Wolframe and the wolfclient project. Keep that in mind when you change
+# things in the Installation sections of Wolfbook!
 
 INSTALLATION_UNIX_FILES = \
 	InstallationUnix.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
+	WolfBookVersion.txt \
+	WolfBookDate.txt \
 	Installation/InstallationSourceUnix.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 
 INSTALLATION_WINDOWS_FILES = \
 	InstallationWindows.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
+	WolfBookVersion.txt \
+	WolfBookDate.txt \
 	Installation/InstallationSourceWindows.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 
 INSTALLATION_UNIX_CLIENT_FILES = \
 	InstallationUnixClient.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
+	WolfBookVersion.txt \
+	WolfBookDate.txt \
 	Installation/InstallationSourceUnixClient.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 
 INSTALLATION_WINDOWS_CLIENT_FILES = \
 	InstallationWindowsClient.xml \
-	InstallationVersion.txt \
-	InstallationDate.txt \
+	WolfBookVersion.txt \
+	WolfBookDate.txt \
 	Installation/InstallationSourceWindowsClient.xml \
 	WolframeVersion.txt \
 	WolfclientVersion.txt
 	
-Installation.html: $(INSTALLATION_FILES)
-Installation.pdf: $(INSTALLATION_FILES)
-
 InstallationUnix.html: $(INSTALLATION_UNIX_FILES)
 InstallationWindows.html: $(INSTALLATION_WINDOWS_FILES)
 
 InstallationUnixClient.html: $(INSTALLATION_UNIX_CLIENT_FILES)
 InstallationWindowsClient.html: $(INSTALLATION_WINDOWS_CLIENT_FILES)
-
-html-installation/index.html: $(INSTALLATION_FILES)
-	$(XSLT_HTML_CHUNKED) $<
-
-html-installation-webpage/index.html: $(INSTALLATION_FILES)
-	$(XSLT_WEBPAGE_HTML) $<
-
-html-installation-webpage-chunked/index.html: $(INSTALLATION_FILES)
-	$(XSLT_WEBPAGE_HTML_CHUNKED) $<
-
-Installation.epub: $(INSTALLATION_FILES)
-	mkdir -p OEBPS/images
-	cp images/draft.png images/*.svg OEBPS/images
-	echo "application/epub+zip" > mimetype
-	zip -0Xq  Installation.epub mimetype
-	zip -Xr9D Installation.epub META-INF OEBPS
-	rm -rf mimetype META-INF OEBPS
 
 # WolfBook
 
@@ -194,11 +169,31 @@ WOLFBOOK_SOURCE_FILES = \
 	WolfBook.xml \
 	WolfBookVersion.txt \
 	WolfBookDate.txt \
+	WolframeVersion.txt \
+	WolfclientVersion.txt \
+	AppDevelopment/AAAA.xml \
+	AppDevelopment/AAAAConfig.xml \
 	AppDevelopment/AppDevelopment.ent \
+	AppDevelopment/ApplicationServerRequests.xml \
+	AppDevelopment/AuditingAndAccounting.xml \
+	AppDevelopment/Authentication.xml \
+	AppDevelopment/Authorization.xml \
 	AppDevelopment/Appendix.xml \
 	AppDevelopment/CmdHandlerDirectmap.xml \
 	AppDevelopment/CmdHandlerLua.xml \
 	AppDevelopment/CmdHandlers.xml \
+	AppDevelopment/ConfigDatabases.xml \
+	AppDevelopment/ConfigDatabaseSslOptionTable.xml \
+	AppDevelopment/ConfigDatabaseSslModeTable.xml \
+	AppDevelopment/ConfigDatabaseSqlite.xml \
+	AppDevelopment/ConfigDatabasePostgreSQL.xml \
+	AppDevelopment/ConfigDatabaseOracle.xml \
+	AppDevelopment/ConfigGlobalSettings.xml \
+	AppDevelopment/ConfigListener.xml \
+	AppDevelopment/ConfigLogging.xml \
+	AppDevelopment/ConfigModules.xml \
+	AppDevelopment/ConfigService.xml \
+	AppDevelopment/DataProcessing.xml \
 	AppDevelopment/EBNF_Normalizer.xml \
 	AppDevelopment/EBNF_TransactionDefinitionLanguage.xml \
 	AppDevelopment/FilterJSON.xml \
@@ -211,6 +206,7 @@ WOLFBOOK_SOURCE_FILES = \
 	AppDevelopment/Introduction.xml \
 	AppDevelopment/ModelTypedFilter.xml \
 	AppDevelopment/Preface.xml \
+	AppDevelopment/ProcessorConfig.xml \
 	AppDevelopment/ProgramCpp.xml \
 	AppDevelopment/ProgramDotNet.xml \
 	AppDevelopment/ProgramFormDataTypes.xml \
@@ -218,6 +214,7 @@ WOLFBOOK_SOURCE_FILES = \
 	AppDevelopment/ProgramLua.xml \
 	AppDevelopment/ProgramPython.xml \
 	AppDevelopment/ProgramTransactions.xml \
+	AppDevelopment/ServerConfiguration.xml \
 	AppDevelopment/README \
 	AppDevelopment/Testing.xml \
 	Client/CLI.xml \
@@ -239,7 +236,23 @@ WOLFBOOK_SOURCE_FILES = \
 	ExtDevelopment/Glossary.xml \
 	ExtDevelopment/Introduction.xml \
 	ExtDevelopment/NormalizerModules.xml \
-	ExtDevelopment/Preface.xml
+	ExtDevelopment/Preface.xml \
+	Installation/InstallationBinary.xml \
+	Installation/InstallationSource.xml \
+	Installation/InstallationSourceUnix.xml \
+	Installation/InstallationSourceUnixClient.xml \
+	Installation/InstallationSourceWindows.xml \
+	Installation/InstallationSourceWindowsClient.xml \
+	examples/AppDevelop/cfg_command_dotnet.conf \
+	examples/AppDevelop/cfg_command_lua.conf \
+	examples/AppDevelop/cfg_filter_JSON.conf \
+	examples/AppDevelop/cfg_filter_libxml2.conf \
+	examples/AppDevelop/cfg_filter_textwolf.conf \
+	examples/AppDevelop/cfg_normalize_number_string.conf \
+	examples/AppDevelop/cfg_program_dotnet.conf \
+	examples/AppDevelop/cfg_program_wnmp.conf \
+	examples/AppDevelop/cfg_program_xslt.conf \
+	examples/AppDevelop/standardCommandHandler.conf
 
 WolfBook.html: $(WOLFBOOK_SOURCE_FILES)
 
@@ -314,16 +327,13 @@ local_clean:
 	-rm -rf doxygen/html/* doxygen/man/*  doxygen/perlmod/*
 	-rm -f WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub WolfBook.docx
 	-rm -f Tutorial.html Tutorial.pdf
-	-rm -f Installation.html Installation.pdf InstallationUnix.html InstallationUnix.txt InstallationWindows.html InstallationWindows.txt
+	-rm -f InstallationUnix.html InstallationUnix.txt InstallationWindows.html InstallationWindows.txt
 	-rm -rf html/*.html
 	-rm -rf html-webpage/*.html
 	-rm -rf html-tutorial/*.html
-	-rm -rf html-installation/*.html
 	-rm -rf html-webpage-chunked/*.html
 	-rm -rf html-tutorial-webpage/*.html
 	-rm -rf html-tutorial-webpage-chunked/*.html
-	-rm -rf html-installation-webpage/*.html
-	-rm -rf html-installation-webpage-chunked/*.html
 	-rm -rf doxygen/html-webpage/*
 	-rm -rf InstallationUnixClient.html InstallationUnixClient.txt
 	-rm -rf InstallationWindowsClient.html InstallationWindowsClient.txt
@@ -343,6 +353,16 @@ endif
 	$(INSTALL) -m 0644 wolframe-mod_db_sqlite3.5 $(DESTDIR)$(mandir)/man5
 ifneq "$(PLATFORM)" "SUNOS"
 	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5
+endif
+	$(INSTALL) -m 0644 wolframe-mod_db_postgresql.5 $(DESTDIR)$(mandir)/man5
+ifneq "$(PLATFORM)" "SUNOS"
+	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_postgresql.5
+endif
+ifeq ($(WITH_ORACLE),1)
+	$(INSTALL) -m 0644 wolframe-mod_db_oracle.5 $(DESTDIR)$(mandir)/man5
+ifneq "$(PLATFORM)" "SUNOS"
+	gzip -f $(DESTDIR)$(mandir)/man5/wolframe-mod_db_oracle.5
+endif
 endif
 	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(mandir)/man8
 ifneq "$(PLATFORM)" "SUNOS"
@@ -364,14 +384,25 @@ local_uninstall:
 	@-rmdir $(DESTDIR)$(mandir)/man8
 	@-rm $(DESTDIR)$(mandir)/man5/wolframe.conf.5*
 	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_sqlite3.5*
+	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_postgresql.5*
+ifeq ($(WITH_ORACLE),1)
+	@-rm $(DESTDIR)$(mandir)/man5/wolframe-mod_db_oracle.5*
+endif
 	@-rmdir $(DESTDIR)$(mandir)/man5
 	@-rmdir $(DESTDIR)$(mandir)
 
 check:
 	xmllint --noout --xinclude --postvalid WolfBook.xml
 	xmllint --noout --xinclude --postvalid Tutorial.xml
-	xmllint --noout --xinclude --postvalid Installation.xml
+	xmllint --noout --xinclude --postvalid InstallationUnix.xml
+	xmllint --noout --xinclude --postvalid InstallationWindows.xml
+	xmllint --noout --xinclude --postvalid InstallationUnixClient.xml
+	xmllint --noout --xinclude --postvalid InstallationWindowsClient.xml
 	xmllint --noout --xinclude --postvalid wolframe.conf-man.xml
+	xmllint --noout --xinclude --postvalid wolframe-mod_db_sqlite3-man.xml
+	xmllint --noout --xinclude --postvalid wolframe-mod_db_postgresql-man.xml
+ifeq ($(WITH_ORACLE),1)
+	xmllint --noout --xinclude --postvalid wolframe-mod_db_oracle-man.xml
+endif
 	xmllint --noout --xinclude --postvalid wolframed-man.xml
 	xmllint --noout --xinclude --postvalid wolfpasswd-man.xml
-

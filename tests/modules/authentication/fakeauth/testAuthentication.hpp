@@ -164,7 +164,7 @@ private:
 	State m_state;
 	AuthenticatorSlice::Status m_status;
 	std::string m_identifier;
-	types::SecureString m_username;
+	std::string m_username;
 	User* m_user;
 	const std::map<std::string,std::string>* m_usrpwdmap;
 	bool m_inputReusable;

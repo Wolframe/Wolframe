@@ -49,7 +49,8 @@
 namespace _Wolframe {
 namespace net {
 
-static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
+static const char* REFUSE_MSG = "ERR Server is busy. Please try again later.\n";
+static const char* DENY_MSG = "BAD Server denied connection.\n";
 
 void GlobalConnectionList::addList( SocketConnectionList< connection_ptr >* lst )
 {
@@ -108,6 +109,13 @@ connection::~connection()
 		LOG_TRACE << "Connection to " << m_ID <<" destroyed";
 }
 
+void connection::deny_connection()
+{
+	LOG_DEBUG << "Refusing connection from " << identifier() << ". Not allowed.";
+	boost::system::error_code ignored_ec;
+	socket().write_some( boost::asio::buffer( DENY_MSG, strlen( DENY_MSG ) ));
+	socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+}
 
 void connection::start()
 {
@@ -156,7 +164,8 @@ SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      ConnectionHandler *handler ) :
 	ConnectionBase< ssl_socket >( IOservice, handler ),
 	m_SSLsocket( IOservice, SSLcontext ),
-	m_connList( connList )
+	m_connList( connList ),
+	m_connection_denied( false )
 {
 	LOG_TRACE << "New SSL connection created";
 }
@@ -183,6 +192,10 @@ void SSLconnection::start()
 								 boost::asio::placeholders::error )));
 }
 
+void SSLconnection::deny_connection()
+{
+	m_connection_denied = true;
+}
 
 void SSLconnection::handleHandshake( const boost::system::error_code& e )
 {
@@ -198,8 +211,14 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		if ( peerCert )	{
 			certInfo = new SSLcertificateInfo( peerCert );
 		}
-
-		if ( m_connList->push( boost::static_pointer_cast< SSLconnection >( shared_from_this() )) )	{
+		if (m_connection_denied)
+		{
+			LOG_DEBUG << "Refusing connection from " << identifier() << ". Not allowed.";
+			boost::system::error_code ignored_ec;
+			socket().write_some( boost::asio::buffer( DENY_MSG, strlen( DENY_MSG ) ));
+			socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+		}
+		else if ( m_connList->push( boost::static_pointer_cast< SSLconnection >( shared_from_this() )) )	{
 			m_connHandler->setPeer( RemoteSSLendpoint( m_SSLsocket.lowest_layer().remote_endpoint().address().to_string(),
 								   m_SSLsocket.lowest_layer().remote_endpoint().port(),
 								   certInfo ));

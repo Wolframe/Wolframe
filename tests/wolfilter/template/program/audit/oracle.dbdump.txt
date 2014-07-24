@@ -6,4 +6,4 @@ ID, NAME, ADDRESS
 '4', 'Dorothe', 'Demotastrasse 45 Durnfo'
 '5', 'Erik', 'Erakimolstrasse 56 Enden'
 '6', 'Hugi Turbo', 'Gurkenstrasse 7a 3145 Gumligen'
-audit insert id 6 old '' new 'Hugi Turbo'
+audit insert user '' id 6 old '' new 'Hugi Turbo'

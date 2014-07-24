@@ -197,7 +197,8 @@ void InputFilterImpl::initDocMetaData()
 			}
 			else
 			{
-				LOG_WARNING << "unknown XML root element attribute '" << attrname << "'";
+				m_rootAttributes.push_back( RootAttribute( attrname, attrvalue));
+				m_rootAttributeState = 1;
 			}
 			rootattr = rootattr->next;
 		}
@@ -205,6 +206,35 @@ void InputFilterImpl::initDocMetaData()
 	m_nodestk.push_back( m_node->next);
 	m_node = m_node->children;
 	m_taglevel += 1;
+}
+
+void InputFilterImpl::getRootAttribute( FilterBase::ElementType& type, const void*& element, std::size_t& elementsize)
+{
+	if (m_rootAttributeState == 1)
+	{
+		type = FilterBase::Attribute;
+		element = m_rootAttributes.at(m_rootAttributeIdx).key.c_str();
+		elementsize = m_rootAttributes.at(m_rootAttributeIdx).key.size();
+		m_rootAttributeState = 2;
+	}
+	else
+	{
+		type = FilterBase::Value;
+		element = m_rootAttributes.at(m_rootAttributeIdx).value.c_str();
+		elementsize = m_rootAttributes.at(m_rootAttributeIdx).value.size();
+
+		++m_rootAttributeIdx;
+		if (m_rootAttributeIdx < m_rootAttributes.size())
+		{
+			m_rootAttributeState = 1;
+		}
+		else
+		{
+			m_rootAttributeState = 0;
+			m_rootAttributeIdx = 0;
+			m_rootAttributes.clear();							
+		}
+	}
 }
 
 bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
@@ -216,6 +246,11 @@ AGAIN:
 	if (!m_doc.get())
 	{
 		rt = false;
+	}
+	else if (m_rootAttributeState)
+	{
+		getRootAttribute( type, element, elementsize);
+		return true;
 	}
 	else if (m_value)
 	{

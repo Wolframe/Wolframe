@@ -34,6 +34,7 @@
 #include "mainCommandHandler.hpp"
 #include "interfaceCommandHandler.hpp"
 #include "authCommandHandler.hpp"
+#include "passwordChangeCommandHandler.hpp"
 #include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
 #include "processor/execContext.hpp"
 #include "interfaceCommandHandler.hpp"
@@ -44,7 +45,7 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
-using namespace _Wolframe::proc;
+using namespace _Wolframe::cmdbind;
 
 struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler>
 {
@@ -52,7 +53,8 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 	{
 		Unauthenticated,
 		Authentication,
-		Authenticated
+		Authenticated,
+		Authenticated_passwd
 	};
 
 	MainSTM()
@@ -72,6 +74,13 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 				.cmd< &MainCommandHandler::doAuth >( "AUTH")
 				.cmd< &MainCommandHandler::doQuit >( "QUIT")
 				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
+			[Authenticated_passwd]
+				.cmd< &MainCommandHandler::doRequest >( "REQUEST")
+				.cmd< &MainCommandHandler::doInterface >( "INTERFACE")
+				.cmd< &MainCommandHandler::doAuth >( "AUTH")
+				.cmd< &MainCommandHandler::doPasswordChange >( "PASSWD")
+				.cmd< &MainCommandHandler::doQuit >( "QUIT")
+				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
 		;
 	}
 };
@@ -79,11 +88,17 @@ static MainSTM mainstm;
 
 MainCommandHandler::MainCommandHandler()
 	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>(&mainstm)
-	,m_remoteEndpoint(0){}
+	,m_remoteEndpoint(0)
+	,m_localEndpoint(0){}
 
 void MainCommandHandler::setPeer( const net::RemoteEndpoint& remote)
 {
 	m_remoteEndpoint = &remote;
+}
+
+void MainCommandHandler::setLocalEndPoint( const net::LocalEndpoint& local)
+{
+	m_localEndpoint = &local;
 }
 
 int MainCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
@@ -116,6 +131,16 @@ int MainCommandHandler::doQuit( int argc, const char**, std::ostream& out)
 
 int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
+	/*[-]*/if (!m_localEndpoint)
+	/*[-]*/{
+	/*[-]*/	throw std::logic_error( "no local endpoint set");
+	/*[-]*/}
+	/*[-]*/if (!m_remoteEndpoint)
+	/*[-]*/{
+	/*[-]*/	throw std::logic_error( "no remote endpoint set");
+	/*[-]*/}
+	execContext()->setConnectionData( m_remoteEndpoint, m_localEndpoint);
+
 	if (!m_authenticator.get())
 	{
 		if (!m_remoteEndpoint)
@@ -166,7 +191,20 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 		{
 			out << "OK authenticated" << endl();
 			execContext()->setUser( usr);
-			return MainSTM::Authenticated;
+
+			/*[-]*/bool hc = execContext()->hasCapability( net::LocalEndpointConfig::PasswordChange);
+			/*[-]*/bool ca = execContext()->checkAuthorization( proc::ExecContext::PASSWD);
+			/*[-]*/LOG_DEBUG << (hc?"HAS CAPABILITY":"NO CAPABILITY") << " " << (ca?"HAS AUTHZ":"NO AUTHZ");
+
+			if (execContext()->hasCapability( net::LocalEndpointConfig::PasswordChange)
+			&& execContext()->checkAuthorization( proc::ExecContext::PASSWD))
+			{
+				return MainSTM::Authenticated_passwd;
+			}
+			else
+			{
+				return MainSTM::Authenticated;
+			}
 		}
 		else
 		{
@@ -217,6 +255,55 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 			delegateProcessing<&MainCommandHandler::endMech>( authch);
 		}
 	}
+	return stateidx();
+}
+
+int MainCommandHandler::endPasswordChange( cmdbind::CommandHandler* ch, std::ostream& out)
+{
+	cmdbind::CommandHandlerR chr( ch);
+	const char* error = ch->lastError();
+	if (error)
+	{
+		out << "ERR password change failed: " << error << endl();
+	}
+	else
+	{
+		if (m_passwordChanger->status() == AAAA::PasswordChanger::PASSWORD_EXCHANGED)
+		{
+			out << "OK password changed" << endl();
+		}
+		else
+		{
+			out << "ERR password change failed (unknown error)" << endl();
+		}
+	}
+	m_passwordChanger.reset();
+	return stateidx();
+}
+
+int MainCommandHandler::doPasswordChange( int argc, const char**, std::ostream& out)
+{
+	if (argc >= 1)
+	{
+		out << "ERR to many arguments for PASSWD" << endl();
+		return stateidx();
+	}
+	if (!m_remoteEndpoint)
+	{
+		throw std::logic_error("no remote endpoint set, cannot change password");
+	}
+	m_passwordChanger.reset( execContext()->passwordChanger( *m_remoteEndpoint ));
+
+	if (!m_passwordChanger.get())
+	{
+		out << "ERR PASSWD denied" << endl();
+		return stateidx();
+	}
+	out << "OK start password change" << endl();
+
+	cmdbind::PasswordChangeCommandHandler* pwdch = new cmdbind::PasswordChangeCommandHandler( m_passwordChanger);
+	pwdch->setExecContext( execContext());
+	delegateProcessing<&MainCommandHandler::endPasswordChange>( pwdch);
 	return stateidx();
 }
 

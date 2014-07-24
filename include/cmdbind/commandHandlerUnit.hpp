@@ -42,17 +42,22 @@
 namespace _Wolframe {
 namespace cmdbind {
 
+/// \class CommandHandlerUnit
+/// \brief Class that defines a command handler class and is able to create instances of it
 class CommandHandlerUnit
 {
 public:
-	virtual bool loadPrograms( const proc::ProcessorProviderInterface*)=0;
+	/// \brief Load all configured programs
+	virtual bool loadPrograms( const proc::ProcessorProviderInterface* provider)=0;
 
+	/// \brief Get the list of all commands inplemented by this command handler
 	virtual std::vector<std::string> commands() const=0;
 
+	/// \brief Create an instance of this command handler
 	virtual CommandHandler* createCommandHandler( const std::string& cmdname, const std::string& docformat)=0;
 };
 
-///\brief Command handler unit reference
+/// \brief Command handler unit reference
 typedef boost::shared_ptr<CommandHandlerUnit> CommandHandlerUnitR;
 
 }}//namespace

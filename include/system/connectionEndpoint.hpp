@@ -30,14 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// connectionEndpoint.hpp
-//
+/// \brief Classes for network endpoints
+/// \file connectionEndpoint.hpp
 
 #ifndef _CONNECTION_ENDPOINT_HPP_INCLUDED
 #define _CONNECTION_ENDPOINT_HPP_INCLUDED
 
 #include <string>
+#include <vector>
 #include <sstream>
 #include <ctime>
 
@@ -53,6 +53,11 @@ public:
 		TCP,
 		SSL
 	};
+	static const char* connectionTypeName( ConnectionType t)
+	{
+		static const char* ar[] = {"UDP","TCP","SSL"};
+		return ar[t];
+	}
 
 	enum EndPoint	{
 		LOCAL_ENDPOINT,
@@ -83,14 +88,56 @@ private:
 	unsigned short	m_port;
 };
 
+/// Local connection endpoint configuration for authorization, connection based timeout, etc.
+struct LocalEndpointConfig
+{
+	enum ProtocolCapability
+	{
+		PasswordChange=0x1,	///< the user is allowed to change his password
+		Request=0x2		///< the user is allowed make requests
+	};
+	static const char* protocolCapabilityName( ProtocolCapability c)
+	{
+		static const char* ar[] = {0,"PasswordChange","Request"};
+		return ar[c];
+	}
+
+	unsigned int capabilities;
+	std::string socketIdentifier;
+
+	/// \brief Default constructor
+	LocalEndpointConfig()
+		:capabilities(0xFFFF){}
+	/// \brief Copy constructor
+	LocalEndpointConfig( const LocalEndpointConfig& o)
+		:capabilities(o.capabilities),socketIdentifier(o.socketIdentifier){}
+	/// \brief Constructor
+	explicit LocalEndpointConfig( const std::string& socketIdentifier_)
+		:capabilities(0xFFFF),socketIdentifier(socketIdentifier_){}
+
+	/// \brief Reset capabilities
+	void resetCapabilities()
+	{
+		capabilities = 0;
+	}
+	/// \brief Set a capability for this local endpoint configuration
+	void setCapability( ProtocolCapability c)
+	{
+		capabilities |= (1 << (unsigned char)c);
+	}
+	/// \brief Ask for a capability for this local endpoint configuration
+	bool hasCapability( ProtocolCapability c) const
+	{
+		return 0!=(capabilities & (1 << (unsigned char)c));
+	}
+};
 
 /// Local connection endpoints
-/// base class for local endpoint
 class LocalEndpoint : public ConnectionEndpoint
 {
 public:
-	LocalEndpoint( const std::string& Host, unsigned short Port )
-		: ConnectionEndpoint( Host, Port )
+	LocalEndpoint( const std::string& Host, unsigned short Port, const LocalEndpointConfig& Config=LocalEndpointConfig())
+		: ConnectionEndpoint( Host, Port ), m_config( Config )
 	{
 		m_creationTime = time( NULL );
 	}
@@ -98,36 +145,37 @@ public:
 	virtual ConnectionType type() const = 0;
 	EndPoint endpoint() const			{ return LOCAL_ENDPOINT; }
 	time_t creationTime() const			{ return m_creationTime; }
+	const LocalEndpointConfig& config() const	{ return m_config; }
 
 private:
-	time_t	m_creationTime;
+	LocalEndpointConfig m_config;			///< configuration for authorization checks
+	time_t	m_creationTime;				///< time when object has been constructed
 };
 
-/// local unencrypted endpoint
+/// Local unencrypted endpoint
 class LocalTCPendpoint : public LocalEndpoint
 {
 public:
-	LocalTCPendpoint( const std::string& Host, unsigned short Port )
-		: LocalEndpoint( Host, Port )		{}
+	LocalTCPendpoint( const std::string& Host, unsigned short Port, const LocalEndpointConfig& Config=LocalEndpointConfig())
+		: LocalEndpoint( Host, Port, Config )		{}
 
 	ConnectionType type() const			{ return TCP; }
 };
 
 #ifdef WITH_SSL
-/// local SSL connection endpoint
+/// Local SSL connection endpoint
 class LocalSSLendpoint : public LocalEndpoint
 {
 public:
-	LocalSSLendpoint( const std::string& Host, unsigned short Port )
-		: LocalEndpoint( Host, Port )		{}
+	LocalSSLendpoint( const std::string& Host, unsigned short Port, const LocalEndpointConfig& Config=LocalEndpointConfig())
+		: LocalEndpoint( Host, Port, Config )		{}
 
 	ConnectionType type() const			{ return SSL; }
 };
 #endif // WITH_SSL
 
 
-/// Remote connection endpoints
-/// base class for remote endpoint
+/// \brief Remote connection endpoint
 class RemoteEndpoint : public ConnectionEndpoint
 {
 public:
@@ -146,7 +194,7 @@ private:
 	time_t	m_connectionTime;
 };
 
-/// remote unencrypted endpoint
+/// Remote unencrypted endpoint
 class RemoteTCPendpoint : public RemoteEndpoint
 {
 public:

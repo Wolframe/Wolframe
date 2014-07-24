@@ -28,7 +28,6 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	trimNormalizeFunction.obj \
 	asciiNormalizeFunction.obj \
-	stringNormalize.obj \
 	mod_normalize_string.obj
 
 all: $(DYNAMIC_MODULE)

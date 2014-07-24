@@ -1,76 +1,101 @@
-<chapter>
-<title>Testing and Defect Handling</title>
+<sect1>
+<title>Testing and defect handling</title>
 <para>In this chapter we learn how parts of a <application>Wolframe</application>
 application can be verified to work correctly. The basis for testing and debugging
 a <application>Wolframe</application> application is the command line tool 
 <application>wolfilter</application>. 
 </para>
 
-<sect1>
+<sect2>
 <title>Using wolfilter</title>
-	<para>The command line program <application>wolfilter</application> allows you to call any
-	<application>Wolframe</application> function or filter or mapping into a form structure
-	on command line.
+	<para>The command line program <application>wolfilter</application> allows you 
+	to call any <application>Wolframe</application> function or filter or mapping 
+	into a form structure on command line. The program is mapping stdin or if 
+	specified the contents of a file to stdout.
 	</para>
 	<para>
-	There are two possibilities to declare the items involved in the test.
-	Either you pass the configuration with the option '--config' and the name of the command
-	to execute or you declare the items one by one with program options. These two approaches
-	are not mixable. Either you use '--config' or pass the parameters one by one. 
-	A try to mix both of them in one call is refused by <application>wolfilter</application>.
+	The option '--config' (or '-c') specifies the configuration to use, the only argument of the
+	wolfilter program specifies the function to call or form to fill. If a dash '-' is
+	specified as command then no command is called. The input is just mapped through
+	the filters specified. In case of a form or filter mapping, no configuration has
+	to be specified.
 	</para>
 	<para>The following examples assume the input file name to be in.xml or in.json and
 	the output file to be named out.xml or out.json respectively.
 	</para>
-	<sect2>
-		<title>Testing a Filter</title>
+	<sect3>
+		<title>Test configuration</title>
+		<para>For the examples needing a configuration, we prepare the following simple
+		configuration, just declaring the processing stuff, we need. Of course wolfilter
+		can also work with any wolframe server configuration. The configuration will be
+		referenced as 'test.conf'.
+		<programlisting language='text'>
+LoadModules
+{
+    module mod_command_lua
+    module mod_doctype_xml
+    module mod_filter_libxml2
+    module mod_filter_json
+    module mod_filter_token
+}
+Processor
+{
+    program test.lua
+    program myfilter.xslt
+    program myform.sfrm
+}
+		</programlisting>
+		</para>
+	</sect3>
+	<sect3>
+		<title>Testing a filter</title>
 		<para>The following example shows the mapping through a libxml2 filter.
 		Filters are tested by passing a dash '-' command to execute.
+		Because we do not need to load programs, we can call wolfilter without
+		a test configuration.
 		<programlisting language='sh'>
 
-		cat in.xml | wolfilter -f libxml2 -m mod_filter_libxml2 - > out.xml
+cat in.xml | wolfilter -e libxml2 -m mod_filter_libxml2 - > out.xml
 		</programlisting>
 		</para>
 		<para>The following example shows the processing of the input
 		through an xslt filter and mapping the output through a token filter
 		that shows the tokenization of the input by the input filter.
+		Because the referenced XSLT filter is defined as source in a program,
+		we have to specify a configuration (test.conf) that declares the
+		programs to load.
 		<programlisting language='sh'>
 
-		cat in.xml | wolfilter -i myfilter -o token\
-			-m mod_filter_libxml2\
-			-m mod_filter_token\
-			-p myfilter.xslt - > out.xml
+cat in.xml | wolfilter -i myfilter -o token -c test.conf - > out.xml
 		</programlisting>
 		</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 		<title>Testing a Form</title>
 		<para>The following example shows the mapping through a form defined with simpleform DDL.
 		Mapping through forms is tested by passing the name of the form as command to execute.
+		Because forms have to be loaded as programs, we have to specify a 
+		configuration (test.conf) too.
 		<programlisting language='sh'>
 
-		cat in.xml | wolfilter -f libxml2 \
-			-m mod_filter_libxml2\
-			-p myform.sfrm MyForm > out.xml
+cat in.xml | wolfilter -e libxml2 -c test.conf MyForm > out.xml
 		</programlisting>
-		we assume here that the form to use is defined in myform.sfrm and called MyForm.
+		we assume here that the form to use is defined in myform.sfrm that is declared
+		as program in the configuration and that the form is called MyForm.
 		</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 		<title>Testing a Function</title>
 		<para>The following example shows the execution of a function written in Lua.
 		A JSON filter is used for input and output.
 		<programlisting language='sh'>
 
-		cat in.xml | wolfilter -f cjson \
-			-m mod_filter_cjson -m mod_command_lua \
-			-m mod_command_directmap
-			-p myfunc.lua MyFunc > out.json
+cat in.xml | wolfilter -e cjson -c test.conf MyFunc > out.json
 		</programlisting>
-		we assume here that the exported function to call defined in myfunc.lua is called MyFunc.
+		we assume here that the exported function to call defined in myfunc.lua 
+		declared in test.conf and is called MyFunc.
 		</para>
-	</sect2>
+	</sect3>
+</sect2>
 </sect1>
-
-</chapter>
 

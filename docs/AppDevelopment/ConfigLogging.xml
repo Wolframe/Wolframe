@@ -1,0 +1,174 @@
+<sect1>
+	<title>Logger configuration</title>
+	<para>
+	The logger configuration is defined in the <code>Logging</code>
+	section. The logger is defined for different backends.
+	We can define several backends for the logger. 
+	</para>
+
+	<sect2>
+	<title>Log message types and log levels</title>
+	<para>
+	Each backend defines the level (verbosity) of logging. For the
+	log levels we use the type of the log message. The types of log
+	messages can be listed in ascending order of their severity.
+	Setting the log level to a type of log message means that the system
+	logs all messages with equal or higher severity than the specified
+	type. The log message types are listed in the following table.
+	They are listed in ascending order of severity:
+
+	<table frame="all" width="100%">
+		<title>Log message types</title>
+		<tgroup cols="2">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="3*"/>
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+
+		<tbody>
+			<row>
+				<entry>DATA2</entry>
+				<entry>Processing data messages, not truncated</entry>
+			</row>
+			<row>
+				<entry>DATA</entry>
+				<entry>Processing data messages with big chunks truncated</entry>
+			</row>
+			<row>
+				<entry>TRACE</entry>
+				<entry>Processing trace messages</entry>
+			</row>
+			<row>
+				<entry>DEBUG</entry>
+				<entry>Debug messages</entry>
+			</row>
+			<row>
+				<entry>INFO</entry>
+				<entry>Information messages</entry>
+			</row>
+			<row>
+				<entry>NOTICE</entry>
+				<entry>Important information messages</entry>
+			</row>
+			<row>
+				<entry>WARNING</entry>
+				<entry>Warning messages</entry>
+			</row>
+			<row>
+				<entry>ERROR</entry>
+				<entry>Processing error messages</entry>
+			</row>
+			<row>
+				<entry>SEVERE</entry>
+				<entry>Severe errors that should be analyzed.</entry>
+			</row>
+			<row>
+				<entry>CRITICAL</entry>
+				<entry>Critical errors that have to notified.</entry>
+			</row>
+			<row>
+				<entry>ALERT</entry>
+				<entry>Critical errors that have to be escalated to a person responsible immediately.</entry>
+			</row>
+			<row>
+				<entry>FATAL</entry>
+				<entry>Fatal errors that cause the server to shut down.</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	</para>
+	</sect2>
+
+	<sect2>
+	<title>Log backends</title>
+	<para>
+	In the following sub sections we list the different backends and how 
+	they can be configured.
+	</para>
+		<sect3>
+			<title>Backend console</title>
+			<para>For defining the backend to log to console (stderr), we
+			have to configure a subsection <code>stderr</code> of the
+			<code>Logging</code> section. For console logging we just
+			can define the logging level with <code>level</code>.
+Example configuration:
+<programlisting language='text'>
+Logging
+{
+    Stderr {
+        Level INFO
+    }
+}
+</programlisting>
+			</para>
+		</sect3>
+		<sect3>
+			<title>Backend logfile</title>
+			<para>For defining the backend to log to a file, we
+			have to configure a subsection <code>LogFile</code> of the
+			<code>Logging</code> section. For logging to file we 
+			can define the logging level with <code>Level</code>
+			and the file name with <code>Filename</code>.
+Example configuration:
+<programlisting language='text'>
+Logging
+{
+    LogFile {
+        Filename /var/log/wolframed.log
+        Level NOTICE
+    }
+}
+</programlisting>
+			</para>
+		</sect3>
+		<sect3>
+			<title>Backend syslog</title>
+			<para>For defining the backend to log to syslog, we
+			have to configure a subsection <code>Syslog</code> of the
+			<code>Logging</code> section. For logging to syslog we 
+			can define the logging level with <code>Level</code>,
+			the syslog facility with <code>Facility</code>
+			and the identifier with <code>Ident</code>.
+Example configuration:
+<programlisting language='text'>
+Logging
+{
+    Syslog {
+        Ident wolframed
+        Facility LOCAL2
+        Level INFO
+    }
+}
+</programlisting>
+			</para>
+		</sect3>
+		<sect3>
+			<title>Backend eventlog</title>
+			<para>On Windows we can also log to eventlog.
+			For defining the backend to log to eventlog, we
+			have to configure a subsection <code>Eventlog</code> of the
+			<code>Logging</code> section. For logging to eventlog we 
+			can define the logging level with <code>Level</code>,
+			the eventlog source with <code>Source</code>
+			and the identifier with <code>Name</code>.
+Example configuration:
+<programlisting language='text'>
+Logging
+{
+    Eventlog {
+        Name Wolframe
+        Source wolframed
+        Level WARNING
+    }
+}
+</programlisting>
+			</para>
+		</sect3>
+	</sect2>
+</sect1>
+

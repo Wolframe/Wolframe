@@ -82,7 +82,6 @@ const serialize::StructDescriptionBase* PostgreSQLconfigStruct::getStructDescrip
 		( "connections", &PostgreSQLconfigStruct::connections )		.optional()
 		( "acquireTimeout", &PostgreSQLconfigStruct::acquireTimeout )	.optional()
 		( "statementTimeout", &PostgreSQLconfigStruct::statementTimeout ).optional()
-		( "program", &PostgreSQLconfigStruct::m_programFiles )
 		;
 	}
 	};
@@ -145,7 +144,7 @@ bool PostgreSQLconfig::parse( const config::ConfigurationNode& pt, const std::st
 {
 	try
 	{
-		config::parseConfigStructure( *static_cast<PostgreSQLconfigStruct*>(this), pt);
+		serialize::parseConfigStructure( *static_cast<PostgreSQLconfigStruct*>(this), pt);
 		m_config_pos = pt.position();
 		return mapValueDomains();
 	}
@@ -191,15 +190,6 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
-	for ( std::vector< std::string >::iterator it = m_programFiles.begin();
-						it != m_programFiles.end(); it++ )	{
-		std::string oldPath = *it;
-		*it = utils::getCanonicalPath( *it, refPath );
-		if ( oldPath != *it ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
-				       << "' instead of '" << oldPath << "'";
-		}
-	}
 }
 
 void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
@@ -241,17 +231,6 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 		os << indStr << "   Default statement execution timeout: 0 (wait indefinitely)" << std::endl;
 	else
 		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
-
-	if ( m_programFiles.size() == 0 )
-		os << indStr << "   Program file: none" << std::endl;
-	else if ( m_programFiles.size() == 1 )
-		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;
-	else	{
-		std::vector< std::string >::const_iterator it = m_programFiles.begin();
-		os << indStr << "   Program files: " << *it++ << std::endl;
-		while ( it != m_programFiles.end() )
-			os << indStr << "                  " << *it++ << std::endl;
-	}
 }
 
 bool PostgreSQLconfig::check() const

@@ -40,6 +40,7 @@
 #include "types/form.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
+#include "filter/execContextInputFilter.hpp"
 #include <string>
 
 namespace _Wolframe {
@@ -62,6 +63,7 @@ struct DirectmapCommandDescription
 		,inputform(o.inputform)
 		,outputform(o.outputform)
 		,outputmetadata(o.outputmetadata)
+		,execContextElements(o.execContextElements)
 		,authfunction(o.authfunction)
 		,authresource(o.authresource)
 		,has_result(o.has_result)
@@ -75,6 +77,7 @@ struct DirectmapCommandDescription
 	const types::FormDescription* inputform;			///< the input form description
 	const types::FormDescription* outputform;			///< the output form description
 	types::DocMetaData outputmetadata;				///< metadata of the output 
+	std::vector<langbind::ExecContextElement> execContextElements;	///< elements of the execution context passed to the function executed
 	std::string authfunction;					///< authorization function name
 	std::string authresource;					///< authorization resource name
 	bool has_result;						///< true, if this command has a result

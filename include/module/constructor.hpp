@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// Constructor classes
-//
+/// \file module/constructor.hpp
+/// \brief Base classes for virtual constructors to build objects loaded from modules
 
 #include "config/configurationBase.hpp"
 

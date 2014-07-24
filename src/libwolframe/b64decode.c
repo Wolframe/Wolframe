@@ -124,7 +124,7 @@ int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t e
 					fragment = base64_decodeValue( *encoded++ );
 				} while ( fragment < 0 );
 				if ( dataMaxSize-- < 1 )
-					return BUFFER_OVERFLOW;
+					return BASE64_BUFFER_OVERFLOW;
 				dataByte |= ( fragment & 0x030 ) >> 4;
 				*outByte++ = dataByte;
 				dataByte = ( fragment & 0x00f ) << 4;
@@ -138,7 +138,7 @@ int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t e
 					fragment = base64_decodeValue( *encoded++ );
 				} while ( fragment < 0 );
 				if ( dataMaxSize-- < 1 )
-					return BUFFER_OVERFLOW;
+					return BASE64_BUFFER_OVERFLOW;
 				dataByte |= ( fragment & 0x03c ) >> 2;
 				*outByte++ = dataByte;
 				dataByte = ( fragment & 0x003 ) << 6;
@@ -152,7 +152,7 @@ int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t e
 					fragment = base64_decodeValue( *encoded++ );
 				} while ( fragment < 0 );
 				if ( dataMaxSize-- < 1 )
-					return BUFFER_OVERFLOW;
+					return BASE64_BUFFER_OVERFLOW;
 				dataByte |= ( fragment & 0x03f );
 				*outByte++ = dataByte;
 		}
@@ -186,7 +186,7 @@ int base64_decode( const char* encoded, size_t encodedSize, void* data, size_t d
 			fragment = base64_decodeValue( *encoded++ );
 		} while ( fragment < 0 );
 		if ( dataMaxSize-- < 1 )
-			return BUFFER_OVERFLOW;
+			return BASE64_BUFFER_OVERFLOW;
 		dataByte |= ( fragment & 0x030 ) >> 4;
 		*outByte++ = dataByte;
 		dataByte = ( fragment & 0x00f ) << 4;
@@ -197,7 +197,7 @@ int base64_decode( const char* encoded, size_t encodedSize, void* data, size_t d
 			fragment = base64_decodeValue( *encoded++ );
 		} while ( fragment < 0 );
 		if ( dataMaxSize-- < 1 )
-			return BUFFER_OVERFLOW;
+			return BASE64_BUFFER_OVERFLOW;
 		dataByte |= ( fragment & 0x03c ) >> 2;
 		*outByte++ = dataByte;
 		dataByte = ( fragment & 0x003 ) << 6;
@@ -208,7 +208,7 @@ int base64_decode( const char* encoded, size_t encodedSize, void* data, size_t d
 			fragment = base64_decodeValue( *encoded++ );
 		} while ( fragment < 0 );
 		if ( dataMaxSize-- < 1 )
-			return BUFFER_OVERFLOW;
+			return BASE64_BUFFER_OVERFLOW;
 		dataByte |= ( fragment & 0x03f );
 		*outByte++ = dataByte;
 	}

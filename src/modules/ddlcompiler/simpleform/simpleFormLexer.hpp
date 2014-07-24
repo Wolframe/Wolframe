@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file simpleFormLexer.hpp
-///\brief Interface for lexical analysis for the simple form DDL compiler 
+/// \file simpleFormLexer.hpp
+/// \brief Interface for lexical analysis for the simple form DDL compiler 
 
 #ifndef _Wolframe_DDL_SIMPLEFORM_LEXER_HPP_INCLUDED
 #define _Wolframe_DDL_SIMPLEFORM_LEXER_HPP_INCLUDED
@@ -44,13 +44,13 @@ namespace _Wolframe {
 namespace langbind {
 namespace simpleform {
 
-///\class Lexem
-///\brief Single token in simpleform source with position information
+/// \class Lexem
+/// \brief Single token in simpleform source with position information
 class Lexem
 {
 public:
-	///\enum Id
-	///\brief Token identifier enumeration
+	/// \enum Id
+	/// \brief Token identifier enumeration
 	enum Id
 	{
 		EndOfFile,	///< end of source file
@@ -68,16 +68,16 @@ public:
 		Indirection,	///< '^'
 		Assign,		///< '='
 		MetaDataDef,	///< ':'
-		Semicolon	///< ';'
+		Separator	///< ','
 	};
 public:
-	///\brief Default constructor
+	/// \brief Default constructor
 	Lexem()
 		:m_id(EndOfFile){}
-	///\brief Constructor
+	/// \brief Constructor
 	Lexem( utils::SourceLineInfo position_, Id id_, const std::string& value_=std::string())
 		:m_id(id_),m_value(value_),m_position(position_){}
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	Lexem( const Lexem& o)
 		:m_id(o.m_id),m_value(o.m_value),m_position(o.m_position){}
 
@@ -92,33 +92,31 @@ private:
 	utils::SourceLineInfo m_position;	///< lexem position
 };
 
-///\brief Structure for lexical analysis of one simple form source file
-///\class Lexer
+/// \brief Structure for lexical analysis of one simple form source file
+/// \class Lexer
 class Lexer
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	Lexer( const std::string::const_iterator& begin, const std::string::const_iterator& end)
 		:m_start(begin),m_itr(begin),m_end(end),m_itr_position(begin),m_tokch(0){}
-	///\brief Copy constructor
+	/// \brief Copy constructor
 	Lexer( const Lexer& o)
 		:m_start(o.m_start),m_itr(o.m_itr),m_end(o.m_end),m_position(o.m_position),m_itr_position(o.m_itr_position),m_tokch(o.m_tokch){}
 
-	///\brief Make a lookup and evaluate the type of the lexem that will follow
-	///\return the lexem type
-	Lexem::Id forwardLookup();
-	///\brief Fetch the next lexem (that is not a comment) in the source
-	///\return the lexem
-	Lexem next();
-	///\brief Same as 'next' but returns identifier for the keywords 'FORM' and 'STRUCT'
-	///\return the lexem
-	Lexem next2();
-	///\brief Get a description of the current token for error messages
-	///\return the token description
+	/// \brief Fetch the next lexem (that is not a comment) in the source
+	/// \param[in] eolnAsSeparator true, if end of line (CRLF or LF) should be returned as 'Separator' ~ separator of atomic element definitions
+	/// \return the lexem
+	Lexem next( bool eolnAsSeparator);
+	/// \brief Same as 'next(..)' but returns identifier for the keywords 'FORM' and 'STRUCT'
+	/// \return the lexem
+	Lexem next2( bool eolnAsSeparator);
+	/// \brief Get a description of the current token for error messages
+	/// \return the token description
 	std::string curtoken() const;
 
-	///\brief Get the current position
-	///\return the position
+	/// \brief Get the current position
+	/// \return the position
 	utils::SourceLineInfo position() const	{return m_position;}
 
 private:

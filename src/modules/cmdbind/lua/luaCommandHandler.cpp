@@ -146,6 +146,10 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	}
 	else
 	{
+		if (!m_inputfilter->getMetaData())
+		{
+			return Yield;
+		}
 		if (!m_outputfilter->close())
 		{
 			return Yield;

@@ -97,6 +97,7 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 	m_cmdHandler.setInputBuffer( m_readBuf.charptr(), m_readBuf.size() );
 	m_cmdHandler.setOutputBuffer( m_outputBuf.charptr(), m_outputBuf.size() );
 	m_cmdHandler.setExecContext( &m_execContext);
+	m_cmdHandler.setLocalEndPoint( *m_localEP);
 }
 
 
@@ -161,6 +162,8 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 			LOG_FATAL << "Impossible remote connection type !";
 			abort();
 	}
+	// Propagate setPeer to the command handler
+	m_cmdHandler.setPeer( *m_remoteEP);
 
 	// Check if the connection is allowed
 	if (( m_authorization = m_globalCtx.aaaa().authorizer()))	{
@@ -168,6 +171,14 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 			LOG_DEBUG << "Connection from " << m_remoteEP->toString()
 				  << " to " << m_localEP->toString() << " authorized";
 			m_execContext.setAuthorizer( m_authorization);
+
+			if (!m_execContext.checkAuthorization( proc::ExecContext::CONNECT))
+			{
+				LOG_DEBUG << "Connection from " << m_remoteEP->toString()
+					  << " to " << m_localEP->toString() << " not authorized (CONNECT)";
+				// close the connection
+				m_state = FORBIDDEN;
+			}
 		}
 		else	{
 			LOG_DEBUG << "Connection from " << m_remoteEP->toString()
@@ -180,8 +191,6 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		LOG_WARNING << "Authorization not available";
 		//		abort();
 	}
-	// Propagate setPeer to the command handler
-	m_cmdHandler.setPeer( remote);
 }
 
 static void logNetwork( const char* title, const void* ptr, std::size_t size)
@@ -272,7 +281,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 			case TIMEOUT_OCCURED:	{
 				m_state = TERMINATING;
-				return net::NetworkOperation( net::SendString( std::string(m_cmdHandler.interruptDataSessionMarker()) + "BYE Timeout. :P\n" ));
+				return net::NetworkOperation( net::SendString( m_endDataSessionMarker + "BYE Timeout. :P\n" ));
 			}
 
 			case SIGNALLED:	{
@@ -281,13 +290,13 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 				}
 				else	{
 					m_state = TERMINATING;
-					return net::NetworkOperation( net::SendString( std::string(m_cmdHandler.interruptDataSessionMarker()) + "BYE Server is shutting down. :P\n" ));
+					return net::NetworkOperation( net::SendString( m_endDataSessionMarker + "BYE Server is shutting down. :P\n" ));
 				}
 			}
 
 			case FORBIDDEN:	{
 				m_state = TERMINATING;
-				return net::NetworkOperation( net::SendString( std::string(m_cmdHandler.interruptDataSessionMarker()) + "BYE Access denied.\n" ));
+				return net::NetworkOperation( net::SendString( "BYE Access denied.\n" ));
 			}
 
 			case TERMINATING:	{
@@ -352,12 +361,20 @@ void wolframeConnection::signalOccured( NetworkSignal signal )
 	switch( signal )	{
 		case TERMINATE:
 			LOG_TRACE << "Processor received termination signal";
+			if ( m_state == COMMAND_HANDLER )
+			{
+				m_endDataSessionMarker = m_cmdHandler.interruptDataSessionMarker();
+			}
 			if ( m_state != TERMINATING && m_state != FINISHED )
 				m_state = SIGNALLED;
 			break;
 
 		case TIMEOUT:
 			LOG_TRACE << "Processor received timeout signal";
+			if ( m_state == COMMAND_HANDLER )
+			{
+				m_endDataSessionMarker = m_cmdHandler.interruptDataSessionMarker();
+			}
 			if ( m_state != TERMINATING && m_state != FINISHED )
 				m_state = TIMEOUT_OCCURED;
 			break;
@@ -387,6 +404,10 @@ void wolframeConnection::signalOccured( NetworkSignal signal )
 			break;
 
 		case UNKNOWN_ERROR:
+			if ( m_state == COMMAND_HANDLER )
+			{
+				m_endDataSessionMarker = m_cmdHandler.interruptDataSessionMarker();
+			}
 			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
 			if ( m_state != TERMINATING && m_state != FINISHED )
 				m_state = TERMINATING;

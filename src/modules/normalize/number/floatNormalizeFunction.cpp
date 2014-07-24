@@ -32,10 +32,52 @@
 ************************************************************************/
 ///\file floatNormalizeFunction.cpp
 #include "floatNormalizeFunction.hpp"
+#include "normalizeFunctionUtils.hpp"
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
+
+static void getFractionDimArgument( const std::vector<types::Variant>& arg, std::size_t& sizeG, std::size_t& sizeF)
+{
+	if (arg.size() > 2) throw std::runtime_error("too many arguments for floating point number normalize function");
+	sizeG = 0;
+	sizeF = std::numeric_limits<std::size_t>::max();
+	if (arg.size() == 1)
+	{
+		types::Variant::Data::UInt vsizeF = arg.at(0).touint();
+		if (vsizeF >= std::numeric_limits<std::size_t>::max())
+		{
+			throw std::runtime_error( "parameter out of range for floating point number normalize function");
+		}
+		sizeF = (std::size_t)vsizeF;
+	}
+	else if (arg.size() == 2)
+	{
+		types::Variant::Data::UInt vsizeG = arg.at(0).touint();
+		types::Variant::Data::UInt vsizeF = arg.at(1).touint();
+		if (vsizeF >= std::numeric_limits<std::size_t>::max() || vsizeG >= std::numeric_limits<std::size_t>::max())
+		{
+			throw std::runtime_error( "parameter out of range for floating point number normalize function");
+		}
+		sizeG = (std::size_t)vsizeG;
+		sizeF = (std::size_t)vsizeF;
+	}
+}
+
+FloatNormalizeFunction::FloatNormalizeFunction( const std::vector<types::Variant>& arg)
+{
+	getFractionDimArgument( arg, m_sizeG, m_sizeF);
+	if (m_sizeG)
+	{
+		m_max = (double)getMax( m_sizeG);
+	}
+	else
+	{
+		m_max = std::numeric_limits<double>::max();
+	}
+}
+
 
 types::Variant FloatNormalizeFunction::execute( const types::Variant& inp) const
 {

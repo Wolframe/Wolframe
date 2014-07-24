@@ -13,6 +13,7 @@ error in transaction 'insertCustomer':*Customers must have a unique name.
 LoadModules
 {
 	module ../wolfilter/modules/database/postgresql/mod_db_postgresqltest
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../../src/modules/cmdbind/lua/mod_command_lua
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string

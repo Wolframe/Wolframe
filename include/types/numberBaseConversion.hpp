@@ -80,6 +80,7 @@ void convertBCDtoBigEndianUint( const unsigned char* digits, unsigned int nofdig
 	convertBCDtoBinary( digits, nofdigits, (unsigned char*)&val, sizeof(val));
 }
 
+/// \brief Class for little/big endian operations
 struct Endian
 {
 	template <typename UINTTYPE>

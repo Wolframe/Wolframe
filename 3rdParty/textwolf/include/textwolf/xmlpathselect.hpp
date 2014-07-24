@@ -436,18 +436,17 @@ public:
 
 		/// \brief Constructor by values
 		/// \param [in] p_input XML path selection stream to iterate through
-		/// \param [in] type XML element type to feed to XML path matcher
-		/// \param [in] key XML element value reference to feed to XML path matcher
-		/// \param [in] keysize XML element value size in bytes to feed to XML path matcher
-		iterator( ThisXMLPathSelect& p_input, XMLScannerBase::ElementType type, const char* key, int keysize)
+		/// \param [in] p_type XML element type to feed to XML path matcher
+		/// \param [in] p_key XML element value reference to feed to XML path matcher
+		/// \param [in] p_keysize XML element value size in bytes to feed to XML path matcher
+		iterator( ThisXMLPathSelect& p_input, XMLScannerBase::ElementType p_type, const char* p_key, int p_keysize)
 				:input( &p_input)
 		{
-			input->initProcessElement( type, key, keysize);
+			input->initProcessElement( p_type, p_key, p_keysize);
 			skip();
 		}
 
 		/// \brief Default constructor
-		/// \param [in] et end of input tag
 		iterator()
 			:element(0),input(0) {}
 
@@ -476,11 +475,11 @@ public:
 
 		/// \brief Preincrement
 		/// \return *this
-		iterator& operator++()		{return skip();}
+		iterator& operator++()				{return skip();}
 
 		/// \brief Postincrement
 		/// \return *this
-		iterator operator++(int)	{iterator tmp(*this); skip(); return tmp;}
+		iterator operator++(int)			{iterator tmp(*this); skip(); return tmp;}
 
 		/// \brief Compare elements for equality
 		/// \return true, if they are equal
@@ -496,6 +495,13 @@ public:
 	iterator push( XMLScannerBase::ElementType type, const char* key, int keysize)
 	{
 		return iterator( *this, type, key, keysize);
+	}
+
+	/// \brief Feed the path selector with the next token and get the start iterator for the results
+	/// \return iterator pointing to the first of the selected XML path elements
+	iterator push( XMLScannerBase::ElementType type, const std::string& key)
+	{
+		return iterator( *this, type, key.c_str(), key.size());
 	}
 
 	/// \brief Get the end of results returned by 'push(XMLScannerBase::ElementType,const char*, int)'

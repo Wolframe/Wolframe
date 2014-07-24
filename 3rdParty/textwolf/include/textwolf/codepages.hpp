@@ -153,11 +153,12 @@ public:
 	inline char invcode( UChar ch) const
 	{
 		char rt = 0;
-		if (ch <= 128) return ch;
-		if (ch <= 255) rt = m_invcd[ ch - 128];
+		if (ch <= 128) return (char)ch;
+		if (ch <= 255) rt = (unsigned char)m_invcd[ ch - 128];
 		if (rt == 0)
 		{
-			std::map<unsigned short, unsigned char>::const_iterator fi = m_invovlcd->find( ch);
+			if (ch >= (1<<sizeof(unsigned short))) return 0;
+			std::map<unsigned short, unsigned char>::const_iterator fi = m_invovlcd->find( (unsigned short)ch);
 			if (fi == m_invovlcd->end()) return 0;
 			rt = fi->second;
 		}

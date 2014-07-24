@@ -35,7 +35,6 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_DDL_PARSE_STACK_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_DDL_PARSE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "serialize/mapContext.hpp"
 #include "types/variantStruct.hpp"
 #include "types/normalizeFunction.hpp"
 #include <vector>

@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file cmdbind/doctypeinfo.hpp
+/// \file types/doctypeinfo.hpp
 /// \brief Structure for document type and format
 
 #ifndef _Wolframe_TYPES_DOCTYPE_INFO_HPP_INCLUDED

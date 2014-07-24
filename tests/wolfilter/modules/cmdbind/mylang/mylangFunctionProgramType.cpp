@@ -33,7 +33,6 @@ Project Wolframe.
 ///\brief Implementation of the function to create a form function program type object for mylang scripts
 #include "mylangFunctionProgramType.hpp"
 #include "mylangStructureBuilder.hpp"
-#include "mylangInterpreter.hpp"
 #include "langbind/formFunction.hpp"
 #include "processor/procProvider.hpp"
 #include "processor/execContext.hpp"
@@ -57,8 +56,7 @@ class MyLangResult
 {
 public:
 	MyLangResult( const mylang::StructureR& data_)
-		:utils::TypeSignature("langbind::MyLangResult", __LINE__)
-		,TypedInputFilter("mylangresult")
+		:TypedInputFilter("mylangresult")
 		,m_data(data_)
 		,m_bufidx(0)
 	{
@@ -66,8 +64,7 @@ public:
 	}
 
 	MyLangResult( const MyLangResult& o)
-		:utils::TypeSignature("langbind::MyLangResult", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_data(o.m_data)
 		,m_buf(o.m_buf)
 		,m_bufidx(o.m_bufidx)
@@ -360,43 +357,21 @@ private:
 	const mylang::Interpreter* m_interpreter;
 	std::string m_name;
 };
-
-///\class MylangProgramType
-///\brief Program type of mylang programs
-class MylangProgramType
-	:public prgbind::Program
-{
-public:
-	MylangProgramType()
-		:prgbind::Program( prgbind::Program::Function){}
-
-	virtual ~MylangProgramType(){}
-
-	virtual bool is_mine( const std::string& filename) const
-	{
-		boost::filesystem::path p( filename);
-		return p.extension().string() == ".mlg";
-	}
-
-	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
-	{
-		std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
-		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
-		for (; fi != fe; ++fi)
-		{
-			langbind::FormFunctionR ff( new MylangFormFunction( &m_interpreter, *fi));
-			library.defineFormFunction( *fi, ff);
-		}
-	}
-
-private:
-	mylang::Interpreter m_interpreter;
-};
 }//anonymous namespace
 
-prgbind::Program* langbind::createMylangProgramType()
+bool MylangProgramType::is_mine( const std::string& filename) const
 {
-	return new MylangProgramType();
+	boost::filesystem::path p( filename);
+	return p.extension().string() == ".mlg";
 }
 
-
+void MylangProgramType::loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
+{
+	std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
+	std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
+	for (; fi != fe; ++fi)
+	{
+		langbind::FormFunctionR ff( new MylangFormFunction( &m_interpreter, *fi));
+		library.defineFormFunction( *fi, ff);
+	}
+}

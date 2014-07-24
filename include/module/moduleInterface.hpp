@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file moduleInterface.hpp
+/// \brief Basic interface classes that to build objects and the Wolframe module interface
+/// \file module/moduleInterface.hpp
 ///
 
 #ifndef _MODULE_INTERFACE_HPP_INCLUDED
@@ -47,17 +47,20 @@
 namespace _Wolframe {
 namespace module {
 
+/// \class BuilderBase
+/// Base class of all builders
 class BuilderBase
 {
 public:
-	virtual ~BuilderBase(){};
+	virtual ~BuilderBase()				{}
 
 	virtual const char* objectClassName() const = 0;
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
 	virtual ObjectConstructorBase* constructor() = 0;
 };
 
-///
+/// \class SimpleBuilder
+/// \brief Base class for builders of objects without configuration
 class SimpleBuilder
 	:public BuilderBase
 {
@@ -76,19 +79,19 @@ protected:
 	const char* m_className;
 };
 
-///
+/// \class ConfiguredBuilder
+/// \brief Builder for objects with configuration
 class ConfiguredBuilder
 	:public BuilderBase
 {
 	friend class ModulesDirectory;
 public:
-	/// \class ConfiguredBuilder
-	/// \brief builder for objects with configuration
+	/// \brief Constructor
 	/// \param title	string used for printing purposes, usually logging.
 	/// \param section	configuration section (parent node)
 	/// \param keyword	keyword in the configuration section. The object configuration
 	///			is bind to the section, keyword pair
-	///\param className	the name of the class that the built constructor will build
+	/// \param className	the name of the class that the built constructor will build
 	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
 			   const char* className )
 		: m_title( title ), m_section( section ), m_keyword( keyword ),
@@ -119,7 +122,10 @@ protected:
 };
 
 
-/// Template for constructing a configured builder.
+/// \class ConfiguredBuilderDescription
+/// \tparam Tconstructor
+/// \tparam Tconf
+/// \brief Template for constructing a configured builder.
 template < class Tconstructor, class Tconf >
 class ConfiguredBuilderDescription : public ConfiguredBuilder
 {
@@ -146,12 +152,13 @@ private:
 
 //*********** Module interface *********
 
-///\brief Function that constructs a builder.
-//	This function is specific for each of the configured builders in the module.
+/// \brief Function that constructs a builder.
+///	This function is specific for each of the configured builders in the module.
 typedef BuilderBase* (*createBuilderFunc)();
 
 
-/// The module entry point structure. Only one entry point per module.
+/// \class ModuleEntryPoint
+/// \brief The module entry point structure. Only one entry point per module.
 struct ModuleEntryPoint
 {
 	enum	SignSize	{

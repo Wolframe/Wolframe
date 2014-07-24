@@ -48,6 +48,7 @@ TYP_OBJS = \
 	types/bignumber.o \
 	types/datetime.o \
 	types/customDataType.o \
+	types/addressRestriction.o \
 	types/variant.o \
 	types/variantStructDescription.o \
 	types/variantStruct.o \
@@ -68,9 +69,9 @@ UTIL_OBJS = \
 CPP_OBJS = \
 	$(TYP_OBJS) \
 	$(UTIL_OBJS) \
-	logObject.o \
 	logError.o \
 	version.o \
+	platform.o \
 	execContext.o \
 	getPassword.o \
 	user.o \
@@ -78,7 +79,9 @@ CPP_OBJS = \
 	HMAC.o \
 	PBKDF2.o \
 	passwordHash.o \
-	CRAM.o
+	usernameHash.o \
+	CRAM.o \
+	pwdChangeMessage.o
 
 OBJS = \
 	b64encode.o \

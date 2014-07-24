@@ -46,10 +46,13 @@ namespace langbind {
 
 /// \class TypedInputFilter
 /// \brief Input filter with atomic values having a type
-class TypedInputFilter :public FilterBase
+class TypedInputFilter
+	:public FilterBase
 {
 public:
 	typedef InputFilter::State State;
+	/// \class Data
+	/// \brief Private object bound to this filter to hold some data to be freed with the release of this filter (to solve some object life time dependency problems)
 	struct Data
 	{
 		Data(){}
@@ -59,16 +62,14 @@ public:
 
 	/// \brief Constructor
 	explicit TypedInputFilter( const char* name_)
-		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
-		,FilterBase(name_)
+		:FilterBase(name_)
 		,m_state(InputFilter::Start)
 		,m_data(0){}
 
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)
-		:utils::TypeSignature("langbind::TypedInputFilter", __LINE__)
-		,FilterBase(o)
+		:FilterBase(o)
 		,m_state(o.m_state)
 		,m_data(o.m_data?o.m_data->copy():0){}
 
@@ -103,12 +104,12 @@ public:
 	void setData( Data* data_)			{if (m_data) delete m_data; m_data = data_;}
 
 private:
-	State m_state;			//< state
-	Data* m_data;			//< data bound to the filter
+	State m_state;			///< state
+	Data* m_data;			///< data bound to the filter
 };
 
 /// \typedef TypedInputFilterR
-/// \brief Shared input filter reference
+/// \brief Shared input filter (langbind::TypedInputFilter) reference
 typedef boost::shared_ptr<TypedInputFilter> TypedInputFilterR;
 
 
@@ -122,15 +123,13 @@ public:
 
 	/// \brief Constructor
 	explicit TypedOutputFilter( const char* name_)
-		:utils::TypeSignature("langbind::TypedOutputFilter", __LINE__)
-		,FilterBase(name_)
+		:FilterBase(name_)
 		,m_state(OutputFilter::Start) {}
 
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter to copy
 	TypedOutputFilter( const TypedOutputFilter& o)
-		:utils::TypeSignature(o)
-		,FilterBase(o)
+		:FilterBase(o)
 		,m_state(o.m_state){}
 
 	/// \brief Destructor
@@ -161,7 +160,7 @@ private:
 };
 
 /// \typedef TypedOutputFilterR
-/// \brief Shared output filter reference
+/// \brief Shared output filter (langbind::TypedOutputFilter) reference
 typedef boost::shared_ptr<TypedOutputFilter> TypedOutputFilterR;
 
 

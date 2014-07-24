@@ -6,6 +6,7 @@ SUBDIRS =
 
 INCLUDE_DIRS = \
 	-I. \
+	-I$(TOPDIR)/src/modules/cmdbind/tdl \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR)/wtest/include \
@@ -30,9 +31,10 @@ INCLUDE_LIBS = \
 	-lwolftest \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_program_options \
-	$(LIBS_LT)
+	$(LIBS_LT) $(LIBS_NET)
 
-CPP_OBJS =
+CPP_OBJS = \
+	compileTdlFiles.o
 
 TEST_CPP_BINS = \
 	testCompileTDL$(EXE)

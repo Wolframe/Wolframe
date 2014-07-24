@@ -1,19 +1,19 @@
 STRUCT CustomerStruct
 {
-	name string
-	address string
+    name string
+    address string
 }
 
 FORM Customer
-	-root customer
+    -root customer
 {
-	_ CustomerStruct
+    _ CustomerStruct
 }
 
 FORM CustomerInserted
-	-root customer
+    -root customer
 {
-	id string
-	_ CustomerStruct
+    id string
+    _ CustomerStruct
 }
 

@@ -30,19 +30,25 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/programTypeModuleMacros.hpp
-///\brief Macros for a module for a program type for a binding language
+/// \file appdevel/programTypeModuleMacros.hpp
+/// \brief Macros for a module for a program type for a binding language
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/programTypeBuilder.hpp"
+#include "prgbind/program.hpp"
+#include "prgbind/programLibrary.hpp"
 
-///\brief Defines a Wolframe program type
-#define WF_PROGRAM_TYPE( LANGNAME, CREATEPRGFUNC)\
+/// \brief Defines a Wolframe program type
+#define WF_PROGRAM_TYPE( LANGNAME, PROGRAMCLASS)\
 {\
 	struct Constructor\
 	{\
+		static _Wolframe::prgbind::Program* create()\
+		{\
+			return new PROGRAMCLASS();\
+		}\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			return new _Wolframe::module::ProgramTypeBuilder( LANGNAME "ProgramType", LANGNAME "FormFunc", CREATEPRGFUNC);\
+			return new _Wolframe::module::ProgramTypeBuilder( LANGNAME "ProgramType", LANGNAME "Language", create);\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\

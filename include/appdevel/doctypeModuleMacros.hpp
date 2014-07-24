@@ -30,19 +30,23 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/doctypeModuleMacros.hpp
-///\brief Macros for a document type/format module definition
+/// \file appdevel/doctypeModuleMacros.hpp
+/// \brief Macros for a document type/format module definition
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/doctypeDetectorBuilder.hpp"
 
-///\brief Defines a Wolframe document format with a document type detector after the module includes section.
-#define WF_DOCUMENT_FORMAT( DOCFORMATNAME, CREATE_DOCTYPE_DETECTOR)\
+/// \brief Defines a Wolframe document format with a document type detector after the module includes section and module declaration header.
+#define WF_DOCUMENT_FORMAT( DOCFORMATNAME, DETECTORCLASS)\
 {\
 	struct Constructor\
 	{\
+		static _Wolframe::cmdbind::DoctypeDetector* create()\
+		{\
+			return new DETECTORCLASS();\
+		}\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			return new _Wolframe::module::DoctypeDetectorBuilder( DOCFORMATNAME "Detector", DOCFORMATNAME, CREATE_DOCTYPE_DETECTOR);\
+			return new _Wolframe::module::DoctypeDetectorBuilder( DOCFORMATNAME "Detector", DOCFORMATNAME, create);\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\

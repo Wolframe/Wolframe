@@ -36,6 +36,7 @@
 #define _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
 #include "processor/procProviderInterface.hpp"
 #include "types/secureReference.hpp"
+#include "types/keymap.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/authorization.hpp"
 #include "AAAA/authenticator.hpp"
@@ -51,17 +52,18 @@ class ExecContext
 public:
 	/// \brief Default Constructor
 	ExecContext()
-		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0){}
+		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0),m_remoteEndpoint(0),m_localEndpoint(0),m_capabilities(0){}
 	/// \brief Constructor
 	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a)
-		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0){}
+		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0),m_remoteEndpoint(0),m_localEndpoint(0),m_capabilities(0){}
 
 	/// \brief Get the processor provider interface
 	const ProcessorProviderInterface* provider() const	{return m_provider;}
 
 	/// \brief Get the the user instance reference
 	const AAAA::User* user() const				{return m_user.get();}
-	/// \brief Set the user instance (own by this from now)
+	/// \brief Set the user instance
+	/// \remark Allocated with new, owned by this from now
 	void setUser( AAAA::User* u)				{m_user.reset( u);}
 
 	/// \brief Get the authorization instance interface
@@ -74,12 +76,77 @@ public:
 	/// \brief Set the default timeout for read operations in seconds (0=forever)
 	void setDefaultTimeout( unsigned int timeout_sec_)	{m_default_timeout = timeout_sec_;}
 
+	/// \brief Get the socket identifier for authorization checks
+	const char* socketIdentifier() const			{return m_localEndpoint?m_localEndpoint->config().socketIdentifier.c_str():0;}
+	/// \brief Get the remote endpoint for authorization checks
+	const net::RemoteEndpoint* remoteEndpoint() const	{return m_remoteEndpoint;}
+	/// \brief Get the local endpoint for authorization checks
+	const net::LocalEndpoint* localEndpoint() const		{return m_localEndpoint;}
+
+	/// \brief Set the socket identifier for authorization checks
+	void setConnectionData(
+			const net::RemoteEndpoint* remoteEndpoint_,
+			const net::LocalEndpoint* localEndpoint_)
+	{
+		m_remoteEndpoint = remoteEndpoint_;
+		m_localEndpoint = localEndpoint_;
+		m_capabilities |= m_localEndpoint?m_localEndpoint->config().capabilities:0;
+	}
+
+	typedef net::LocalEndpointConfig::ProtocolCapability Capability;
+
+	/// \brief Set a capability for this execution context
+	void setCapability( Capability c)
+	{
+		m_capabilities |= (1 << (unsigned char)c);
+	}
+	/// \brief Ask for a capability for this execution context
+	bool hasCapability( Capability c) const
+	{
+		return 0!=(m_capabilities & (1 << (unsigned char)c));
+	}
+
 	/// \brief Get an authenticator
 	AAAA::Authenticator* authenticator( const net::RemoteEndpoint& client ) const
-								{return m_aaaaProvider?m_aaaaProvider->authenticator( client ):0;}
+	{
+		return m_aaaaProvider?m_aaaaProvider->authenticator( client ):0;
+	}
+	/// \brief Get a password changer
+	AAAA::PasswordChanger* passwordChanger( const net::RemoteEndpoint& client ) const
+	{
+		return m_aaaaProvider?m_aaaaProvider->passwordChanger( *m_user.get(), client ):0;
+	}
 
-	/// \brief Checks if a function tagged with AUTHORIZE( authorizationFunction, authorizationResource) is allowed to be executed
-	bool checkAuthorization( const std::string& authorizationFunction, const std::string& authorizationResource);
+	/// \brief Checks if a function tagged with AUTHORIZE( funcname, resource) is allowed to be executed
+	bool checkAuthorization( const std::string& funcname, const std::string& resource, std::string& errmsg, bool allowIfNotExists=false);
+
+	/// \brief Hardcoded basic authorization function enumeration
+	enum BasicAuthorizationFunction
+	{
+		CONNECT,
+		PASSWD
+	};
+	/// \brief Get the name of a basic function
+	static const char* basicAuthorizationFunctionName( BasicAuthorizationFunction n)
+	{
+		static const char* ar[] = {"CONNECT","PASSWD"};
+		return ar[n];
+	}
+
+	/// \brief Checks authorization for a basic function
+	bool checkAuthorization( BasicAuthorizationFunction f)
+	{
+		std::string errmsg;
+		return checkAuthorization( basicAuthorizationFunctionName(f), "", errmsg, true);
+	}
+
+	/// \brief Create a new transaction object
+	db::Transaction* transaction( const std::string& name);
+
+	/// \brief Declare the database 'dbname' as the current transaction database
+	void push_database( const std::string& dbname)			{m_dbstack.push_back( dbname);}
+	/// \brief Restore the previous current transaction database
+	void pop_database()						{m_dbstack.pop_back();}
 
 private:
 	ExecContext( const ExecContext&);			//... non copyable
@@ -91,6 +158,10 @@ private:
 	const AAAA::Authorizer* m_authorizer;			///< instance to query for execution permission based on login data
 	const AAAA::AAAAprovider* m_aaaaProvider;		///< instance to query for an authenticator
 	unsigned int m_default_timeout;				///< default timeout
+	const net::RemoteEndpoint* m_remoteEndpoint;		///< remote end point of the connection
+	const net::LocalEndpoint* m_localEndpoint;		///< local end point of the connection
+	std::vector<std::string> m_dbstack;			///< stack for implementing current database as scope
+	unsigned int m_capabilities;				///< configured capability set
 };
 
 }} //namespace

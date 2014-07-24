@@ -222,6 +222,8 @@ public:
 	/// \param[in] strsize size of 'str' in bytes
 	void init( const char* str, std::size_t strsize);
 
+	/// \class StringFormat
+	/// \brief Format for parsing/printing date time
 	struct StringFormat
 	{
 		enum Id

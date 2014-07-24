@@ -32,9 +32,9 @@ Project Wolframe.
 /// \file types/string.hpp
 /// \brief Type for strings in various encodings
 /// \remark You have to build Wolframe with the flag WITH_TEXTWOLF=1 to make the types::String work
-//	with all encodings and code pages listed in the interface. Without this flag set UTF-8 
-//	will be accepted only as Ascii and UTF16BE (wchat_t) only with Ascii and Latin-1
-//	characters. Other character set conversions are not available in this module.
+///	with all encodings and code pages listed in the interface. Without this flag set UTF-8 
+///	will be accepted only as Ascii and UTF16BE (wchat_t) only with Ascii and Latin-1
+///	characters. Other character set conversions are not available in this module.
 #ifndef _Wolframe_TYPES_STRING_HPP_INCLUDED
 #define _Wolframe_TYPES_STRING_HPP_INCLUDED
 #include <cstdlib>

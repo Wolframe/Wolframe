@@ -204,6 +204,8 @@ private:
 	ElementRequirement m_requirement;
 };
 
+/// \class EmptyStruct
+/// \brief Class representing an empty structure
 struct EmptyStruct
 {
 	static const serialize::StructDescriptionBase* getStructDescription();

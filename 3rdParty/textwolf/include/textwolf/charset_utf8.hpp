@@ -50,7 +50,7 @@ namespace charset {
 struct UTF8
 {
 	/// \brief Maximum character that can be represented by this encoding implementation
-	enum {MaxChar=0x7FFFFFFF};
+	enum {MaxChar=0x7FFFFFFFU};
 	enum {
 		B11111111=0xFF,
 		B01111111=0x7F,

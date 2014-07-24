@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/module/cppFormFunctionBuilder.hpp
-///\brief Interface template for object builder of built-in functions
+/// \file appdevel/module/cppFormFunctionBuilder.hpp
+/// \brief Interface template for object builder of built-in functions
 #ifndef _Wolframe_MODULE_CPP_FORM_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_CPP_FORM_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "serialize/cppFormFunction.hpp"
@@ -43,12 +43,16 @@ namespace _Wolframe {
 namespace module {
 
 
+/// \class CppFormFunctionDef
+/// \brief Definition of a form function written in C++
 struct CppFormFunctionDef
 {
 	const char* name;
 	serialize::CppFormFunction func;
 };
 
+/// \class CppFormFunctionConstructor
+/// \brief Constructor of a form function written in C++
 class CppFormFunctionConstructor :public SimpleObjectConstructor< serialize::CppFormFunction >
 {
 public:
@@ -87,6 +91,8 @@ private:
 typedef boost::shared_ptr<CppFormFunctionConstructor> CppFormFunctionConstructorR;
 
 
+/// \class CppFormFunctionBuilder
+/// \brief Builder of a form function constructor written in C++
 class CppFormFunctionBuilder :public SimpleBuilder
 {
 public:

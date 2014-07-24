@@ -27,7 +27,7 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	integerNormalizeFunction.obj \
 	floatNormalizeFunction.obj \
-	numberNormalize.obj \
+	normalizeFunctionUtils.obj \
 	mod_normalize_number.obj
 
 all: $(DYNAMIC_MODULE)

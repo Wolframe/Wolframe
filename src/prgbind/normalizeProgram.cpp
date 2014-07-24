@@ -39,9 +39,9 @@
 #include "types/customDataType.hpp"
 #include "utils/parseUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "utils/fileLineInfo.hpp"
 #include "processor/procProvider.hpp"
 #include "logger-v1.hpp"
-#include "config/programBase.hpp"
 #include <string>
 
 using namespace _Wolframe;
@@ -149,15 +149,17 @@ private:
 
 
 static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
-	loadSource( const std::string& source, const ProgramLibrary& prglibrary)
+	loadSource( const std::string& filename, const std::string& source, const ProgramLibrary& prglibrary)
 {
 	std::vector<std::pair<std::string,types::NormalizeFunctionR> > rt;
-	config::PositionalErrorMessageBase PRGBIND_ERROR(source);
-	config::PositionalErrorMessageBase::Message MSG;
 	static const utils::CharTable optab( "#=;)(,");
 	std::string prgname,tok,funcname;
 	std::string::const_iterator argstart;
 	std::string::const_iterator si = source.begin(), se = source.end();
+
+	utils::FileLineInfo posinfo( utils::getFileStem( filename) + utils::getFileExtension( filename));
+	std::string::const_iterator posinfo_si = si;
+	
 	char ch;
 
 	try
@@ -167,33 +169,33 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 			switch ((ch=utils::parseNextToken( prgname, si, se, optab)))
 			{
 				case '#': utils::parseLine( si, se); continue; //... comment
-				case ';': throw PRGBIND_ERROR( si, "empty statement");
+				case ';': throw std::runtime_error( "empty statement");
 				case '\'':
-				case '\"': throw PRGBIND_ERROR( si, "identifier expected instead of string at start of statement");
+				case '\"': throw std::runtime_error( "identifier expected instead of string at start of statement");
 				default:
-					if (optab[ ch]) throw PRGBIND_ERROR( si, "identifier expected at start of statement");
+					if (optab[ ch]) throw std::runtime_error( "identifier expected at start of statement");
 			}
 			CombinedNormalizeFunction funcdef( prgname);
 
 			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
 			{
-				case '\0': throw PRGBIND_ERROR( si, "unexpected end of program");
+				case '\0': throw std::runtime_error( "unexpected end of program");
 				case '=': break;
 				default:
-					if (optab[ ch]) throw PRGBIND_ERROR( si, MSG << "'=' expected instead of '" << ch << "'");
-					throw PRGBIND_ERROR( si, MSG << "'=' expected instead of '" << tok << "'");
+					if (optab[ ch]) throw std::runtime_error( std::string("'=' expected instead of '") + ch + "'");
+					throw std::runtime_error( std::string("'=' expected instead of '") + tok + "'");
 			}
 			while (ch != ';')
 			{
 				switch ((ch=utils::parseNextToken( funcname, si, se, optab)))
 				{
-					case '\0': throw PRGBIND_ERROR( si, "unexpected end of program");
+					case '\0': throw std::runtime_error( "unexpected end of program");
 					default:
-						if (optab[ ch]) throw PRGBIND_ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
+						if (optab[ ch]) throw std::runtime_error( std::string( "function name identifier expected instead of '") + ch + "'");
 				}
 				switch ((ch=utils::gotoNextToken( si, se)))
 				{
-					case '\0': throw PRGBIND_ERROR( si, "unexpected end of program");
+					case '\0': throw std::runtime_error( "unexpected end of program");
 					case ',':
 					case ';':
 						if (funcdef.hasMethod( funcname))
@@ -213,20 +215,20 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 						do
 						{
 							ch = utils::parseNextToken( tok, si, se, optab);
-							if (ch == '\0') throw PRGBIND_ERROR( si, "unexpected end of program");
-							if (ch == '(') throw PRGBIND_ERROR( si, "nested expressions, bracket not closed");
+							if (ch == '\0') throw std::runtime_error( "unexpected end of program");
+							if (ch == '(') throw std::runtime_error( "nested expressions, bracket not closed");
 							if (ch == ')')
 							{
 								if (arg.empty()) break;
-								throw PRGBIND_ERROR( si, "unexpected token ')', argument expected");
+								throw std::runtime_error( "unexpected token ')', argument expected");
 							}
-							if (ch == '=') throw PRGBIND_ERROR( si, "unexpected token '='");
-							if (ch == ';') throw PRGBIND_ERROR( si, "unexpected end of expression, bracket not closed");
-							if (ch == ',') throw PRGBIND_ERROR( si, "unexpected token ',', argument expected");
+							if (ch == '=') throw std::runtime_error( "unexpected token '='");
+							if (ch == ';') throw std::runtime_error( "unexpected end of expression, bracket not closed");
+							if (ch == ',') throw std::runtime_error( "unexpected token ',', argument expected");
 							arg.push_back( types::Variant( tok));
 						}
 						while ((ch=utils::parseNextToken( tok, si, se, optab)) == ',');
-						if (ch != ')') throw PRGBIND_ERROR( si, "expected ')' or argument separator ','");
+						if (ch != ')') throw std::runtime_error( "expected ')' or argument separator ','");
 						
 						if (funcdef.hasMethod( funcname))
 						{
@@ -242,11 +244,11 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 							++si;
 							continue;
 						}
-						if (!ch) throw PRGBIND_ERROR( si, "unexpected end of program");
-						throw PRGBIND_ERROR( si, "unexpected token at end of expression");
+						if (!ch) throw std::runtime_error( "unexpected end of program");
+						throw std::runtime_error( "unexpected token at end of expression");
 					}
 					default:
-						throw PRGBIND_ERROR( si, MSG << "separator ',' or ';' expected or function arguments in '(' ')' brackets instead of '" << ch << "'");
+						throw std::runtime_error( std::string( "separator ',' or ';' expected or function arguments in '(' ')' brackets instead of '") + ch + "'");
 				}
 			}
 			types::NormalizeFunctionR func( new CombinedNormalizeFunction( funcdef));
@@ -254,13 +256,10 @@ static std::vector<std::pair<std::string,types::NormalizeFunctionR> >
 		}
 		return rt;
 	}
-	catch (const config::PositionalErrorException& e)
-	{
-		throw e;
-	}
 	catch (const std::runtime_error& e)
 	{
-		throw PRGBIND_ERROR( si, e.what());
+		posinfo.update( posinfo_si, si);
+		throw std::runtime_error( std::string(e.what()) + " " + posinfo.logtext());
 	}
 }
 
@@ -281,7 +280,7 @@ void NormalizeProgram::loadProgram( ProgramLibrary& library, db::Database*, cons
 	try
 	{
 		std::vector<std::pair<std::string,types::NormalizeFunctionR> > funclist
-			= loadSource( utils::readSourceFileContent( filename), library);
+			= loadSource( filename, utils::readSourceFileContent( filename), library);
 
 		std::vector<std::pair<std::string,types::NormalizeFunctionR> >::const_iterator ni = funclist.begin(), ne = funclist.end();
 		for (; ni != ne; ++ni)
@@ -289,13 +288,9 @@ void NormalizeProgram::loadProgram( ProgramLibrary& library, db::Database*, cons
 			library.defineNormalizeFunction( ni->first, ni->second);
 		}
 	}
-	catch (const config::PositionalErrorException& e)
-	{
-		throw config::PositionalFileErrorException( config::PositionalFileError( e, filename));
-	}
 	catch (const std::runtime_error& err)
 	{
-		throw std::runtime_error( std::string( "error in normalize program file '") + filename + "' :" + err.what());
+		throw std::runtime_error( std::string( "error in normalize program: ") + err.what());
 	}
 }
 

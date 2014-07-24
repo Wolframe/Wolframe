@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.0.1
+VERSION=0.0.2
 PKGBUILD=$HOME/bsdbuild
 ORIG_ARCH=`uname -m`
 OS_VERSION=`uname -r`
@@ -45,7 +45,6 @@ check_for_errors( )
 	fi
 }
 
-cp packaging/freebsd/wolframe.conf $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/wolframe/.
 rm -rf $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
 mkdir $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
 cp packaging/freebsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/.

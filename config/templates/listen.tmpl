@@ -1,0 +1,58 @@
+; network configuration
+
+Server {
+
+; Maximum number of simultaneous connections (clients).
+; Default is the OS limit. This is the global (total) value.
+; Set it to 0 to disable (to use the system limit)
+
+    MaxConnections 4
+
+; Number of threads for serving client connections.
+; Default: 4
+    
+    Threads 4
+
+    Listen {
+
+; Interfaces can be named for later reference
+
+        Identifier \"insecure loopback\"
+ 
+; The address to listen to
+; can be an IPv4 of the form x.x.x.x or 0.0.0.0 (for any address)
+; can be an IPv6 of the form x:x:x:x:x:x:x:x or :: (for any address)
+
+        Address ${WOLFRAME_NORMAL_ADDRESS}
+
+; Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
+; Use 7661 for unencrypted connections and 7961 for SSL connections.
+; Note that 7654 is used by Winamp.
+
+        Port ${WOLFRAME_NORMAL_PORT}
+
+; Maximum number of simultaneous connections (clients)								
+; for this socket.
+; Default is the OS limit.
+
+        MaxConnections 4
+
+; Access restriction by IP
+; Default: Allow all
+
+        Restrictions {
+        
+; Allow <IP>
+
+            Allow all
+
+; Deny <IP>
+
+;            Deny 127.0.0.1
+        }
+        
+    }
+
+$(if test "x$WITH_SSL" = "x1"; then eval "echo \"$(cat listen-ssl.tmpl | sed 's/^\(.*\)/;\1/g' )\""; fi)
+    
+}

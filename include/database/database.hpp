@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// database.hpp - Wolframe base database class
-//
+/// \file database.hpp
+/// \brief Wolframe base database class
 
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
@@ -45,22 +44,22 @@
 namespace _Wolframe {
 namespace db {
 
-///\class Database
-///\brief Base class for database interface. All databases should provide this interface
+/// \class Database
+/// \brief Base class for database interface. All databases should provide this interface
 class Database
 {
 public:
 	virtual ~Database()			{}
 
-	///\brief Database identification.
-	// All databases must have an identifier as they are referenced using this identifier.
-	// The identifier must be unique (of course).
+	/// \brief Database identification.
+	/// All databases must have an identifier as they are referenced using this identifier.
+	/// The identifier must be unique (of course).
 	virtual const std::string& ID() const = 0;
 
-	///\brief Database type identification.
+	/// \brief Database type identification.
 	virtual const char* className() const = 0;
 
-	///\brief Get a database transaction object
+	/// \brief Get a database transaction object
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
 	virtual const LanguageDescription* getLanguageDescription() const
@@ -75,22 +74,22 @@ public:
 };
 
 
-///\class DatabaseUnit
-///\brief This is the base class for database unit implementations
+/// \class DatabaseUnit
+/// \brief This is the base class for database unit implementations
 class DatabaseUnit
 {
 public:
 	virtual ~DatabaseUnit()			{}
 
-	///\brief Database type identification
-	///\remark All database implementations need a class name.
-	///\remark Class names must be unique.
+	/// \brief Database type identification
+	/// \remark All database implementations need a class name.
+	/// \remark Class names must be unique.
 	virtual const char* className() const = 0;
 
-	///\brief The database identifier. This is the configured name.
+	/// \brief The database identifier. This is the configured name.
 	virtual const std::string& ID() const = 0;
 
-	///\brief The actual database object.
+	/// \brief The actual database object.
 	virtual Database* database() = 0;
 };
 

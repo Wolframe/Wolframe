@@ -30,10 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file logger.hpp
-/// \brief Top-level include file for logging
-///
+/// \file logger-v1.hpp
+/// \brief Top-level include file for logging (version 1)
 
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED
@@ -48,6 +46,7 @@
 namespace _Wolframe {
 namespace log {
 
+/// Logger abstraction configurable to print to multiple backends
 class Logger {
 public:
 	/// create a logger and connect it to a backend, typically
@@ -80,7 +79,7 @@ private:
 };
 
 
-/// template functions for logging, default is we search for the << operator
+/// \brief template functions for logging, default is we search for the << operator
 /// and log with this one..
 template <typename T>
 Logger& operator<< ( Logger& logger, T t )

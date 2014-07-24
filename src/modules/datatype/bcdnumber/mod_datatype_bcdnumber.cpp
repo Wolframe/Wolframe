@@ -33,7 +33,7 @@
 ///\file mod_datatype_datetime.cpp
 ///\brief Extension module for date and time arithmetic
 #include "appdevel/moduleFrameMacros.hpp"
-#include "appdevel/customDatatypeModuleMacros.hpp"
+#include "appdevel/customDataTypeModuleMacros.hpp"
 #include "datatypeBigint.hpp"
 #include "datatypeBigfxp.hpp"
 

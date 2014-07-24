@@ -61,6 +61,7 @@ private:
 	/// \brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
 	/// \param [in] src pointer to string to print
 	/// \param [in] srcsize size of src in bytes
+	/// \param [out] buf buffer to append result to
 	void printToBuffer( const char* src, std::size_t srcsize, BufferType& buf) const
 	{
 		CStringIterator itr( src, srcsize);
@@ -75,6 +76,7 @@ private:
 	}
 
 	/// \brief print a character substitute or the character itself
+	/// \param [in] ch character to print
 	/// \param [in,out] buf buffer to print to
 	/// \param [in] nof_echr number of elements in echr and estr
 	/// \param [in] echr ASCII characters to substitute

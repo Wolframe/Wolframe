@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=0.0.1
+VERSION=0.0.2
 PKGBUILD=$HOME/slackbuild
 ARCH=`uname -m`
 if test "x$ARCH" = "xx86_64"; then
@@ -29,10 +29,12 @@ mkdir -p $PKGBUILD $PKGBUILD/BUILD $PKGBUILD/PKG $PKGBUILD/PKGS/$ARCH
 rm -f wolframe-$VERSION.tar.gz
 rm -f $PKGBUILD/BUILD/wolframe_$VERSION.tar.gz
 
+GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
 make distclean
 mkdir /tmp/wolframe-$VERSION
 cp -a * /tmp/wolframe-$VERSION
 cd /tmp
+sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" wolframe-$VERSION/include/wolframe.hpp
 tar zcf wolframe-$VERSION.tar.gz wolframe-$VERSION
 cd -
 mv /tmp/wolframe-$VERSION.tar.gz .
@@ -49,7 +51,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules \
 	help
 
@@ -59,7 +61,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules \
 	config
 
@@ -69,7 +71,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules
 check_for_errors
 
@@ -79,7 +81,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	libdir=$LIBDIR DEFAULT_MODULE_LOAD_DIR=$LIBDIR/wolframe/modules \
 	testreport
 check_for_errors
@@ -90,7 +92,7 @@ make WITH_SSL=1 WITH_EXPECT=1 WITH_SASL=1 WITH_SYSTEM_SQLITE3=1 \
 	WITH_PYTHON=1 PGSQL_DIR=/usr/local/pgsql \
 	WITH_TEXTWOLF=1 WITH_CJSON=1 RELEASE=1 \
 	CC='ccache gcc' CXX='ccache g++' \
-	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe" \
+	LDFLAGS="-Wl,-rpath=$LIBDIR/wolframe,--enable-new-dtags" \
 	DESTDIR=$PKGBUILD/PKG install sysconfdir=/etc libdir=$LIBDIR
 check_for_errors
 
@@ -100,7 +102,6 @@ check_for_errors
 mkdir $PKGBUILD/PKG/install
 cp packaging/slackware/slack-desc $PKGBUILD/PKG/install/.
 cp packaging/slackware/doinst.sh $PKGBUILD/PKG/install/.
-cp packaging/slackware/wolframe.conf $PKGBUILD/PKG/etc/wolframe/.
 mkdir $PKGBUILD/PKG/etc/rc.d
 cp packaging/slackware/rc.wolframed $PKGBUILD/PKG/etc/rc.d/.
 chmod 0775 $PKGBUILD/PKG/etc/rc.d/rc.wolframed

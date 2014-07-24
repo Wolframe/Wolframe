@@ -64,6 +64,11 @@ Authenticator* AAAAprovider::authenticator( const _Wolframe::net::RemoteEndpoint
 	return m_impl->authenticator( client );
 }
 
+PasswordChanger* AAAAprovider::passwordChanger( const User& user, const net::RemoteEndpoint& client) const
+{
+	return m_impl->passwordChanger( user, client );
+}
+
 Authorizer* AAAAprovider::authorizer() const
 {
 	return m_impl->authorizer();

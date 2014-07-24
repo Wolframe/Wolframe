@@ -47,7 +47,7 @@
 namespace _Wolframe {
 namespace db {
 
-enum {DEFAULT_SQLITE_CONNECTIONS = 3};
+enum {DEFAULT_SQLITE_CONNECTIONS = 4};
 
 SQLiteConfigStruct::SQLiteConfigStruct()
 	:m_foreignKeys(true)
@@ -67,7 +67,6 @@ const serialize::StructDescriptionBase* SQLiteConfigStruct::getStructDescription
 		( "foreignKeys", &SQLiteConfigStruct::m_foreignKeys)		.optional()
 		( "profiling", &SQLiteConfigStruct::m_profiling)		.optional()
 		( "connections", &SQLiteConfigStruct::m_connections)		.optional()
-		( "program", &SQLiteConfigStruct::m_programFiles )
 		( "extension", &SQLiteConfigStruct::m_extensionFiles )
 		;
 	}
@@ -81,7 +80,7 @@ bool SQLiteConfig::parse( const config::ConfigurationNode& pt, const std::string
 {
 	try
 	{
-		config::parseConfigStructure( *static_cast<SQLiteConfigStruct*>(this), pt);
+		serialize::parseConfigStructure( *static_cast<SQLiteConfigStruct*>(this), pt);
 		m_config_pos = pt.position();
 		return true;
 	}
@@ -106,16 +105,6 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   Filename: " << m_filename << std::endl;
 	os << indStr << "      Referential integrity: " << (m_foreignKeys ? "enabled" : "disabled") << std::endl;
 	os << indStr << "      Profiling: " << (m_profiling ? "enabled" : "disabled") << std::endl;
-	if ( m_programFiles.empty() )
-		os << indStr << "   Program file: none" << std::endl;
-	else if ( m_programFiles.size() == 1 )
-		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;
-	else	{
-		std::vector< std::string >::const_iterator it = m_programFiles.begin();
-		os << indStr << "   Program files: " << *it++ << std::endl;
-		while ( it != m_programFiles.end() )
-			os << indStr << "                  " << *it++ << std::endl;
-	}
 }
 
 bool SQLiteConfig::check() const
@@ -134,15 +123,6 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 		m_filename = utils::getCanonicalPath( m_filename, refPath);
 		if ( oldPath != m_filename )	{
 /*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute database filename '" << m_filename
-				       << "' instead of '" << oldPath << "'";
-		}
-	}
-	for ( std::vector< std::string >::iterator it = m_programFiles.begin();
-						it != m_programFiles.end(); it++ )	{
-		std::string oldPath = *it;
-		*it = utils::getCanonicalPath( *it, refPath );
-		if ( oldPath != *it )	{
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
 				       << "' instead of '" << oldPath << "'";
 		}
 	}

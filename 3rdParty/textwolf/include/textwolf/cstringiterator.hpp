@@ -37,6 +37,7 @@
 
 #ifndef __TEXTWOLF_CSTRING_ITERATOR_HPP__
 #define __TEXTWOLF_CSTRING_ITERATOR_HPP__
+#include <string>
 #include <cstring>
 #include <cstdlib>
 
@@ -56,11 +57,25 @@ public:
 		,m_pos(0){}
 
 	/// \brief Constructor
-	/// \param [in] src string to iterate on
-	/// \param [in] size number of char in the string to iterate on
+	/// \param [in] src null terminated C string to iterate on
+	/// \param [in] size number of bytes in the string to iterate on
 	CStringIterator( const char* src, unsigned int size)
 		:m_src(src)
 		,m_size(size)
+		,m_pos(0){}
+
+	/// \brief Constructor
+	/// \param [in] src string to iterate on
+	CStringIterator( const char* src)
+		:m_src(src)
+		,m_size(std::strlen(src))
+		,m_pos(0){}
+
+	/// \brief Constructor
+	/// \param [in] src string to iterate on
+	CStringIterator( const std::string& src)
+		:m_src(src.c_str())
+		,m_size(src.size())
 		,m_pos(0){}
 
 	/// \brief Copy constructor

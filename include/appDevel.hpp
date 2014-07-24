@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appDevel.hpp
-///\brief Macros and templates for building Wolframe extensions. This is the main include file for writing Wolframe application extensions in native C++.
+/// \file appDevel.hpp
+/// \brief Macros and templates for building Wolframe extensions. This is the main include file for writing Wolframe application extensions in native C++.
 #ifndef _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
 #define _Wolframe_APPDEVEL_MODULE_HPP_INCLUDED
 #include "wolframe.hpp"
@@ -41,7 +41,7 @@
 #include "appdevel/authenticationModuleMacros.hpp"	///< modules implementing an authentification mechanism
 #include "appdevel/cppFormFunctionModuleMacros.hpp"	///< modules implementing a set of form functions written in C++
 #include "appdevel/normalizeModuleMacros.hpp"		///< modules implementing a set of basic normalizer functions
-#include "appdevel/customDatatypeModuleMacros.hpp"	///< modules implementing a set of custom data types
+#include "appdevel/customDataTypeModuleMacros.hpp"	///< modules implementing a set of custom data types
 #include "appdevel/runtimeEnvironmentModuleMacros.hpp"	///< modules implementing a program type needing a configurable runtime environment
 #include "appdevel/commandHandlerModuleMacros.hpp"	///< modules implementing a command handler and optionally also a program type without configuration
 #include "appdevel/programTypeModuleMacros.hpp"		///< modules implementing a program type without configuration
@@ -49,5 +49,6 @@
 #include "appdevel/filterModuleMacros.hpp"		///< modules implementing a filer
 #include "appdevel/doctypeModuleMacros.hpp"		///< modules implementing a document type/format detector
 #include "appdevel/moduleFrameMacros.hpp"		///< frame (begin,end) for a wolframe module
+#include "appdevel/databaseModuleMacros.hpp"		///< module implementing a database interface
 #endif
 

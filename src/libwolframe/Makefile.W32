@@ -42,6 +42,7 @@ TYPE_OBJS = \
 	types\bignumber.obj \
 	types\datetime.obj \
 	types\customDataType.obj \
+	types\addressRestriction.obj \
 	types\variant.obj \
 	types\variantStructDescription.obj \
 	types\variantStruct.obj \
@@ -62,9 +63,9 @@ UTIL_OBJS = \
 CPP_OBJS = \
 	$(TYPE_OBJS) \
 	$(UTIL_OBJS) \
-	logObject.obj \
 	logError.obj \
 	version.obj \
+	platform.obj \
 	execContext.obj \
 	getPassword.obj \
 	user.obj \
@@ -72,7 +73,9 @@ CPP_OBJS = \
 	HMAC.obj \
 	PBKDF2.obj \
 	passwordHash.obj \
-	CRAM.obj
+	usernameHash.obj \
+	CRAM.obj \
+	pwdChangeMessage.obj
 
 OBJS = \
 	b64encode.obj \

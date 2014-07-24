@@ -46,7 +46,6 @@ using namespace langbind;
 
 namespace
 {
-typedef std::string (*LocaleConv)( std::string const&, std::locale const&);
 
 template <boost::locale::norm_type NormType>
 struct CompositionNormalizer
@@ -145,123 +144,62 @@ struct Tokenize
 
 }//anonymous namespace
 
-struct LocaleConvNormalizeFunction
-	:public types::NormalizeFunction
+LocaleConvNormalizeFunction::LocaleConvNormalizeFunction( const LocaleConvNormalizeFunction& o)
+	:m_reshnd(o.m_reshnd)
+	,m_func(o.m_func)
+	,m_lc(o.m_lc)
+	,m_name(o.m_name){}
+LocaleConvNormalizeFunction::LocaleConvNormalizeFunction( LocaleResourceHandle* reshnd, const std::vector<types::Variant>& arg, const LocaleConv& func, const char* name_)
+	:m_reshnd(reshnd)
+	,m_func(func)
+	,m_lc(getLcFromArg(arg))
+	,m_name(name_){}
+
+types::Variant LocaleConvNormalizeFunction::execute( const types::Variant& inp) const
 {
-	LocaleConvNormalizeFunction( const LocaleConvNormalizeFunction& o)
-		:m_reshnd(o.m_reshnd)
-		,m_func(o.m_func)
-		,m_lc(o.m_lc)
-		,m_name(o.m_name){}
-	LocaleConvNormalizeFunction( LocaleResourceHandle& reshnd, const std::vector<types::Variant>& arg, const LocaleConv& func, const char* name_)
-		:m_reshnd(&reshnd)
-		,m_func(func)
-		,m_lc(getLcFromArg(arg))
-		,m_name(name_){}
-
-	virtual ~LocaleConvNormalizeFunction(){}
-
-	virtual types::Variant execute( const types::Variant& inp) const
+	if (inp.type() == types::Variant::String)
 	{
-		if (inp.type() == types::Variant::String)
-		{
-			std::locale loc = m_reshnd->getLocale( m_lc);
-			return m_func( inp.tostring(), loc);
-		}
-		else
-		{
-			return inp;
-		}
+		std::locale loc = m_reshnd->getLocale( m_lc);
+		return m_func( inp.tostring(), loc);
 	}
-	virtual const char* name() const		{return m_name;}
-
-	virtual types::NormalizeFunction* copy() const
+	else
 	{
-		return new LocaleConvNormalizeFunction( *this);
+		return inp;
 	}
-
-private:
-	static std::string getLcFromArg( const std::vector<types::Variant>& arg)
-	{
-		if (arg.empty()) return std::string();
-		if (arg.size() > 1) std::runtime_error( "too many arguments passed to locale conversion normalize function");
-		return arg.at(0).tostring();
-	}
-	
-private:
-	LocaleResourceHandle* m_reshnd;
-	LocaleConv m_func;
-	std::string m_lc;
-	const char* m_name;
-};
-
-namespace _Wolframe {
-namespace langbind {
-
-types::NormalizeFunction* create_tolower_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
-{
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::to_lower<char>, "tolower");
 }
 
-types::NormalizeFunction* create_toupper_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+types::NormalizeFunction* LocaleConvNormalizeFunction::copy() const
 {
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::to_upper<char>, "toupper");
+	return new LocaleConvNormalizeFunction( *this);
 }
 
-types::NormalizeFunction* create_totitle_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+std::string LocaleConvNormalizeFunction::getLcFromArg( const std::vector<types::Variant>& arg)
 {
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::to_title<char>, "totitle");
+	if (arg.empty()) return std::string();
+	if (arg.size() > 1) std::runtime_error( "too many arguments passed to locale conversion normalize function");
+	return arg.at(0).tostring();
 }
 
-types::NormalizeFunction* create_foldcase_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
-{
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &boost::locale::fold_case<char>, "foldcase");
-}
+ToLowerNormalizeFunction::ToLowerNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &boost::locale::to_lower<char>, "tolower"){}
+ToUpperNormalizeFunction::ToUpperNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &boost::locale::to_upper<char>, "toupper"){}
+ToTitleNormalizeFunction::ToTitleNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &boost::locale::to_title<char>, "totitle"){}
+ToFoldcaseNormalizeFunction::ToFoldcaseNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &boost::locale::fold_case<char>, "foldcase"){}
+NFDNormalizeFunction::NFDNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &CompositionNormalizer<boost::locale::norm_nfd>::localeConv, "nfd"){}
+NFCNormalizeFunction::NFCNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &CompositionNormalizer<boost::locale::norm_nfd>::localeConv, "nfc"){}
+NFKDNormalizeFunction::NFKDNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &CompositionNormalizer<boost::locale::norm_nfkd>::localeConv, "nfkd"){}
+NFKCNormalizeFunction::NFKCNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &CompositionNormalizer<boost::locale::norm_nfkc>::localeConv, "nfkc"){}
+LatinwordNormalizeFunction::LatinwordNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &Tokenize::latinWord, "latinword"){}
+AsciiDeNormalizeFunction::AsciiDeNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &GermanAsciiNormalizer::localeConv, "ascii_de"){}
+AsciiEuNormalizeFunction::AsciiEuNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
+	:LocaleConvNormalizeFunction( dynamic_cast<LocaleResourceHandle*>(reshnd), arg, &EuropeanAsciiNormalizer::localeConv, "ascii_eu"){}
 
-types::NormalizeFunction* create_nfd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
-{
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &CompositionNormalizer<boost::locale::norm_nfd>::localeConv, "nfd");
-}
-
-types::NormalizeFunction* create_nfc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
-{
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &CompositionNormalizer<boost::locale::norm_nfd>::localeConv, "nfc");
-}
-
-types::NormalizeFunction* create_nfkd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
-{
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &CompositionNormalizer<boost::locale::norm_nfkd>::localeConv, "nfkd");
-}
-
-types::NormalizeFunction* create_nfkc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
-{
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &CompositionNormalizer<boost::locale::norm_nfkc>::localeConv, "nfkc");
-}
-
-types::NormalizeFunction* create_latinword_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
-{
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &Tokenize::latinWord, "latinword");
-}
-
-types::NormalizeFunction* create_ascii_de_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
-{
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &GermanAsciiNormalizer::localeConv, "ascii_de");
-}
-
-types::NormalizeFunction* create_ascii_eu_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg)
-{
-	LocaleResourceHandle* myreshnd = dynamic_cast<LocaleResourceHandle*>(reshnd);
-	return new LocaleConvNormalizeFunction( *myreshnd, arg, &EuropeanAsciiNormalizer::localeConv, "ascii_eu");
-}
-
-}}//namespace

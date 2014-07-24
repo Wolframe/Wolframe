@@ -69,6 +69,9 @@ static const size_t CRAM_CHALLENGE_BASE64_SIZE = (( CRAM_CHALLENGE_SIZE - 1 ) / 
 static const size_t CRAM_RESPONSE_BCD_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 static const size_t CRAM_RESPONSE_BASE64_SIZE = (( CRAM_RESPONSE_SIZE - 1 ) / 3 ) * 4 + 5;
 
+static const size_t CRAM_SALT_BCD_SIZE = 2 * CRAM_SALT_SIZE + 1;
+static const size_t CRAM_SALT_BASE64_SIZE = (( CRAM_SALT_SIZE - 1 ) / 3 ) * 4 + 5;
+
 
 CRAMchallenge::CRAMchallenge( const crypto::RandomGenerator& rndGen )
 {
@@ -256,5 +259,59 @@ bool CRAMresponse::operator == ( const std::string& rhs )
 			    buffer, CRAM_RESPONSE_SIZE ) != (int)CRAM_RESPONSE_SIZE )
 		return false;
 	return !memcmp( this->m_response, buffer, CRAM_RESPONSE_SIZE );
+}
+
+
+/******************************************************************************/
+CRAMsalt::CRAMsalt( const std::string& challenge )
+{
+	memset( m_salt, 0, CRAM_SALT_SIZE );
+
+	std::string s = boost::algorithm::trim_copy( challenge );
+	if ( s[ 0 ] == '$' )	{
+		size_t chlngStart = s.find( "$", 1 );
+		if ( chlngStart == s.npos )	{
+			std::string errMsg = "'" + s + "' is not a valid challenge string";
+			throw std::runtime_error( errMsg );
+		}
+		if ( base64::decode( s.substr( 1, chlngStart - 1 ),
+				     m_salt, CRAM_SALT_SIZE ) < 0 )	{
+			std::string errMsg = "'" + s + "' is not a valid challenge string (salt error)";
+			throw std::runtime_error( errMsg );
+		}
+	}
+	else	{
+		std::string errMsg = "'" + s + "' is not a valid challenge string";
+		throw std::runtime_error( errMsg );
+	}
+}
+
+std::string CRAMsalt::toBCD() const
+{
+	char	buffer[ CRAM_SALT_BCD_SIZE ];
+
+	int len = byte2hex( m_salt, CRAM_SALT_SIZE,
+			    buffer, CRAM_SALT_BCD_SIZE );
+	assert( len == CRAM_SALT_SIZE * 2 );
+
+	return std::string( buffer );
+}
+
+std::string CRAMsalt::toString() const
+{
+	char	buffer[ CRAM_SALT_BASE64_SIZE ];
+
+	int len = base64_encode( m_salt, CRAM_SALT_SIZE,
+				 buffer, CRAM_SALT_BASE64_SIZE, 0 );
+	assert( len >= 0 && len < (int)CRAM_SALT_BASE64_SIZE );
+	while ( len > 0 && buffer[ len - 1 ] == '=' )
+		len--;
+	buffer[ len ] = 0;
+	return std::string( buffer );
+}
+
+CRAMsalt::~CRAMsalt()
+{
+	memset( m_salt, 0, CRAM_SALT_SIZE );
 }
 

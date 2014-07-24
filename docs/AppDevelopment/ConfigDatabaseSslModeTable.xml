@@ -1,0 +1,39 @@
+<table frame="all" width="100%">
+	<title>SSL modes</title>
+	<tgroup cols="2">
+	<colspec colnum="1" colname="col1" colwidth="1*"/>
+	<colspec colnum="2" colname="col2" colwidth="3*"/>
+	<thead>
+		<row>
+			<entry>Name</entry>
+			<entry>Description</entry>
+		</row>
+	</thead>
+	<tbody>
+		<row>
+			<entry>disable</entry>
+			<entry>Only try a non-SSL connection</entry>
+		</row>
+		<row>
+			<entry>allow</entry>
+			<entry>First try a non-SSL connection. If that fails, try an SSL connection</entry>
+		</row>
+		<row>
+			<entry>prefer</entry>
+			<entry>First try an SSL connection. If that fails, try a non-SSL connection. This is the default.</entry>
+		</row>
+		<row>
+			<entry>require</entry>
+			<entry>Only try an SSL connection. If a root CA file is present, verify the certificate.</entry>
+		</row>
+		<row>
+			<entry>verify-ca</entry>
+			<entry>Only try an SSL connection, and verify that the server. The certificate is issued by a trusted CA.</entry>
+		</row>
+		<row>
+			<entry>verify-full</entry>
+			<entry>Only try an SSL connection, verify that the server certificate is issued by a trusted CA and that the server hostname matches that in the certificate.</entry>
+		</row>
+	</tbody>
+	</tgroup>
+</table>

@@ -44,20 +44,25 @@
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace proc {
+namespace cmdbind {
 
 class MainCommandHandler
 	:public cmdbind::LineCommandHandlerTemplate<MainCommandHandler>
 {
 public:
 	typedef cmdbind::LineCommandHandlerTemplate<MainCommandHandler> Parent;
+
 	MainCommandHandler();
 	virtual ~MainCommandHandler(){}
 
 	void setPeer( const net::RemoteEndpoint& remote);
+	void setLocalEndPoint( const net::LocalEndpoint& local);
 
 public:
 	int doAuth( int argc, const char** argv, std::ostream& out);
+
+	int doPasswordChange( int argc, const char** argv, std::ostream& out);
+	int endPasswordChange( cmdbind::CommandHandler* ch, std::ostream& out);
 
 	int doMech( int argc, const char** argv, std::ostream& out);
 	int endMech( cmdbind::CommandHandler* ch, std::ostream& out);
@@ -79,7 +84,9 @@ private:
 
 private:
 	boost::shared_ptr<AAAA::Authenticator> m_authenticator;
+	boost::shared_ptr<AAAA::PasswordChanger> m_passwordChanger;
 	const net::RemoteEndpoint* m_remoteEndpoint;
+	const net::LocalEndpoint* m_localEndpoint;
 	std::string m_command;
 	std::string m_commandtag;
 };

@@ -48,6 +48,7 @@ public:
 		:m_sizeG(sizeG_)
 		,m_sizeF(sizeF_)
 		,m_max(max_){}
+	FloatNormalizeFunction( const std::vector<types::Variant>& arg);
 	FloatNormalizeFunction( const FloatNormalizeFunction& o)
 		:m_sizeG(o.m_sizeG)
 		,m_sizeF(o.m_sizeF)

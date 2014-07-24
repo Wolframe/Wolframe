@@ -31,8 +31,8 @@
 
 ************************************************************************/
 
-///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/statement.hpp
+/// \brief Interface to substitute parameters in embedded SQL statements
+/// \file database/baseStatement.hpp
 
 #ifndef _DATABASE_BASE_STATEMENT_HPP_INCLUDED
 #define _DATABASE_BASE_STATEMENT_HPP_INCLUDED
@@ -45,10 +45,10 @@
 namespace _Wolframe {
 namespace db {
 
-///\class BaseStatement
-///\brief Implements basic parsing of the Wolframe SQL statement with
-//       placeholders, derived classes can steer how the SQL string is
-//       converted to native format
+/// \class BaseStatement
+/// \brief Implements basic parsing of the Wolframe SQL statement with
+///       placeholders, derived classes can steer how the SQL string is
+///       converted to native format
 class BaseStatement : public Statement
 {
 	public:
@@ -69,36 +69,36 @@ class BaseStatement : public Statement
 		virtual const std::string nativeSQL( ) const;
 		
 	protected:
-		// \brief The original SQL
+		/// \brief The original SQL
 		std::string m_stmtStr;
 
-		// \brief The maximum number of parsed placeholders so far
+		/// \brief The maximum number of parsed placeholders so far
 		unsigned int m_maxParam;
 
 	private:
 		void parse( );
 
 	public:
-		// \enum MaxNofParams
-		// \brief this implementation can handle at most MaxNofParams
-		//        placeholders. The code checks the limit and throws
-		//        an exception if more parameters are used. Derived
-		//        classes should use the same constant.
+		/// \enum MaxNofParams
+		/// \brief this implementation can handle at most MaxNofParams
+		///        placeholders. The code checks the limit and throws
+		///        an exception if more parameters are used. Derived
+		///        classes should use the same constant.
 		enum { MaxNofParams = 32 };
 		
 	private:
 		typedef std::pair<unsigned int, std::string> Element;
 
-		// \brief Remembers positions and parts of SQL snippets
+		/// \brief Remembers positions and parts of SQL snippets
 		std::vector<Element> m_data;
 
-		// \brief The SQL statement as understood by the database
+		/// \brief The SQL statement as understood by the database
 		std::string m_nativeStmt;
 
-		// \brief Remembers the indexes used in the SQL statement
+		/// \brief Remembers the indexes used in the SQL statement
 		std::bitset<MaxNofParams> m_usedIdx;
 
-		// \brief Remembers the placeholders bound to actual data
+		/// \brief Remembers the placeholders bound to actual data
 		std::bitset<MaxNofParams> m_setIdx;
 };
 

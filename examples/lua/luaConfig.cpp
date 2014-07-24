@@ -60,11 +60,11 @@ bool LuaConfiguration::parse( const config::ConfigurationNode& pt, const std::st
 
 	for ( config::ConfigurationNode::const_iterator L1it = pt.begin();
 							L1it != pt.end(); L1it++ )	{
-		if ( boost::algorithm::iequals( L1it->first, "script" ))	{
+		if ( boost::algorithm::iequals( L1it->first, "Script" ))	{
 			bool isDefined = ( !script.empty());
 			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, script, &isDefined ))
 				retVal = false;
-		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
+		} else if ( boost::algorithm::iequals( L1it->first, "PreloadLib" ))	{
 			std::string preload_lib;
 			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, preload_lib ))
 				retVal = false;
