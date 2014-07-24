@@ -30,14 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mainCommandHandler.cpp
-#include "mainCommandHandler.hpp"
-#include "interfaceCommandHandler.hpp"
-#include "authCommandHandler.hpp"
-#include "passwordChangeCommandHandler.hpp"
-#include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
+///\file StandardProtocolHandler.cpp
+#include "standardProtocolHandler.hpp"
+#include "interfaceProtocolHandler.hpp"
+#include "authProtocolHandler.hpp"
+#include "passwordChangeProtocolHandler.hpp"
+#include "escDlfProtocolHandler.hpp"
 #include "processor/execContext.hpp"
-#include "interfaceCommandHandler.hpp"
+#include "interfaceProtocolHandler.hpp"
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
@@ -47,7 +47,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
-struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler>
+struct MainSTM :public cmdbind::LineProtocolHandlerSTMTemplate<StandardProtocolHandler>
 {
 	enum State
 	{
@@ -61,47 +61,47 @@ struct MainSTM :public cmdbind::LineCommandHandlerSTMTemplate<MainCommandHandler
 	{
 		(*this)
 			[Unauthenticated]
-				.cmd< &MainCommandHandler::doAuth >( "AUTH")
-				.cmd< &MainCommandHandler::doQuit >( "QUIT")
-				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
+				.cmd< &StandardProtocolHandler::doAuth >( "AUTH")
+				.cmd< &StandardProtocolHandler::doQuit >( "QUIT")
+				.cmd< &StandardProtocolHandler::doCapabilities >( "CAPABILITIES")
 			[Authentication]
-				.cmd< &MainCommandHandler::doMech >( "MECH")
-				.cmd< &MainCommandHandler::doQuit >( "QUIT")
-				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
+				.cmd< &StandardProtocolHandler::doMech >( "MECH")
+				.cmd< &StandardProtocolHandler::doQuit >( "QUIT")
+				.cmd< &StandardProtocolHandler::doCapabilities >( "CAPABILITIES")
 			[Authenticated]
-				.cmd< &MainCommandHandler::doRequest >( "REQUEST")
-				.cmd< &MainCommandHandler::doInterface >( "INTERFACE")
-				.cmd< &MainCommandHandler::doAuth >( "AUTH")
-				.cmd< &MainCommandHandler::doQuit >( "QUIT")
-				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
+				.cmd< &StandardProtocolHandler::doRequest >( "REQUEST")
+				.cmd< &StandardProtocolHandler::doInterface >( "INTERFACE")
+				.cmd< &StandardProtocolHandler::doAuth >( "AUTH")
+				.cmd< &StandardProtocolHandler::doQuit >( "QUIT")
+				.cmd< &StandardProtocolHandler::doCapabilities >( "CAPABILITIES")
 			[Authenticated_passwd]
-				.cmd< &MainCommandHandler::doRequest >( "REQUEST")
-				.cmd< &MainCommandHandler::doInterface >( "INTERFACE")
-				.cmd< &MainCommandHandler::doAuth >( "AUTH")
-				.cmd< &MainCommandHandler::doPasswordChange >( "PASSWD")
-				.cmd< &MainCommandHandler::doQuit >( "QUIT")
-				.cmd< &MainCommandHandler::doCapabilities >( "CAPABILITIES")
+				.cmd< &StandardProtocolHandler::doRequest >( "REQUEST")
+				.cmd< &StandardProtocolHandler::doInterface >( "INTERFACE")
+				.cmd< &StandardProtocolHandler::doAuth >( "AUTH")
+				.cmd< &StandardProtocolHandler::doPasswordChange >( "PASSWD")
+				.cmd< &StandardProtocolHandler::doQuit >( "QUIT")
+				.cmd< &StandardProtocolHandler::doCapabilities >( "CAPABILITIES")
 		;
 	}
 };
 static MainSTM mainstm;
 
-MainCommandHandler::MainCommandHandler()
-	:cmdbind::LineCommandHandlerTemplate<MainCommandHandler>(&mainstm)
+StandardProtocolHandler::StandardProtocolHandler()
+	:cmdbind::LineProtocolHandlerTemplate<StandardProtocolHandler>(&mainstm)
 	,m_remoteEndpoint(0)
 	,m_localEndpoint(0){}
 
-void MainCommandHandler::setPeer( const net::RemoteEndpoint& remote)
+void StandardProtocolHandler::setPeer( const net::RemoteEndpoint& remote)
 {
 	m_remoteEndpoint = &remote;
 }
 
-void MainCommandHandler::setLocalEndPoint( const net::LocalEndpoint& local)
+void StandardProtocolHandler::setLocalEndPoint( const net::LocalEndpoint& local)
 {
 	m_localEndpoint = &local;
 }
 
-int MainCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
+int StandardProtocolHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
@@ -115,7 +115,7 @@ int MainCommandHandler::doCapabilities( int argc, const char**, std::ostream& ou
 	}
 }
 
-int MainCommandHandler::doQuit( int argc, const char**, std::ostream& out)
+int StandardProtocolHandler::doQuit( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
@@ -129,7 +129,7 @@ int MainCommandHandler::doQuit( int argc, const char**, std::ostream& out)
 	}
 }
 
-int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
+int StandardProtocolHandler::doAuth( int argc, const char**, std::ostream& out)
 {
 	if (!m_localEndpoint)
 	{
@@ -175,9 +175,9 @@ int MainCommandHandler::doAuth( int argc, const char**, std::ostream& out)
 	}
 }
 
-int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
+int StandardProtocolHandler::endMech( cmdbind::ProtocolHandler* ch, std::ostream& out)
 {
-	cmdbind::CommandHandlerR chr( ch);
+	cmdbind::ProtocolHandlerR chr( ch);
 	const char* error = ch->lastError();
 	if (error)
 	{
@@ -210,7 +210,7 @@ int MainCommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 	}
 }
 
-int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
+int StandardProtocolHandler::doMech( int argc, const char** argv, std::ostream& out)
 {
 	if (argc == 0)
 	{
@@ -246,17 +246,17 @@ int MainCommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		else
 		{
 			out << "OK go authentication with mech " << argv[0] << endl();
-			cmdbind::AuthCommandHandler* authch = new cmdbind::AuthCommandHandler( m_authenticator);
+			cmdbind::AuthProtocolHandler* authch = new cmdbind::AuthProtocolHandler( m_authenticator);
 			authch->setExecContext( execContext());
-			delegateProcessing<&MainCommandHandler::endMech>( authch);
+			delegateProcessing<&StandardProtocolHandler::endMech>( authch);
 		}
 	}
 	return stateidx();
 }
 
-int MainCommandHandler::endPasswordChange( cmdbind::CommandHandler* ch, std::ostream& out)
+int StandardProtocolHandler::endPasswordChange( cmdbind::ProtocolHandler* ch, std::ostream& out)
 {
-	cmdbind::CommandHandlerR chr( ch);
+	cmdbind::ProtocolHandlerR chr( ch);
 	const char* error = ch->lastError();
 	if (error)
 	{
@@ -277,7 +277,7 @@ int MainCommandHandler::endPasswordChange( cmdbind::CommandHandler* ch, std::ost
 	return stateidx();
 }
 
-int MainCommandHandler::doPasswordChange( int argc, const char**, std::ostream& out)
+int StandardProtocolHandler::doPasswordChange( int argc, const char**, std::ostream& out)
 {
 	if (argc >= 1)
 	{
@@ -297,37 +297,37 @@ int MainCommandHandler::doPasswordChange( int argc, const char**, std::ostream& 
 	}
 	out << "OK start password change" << endl();
 
-	cmdbind::PasswordChangeCommandHandler* pwdch = new cmdbind::PasswordChangeCommandHandler( m_passwordChanger);
+	cmdbind::PasswordChangeProtocolHandler* pwdch = new cmdbind::PasswordChangeProtocolHandler( m_passwordChanger);
 	pwdch->setExecContext( execContext());
-	delegateProcessing<&MainCommandHandler::endPasswordChange>( pwdch);
+	delegateProcessing<&StandardProtocolHandler::endPasswordChange>( pwdch);
 	return stateidx();
 }
 
-int MainCommandHandler::endInterface( cmdbind::CommandHandler* ch, std::ostream&)
+int StandardProtocolHandler::endInterface( cmdbind::ProtocolHandler* ch, std::ostream&)
 {
 	delete ch;
 	int rt = stateidx();
 	return rt;
 }
 
-int MainCommandHandler::doInterface( int argc, const char**, std::ostream& out)
+int StandardProtocolHandler::doInterface( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
 		out << "ERR INTERFACE unexpected arguments" << endl();
 		return stateidx();
 	}
-	cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new InterfaceCommandHandler();
+	cmdbind::ProtocolHandler* delegate_ch = (cmdbind::ProtocolHandler*)new InterfaceProtocolHandler();
 	out << "OK INTERFACE enter commands" << endl();
-	delegateProcessing<&MainCommandHandler::endInterface>( delegate_ch);
+	delegateProcessing<&StandardProtocolHandler::endInterface>( delegate_ch);
 	return stateidx();
 }
 
 static bool IsCntrl( char ch) {return ch>0 && ch <=32;}
 
-int MainCommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out)
+int StandardProtocolHandler::endRequest( cmdbind::ProtocolHandler* chnd, std::ostream& out)
 {
-	cmdbind::CommandHandlerR chr( chnd);
+	cmdbind::ProtocolHandlerR chr( chnd);
 	int rt = stateidx();
 	const char* error = chnd->lastError();
 	if (error)
@@ -344,7 +344,7 @@ int MainCommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream&
 	return rt;
 }
 
-bool MainCommandHandler::redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out)
+bool StandardProtocolHandler::redirectConsumedInput( cmdbind::DoctypeFilterProtocolHandler* fromh, cmdbind::ProtocolHandler* toh, std::ostream& out)
 {
 	void* buf;
 	std::size_t bufsize;
@@ -352,18 +352,18 @@ bool MainCommandHandler::redirectConsumedInput( cmdbind::DoctypeFilterCommandHan
 	return Parent::redirectInput( buf, bufsize, toh, out);
 }
 
-int MainCommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out)
+int StandardProtocolHandler::endErrDocumentType( cmdbind::ProtocolHandler* ch, std::ostream& out)
 {
-	cmdbind::CommandHandlerR chr( ch);
+	cmdbind::ProtocolHandlerR chr( ch);
 	const char* err = ch->lastError();
-	out << "ERR " << (err?err:"document type")<< LineCommandHandler::endl();
+	out << "ERR " << (err?err:"document type")<< LineProtocolHandler::endl();
 	return stateidx();
 }
 
-int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out)
+int StandardProtocolHandler::endDoctypeDetection( cmdbind::ProtocolHandler* ch, std::ostream& out)
 {
-	cmdbind::DoctypeFilterCommandHandler* chnd = dynamic_cast<cmdbind::DoctypeFilterCommandHandler*>( ch);
-	cmdbind::CommandHandlerR chr( ch);
+	cmdbind::DoctypeFilterProtocolHandler* chnd = dynamic_cast<cmdbind::DoctypeFilterProtocolHandler*>( ch);
+	cmdbind::ProtocolHandlerR chr( ch);
 
 	types::DoctypeInfoR info = chnd->info();
 
@@ -376,7 +376,8 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	{
 		std::ostringstream msg;
 		msg << "failed to retrieve document type (" << error << ")";
-		cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
+		cmdbind::ProtocolHandler* delegate_ch = (cmdbind::ProtocolHandler*)new cmdbind::EscDlfProtocolHandler();
+		delegate_ch->setLastError( msg.str());
 		if (m_commandtag.empty())
 		{
 			out << "ANSWER" << endl();
@@ -387,7 +388,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 		}
 		if (redirectConsumedInput( chnd, delegate_ch, out))
 		{
-			delegateProcessing<&MainCommandHandler::endErrDocumentType>( delegate_ch);
+			delegateProcessing<&StandardProtocolHandler::endErrDocumentType>( delegate_ch);
 		}
 		else
 		{
@@ -399,20 +400,21 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	LOG_DEBUG << "Got document type '" << info->doctype() << "' format '" << info->docformat() << "' command prefix '" << m_command << "'";
 	m_command.append(info->doctype());
 
-	cmdbind::CommandHandler* execch = execContext()->provider()->cmdhandler( m_command, info->docformat());
-	if (!execch)
+	cmdbind::CommandHandlerR exec( execContext()->provider()->cmdhandler( m_command, info->docformat()));	
+	if (!exec.get())
 	{
 		std::ostringstream msg;
 		if (m_command.empty())
 		{
-			msg << "ERR got no document type and no command defined (empty request ?)";
+			msg << "got no document type and no command defined (empty request ?)";
 		}
 		else
 		{
 			msg << "no command handler for '" << m_command << "'";
 		}
-		execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
+		cmdbind::ProtocolHandler* execch = (cmdbind::ProtocolHandler*)new cmdbind::EscDlfProtocolHandler();
 		execch->setExecContext( execContext());
+		execch->setLastError( msg.str());
 		if (m_commandtag.empty())
 		{
 			out << "ANSWER" << endl();
@@ -423,7 +425,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 		}
 		if (redirectConsumedInput( chnd, execch, out))
 		{
-			delegateProcessing<&MainCommandHandler::endErrDocumentType>( execch);
+			delegateProcessing<&StandardProtocolHandler::endErrDocumentType>( execch);
 		}
 		else
 		{
@@ -434,10 +436,11 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	}
 	else
 	{
-		const char* docformatptr = info->docformat().c_str();
+		exec->setDoctypeInfo( info);
 
+		EscDlfProtocolHandler* execch = new EscDlfProtocolHandler( cmdbind::CommandHandlerR( exec));
 		execch->setExecContext( execContext());
-		execch->passParameters( m_command, 1, &docformatptr);
+
 		if (m_commandtag.empty())
 		{
 			out << "ANSWER" << endl();
@@ -448,7 +451,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 		}
 		if (redirectConsumedInput( chnd, execch, out))
 		{
-			delegateProcessing<&MainCommandHandler::endRequest>( execch);
+			delegateProcessing<&StandardProtocolHandler::endRequest>( execch);
 		}
 		else
 		{
@@ -468,7 +471,7 @@ int MainCommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::o
 	}
 }
 
-int MainCommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
+int StandardProtocolHandler::doRequest( int argc, const char** argv, std::ostream& out)
 {
 	m_command.clear();
 	m_commandtag.clear();
@@ -500,10 +503,10 @@ int MainCommandHandler::doRequest( int argc, const char** argv, std::ostream& ou
 			}
 		}
 	}
-	CommandHandler* ch = (CommandHandler*)new cmdbind::DoctypeFilterCommandHandler();
+	ProtocolHandler* ch = (ProtocolHandler*)new cmdbind::DoctypeFilterProtocolHandler();
 	ch->setExecContext( execContext());
 
-	delegateProcessing<&MainCommandHandler::endDoctypeDetection>( ch);
+	delegateProcessing<&StandardProtocolHandler::endDoctypeDetection>( ch);
 	return stateidx();
 }
 

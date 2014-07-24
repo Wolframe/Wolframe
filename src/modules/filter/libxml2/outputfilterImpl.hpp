@@ -78,6 +78,9 @@ public:
 	/// \brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
 
+	/// \brief Implementation of OutputFilter::getOutput( const void*&,std::size_t&)
+	virtual void getOutput( const void*& buf, std::size_t& bufsize);
+
 	/// \brief Implementation of OutputFilter::close()
 	virtual bool close();
 
@@ -102,8 +105,6 @@ private:
 		m_valuestrbuf.append( (const char*)element, elementsize);
 		return (const xmlChar*)m_valuestrbuf.c_str();
 	}
-
-	bool flushBuffer();
 
 	void setXmlError( const char* msg);
 

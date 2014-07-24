@@ -30,32 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file authCommandHandler.hpp
+/// \file authProtocolHandler.hpp
 /// \brief Interface of the authentication command handler
 
-#ifndef _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
+#ifndef _Wolframe_AUTH_PROTOCOL_HANDLER_HPP_INCLUDED
+#define _Wolframe_AUTH_PROTOCOL_HANDLER_HPP_INCLUDED
 
-#include "baseCryptoCommandHandler.hpp"
+#include "baseCryptoProtocolHandler.hpp"
 #include "AAAA/authenticator.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \class AuthCommandHandler
+/// \class AuthProtocolHandler
 /// \brief Command handler for the sub protocol for authentication
-class AuthCommandHandler
-	:public cmdbind::BaseCryptoCommandHandler
+class AuthProtocolHandler
+	:public cmdbind::BaseCryptoProtocolHandler
 {
 public:
-	explicit AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_);
-	virtual ~AuthCommandHandler();
+	explicit AuthProtocolHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_);
+	virtual ~AuthProtocolHandler();
 
 private:
-	/// \brief See CommandHandler::nextOperation()
+	/// \brief See ProtocolHandler::nextOperation()
 	virtual Operation nextOperation();
-	/// \brief See BaseCryptoCommandHandler::processMessage(const std::string&)
+	/// \brief See BaseCryptoProtocolHandler::processMessage(const std::string&)
 	virtual void processMessage( const std::string& msg);
 
 private:

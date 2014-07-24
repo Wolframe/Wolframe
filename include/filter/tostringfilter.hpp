@@ -48,6 +48,7 @@ public:
 	/// \brief Constructor
 	explicit ToStringFilter( const std::string indentstr_="")
 		:TypedOutputFilter("tostring")
+		,m_contentpos(0)
 		,m_lasttype(FilterBase::OpenTag)
 		,m_indentstr(indentstr_)
 		,m_taglevel(0){}
@@ -57,6 +58,7 @@ public:
 	ToStringFilter( const ToStringFilter& o)
 		:TypedOutputFilter(o)
 		,m_content(o.m_content)
+		,m_contentpos(o.m_contentpos)
 		,m_lasttype(o.m_lasttype)
 		,m_indent(o.m_indent)
 		,m_indentstr(o.m_indentstr)
@@ -71,11 +73,19 @@ public:
 	/// \brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
 	virtual bool print( ElementType type, const types::VariantConst& element);
 
+	virtual void getOutput( const void*& buf, std::size_t& bufsize)
+	{
+		buf = (const void*)(m_content.c_str() + m_contentpos);
+		bufsize = m_content.size() - m_contentpos;
+		m_contentpos = m_content.size();
+	}
+
 	/// \brief Get the content
 	const std::string& content() const		{return m_content;}
 
 private:
 	std::string m_content;				///< content string
+	std::size_t m_contentpos;			///< position in content string
 	FilterBase::ElementType m_lasttype;		///< last parsed element type
 	std::string m_indent;				///< indent array
 	std::string m_indentstr;			///< indentiation string

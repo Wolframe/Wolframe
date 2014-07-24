@@ -102,6 +102,10 @@ public:
 				setState( Open);
 				m_ref->setState( Open);
 			}
+			else
+			{
+				setState( m_ref->state());
+			}
 		}
 		else
 		{

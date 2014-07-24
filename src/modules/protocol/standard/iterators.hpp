@@ -33,7 +33,7 @@ Project Wolframe.
 #define _Wolframe_PROTOCOL_ITERATORS_HPP_INCLUDED
 #include <iterator>
 
-/// \file protocol/iterators.hpp
+/// \file iterators.hpp
 /// \brief Iterator types of the protocol input blocks
 
 namespace _Wolframe {

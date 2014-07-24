@@ -30,32 +30,39 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file cmdbind/discardInputCommandHandlerEscDLF.hpp
-/// \brief Command handler that discards the input (> /dev/null ) instead of processing it. Used for handling rest of content when an error occurrs before the whole input has been consumed.
+/// \file passwordChangeProtocolHandler.hpp
+/// \brief Interface of the password change command handler
 
-#ifndef _Wolframe_cmdbind_DISCARD_INPUT_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
-#define _Wolframe_cmdbind_DISCARD_INPUT_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
-#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
+#ifndef _Wolframe_PASSWORD_CHANGE_PROTOCOL_HANDLER_HPP_INCLUDED
+#define _Wolframe_PASSWORD_CHANGE_PROTOCOL_HANDLER_HPP_INCLUDED
+
+#include "baseCryptoProtocolHandler.hpp"
+#include "AAAA/passwordChanger.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \class DiscardInputCommandHandlerEscDLF
-/// \brief Command handler that does nothing but seek for the end of content marker. Used to delegate protocol input in case of an error in the protocol on a command that expects "LT.LF" terminated content.
-class DiscardInputCommandHandlerEscDLF :public IOFilterCommandHandlerEscDLF
+/// \class PasswordChangeProtocolHandler
+/// \brief Command handler for the sub protocol for password change
+class PasswordChangeProtocolHandler
+	:public cmdbind::BaseCryptoProtocolHandler
 {
 public:
-	DiscardInputCommandHandlerEscDLF( const std::string& msg_)
-		:m_msg(msg_){}
-	virtual CallResult call( const char*& err)
-	{
-		err = m_msg.c_str(); return Error;
-	}
+	explicit PasswordChangeProtocolHandler( const boost::shared_ptr<AAAA::PasswordChanger>& passwordChanger_);
+	virtual ~PasswordChangeProtocolHandler();
 
 private:
-	std::string m_msg;
+	/// \brief See ProtocolHandler::nextOperation()
+	virtual Operation nextOperation();
+	/// \brief See BaseCryptoProtocolHandler::processMessage(const std::string&)
+	virtual void processMessage( const std::string& msg);
+
+private:
+	boost::shared_ptr<AAAA::PasswordChanger> m_passwordChanger;	///< password changer object reference
 };
 
-}}
+}} //namespace
+
 #endif
 

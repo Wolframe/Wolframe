@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#include "protocol/ioblocks.hpp"
+#include "ioblocks.hpp"
 #include <vector>
 #include <string>
 #include <cstring>
@@ -289,71 +289,6 @@ bool OutputBlock::printNumber( unsigned int num)
 		nn[ --ii] = sg;
 	}
 	return print( nn+ii, sizeof(nn)-ii);
-}
-
-EscapeBuffer::EscapeBuffer()
-	:m_data( (char*)std::calloc( InitDataSize, sizeof(char))),m_itr(0),m_end(0),m_size(InitDataSize),m_state(SRC){}
-
-EscapeBuffer::~EscapeBuffer()
-{
-	std::free( m_data);
-}
-
-void EscapeBuffer::push( char ch)
-{
-	if (((m_end +1) & (m_size-1)) == m_itr)
-	{
-		std::size_t nn = m_size*2;
-		char* dd = (char*)std::calloc( nn, sizeof(char));
-		if (nn <= m_size || !dd) throw std::bad_alloc();
-		std::size_t ii,ee;
-		for (ii=0; (ee=(m_itr+ii)&(m_size-1)) != m_end; ii++)
-		{
-			dd[ ii] = m_data[ ee];
-		}
-		m_itr = 0;
-		m_end = ii;
-		m_size = nn;
-		std::free( m_data);
-		m_data = dd;
-	}
-	m_data[ m_end] = ch;
-	m_end = (m_end+1)&(m_size-1);
-}
-
-void EscapeBuffer::process( char* aa, std::size_t aasize, std::size_t& aapos)
-{
-	std::size_t ii = 0;
-	for (; ii < aapos; ++ii)
-	{
-		if (aa[ii] == '\n')
-		{
-			m_state = LF;
-		}
-		else if (aa[ii] == '.')
-		{
-			if (m_state == LF)
-			{
-				push( '.');
-			}
-			m_state = SRC;
-		}
-		else
-		{
-			m_state = SRC;
-		}
-		if (m_itr != m_end)
-		{
-			push( aa[ii]);
-			aa[ii] = m_data[ m_itr];
-			m_itr = (m_itr+1)&(m_size-1);
-		}
-	}
-	while (aapos < aasize && m_itr != m_end)
-	{
-		aa[ aapos++] = m_data[ m_itr];
-		m_itr = (m_itr+1)&(m_size-1);
-	}
 }
 
 

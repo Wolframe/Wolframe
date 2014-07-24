@@ -990,19 +990,6 @@ struct OutputFilterImpl :public OutputFilter
 		return new OutputFilterImpl( *this);
 	}
 
-	bool emptybuf()
-	{
-		std::size_t nn = m_elembuf.size() - m_elemitr;
-		m_elemitr += write( m_elembuf.c_str() + m_elemitr, nn);
-		if (m_elemitr == m_elembuf.size())
-		{
-			m_elembuf.clear();
-			m_elemitr = 0;
-			return true;
-		}
-		return false;
-	}
-
 	static bool metadataContainSchemaReference( const types::DocMetaData& md)
 	{
 		std::vector<types::DocMetaData::Attribute>::const_iterator ai = md.attributes().begin(), ae = md.attributes().end();
@@ -1173,12 +1160,9 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		if (m_elemitr < m_elembuf.size())
 		{
-			// there is something to print left from last time
-			if (!emptybuf())
-			{
-				setState( EndOfBuffer);
-				return false;
-			}
+			// there is something to print left
+			setState( EndOfBuffer);
+			return false;
 		}
 		return true;
 	}
@@ -1191,16 +1175,10 @@ struct OutputFilterImpl :public OutputFilter
 	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
-		if (m_elemitr < m_elembuf.size())
+		if (m_elemitr == m_elembuf.size())
 		{
-			// there is something to print left from last time
-			if (!emptybuf())
-			{
-				setState( EndOfBuffer);
-				return false;
-			}
-			//... we've done the emptying of the buffer left
-			return true;
+			m_elembuf.clear();
+			m_elemitr = 0;
 		}
 		if (!m_headerPrinted)
 		{
@@ -1261,12 +1239,20 @@ struct OutputFilterImpl :public OutputFilter
 				}
 				break;
 		}
-		if (!emptybuf())
+		if (m_elembuf.size() > outputChunkSize())
 		{
 			setState( EndOfBuffer);
 			return false;
 		}
 		return true;
+	}
+
+	/// \brief Implementation of OutputFilter::getOutput( const void*&,std::size_t&)
+	virtual void getOutput( const void*& buf, std::size_t& bufsize)
+	{
+		buf = (const void*)(m_elembuf.c_str() + m_elemitr);
+		bufsize = m_elembuf.size() - m_elemitr;
+		m_elemitr = m_elembuf.size();
 	}
 
 	/// \brief Implementation of FilterBase::getValue( const char*, std::string&)

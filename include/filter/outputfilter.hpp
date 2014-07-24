@@ -50,6 +50,9 @@ class OutputFilter
 	:public FilterBase
 {
 public:
+	enum {
+
+	};
 	/// \enum State
 	/// \brief State of the input filter used in the application processor iterating loop to decide what to do
 	enum State
@@ -64,9 +67,6 @@ public:
 	OutputFilter( const char* name_, const types::DocMetaDataR& inheritMetadata_)
 		:FilterBase(name_)
 		,m_state(Start)
-		,m_buf(0)
-		,m_size(0)
-		,m_pos(0)
 		,m_inheritMetadata(inheritMetadata_)
 	{}
 
@@ -74,9 +74,6 @@ public:
 	explicit OutputFilter( const char* name_)
 		:FilterBase(name_)
 		,m_state(Start)
-		,m_buf(0)
-		,m_size(0)
-		,m_pos(0)
 	{}
 
 	/// \brief Copy constructor
@@ -84,9 +81,6 @@ public:
 	OutputFilter( const OutputFilter& o)
 		:FilterBase(o)
 		,m_state(o.m_state)
-		,m_buf(o.m_buf)
-		,m_size(o.m_size)
-		,m_pos(o.m_pos)
 		,m_inheritMetadata(o.m_inheritMetadata)
 		,m_metadata(o.m_metadata)
 		{}
@@ -97,24 +91,6 @@ public:
 	/// \brief Get a self copy
 	/// \return allocated pointer to copy of this
 	virtual OutputFilter* copy() const=0;
-
-	/// \brief Declare the next input chunk to the filter
-	/// \param [in] buf the start of the input chunk
-	/// \param [in] bufsize the size of the input chunk in bytes
-	void setOutputBuffer( void* buf, std::size_t bufsize)
-	{
-		if (m_state == EndOfBuffer && bufsize > 0) m_state = Open;
-		m_buf = (char*)buf;
-		m_size = bufsize;
-		m_pos = 0;
-	}
-
-	/// \brief Get the output size printed
-	/// \return size of the output printed in bytes
-	std::size_t getPosition() const
-	{
-		return m_pos;
-	}
 
 	/// \brief Print the follow element to the buffer
 	/// \param [in] type type of element to print
@@ -131,6 +107,11 @@ public:
 	{
 		return print( type, element.c_str(), element.size());
 	}
+
+	/// \brief Get the last output chunk
+	/// \param [out] pointer to buffer
+	/// \param [out] size of chunk in bytes
+	virtual void getOutput( const void*& buf, std::size_t& bufsize)=0;
 
 	/// \brief Print the final close tag, if not printed yet, to close the output
 	virtual bool close()=0;
@@ -171,16 +152,6 @@ public:
 	/// \param [in] msg (optional) error to set
 	void setState( State s, const char* msg=0)		{m_state=s; setError(msg);}
 
-	/// \brief Assigns the output filter state of another output filter
-	/// \param [in] o the output filter to get the state from
-	void assignState( const OutputFilter& o)
-	{
-		m_state = o.m_state;
-		m_buf = o.m_buf;
-		m_size = o.m_size;
-		m_pos = o.m_pos;
-	}
-
 	/// \brief Set one document meta data element
 	/// \param [in] name_ name of the document meta data element
 	/// \param [in] value_ value of the document meta data element
@@ -204,20 +175,19 @@ public:
 		m_metadata.setDoctype( id_);
 	}
 
-protected:
-	std::size_t write( const void* dt, std::size_t dtsize)
+	void setOutputChunkSize( unsigned int outputChunkSize_)
 	{
-		std::size_t nn = m_size - m_pos;
-		if (nn > dtsize) nn = dtsize;
-		std::memcpy( m_buf+m_pos, dt, nn);
-		m_pos += nn;
-		return nn;
+		m_outputChunkSize = outputChunkSize_;
 	}
+
+	unsigned int outputChunkSize() const
+	{
+		return m_outputChunkSize;
+	}
+
 private:
 	State m_state;					///< state
-	char* m_buf;					///< buffer base pointer
-	std::size_t m_size;				///< buffer size in bytes
-	std::size_t m_pos;				///< write byte position
+	unsigned int m_outputChunkSize;			///< output chunk size
 	types::DocMetaDataR m_inheritMetadata;		///< reference to meta data inherited from input
 	types::DocMetaData m_metadata;			///< document meta data
 };

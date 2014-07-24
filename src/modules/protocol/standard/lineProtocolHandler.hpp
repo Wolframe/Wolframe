@@ -30,14 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file cmdbind/lineCommandHandler.hpp
+/// \file lineProtocolHandler.hpp
 /// \brief Interface to a generic command handler for a networkHandler command with delegation of network I/O until the command context is left
-#ifndef _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
-#include "cmdbind/commandHandler.hpp"
+#ifndef _Wolframe_cmdbind_LINE_PROTOCOL_HANDLER_HPP_INCLUDED
+#define _Wolframe_cmdbind_LINE_PROTOCOL_HANDLER_HPP_INCLUDED
+#include "cmdbind/protocolHandler.hpp"
 #include "processor/execContext.hpp"
-#include "protocol/ioblocks.hpp"
-#include "protocol/parser.hpp"
+#include "ioblocks.hpp"
+#include "parser.hpp"
 #include "system/connectionHandler.hpp"
 #include "types/countedReference.hpp"
 #include "logger-v1.hpp"
@@ -48,9 +48,9 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \class LineCommandHandlerSTM
-/// \brief State machine definition for a LineCommandHandler
-class LineCommandHandlerSTM
+/// \class LineProtocolHandlerSTM
+/// \brief State machine definition for a LineProtocolHandler
+class LineProtocolHandlerSTM
 {
 public:
 	/// \return -1 for terminate or a valid state in the state machine definition
@@ -102,15 +102,15 @@ private:
 };
 
 
-/// \class LineCommandHandler
+/// \class LineProtocolHandler
 /// \brief Command handler for text-line based protocols
-class LineCommandHandler :public CommandHandler
+class LineProtocolHandler :public ProtocolHandler
 {
 public:
 	/// \brief Constructor
-	explicit LineCommandHandler( const LineCommandHandlerSTM* stm_, std::size_t stateidx_=0);
+	explicit LineProtocolHandler( const LineProtocolHandlerSTM* stm_, std::size_t stateidx_=0);
 	/// \brief Destructor
-	virtual ~LineCommandHandler();
+	virtual ~LineProtocolHandler();
 
 	/// \brief See Parent::setInputBuffer(void*,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
@@ -143,10 +143,10 @@ public:
 	static const char* endl()			{return "\r\n";}
 
 protected:
-	typedef int (*DelegateHandlerEnd)( void*, CommandHandler*, std::ostream&);
+	typedef int (*DelegateHandlerEnd)( void*, ProtocolHandler*, std::ostream&);
 
 	/// \brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
-	void delegateProcessingFunction( CommandHandler* ch, DelegateHandlerEnd end)
+	void delegateProcessingFunction( ProtocolHandler* ch, DelegateHandlerEnd end)
 	{
 		if (m_delegateHandler) throw std::logic_error( "duplicate delegation of protocol processing");
 		m_delegateHandler = ch;
@@ -167,27 +167,27 @@ protected:
 	/// \param[in] datasize size of 'data' in bytes
 	/// \param[in] toh command handler to address
 	/// \param[in,out] out buffer for protocol write
-	bool redirectInput( void* data, std::size_t datasize, cmdbind::CommandHandler* toh, std::ostream& out);
+	bool redirectInput( void* data, std::size_t datasize, cmdbind::ProtocolHandler* toh, std::ostream& out);
 
 private:
-	protocol::InputBlock m_input;				//< buffer for network read messages
-	protocol::OutputBlock m_output;				//< buffer for network write messages
+	protocol::InputBlock m_input;				///< buffer for network read messages
+	protocol::OutputBlock m_output;				///< buffer for network write messages
 
-	protocol::InputBlock::iterator m_itr;			//< iterator to scan protocol input
-	protocol::InputBlock::iterator m_end;			//< iterator pointing to end of message buffer
+	protocol::InputBlock::iterator m_itr;			///< iterator to scan protocol input
+	protocol::InputBlock::iterator m_end;			///< iterator pointing to end of message buffer
 
 	/// \enum CommandState
 	/// \brief Enumeration of command processing states
 	enum CommandState
 	{
-		Init,						//< start state, called first time in this session
-		ProcessingDelegation,				//< the command execution has been delegated to another command handler
-		EnterCommand,					//< parse command
-		ParseArgs,					//< parse command arguments
-		ParseArgsEOL,					//< parse end of line after command arguments
-		ProtocolError,					//< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
-		ProcessOutput,					//< prints the command output to the output buffer
-		Terminate					//< terminate application processor session (close for network)
+		Init,						///< start state, called first time in this session
+		ProcessingDelegation,				///< the command execution has been delegated to another command handler
+		EnterCommand,					///< parse command
+		ParseArgs,					///< parse command arguments
+		ParseArgsEOL,					///< parse end of line after command arguments
+		ProtocolError,					///< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
+		ProcessOutput,					///< prints the command output to the output buffer
+		Terminate					///< terminate application processor session (close for network)
 	};
 	/// \brief Returns the state as string for logging etc.
 	/// \param [in] i state to get as string
@@ -196,49 +196,49 @@ private:
 		static const char* ar[] = {"Init","ProcessingDelegation","EnterCommand","ParseArgs","ParseArgsEOL","ProtocolError","ProcessOutput","Terminate"};
 		return ar[i];
 	}
-	CommandHandler* m_delegateHandler;			//< command handler that processes the I/O delegated from this command handler until it return a CLOSE and gets destroyed again
-	DelegateHandlerEnd m_delegateHandlerEnd;		//< function type called after termination of m_delegateHandler
-	const LineCommandHandlerSTM* m_stm;			//< command level protocol state machine
-	protocol::CArgBuffer< std::string > m_argBuffer;	//< buffer type for the command arguments
-	std::string m_buffer;					//< line buffer
-	CommandState m_cmdstateidx;				//< current state of command execution
-	std::size_t m_stateidx;					//< current state in the STM
-	int m_cmdidx;						//< index of the command to execute starting with 0 (-1 = undefined command)
-	int m_resultstate;					//< result state of the last command
-	std::string m_resultstr;				//< content the command output stream after command execution
-	std::size_t m_resultitr;				//< iterator on m_result to send the output via network output
+	ProtocolHandler* m_delegateHandler;			///< command handler that processes the I/O delegated from this command handler until it return a CLOSE and gets destroyed again
+	DelegateHandlerEnd m_delegateHandlerEnd;		///< function type called after termination of m_delegateHandler
+	const LineProtocolHandlerSTM* m_stm;			///< command level protocol state machine
+	protocol::CArgBuffer< std::string > m_argBuffer;	///< buffer type for the command arguments
+	std::string m_buffer;					///< line buffer
+	CommandState m_cmdstateidx;				///< current state of command execution
+	std::size_t m_stateidx;					///< current state in the STM
+	int m_cmdidx;						///< index of the command to execute starting with 0 (-1 = undefined command)
+	int m_resultstate;					///< result state of the last command
+	std::string m_resultstr;				///< content the command output stream after command execution
+	std::size_t m_resultitr;				///< iterator on m_result to send the output via network output
 };
 
 
 /// \brief Defines a static function calling a member function with fixed signature
 /// \warning do not declare virtual method calls like this. It is not portable (GCC only) !
 //PF:TODO make a BOOST_ASSERT here for refusing virtual methods here
-template <class T, int (T::*TerminateDelegationMethod)( CommandHandler*, std::ostream&)>
-struct LineCommandHandlerTerminateDelegationWrapper
+template <class T, int (T::*TerminateDelegationMethod)( ProtocolHandler*, std::ostream&)>
+struct LineProtocolHandlerTerminateDelegationWrapper
 {
-	static int function( void* this_, CommandHandler* ch, std::ostream& out)
+	static int function( void* this_, ProtocolHandler* ch, std::ostream& out)
 	{
 		return (((T*)this_)->*TerminateDelegationMethod)( ch, out);
 	}
 };
 
 /// \brief Defines some template based extensions to line command handler
-// Usage: derive LineCommandHandlerImpl from LineCommandHandlerTemplate<LineCommandHandlerImpl>
-template <class LineCommandHandlerImpl>
-struct LineCommandHandlerTemplate :public LineCommandHandler
+// Usage: derive LineProtocolHandlerImpl from LineProtocolHandlerTemplate<LineProtocolHandlerImpl>
+template <class LineProtocolHandlerImpl>
+struct LineProtocolHandlerTemplate :public LineProtocolHandler
 {
 	/// \brief Constructor
-	explicit LineCommandHandlerTemplate( const LineCommandHandlerSTM* stm_, std::size_t stateidx_=0)
-		:LineCommandHandler( stm_,stateidx_){}
+	explicit LineProtocolHandlerTemplate( const LineProtocolHandlerSTM* stm_, std::size_t stateidx_=0)
+		:LineProtocolHandler( stm_,stateidx_){}
 
 	/// \brief Destructor
-	virtual ~LineCommandHandlerTemplate(){}
+	virtual ~LineProtocolHandlerTemplate(){}
 
 	/// \brief Delegate the processing to 'ch' until its termination. Call the processing termination function for informing the caller
-	template <int (LineCommandHandlerImpl::*EndDelegateProcessingMethod)( CommandHandler*, std::ostream&)>
-	void delegateProcessing( CommandHandler* ch)
+	template <int (LineProtocolHandlerImpl::*EndDelegateProcessingMethod)( ProtocolHandler*, std::ostream&)>
+	void delegateProcessing( ProtocolHandler* ch)
 	{
-		delegateProcessingFunction( ch, &LineCommandHandlerTerminateDelegationWrapper<LineCommandHandlerImpl,EndDelegateProcessingMethod>::function);
+		delegateProcessingFunction( ch, &LineProtocolHandlerTerminateDelegationWrapper<LineProtocolHandlerImpl,EndDelegateProcessingMethod>::function);
 	}
 };
 
@@ -247,7 +247,7 @@ struct LineCommandHandlerTemplate :public LineCommandHandler
 /// \warning do not declare virtual method calls like this. It is not portable (GCC only) !
 //PF:TODO make a BOOST_ASSERT here for refusing virtual methods here
 template <class T, int (T::*Method)( int argc, const char** argv, std::ostream& out)>
-struct LineCommandHandlerWrapper
+struct LineProtocolHandlerWrapper
 {
 	static int function( void* this_, int argc, const char** argv, std::ostream& out)
 	{
@@ -256,21 +256,21 @@ struct LineCommandHandlerWrapper
 };
 
 
-/// \class LineCommandHandlerSTMTemplate
+/// \class LineProtocolHandlerSTMTemplate
 /// \brief Template to build up a protocol description out of basic bricks
-template <class LineCommandHandlerImpl>
-struct LineCommandHandlerSTMTemplate :public LineCommandHandlerSTM
+template <class LineProtocolHandlerImpl>
+struct LineProtocolHandlerSTMTemplate :public LineProtocolHandlerSTM
 {
-	LineCommandHandlerSTMTemplate& operator[]( std::size_t se)
+	LineProtocolHandlerSTMTemplate& operator[]( std::size_t se)
 	{
 		defineState( se);
 		return *this;
 	}
 
-	template <int (LineCommandHandlerImpl::*Method)(int,const char**,std::ostream&)>
-	LineCommandHandlerSTMTemplate& cmd( const char* cmdname_)
+	template <int (LineProtocolHandlerImpl::*Method)(int,const char**,std::ostream&)>
+	LineProtocolHandlerSTMTemplate& cmd( const char* cmdname_)
 	{
-		defineCommand( cmdname_, &LineCommandHandlerWrapper<LineCommandHandlerImpl,Method>::function);
+		defineCommand( cmdname_, &LineProtocolHandlerWrapper<LineProtocolHandlerImpl,Method>::function);
 		return *this;
 	}
 };

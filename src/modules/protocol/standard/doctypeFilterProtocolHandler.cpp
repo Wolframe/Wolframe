@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind_doctypeFilterCommandHandler.cpp
-#include "doctypeFilterCommandHandler.hpp"
+///\file cmdbind_doctypeFilterProtocolHandler.cpp
+#include "doctypeFilterProtocolHandler.hpp"
 #include "processor/execContext.hpp"
 #include "logger-v1.hpp"
 #include "utils/parseUtils.hpp"
@@ -42,20 +42,20 @@
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
-void DoctypeFilterCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
+void DoctypeFilterProtocolHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
 	m_input = protocol::InputBlock( (char*)buf, allocsize);
 }
 
-void DoctypeFilterCommandHandler::setOutputBuffer( void*, std::size_t, std::size_t)
+void DoctypeFilterProtocolHandler::setOutputBuffer( void*, std::size_t, std::size_t)
 {}
 
-const types::DoctypeInfoR& DoctypeFilterCommandHandler::info() const
+const types::DoctypeInfoR& DoctypeFilterProtocolHandler::info() const
 {
 	return m_doctypeDetector->info();
 }
 
-bool DoctypeFilterCommandHandler::createDoctypeDetector()
+bool DoctypeFilterProtocolHandler::createDoctypeDetector()
 {
 	proc::ExecContext* ctx = execContext();
 	if (!ctx)
@@ -72,7 +72,7 @@ bool DoctypeFilterCommandHandler::createDoctypeDetector()
 	return true;
 }
 
-CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
+ProtocolHandler::Operation DoctypeFilterProtocolHandler::nextOperation()
 {
 	try
 	{
@@ -123,7 +123,7 @@ CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 	}
 }
 
-void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
+void DoctypeFilterProtocolHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	m_inputbuffer.append( (const char*)begin, bytesTransferred);
 	if (!m_doctypeDetector.get())
@@ -139,25 +139,25 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 	}
 }
 
-void DoctypeFilterCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
+void DoctypeFilterProtocolHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
 	begin = m_input.ptr();
 	maxBlockSize = m_input.size();
 }
 
-void DoctypeFilterCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
+void DoctypeFilterProtocolHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
 	begin = 0;
 	bytesToTransfer = 0;
 }
 
-void DoctypeFilterCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
+void DoctypeFilterProtocolHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
 	begin = m_input.ptr();
 	nofBytes = 0;
 }
 
-void DoctypeFilterCommandHandler::getInputBuffer( void*& begin, std::size_t& nofBytes)
+void DoctypeFilterProtocolHandler::getInputBuffer( void*& begin, std::size_t& nofBytes)
 {
 	begin = (void*)const_cast<char*>( m_inputbuffer.c_str());
 	nofBytes = m_inputbuffer.size();

@@ -30,32 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file passwordChangeCommandHandler.cpp
+/// \file passwordChangeProtocolHandler.cpp
 /// \brief Implementation of the authentication command handler
 
-#include "passwordChangeCommandHandler.hpp"
+#include "passwordChangeProtocolHandler.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
-PasswordChangeCommandHandler::PasswordChangeCommandHandler( const boost::shared_ptr<AAAA::PasswordChanger>& passwordChanger_)
+PasswordChangeProtocolHandler::PasswordChangeProtocolHandler( const boost::shared_ptr<AAAA::PasswordChanger>& passwordChanger_)
 	:m_passwordChanger(passwordChanger_)
 {}
 
-PasswordChangeCommandHandler::~PasswordChangeCommandHandler()
+PasswordChangeProtocolHandler::~PasswordChangeProtocolHandler()
 {
 }
 
-void PasswordChangeCommandHandler::processMessage( const std::string& msg)
+void PasswordChangeProtocolHandler::processMessage( const std::string& msg)
 {
 	m_passwordChanger->messageIn( msg);
 }
 
-CommandHandler::Operation PasswordChangeCommandHandler::nextOperation()
+ProtocolHandler::Operation PasswordChangeProtocolHandler::nextOperation()
 {
 	for (;;)
 	{
-		LOG_TRACE << "STATE PasswordChangeCommandHandler " << stateName( state()) << " " << m_passwordChanger->statusName( m_passwordChanger->status());
+		LOG_TRACE << "STATE PasswordChangeProtocolHandler " << stateName( state()) << " " << m_passwordChanger->statusName( m_passwordChanger->status());
 		switch (state())
 		{
 			case Init:

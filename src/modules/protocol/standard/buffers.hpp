@@ -31,12 +31,12 @@ Project Wolframe.
 ************************************************************************/
 #ifndef _Wolframe_PROTOCOL_BUFFERS_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_BUFFERS_HPP_INCLUDED
-/// \file protocol/buffers.hpp
+/// \file buffers.hpp
 /// \brief Defines the buffers used by protocol parsers to buffer the commands and their arguments.
 /// All buffers defined in this module are preallocated fixed size and implement a subset of STL back insertion sequence interface for appending data.
-/// This interface is used by the buffering parsing methods defined in protocol/parser.hpp.
+/// This interface is used by the buffering parsing methods defined in parser.hpp.
 /// The protocol uses fixed size buffers because protocol messages are not considered to have a size defined by the client for security reasons.
-/// The buffers are not used for buffering processed data. Data is passed as memory blocks of the type defined in protocol/ioblocks.hpp
+/// The buffers are not used for buffering processed data. Data is passed as memory blocks of the type defined in ioblocks.hpp
 /// to the application processors.
 
 #include <cstddef>

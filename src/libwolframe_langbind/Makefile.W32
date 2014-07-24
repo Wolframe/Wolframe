@@ -22,7 +22,6 @@ LIBRARIES = \
 	wolframe_langbind.lib
 
 CPP_OBJS = \
-	protocol_ioblocks.obj \
 	filterdef.obj \
 	input.obj \
 	output.obj \
@@ -33,9 +32,7 @@ CPP_OBJS = \
 	inputfilterScope.obj \
 	joinfilter.obj \
 	null_filter.obj \
-	execContextInputFilter.obj \
-	cmdbind_lineCommandHandler.obj \
-	cmdbind_IOFilterCommandHandlerEscDLF.obj
+	execContextInputFilter.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

@@ -40,7 +40,7 @@
 #include "processor/procProviderInterface.hpp"
 #include "processor/procProviderConfig.hpp"
 #include "database/database.hpp"
-#include "cmdbind/commandHandlerUnit.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "cmdbind/doctypeDetector.hpp"
 #include "cmdbind/protocolHandler.hpp"
 #include "prgbind/programLibrary.hpp"

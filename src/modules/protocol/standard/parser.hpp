@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file protocol/parser.hpp
+/// \file parser.hpp
 /// \brief Parsing functions of the lexical elements of the protocol like commands, lines and tokens
 
 #ifndef _Wolframe_PROTOCOL_PARSER_HPP_INCLUDED

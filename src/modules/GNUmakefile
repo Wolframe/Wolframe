@@ -2,7 +2,7 @@ TOPDIR = ../..
 
 SUBDIRS = audit authentication authorization \
 	database datatype doctype filter ddlcompiler \
-	normalize prnt cmdbind functions jobSchedule
+	normalize prnt cmdbind functions jobSchedule protocol
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

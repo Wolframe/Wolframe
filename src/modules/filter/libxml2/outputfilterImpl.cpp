@@ -64,31 +64,6 @@ OutputFilterImpl::OutputFilterImpl( const OutputFilterImpl& o)
 	,m_elemitr(o.m_elemitr)
 	{}
 
-bool OutputFilterImpl::flushBuffer()
-{
-	bool rt = true;
-	// if we have the whole document, then we start to print it and return an error, as long as we still have data:
-	if (m_elemitr < m_elembuf.size())
-	{
-		m_elemitr += write( m_elembuf.c_str() + m_elemitr, m_elembuf.size() - m_elemitr);
-		if (m_elemitr == m_elembuf.size())
-		{
-			setState( OutputFilter::Open);
-			rt = true;
-		}
-		else
-		{
-			setState( OutputFilter::EndOfBuffer);
-			rt = false;
-		}
-	}
-	else
-	{
-		setState( OutputFilter::Open);
-	}
-	return rt;
-}
-
 void OutputFilterImpl::setXmlError( const char* msg)
 {
 	xmlError* err = xmlGetLastError();
@@ -242,7 +217,7 @@ bool OutputFilterImpl::close()
 				return false;
 			}
 		}
-		return flushBuffer();
+		return true;
 	}
 	if (m_taglevel > 1)
 	{
@@ -269,9 +244,19 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 		}
 		xmlout = m_doc.get();
 	}
+	if (m_elemitr && m_elembuf.size() == m_elemitr)
+	{
+		m_elembuf.clear();
+		m_elemitr = 0;
+	}
 	if (m_taglevel == 0)
 	{
-		return flushBuffer();
+		if (m_elembuf.size() > outputChunkSize())
+		{
+			setState( EndOfBuffer);
+			return false;
+		}
+		return true;
 	}
 	switch (type)
 	{
@@ -332,7 +317,12 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 					rt = false;
 					break;
 				}
-				return flushBuffer();
+				if (m_elembuf.size() > outputChunkSize())
+				{
+					setState( EndOfBuffer);
+					return false;
+				}
+				return true;
 			}
 			break;
 

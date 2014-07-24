@@ -77,14 +77,6 @@ struct InputFilterImpl :public InputFilter
 		m_srcsize = size;
 	}
 
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	//\brief Implement InputFilter::getRest(const void*&,std::size_t&,bool&)
-	{
-		ptr = m_src;
-		size = m_srcsize;
-		end = m_srcend;
-	}
-
 	//\brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType&, const void*&, std::size_t&)
 	{
@@ -130,6 +122,12 @@ struct OutputFilterImpl :public OutputFilter
 		setState( Error, "output filter not defined");
 		return false;
 	}
+	virtual void getOutput( const void*& buf, std::size_t& bufsize)
+	{
+		buf = 0;
+		bufsize = 0;
+	}
+
 	virtual bool close(){return true;}
 };
 }//end anonymous namespace

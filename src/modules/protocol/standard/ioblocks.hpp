@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 #ifndef _Wolframe_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
 #define _Wolframe_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
-/// \file protocol/ioblocks.hpp
+/// \file ioblocks.hpp
 /// \brief Network message blocks as seen from the protocol with the input iterator classes and print functions
 #include "iterators.hpp"
 #include "buffers.hpp"
@@ -251,9 +251,7 @@ private:
 
 /// \class OutputBlock
 /// \brief Protocol output buffer
-//
-// Print as buffer is available and then order to "ship" what you printed.
-//
+/// Print as buffer is available and then order to "ship" what you printed.
 class OutputBlock :public MemBlock
 {
 public:
@@ -347,19 +345,53 @@ struct CharBuffer :public utils::ArrayDoublingAllocator
 };
 
 
-/// \class EscapeBuffer
+/// \class EscapeSTM
 /// \brief Statemachine used for replacing "LF DOT" sequences in a buffer with "LF DOT DOT"
-class EscapeBuffer
+class EscapeSTM
 {
 public:
-	EscapeBuffer();
-	~EscapeBuffer();
+	EscapeSTM()
+		:m_state(SRC),m_output(0),m_blk(0),m_blksize(0),m_blkpos(0){}
 
-	void process( char* aa, std::size_t aasize, std::size_t& aapos);
-	bool hasData() const {return m_itr != m_end;}
+	void setNextBlock( OutputBlock* output_, const char* blk_, std::size_t blksize_)
+	{
+		m_output = output_;
+		m_blk = blk_;
+		m_blksize = blksize_;
+		m_blkpos = 0;
+	}
 
-private:
-	void push( char ch);
+	void process()
+	{
+		while (m_blkpos < m_blksize)
+		{
+			char ch = m_blk[m_blkpos];
+			if (!m_output->print( ch)) return;
+
+			if (m_state == SRC)
+			{
+				if (ch == '\n') m_state = LF;
+			}
+			else if (m_state == LF)
+			{
+				if (ch == '.')
+				{
+					if (!m_output->print( ch)) return;
+					m_state = SRC;
+				}
+				else if (ch != '\n')
+				{
+					m_state = SRC;
+				}
+			}
+			++m_blkpos;
+		}
+	}
+
+	bool hasMore() const
+	{
+		return m_blkpos < m_blksize;
+	}
 
 private:
 	/// \enum State
@@ -369,12 +401,11 @@ private:
 		SRC,			///< parsing content
 		LF			///< detected an LineFeed in state SRC
 	};
-	enum {InitDataSize=2};
-	char* m_data;
-	std::size_t m_itr;
-	std::size_t m_end;
-	std::size_t m_size;
 	State m_state;
+	OutputBlock* m_output;
+	const char* m_blk;
+	std::size_t m_blksize;
+	std::size_t m_blkpos;
 };
 
 

@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file interfaceCommandHandler.cpp
-#include "interfaceCommandHandler.hpp"
+///\file interfaceProtocolHandler.cpp
+#include "interfaceProtocolHandler.hpp"
 #include "logger-v1.hpp"
 #include "processor/procProvider.hpp"
 #include <stdexcept>
@@ -47,25 +47,25 @@ enum State
 	AdminPush
 };
 
-struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandler>
+struct STM :public cmdbind::LineProtocolHandlerSTMTemplate<InterfaceProtocolHandler>
 {
 	STM()
 	{
 		(*this)
 			[User]
-				.cmd< &InterfaceCommandHandler::doCapabilities >( "CAPABILITIES")
+				.cmd< &InterfaceProtocolHandler::doCapabilities >( "CAPABILITIES")
 			[Admin]
-				.cmd< &InterfaceCommandHandler::doCapabilities >( "CAPABILITIES")
+				.cmd< &InterfaceProtocolHandler::doCapabilities >( "CAPABILITIES")
 		;
 	}
 };
 static STM stm;
 
-InterfaceCommandHandler::InterfaceCommandHandler( bool adminInterface_)
-	:cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>( &stm, (std::size_t)(adminInterface_?User:Admin))
+InterfaceProtocolHandler::InterfaceProtocolHandler( bool adminInterface_)
+	:cmdbind::LineProtocolHandlerTemplate<InterfaceProtocolHandler>( &stm, (std::size_t)(adminInterface_?User:Admin))
 {}
 
-int InterfaceCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
+int InterfaceProtocolHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{

@@ -51,31 +51,6 @@ std::string OutputFilterImpl::elementpath() const
 	return rt;
 }
 
-bool OutputFilterImpl::flushBuffer()
-{
-	bool rt = true;
-	// if we have the whole document, then we start to print it and return an error, as long as we still have data:
-	if (m_elemitr < m_elembuf.size())
-	{
-		m_elemitr += write( m_elembuf.c_str() + m_elemitr, m_elembuf.size() - m_elemitr);
-		if (m_elemitr == m_elembuf.size())
-		{
-			setState( OutputFilter::Open);
-			rt = true;
-		}
-		else
-		{
-			setState( OutputFilter::EndOfBuffer);
-			rt = false;
-		}
-	}
-	else
-	{
-		setState( OutputFilter::Open);
-	}
-	return rt;
-}
-
 void OutputFilterImpl::printStructToBuffer()
 {
 	if (!m_stk.back().m_node)
@@ -174,7 +149,6 @@ void OutputFilterImpl::closeElement()
 		if (m_stk.empty()) throw std::runtime_error("tags not balanced, got a close too much");
 		printStructToBuffer();
 		m_stk.pop_back();
-		m_flushing = true;
 	}
 	else
 	{
@@ -344,7 +318,7 @@ bool OutputFilterImpl::close()
 	{
 		printHeader();
 	}
-	if (m_flushing || !m_stk.empty())
+	if (!m_stk.empty())
 	{
 		return print( FilterBase::CloseTag, 0, 0);
 	}
@@ -355,14 +329,10 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 {
 	try
 	{
-		if (m_flushing)
+		if (m_elemitr && m_elemitr == m_elembuf.size())
 		{
-			if (flushBuffer())
-			{
-				m_flushing = false;
-				return true;
-			}
-			return false;
+			m_elembuf.clear();
+			m_elemitr = 0;
 		}
 		if (m_stk.empty())
 		{
@@ -410,9 +380,9 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 				return false;
 		}
 		m_lastelemtype = type;
-		if (!flushBuffer())
+		if (m_elembuf.size() > outputChunkSize())
 		{
-			m_flushing = true;
+			setState( EndOfBuffer);
 			return false;
 		}
 		return true;
@@ -427,6 +397,13 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 		setState( Error, e.what());
 		return false;
 	}
+}
+
+void OutputFilterImpl::getOutput( const void*& buf, std::size_t& bufsize)
+{
+	buf = (const void*)(m_elembuf.c_str() + m_elemitr);
+	bufsize = m_elembuf.size() - m_elemitr;
+	m_elemitr = m_elembuf.size();
 }
 
 bool OutputFilterImpl::getValue( const char* id, std::string& val) const

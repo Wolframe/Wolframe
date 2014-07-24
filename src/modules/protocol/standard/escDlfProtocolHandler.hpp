@@ -30,31 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file cmdbind/ioFilterCommandHandlerEscDLF.hpp
-/// \brief Filter based command handler base class that escapes patterns in input/output that could be mixeed with the protocol end of content marker "Dot LF" or "Dot CR LF"
+/// \file escDlfProtocolHandler.hpp
+/// \brief Protocol handler escaping input/output with end of content marker "Dot LF" or "Dot CR LF"
 
-#ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
-#define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
-#include "protocol/ioblocks.hpp"
+#ifndef _Wolframe_ESC_DLF_PROTOCOL_HANDLER_ESC_DOT_LF_HPP_INCLUDED
+#define _Wolframe_ESC_DLF_PROTOCOL_HANDLER_ESC_DOT_LF_HPP_INCLUDED
+#include "ioblocks.hpp"
 #include "filter/filter.hpp"
-#include "cmdbind/ioFilterCommandHandler.hpp"
-#include "system/connectionHandler.hpp"
+#include "cmdbind/protocolHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \class IOFilterCommandHandlerEscDLF
-/// \brief Command handler processing filter input/output with end of content marked as Dot ('.') LF or Dot CR LF
+/// \class EscDlfProtocolHandler
+/// \brief Protocol handler processing input/output with end of content marked as Dot ('.') LF or Dot CR LF
 /// \remark Dot ('.') on start of lines are escaped with Dot Dot LF
-class IOFilterCommandHandlerEscDLF :public IOFilterCommandHandler
+class EscDlfProtocolHandler
+	:public ProtocolHandler
 {
 public:
-	typedef IOFilterCommandHandler Parent;
-
+	/// \brief Default constructor
+	explicit EscDlfProtocolHandler();
 	/// \brief Constructor
-	IOFilterCommandHandlerEscDLF();
+	explicit EscDlfProtocolHandler( const CommandHandlerR& cmdhandler_);
 	/// \brief Destructor
-	virtual ~IOFilterCommandHandlerEscDLF();
+	virtual ~EscDlfProtocolHandler();
 
 	/// \brief See CommandHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
@@ -80,12 +81,8 @@ public:
 	/// \brief See CommandHandler::interruptDataSessionMarker()
 	virtual const char* interruptDataSessionMarker() const;
 
-	/// \param[out] err error code in case of error
-	/// \return CallResult status of the filter input for the state machine of this command handler
-	virtual CallResult call( const char*& err)=0;
-
 private:
-	void getFilterOutputWriteData();
+	bool getCommandHandlerWriteData();
 	bool consumeInput();
 
 private:
@@ -103,8 +100,6 @@ private:
 		return ar[ (int)st];
 	}
 
-	protocol::EscapeBuffer m_escapeBuffer;
-
 	State m_state;					///< processing state machine state
 	bool m_unconsumedInput;				///< true, if there is unconsumed input waiting to be consumed before the next read
 	bool m_gotEoD;					///< true if we got EoD and consumed all input
@@ -113,9 +108,11 @@ private:
 
 	protocol::InputBlock m_input;			///< input buffer
 	protocol::OutputBlock m_output;			///< output buffer
+	protocol::EscapeSTM m_esc_stm;			///< escaping output statemachine
 	protocol::InputBlock::iterator m_eoD;		///< input end of data marker
 	std::size_t m_nextmsg;				///< start of the follow message after end of data (eoD)
 	std::size_t m_itrpos;				///< read start position in buffer for the command handler
+	CommandHandlerR m_cmdhandler;			///< command handler to which the unescaped content is passed to
 };
 }}
 #endif

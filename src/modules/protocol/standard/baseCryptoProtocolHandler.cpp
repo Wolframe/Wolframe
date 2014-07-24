@@ -30,15 +30,15 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file baseCryptoCommandHandler.cpp
+/// \file baseCryptoProtocolHandler.cpp
 /// \brief Implementation of the authentication command handler
 
-#include "baseCryptoCommandHandler.hpp"
+#include "baseCryptoProtocolHandler.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
-BaseCryptoCommandHandler::BaseCryptoCommandHandler()
+BaseCryptoProtocolHandler::BaseCryptoProtocolHandler()
 	:m_itrpos(0)
 	,m_msgstart(0)
 	,m_outputbuf(0)
@@ -48,21 +48,21 @@ BaseCryptoCommandHandler::BaseCryptoCommandHandler()
 	,m_writepos(0)
 {}
 
-BaseCryptoCommandHandler::~BaseCryptoCommandHandler()
+BaseCryptoProtocolHandler::~BaseCryptoProtocolHandler()
 {
 }
 
-const char* BaseCryptoCommandHandler::interruptDataSessionMarker() const
+const char* BaseCryptoProtocolHandler::interruptDataSessionMarker() const
 {
 	return (m_state == FlushOutput)?"\r\n.\r\n":"";
 }
 
-void BaseCryptoCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
+void BaseCryptoProtocolHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
 	m_input.set( (char*)buf, allocsize);
 }
 
-void BaseCryptoCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
+void BaseCryptoProtocolHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
 	m_outputbuf = (char*)buf;
 	m_outputbufsize = size;
@@ -70,7 +70,7 @@ void BaseCryptoCommandHandler::setOutputBuffer( void* buf, std::size_t size, std
 	if (pos > size) throw std::logic_error("illegal parameter (setOutputBuffer)");
 }
 
-bool BaseCryptoCommandHandler::consumeNextMessage()
+bool BaseCryptoProtocolHandler::consumeNextMessage()
 {
 	protocol::InputBlock::iterator start = m_input.at( m_msgstart);
 	m_eoD = m_input.getEoD( start);
@@ -94,12 +94,12 @@ bool BaseCryptoCommandHandler::consumeNextMessage()
 	}
 }
 
-void BaseCryptoCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
+void BaseCryptoProtocolHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	std::size_t startidx = (const char*)begin - m_input.charptr();
 	if (bytesTransferred + startidx > m_input.size())
 	{
-		throw std::logic_error( "illegal input range passed to BaseCryptoCommandHandler");
+		throw std::logic_error( "illegal input range passed to BaseCryptoProtocolHandler");
 	}
 	m_input.setPos( bytesTransferred + startidx);
 	if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
@@ -108,7 +108,7 @@ void BaseCryptoCommandHandler::putInput( const void *begin, std::size_t bytesTra
 	m_state = NextOperation;
 }
 
-void BaseCryptoCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
+void BaseCryptoProtocolHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
 	if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
 	{
@@ -117,7 +117,7 @@ void BaseCryptoCommandHandler::getInputBlock( void*& begin, std::size_t& maxBloc
 	m_itrpos = ((const char*)begin - m_input.charptr());
 }
 
-void BaseCryptoCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
+void BaseCryptoProtocolHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
 	bytesToTransfer = m_outputbufsize - m_outputbufpos;
 	if (bytesToTransfer > m_writebuffer.size() - m_writepos)
@@ -132,13 +132,13 @@ void BaseCryptoCommandHandler::getOutput( const void*& begin, std::size_t& bytes
 	m_writepos += bytesToTransfer;
 }
 
-void BaseCryptoCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
+void BaseCryptoProtocolHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
 	begin = (const void*)(m_input.charptr() + m_msgstart);
 	nofBytes = m_input.pos() - m_msgstart;
 }
 
-void BaseCryptoCommandHandler::pushOutput( const std::string& msg)
+void BaseCryptoProtocolHandler::pushOutput( const std::string& msg)
 {
 	m_writebuffer = protocol::escapeStringDLF( msg);
 	m_writebuffer.append( "\r\n.\r\n");
@@ -147,7 +147,7 @@ void BaseCryptoCommandHandler::pushOutput( const std::string& msg)
 	
 }
 
-bool BaseCryptoCommandHandler::endOfOutput()
+bool BaseCryptoProtocolHandler::endOfOutput()
 {
 	if (m_writepos == m_writebuffer.size())
 	{

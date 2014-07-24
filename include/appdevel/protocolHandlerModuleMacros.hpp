@@ -46,7 +46,7 @@
 	public:\
 		ProtocolHandlerConstructor(){}\
 		virtual ~ProtocolHandlerConstructor(){}\
-		virtual _Wolframe::cmdbind::ProtocolHandlerUnit* object()\
+		virtual _Wolframe::cmdbind::ProtocolHandlerUnit* object() const\
 		{\
 			return new CLASSDEF();\
 		}\

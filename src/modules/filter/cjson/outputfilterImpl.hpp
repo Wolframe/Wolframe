@@ -60,7 +60,6 @@ public:
 		:OutputFilter("cjson", inheritedMetaData)
 		,m_elemitr(0)
 		,m_headerprinted(false)
-		,m_flushing(false)
 		,m_lastelemtype(FilterBase::OpenTag)
 	{
 		m_stk.push_back( StackElement(""));
@@ -74,7 +73,6 @@ public:
 		,m_elemitr(o.m_elemitr)
 		,m_encattr(o.m_encattr)
 		,m_headerprinted(o.m_headerprinted)
-		,m_flushing(o.m_flushing)
 		,m_stk(o.m_stk)
 		,m_lastelemtype(o.m_lastelemtype)
 		{}
@@ -89,6 +87,9 @@ public:
 
 	/// \brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize);
+
+	/// \brief Implementation of OutputFilter::getOutput( const void*&,std::size_t&)
+	virtual void getOutput( const void*& buf, std::size_t& bufsize);
 
 	/// \brief Implementation of OutputFilter::close()
 	virtual bool close();
@@ -106,7 +107,6 @@ private:
 	void setContentValue( const std::string& value);
 	void closeElement();
 	void printStructToBuffer();
-	bool flushBuffer();
 	std::string elementpath() const;
 
 private:

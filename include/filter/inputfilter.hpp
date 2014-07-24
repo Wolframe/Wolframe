@@ -98,17 +98,6 @@ public:
 	/// \param [in] end true, if end of input (the last chunk) has been reached.
 	virtual void putInput( const void* ptr, std::size_t size, bool end)=0;
 
-	/// \brief Get the rest of the input chunk left unparsed yet (defaults to nothing left)
-	/// \param [out] ptr the start of the input chunk left to parse
-	/// \param [out] size the size of the input chunk left to parse in bytes
-	/// \param [out] end true, if end of input (the last chunk) has been reached.
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	{
-		ptr = 0;
-		size = 0;
-		end = false;
-	}
-
 	/// \brief Implementation of FilterBase::getValue( const char*, std::string&)
 	virtual bool getValue( const char* id, std::string& val) const
 	{

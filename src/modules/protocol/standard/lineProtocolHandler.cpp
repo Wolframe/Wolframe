@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "cmdbind/lineCommandHandler.hpp"
+#include "lineProtocolHandler.hpp"
 #include "processor/execContext.hpp"
-#include "protocol/ioblocks.hpp"
+#include "ioblocks.hpp"
 #include "logger-v1.hpp"
 
 #undef _Wolframe_LOWLEVEL_DEBUG
@@ -41,19 +41,19 @@ using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::protocol;
 
-LineCommandHandler::LineCommandHandler( const LineCommandHandlerSTM* stm_, std::size_t stateidx_)
+LineProtocolHandler::LineProtocolHandler( const LineProtocolHandlerSTM* stm_, std::size_t stateidx_)
 	:m_delegateHandler(0),m_delegateHandlerEnd(0),m_stm(stm_),m_argBuffer(&m_buffer),m_cmdstateidx(Init),m_stateidx(stateidx_),m_cmdidx(-1),m_resultstate(-1),m_resultitr(0)
 {
 	m_itr = m_input.begin();
 	m_end = m_input.end();
 }
 
-LineCommandHandler::~LineCommandHandler()
+LineProtocolHandler::~LineProtocolHandler()
 {
 	if (m_delegateHandler) delete m_delegateHandler;
 }
 
-void LineCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
+void LineProtocolHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
 	m_input = protocol::InputBlock( (char*)buf, allocsize);
 	m_itr = m_end = m_input.begin();
@@ -63,7 +63,7 @@ void LineCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
 	}
 }
 
-void LineCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
+void LineProtocolHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
 	if (size < 16) throw std::logic_error("output buffer smaller than 16 bytes");
 	m_output = protocol::OutputBlock( buf, size, pos);
@@ -73,7 +73,7 @@ void LineCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size
 	}
 }
 
-void LineCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
+void LineProtocolHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
@@ -87,7 +87,7 @@ void LineCommandHandler::putInput( const void *begin, std::size_t bytesTransferr
 	}
 }
 
-void LineCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
+void LineProtocolHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
 	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
@@ -99,7 +99,7 @@ void LineCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 	}
 }
 
-void LineCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
+void LineProtocolHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
 	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
@@ -113,7 +113,7 @@ void LineCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTran
 	}
 }
 
-void LineCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
+void LineProtocolHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
 	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
@@ -126,7 +126,7 @@ void LineCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 	}
 }
 
-const char* LineCommandHandler::interruptDataSessionMarker() const
+const char* LineProtocolHandler::interruptDataSessionMarker() const
 {
 	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
 	{
@@ -135,7 +135,7 @@ const char* LineCommandHandler::interruptDataSessionMarker() const
 	return "";
 }
 
-int LineCommandHandler::runCommand( const char* cmd_, int argc_, const char** argv_, std::ostream& out_)
+int LineProtocolHandler::runCommand( const char* cmd_, int argc_, const char** argv_, std::ostream& out_)
 {
 	char* begin=const_cast<char*>(cmd_);
 	char* end=begin+strlen(cmd_)+1;
@@ -146,7 +146,7 @@ int LineCommandHandler::runCommand( const char* cmd_, int argc_, const char** ar
 	return m_stm->runCommand( m_stateidx, (std::size_t)cmdidx-1, this, argc_, argv_, out_);
 }
 
-bool LineCommandHandler::redirectInput( void* data, std::size_t datasize, cmdbind::CommandHandler* toh, std::ostream& out)
+bool LineProtocolHandler::redirectInput( void* data, std::size_t datasize, cmdbind::ProtocolHandler* toh, std::ostream& out)
 {
 	const void* toh_output;
 	std::size_t toh_outputsize;
@@ -157,14 +157,14 @@ bool LineCommandHandler::redirectInput( void* data, std::size_t datasize, cmdbin
 
 	for (;;) switch (toh->nextOperation())
 	{
-		case cmdbind::CommandHandler::READ:
+		case cmdbind::ProtocolHandler::READ:
 			toh->setInputBuffer( m_input.ptr(), m_input.size());
 			return true;
-		case cmdbind::CommandHandler::WRITE:
+		case cmdbind::ProtocolHandler::WRITE:
 			toh->getOutput( toh_output, toh_outputsize);
 			out << std::string( (const char*)toh_output, toh_outputsize);
 			continue;
-		case cmdbind::CommandHandler::CLOSE:
+		case cmdbind::ProtocolHandler::CLOSE:
 			error = toh->lastError();
 			if (error) { LOG_ERROR << "error redirect input: " << error; }
 			toh->setInputBuffer( m_input.ptr(), m_input.size());
@@ -172,12 +172,12 @@ bool LineCommandHandler::redirectInput( void* data, std::size_t datasize, cmdbin
 	}
 }
 
-CommandHandler::Operation LineCommandHandler::nextOperation()
+ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 {
 	for (;;)
 	{
 #ifdef _Wolframe_LOWLEVEL_DEBUG
-		LOG_TRACE << "STATE LineCommandHandler " << commandStateName( m_cmdstateidx);
+		LOG_TRACE << "STATE LineProtocolHandler " << commandStateName( m_cmdstateidx);
 		// to blurry log message. Helped in the beginning, but got now useless
 #endif
 		switch( m_cmdstateidx)
@@ -205,7 +205,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 			case ProcessingDelegation:
 				if (m_delegateHandler)
 				{
-					CommandHandler::Operation delegateRes = m_delegateHandler->nextOperation();
+					ProtocolHandler::Operation delegateRes = m_delegateHandler->nextOperation();
 					if (delegateRes == CLOSE)
 					{
 						try
@@ -214,7 +214,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 							const void* r_begin;
 							std::size_t r_nofBytes;
 							m_delegateHandler->getDataLeft( r_begin, r_nofBytes);
-							CommandHandler* l_delegateHandler = m_delegateHandler;
+							ProtocolHandler* l_delegateHandler = m_delegateHandler;
 							DelegateHandlerEnd l_delegateHandlerEnd = m_delegateHandlerEnd;
 							m_delegateHandler = 0;
 							m_delegateHandlerEnd = 0;
@@ -246,7 +246,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 
 			case EnterCommand:
 			{
-				const LineCommandHandlerSTM::State& st = (*m_stm).get( m_stateidx);
+				const LineProtocolHandlerSTM::State& st = (*m_stm).get( m_stateidx);
 				int ci = st.m_parser.getCommand( m_itr, m_end, m_buffer);
 				if (ci == -1)
 				{

@@ -28,7 +28,6 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
-	protocol_ioblocks.o \
 	filterdef.o \
 	input.o \
 	output.o \
@@ -39,9 +38,7 @@ CPP_OBJS = \
 	joinfilter.o \
 	tostringfilter.o \
 	ptreefilter.o \
-	execContextInputFilter.o \
-	cmdbind_lineCommandHandler.o \
-	cmdbind_ioFilterCommandHandlerEscDLF.o
+	execContextInputFilter.o
 
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

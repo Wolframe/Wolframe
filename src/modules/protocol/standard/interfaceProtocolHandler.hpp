@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file interfaceCommandHandler.hpp
+///\file interfaceProtocolHandler.hpp
 ///\brief Interface to INTERFACE command handler (sub statemachine)
-#ifndef _Wolframe_INTERFACE_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_INTERFACE_COMMAND_HANDLER_HPP_INCLUDED
-#include "cmdbind/lineCommandHandler.hpp"
+#ifndef _Wolframe_INTERFACE_PROTOCOL_HANDLER_HPP_INCLUDED
+#define _Wolframe_INTERFACE_PROTOCOL_HANDLER_HPP_INCLUDED
+#include "lineProtocolHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <list>
 #include <string>
@@ -42,12 +42,12 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-class InterfaceCommandHandler :public cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>
+class InterfaceProtocolHandler :public cmdbind::LineProtocolHandlerTemplate<InterfaceProtocolHandler>
 {
 public:
-	typedef cmdbind::LineCommandHandlerTemplate<CommandHandler> Parent;
-	explicit InterfaceCommandHandler( bool adminInterface_=false);
-	virtual ~InterfaceCommandHandler(){}
+	typedef cmdbind::LineProtocolHandlerTemplate<ProtocolHandler> Parent;
+	explicit InterfaceProtocolHandler( bool adminInterface_=false);
+	virtual ~InterfaceProtocolHandler(){}
 
 public:
 	int doCapabilities( int argc, const char** argv, std::ostream& out);

@@ -30,39 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file passwordChangeCommandHandler.hpp
-/// \brief Interface of the password change command handler
+///\file mod_protocol_standard.cpp
+///\brief Module for the standard Wolframe protocol handler 
+#include "appdevel/protocolHandlerModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "standardProtocolHandler.hpp"
 
-#ifndef _Wolframe_PASSWORD_CHANGE_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_PASSWORD_CHANGE_COMMAND_HANDLER_HPP_INCLUDED
-
-#include "baseCryptoCommandHandler.hpp"
-#include "AAAA/passwordChanger.hpp"
-#include <boost/shared_ptr.hpp>
-
-namespace _Wolframe {
-namespace cmdbind {
-
-/// \class PasswordChangeCommandHandler
-/// \brief Command handler for the sub protocol for password change
-class PasswordChangeCommandHandler
-	:public cmdbind::BaseCryptoCommandHandler
-{
-public:
-	explicit PasswordChangeCommandHandler( const boost::shared_ptr<AAAA::PasswordChanger>& passwordChanger_);
-	virtual ~PasswordChangeCommandHandler();
-
-private:
-	/// \brief See CommandHandler::nextOperation()
-	virtual Operation nextOperation();
-	/// \brief See BaseCryptoCommandHandler::processMessage(const std::string&)
-	virtual void processMessage( const std::string& msg);
-
-private:
-	boost::shared_ptr<AAAA::PasswordChanger> m_passwordChanger;	///< password changer object reference
-};
-
-}} //namespace
-
-#endif
+WF_MODULE_BEGIN( "StandardProtocolHandler", "Wolframe standard protocol handler module")
+ WF_PROTOCOL_HANDLER( "standard", _Wolframe::cmdbind::StandardProtocolHandlerUnit)
+WF_MODULE_END
 

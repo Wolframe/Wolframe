@@ -30,32 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file authCommandHandler.cpp
+/// \file authProtocolHandler.cpp
 /// \brief Implementation of the authentication command handler
 
-#include "authCommandHandler.hpp"
+#include "authProtocolHandler.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
-AuthCommandHandler::AuthCommandHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_)
+AuthProtocolHandler::AuthProtocolHandler( const boost::shared_ptr<AAAA::Authenticator>& authenticator_)
 	:m_authenticator(authenticator_)
 {}
 
-AuthCommandHandler::~AuthCommandHandler()
+AuthProtocolHandler::~AuthProtocolHandler()
 {
 }
 
-void AuthCommandHandler::processMessage( const std::string& msg)
+void AuthProtocolHandler::processMessage( const std::string& msg)
 {
 	m_authenticator->messageIn( msg);
 }
 
-CommandHandler::Operation AuthCommandHandler::nextOperation()
+ProtocolHandler::Operation AuthProtocolHandler::nextOperation()
 {
 	for (;;)
 	{
-		LOG_TRACE << "STATE AuthCommandHandler " << stateName( state()) << " " << m_authenticator->statusName( m_authenticator->status());
+		LOG_TRACE << "STATE AuthProtocolHandler " << stateName( state()) << " " << m_authenticator->statusName( m_authenticator->status());
 		switch (state())
 		{
 			case Init:

@@ -30,51 +30,51 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file baseCryptoCommandHandler.hpp
+/// \file baseCryptoProtocolHandler.hpp
 /// \brief Base class of the authentication command handler and the password change command handler
 
-#ifndef _Wolframe_BASE_CRYPTO_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_BASE_CRYPTO_COMMAND_HANDLER_HPP_INCLUDED
+#ifndef _Wolframe_BASE_CRYPTO_PROTOCOL_HANDLER_HPP_INCLUDED
+#define _Wolframe_BASE_CRYPTO_PROTOCOL_HANDLER_HPP_INCLUDED
 
-#include "cmdbind/lineCommandHandler.hpp"
+#include "lineProtocolHandler.hpp"
 #include "AAAA/authenticator.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \class BaseCryptoCommandHandler
+/// \class BaseCryptoProtocolHandler
 /// \brief Base class for the command handlers for the sub protocols for authentication and password change
-class BaseCryptoCommandHandler
-	:public cmdbind::CommandHandler
+class BaseCryptoProtocolHandler
+	:public cmdbind::ProtocolHandler
 {
 public:
-	explicit BaseCryptoCommandHandler();
-	virtual ~BaseCryptoCommandHandler();
+	explicit BaseCryptoProtocolHandler();
+	virtual ~BaseCryptoProtocolHandler();
 
-	/// \brief See CommandHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
+	/// \brief See ProtocolHandler::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
-	/// \brief See CommandHandler::setOutputBuffer(void*,std::size_t,std::size_t)
+	/// \brief See ProtocolHandler::setOutputBuffer(void*,std::size_t,std::size_t)
 	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
 
-	/// \brief See CommandHandler::putInput(const void*,std::size_t);
+	/// \brief See ProtocolHandler::putInput(const void*,std::size_t);
 	virtual void putInput( const void *begin, std::size_t bytesTransferred);
 
-	/// \brief See CommandHandler::getInputBlock(void*&,std::size_t&)
+	/// \brief See ProtocolHandler::getInputBlock(void*&,std::size_t&)
 	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
 
-	/// \brief See CommandHandler::getOutput(const void*&,std::size_t&)
+	/// \brief See ProtocolHandler::getOutput(const void*&,std::size_t&)
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
 
-	/// \brief See CommandHandler::getDataLeft(const void*&,std::size_t&)
+	/// \brief See ProtocolHandler::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	/// \brief See CommandHandler::interruptDataSessionMarker()
+	/// \brief See ProtocolHandler::interruptDataSessionMarker()
 	virtual const char* interruptDataSessionMarker() const;
 
 private:
-	/// \brief Method to define by inheriting classes. See CommandHandler::nextOperation()
+	/// \brief Method to define by inheriting classes. See ProtocolHandler::nextOperation()
 	virtual Operation nextOperation()=0;
 	/// \brief Method to define by inheriting classes.
 	virtual void processMessage( const std::string& msg)=0;

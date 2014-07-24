@@ -41,19 +41,22 @@
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
+namespace proc {
+/// \brief Forward declaration
+class ExecContext;
+}//namespace proc
 namespace cmdbind {
 
 /// \class ProtocolHandler
 /// \brief Protocol handler interface
 class ProtocolHandler
-	:public cmdbind::CommandHandler
 {
 public:
 	/// \brief Operation type
 	enum Operation	{
-		READ,			/// <request to read data
-		WRITE,			/// <request to write data
-		CLOSE			/// <request to terminate processing
+		READ=cmdbind::CommandHandler::READ,	/// <request to read data
+		WRITE=cmdbind::CommandHandler::WRITE,	/// <request to write data
+		CLOSE=cmdbind::CommandHandler::CLOSE	/// <request to terminate processing
 	};
 
 	/// \brief Destructor
@@ -61,11 +64,79 @@ public:
 
 	/// \brief Set the client connection end point
 	/// \param [in] remote the end point to set
-	virtual void setPeer( const net::RemoteEndpoint& remote)=0;
+	virtual void setPeer( const net::RemoteEndpoint&){}
 
 	/// \brief Set the local connection end point
 	/// \param [in] local the local point to set
-	virtual void setLocalEndPoint( const net::LocalEndpoint& local)=0;
+	virtual void setLocalEndPoint( const net::LocalEndpoint&){}
+
+	/// \brief Define the input buffer for processing the command
+	/// \param [in] buf buffer for the data to process
+	/// \param [in] allocsize allocation size of the buffer for the data to process in bytes
+	virtual void setInputBuffer( void* buf, std::size_t allocsize)=0;
+
+	/// \brief Define the input buffer for processing the command
+	/// \param [in] buf buffer for the data to process
+	/// \param [in] size size of the buffer for the data to process in bytes
+	/// \param [in] pos cursor position in the buffer defining byte position of the start of the the data to process
+	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos)=0;
+
+	/// \brief Get the next operation to do for the connection handler
+	/// \return the next operation for the connection handler
+	virtual Operation nextOperation()=0;
+
+	/// \brief Passes the network input to the command handler (READ operation)
+	/// \param [in] begin start of the network input block.
+	/// \param [in] bytesTransferred number of bytes passed in the input block
+	virtual void putInput( const void* begin, std::size_t bytesTransferred)=0;
+
+	/// \brief Get the input block request (READ operation)
+	/// \param [out] begin start of the network input buffer
+	/// \param [out] maxBlockSize maximum size of data in bytes to pass with the subsequent putInput(const void*,std::size_t) call
+	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize)=0;
+
+	/// \brief Get the next output chunk from the command handler (WRITE operation)
+	/// \param [out] begin start of the output chunk
+	/// \param [out] bytesToTransfer size of the output chunk to send in bytes
+	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer)=0;
+
+	/// \brief Get the data left unprocessed after close. The data belongs to the caller to process.
+	/// \param [out] begin returned start of the data chunk
+	/// \param [out] nofBytes size of the returned data chunk in bytes
+	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes)=0;
+
+	/// \brief Get the last error message of command execution to be returned to the client
+	const char* lastError() const
+	{
+		return m_lastError.empty()?0:m_lastError.c_str();
+	}
+
+	/// \brief Set the last error message of command execution to be returned to the client
+	void setLastError( const std::string& msg)
+	{
+		m_lastError = msg;
+	}
+
+	/// \brief Pass the reference to the execution context to the command handler
+	/// \param[in] c the reference to the execution context owned by the caller (connection)
+	void setExecContext( proc::ExecContext* c)
+	{
+		m_execContext = c;
+	}
+
+	/// \brief Get the reference to the processor provider
+	/// \return the reference to the processor provider
+	proc::ExecContext* execContext()
+	{
+		return m_execContext;
+	}
+
+	/// \brief Get the termination marker to send for an abort of a running data session
+	virtual const char* interruptDataSessionMarker() const	{return "";}
+
+private:
+	std::string m_lastError;				//< error operation for the client
+	proc::ExecContext* m_execContext;			//< the reference to the execution context of the connection
 };
 
 typedef boost::shared_ptr<ProtocolHandler> ProtocolHandlerR;

@@ -30,33 +30,33 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file doctypeFilterCommandHandler.hpp
+/// \file doctypeFilterProtocolHandler.hpp
 /// \brief Command handler that does nothing but extracting the document type from the content and buffering the input processed. The document type extracted and the current command determine what command handler has to process the buffered plus the unprocessed content.
-#ifndef _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
-#include "protocol/ioblocks.hpp"
-#include "cmdbind/commandHandler.hpp"
+#ifndef _Wolframe_cmdbind_DOCTYPE_FILTER_PROTOCOL_HANDLER_HPP_INCLUDED
+#define _Wolframe_cmdbind_DOCTYPE_FILTER_PROTOCOL_HANDLER_HPP_INCLUDED
+#include "ioblocks.hpp"
+#include "cmdbind/protocolHandler.hpp"
 #include "cmdbind/doctypeDetector.hpp"
 #include "system/connectionHandler.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \class DoctypeFilterCommandHandler
+/// \class DoctypeFilterProtocolHandler
 /// \brief Command handler for exctracting the document type identifier from a content
 /// \remark This is a pre-processing command handler. It is returning the consumed input as data left for following processing
-class DoctypeFilterCommandHandler
-	:public CommandHandler
+class DoctypeFilterProtocolHandler
+	:public ProtocolHandler
 {
 public:
-	typedef CommandHandler Parent;
+	typedef ProtocolHandler Parent;
 
 	/// \brief Constructor
-	DoctypeFilterCommandHandler()
+	DoctypeFilterProtocolHandler()
 		:m_done(false){}
 
 	/// \brief Destructor
-	virtual ~DoctypeFilterCommandHandler(){}
+	virtual ~DoctypeFilterProtocolHandler(){}
 
 	/// \brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);

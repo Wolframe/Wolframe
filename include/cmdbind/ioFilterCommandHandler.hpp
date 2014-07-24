@@ -30,12 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file cmdbind/ioFilterCommandHandler.hpp
+/// \file ioFilterCommandHandler.cpp
 /// \brief Command handler base class for processing content and writing output through filters
 
-#ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
-#define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
-#include "protocol/ioblocks.hpp"
+#ifndef _Wolframe_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
+#define _Wolframe_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
+#include "ioblocks.hpp"
 #include "filter/filter.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "system/connectionHandler.hpp"
@@ -45,11 +45,14 @@ namespace cmdbind {
 
 /// \class IOFilterCommandHandler
 /// \brief Abstract class for command handler processing filter input/output
-class IOFilterCommandHandler :public CommandHandler
+class IOFilterCommandHandler
+	:public CommandHandler
 {
 public:
 	/// \brief Constructor
-	IOFilterCommandHandler(){}
+	IOFilterCommandHandler()
+		:m_gotEoD(false){}
+
 	/// \brief Destructor
 	virtual ~IOFilterCommandHandler(){}
 
@@ -73,52 +76,24 @@ public:
 		return m_outputfilter;
 	}
 
-	void setFilterAs( const langbind::InputFilterR& in)
-	{
-		if (m_inputfilter->state() != langbind::InputFilter::Start)
-		{
-			throw std::runtime_error( "cannot change input filter after first read");
-		}
-		// assign the rest of the input to the new filter attached:
-		const void* chunk;
-		std::size_t chunksize;
-		bool chunkend;
-		m_inputfilter->getRest( chunk, chunksize, chunkend);
-		langbind::InputFilter* incopy = in->copy();
-		try
-		{
-			incopy->putInput( chunk, chunksize, chunkend);
-		}
-		catch (const std::bad_alloc& e)
-		{
-			delete incopy;
-			throw e;
-		}
-		catch (const std::runtime_error& e)
-		{
-			delete incopy;
-			throw e;
-		}
-		m_inputfilter.reset( incopy);
-		// synchronize inherited meta data:
-		if (m_outputfilter.get())
-		{
-			m_outputfilter->inheritMetaData( incopy->getMetaDataRef());
-		}
-	}
+	void setFilterAs( const langbind::InputFilterR& in);
 
-	void setFilterAs( const langbind::OutputFilterR& out)
-	{
-		if (m_outputfilter->state() != langbind::OutputFilter::Start)
-		{
-			throw std::runtime_error( "cannot change output filter after first print");
-		}
-		langbind::OutputFilter* of = out->copy();
-		of->assignState( *m_outputfilter);
-		m_outputfilter.reset( of);;
-		// synchronize inherited meta data:
-		m_outputfilter->inheritMetaData( m_inputfilter->getMetaDataRef());
-	}
+	void setFilterAs( const langbind::OutputFilterR& out);
+
+	/// \brief Get the next operation to do for the connection handler
+	/// \return the next operation for the connection handler
+	virtual Operation nextOperation();
+
+	/// \brief Passes the network input to the command handler (READ operation)
+	/// \param [in] begin start of the network input block.
+	/// \param [in] bytesTransferred number of bytes passed in the input block
+	/// \param [in] eod (end of data) true, if the passed chunk is the last one
+	virtual void putInput( const void* begin, std::size_t bytesTransferred, bool eod);
+
+	/// \brief Get the next output chunk from the command handler (WRITE operation)
+	/// \param [out] begin start of the output chunk
+	/// \param [out] bytesToTransfer size of the output chunk to send in bytes
+	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
 
 	/// \enum CallResult
 	/// \brief Enumeration of call states of this application processor instance
@@ -139,9 +114,11 @@ public:
 	/// \return CallResult status of the filter input for the state machine of this command handler
 	virtual CallResult call( const char*& err)=0;
 
+
 protected:
-	langbind::InputFilterR m_inputfilter;		//< input interface for this command handler
-	langbind::OutputFilterR m_outputfilter;		//< output interface for this command handler
+	langbind::InputFilterR m_inputfilter;		///< input interface for this command handler
+	langbind::OutputFilterR m_outputfilter;		///< output interface for this command handler
+	bool m_gotEoD;					///< true, if we got end of data
 };
 }}
 #endif
