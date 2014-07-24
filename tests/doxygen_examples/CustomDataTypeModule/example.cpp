@@ -7,7 +7,7 @@ class MyInitializer
 	:public _Wolframe::types::CustomDataInitializer
 {
 public:
-	MyInitializer( const std::vector<_Wolframe::types::Variant>& /*arg*/)
+	MyInitializer( const std::vector<_Wolframe::types::Variant>& arg)
 	{
 		// ... construct your custom data type initializer object here
 	}
@@ -22,45 +22,40 @@ class MyValue
 	:public _Wolframe::types::CustomDataValue
 {
 public:
-	explicit MyValue( const std::string& /*dt*/, const MyInitializer* /*ini*/=0)
+	explicit MyValue( const std::string& dt, const MyInitializer* ini=0)
 	{
 		// ... put your value constructor from string here
 	}
 
-	virtual int compare( const _Wolframe::types::CustomDataValue& /*o*/) const
+	virtual int compare( const _Wolframe::types::CustomDataValue& o) const
 	{
 		// ... put your compare function returning -1,0 or +1 here
-		return 0;
 	}
 
 	virtual std::string tostring() const
 	{
 		// ... put your conversion of the value to a string here
-		return std::string();
 	}
 
-	virtual void assign( const _Wolframe::types::Variant& /*o*/)
+	virtual void assign( const _Wolframe::types::Variant& o)
 	{
 		// ... put the assignment from a variant data type here
 	}
 
-	virtual bool getBaseTypeValue( _Wolframe::types::Variant& /*dest*/) const
+	virtual bool getBaseTypeValue( _Wolframe::types::Variant& dest) const
 	{
 		// ... try to convert this value to a variant data type returned in dest
 		// ... return false, if not possible
-		return false;
 	}
 
 	virtual _Wolframe::types::CustomDataValue* copy() const
 	{
 		// ... return an exact copy of this here
-		return 0;
 	}
 
-	static _Wolframe::types::CustomDataValue* create( const _Wolframe::types::CustomDataInitializer* /*ini*/)
+	static _Wolframe::types::CustomDataValue* create( const _Wolframe::types::CustomDataInitializer* ini)
 	{
 		// ... create a default value from initializer (can be NULL) here
-		return 0;
 	}
 };
 
@@ -76,20 +71,17 @@ public:
 		define( "mymethod", &myMethod);
 	}
 
-	static _Wolframe::types::Variant myMethod( const _Wolframe::types::CustomDataValue& /*operand*/, const std::vector<_Wolframe::types::Variant>& /*arg*/)
+	static _Wolframe::types::Variant myMethod( const _Wolframe::types::CustomDataValue& operand, const std::vector<_Wolframe::types::Variant>& arg )
 	{
 		// ... the implementation of the method "mymethod" operating on operand with arg as list of arguments comes here
-		return _Wolframe::types::Variant();
 	}
-	static _Wolframe::types::Variant increment( const _Wolframe::types::CustomDataValue& /*operand*/)
+	static _Wolframe::types::Variant increment( const _Wolframe::types::CustomDataValue& operand)
 	{
 		// ... the increment operator implementation follows here
-		return _Wolframe::types::Variant();
 	}
-	static _Wolframe::types::Variant add( const _Wolframe::types::CustomDataValue& /*operand*/, const _Wolframe::types::Variant& /*arg*/)
+	static _Wolframe::types::Variant add( const _Wolframe::types::CustomDataValue& operand, const _Wolframe::types::Variant& arg )
 	{
 		// ... the implementation of the addition operator operating on operand with arg as argument comes here
-		return _Wolframe::types::Variant();
 	}
 
 	static _Wolframe::types::CustomDataType* create( const std::string& name)

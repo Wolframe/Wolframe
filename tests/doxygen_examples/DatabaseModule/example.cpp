@@ -1,6 +1,5 @@
 #include "appdevel/databaseModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "config/configurationBase.hpp"
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "types/variant.hpp"
@@ -11,7 +10,8 @@ class MyDatabaseConfig
 	:public _Wolframe::serialize::DescriptiveConfiguration
 {
 public:
-	// ... define your configuration data elements here
+	// ... define your configuration data members here
+	// ... you will find an example of how to define a configuration in a descriptive way at \ref ConfigDescription
 
 	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription()
 	{

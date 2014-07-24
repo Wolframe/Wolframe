@@ -6,7 +6,6 @@ static int initMyRuntimeEnvironment()
 {
 	// ... put your global initializations here
 	// ... return 0 on success, an error code != 0 else
-	return 0;
 }
 
 class MyRuntimeEnvironmentConfig
@@ -18,9 +17,8 @@ public:
 	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription()
 	{
 		// ... return your introspection description reference of the configuration here
-		return 0;
 	}
-	MyRuntimeEnvironmentConfig( const char* /*classname*/, const char* title, const char* logprefix, const char* /*subsection*/)
+	MyRuntimeEnvironmentConfig( const char* classname, const char* title, const char* logprefix, const char* subsection)
 		:_Wolframe::serialize::DescriptiveConfiguration( title, "authentication", logprefix, getStructDescription())
 	{
 		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
@@ -33,26 +31,23 @@ class MyRuntimeEnvironment
 public:
 	// ... put your runtime environment host structures here
 
-	MyRuntimeEnvironment( const MyRuntimeEnvironmentConfig* /*cfg*/)
+	MyRuntimeEnvironment( const MyRuntimeEnvironmentConfig* cfg)
 	{
 		// ... create your runtime environment from its configuration here
 	}
-	virtual _Wolframe::langbind::FormFunctionClosure* createClosure( const std::string& /*funcname*/) const
+	virtual _Wolframe::langbind::FormFunctionClosure* createClosure( const std::string& funcname) const
 	{
 		// ... create and return a closure to execute the function 'funcname' here
-		return 0;
 	}
 
 	virtual std::vector<std::string> functions() const
 	{
 		// ... return the list of functions that are exported by the runtime environment here
-		return std::vector<std::string>();
 	}
 
 	virtual const char* name() const
 	{
 		// ... return the name of the runtime environment here
-		return 0;
 	}
 };
 

@@ -18,7 +18,7 @@ WF_MODULE_END
             - the standard command handler also called direct map. The standard command handler delegates the requests to functions to execute. It uses the filter modules to get an iterator on the input to pass to functions to execute. It uses forms declared to validate input and output.
             - the lua command handler
             .
-         See \ref CommandHandlerModule
+         See \ref CommandHandlerModule. A real example can be found in src/modules/cmdbind/directmap/.
     - \b Document \b type \b detection:
          We need for each document format processed a document type detection (_Wolframe::cmdbind::DoctypeDetector) that extracts the document type information (_Wolframe::types::DoctypeInfo). This info structure is needed by command handlers to associate a document with a function to execute. Currently there are two document type detection modules implemented:
             - XML
@@ -76,7 +76,7 @@ WF_MODULE_END
          and if the model behind allows it. 
          The method _Wolframe::langbind::InputFilter::setFlags( Flags f)
          can return false if it cannot provide the required information.
-         See \ref FilterModule
+         See \ref FilterModule. As a real example we suggest to have a look at src/modules/filter/cjson/.
     - \b Form \b Function:
          Form functions (_Wolframe::langbind::FormFunction) are functions with a structure 
          as input and a structure as output. The input structure is represented by an 
@@ -87,29 +87,31 @@ WF_MODULE_END
          implemented as form function. With this object type it is also 
          possible to implement form functions in C++
          (_Wolframe::serialize::CppFormFunction).
-         See \ref FormFunctionModule
+         See \ref FormFunctionModule. As a real example we suggest to have a look at src/modules/function/graphix/.
     - \b Program \b type:
          Program types define the loading of objects into the program library (_Wolframe::prgbind::ProgramLibrary). Each program type declares a file type to be of its own and loads every file of this type configured with 'program' in the 'Processor' section of the configuration.
-         See \ref ProgramTypeModule
+         See \ref ProgramTypeModule. As a real example we suggest to have a look at src/modules/cmdbind/aamap/.
     - \b DDL \b compiler:
          DDL (data definition language) compilers are compilers for forms used to validate input and output. Currently only 'simpleform' is implemented.
-         See \ref DDLCompilerModule
+         See \ref DDLCompilerModule. As a real example we suggest to have a look at src/modules/ddlcompiler/simpleform/
     - \b Custom \b data \b type:
          Custom data types (_Wolframe::types::CustomDataType) define arithmetic types with some methods. The idea is to define arithmetic data types for things like date/time or currency only once and not for every language binding. Custom data types can be used in normalization programs and so in data forms to validate and normalize atomic elements.
-         See \ref CustomDataTypeModule
+         See \ref CustomDataTypeModule. As a real example we suggest to have a look at src/modules/datatype/datetime/.
     - \b Normalization \b function:
          Normalization functions (_Wolframe::types::NormalizeFunction) are besides custom data types the basic bricks to define atomic data types in forms. This component type lets you define your own normalization functions.
-         See \ref NormalizerModule
+         See \ref NormalizerModule. As a real example, that is using resources, 
+         have a look at src/modules/normalize/string. For an example, that is
+         not using resources have a look at src/modules/normalize/string/.
     - \b Runtime \b environment:
          A runtime environment (_Wolframe::langbind::RuntimeEnvironment) is a configurable environment for functions that need a context for execution. The only case where a runtime environment is currently used in Wolframe is for .NET (Windows only).
-         See \ref RuntimeEnvironmentModule
+         See \ref RuntimeEnvironmentModule. The only real example we have is .NET at src/modules/cmdbind/dotnet/.
     - \b Authenticator \b unit:
          An authenticator unit (_Wolframe::AAAA::AuthenticatorUnit) implements one
          or more authentication mechanisms. An authentication unit is chosen
          for authentication of the client if it is the first configured authentication
          unit in the configuration section AAAA that implements the mechanism chosen.
          The class processing the authentication is called authentication slice (_Wolframe::AAAA::AuthenticatorSlice).
-         See \ref AuthenticatorModule
+         See \ref AuthenticatorModule. As a real example we suggest to have a look at tests/modules/authentication/fakeauth/.
     - \b Database \b interface:
          Wolframe has interfaces to execute queries on Sqlite3 and PostgreSQL databases.
          To define a new database interface, we have to implement at least the following interfaces:
@@ -120,24 +122,68 @@ WF_MODULE_END
               .
          The database and the configuration are the objects you have to declare when implementing
          a database module. 
-         See \ref DatabaseModule.
+         See \ref DatabaseModule. As a real example have a look at src/modules/database/sqlite3/.
 
+ * \subsection ModuleConfiguration Defining a module configuration
+    For defining the configuration of a module we can either derive a class
+    from _Wolframe::config::NamedConfiguration and implement the parsing 
+    by hand or we can derive from the class _Wolframe::serialize::DescriptiveConfiguration
+    and declare the configuration in a descriptive way. The first method is mainly
+    used in the core for not getting into a dependency to the serialization library
+    (libwolframe_serialize). In modules we suggest to use the declarative way
+    of describing a configuration. The declarative way lets you describe the
+    basic configuration structure as class with atomic types (integer types,
+    std::string, float and bool) or subclasses or 
+    arrays (std::vector) of one of them. Additionaly you can overwrite some hooks
+    to do additional checks or transformations. Each class that is part of a
+    declarative configuration, either as main structure or as substructure needs
+    to have a static method with the following signature as member:
+    \code
+       static const _Wolframe::serialize::StructDescriptionBase* getStructDescription();
+    \endcode
+    The method has to return a description of the structure for introspection
+    because nativ C++ does not provide introspection on its own. The 
+    template class _Wolframe::serialize::StructDescription offers some
+    methods to assign names to data members and to tag them with properties
+    (like the property optional).
+    The example in \ref ConfigDescription describes a structure with a vector
+    of substructures and some atomic elements.
+
+ 
  * \page CommandHandlerModule Command handler module
+The configuration of the command handler module example is defined in a 
+descriptive way. If you want to learn more about how to define a configuration 
+by declaring first the data members and then the description for introspection,
+you will find an example at \ref ConfigDescription
  *
  * \code
 #include "appdevel/commandHandlerModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
+#include "serialize/descriptiveConfiguration.hpp"
+#include <vector>
 
 class MyCommandHandlerConfig
-	:public _Wolframe::config::NamedConfiguration
+	:public _Wolframe::serialize::DescriptiveConfiguration
 {
-	// ... your command handler configuration is here
-}
+public:
+	// ... define your configuration data members here
+
+	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription()
+	{
+		// ... return your introspection description reference of the configuration here
+	}
+	MyCommandHandlerConfig( const char* classname, const char* title, const char* logprefix, const char* subsection)
+		:_Wolframe::serialize::DescriptiveConfiguration( title, "authentication", logprefix, getStructDescription())
+	{
+		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
+	}
+};
 
 class MyCommandHandlerUnit
 	:public _Wolframe::cmdbind::CommandHandlerUnit
 {
+public:
 	// ... your command handler unit definition is here
 	MyCommandHandlerUnit( const MyCommandHandlerConfig* cfg)
 	{
@@ -157,7 +203,7 @@ class MyCommandHandlerUnit
 	{
 		// ... create and return an instance of a command handler for executing the command cmdname here
 	}
-}
+};
 
 WF_MODULE_BEGIN( "MyCommandHandler", "my command handler short description")
  WF_COMMAND_HANDLER( "MyCommandHandler", "cmdhandler", "mycmd", MyCommandHandlerUnit, MyCommandHandlerConfig)
@@ -193,7 +239,7 @@ public:
 		// ... return the last error occurred here
 	}
 
-	virtual const types::DoctypeInfoR& info() const
+	virtual const _Wolframe::types::DoctypeInfoR& info() const
 	{
 		// ... return the document type infor structure here, if the document format is yours
 	}
@@ -202,12 +248,10 @@ public:
 WF_MODULE_BEGIN( "myDocformat", "document type/format detection for MyFormat")
  WF_DOCUMENT_FORMAT( "MYFM", DoctypeDetectorMyFormat)
 WF_MODULE_END
-
  * \endcode
  * \page FilterModule Filter module
  *
  * \code
-
 #include "appdevel/moduleFrameMacros.hpp"
 #include "appdevel/filterModuleMacros.hpp"
 #include "filter/filter.hpp"
@@ -215,12 +259,19 @@ WF_MODULE_END
 class MyInputFilter
 	:public _Wolframe::langbind::InputFilter
 {
-	virtual InputFilter* copy() const
+public:
+	MyInputFilter()
+		:_Wolframe::langbind::InputFilter("myfilter")
+	{
+		// ... initialize your input filter here
+	}
+
+	virtual _Wolframe::langbind::InputFilter* copy() const
 	{
 		// ... create a copy of this input filter here
 	}
 
-	virtual InputFilter* initcopy() const
+	virtual _Wolframe::langbind::InputFilter* initcopy() const
 	{
 		// ... create a copy of this in first initialization state here
 	}
@@ -263,9 +314,16 @@ class MyInputFilter
 class MyOutputFilter
 	:public _Wolframe::langbind::OutputFilter
 {
+public:
+	MyOutputFilter()
+		:_Wolframe::langbind::OutputFilter("myfilter")
+	{
+		// ... initialize your input filter here
+	}
+
 	virtual _Wolframe::langbind::OutputFilter* copy() const
 	{
-		// ... create a copy of this output filter here
+		// ... create and return a copy of this output filter here
 	}
 
 	virtual bool print( typename _Wolframe::langbind::OutputFilter::ElementType type, const void* element, std::size_t elementsize)
@@ -284,8 +342,9 @@ class MyOutputFilter
 class MyFilter
 	:public _Wolframe::langbind::Filter
 {
+public:
 	MyFilter()
-		:_Wolframe::langbind::Filter( new _Wolframe::langbind::InputFilter(), new _Wolframe::langbind::OutputFilter()){}
+		:_Wolframe::langbind::Filter( new MyInputFilter(), new MyOutputFilter()){}
 };
 
 class MyFilterType
@@ -304,15 +363,19 @@ public:
 WF_MODULE_BEGIN( "MyFilter", "my content filter")
  WF_FILTER_TYPE( "myfilter", MyFilterType)
 WF_MODULE_END
-
  * \endcode
  *
- * \page FormFunctionModule Form function module
+ * \page FormFunctionModule C++ form function module
+ *
+ * The following example of a form function in C++ declares structures
+ * for input and output with help of serialization. If you have a
+ * function with an empty input or empty output (procedure) then you can
+ * use the predefined structure _Wolframe::serialize::EmptyStruct for that.
  *
  * \code
-
 #include "appdevel/moduleFrameMacros.hpp"
 #include "appdevel/cppFormFunctionModuleMacros.hpp"
+#include "serialize/struct/structDescription.hpp"
 
 struct MyInput
 {
@@ -320,11 +383,12 @@ struct MyInput
 	int id;
 	// ... your data structures are here
 
-	static const _Wolframe::serialize::StructDescriptionBase *getStructDescription()
+	static const _Wolframe::serialize::StructDescriptionBase *getStructDescription();
 };
 
-class MyInputDescription :public serialize::StructDescription<MyInput>
+class MyInputDescription :public _Wolframe::serialize::StructDescription<MyInput>
 {
+public:
 	MyInputDescription()
 	{
 		// here you define introspection for your data:
@@ -333,9 +397,9 @@ class MyInputDescription :public serialize::StructDescription<MyInput>
 			("id", &MyInput::id)
 		;
 	}
-}
+};
 
-static const _Wolframe::serialize::StructDescriptionBase* MyInput::getStructDescription()
+const _Wolframe::serialize::StructDescriptionBase* MyInput::getStructDescription()
 {
 	static MyInputDescription rt;
 	return &rt;
@@ -345,22 +409,22 @@ struct MyOutput
 {
 	// ... your data structures are here as in MyInput
 
-	static const serialize::StructDescriptionBase *getStructDescription()
+	static const _Wolframe::serialize::StructDescriptionBase *getStructDescription()
 	{
 		// ... your data structure description is here as for MyInput
 	}
 };
 
 
-static int myFunction( proc::ExecContext* ctx, MyOutput& res, const MyInput& param)
+int myFunction( _Wolframe::proc::ExecContext* ctx, MyOutput& res, const MyInput& param)
 {
 	// ... your function implementation is here
+	// ... it returns 0 on success or else an error code
 }
 
 WF_MODULE_BEGIN( "MyFunctions", "my functions short description")
  WF_FORM_FUNCTION( "myfunc", myFunction, MyOutput, MyInput)
 WF_MODULE_END
-
 * \endcode
 *
 * \page ProgramTypeModule Program type module
@@ -368,9 +432,6 @@ WF_MODULE_END
 * \code
 #include "appdevel/programTypeModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "prgbind/program.hpp"
-#include "prgbind/programLibrary.hpp"
-#include <string>
 
 class MyProgram
 	:public _Wolframe::prgbind::Program
@@ -393,7 +454,6 @@ public:
 WF_MODULE_BEGIN( "MyProgramTypeModule", "my program type module")
  WF_PROGRAM_TYPE( "MyProgram", MyProgram)
 WF_MODULE_END
-
 * \endcode
 *
 * \page DDLCompilerModule Data definition language (DDL) compiler module
@@ -433,12 +493,12 @@ class MyInitializer
 	:public _Wolframe::types::CustomDataInitializer
 {
 public:
-	MyInitializer( const std::vector<types::Variant>& arg)
+	MyInitializer( const std::vector<_Wolframe::types::Variant>& arg)
 	{
 		// ... construct your custom data type initializer object here
 	}
 
-	static CustomDataInitializer* create( const std::vector<types::Variant>& arg)
+	static _Wolframe::types::CustomDataInitializer* create( const std::vector<_Wolframe::types::Variant>& arg)
 	{
 		return new MyInitializer( arg);
 	}
@@ -479,7 +539,7 @@ public:
 		// ... return an exact copy of this here
 	}
 
-	static _Wolframe::types::CustomDataValue* create( const _Wolframe::types::CustomDataInitializer*)
+	static _Wolframe::types::CustomDataValue* create( const _Wolframe::types::CustomDataInitializer* ini)
 	{
 		// ... create a default value from initializer (can be NULL) here
 	}
@@ -497,7 +557,7 @@ public:
 		define( "mymethod", &myMethod);
 	}
 
-	static _Wolframe::types::Variant myMethod( const _Wolframe::types::CustomDataValue& operand, const std::vector<_Wolframe::types::Variant>& arg)
+	static _Wolframe::types::Variant myMethod( const _Wolframe::types::CustomDataValue& operand, const std::vector<_Wolframe::types::Variant>& arg )
 	{
 		// ... the implementation of the method "mymethod" operating on operand with arg as list of arguments comes here
 	}
@@ -505,7 +565,7 @@ public:
 	{
 		// ... the increment operator implementation follows here
 	}
-	static _Wolframe::types::Variant add( const CustomDataValue& operand, const Variant& arg);
+	static _Wolframe::types::Variant add( const _Wolframe::types::CustomDataValue& operand, const _Wolframe::types::Variant& arg )
 	{
 		// ... the implementation of the addition operator operating on operand with arg as argument comes here
 	}
@@ -526,10 +586,9 @@ WF_MODULE_END
 * \code
 #include "appdevel/normalizeModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "types/normalizeFunction.hpp"
 
 class MyNormalizeFunction
-	:_Wolframe::types::NormalizeFunction
+	:public _Wolframe::types::NormalizeFunction
 {
 public:
 	MyNormalizeFunction( const std::vector<_Wolframe::types::Variant>& arg)
@@ -583,23 +642,41 @@ WF_NORMALIZER_WITH_RESOURCE( "mynormalize",  MyNormalizeFunction, MyResources)
 * \endcode
 * \page RuntimeEnvironmentModule Runtime environment host structure module
 *
+The configuration of the runtime environment module example is defined in a 
+descriptive way. If you want to learn more about how to define a configuration 
+by declaring first the data members and then the description for introspection,
+you will find an example at \ref ConfigDescription
+*
 * \code
 #include "appdevel/runtimeEnvironmentModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
+#include "serialize/descriptiveConfiguration.hpp"
 
-static initMyRuntimeEnvironment()
+static int initMyRuntimeEnvironment()
 {
-    // ... put your global initializations here
+	// ... put your global initializations here
+	// ... return 0 on success, an error code != 0 else
 }
 
 class MyRuntimeEnvironmentConfig
-	:public config::NamedConfiguration
+	:public _Wolframe::serialize::DescriptiveConfiguration
 {
-	// ... put your runtime environment configuration here
-}
+public:
+	// ... define your runtime environment configuration data members here
+
+	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription()
+	{
+		// ... return your introspection description reference of the configuration here
+	}
+	MyRuntimeEnvironmentConfig( const char* classname, const char* title, const char* logprefix, const char* subsection)
+		:_Wolframe::serialize::DescriptiveConfiguration( title, "authentication", logprefix, getStructDescription())
+	{
+		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
+	}
+};
 
 class MyRuntimeEnvironment
-	:public langbind::RuntimeEnvironment
+	:public _Wolframe::langbind::RuntimeEnvironment
 {
 public:
 	// ... put your runtime environment host structures here
@@ -608,7 +685,21 @@ public:
 	{
 		// ... create your runtime environment from its configuration here
 	}
-}
+	virtual _Wolframe::langbind::FormFunctionClosure* createClosure( const std::string& funcname) const
+	{
+		// ... create and return a closure to execute the function 'funcname' here
+	}
+
+	virtual std::vector<std::string> functions() const
+	{
+		// ... return the list of functions that are exported by the runtime environment here
+	}
+
+	virtual const char* name() const
+	{
+		// ... return the name of the runtime environment here
+	}
+};
 
 WF_MODULE_BEGIN( "MyRuntimeEnvironment", "runtime environment for my programs")
  WF_RUNTIME_ENVIRONMENT( "my runtime environment", "runtimeenv", "myrunenv", MyRuntimeEnvironment, MyRuntimeEnvironmentConfig, initMyRuntimeEnvironment)
@@ -616,12 +707,36 @@ WF_MODULE_END
 * \endcode
 *
 * \page AuthenticatorModule Authenticator module
+The configuration of the authenticator module example is defined in a 
+descriptive way. If you want to learn more about how to define a configuration 
+by declaring first the data members and then the description for introspection,
+you will find an example at \ref ConfigDescription
 * \code
+#include "appdevel/authenticationModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "config/configurationBase.hpp"
+#include "serialize/descriptiveConfiguration.hpp"
+#include "AAAA/authSlice.hpp"
+#include "AAAA/authenticator.hpp"
+#include <string>
+
 class MyAuthenticationConfig
-	:public config::NamedConfiguration
+	:public _Wolframe::serialize::DescriptiveConfiguration
 {
-	// ... define your authentication configuration here (derived from config::NamedConfiguration)
+public:
+	// ... define your configuration data members here
+
+	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription()
+	{
+		// ... return your introspection description reference of the configuration here
+	}
+	MyAuthenticationConfig( const char* title, const char* logprefix, const char* subsection)
+		:_Wolframe::serialize::DescriptiveConfiguration( title, "authentication", logprefix, getStructDescription())
+	{
+		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
+	}
 };
+
 
 class MyAuthenticatorSlice
 	:public _Wolframe::AAAA::AuthenticatorSlice
@@ -639,7 +754,8 @@ public:
 
 	virtual const std::string& identifier() const
 	{
-		// ... return the identifier of the authenticator
+		static const std::string my_authenticatorID("myauth");
+		return my_authenticatorID;  // ... return the configuration identifier of your authenticator
 	}
 
 	virtual void messageIn( const std::string& msg)
@@ -652,7 +768,7 @@ public:
 		// ... return the message to be sent announced by 'status()const' here
 	}
 
-	virtual _Wolframe::AAAA::Authenticator::Status status() const
+	virtual _Wolframe::AAAA::AuthenticatorSlice::Status status() const
 	{
 		// ... return the current status of the authenticator slice
 	}
@@ -662,7 +778,7 @@ public:
 		// ... return true, if the last message processed can be forwarded to another slice of the same mech
 	}
 
-	virtual User* user()
+	virtual _Wolframe::AAAA::User* user()
 	{
 		// ... 	return the authenticated user or NULL if not authenticated here
 	}
@@ -691,12 +807,18 @@ public:
 };
 
 WF_MODULE_BEGIN( "MyAuthenticator", "my authenticator module")
- WF_AUTHENTICATOR( "my authenticator", MyAuthenticatorUnit, MyAuthenticatorConfig)
+ WF_AUTHENTICATOR( "my authenticator", MyAuthenticationUnit, MyAuthenticationConfig)
 WF_MODULE_END
 * \endcode
 
 * \page DatabaseModule Database interface module
-This example shows the simplest case of a database. The macro for its declaration is called WF_SIMPLE_DATABASE because of that. The base classes allow more complex configurations.
+This example shows the simplest case of a database. The macro for its declaration is called WF_SIMPLE_DATABASE because of that. 
+The base classes allow to handle more complex system configurations. 
+The configuration of the database example is defined in a descriptive way.
+If you want to learn more about how to define a configuration by declaring first the
+data members and then the description for introspection, you will find an example
+at \ref ConfigDescription
+
 * \code
 #include "appdevel/databaseModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
@@ -711,13 +833,13 @@ class MyDatabaseConfig
 	:public _Wolframe::serialize::DescriptiveConfiguration
 {
 public:
-	// ... define your configuration data elements here
+	// ... define your configuration data members here
 
 	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription()
 	{
 		// ... return your introspection description reference of the configuration here
-		return 0;
 	}
+
 	MyDatabaseConfig( const char* title, const char* logprefix)
 		:_Wolframe::serialize::DescriptiveConfiguration( title, "database", logprefix, getStructDescription())
 	{
@@ -725,14 +847,13 @@ public:
 	}
 };
 
-
 class MyDatabase;
 
 class MyTransactionExecStatemachine
 	:public _Wolframe::db::TransactionExecStatemachine
 {
 public:
-	MyTransactionExecStatemachine( MyDatabase* /*database*/)
+	MyTransactionExecStatemachine( MyDatabase* database)
 	{
 		// ... create a statemachine for one transaction on a database of 'unit' that will start with the next call of begin()
 	}
@@ -740,85 +861,72 @@ public:
 	virtual const std::string& databaseID() const
 	{
 		static const std::string my_databaseID("mydb");
-		return my_databaseID;  // ... return the configuration identifier of your database
+		return my_databaseID;  // ... configuration identifier of your database
 	}
 
 	virtual bool begin()
 	{
 		// ... begin of the current transaction
-		return true;
 	}
 
 	virtual bool commit()
 	{
 		// ... commit of the current transaction
-		return true;
 	}
 
 	virtual bool rollback()
 	{
 		// ... rollback of the current transaction
-		return true;
 	}
 
-	virtual bool start( const std::string& /*statement*/)
+	virtual bool start( const std::string& statement)
 	{
 		// ... create a new statement instance from string
-		return true;
 	}
 
-	virtual bool bind( std::size_t /*idx*/, const _Wolframe::types::VariantConst& /*value*/)
+	virtual bool bind( std::size_t idx, const _Wolframe::types::VariantConst& value)
 	{
 		// ... bind a parameter (idx >= 1) of the current statement instance
-		return true;
 	}
 
 	virtual bool execute()
 	{
 		// ... execute the built instance of the current statement
-		return true;
 	}
 
 	virtual std::size_t nofColumns()
 	{
 		// ... get the number of columns of the last result, 0 if there was no result
-		return 0;
 	}
 
-	virtual const char* columnName( std::size_t /*idx*/)
+	virtual const char* columnName( std::size_t idx)
 	{
 		// ... get the name of a column by index (idx >= 1) of the last result
-		return 0;
 	}
 
-	virtual _Wolframe::types::VariantConst get( std::size_t /*idx*/)
+	virtual _Wolframe::types::VariantConst get( std::size_t idx)
 	{
 		// ... get the value of a column by index (idx >= 1) of the last result
-		return _Wolframe::types::VariantConst();
 	}
 
 	virtual bool next()
 	{
 		// ... skip to the next result, return false, if there is no result left
-		return true;
 	}
 
 	virtual bool hasResult()
 	{
 		// ... return true, if the last database statement returned at least one result row
-		return true;
 	}
 
 	virtual const _Wolframe::db::DatabaseError* getLastError()
 	{
 		// ... return the last database error as structure here
-		return 0;
 	}
 
 	virtual bool isCaseSensitive()
 	{
 		// ... return true, if the database language is case sensitive (SQL is case insensitive)
-		return true;
 	}
 };
 
@@ -826,7 +934,7 @@ class MyDatabase
 	:public _Wolframe::db::Database
 {
 public:
-	MyDatabase( const MyDatabaseConfig& /*config*/)
+	MyDatabase( const MyDatabaseConfig& config)
 	{
 		// ... define your database from configuration here
 	}
@@ -859,6 +967,113 @@ WF_MODULE_BEGIN( "MyDatabase", "my database module")
  WF_SIMPLE_DATABASE( "MyDB", MyDatabase, MyDatabaseConfig)
 WF_MODULE_END
 * \endcode
+
+* \page ConfigDescription Descriptive configuration declaration example
+* The following example illustrates how complex configurations with substructures
+* can be declared in a declarative way. You define the data members and a
+* description for introspection:
 *
+* \code
+#include "config/configurationBase.hpp"
+#include "serialize/descriptiveConfiguration.hpp"
+#include "serialize/struct/structDescription.hpp"
+#include "config/configurationTree.hpp"
+
+class MyConfigSubstruct
+{
+public:
+	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription();
+
+public:
+	int identifier;
+	std::string filename;
+};
+
+class MyConfig
+	:public _Wolframe::serialize::DescriptiveConfiguration
+{
+public:
+	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription();
+
+public:
+	// Our configuration elements:
+	std::vector<MyConfigSubstruct> files;
+	int classifier;
+	std::string name;
+
+	// Default constructor that declares the name of the structure
+	// to be "MyConfig" and the logging prefix to be "MyClass/MyApp":
+	MyConfig()
+		:_Wolframe::serialize::DescriptiveConfiguration( "MyConfig", "MyClass", "MyApp", getStructDescription())
+	{
+		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
+	}
+
+	virtual bool parse( const _Wolframe::config::ConfigurationNode& cfgTree, const std::string& node,
+				const _Wolframe::module::ModulesDirectory* modules )
+	{
+		// ... if your structure has some more initializations than the pure structure mapping you can overload this method
+		if (_Wolframe::serialize::DescriptiveConfiguration::parse(cfgTree,node,modules))
+		{
+			// ... you can do some further initializations and checks (e.g. mapping strings to enums) here
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	virtual bool check() const
+	{
+		// ... you can do some additional semantic checks and test if resources are available here
+		// ... return true on success
+	}
+
+	virtual void setCanonicalPathes( const std::string& refPath)
+	{
+		// ... you can expand all local path references with _Wolframe::utils::getCanonicalPath( const std::string&, const std::string&) here
+	}
+
+	virtual void print( std::ostream& os, size_t indent = 0 )
+	{
+		// ... if you do not like the standard way of priting a structure, you can define your way here
+	}
+};
+
+// Introspection description implementation for MyConfigSubstruct:
+const _Wolframe::serialize::StructDescriptionBase* MyConfigSubstruct::getStructDescription()
+{
+	struct ThisDescription :public _Wolframe::serialize::StructDescription<MyConfigSubstruct>
+	{
+	ThisDescription()
+	{
+		(*this)
+		( "identifier", &MyConfigSubstruct::identifier)	.mandatory()
+		( "file", &MyConfigSubstruct::filename)		.mandatory()
+		;
+	}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
+// Introspection description implementation for MyConfig:
+const _Wolframe::serialize::StructDescriptionBase* MyConfig::getStructDescription()
+{
+	struct ThisDescription :public _Wolframe::serialize::StructDescription<MyConfig>
+	{
+	ThisDescription()
+	{
+		(*this)
+		( "files", &MyConfig::files)
+		( "classifier", &MyConfig::classifier)	.optional()
+		( "name", &MyConfig::name)		.mandatory()
+		;
+	}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+* \endcode
 */
 

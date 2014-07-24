@@ -1,6 +1,5 @@
 #include "appdevel/databaseModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "config/configurationBase.hpp"
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "types/variant.hpp"

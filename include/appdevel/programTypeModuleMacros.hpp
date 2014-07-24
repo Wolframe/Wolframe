@@ -34,6 +34,8 @@
 /// \brief Macros for a module for a program type for a binding language
 #include "module/moduleInterface.hpp"
 #include "appdevel/module/programTypeBuilder.hpp"
+#include "prgbind/program.hpp"
+#include "prgbind/programLibrary.hpp"
 
 /// \brief Defines a Wolframe program type
 #define WF_PROGRAM_TYPE( LANGNAME, PROGRAMCLASS)\

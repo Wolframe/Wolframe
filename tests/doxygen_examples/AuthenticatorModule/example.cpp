@@ -14,9 +14,8 @@ public:
 	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription()
 	{
 		// ... return your introspection description reference of the configuration here
-		return 0;
 	}
-	MyAuthenticationConfig( const char* title, const char* logprefix, const char* /*subsection*/)
+	MyAuthenticationConfig( const char* title, const char* logprefix, const char* subsection)
 		:_Wolframe::serialize::DescriptiveConfiguration( title, "authentication", logprefix, getStructDescription())
 	{
 		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
@@ -44,7 +43,7 @@ public:
 		return my_authenticatorID;  // ... return the configuration identifier of your authenticator
 	}
 
-	virtual void messageIn( const std::string& /*msg*/)
+	virtual void messageIn( const std::string& msg)
 	{
 		// ... process the message requested by 'status()const' here
 	}
@@ -52,25 +51,21 @@ public:
 	virtual std::string messageOut()
 	{
 		// ... return the message to be sent announced by 'status()const' here
-		return std::string();
 	}
 
 	virtual _Wolframe::AAAA::AuthenticatorSlice::Status status() const
 	{
 		// ... return the current status of the authenticator slice
-		return (_Wolframe::AAAA::AuthenticatorSlice::Status)0;
 	}
 
 	virtual bool inputReusable() const
 	{
 		// ... return true, if the last message processed can be forwarded to another slice of the same mech
-		return false;
 	}
 
 	virtual _Wolframe::AAAA::User* user()
 	{
 		// ... 	return the authenticated user or NULL if not authenticated here
-		return 0;
 	}
 };
 
@@ -88,13 +83,11 @@ public:
 	const char** mechs() const
 	{
 		// ... return the mechs implemented by this authenticator unit here
-		return 0;
 	}
 
-	MyAuthenticatorSlice* slice( const std::string& /*mech*/, const _Wolframe::net::RemoteEndpoint& /*client*/)
+	MyAuthenticatorSlice* slice( const std::string& mech, const _Wolframe::net::RemoteEndpoint& client)
 	{
 		// ... create and return a new instance of an authenticator slice here
-		return 0;
 	}
 };
 

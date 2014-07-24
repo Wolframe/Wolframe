@@ -9,10 +9,9 @@ public:
 	MyDDLCompiler()
 		:_Wolframe::langbind::DDLCompiler( "myddl", "mdl") {}
 
-	virtual std::vector<_Wolframe::types::FormDescriptionR> compile( const std::string& /*filename*/, const _Wolframe::types::NormalizeFunctionMap* /*typemap*/) const
+	virtual std::vector<_Wolframe::types::FormDescriptionR> compile( const std::string& filename, const _Wolframe::types::NormalizeFunctionMap* typemap) const
 	{
 		// ... compile the source file filename and return the resulting form definitions here
-		return std::vector<_Wolframe::types::FormDescriptionR>();
 	}
 };
 

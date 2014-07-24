@@ -35,6 +35,7 @@
 
 #include "appdevel/module/cppFormFunctionTemplate.hpp"
 #include "appdevel/module/cppFormFunctionBuilder.hpp"
+#include "appdevel/module/cppFormFunctionTemplate.hpp"
 
 /// \brief Defines normalization function
 #define WF_FORM_FUNCTION(NAME,FUNCTION,OUTPUT,INPUT)\
@@ -43,7 +44,7 @@
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			serialize::CppFormFunction func = appdevel::CppFormFunction<OUTPUT,INPUT,FUNCTION>::declaration();\
+			_Wolframe::serialize::CppFormFunction func = _Wolframe::appdevel::CppFormFunction<OUTPUT,INPUT,FUNCTION>::declaration();\
 			return new _Wolframe::module::CppFormFunctionBuilder( "CppFormFunction_" NAME, NAME, func);\
 		}\
 	};\
@@ -57,7 +58,7 @@
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			serialize::CppFormFunction func = appdevel::CppFormFunction<serialize::EmptyStruct,INPUT,PROCEDURE>::declaration();\
+			_Wolframe::serialize::CppFormFunction func = _Wolframe::appdevel::CppFormFunction<_Wolframe::serialize::EmptyStruct,INPUT,PROCEDURE>::declaration();\
 			return new _Wolframe::module::CppFormFunctionBuilder( "CppFormFunction_" NAME, NAME, func);\
 		}\
 	};\

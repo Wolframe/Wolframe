@@ -85,7 +85,7 @@ public:
 		return true;
 	}
 
-	void print( std::ostream& os, size_t indent ) const
+	virtual void print( std::ostream& os, size_t indent=0) const
 	{
 		std::string indentstr( indent, ' ');
 		os << indentstr << "Configuration of " << m_classname << ":" << std::endl;

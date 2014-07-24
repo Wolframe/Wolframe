@@ -63,11 +63,11 @@
 		}\
 	};\
 	class RuntimeEnvBuilder\
-		:public ConfiguredBuilder\
+		:public _Wolframe::module::ConfiguredBuilder\
 	{\
 	public:\
 		RuntimeEnvBuilder()\
-			:ConfiguredBuilder( DESCRIPTION, CONFIG_SECTION, CONFIG_TITLE, CONFIG_TITLE "RuntimeEnvironment")\
+			:_Wolframe::module::ConfiguredBuilder( DESCRIPTION, CONFIG_SECTION, CONFIG_TITLE, CONFIG_TITLE "RuntimeEnvironment")\
 		{\
 			int err;\
 			if (0!=(err=INITFUNCTION())) throw std::runtime_error(std::string("failed to initialize runtime environment (error code ") + boost::lexical_cast<std::string>(err) + ")");\

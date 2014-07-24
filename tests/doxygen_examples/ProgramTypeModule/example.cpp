@@ -8,13 +8,12 @@ public:
 	MyProgram()
 		:_Wolframe::prgbind::Program( SuperFunction){}
 
-	virtual bool is_mine( const std::string& /*filename*/) const
+	virtual bool is_mine( const std::string& filename) const
 	{
 		// ... return true, if the file filename is of my type here
-		return false;
 	}
 
-	virtual void loadProgram( _Wolframe::prgbind::ProgramLibrary& /*library*/, _Wolframe::db::Database* /*transactionDB*/, const std::string& /*filename*/)
+	virtual void loadProgram( _Wolframe::prgbind::ProgramLibrary& library, _Wolframe::db::Database* transactionDB, const std::string& filename)
 	{
 		// ... load the program in the file filename and store its declared items in the program library or in the database
 	}

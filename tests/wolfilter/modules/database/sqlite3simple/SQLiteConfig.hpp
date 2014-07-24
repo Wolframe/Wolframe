@@ -48,13 +48,6 @@ namespace db {
 static const char* SQLite_DB_CLASS_NAME = "SQLite";
 enum {DEFAULT_SQLITE_CONNECTIONS = 4};
 
-struct SQLiteConfigStruct
-{
-	SQLiteConfigStruct();
-
-};
-
-
 /// \brief SQLite database configuration
 class SQLiteConfig
 	:public _Wolframe::serialize::DescriptiveConfiguration

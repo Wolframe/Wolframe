@@ -37,16 +37,14 @@ struct MyOutput
 	static const _Wolframe::serialize::StructDescriptionBase *getStructDescription()
 	{
 		// ... your data structure description is here as for MyInput
-		return 0;
 	}
 };
 
 
-int myFunction( _Wolframe::proc::ExecContext* /*ctx*/, MyOutput& /*res*/, const MyInput& /*param*/)
+int myFunction( _Wolframe::proc::ExecContext* ctx, MyOutput& res, const MyInput& param)
 {
 	// ... your function implementation is here
 	// ... it returns 0 on success or else an error code
-	return 0;
 }
 
 WF_MODULE_BEGIN( "MyFunctions", "my functions short description")

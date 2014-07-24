@@ -33,6 +33,8 @@
 /// \file appdevel/normalizeModuleMacros.hpp
 /// \brief Macros for defining normalization and validaton function module
 #include "appdevel/module/normalizeFunctionBuilder.hpp"
+#include "types/normalizeFunction.hpp"
+#include "types/variant.hpp"
 #include <boost/shared_ptr.hpp>
 
 #define WF_NORMALIZER_RESOURCE(RESOURCECLASS)\
