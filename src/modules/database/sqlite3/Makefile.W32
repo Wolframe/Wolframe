@@ -33,7 +33,6 @@ CPP_OBJS = \
 	SQLiteConstructor.obj \
 	SQLiteConfig.obj \
 	SQLiteTransactionExecStatemachine.obj \
-	SQLiteProgram.obj \
 	SQLiteModule.obj \
 	SQLiteStatement.obj
 

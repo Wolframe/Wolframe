@@ -44,7 +44,6 @@
 #include "serialize/configSerialize.hpp"
 #include "types/keymap.hpp"
 #include "module/constructor.hpp"
-#include "SQLiteProgram.hpp"
 #include <list>
 #include <vector>
 #include "system/objectPool.hpp"
@@ -167,7 +166,6 @@ private:
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
 
-	SQLiteProgram		m_program;		///< database programs
 	SQLiteDatabase		m_db;
 	std::vector<std::string>m_extensionFiles;
 };
