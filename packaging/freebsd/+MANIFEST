@@ -172,6 +172,13 @@ files:
  /usr/local/include/wolframe/database/statement.hpp: 'sha256sum'
  /usr/local/include/wolframe/database/baseStatement.hpp: 'sha256sum'
  /usr/local/include/wolframe/database/substitutingStatement.hpp: 'sha256sum'
+ /usr/local/include/wolframe/database/vm/programImage.hpp: 'sha256sum'
+ /usr/local/include/wolframe/database/vm/subroutineFrame.hpp: 'sha256sum'
+ /usr/local/include/wolframe/database/vm/programInstance.hpp: 'sha256sum'
+ /usr/local/include/wolframe/database/vm/instructionSet.hpp: 'sha256sum'
+ /usr/local/include/wolframe/database/vm/programCode.hpp: 'sha256sum'
+ /usr/local/include/wolframe/database/vm/output.hpp: 'sha256sum'
+ /usr/local/include/wolframe/database/vm/valueTupleSet.hpp: 'sha256sum'
  /usr/local/include/wolframe/config/configurationTree.hpp: 'sha256sum'
  /usr/local/include/wolframe/config/configurationBase.hpp: 'sha256sum'
  /usr/local/include/wolframe/config/valueParser.hpp: 'sha256sum'
@@ -299,6 +306,28 @@ files:
  /usr/local/include/wolframe/system/objectPool.hpp: 'sha256sum'
  /usr/local/include/wolframe/system/randomGenerator.hpp: 'sha256sum'
  /usr/local/include/wolframe/system/serverEndpoint.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/authenticationModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/normalizeFunctionBuilder.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/programTypeBuilder.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/authenticationConstructor.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/doctypeDetectorBuilder.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/ddlcompilerBuilder.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/cppFormFunctionTemplate.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/cppFormFunctionBuilder.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/runtimeEnvironmentConstructor.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/filterBuilder.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/module/customDataTypeBuilder.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/customDataTypeModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/ddlCompilerModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/normalizeModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/doctypeModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/programTypeModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/moduleFrameMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/cppFormFunctionModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/runtimeEnvironmentModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/filterModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/commandHandlerModuleMacros.hpp: 'sha256sum'
+ /usr/local/include/wolframe/appdevel/databaseModuleMacros.hpp: 'sha256sum'
 dirs:
 - /usr/local/etc
 - /usr/local/etc/wolframe
@@ -312,6 +341,7 @@ dirs:
 - /usr/local/include/wolframe/protocol
 - /usr/local/include/wolframe/cmdbind
 - /usr/local/include/wolframe/database
+- /usr/local/include/wolframe/database/vm
 - /usr/local/include/wolframe/config
 - /usr/local/include/wolframe/logger
 - /usr/local/include/wolframe/utils
@@ -326,6 +356,8 @@ dirs:
 - /usr/local/include/wolframe/prgbind
 - /usr/local/include/wolframe/crypto
 - /usr/local/include/wolframe/system
+- /usr/local/include/wolframe/appdevel
+- /usr/local/include/wolframe/appdevel/module
 - /usr/local/man/man1
 - /usr/local/man/man5
 - /usr/local/man/man8
