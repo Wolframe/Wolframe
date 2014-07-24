@@ -186,6 +186,14 @@
 									</listitem>
 								</varlistentry>
 								<varlistentry>
+									<term>Build</term>
+									<listitem>
+										<para>
+											Print major, minor, revision and build of Wolframe.
+										</para>
+									</listitem>
+								</varlistentry>
+								<varlistentry>
 									<term>OS</term>
 									<listitem>
 										<para>
