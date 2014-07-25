@@ -37,7 +37,7 @@
 #include "logger-v1.hpp"
 #include "PostgreSQL.hpp"
 #include "utils/fileUtils.hpp"
-#include "PostgreSQLtransactionExecStatemachine.hpp"
+#include "PostgreSQLTransactionExecStatemachine.hpp"
 #include <string>
 #include <sstream>
 
@@ -331,7 +331,7 @@ Database* PostgreSQLdbUnit::database()
 
 
 /*****  PostgreSQL database  ******************************************/
-const std::string& PostgreSQLdatabase::ID() const
+const std::string& PostgreSQLDatabase::ID() const
 {
 	if ( m_unit )
 		return m_unit->ID();
@@ -339,18 +339,18 @@ const std::string& PostgreSQLdatabase::ID() const
 		throw std::runtime_error( "PostgreSQL database unit not initialized" );
 }
 
-Transaction* PostgreSQLdatabase::transaction( const std::string& name)
+Transaction* PostgreSQLDatabase::transaction( const std::string& name)
 {
 	return new PostgreSQLtransaction( *this, name);
 }
 
-void PostgreSQLdatabase::closeTransaction( Transaction *t )
+void PostgreSQLDatabase::closeTransaction( Transaction *t )
 {
 	delete t;
 }
 
 
-PostgreSQLtransaction::PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_)
+PostgreSQLtransaction::PostgreSQLtransaction( PostgreSQLDatabase& database, const std::string& name_)
 	:Transaction( name_, TransactionExecStatemachineR( new TransactionExecStatemachine_postgres( &database.dbUnit()))){}
 
 }} // _Wolframe::db

@@ -30,11 +30,10 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	SQLite.obj \
-	SQLiteConstructor.obj \
 	SQLiteConfig.obj \
 	SQLiteTransactionExecStatemachine.obj \
-	SQLiteModule.obj \
-	SQLiteStatement.obj
+	SQLiteStatement.obj \
+	mod_db_sqlite3.obj
 
 all: $(DYNAMIC_MODULE)
 

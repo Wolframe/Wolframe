@@ -47,8 +47,6 @@
 namespace _Wolframe {
 namespace db {
 
-enum {DEFAULT_SQLITE_CONNECTIONS = 4};
-
 SQLiteConfigStruct::SQLiteConfigStruct()
 	:m_foreignKeys(true)
 	,m_profiling(false)

@@ -50,7 +50,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDbUnit *dbUnit_)
+TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDatabase *database_)
 	:m_state(Init)
 	,m_env(env_)
 	,m_lastresult(0)
@@ -58,7 +58,7 @@ TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEn
 	,m_statement( new OracleStatement( m_env ) )
 	,m_hasResult(false)
 	,m_hasRow(false)
-	,m_dbUnit(dbUnit_)
+	,m_database(database_)
 	,m_conn(0)
 	{}
 
@@ -169,7 +169,7 @@ bool TransactionExecStatemachine_oracle::begin()
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
 	if (m_conn) delete m_conn;
-	m_conn = m_dbUnit->newConnection();
+	m_conn = m_database->newConnection();
 	static_cast<OracleStatement *>( m_statement )->setConnection( m_conn->object( ) );
 
 	return status( OCITransStart( (*m_conn)->svchp, (*m_conn)->errhp, (uword)0, (ub4)OCI_TRANS_NEW ), Transaction );
@@ -694,5 +694,5 @@ bool TransactionExecStatemachine_oracle::next()
 
 const std::string& TransactionExecStatemachine_oracle::databaseID() const
 {
-	return m_dbUnit->ID();
+	return m_database->ID();
 }

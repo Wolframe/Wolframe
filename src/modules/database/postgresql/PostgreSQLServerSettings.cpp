@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file PostgreSQLserverSettings.cpp
-#include "PostgreSQLserverSettings.hpp"
+///\file PostgreSQLServerSettings.cpp
+#include "PostgreSQLServerSettings.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 #include <stdarg.h> 
@@ -61,7 +61,7 @@ static int status( const char* res, unsigned int nn, ...)
 }
 
 
-bool PostgreSQLserverSettings::load( PGconn* conn)
+bool PostgreSQLServerSettings::load( PGconn* conn)
 {
 	LOG_DEBUG << "Reading binary protocol settings of server:";
 

@@ -31,11 +31,11 @@
 
 ************************************************************************/
 ///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/PostgreSQLstatement.hpp
+///\file database/PostgreSQLStatement.hpp
 #ifndef _POSTGRESQL_STATEMENT_HPP_INCLUDED
 #define _POSTGRESQL_STATEMENT_HPP_INCLUDED
 #include "database/baseStatement.hpp"
-#include "PostgreSQLserverSettings.hpp"
+#include "PostgreSQLServerSettings.hpp"
 #include <string>
 #include "types/variant.hpp"
 #include <libpq-fe.h>
@@ -43,13 +43,13 @@
 namespace _Wolframe {
 namespace db {
 
-class PostgreSQLstatement : public BaseStatement
+class PostgreSQLStatement : public BaseStatement
 {
 public:
-	PostgreSQLstatement();
-	PostgreSQLstatement( const PostgreSQLstatement& o);
+	PostgreSQLStatement();
+	PostgreSQLStatement( const PostgreSQLStatement& o);
 
-	void setConnection( PGconn *conn, const PostgreSQLserverSettings& settings);
+	void setConnection( PGconn *conn, const PostgreSQLServerSettings& settings);
 
 	PGresult* execute( ) const;
 
@@ -95,7 +95,7 @@ private:
 	int m_paramarsize;
 	std::string m_buf;
 	PGconn *m_conn;
-	PostgreSQLserverSettings m_settings;
+	PostgreSQLServerSettings m_settings;
 };
 
 

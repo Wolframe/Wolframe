@@ -31,17 +31,17 @@
 
 ************************************************************************/
 ///\brief Implementation of the standard database transaction execution statemechine with postgres client using libpq
-///\file PostgreSQLtransactionExecStatemachine.cpp
+///\file PostgreSQLTransactionExecStatemachine.cpp
 
-#include "PostgreSQLtransactionExecStatemachine.hpp"
+#include "PostgreSQLTransactionExecStatemachine.hpp"
 #include "PostgreSQL.hpp"
 #undef SUBSTITUTE_STATEMENT
 #ifdef SUBSTITUTE_STATEMENT
-#include "PostgreSQLsubstitutingStatement.hpp"
-#define STATEMENT_CLASS PostgreSQLsubstitutingStatement
+#include "PostgreSQLSubstitutingStatement.hpp"
+#define STATEMENT_CLASS PostgreSQLSubstitutingStatement
 #else
-#include "PostgreSQLstatement.hpp"
-#define STATEMENT_CLASS PostgreSQLstatement
+#include "PostgreSQLStatement.hpp"
+#define STATEMENT_CLASS PostgreSQLStatement
 #endif
 #include "logger-v1.hpp"
 #include <iostream>
@@ -55,14 +55,14 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( PostgreSQLdbUnit* dbunit_)
+TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( PostgreSQLDatabase* database_)
 	:m_state(Init)
 	,m_lastresult(0)
 	,m_statement( new STATEMENT_CLASS( ) )
 	,m_nof_rows(0)
 	,m_idx_row(0)
 	,m_hasResult(false)
-	,m_dbunit(dbunit_)
+	,m_database(database_)
 	,m_conn(0)
 	{}
 
@@ -218,8 +218,8 @@ bool TransactionExecStatemachine_postgres::begin()
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
 	if (m_conn) delete m_conn;
-	m_conn = m_dbunit->newConnection();
-	static_cast<STATEMENT_CLASS *>( m_statement )->setConnection( **m_conn, m_dbunit->serverSettings());
+	m_conn = m_database->newConnection();
+	static_cast<STATEMENT_CLASS *>( m_statement )->setConnection( **m_conn, m_database->serverSettings());
 	return status( PQexec( **m_conn, "BEGIN;"), Transaction);
 }
 
@@ -497,7 +497,7 @@ bool TransactionExecStatemachine_postgres::next()
 
 const std::string& TransactionExecStatemachine_postgres::databaseID() const
 {
-	return m_dbunit->ID();
+	return m_database->ID();
 }
 
 

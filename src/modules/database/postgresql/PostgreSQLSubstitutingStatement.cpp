@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file PostgreSQLsubstitutingStatement.cpp
-#include "PostgreSQLsubstitutingStatement.hpp"
+///\file PostgreSQLSubstitutingStatement.cpp
+#include "PostgreSQLSubstitutingStatement.hpp"
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
 #include "types/customDataType.hpp"
@@ -39,24 +39,24 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PostgreSQLsubstitutingStatement::PostgreSQLsubstitutingStatement( )
+PostgreSQLSubstitutingStatement::PostgreSQLSubstitutingStatement( )
 	: SubstitutingStatement( ),
 	m_conn( 0 )
 {
 }
 
-PostgreSQLsubstitutingStatement::PostgreSQLsubstitutingStatement( const PostgreSQLsubstitutingStatement &o )
+PostgreSQLSubstitutingStatement::PostgreSQLSubstitutingStatement( const PostgreSQLSubstitutingStatement &o )
 	: SubstitutingStatement( o ),
 	m_conn( 0 )
 {
 }
 
-void PostgreSQLsubstitutingStatement::setConnection( PGconn *conn )
+void PostgreSQLSubstitutingStatement::setConnection( PGconn *conn )
 {
 	m_conn = conn;
 }
 
-const std::string PostgreSQLsubstitutingStatement::convert( const types::Variant &value ) const
+const std::string PostgreSQLSubstitutingStatement::convert( const types::Variant &value ) const
 {
 	switch( value.type( ) ) {
 		
@@ -114,7 +114,7 @@ const std::string PostgreSQLsubstitutingStatement::convert( const types::Variant
 	throw new std::logic_error( "Unknown variant type '" + std::string( value.typeName( ) ) + "'" );
 }
 
-PGresult *PostgreSQLsubstitutingStatement::execute( ) const
+PGresult *PostgreSQLSubstitutingStatement::execute( ) const
 {
 	return PQexec( m_conn, nativeSQL( ).c_str( ) );
 }

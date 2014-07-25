@@ -43,45 +43,39 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
-enum {
-	DEFAULT_POSTGRESQL_CONNECTIONS = 4,
-	DEFAULT_CONNECTION_TIMEOUT = 30,
-	DEFAULT_STATEMENT_TIMEOUT = 30000
-};
-
 namespace _Wolframe {
 namespace db {
 
-PostgreSQLconfigStruct::PostgreSQLconfigStruct()
+PostgreSQLConfigStruct::PostgreSQLConfigStruct()
 	:m_port(0)
-	,connectTimeout(DEFAULT_CONNECTION_TIMEOUT)
+	,connectTimeout(DEFAULT_POSTGRESQL_CONNECTION_TIMEOUT)
 	,connections(DEFAULT_POSTGRESQL_CONNECTIONS)
 	,acquireTimeout(0)
-	,statementTimeout(DEFAULT_STATEMENT_TIMEOUT)
+	,statementTimeout(DEFAULT_POSTGRESQL_STATEMENT_TIMEOUT)
 {}
 
-const serialize::StructDescriptionBase* PostgreSQLconfigStruct::getStructDescription()
+const serialize::StructDescriptionBase* PostgreSQLConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<PostgreSQLconfigStruct>
+	struct ThisDescription :public serialize::StructDescription<PostgreSQLConfigStruct>
 	{
 	ThisDescription()
 	{
 		(*this)
-		( "identifier", &PostgreSQLconfigStruct::m_ID)			.mandatory()
-		( "host", &PostgreSQLconfigStruct::m_host )			.optional()
-		( "port", &PostgreSQLconfigStruct::m_port )			.optional()
-		( "database", &PostgreSQLconfigStruct::m_dbName )		.optional()
-		( "user", &PostgreSQLconfigStruct::m_user )			.optional()
-		( "password", &PostgreSQLconfigStruct::m_password )		.optional()
-		( "sslMode", &PostgreSQLconfigStruct::sslMode )			.optional()
-		( "sslCert", &PostgreSQLconfigStruct::sslCert )			.optional()
-		( "sslKey", &PostgreSQLconfigStruct::sslKey )			.optional()
-		( "sslRootCert", &PostgreSQLconfigStruct::sslRootCert	)	.optional()
-		( "sslCRL", &PostgreSQLconfigStruct::sslCRL )			.optional()
-		( "connectionTimeout", &PostgreSQLconfigStruct::connectTimeout ).optional()
-		( "connections", &PostgreSQLconfigStruct::connections )		.optional()
-		( "acquireTimeout", &PostgreSQLconfigStruct::acquireTimeout )	.optional()
-		( "statementTimeout", &PostgreSQLconfigStruct::statementTimeout ).optional()
+		( "identifier", &PostgreSQLConfigStruct::m_ID)			.mandatory()
+		( "host", &PostgreSQLConfigStruct::m_host )			.optional()
+		( "port", &PostgreSQLConfigStruct::m_port )			.optional()
+		( "database", &PostgreSQLConfigStruct::m_dbName )		.optional()
+		( "user", &PostgreSQLConfigStruct::m_user )			.optional()
+		( "password", &PostgreSQLConfigStruct::m_password )		.optional()
+		( "sslMode", &PostgreSQLConfigStruct::sslMode )			.optional()
+		( "sslCert", &PostgreSQLConfigStruct::sslCert )			.optional()
+		( "sslKey", &PostgreSQLConfigStruct::sslKey )			.optional()
+		( "sslRootCert", &PostgreSQLConfigStruct::sslRootCert	)	.optional()
+		( "sslCRL", &PostgreSQLConfigStruct::sslCRL )			.optional()
+		( "connectionTimeout", &PostgreSQLConfigStruct::connectTimeout ).optional()
+		( "connections", &PostgreSQLConfigStruct::connections )		.optional()
+		( "acquireTimeout", &PostgreSQLConfigStruct::acquireTimeout )	.optional()
+		( "statementTimeout", &PostgreSQLConfigStruct::statementTimeout ).optional()
 		;
 	}
 	};
@@ -90,11 +84,11 @@ const serialize::StructDescriptionBase* PostgreSQLconfigStruct::getStructDescrip
 }
 
 //***  PostgreSQL configuration functions  **********************************
-PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
+PostgreSQLConfig::PostgreSQLConfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::NamedConfiguration( cfgName, logParent, logName )
 {}
 
-bool PostgreSQLconfig::mapValueDomains()
+bool PostgreSQLConfig::mapValueDomains()
 {
 	bool retVal = true;
 	if (m_port == 0)
@@ -139,12 +133,12 @@ bool PostgreSQLconfig::mapValueDomains()
 	return retVal;
 }
 
-bool PostgreSQLconfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
+bool PostgreSQLConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 			      const module::ModulesDirectory* /*modules*/ )
 {
 	try
 	{
-		serialize::parseConfigStructure( *static_cast<PostgreSQLconfigStruct*>(this), pt);
+		serialize::parseConfigStructure( *static_cast<PostgreSQLConfigStruct*>(this), pt);
 		m_config_pos = pt.position();
 		return mapValueDomains();
 	}
@@ -155,7 +149,7 @@ bool PostgreSQLconfig::parse( const config::ConfigurationNode& pt, const std::st
 	}
 }
 
-void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
+void PostgreSQLConfig::setCanonicalPathes( const std::string& refPath )
 {
 	if ( ! sslCert.empty() )	{
 		std::string oldPath = sslCert;
@@ -192,7 +186,7 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 	}
 }
 
-void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
+void PostgreSQLConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );
 
@@ -233,7 +227,7 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
 }
 
-bool PostgreSQLconfig::check() const
+bool PostgreSQLConfig::check() const
 {
 	if ( connections == 0 )	{
 		LOG_ERROR << logPrefix() << " " << m_config_pos.logtext() << ": number of database connections cannot be 0";

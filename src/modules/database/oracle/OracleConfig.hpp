@@ -31,11 +31,11 @@
 
 ************************************************************************/
 //
-// Wolframe SQLite client configuration
+// Wolframe Oracle client configuration
 //
 
-#ifndef _SQLITE_CONFIG_HPP_INCLUDED
-#define _SQLITE_CONFIG_HPP_INCLUDED
+#ifndef _ORACLE_CONFIG_HPP_INCLUDED
+#define _ORACLE_CONFIG_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
 #include "serialize/configSerialize.hpp"
@@ -45,30 +45,34 @@
 namespace _Wolframe {
 namespace db {
 
-static const char* SQLITE_DB_CLASS_NAME = "SQLite";
-enum {DEFAULT_SQLITE_CONNECTIONS = 4};
+static const char* ORACLE_DB_CLASS_NAME = "Oracle";
+enum {
+	DEFAULT_ORACLE_CONNECTIONS = 4,
+	DEFAULT_ORACLE_CONNECTION_TIMEOUT = 30,
+	DEFAULT_ORACLE_STATEMENT_TIMEOUT = 30000
+};
 
 /// \brief SQLite database configuration
-class SQLiteConfig
+class OracleConfig
 	:public _Wolframe::serialize::DescriptiveConfiguration
 {
 public:
-	const char* className() const				{ return SQLITE_DB_CLASS_NAME; }
+	const char* className() const				{ return ORACLE_DB_CLASS_NAME; }
 
-	SQLiteConfig()
-		:_Wolframe::serialize::DescriptiveConfiguration(SQLITE_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
+	OracleConfig()
+		:_Wolframe::serialize::DescriptiveConfiguration(ORACLE_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
 		,m_foreignKeys(true)
 		,m_profiling(false)
-		,m_connections(DEFAULT_SQLITE_CONNECTIONS)
+		,m_connections(DEFAULT_ORACLE_CONNECTIONS)
 	{
 		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
 	}
 
-	SQLiteConfig( const std::string& id_, const std::string& filename_,
+	OracleConfig( const std::string& id_, const std::string& filename_,
 			bool foreignKeys_, bool profiling_,
 			unsigned short connections_,
 			const std::vector<std::string>& extensionFiles_ )
-		:_Wolframe::serialize::DescriptiveConfiguration(SQLITE_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
+		:_Wolframe::serialize::DescriptiveConfiguration(SQLite_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
 		,m_ID(id_)
 		,m_filename(filename_)
 		,m_foreignKeys(foreignKeys_)
@@ -76,11 +80,11 @@ public:
 		,m_connections(connections_)
 		,m_extensionFiles(extensionFiles_){}
 
-	SQLiteConfig( const char* title, const char* logprefix)
+	OracleConfig( const char* title, const char* logprefix)
 		:_Wolframe::serialize::DescriptiveConfiguration( title, "database", logprefix, getStructDescription())
 		,m_foreignKeys(true)
 		,m_profiling(false)
-		,m_connections(DEFAULT_SQLITE_CONNECTIONS)
+		,m_connections(DEFAULT_ORACLE_CONNECTIONS)
 	{
 		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
 	}
@@ -113,4 +117,4 @@ private:
 
 }} // _Wolframe::db
 
-#endif // _SQLITE_CONFIG_HPP_INCLUDED
+#endif // _ORACLE_CONFIG_HPP_INCLUDED

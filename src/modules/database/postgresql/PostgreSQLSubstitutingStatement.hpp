@@ -30,27 +30,37 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// SQLite constructor
-//
-
-#include "SQLite.hpp"
-#include "logger-v1.hpp"
+///\brief Interface to substitute parameters in embedded SQL statements
+///\file database/PostgreSQLSubstitutingStatement.hpp
+#ifndef _POSTGRESQL_SUBSTUTITUNG_STATEMENT_HPP_INCLUDED
+#define _POSTGRESQL_SUBSTUTITUNG_STATEMENT_HPP_INCLUDED
+#include "database/substitutingStatement.hpp"
+#include <string>
+#include "types/variant.hpp"
+#include <libpq-fe.h>
 
 namespace _Wolframe {
 namespace db {
 
-SQLiteDBunit* SQLiteConstructor::object( const config::NamedConfiguration& conf )
+class PostgreSQLSubstitutingStatement : public SubstitutingStatement
 {
-	const SQLiteConfig& cfg = dynamic_cast< const SQLiteConfig& >( conf );
+	public:
+		PostgreSQLSubstitutingStatement( );
+		PostgreSQLSubstitutingStatement( const PostgreSQLSubstitutingStatement &o );
 
-	SQLiteDBunit* m_db = new SQLiteDBunit( cfg.ID(), cfg.filename(),
-					       cfg.foreignKeys(),
-					       cfg.profiling(),
-					       cfg.connections(),
-					       cfg.extensionFiles());
-	LOG_TRACE << "SQLite database unit for '" << cfg.ID() << "' created";
-	return m_db;
-}
+		void setConnection( PGconn *conn );
+		
+		///\brief Executes the statement with substituted parameters
+		PGresult* execute( ) const;
 
-}} // namespace _Wolframe::db
+	protected:
+		virtual const std::string convert( const types::Variant &value ) const;
+		
+	private:
+		PGconn *m_conn;
+};
+
+
+}}//namespace
+#endif
+

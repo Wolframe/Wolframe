@@ -30,37 +30,49 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to substitute parameters in embedded SQL statements
-///\file database/PostgreSQLsubstitutingStatement.hpp
-#ifndef _POSTGRESQL_SUBSTUTITUNG_STATEMENT_HPP_INCLUDED
-#define _POSTGRESQL_SUBSTUTITUNG_STATEMENT_HPP_INCLUDED
-#include "database/substitutingStatement.hpp"
-#include <string>
-#include "types/variant.hpp"
-#include <libpq-fe.h>
+///\file mod_db_oracle.cpp
+///\brief Database interface module for Oracle
+#include "appdevel/databaseModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "Oracle.hpp"
+
+WF_MODULE_BEGIN( "OracleDatabase", "Database interface module for Oracle")
+ WF_SIMPLE_DATABASE( "oracle", _Wolframe::db::OracleDatabase, _Wolframe::db::OracleConfig)
+WF_MODULE_END
+
+namespace _Wolframe {
+namespace module {
+
+static BuilderBase* createOracleModule( void )
+{
+	static ConfiguredBuilderDescription< db::OracleConstructor,
+			db::OracleConfig > mod( "Oracle database", "database",
+						    "Oracle", "Oracle" );
+	return &mod;
+}
+
+static BuilderBase* (*containers[])() = {
+	createOracleModule, NULL
+};
+
+ModuleEntryPoint entryPoint( 0, "Oracle database", containers);
+
+}} // namespace _Wolframe::module
 
 namespace _Wolframe {
 namespace db {
 
-class PostgreSQLsubstitutingStatement : public SubstitutingStatement
+OracleDbUnit* OracleConstructor::object( const config::NamedConfiguration& conf )
 {
-	public:
-		PostgreSQLsubstitutingStatement( );
-		PostgreSQLsubstitutingStatement( const PostgreSQLsubstitutingStatement &o );
+	const OracleConfig& cfg = dynamic_cast< const OracleConfig& >( conf );
 
-		void setConnection( PGconn *conn );
-		
-		///\brief Executes the statement with substituted parameters
-		PGresult* execute( ) const;
+	OracleDbUnit* m_db = new OracleDbUnit( cfg.m_ID, cfg.host(), cfg.port(), cfg.dbName(),
+						       cfg.user(), cfg.password(),
+						       cfg.connectTimeout,
+						       cfg.connections, cfg.acquireTimeout,
+						       cfg.statementTimeout);
+	LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
+	return m_db;
+}
 
-	protected:
-		virtual const std::string convert( const types::Variant &value ) const;
-		
-	private:
-		PGconn *m_conn;
-};
-
-
-}}//namespace
-#endif
-
+}} // namespace _Wolframe::db

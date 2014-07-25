@@ -56,8 +56,6 @@
 namespace _Wolframe {
 namespace db {
 
-static const char* ORACLE_DB_CLASS_NAME = "Oracle";
-
 struct OracleConfigStruct
 {
 	OracleConfigStruct();
@@ -68,11 +66,6 @@ struct OracleConfigStruct
 	std::string	m_dbName;		//< database name on server
 	std::string	m_user;			//< database user
 	std::string	m_password;		//< and password
-	std::string	sslMode;		//< SSL connection mode
-	std::string	sslCert;		//< client SSL certificate file
-	std::string	sslKey;			//< client SSL key file
-	std::string	sslRootCert;		//< root SSL certificate file
-	std::string	sslCRL;			//< SSL certificate revocation list
 	unsigned short	connectTimeout;		//< connection timeout
 	unsigned short	connections;		//< number of database connection (pool size)
 	unsigned short	acquireTimeout;		//< timeout when acquiring a connection from the pool
@@ -177,8 +170,6 @@ public:
 	OracleDbUnit( const std::string& id,
 			  const std::string& host, unsigned short port, const std::string& dbName,
 			  const std::string& user, const std::string& password,
-			  std::string sslMode, std::string sslCert, std::string sslKey,
-			  std::string sslRootCert, std::string sslCRL,
 			  unsigned short connectTimeout,
 			  size_t connections, unsigned short acquireTimeout,
 			  unsigned statementTimeout);

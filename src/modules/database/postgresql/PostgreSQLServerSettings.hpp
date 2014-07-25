@@ -30,29 +30,39 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// PostgreSQL module
-//
-
-#include "PostgreSQL.hpp"
-#include "module/moduleInterface.hpp"
-#include "logger-v1.hpp"
+///\brief Interface for postgreSQL server settings (protocol to store and retrieve data in the internal binary format instead of string)
+///\file PostgreSQLServerSettings.hpp
+#ifndef _DATABASE_POSTGRES_SERVER_SETTINGS_HPP_INCLUDED
+#define _DATABASE_POSTGRES_SERVER_SETTINGS_HPP_INCLUDED
+#include <libpq-fe.h>
 
 namespace _Wolframe {
-namespace module {
+namespace db {
 
-static BuilderBase* createPGSQLmodule( void )
+class PostgreSQLServerSettings
 {
-	static ConfiguredBuilderDescription< db::PostgreSQLconstructor,
-			db::PostgreSQLconfig > mod( "PostgreSQL database", "database",
-						    "PostgreSQL", "PostgreSQL" );
-	return &mod;
-}
+public:
+	PostgreSQLServerSettings()
+		:m_binaryTimestampFormat(TimestampFormatUndefined)
+	{}
+	PostgreSQLServerSettings( const PostgreSQLServerSettings& o)
+		:m_binaryTimestampFormat(o.m_binaryTimestampFormat)
+	{}
 
-static BuilderBase* (*containers[])() = {
-	createPGSQLmodule, NULL
+	enum BinaryTimestampFormat
+	{
+		TimestampFormatUndefined,
+		TimestampAsInt,
+		TimestampAsDouble
+	};
+
+	BinaryTimestampFormat binaryTimestampFormat() const	{return m_binaryTimestampFormat;}
+
+	bool load( PGconn* conn);
+
+private:
+	BinaryTimestampFormat m_binaryTimestampFormat;
 };
 
-ModuleEntryPoint entryPoint( 0, "PostgreSQL database", containers);
-
-}} // namespace _Wolframe::module
+}}
+#endif

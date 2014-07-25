@@ -93,8 +93,6 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 				    const std::string& host, unsigned short port,
 				    const std::string& dbName,
 				    const std::string& user, const std::string& password,
-				    std::string /*sslMode*/, std::string /*sslCert*/, std::string /*sslKey*/,
-				    std::string /*sslRootCert*/, std::string /*sslCRL*/ ,
 				    unsigned short /*connectTimeout*/,
 				    size_t connections, unsigned short acquireTimeout,
 				    unsigned statementTimeout)

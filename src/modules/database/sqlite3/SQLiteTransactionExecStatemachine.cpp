@@ -55,12 +55,12 @@ static int wrap_sqlite3_prepare_v2( sqlite3* c, const char* s, int n, sqlite3_st
 	return sqlite3_prepare_v2( c, s, n, stm, t);
 }
 
-TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( SQLiteDBunit* dbunit_)
+TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( SQLiteDatabase* database_)
 	:m_state(Init)
 	,m_hasResult(false)
 	,m_hasRow(false)
 	,m_stm(0)
-	,m_dbunit(dbunit_)
+	,m_database(database_)
 	,m_conn(0)
 	,m_statement( new SQLiteStatement( ) )
 {}
@@ -157,7 +157,7 @@ bool TransactionExecStatemachine_sqlite3::begin()
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
 	if (m_conn) delete m_conn;
-	m_conn = m_dbunit->newConnection();
+	m_conn = m_database->newConnection();
 	return executeInstruction( "BEGIN TRANSACTION;", Transaction);
 }
 
@@ -473,6 +473,6 @@ bool TransactionExecStatemachine_sqlite3::next()
 
 const std::string& TransactionExecStatemachine_sqlite3::databaseID() const
 {
-	return m_dbunit->ID();
+	return m_database->ID();
 }
 

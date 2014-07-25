@@ -29,15 +29,14 @@ DYNAMIC_MODULE = \
 	mod_db_postgresql.dll
 
 CPP_OBJS = \
-	PostgreSQLdatatypes.obj \
-	PostgreSQLserverSettings.obj \
-	PostgreSQLconfig.obj \
-	PostgreSQLconstructor.obj \
+	PostgreSQLDatatypes.obj \
+	PostgreSQLServerSettings.obj \
+	PostgreSQLConfig.obj \
 	PostgreSQL.obj \
-	PostgreSQLtransactionExecStatemachine.obj \
-	PostgreSQLstatement.obj \
+	PostgreSQLTransactionExecStatemachine.obj \
+	PostgreSQLStatement.obj \
 	PostgreSQLsubstitutingStatement.obj \
-	PostgreSQLmodule.obj
+	mod_db_postgresql.obj
 
 all: $(DYNAMIC_MODULE)
 

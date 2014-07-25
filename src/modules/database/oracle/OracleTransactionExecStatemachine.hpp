@@ -87,7 +87,7 @@ typedef boost::shared_ptr<OracleColumnDescription> OracleColumnDescriptionPtr;
 struct TransactionExecStatemachine_oracle :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDbUnit *dbUnit_);
+	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDatabase *database_);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_oracle();
@@ -156,7 +156,7 @@ private:
 	Statement *m_statement;
 	bool m_hasResult;
 	bool m_hasRow;
-	OracleDbUnit* m_dbUnit;
+	OracleDatabase* m_database;
 	PoolObject<OracleConnection*> *m_conn;	//< DB connection
 };
 

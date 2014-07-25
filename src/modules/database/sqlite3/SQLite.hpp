@@ -56,53 +56,6 @@
 namespace _Wolframe {
 namespace db {
 
-static const char* SQLite_DB_CLASS_NAME = "SQLite";
-
-struct SQLiteConfigStruct
-{
-	SQLiteConfigStruct();
-
-	std::string	m_ID;
-	std::string	m_filename;
-	bool		m_foreignKeys;
-	bool		m_profiling;
-	unsigned short	m_connections;
-	std::vector< std::string > m_extensionFiles;		//< list of Sqlite extension modules to load
-
-	//\brief Structure description for serialization/parsing
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
-
-//\brief SQLite database configuration
-class SQLiteConfig
-	:public config::NamedConfiguration
-	,public SQLiteConfigStruct
-{
-public:
-	const char* className() const				{ return SQLite_DB_CLASS_NAME; }
-
-	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	~SQLiteConfig(){}
-
-	bool parse( const config::ConfigurationNode& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	const std::string& ID() const				{ return m_ID; }
-	const std::string& filename() const			{ return m_filename; }
-	bool foreignKeys() const				{ return m_foreignKeys; }
-	bool profiling() const					{ return m_profiling; }
-	unsigned short connections() const			{ return m_connections; }
-	const std::vector< std::string > extensionFiles() const	{ return m_extensionFiles; }
-private:
-	config::ConfigurationTree::Position m_config_pos;
-};
-
-
-
 struct SQLiteLanguageDescription :public LanguageDescription
 {
 	///\brief String used for declaring a reference to an argument by index (starting with 1).
@@ -113,8 +66,6 @@ struct SQLiteLanguageDescription :public LanguageDescription
 		return rt.str();
 	}
 };
-
-class SQLiteDBunit;
 
 class SQLiteDatabase : public Database
 {
@@ -127,7 +78,7 @@ public:
 	SQLiteDBunit& dbUnit() const		{ return *m_unit; }
 
 	const std::string& ID() const;
-	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
+	const char* className() const		{ return SQLITE_DB_CLASS_NAME; }
 
 	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );
@@ -155,7 +106,7 @@ public:
 	~SQLiteDBunit();
 
 	const std::string& ID() const		{ return m_ID; }
-	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
+	const char* className() const		{ return SQLITE_DB_CLASS_NAME; }
 	Database* database();
 
 	PoolObject<sqlite3*>* newConnection()	{return new PoolObject<sqlite3*>( m_connPool);}
@@ -178,7 +129,7 @@ class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 public:
 	ObjectConstructorBase::ObjectType objectType() const
 						{ return DATABASE_OBJECT; }
-	const char* objectClassName() const	{ return SQLite_DB_CLASS_NAME; }
+	const char* objectClassName() const	{ return SQLITE_DB_CLASS_NAME; }
 	SQLiteDBunit* object( const config::NamedConfiguration& conf );
 };
 

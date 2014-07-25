@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file PostgreSQLstatement.cpp
-#include "PostgreSQLstatement.hpp"
+///\file PostgreSQLStatement.cpp
+#include "PostgreSQLStatement.hpp"
 #include "types/variant.hpp"
 #include "types/datetime.hpp"
 #include "types/bignumber.hpp"
@@ -52,7 +52,7 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PostgreSQLstatement::PostgreSQLstatement( const PostgreSQLstatement& o)
+PostgreSQLStatement::PostgreSQLStatement( const PostgreSQLStatement& o)
 	:BaseStatement(o)
 	,m_paramarsize(o.m_paramarsize)
 	,m_buf(o.m_buf)
@@ -64,27 +64,27 @@ PostgreSQLstatement::PostgreSQLstatement( const PostgreSQLstatement& o)
 }
 
 
-PostgreSQLstatement::PostgreSQLstatement()
+PostgreSQLStatement::PostgreSQLStatement()
 	:BaseStatement()
 	,m_paramarsize(0)
 	,m_conn(0)
 	{}
 
 
-void PostgreSQLstatement::clear()
+void PostgreSQLStatement::clear()
 {
 	BaseStatement::clear();
 	m_paramarsize = 0;
 	m_buf.clear();
 }
 
-void PostgreSQLstatement::setConnection( PGconn *conn, const PostgreSQLserverSettings& settings_)
+void PostgreSQLStatement::setConnection( PGconn *conn, const PostgreSQLServerSettings& settings_)
 {
 	m_conn = conn;
 	m_settings = settings_;
 }
 
-void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& value)
+void PostgreSQLStatement::bind( const unsigned int idx, const types::Variant& value)
 {
 	// does boundary checking
 	BaseStatement::bind( idx, value );
@@ -92,7 +92,7 @@ void PostgreSQLstatement::bind( const unsigned int idx, const types::Variant& va
 	bindVariant( idx, value);
 }
 
-void PostgreSQLstatement::bindVariant( unsigned int idx, const types::Variant& value)
+void PostgreSQLStatement::bindVariant( unsigned int idx, const types::Variant& value)
 {
 	if (idx != ((unsigned int)m_paramarsize +1)) throw std::logic_error("internal: wrong order of bind param in postgreSQL database module");
 
@@ -182,7 +182,7 @@ void PostgreSQLstatement::bindVariant( unsigned int idx, const types::Variant& v
 }
 
 //\remark See implementation of pq_sendint64
-void PostgreSQLstatement::bindUInt64( boost::uint64_t value, const char* type)
+void PostgreSQLStatement::bindUInt64( boost::uint64_t value, const char* type)
 {
 	boost::uint32_t pp[2];
 	pp[0] = (boost::uint32_t) (value >> 32);
@@ -192,51 +192,51 @@ void PostgreSQLstatement::bindUInt64( boost::uint64_t value, const char* type)
 	setNextParam( (const void*)&pp, sizeof(pp), type);
 }
 
-void PostgreSQLstatement::bindInt64( boost::int64_t value)
+void PostgreSQLStatement::bindInt64( boost::int64_t value)
 {
 	bindUInt64( (boost::uint64_t)value, "int8");
 }
 
-void PostgreSQLstatement::bindUInt32( boost::uint32_t value, const char* type)
+void PostgreSQLStatement::bindUInt32( boost::uint32_t value, const char* type)
 {
 	boost::uint32_t pp;
 	pp = htonl( value);
 	setNextParam( &pp, sizeof(pp), type);
 }
 
-void PostgreSQLstatement::bindInt32( boost::int32_t value)
+void PostgreSQLStatement::bindInt32( boost::int32_t value)
 {
 	bindUInt32( (boost::uint32_t)value, "int4");
 }
 
-void PostgreSQLstatement::bindUInt16( boost::uint16_t value, const char* type)
+void PostgreSQLStatement::bindUInt16( boost::uint16_t value, const char* type)
 {
 	boost::uint16_t pp = htons( value);
 	setNextParam( &pp, sizeof(pp), type);
 }
 
-void PostgreSQLstatement::bindInt16( boost::int16_t value)
+void PostgreSQLStatement::bindInt16( boost::int16_t value)
 {
 	bindUInt16( (boost::uint16_t)value, "int2");
 }
 
-void PostgreSQLstatement::bindByte( boost::uint8_t value, const char* type)
+void PostgreSQLStatement::bindByte( boost::uint8_t value, const char* type)
 {
 	setNextParam( &value, sizeof(value), type);
 }
 
-void PostgreSQLstatement::bindByte( boost::int8_t value)
+void PostgreSQLStatement::bindByte( boost::int8_t value)
 {
 	bindByte( (boost::uint8_t)value, "int1");
 }
 
-void PostgreSQLstatement::bindBool( bool value)
+void PostgreSQLStatement::bindBool( bool value)
 {
 	bindByte( value?1:0, "bool");
 }
 
 //\remark See implementation of pq_sendfloat8
-void PostgreSQLstatement::bindDouble( double value)
+void PostgreSQLStatement::bindDouble( double value)
 {
 	union
 	{
@@ -247,13 +247,13 @@ void PostgreSQLstatement::bindDouble( double value)
 	bindUInt64( swap.i, "float8");
 }
 
-void PostgreSQLstatement::bindString( const char* value, std::size_t size)
+void PostgreSQLStatement::bindString( const char* value, std::size_t size)
 {
 	setNextParam( value, size, "");
 	m_buf.push_back( '\0');
 }
 
-void PostgreSQLstatement::bindNull()
+void PostgreSQLStatement::bindNull()
 {
 	m_paramofs[ m_paramarsize] = 0;
 	m_paramtype[ m_paramarsize] = 0;
@@ -262,7 +262,7 @@ void PostgreSQLstatement::bindNull()
 	++m_paramarsize;
 }
 
-void PostgreSQLstatement::setNextParam( const void* ptr, unsigned int size, const char* type)
+void PostgreSQLStatement::setNextParam( const void* ptr, unsigned int size, const char* type)
 {
 	m_paramofs[ m_paramarsize] = m_buf.size();
 	m_paramtype[ m_paramarsize] = type;
@@ -273,7 +273,7 @@ void PostgreSQLstatement::setNextParam( const void* ptr, unsigned int size, cons
 	++m_paramarsize;
 }
 
-void PostgreSQLstatement::getParams( Params& params) const
+void PostgreSQLStatement::getParams( Params& params) const
 {
 	params.paramarsize = m_paramarsize;
 	for (int ii=0; ii<m_paramarsize; ++ii)
@@ -289,7 +289,7 @@ void PostgreSQLstatement::getParams( Params& params) const
 	}
 }
 
-PGresult* PostgreSQLstatement::execute( ) const
+PGresult* PostgreSQLStatement::execute( ) const
 {
 	std::string command = nativeSQL();
 	Params params;
@@ -302,7 +302,7 @@ PGresult* PostgreSQLstatement::execute( ) const
 			params.paramar, m_paramlen, m_parambinary, 0);
 }
 
-const std::string PostgreSQLstatement::replace( const unsigned int idx ) const
+const std::string PostgreSQLStatement::replace( const unsigned int idx ) const
 {
 	std::string rt;
 	

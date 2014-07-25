@@ -43,21 +43,15 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
-enum {
-	DEFAULT_ORACLE_CONNECTIONS = 4,
-	DEFAULT_CONNECTION_TIMEOUT = 30,
-	DEFAULT_STATEMENT_TIMEOUT = 30000
-};
-
 namespace _Wolframe {
 namespace db {
 
 OracleConfigStruct::OracleConfigStruct()
 	:m_port(0)
-	,connectTimeout(DEFAULT_CONNECTION_TIMEOUT)
+	,connectTimeout(DEFAULT_ORACLE_CONNECTION_TIMEOUT)
 	,connections(DEFAULT_ORACLE_CONNECTIONS)
 	,acquireTimeout(0)
-	,statementTimeout(DEFAULT_STATEMENT_TIMEOUT)
+	,statementTimeout(DEFAULT_ORACLE_STATEMENT_TIMEOUT)
 {}
 
 const serialize::StructDescriptionBase* OracleConfigStruct::getStructDescription()
@@ -73,11 +67,6 @@ const serialize::StructDescriptionBase* OracleConfigStruct::getStructDescription
 		( "database", &OracleConfigStruct::m_dbName )		.optional()
 		( "user", &OracleConfigStruct::m_user )			.optional()
 		( "password", &OracleConfigStruct::m_password )		.optional()
-		( "sslMode", &OracleConfigStruct::sslMode )		.optional()
-		( "sslCert", &OracleConfigStruct::sslCert )		.optional()
-		( "sslKey", &OracleConfigStruct::sslKey )		.optional()
-		( "sslRootCert", &OracleConfigStruct::sslRootCert )	.optional()
-		( "sslCRL", &OracleConfigStruct::sslCRL )		.optional()
 		( "connectionTimeout", &OracleConfigStruct::connectTimeout ).optional()
 		( "connections", &OracleConfigStruct::connections )	.optional()
 		( "acquireTimeout", &OracleConfigStruct::acquireTimeout ).optional()
@@ -102,40 +91,6 @@ bool OracleConfig::mapValueDomains()
 		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": port must be defined as a non zero non negative number";
 		retVal = false;
 	}
-	if (!sslMode.empty())
-	{
-		if ( boost::algorithm::iequals( sslMode, "disable" ))
-			sslMode = "disable";
-		else if ( boost::algorithm::iequals( sslMode, "allow" ))
-			sslMode = "allow";
-		else if ( boost::algorithm::iequals( sslMode, "prefer" ))
-			sslMode = "prefer";
-		else if ( boost::algorithm::iequals( sslMode, "require" ))
-			sslMode = "require";
-		else if ( boost::algorithm::iequals( sslMode, "verify-ca" ))
-			sslMode = "verify-ca";
-		else if ( boost::algorithm::iequals( sslMode, "verify-full" ))
-			sslMode = "verify-full";
-		else	{
-			LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": unknown SSL mode: '" << sslMode << "'";
-			retVal = false;
-		}
-	}
-	if ( !sslCert.empty() && sslKey.empty() )	{
-		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": SSL certificate configured but no SSL key specified";
-		retVal = false;
-	}
-	if ( !sslCert.empty() && sslKey.empty() )	{
-		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": SSL key configured but no SSL certificate specified";
-		retVal = false;
-	}
-	if ( boost::algorithm::iequals( sslMode, "verify-ca" ) ||
-	     boost::algorithm::iequals( sslMode, "verify-full" ))	{
-		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": server SSL certificate requested but no root CA specified";
-		retVal = false;
-	}
-	if ( sslMode.empty())
-		sslMode = "prefer";
 	return retVal;
 }
 
@@ -157,39 +112,6 @@ bool OracleConfig::parse( const config::ConfigurationNode& pt, const std::string
 
 void OracleConfig::setCanonicalPathes( const std::string& refPath )
 {
-	if ( ! sslCert.empty() )	{
-		std::string oldPath = sslCert;
-		sslCert = utils::getCanonicalPath( sslCert, refPath);
-/* Aba: avoid "suggest explicit braces to avoid ambiguous ‘else’ [-Wparentheses]" */
-		if ( oldPath != sslCert ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute SSL certificate filename '" << sslCert
-				       << "' instead of '" << oldPath << "'";
-		}
-	}
-	if ( ! sslKey.empty() )	{
-		std::string oldPath = sslKey;
-		sslKey = utils::getCanonicalPath( sslKey, refPath );
-		if ( oldPath != sslKey ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute SSL key filename '" << sslKey
-				       << "' instead of '" << oldPath << "'";
-		}
-	}
-	if ( ! sslRootCert.empty() )	{
-		std::string oldPath = sslRootCert;
-		sslRootCert = utils::getCanonicalPath( sslRootCert, refPath );
-		if ( oldPath != sslRootCert ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute CA certificate filename '" << sslRootCert
-				       << "' instead of '" << oldPath << "'";
-		}
-	}
-	if ( ! sslCRL.empty() )	{
-		std::string oldPath = sslCRL;
-		sslCRL = utils::getCanonicalPath( sslCRL, refPath );
-		if ( oldPath != sslCRL ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute CRL filename '" << sslCRL
-				       << "' instead of '" << oldPath << "'";
-		}
-	}
 }
 
 void OracleConfig::print( std::ostream& os, size_t indent ) const
@@ -206,17 +128,6 @@ void OracleConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   Database name: " << (m_dbName.empty() ? "(not specified - server user default)" : m_dbName) << std::endl;
 	os << indStr << "   Database user: " << (m_user.empty() ? "(not specified - same as server user)" : m_user)
 	   << ", password: " << (m_password.empty() ? "(not specified - no password used)" : m_password) << std::endl;
-	if ( ! sslMode.empty())
-		os << indStr << "   Database connection SSL mode: " << sslMode << std::endl;
-	if ( ! sslCert.empty())	{
-		os << indStr << "   Client SSL certificate file: " << sslCert << std::endl;
-		if ( ! sslMode.empty())
-			os << indStr << "   Client SSL key file: " << sslKey << std::endl;
-	}
-	if ( ! sslRootCert.empty())
-		os << indStr << "   SSL root CA file: " << sslRootCert << std::endl;
-	if ( ! sslCRL.empty())
-		os << indStr << "   SSL CRL file: " << sslCRL << std::endl;
 
 	if ( connectTimeout == 0 )
 		os << indStr << "   Connect timeout: 0 (wait indefinitely)" << std::endl;

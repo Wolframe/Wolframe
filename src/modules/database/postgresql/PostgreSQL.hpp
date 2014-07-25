@@ -43,7 +43,7 @@
 #include <vector>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
-#include "PostgreSQLserverSettings.hpp"
+#include "PostgreSQLServerSettings.hpp"
 #include "config/configurationBase.hpp"
 #include "serialize/configSerialize.hpp"
 #include "module/constructor.hpp"
@@ -56,69 +56,10 @@
 namespace _Wolframe {
 namespace db {
 
-static const char* POSTGRESQL_DB_CLASS_NAME = "PostgreSQL";
-
 enum {
 	POSTGRESQL_MIN_DB_VERSION = 80400,
 	POSTGRESQL_MIN_PROTOCOL_VERSION = 3
 };
-
-struct PostgreSQLconfigStruct
-{
-	PostgreSQLconfigStruct();
-
-	std::string	m_ID;			 //< database identifier
-	std::string	m_host;			 //< server host
-	unsigned short	m_port;			 //< server port
-	std::string	m_dbName;		 //< database name on server
-	std::string	m_user;			 //< database user
-	std::string	m_password;		 //< and password
-	std::string	sslMode;		 //< SSL connection mode
-	std::string	sslCert;		 //< client SSL certificate file
-	std::string	sslKey;			 //< client SSL key file
-	std::string	sslRootCert;		 //< root SSL certificate file
-	std::string	sslCRL;			 //< SSL certificate revocation list
-	unsigned short	connectTimeout;		 //< connection timeout
-	unsigned short	connections;		 //< number of database connection (pool size)
-	unsigned short	acquireTimeout;		 //< timeout when acquiring a connection from the pool
-	unsigned	statementTimeout;	 //< default timeout when executin a statement
-
-	//\brief Structure description for serialization/parsing
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
-//\brief PostgreSQL server connection configuration
-class PostgreSQLconfig
-	:public config::NamedConfiguration
-	,public PostgreSQLconfigStruct
-{
-	friend class PostgreSQLconstructor;
-public:
-	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
-
-	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
-	~PostgreSQLconfig()			{}
-
-	bool parse( const config::ConfigurationNode& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	virtual bool check() const;
-	virtual void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	const std::string& host() const		{return m_host;}
-	unsigned short port() const		{return m_port;}
-	const std::string& dbName() const	{return m_dbName;}
-	const std::string& user() const		{return m_user;}
-	const std::string& password() const	{return m_password;}
-
-private:
-	//\brief Check the domains of the configured values and do some mappings (e.g. instantiating enum values from strings)
-	bool mapValueDomains();
-	config::ConfigurationTree::Position m_config_pos;
-};
-
-
-class PostgreSQLdbUnit;
 
 struct PostgreSQLLanguageDescription : public LanguageDescription
 {
@@ -130,11 +71,11 @@ struct PostgreSQLLanguageDescription : public LanguageDescription
 	}
 };
 
-class PostgreSQLdatabase : public Database
+class PostgreSQLDatabase : public Database
 {
 public:
-	PostgreSQLdatabase() : m_unit( NULL )	{}
-	~PostgreSQLdatabase()			{}
+	PostgreSQLDatabase() : m_unit( NULL )	{}
+	~PostgreSQLDatabase()			{}
 
 	void setUnit( PostgreSQLdbUnit* unit )	{ m_unit = unit; }
 	bool hasUnit() const			{ return m_unit != NULL; }
@@ -179,22 +120,22 @@ public:
 
 	PoolObject<PGconn*>* newConnection()	{return new PoolObject<PGconn*>( m_connPool);}
 
-	PostgreSQLserverSettings serverSettings() const
+	PostgreSQLServerSettings serverSettings() const
 						{ return m_serverSettings; }
 
 private:
 	const std::string	m_ID;			//< database ID
 	std::string		m_connStr;		//< connection string
 	size_t			m_noConnections;	//< number of connections
-	PostgreSQLserverSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
+	PostgreSQLServerSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
 	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
 	unsigned		m_statementTimeout;	//< default statement execution timeout
-	PostgreSQLdatabase	m_db;			//< real database object
+	PostgreSQLDatabase	m_db;			//< real database object
 };
 
 
 //***  PostgreSQL database constructor  ***************************************
-class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
+class PostgreSQLConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
 	ObjectConstructorBase::ObjectType objectType() const
@@ -209,7 +150,7 @@ class PostgreSQLtransaction
 	:public Transaction
 {
 public:
-	PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_);
+	PostgreSQLtransaction( PostgreSQLDatabase& database, const std::string& name_);
 	virtual ~PostgreSQLtransaction(){}
 };
 

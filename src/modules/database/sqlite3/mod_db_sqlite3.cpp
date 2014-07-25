@@ -30,28 +30,43 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// Oracle constructor
-//
+///\file mod_db_sqlite3.cpp
+///\brief Database interface module for Sqlite3
+#include "appdevel/databaseModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "SQLite.hpp"
 
-#include "Oracle.hpp"
-#include "logger-v1.hpp"
+WF_MODULE_BEGIN( "Sqlite3Database", "Database interface module for Sqlite3")
+ WF_SIMPLE_DATABASE( "sqlite3", _Wolframe::db::SQLiteDatabase, _Wolframe::db::SQLiteConfig)
+WF_MODULE_END
 
 namespace _Wolframe {
-namespace db {
+namespace module {
 
-OracleDbUnit* OracleConstructor::object( const config::NamedConfiguration& conf )
+static BuilderBase* createSQLiteModule( void )
 {
-	const OracleConfig& cfg = dynamic_cast< const OracleConfig& >( conf );
+	static module::ConfiguredBuilderDescription< db::SQLiteConstructor,
+			db::SQLiteConfig > mod( "SQLite database", "database",
+						"SQLite", "SQLite" );
+	return &mod;
+}
 
-	OracleDbUnit* m_db = new OracleDbUnit( cfg.m_ID, cfg.host(), cfg.port(), cfg.dbName(),
-						       cfg.user(), cfg.password(),
-						       cfg.sslMode, cfg.sslCert, cfg.sslKey,
-						       cfg.sslRootCert, cfg.sslCRL,
-						       cfg.connectTimeout,
-						       cfg.connections, cfg.acquireTimeout,
-						       cfg.statementTimeout);
-	LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
+static BuilderBase* (*containers[])() = {
+	createSQLiteModule, NULL
+};
+
+ModuleEntryPoint entryPoint( 0, "SQLite database", containers);
+
+SQLiteDBunit* SQLiteConstructor::object( const config::NamedConfiguration& conf )
+{
+	const SQLiteConfig& cfg = dynamic_cast< const SQLiteConfig& >( conf );
+
+	SQLiteDBunit* m_db = new SQLiteDBunit( cfg.ID(), cfg.filename(),
+					       cfg.foreignKeys(),
+					       cfg.profiling(),
+					       cfg.connections(),
+					       cfg.extensionFiles());
+	LOG_TRACE << "SQLite database unit for '" << cfg.ID() << "' created";
 	return m_db;
 }
 

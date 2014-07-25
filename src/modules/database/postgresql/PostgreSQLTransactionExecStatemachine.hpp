@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\brief PostgreSQL interface to the standard database transaction execution statemechine
-///\file PostgreSQLtransactionExecStatemachine.hpp
+///\file PostgreSQLTransactionExecStatemachine.hpp
 #ifndef _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #define _DATABASE_POSTGRESQL_LIBPQ_TRANSACTION_EXECUTION_STATEMACHINE_HPP_INCLUDED
 #include "database/transactionExecStatemachine.hpp"
@@ -47,7 +47,7 @@
 namespace _Wolframe {
 namespace db {
 
-class PostgreSQLdbUnit;
+class PostgreSQLDatabase;
 
 ///\class TransactionExecStatemachine_postgres
 ///\brief Implementation of the standard database transaction execution statemechine for postgresql (libpq)
@@ -55,7 +55,7 @@ class PostgreSQLdbUnit;
 struct TransactionExecStatemachine_postgres :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	explicit TransactionExecStatemachine_postgres( PostgreSQLdbUnit* dbunit_);
+	explicit TransactionExecStatemachine_postgres( PostgreSQLDatabase* database_);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_postgres();
@@ -121,7 +121,7 @@ private:
 	std::size_t m_nof_rows;
 	std::size_t m_idx_row;
 	bool m_hasResult;
-	PostgreSQLdbUnit* m_dbunit;
+	PostgreSQLDatabase* m_database;
 	PoolObject<PGconn*>* m_conn;		//< DB connection
 };
 

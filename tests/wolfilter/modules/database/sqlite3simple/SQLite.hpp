@@ -77,7 +77,7 @@ public:
 	 ~SQLiteDatabase();
 
 	const std::string& ID() const		{ return m_ID;}
-	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
+	const char* className() const		{ return SQLITE_DB_CLASS_NAME; }
 
 	Transaction* transaction( const std::string& name_)
 	{
