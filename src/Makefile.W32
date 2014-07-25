@@ -67,18 +67,9 @@ PROGRAM_OBJS = \
 	prgbind\ddlProgram.obj \
 	prgbind\programLibrary.obj
 
-CMDHANDLER_OBJS =\
-	mainCommandHandler.obj \
-	interfaceCommandHandler.obj \
-	doctypeFilterCommandHandler.obj \
-	baseCryptoCommandHandler.obj \
-	passwordChangeCommandHandler.obj \
-	authCommandHandler.obj
-
 LOCAL_STATIC_LIB_OBJS = \
 	$(PROVIDER_OBJS) \
 	$(PROGRAM_OBJS) \
-	$(CMDHANDLER_OBJS) \
 	wolframedCommandLine.obj \
 	wolfilterCommandLine.obj \
 	wolfilterIostreamFilter.obj \

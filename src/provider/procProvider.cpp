@@ -70,10 +70,6 @@ public:
 			m_detectors.push_back( cmdbind::DoctypeDetectorR( di->create()));
 			m_finished.push_back( false);
 		}
-		if (dtlist.empty())
-		{
-			m_lastError = "no module for document type/format detection loaded";
-		}
 	}
 
 	/// \brief Implement cmdbind::DoctypeDetector::putInput( const std::string&,std::size)
@@ -549,6 +545,7 @@ const types::CustomDataType* ProcessorProvider::customDataType( const std::strin
 
 cmdbind::DoctypeDetector* ProcessorProvider::doctypeDetector() const
 {
+	if (m_doctypes.empty()) return 0;
 	return new CombinedDoctypeDetector( m_doctypes);
 }
 
@@ -563,10 +560,23 @@ cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& comma
 	return unit->createCommandHandler( command, docformat);
 }
 
-bool ProcessorProvider::existcmd( const std::string& command) const
+bool ProcessorProvider::hasCommand( const std::string& command) const
 {
 	return m_cmdMap.find( command) != m_cmdMap.end();
 }
+
+cmdbind::ProtocolHandler* ProcessorProvider::protocolHandler( const std::string& protocol) const
+{
+	types::keymap<cmdbind::ProtocolHandlerUnitR>::const_iterator pi = m_protocols.find( protocol);
+	if (pi == m_protocols.end()) return 0;
+	return pi->second->createProtocolHandler();
+}
+
+bool ProcessorProvider::hasProtocol( const std::string& protocol) const
+{
+	return m_protocols.find( protocol) != m_protocols.end();
+}
+
 
 db::Database* ProcessorProvider::transactionDatabase() const
 {

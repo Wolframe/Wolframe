@@ -38,7 +38,8 @@ CPP_OBJS = \
 	joinfilter.o \
 	tostringfilter.o \
 	ptreefilter.o \
-	execContextInputFilter.o
+	execContextInputFilter.o \
+	ioFilterCommandHandler.o \
 
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

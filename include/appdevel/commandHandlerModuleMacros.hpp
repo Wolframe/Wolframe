@@ -34,7 +34,6 @@
 /// \brief Macros for a module for a configurable command handler
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
-#include "cmdbind/commandHandlerUnit.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 

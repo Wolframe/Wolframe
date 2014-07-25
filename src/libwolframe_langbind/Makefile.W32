@@ -32,7 +32,8 @@ CPP_OBJS = \
 	inputfilterScope.obj \
 	joinfilter.obj \
 	null_filter.obj \
-	execContextInputFilter.obj
+	execContextInputFilter.obj \
+	ioFilterCommandHandler.obj \
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

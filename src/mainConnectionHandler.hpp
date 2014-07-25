@@ -70,17 +70,15 @@ public:
 	/// \brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
 	virtual void signalOccured( NetworkSignal);
 
-	/// \brief Set the reference to the execution context
-	void setExecContext( proc::ExecContext* context_)
-	{
-		m_cmdhandler.setExecContext( context_);
-	}
+	/// \brief Set the reference to the execution context and initialize the protocol handler
+	void setExecContext( proc::ExecContext* context_);
 
 private:
 	void initSessionExceptionBYE();
 
 private:
-	cmdbind::MainCommandHandler m_cmdhandler;	///< top level instance executing commands
+	std::string m_protocol;				///< name of the protocol to use
+	cmdbind::ProtocolHandlerR m_protocolHandler;	///< top level protocol handler
 	protocol::InputBlock m_input;			///< buffer for network read messages
 	protocol::OutputBlock m_output;			///< buffer for network write messages
 	bool m_terminated;				///< true, if a termination signal came from the network

@@ -51,11 +51,11 @@ CommandHandler* LuaCommandHandlerUnit::createCommandHandler( const std::string& 
 	types::keymap<langbind::FilterDef>::const_iterator fi = m_filtermap.find( docformat);
 	if (fi != m_filtermap.end())
 	{
-		return new LuaCommandHandler( interp, docformat, fi->second);
+		return new LuaCommandHandler( interp, cmdname, docformat, fi->second);
 	}
 	else
 	{
-		return new LuaCommandHandler( interp, docformat, langbind::FilterDef());
+		return new LuaCommandHandler( interp, cmdname, docformat, langbind::FilterDef());
 	}
 }
 

@@ -77,8 +77,13 @@ public:
 
 	/// \brief Create a new command handler for a command and for a document format (e.g. XML,JSON,...)
 	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command, const std::string& docformat) const;
-	/// \brief Find out if a command with a specific name exists without creating a new command handler instance
-	virtual bool existcmd( const std::string& command) const;
+
+	/// \brief Create a new protocol handler
+	virtual cmdbind::ProtocolHandler* protocolHandler( const std::string& protocol) const;
+	/// \brief Find out if a protocol with a specific name exists
+	virtual bool hasProtocol( const std::string& protocol) const;
+	/// \brief Find out if a command with a specific name exists
+	virtual bool hasCommand( const std::string& command) const;
 
 	/// \brief Get a reference to the transaction database
 	virtual db::Database* transactionDatabase() const;

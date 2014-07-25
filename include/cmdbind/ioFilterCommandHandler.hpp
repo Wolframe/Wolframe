@@ -35,7 +35,6 @@
 
 #ifndef _Wolframe_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
 #define _Wolframe_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
-#include "ioblocks.hpp"
 #include "filter/filter.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "system/connectionHandler.hpp"

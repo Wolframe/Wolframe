@@ -192,7 +192,7 @@ int StandardProtocolHandler::endMech( cmdbind::ProtocolHandler* ch, std::ostream
 			out << "OK authenticated" << endl();
 			execContext()->setUser( usr);
 
-			if (execContext()->hasCapability( net::LocalEndpointConfig::PasswordChange)
+			if (execContext()->hasCapability( "PasswordChange")
 			&& execContext()->checkAuthorization( proc::ExecContext::PASSWD))
 			{
 				return MainSTM::Authenticated_passwd;

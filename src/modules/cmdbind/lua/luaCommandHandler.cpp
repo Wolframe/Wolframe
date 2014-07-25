@@ -89,7 +89,6 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 {
 	int rt = 0;
 	errorCode = 0;
-	int nargs = 0;
 
 	if (!m_called)
 	{
@@ -104,13 +103,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 			return Error;
 		}
 		// call the function (for the first time)
-		lua_getglobal( m_interp->thread(), m_name.c_str());
-		std::vector<std::string>::const_iterator itr=m_argBuffer.begin(),end=m_argBuffer.end();
-		for (;itr != end; ++itr)
-		{
-			lua_pushlstring( m_interp->thread(), itr->c_str(), itr->size());
-		}
-		nargs = (int)m_argBuffer.size();
+		lua_getglobal( m_interp->thread(), m_cmdname.c_str());
 		m_called = true;
 	}
 	if (!m_done)
@@ -118,11 +111,11 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 		do
 		{
 			// call the function (subsequently until termination)
-			rt = lua_resume( m_interp->thread(), NULL, nargs);
+			rt = lua_resume( m_interp->thread(), NULL, 0);
 			if (rt == LUA_YIELD)
 			{
 				// call the function (subsequently until termination)
-				rt = lua_resume( m_interp->thread(), NULL, nargs);
+				rt = lua_resume( m_interp->thread(), NULL, 0);
 				if (rt == LUA_YIELD)
 				{
 					if ((m_inputfilter.get() && m_inputfilter->state() != InputFilter::Open)
@@ -131,7 +124,6 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 						return Yield;
 					}
 				}
-				nargs = 0;
 			}
 		}
 		while (rt == LUA_YIELD);
@@ -140,7 +132,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	if (rt != 0)
 	{
 		m_lasterror.append( m_interp->luaUserErrorMessage( m_interp->thread()));
-		LOG_ERROR << "error calling lua function '" << m_name.c_str() << "':" << m_interp->luaErrorMessage( m_interp->thread());
+		LOG_ERROR << "error calling lua function '" << m_cmdname.c_str() << "':" << m_interp->luaErrorMessage( m_interp->thread());
 		errorCode = m_lasterror.c_str();
 		return Error;
 	}

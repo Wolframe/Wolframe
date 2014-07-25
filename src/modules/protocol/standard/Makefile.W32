@@ -27,7 +27,6 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	ioblocks.obj \
-	ioFilterCommandHandler.obj \
 	lineProtocolHandler.obj \
 	escDlfProtocolHandler.obj \
 	authProtocolHandler.obj \
@@ -36,6 +35,7 @@ CPP_OBJS = \
 	interfaceProtocolHandler.obj \
 	passwordChangeProtocolHandler.obj \
 	standardProtocolHandler.obj \
+	contentOnlyProtocolHandler.obj \
 	mod_protocol_standard.obj
 
 all: $(DYNAMIC_MODULE)

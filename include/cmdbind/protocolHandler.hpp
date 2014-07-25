@@ -90,6 +90,9 @@ public:
 	/// \param [in] bytesTransferred number of bytes passed in the input block
 	virtual void putInput( const void* begin, std::size_t bytesTransferred)=0;
 
+	/// \brief Tell the protocol handler that EOF has been reached, if implemented
+	virtual void putEOF(){}
+
 	/// \brief Get the input block request (READ operation)
 	/// \param [out] begin start of the network input buffer
 	/// \param [out] maxBlockSize maximum size of data in bytes to pass with the subsequent putInput(const void*,std::size_t) call
@@ -130,6 +133,9 @@ public:
 	{
 		return m_execContext;
 	}
+
+	/// \brief Pass arguments to protocol handler
+	virtual void setArgumentString( const std::string&){};
 
 	/// \brief Get the termination marker to send for an abort of a running data session
 	virtual const char* interruptDataSessionMarker() const	{return "";}

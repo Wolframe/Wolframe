@@ -37,6 +37,7 @@ Project Wolframe.
 #include "langbind/formFunction.hpp"
 #include "filter/redirectFilterClosure.hpp"
 #include "processor/execContext.hpp"
+#include "cmdbind/ioFilterCommandHandler.hpp"
 #include <boost/shared_ptr.hpp>
 #include "types/keymap.hpp"
 #include "types/form.hpp"
@@ -49,10 +50,9 @@ namespace cmdbind {
 /// \class DirectmapCommandHandler
 /// \brief Command handler instance for processing a call as Directmap (mapping with forms and a transaction or form function)
 class DirectmapCommandHandler
-	:public IOFilterCommandHandlerEscDLF
+	:public IOFilterCommandHandler
 {
 public:
-	typedef IOFilterCommandHandlerEscDLF Parent;
 	/// \brief Constructor
 	explicit DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const langbind::InputFilterR& inputfilter_, const langbind::OutputFilterR& outputfilter_);
 

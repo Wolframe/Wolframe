@@ -35,15 +35,14 @@
 #include "wolfilterIostreamFilter.hpp"
 #include "serialize/ddlFormSerializer.hpp"
 #include "serialize/ddlFormParser.hpp"
-#include "langbind/formFunction.hpp"
 #include "serialize/ddl/ddlStructParser.hpp"
 #include "serialize/ddl/ddlStructSerializer.hpp"
-#include "doctypeFilterCommandHandler.hpp"
-#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "processor/execContext.hpp"
+#include "cmdbind/protocolHandler.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/null_filter.hpp"
 #include "filter/redirectFilterClosure.hpp"
+#include "langbind/formFunction.hpp"
 #include "utils/stringUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
@@ -173,7 +172,7 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, InputF
 	}
 }
 
-static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbind::CommandHandler* cmdh)
+static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbind::ProtocolHandler* cmdh)
 {
 	std::size_t pp = 0;
 	while (pp < bufsize && !is.eof())
@@ -186,245 +185,17 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbin
 		throw std::runtime_error("unexpected end of file");
 	}
 	cmdh->putInput( buf, pp);
-}
-
-static bool readInputEscLFdot( int& state, char* buf, unsigned int bufsize, std::istream& is, cmdbind::CommandHandler* cmdh)
-{
-	enum State {Init=0,ConsumedLF=1,ConsumedLFDot=2,PutEOF_LF=3,PutEOF_LFDot=4,PutEOF_LFDotLF=5};
-	std::size_t pp = 0;
-	while (pp < bufsize)
+	if (is.eof())
 	{
-		if (state == ConsumedLFDot)
-		{
-			state = Init;
-			buf[ pp++] = '.';
-		}
-		else if (state == PutEOF_LF)
-		{
-			state = PutEOF_LFDot;
-			buf[ pp++] = '\n';
-		}
-		else if (state == PutEOF_LFDot)
-		{
-			state = PutEOF_LFDotLF;
-			buf[ pp++] = '.';
-		}
-		else if (state == PutEOF_LFDotLF)
-		{
-			buf[ pp++] = '\n';
-			cmdh->putInput( buf, pp);
-			state = Init;
-			return true;
-		}
-		else if (is.eof())
-		{
-			state = PutEOF_LF;
-		}
-		else
-		{
-			is.read( buf + pp, sizeof(char));
-			if (!is.eof())
-			{
-				switch ((State)state)
-				{
-					case Init:
-						if (buf[pp] == '\n')
-						{
-							state = ConsumedLF;
-						}
-						break;
-					case ConsumedLF:
-						if (buf[pp] == '.')
-						{
-							state = ConsumedLFDot;
-						}
-						else if (buf[pp] != '\n')
-						{
-							state = Init;
-						}
-						break;
-					case ConsumedLFDot:
-						throw std::logic_error("illegal state");
-					case PutEOF_LF:
-					case PutEOF_LFDot:
-					case PutEOF_LFDotLF:
-						break;
-				}
-				++pp;
-			}
-		}
+		cmdh->putEOF();
 	}
-	cmdh->putInput( buf, pp);
-	return false;
-}
-
-static void writeOutputEscLFdot( int& state, const char* buf, unsigned int bufsize, std::ostream& os)
-{
-	enum State {
-		Init=0,
-		ConsumedCR,
-		ConsumedLF,
-		ConsumedCRLF,
-		ConsumedLFDot,
-		ConsumedCRLFDot,
-		ConsumedLFDotCR,
-		ConsumedCRLFDotCR
-	};
-	std::size_t pp = 0;
-	std::string outstr;
-	while (pp < bufsize)
-	{
-		switch ((State)state)
-		{
-			case Init:
-				if (buf[pp] == '\n')
-				{
-					state = ConsumedLF;
-				}
-				else if (buf[pp] == '\r')
-				{
-					state = ConsumedCR;
-				}
-				else
-				{
-					outstr.push_back( buf[pp]);
-				}
-				break;
-			case ConsumedCR:
-				if (buf[pp] == '\n')
-				{
-					state = ConsumedCRLF;
-				}
-				else if (buf[pp] == '\r')
-				{
-					outstr.push_back( buf[pp]);
-				}
-				else
-				{
-					outstr.push_back( '\r');
-					outstr.push_back( buf[pp]);
-					state = Init;
-				}
-				break;
-			case ConsumedLF:
-				if (buf[pp] == '.')
-				{
-					state = ConsumedLFDot;
-				}
-				else if (buf[pp] == '\n')
-				{
-					outstr.push_back( '\n');
-				}
-				else if (buf[pp] == '\r')
-				{
-					outstr.push_back( '\n');
-					state = ConsumedCR;
-				}
-				else
-				{
-					outstr.push_back( '\n');
-					outstr.push_back( buf[pp]);
-					state = Init;
-				}
-				break;
-			case ConsumedCRLF:
-				if (buf[pp] == '.')
-				{
-					state = ConsumedCRLFDot;
-				}
-				else if (buf[pp] == '\n')
-				{
-					outstr.push_back( '\r');
-					outstr.push_back( '\n');
-					state = ConsumedLF;
-				}
-				else if (buf[pp] == '\r')
-				{
-					outstr.push_back( '\r');
-					outstr.push_back( '\n');
-					state = ConsumedCR;
-				}
-				else
-				{
-					outstr.push_back( '\r');
-					outstr.push_back( '\n');
-					outstr.push_back( buf[pp]);
-					state = Init;
-				}
-				break;
-			case ConsumedLFDot:
-				if (buf[pp] == '\n')
-				{
-					state = Init;
-					//... EOF marker is swallowed
-				}
-				if (buf[pp] == '\r')
-				{
-					state = ConsumedLFDotCR;
-				}
-				else
-				{
-					outstr.push_back( '\n');
-					outstr.push_back( buf[pp]);
-					//... LF dot X -> LF X
-					state = Init;
-				}
-				break;
-			case ConsumedCRLFDot:
-				if (buf[pp] == '\n')
-				{
-					state = Init;
-					//... EOF marker is swallowed
-				}
-				if (buf[pp] == '\r')
-				{
-					state = ConsumedCRLFDotCR;
-				}
-				else
-				{
-					outstr.push_back( '\r');
-					outstr.push_back( '\n');
-					outstr.push_back( buf[pp]);
-					//... CR LF dot X -> CR LF X
-					state = Init;
-				}
-				break;
-			case ConsumedLFDotCR:
-			case ConsumedCRLFDotCR:
-				if (buf[pp] == '\n')
-				{
-					state = Init;
-					//... EOF marker is swallowed
-				}
-				else
-				{
-					throw std::runtime_error("expected LF after LF dot CR sequence in input (incomplete EOF marker)");
-				}
-				break;
-		}
-		++pp;
-	}
-	os << outstr;
 }
 
 
-static void checkUnconsumedInput( std::istream& is, InputFilter& iflt)
+
+static void checkUnconsumedInput( std::istream& is)
 {
-	union
-	{
-		const void* ptr_;
-		const char* ptr;
-	} data;
-	std::size_t ii,size;
-	bool end;
-	iflt.getRest( data.ptr_, size, end);
-	for (ii=0; ii<size; ++ii)
-	{
-		if ((unsigned char)data.ptr[ii] > 32)
-		{
-			throw std::runtime_error( "unconsumed input left");
-		}
-	}
+	bool end = 0;
 	while (!end)
 	{
 		char ch = 0;
@@ -437,10 +208,13 @@ static void checkUnconsumedInput( std::istream& is, InputFilter& iflt)
 	}
 }
 
-static void writeOutput( char* buf, unsigned int size, std::ostream& os, OutputFilter& oflt)
+static void writeOutput( std::ostream& os, OutputFilter& oflt)
 {
-	os.write( buf, oflt.getPosition());
-	oflt.setOutputBuffer( buf, size);
+	const void* buf;
+	std::size_t bufsize;
+
+	oflt.getOutput( buf, bufsize);
+	os.write( (const char*)buf, bufsize);
 }
 
 struct BufferStruct
@@ -490,7 +264,7 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 			throw std::runtime_error( "unknown error");
 
 		case OutputFilter::EndOfBuffer:
-			writeOutput( buf.outbuf, buf.outsize, os, *oflt);
+			writeOutput( os, *oflt);
 			return;
 
 		case OutputFilter::Error:
@@ -502,89 +276,27 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 	}
 }
 
-static bool redirectInput( BufferStruct& buf, int& stateEscOut, const void* data, std::size_t datasize, cmdbind::CommandHandler* toh, std::ostream& os)
+static bool processProtocolHandler( BufferStruct& buf, cmdbind::ProtocolHandler* cmdh, std::istream& is, std::ostream& os, std::string& lasterr)
 {
-	bool doEscapeLFdot = !!dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( toh);
-	const void* toh_output;
-	std::size_t toh_outputsize;
-	const char* error;
-	toh->setInputBuffer( const_cast<char*>((const char*)data), datasize);
-	toh->putInput( data, datasize);
-
-	for (;;) switch (toh->nextOperation())
-	{
-		case cmdbind::CommandHandler::READ:
-			toh->setInputBuffer( buf.inbuf, buf.insize);
-			return true;
-		case cmdbind::CommandHandler::WRITE:
-			toh->getOutput( toh_output, toh_outputsize);
-			if (doEscapeLFdot)
-			{
-				writeOutputEscLFdot( stateEscOut, (const char*)toh_output, toh_outputsize, os);
-			}
-			else
-			{
-				os << std::string( (const char*)toh_output, toh_outputsize);
-			}
-			continue;
-		case cmdbind::CommandHandler::CLOSE:
-			error = toh->lastError();
-			if (error)
-			{ 
-				std::ostringstream msg;
-				msg << "error redirect input: " << error;
-				throw std::runtime_error( msg.str());
-			}
-			toh->setInputBuffer( buf.inbuf, buf.insize);
-			return false;
-	}
-}
-
-static bool processCommandHandler( BufferStruct& buf, int& stateEscIn, int& stateEscOut, cmdbind::CommandHandler* cmdh, std::istream& is, std::ostream& os, bool doEscapeLFdot, std::string& lasterr)
-{
-	const void* cmdh_output;
-	std::size_t cmdh_outputsize;
-	void* cmdh_input;
-	std::size_t cmdh_inputsize;
-	const char* error;
 	cmdh->setInputBuffer( buf.inbuf, buf.insize);
-	int eofCnt = 0;
 
 	for (;;) switch (cmdh->nextOperation())
 	{
-		case cmdbind::CommandHandler::READ:
-			if (doEscapeLFdot)
-			{
-				cmdh->getInputBlock( cmdh_input, cmdh_inputsize);
-				if (readInputEscLFdot( stateEscIn, (char*)cmdh_input, cmdh_inputsize, is, cmdh))
-				{
-					if (++eofCnt > 2)
-					{
-						lasterr = "got READ after processing EoD";
-						return false;
-					}
-				}
-			}
-			else
-			{
-				readInput( buf.inbuf, buf.insize, is, cmdh);
-			}
+		case cmdbind::ProtocolHandler::READ:
+			readInput( buf.inbuf, buf.insize, is, cmdh);
 			continue;
 
-		case cmdbind::CommandHandler::WRITE:
+		case cmdbind::ProtocolHandler::WRITE:
+		{
+			const void* cmdh_output;
+			std::size_t cmdh_outputsize;
 			cmdh->getOutput( cmdh_output, cmdh_outputsize);
-			if (doEscapeLFdot)
-			{
-				writeOutputEscLFdot( stateEscOut, (const char*)cmdh_output, cmdh_outputsize, os);
-			}
-			else
-			{
-				os << std::string( (const char*)cmdh_output, cmdh_outputsize);
-			}
+			os << std::string( (const char*)cmdh_output, cmdh_outputsize);
 			continue;
-
-		case cmdbind::CommandHandler::CLOSE:
-			error = cmdh->lastError();
+		}
+		case cmdbind::ProtocolHandler::CLOSE:
+		{
+			const char* error = cmdh->lastError();
 			if (error)
 			{ 
 				std::ostringstream msg;
@@ -593,11 +305,12 @@ static bool processCommandHandler( BufferStruct& buf, int& stateEscIn, int& stat
 				return false;
 			}
 			return true;
+		}
 	}
 }
 
 
-void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
+void langbind::iostreamfilter( proc::ExecContext* execContext, const std::string& protocol, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	BufferStruct buf( ib, ob);
 	const proc::ProcessorProviderInterface* provider = execContext->provider();
@@ -608,7 +321,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		Filter flt = getFilter( provider, ifl, ofl);
 		if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
 		if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
-		flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
+		flt.outputfilter()->setOutputChunkSize( buf.outsize);
 
 		// ... no command specified -> we simply map the input through the
 		//	input/output filters specified:
@@ -648,121 +361,32 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 		{
 			processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 		}
-		checkUnconsumedInput( is, *flt.inputfilter());
-		writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+		checkUnconsumedInput( is);
+		writeOutput( os, *flt.outputfilter());
 		if (taglevel != -1) throw std::runtime_error( "tags not balanced");
 		return;
 	}
 	{
-		if (proc[ proc.size()-1] == '~' || provider->existcmd( proc))
+		if (proc[ proc.size()-1] == '~' || provider->hasCommand( proc))
 		{
 			LOG_TRACE << "Start executing command '" << proc << "'";
-			// ... command is handled by a command handler
-			//	-> detect document type with the doctype detection,
-			//	evaluate the command to execute (substitute '~' with doctype id)
-			//	and initialize the command handler with the docformat
-			//	as first parameter as the main protocol does.
 
-			bool standaloneCommand = (proc[ proc.size()-1] != '~');
-			cmdbind::DoctypeFilterCommandHandler* dtfh = new cmdbind::DoctypeFilterCommandHandler();
-			cmdbind::CommandHandlerR dtfh_scoped( dtfh);
-			dtfh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
-			dtfh->setExecContext( execContext);
+			cmdbind::ProtocolHandlerR protocolhnd( provider->protocolHandler( protocol));
+			if (!protocolhnd.get()) throw std::runtime_error( std::string("protocol '") + protocol + "' is not defined");
+			if (proc[ proc.size()-1] == '~')
+			{
+				protocolhnd->setArgumentString( std::string( proc.c_str(), proc.size()-1));
+			}
+			else
+			{
+				protocolhnd->setArgumentString( proc + "!");
+			}
+			protocolhnd->setOutputBuffer( buf.outbuf, buf.outsize, 0);
 
-			// Detect document format:
-			int stateEscIn = 0;
-			int stateEscOut = 0;
 			std::string lasterr;
-			if (!processCommandHandler( buf, stateEscIn, stateEscOut, dtfh, is, os, true, lasterr))
+			if (!processProtocolHandler( buf, protocolhnd.get(), is, os, lasterr))
 			{
-				if (!standaloneCommand)
-				{
-					throw std::runtime_error( lasterr);
-				}
-			}
-			std::string docformat;
-			std::string doctype;
-			types::DoctypeInfoR info = dtfh->info();
-			if (info.get())
-			{
-				docformat = info->docformat();
-				doctype = info->doctype();
-			}
-			else
-			{
-				std::string explain;
-				if (dtfh->lastError())
-				{
-					explain.append( ": ");
-					explain.append( dtfh->lastError());
-				}
-				if (standaloneCommand)
-				{
-					LOG_WARNING << "document format not detected and assumed to be 'text'" << explain;
-					docformat = "text";
-				}
-				else
-				{
-					throw std::runtime_error( std::string("document format not recognigzed") + explain);
-				}
-			}
-			std::string cmdname;
-			if (standaloneCommand)
-			{
-				cmdname = proc;
-			}
-			else
-			{
-				cmdname = std::string( proc.c_str(), proc.size()-1) + doctype;
-			}
-			cmdbind::CommandHandler* cmdh = provider->cmdhandler( cmdname, docformat);
-			if (!cmdh)
-			{
-				throw std::runtime_error( std::string("no command handler defined for '") + proc + " processing '" + docformat + "'");
-			}
-			cmdbind::CommandHandlerR cmdh_scoped( cmdh);
-			cmdh->setExecContext( execContext);
-
-			Filter flt = getFilter( provider, ifl, ofl);
-			cmdbind::IOFilterCommandHandlerEscDLF* ifch = dynamic_cast<cmdbind::IOFilterCommandHandlerEscDLF*>( cmdh);
-			if (!ifch) 
-			{
-				throw std::runtime_error( "expected command handler processing CRLFdot escaped content");
-			}
-			if (ifl.size() && flt.inputfilter().get())
-			{
-				ifch->setFilter( flt.inputfilter());
-			}
-			if (ofl.size() && flt.outputfilter().get())
-			{
-				ifch->setFilter( flt.outputfilter());
-				flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
-			}
-			const char* cmd_argv = docformat.c_str();
-			cmdh->passParameters( cmdname, 1, &cmd_argv);
-			cmdh->setOutputBuffer( buf.outbuf, buf.outsize, 0);
-
-			// Get data (consumed and rest = not processed) from 
-			//	the doc type detection command handler 
-			//	to redirect to the executing command handler:
-			std::string databuf;
-			void* comsumed_buffer;
-			std::size_t comsumed_size;
-			dtfh->getInputBuffer( comsumed_buffer, comsumed_size);
-			const void* rest_buffer;
-			std::size_t rest_size;
-			dtfh->getDataLeft( rest_buffer, rest_size);
-			databuf.append( (const char*)comsumed_buffer, comsumed_size);
-			databuf.append( (const char*)rest_buffer, rest_size);
-
-			// Redirect input processed and call command handler 
-			//	to process if there is still input left:
-			if (redirectInput( buf, stateEscOut, databuf.c_str(), databuf.size(), cmdh, os))
-			{
-				if (!processCommandHandler( buf, stateEscIn, stateEscOut, cmdh, is, os, true, lasterr))
-				{
-					throw std::runtime_error( lasterr);
-				}
+				throw std::runtime_error( lasterr);
 			}
 			// Check if there is unconsumed input left (must not happen):
 			bool end = false;
@@ -790,7 +414,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			Filter flt = getFilter( provider, ifl, ofl);
 			if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
 			if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
-			flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
+			flt.outputfilter()->setOutputChunkSize( buf.outsize);
 
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
@@ -804,8 +428,8 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 			while (!flt.outputfilter()->close()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-			checkUnconsumedInput( is, *flt.inputfilter());
+			writeOutput( os, *flt.outputfilter());
+			checkUnconsumedInput( is);
 			return;
 		}
 	}
@@ -821,7 +445,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			Filter flt = getFilter( provider, ifl, ofl);
 			if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
 			if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
-			flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
+			flt.outputfilter()->setOutputChunkSize( buf.outsize);
 
 			types::Form df( st);
 			flt.inputfilter()->setValue( "empty", "false");
@@ -838,8 +462,8 @@ void _Wolframe::langbind::iostreamfilter( proc::ExecContext* execContext, const 
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 			while (!flt.outputfilter()->close()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-			checkUnconsumedInput( is, *flt.inputfilter());
+			writeOutput( os, *flt.outputfilter());
+			checkUnconsumedInput( is);
 			return;
 		}
 	}

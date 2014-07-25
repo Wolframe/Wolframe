@@ -1598,25 +1598,9 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 		}
 		else if (input->inputfilter().get())
 		{
-			//... old filter defined, then assign the rest of the input to the new filter attached
-			const void* chunk;
-			std::size_t chunksize;
-			bool chunkend;
-			input->inputfilter()->getRest( chunk, chunksize, chunkend);
-			try
+			if (input->inputfilter()->state() != langbind::InputFilter::Start)
 			{
-				chunk = input->allocContentCopy( chunk, chunksize);
-				ff->putInput( chunk, chunksize, chunkend);
-			}
-			catch (const std::runtime_error& e)
-			{
-				delete ff;
-				throw e;
-			}
-			catch (const std::bad_alloc& e)
-			{
-				delete ff;
-				throw e;
+				throw std::runtime_error( "cannot change input filter after first read");
 			}
 			input->inputfilter().reset( ff);
 		}
@@ -1840,7 +1824,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 						ff->inheritMetaData( input->inputfilter()->getMetaDataRef());
 					}
 				}
-				ff->assignState( *output->outputfilter());
+				ff->setOutputChunkSize( output->outputfilter()->outputChunkSize());
 			}
 			output->outputfilter().reset( ff);
 		}

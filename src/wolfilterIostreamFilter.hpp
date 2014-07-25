@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilterIostreamFilter.hpp
-///\brief Interface for mapping istream to ostream by filters, forms, functions
+/// \file wolfilterIostreamFilter.hpp
+/// \brief Interface for mapping istream to ostream by filters, forms, functions
 #ifndef _Wolfilter_IOSTREAMFILTER_HPP_INCLUDED
 #define _Wolfilter_IOSTREAMFILTER_HPP_INCLUDED
 #include <string>
@@ -41,17 +41,18 @@
 namespace _Wolframe {
 namespace langbind {
 
-///\brief Maps input to output through a filter and a conversion procedure.
-///\remark throws exception on error
-///\param[in] execContext the execution context
-///\param[in] proc conversion procedure name. emty for no conversion
-///\param[in] ifl input filter name
-///\param[in] ib input buffer size
-///\param[in] ofl output filter name
-///\param[in] ob output buffer size
-///\param[in,out] is input stream
-///\param[in,out] os output stream
-void iostreamfilter( proc::ExecContext* execContext, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os);
+/// \brief Maps input to output through a filter and a conversion procedure.
+/// \remark throws exception on error
+/// \param[in] execContext the execution context
+/// \param[in] protocol protocol to use
+/// \param[in] proc conversion procedure name. emty for no conversion
+/// \param[in] ifl input filter name
+/// \param[in] ib input buffer size
+/// \param[in] ofl output filter name
+/// \param[in] ob output buffer size
+/// \param[in,out] is input stream
+/// \param[in,out] os output stream
+void iostreamfilter( proc::ExecContext* execContext, const std::string& protocol, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os);
 
 }}//namespace
 #endif

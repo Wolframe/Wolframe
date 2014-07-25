@@ -40,6 +40,7 @@
 #include <vector>
 #include <sstream>
 #include <ctime>
+#include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 namespace net {
@@ -102,8 +103,9 @@ struct LocalEndpointConfig
 		return ar[c];
 	}
 
-	unsigned int capabilities;
+	std::vector<std::string> capabilities;
 	std::string socketIdentifier;
+	std::string protocol;
 
 	/// \brief Default constructor
 	LocalEndpointConfig()
@@ -118,17 +120,22 @@ struct LocalEndpointConfig
 	/// \brief Reset capabilities
 	void resetCapabilities()
 	{
-		capabilities = 0;
+		capabilities.clear();
 	}
 	/// \brief Set a capability for this local endpoint configuration
-	void setCapability( ProtocolCapability c)
+	void setCapability( const std::string& c)
 	{
-		capabilities |= (1 << (unsigned char)c);
+		capabilities.push_back( c);
 	}
 	/// \brief Ask for a capability for this local endpoint configuration
-	bool hasCapability( ProtocolCapability c) const
+	bool hasCapability( const std::string& c) const
 	{
-		return 0!=(capabilities & (1 << (unsigned char)c));
+		std::vector<std::string>::const_iterator ci = capabilities.begin(), ce = capabilities.end();
+		for (; ci != ce; ++ci)
+		{
+			if (boost::algorithm::iequals( *ci, c)) return true;
+		}
+		return false;
 	}
 };
 

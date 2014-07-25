@@ -35,7 +35,7 @@ Project Wolframe.
 #define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_UNIT_HPP_INCLUDED
 #include "filter/filterdef.hpp"
 #include "luaScriptContext.hpp"
-#include "cmdbind/commandHandlerUnit.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "luaCommandHandlerConfig.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <vector>

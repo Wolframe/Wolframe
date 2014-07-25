@@ -62,6 +62,8 @@ namespace cmdbind
 /// \brief Forward declaration
 class CommandHandler;
 /// \brief Forward declaration
+class ProtocolHandler;
+/// \brief Forward declaration
 class DoctypeDetector;
 }
 namespace langbind
@@ -86,10 +88,17 @@ public:
 	/// \param[in] docformat document format, e.g. "XML","JSON"
 	/// \return the constructed command handler (owned now by the caller)
 	virtual cmdbind::CommandHandler* cmdhandler( const std::string& command, const std::string& docformat) const=0;
+	/// \brief Create a new protocol handler for a command and for a document format (e.g. XML,JSON,...)
+	/// \param[in] protocol name of the protocol
+	virtual cmdbind::ProtocolHandler* protocolHandler( const std::string& protocol) const=0;
+	/// \brief Find out if a protocol with a specific name exists
+	/// \param[in] protocol name of the protocol
+	/// \return true, if yes
+	virtual bool hasProtocol( const std::string& protocol) const=0;
 	/// \brief Find out if there exists a command handler for a specific command without creating it
 	/// \param[in] command name of the command
 	/// \return true, if yes
-	virtual bool existcmd( const std::string& command) const=0;
+	virtual bool hasCommand( const std::string& command) const=0;
 	/// \brief Get the database for transactions
 	/// \return reference to database
 	virtual db::Database* transactionDatabase() const=0;

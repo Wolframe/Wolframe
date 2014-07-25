@@ -101,14 +101,14 @@ const net::NetworkOperation MainConnectionHandler::nextOperation()
 	}
 	try
 	{
-		switch(m_cmdhandler.nextOperation())
+		switch(m_protocolHandler->nextOperation())
 		{
 			case cmdbind::CommandHandler::READ:
-				m_cmdhandler.getInputBlock( inpp, inppsize);
+				m_protocolHandler->getInputBlock( inpp, inppsize);
 				return net::ReadData( inpp, inppsize, m_cmdhandler.execContext()->defaultTimeout());
 	
 			case cmdbind::CommandHandler::WRITE:
-				m_cmdhandler.getOutput( outpp, outppsize);
+				m_protocolHandler->getOutput( outpp, outppsize);
 				return net::SendData( outpp, outppsize);
 	
 			case cmdbind::CommandHandler::CLOSE:
@@ -135,10 +135,14 @@ const net::NetworkOperation MainConnectionHandler::nextOperation()
 }
 
 MainConnectionHandler::MainConnectionHandler( const net::LocalEndpoint& local)
-	:m_cmdhandler()
-	,m_terminated(false)
+	:m_terminated(false)
 	,m_exceptionByeMessagePtr(0)
 {
+	m_protocol = local.config().protocol;
+	if (m_protocol.empty())
+	{
+		m_protocol = "standard";
+	}
 	m_cmdhandler.setInputBuffer( m_input.ptr(), m_input.size());
 	m_cmdhandler.setOutputBuffer( m_output.ptr(), m_output.size());
 	m_cmdhandler.setLocalEndPoint( local);
@@ -156,4 +160,13 @@ void MainConnectionHandler::setPeer( const net::RemoteEndpoint& remote)
 	m_cmdhandler.setPeer( remote);
 }
 
+void MainConnectionHandler::setExecContext( proc::ExecContext* context_)
+{
+	m_protocolHandler.reset( context_->provider->protocolHandler( m_protocol));
+	if (!m_protocolHandler.get())
+	{
+		throw std::runtime_error( std::string("protocol '") + m_protocol + "' is not defined");
+	}
+	m_cmdhandler.setExecContext( context_);
+}
 

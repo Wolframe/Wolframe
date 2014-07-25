@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file ioFilterCommandHandler.cpp
+/// \file cmdbind/ioFilterCommandHandler.cpp
 /// \brief Command handler base class for processing content and writing output through filters
-#include "ioFilterCommandHandler.hpp"
+#include "cmdbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;

@@ -36,7 +36,7 @@ Project Wolframe.
 #include "directmapProgram.hpp"
 #include "filter/filterdef.hpp"
 #include "directmapCommandHandlerConfig.hpp"
-#include "cmdbind/commandHandlerUnit.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "processor/procProviderInterface.hpp"
 #include <vector>
 #include <string>

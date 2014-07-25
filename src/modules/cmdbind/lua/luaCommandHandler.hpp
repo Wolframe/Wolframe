@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface to the lua command handler
 #ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
+#include "cmdbind/ioFilterCommandHandler.hpp"
 #include "filter/filterdef.hpp"
 #include "luaObjects.hpp"
 #include "luaScriptContext.hpp"
@@ -45,15 +45,13 @@ namespace cmdbind {
 
 ///\class LuaCommandHandler
 ///\brief command handler instance for processing a call as Lua script
-class LuaCommandHandler :public IOFilterCommandHandlerEscDLF
+class LuaCommandHandler
+	:public IOFilterCommandHandler
 {
 public:
-	typedef IOFilterCommandHandlerEscDLF Parent;
-
-public:
 	///\brief Constructor
-	explicit LuaCommandHandler( const langbind::LuaScriptInstanceR& interp_, const std::string& docformat_, const langbind::FilterDef& default_filter_)
-		:m_interp(interp_),m_docformat(docformat_),m_default_filter(default_filter_),m_called(false),m_done(false){}
+	explicit LuaCommandHandler( const langbind::LuaScriptInstanceR& interp_, const std::string& cmdname_, const std::string& docformat_, const langbind::FilterDef& default_filter_)
+		:m_interp(interp_),m_cmdname(cmdname_),m_docformat(docformat_),m_default_filter(default_filter_),m_called(false),m_done(false){}
 
 	///\brief Destructor
 	virtual ~LuaCommandHandler(){}
@@ -74,9 +72,10 @@ private:
 
 private:
 	langbind::LuaScriptInstanceR m_interp;
-	std::string m_docformat;
-	langbind::FilterDef m_default_filter;
-	std::string m_lasterror;
+	std::string m_cmdname;			///< name of the command executed
+	std::string m_docformat;		///< document format identifier, e.g. "XML","JSON", etc.
+	langbind::FilterDef m_default_filter;	///< default filter to use
+	std::string m_lasterror;		///< buffer for the error string returned in call(const char*&)
 	bool m_called;				///< already called once
 	bool m_done;				///< terminated execution, executing output filter close phase
 };
