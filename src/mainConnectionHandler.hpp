@@ -53,14 +53,14 @@ public:
 	enum {NeworkBufferSize=4000};
 
 	/// \brief Constructor
-	MainConnectionHandler( const net::LocalEndpoint& local);
+	MainConnectionHandler( const net::LocalEndpointR& local);
 
 	/// \brief Destructor
 	virtual ~MainConnectionHandler();
 
 	/// \brief Set the remote peer and indicate that the connection is up now.
 	/// \param [in] remote remote peer
-	virtual void setPeer( const net::RemoteEndpoint& remote);
+	virtual void setPeer( const net::RemoteEndpointR& remote);
 
 	/// \brief Handle a request and produce a reply (statemachine of the processor)
 	virtual const net::NetworkOperation nextOperation();
@@ -81,7 +81,8 @@ private:
 	void initSessionExceptionBYE();
 
 private:
-	std::string m_protocol;				///< name of the protocol to use
+	net::LocalEndpointR m_localEndPoint;		///< local end point of the connection
+	net::RemoteEndpointR m_remoteEndPoint;		///< local end point of the connection
 	cmdbind::ProtocolHandlerR m_protocolHandler;	///< top level protocol handler
 	char* m_input;					///< buffer for network read messages
 	std::size_t m_inputsize;			///< allocation size of m_input in bytes

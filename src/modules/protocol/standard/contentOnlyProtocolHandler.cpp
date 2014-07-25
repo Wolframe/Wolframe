@@ -48,19 +48,17 @@ using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
 ContentOnlyProtocolHandler::ContentOnlyProtocolHandler()
-	:m_remoteEndpoint(0)
-	,m_localEndpoint(0)
-	,m_state(Init)
+	:m_state(Init)
 	,m_eod(false){}
 
-void ContentOnlyProtocolHandler::setPeer( const net::RemoteEndpoint& remote)
+void ContentOnlyProtocolHandler::setPeer( const net::RemoteEndpointR& remote)
 {
-	m_remoteEndpoint = &remote;
+	m_remoteEndpoint = remote;
 }
 
-void ContentOnlyProtocolHandler::setLocalEndPoint( const net::LocalEndpoint& local)
+void ContentOnlyProtocolHandler::setLocalEndPoint( const net::LocalEndpointR& local)
 {
-	m_localEndpoint = &local;
+	m_localEndpoint = local;
 }
 
 static bool IsSpace( char ch) {return ch>0 && ch <=32;}

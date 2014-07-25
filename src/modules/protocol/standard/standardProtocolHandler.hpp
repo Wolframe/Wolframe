@@ -51,8 +51,8 @@ public:
 	StandardProtocolHandler();
 	virtual ~StandardProtocolHandler(){}
 
-	void setPeer( const net::RemoteEndpoint& remote);
-	void setLocalEndPoint( const net::LocalEndpoint& local);
+	void setPeer( const net::RemoteEndpointR& remote);
+	void setLocalEndPoint( const net::LocalEndpointR& local);
 
 public:
 	int doAuth( int argc, const char** argv, std::ostream& out);
@@ -81,8 +81,8 @@ private:
 private:
 	boost::shared_ptr<AAAA::Authenticator> m_authenticator;
 	boost::shared_ptr<AAAA::PasswordChanger> m_passwordChanger;
-	const net::RemoteEndpoint* m_remoteEndpoint;
-	const net::LocalEndpoint* m_localEndpoint;
+	net::RemoteEndpointR m_remoteEndpoint;
+	net::LocalEndpointR m_localEndpoint;
 	std::string m_command;
 	std::string m_commandtag;
 };

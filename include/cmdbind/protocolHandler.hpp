@@ -64,11 +64,11 @@ public:
 
 	/// \brief Set the client connection end point
 	/// \param [in] remote the end point to set
-	virtual void setPeer( const net::RemoteEndpoint&){}
+	virtual void setPeer( const net::RemoteEndpointR&){}
 
 	/// \brief Set the local connection end point
 	/// \param [in] local the local point to set
-	virtual void setLocalEndPoint( const net::LocalEndpoint&){}
+	virtual void setLocalEndPoint( const net::LocalEndpointR&){}
 
 	/// \brief Define the input buffer for processing the command
 	/// \param [in] buf buffer for the data to process

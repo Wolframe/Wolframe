@@ -87,18 +87,16 @@ struct MainSTM :public cmdbind::LineProtocolHandlerSTMTemplate<StandardProtocolH
 static MainSTM mainstm;
 
 StandardProtocolHandler::StandardProtocolHandler()
-	:cmdbind::LineProtocolHandlerTemplate<StandardProtocolHandler>(&mainstm)
-	,m_remoteEndpoint(0)
-	,m_localEndpoint(0){}
+	:cmdbind::LineProtocolHandlerTemplate<StandardProtocolHandler>(&mainstm){}
 
-void StandardProtocolHandler::setPeer( const net::RemoteEndpoint& remote)
+void StandardProtocolHandler::setPeer( const net::RemoteEndpointR& remote)
 {
-	m_remoteEndpoint = &remote;
+	m_remoteEndpoint = remote;
 }
 
-void StandardProtocolHandler::setLocalEndPoint( const net::LocalEndpoint& local)
+void StandardProtocolHandler::setLocalEndPoint( const net::LocalEndpointR& local)
 {
-	m_localEndpoint = &local;
+	m_localEndpoint = local;
 }
 
 int StandardProtocolHandler::doCapabilities( int argc, const char**, std::ostream& out)
@@ -131,11 +129,11 @@ int StandardProtocolHandler::doQuit( int argc, const char**, std::ostream& out)
 
 int StandardProtocolHandler::doAuth( int argc, const char**, std::ostream& out)
 {
-	if (!m_localEndpoint)
+	if (!m_localEndpoint.get())
 	{
 		throw std::logic_error( "no local endpoint set");
 	}
-	if (!m_remoteEndpoint)
+	if (!m_remoteEndpoint.get())
 	{
 		throw std::logic_error( "no remote endpoint set");
 	}
@@ -143,7 +141,7 @@ int StandardProtocolHandler::doAuth( int argc, const char**, std::ostream& out)
 
 	if (!m_authenticator.get())
 	{
-		if (!m_remoteEndpoint)
+		if (!m_remoteEndpoint.get())
 		{
 			throw std::logic_error("no remote endpoint set, cannot authenticate");
 		}
@@ -284,7 +282,7 @@ int StandardProtocolHandler::doPasswordChange( int argc, const char**, std::ostr
 		out << "ERR to many arguments for PASSWD" << endl();
 		return stateidx();
 	}
-	if (!m_remoteEndpoint)
+	if (!m_remoteEndpoint.get())
 	{
 		throw std::logic_error("no remote endpoint set, cannot change password");
 	}

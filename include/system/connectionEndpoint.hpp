@@ -41,6 +41,7 @@
 #include <sstream>
 #include <ctime>
 #include <boost/algorithm/string.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace net {
@@ -159,6 +160,9 @@ private:
 	time_t	m_creationTime;				///< time when object has been constructed
 };
 
+typedef boost::shared_ptr<LocalEndpoint> LocalEndpointR;
+
+
 /// Local unencrypted endpoint
 class LocalTCPendpoint : public LocalEndpoint
 {
@@ -200,6 +204,9 @@ public:
 private:
 	time_t	m_connectionTime;
 };
+
+typedef boost::shared_ptr<RemoteEndpoint> RemoteEndpointR;
+
 
 /// Remote unencrypted endpoint
 class RemoteTCPendpoint : public RemoteEndpoint

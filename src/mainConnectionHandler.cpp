@@ -32,11 +32,7 @@
 ************************************************************************/
 ///\file mainConnectionHandler.cpp
 #include "mainConnectionHandler.hpp"
-#include "mainCommandHandler.hpp"
-#include "authCommandHandler.hpp"
-#include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
 #include "processor/execContext.hpp"
-#include "interfaceCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
@@ -48,7 +44,7 @@ using namespace _Wolframe::proc;
 
 void MainConnectionHandler::initSessionExceptionBYE()
 {
-	const char* termCommandStr = m_cmdhandler.interruptDataSessionMarker();
+	const char* termCommandStr = m_protocolHandler.get()?m_protocolHandler->interruptDataSessionMarker():"";
 	m_exceptionByeMessage.append( termCommandStr?termCommandStr:"");
 	m_exceptionByeMessage.append( "BYE\r\n");
 	m_exceptionByeMessagePtr = m_exceptionByeMessage.c_str();
@@ -58,7 +54,7 @@ void MainConnectionHandler::networkInput( const void* dt, std::size_t nofBytes)
 {
 	try
 	{
-		m_cmdhandler.putInput( dt, nofBytes);
+		m_protocolHandler->putInput( dt, nofBytes);
 		return;
 	}
 	catch (const std::runtime_error& err)
@@ -105,7 +101,7 @@ const net::NetworkOperation MainConnectionHandler::nextOperation()
 		{
 			case cmdbind::CommandHandler::READ:
 				m_protocolHandler->getInputBlock( inpp, inppsize);
-				return net::ReadData( inpp, inppsize, m_cmdhandler.execContext()->defaultTimeout());
+				return net::ReadData( inpp, inppsize, m_protocolHandler->execContext()->defaultTimeout());
 	
 			case cmdbind::CommandHandler::WRITE:
 				m_protocolHandler->getOutput( outpp, outppsize);
@@ -134,8 +130,9 @@ const net::NetworkOperation MainConnectionHandler::nextOperation()
 	return net::SendData( m_exceptionByeMessage.c_str(), m_exceptionByeMessage.size());
 }
 
-MainConnectionHandler::MainConnectionHandler( const net::LocalEndpoint& local)
-	:m_input(0)
+MainConnectionHandler::MainConnectionHandler( const net::LocalEndpointR& local)
+	:m_localEndPoint(local)
+	,m_input(0)
 	,m_inputsize(0)
 	,m_output(0)
 	,m_outputsize(0)
@@ -150,15 +147,7 @@ MainConnectionHandler::MainConnectionHandler( const net::LocalEndpoint& local)
 		if (m_output) std::free( m_output);
 		throw std::bad_alloc();
 	}
-	m_protocol = local.config().protocol;
-	if (m_protocol.empty())
-	{
-		m_protocol = "standard";
-	}
-	m_cmdhandler.setInputBuffer( m_input, m_inputsize);
-	m_cmdhandler.setOutputBuffer( m_output, m_outputsize);
-	m_cmdhandler.setLocalEndPoint( local);
-	LOG_TRACE << "Created connection handler for " << local.toString();
+	LOG_TRACE << "Created connection handler for " << local->toString();
 }
 
 MainConnectionHandler::~MainConnectionHandler()
@@ -168,19 +157,32 @@ MainConnectionHandler::~MainConnectionHandler()
 	LOG_TRACE << "Connection handler destroyed";
 }
 
-void MainConnectionHandler::setPeer( const net::RemoteEndpoint& remote)
+void MainConnectionHandler::setPeer( const net::RemoteEndpointR& remote)
 {
-	LOG_TRACE << "++++ Peer set to " << remote.toString();
-	m_cmdhandler.setPeer( remote);
+	LOG_TRACE << "Peer set to " << remote->toString();
+	m_remoteEndPoint = remote;
+	if (m_protocolHandler.get())
+	{
+		m_protocolHandler->setPeer( m_remoteEndPoint);
+	}
 }
 
 void MainConnectionHandler::setExecContext( proc::ExecContext* context_)
 {
-	m_protocolHandler.reset( context_->provider->protocolHandler( m_protocol));
+	std::string protocol = m_localEndPoint->config().protocol;
+	if (protocol.empty())
+	{
+		protocol = "standard";
+	}
+	m_protocolHandler.reset( context_->provider()->protocolHandler( protocol));
 	if (!m_protocolHandler.get())
 	{
-		throw std::runtime_error( std::string("protocol '") + m_protocol + "' is not defined");
+		throw std::runtime_error( std::string("protocol '") + protocol + "' is not defined");
 	}
-	m_cmdhandler.setExecContext( context_);
+	m_protocolHandler->setExecContext( context_);
+	m_protocolHandler->setInputBuffer( m_input, m_inputsize);
+	m_protocolHandler->setOutputBuffer( m_output, m_outputsize, 0);
+	m_protocolHandler->setLocalEndPoint( m_localEndPoint);
+	m_protocolHandler->setPeer( m_remoteEndPoint);
 }
 

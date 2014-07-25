@@ -52,10 +52,10 @@ class ExecContext
 public:
 	/// \brief Default Constructor
 	ExecContext()
-		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0),m_remoteEndpoint(0),m_localEndpoint(0){}
+		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0){}
 	/// \brief Constructor
 	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a)
-		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0),m_remoteEndpoint(0),m_localEndpoint(0){}
+		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0){}
 
 	/// \brief Get the processor provider interface
 	const ProcessorProviderInterface* provider() const	{return m_provider;}
@@ -77,16 +77,16 @@ public:
 	void setDefaultTimeout( unsigned int timeout_sec_)	{m_default_timeout = timeout_sec_;}
 
 	/// \brief Get the socket identifier for authorization checks
-	const char* socketIdentifier() const			{return m_localEndpoint?m_localEndpoint->config().socketIdentifier.c_str():0;}
+	const char* socketIdentifier() const			{return m_localEndpoint.get()?m_localEndpoint->config().socketIdentifier.c_str():0;}
 	/// \brief Get the remote endpoint for authorization checks
-	const net::RemoteEndpoint* remoteEndpoint() const	{return m_remoteEndpoint;}
+	const net::RemoteEndpoint* remoteEndpoint() const	{return m_remoteEndpoint.get();}
 	/// \brief Get the local endpoint for authorization checks
-	const net::LocalEndpoint* localEndpoint() const		{return m_localEndpoint;}
+	const net::LocalEndpoint* localEndpoint() const		{return m_localEndpoint.get();}
 
 	/// \brief Set the socket identifier for authorization checks
 	void setConnectionData(
-			const net::RemoteEndpoint* remoteEndpoint_,
-			const net::LocalEndpoint* localEndpoint_)
+			const net::RemoteEndpointR& remoteEndpoint_,
+			const net::LocalEndpointR& localEndpoint_)
 	{
 		m_remoteEndpoint = remoteEndpoint_;
 		m_localEndpoint = localEndpoint_;
@@ -95,7 +95,7 @@ public:
 	/// \brief Ask for a capability for this execution context
 	bool hasCapability( const std::string& c) const
 	{
-		if (!m_localEndpoint) return false;
+		if (!m_localEndpoint.get()) return false;
 		return m_localEndpoint->config().hasCapability( c);
 	}
 
@@ -151,8 +151,8 @@ private:
 	const AAAA::Authorizer* m_authorizer;			///< instance to query for execution permission based on login data
 	const AAAA::AAAAprovider* m_aaaaProvider;		///< instance to query for an authenticator
 	unsigned int m_default_timeout;				///< default timeout
-	const net::RemoteEndpoint* m_remoteEndpoint;		///< remote end point of the connection
-	const net::LocalEndpoint* m_localEndpoint;		///< local end point of the connection
+	net::RemoteEndpointR m_remoteEndpoint;			///< remote end point of the connection
+	net::LocalEndpointR m_localEndpoint;			///< local end point of the connection
 	std::vector<std::string> m_dbstack;			///< stack for implementing current database as scope
 };
 

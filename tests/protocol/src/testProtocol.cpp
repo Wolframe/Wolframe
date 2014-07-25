@@ -78,12 +78,12 @@ struct BufferStruct
 	}
 };
 
-static void readInput( cmdbind::CommandHandler& cmdhandler, std::istream& is)
+static void readInput( cmdbind::CommandHandler& protocolhandler, std::istream& is)
 {
 	char* buf;
 	std::size_t bufsize;
 	void* buf_void;
-	cmdhandler.getInputBlock( buf_void, bufsize);
+	protocolhandler.getInputBlock( buf_void, bufsize);
 	buf = (char*)buf_void;
 	
 	std::size_t readsize = g_random.get( 1, bufsize);
@@ -97,7 +97,7 @@ static void readInput( cmdbind::CommandHandler& cmdhandler, std::istream& is)
 	{
 		throw std::runtime_error("unexpected end of file");
 	}
-	cmdhandler.putInput( buf, pp);
+	protocolhandler.putInput( buf, pp);
 }
 
 static std::string normalizeOutputCRLF( const std::string& output, const std::string& expected)
@@ -153,27 +153,27 @@ static std::string normalizeOutputCRLF( const std::string& output, const std::st
 	}
 }
 
-static void processCommandHandlerSTM( cmdbind::CommandHandler& cmdhandler, BufferStruct& buf, std::istream& is, std::ostream& os)
+static void processCommandHandlerSTM( cmdbind::CommandHandler& protocolhandler, BufferStruct& buf, std::istream& is, std::ostream& os)
 {
 	const void* cmdh_output;
 	std::size_t cmdh_outputsize;
 	const char* error;
-	cmdhandler.setInputBuffer( buf.inbuf, buf.insize);
-	cmdhandler.setOutputBuffer( buf.outbuf, buf.outsize, 0);
+	protocolhandler.setInputBuffer( buf.inbuf, buf.insize);
+	protocolhandler.setOutputChunkSize( buf.outsize);
 
-	for (;;) switch (cmdhandler.nextOperation())
+	for (;;) switch (protocolhandler.nextOperation())
 	{
 		case cmdbind::CommandHandler::READ:
-			readInput( cmdhandler, is);
+			readInput( protocolhandler, is);
 			continue;
 
 		case cmdbind::CommandHandler::WRITE:
-			cmdhandler.getOutput( cmdh_output, cmdh_outputsize);
+			protocolhandler.getOutput( cmdh_output, cmdh_outputsize);
 			os << std::string( (const char*)cmdh_output, cmdh_outputsize);
 			continue;
 
 		case cmdbind::CommandHandler::CLOSE:
-			error = cmdhandler.lastError();
+			error = protocolhandler.lastError();
 			if (error)
 			{ 
 				std::ostringstream msg;
@@ -184,12 +184,12 @@ static void processCommandHandlerSTM( cmdbind::CommandHandler& cmdhandler, Buffe
 	}
 }
 
-static void processCommandHandler( cmdbind::CommandHandler& cmdhandler, const std::string& input, std::size_t ibsize, std::string& output, std::size_t obsize)
+static void processProtocolHandler( cmdbind::ProtocolHandler& protocolhandler, const std::string& input, std::size_t ibsize, std::string& output, std::size_t obsize)
 {
 	BufferStruct buf( ibsize, obsize);
 	std::istringstream is( input);
 	std::ostringstream os;
-	processCommandHandlerSTM( cmdhandler, buf, is, os);
+	processCommandHandlerSTM( protocolhandler, buf, is, os);
 
 	// Check if there is unconsumed input left (must not happen):
 	bool end = false;
@@ -426,19 +426,22 @@ TEST_F( MainProtocolTest, tests)
 		{
 			for (oo=0; oo<obarsize; oo++)
 			{
-				net::RemoteTCPendpoint client( "127.0.0.1", 7661);
+				net::RemoteTCPendpoint* clientPtr = new net::RemoteTCPendpoint( "127.0.0.1", 7661);
+				net::RemoteEndpointR client( clientPtr);
 				net::LocalEndpointConfig localEndpointConfig( "test");
-				net::LocalTCPendpoint localEndPoint( "127.0.0.1", 7661, localEndpointConfig);
-				cmdbind::MainCommandHandler cmdhandler;
-				cmdhandler.setPeer( client);
-				cmdhandler.setLocalEndPoint( localEndPoint);
+				net::LocalTCPendpoint* localEndPointPtr = new net::LocalTCPendpoint( "127.0.0.1", 7661, localEndpointConfig);
+				net::LocalEndpointR localEndPoint( localEndPointPtr);
+
+				cmdbind::ProtocolHandlerR protocolhandler( processingContext.execContext()->provider()->protocolHandler( "standard"));
 				processingContext.resetExecContext();
-				cmdhandler.setExecContext( processingContext.execContext());
+				protocolhandler.setExecContext( processingContext.execContext());
+				protocolhandler.setPeer( client);
+				protocolhandler.setLocalEndPoint( localEndPoint);
 
 				std::string output;
 				try
 				{
-					processCommandHandler( cmdhandler, input, ibar[ii], output, obar[oo]);
+					processProtocolHandler( protocolhandler, input, ibar[ii], output, obar[oo]);
 				}
 				catch (const std::runtime_error& e)
 				{

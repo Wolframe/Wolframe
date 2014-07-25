@@ -50,8 +50,8 @@ public:
 	ContentOnlyProtocolHandler();
 	virtual ~ContentOnlyProtocolHandler(){}
 
-	void setPeer( const net::RemoteEndpoint& remote);
-	void setLocalEndPoint( const net::LocalEndpoint& local);
+	void setPeer( const net::RemoteEndpointR& remote);
+	void setLocalEndPoint( const net::LocalEndpointR& local);
 
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
@@ -83,8 +83,8 @@ private:
 		static const char* ar[] = {"Init","DoctypeDetection","Processing","Done"};
 		return ar[s];
 	}
-	const net::RemoteEndpoint* m_remoteEndpoint;	///< remote end point
-	const net::LocalEndpoint* m_localEndpoint;	///< connection endpoint
+	net::RemoteEndpointR m_remoteEndpoint;		///< remote end point
+	net::LocalEndpointR m_localEndpoint;		///< connection endpoint
 	cmdbind::DoctypeDetectorR m_doctypeDetector;	///< document type detection
 	std::string m_buffer;				///< buffer for input during document type detection
 	std::string m_cmdname;				///< name of command to execute -> command handler
