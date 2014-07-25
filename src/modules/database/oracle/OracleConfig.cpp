@@ -56,21 +56,20 @@ OracleConfigStruct::OracleConfigStruct()
 
 const serialize::StructDescriptionBase* OracleConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<OracleConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<OracleConfig>
 	{
 	ThisDescription()
 	{
 		(*this)
-		( "identifier", &OracleConfigStruct::m_ID)		.mandatory()
-		( "host", &OracleConfigStruct::m_host )			.optional()
-		( "port", &OracleConfigStruct::m_port )			.optional()
-		( "database", &OracleConfigStruct::m_dbName )		.optional()
-		( "user", &OracleConfigStruct::m_user )			.optional()
-		( "password", &OracleConfigStruct::m_password )		.optional()
-		( "connectionTimeout", &OracleConfigStruct::connectTimeout ).optional()
-		( "connections", &OracleConfigStruct::connections )	.optional()
-		( "acquireTimeout", &OracleConfigStruct::acquireTimeout ).optional()
-		( "statementTimeout", &OracleConfigStruct::statementTimeout ).optional()
+		( "identifier", &OracleConfig::m_ID)		.mandatory()
+		( "host", &OracleConfig::m_host )		.optional()
+		( "port", &OracleConfig::m_port )		.optional()
+		( "database", &OracleConfig::m_dbName )		.optional()
+		( "user", &OracleConfig::m_user )		.optional()
+		( "password", &OracleConfig::m_password )	.optional()
+		( "connections", &OracleConfig::connections )	.optional()
+		( "acquireTimeout", &OracleConfig::acquireTimeout ).optional()
+		( "statementTimeout", &OracleConfig::statementTimeout ).optional()
 		;
 	}
 	};

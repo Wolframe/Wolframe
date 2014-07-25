@@ -37,6 +37,7 @@
 #ifndef _POSTGRESQL_HPP_INCLUDED
 #define _POSTGRESQL_HPP_INCLUDED
 
+#include "PostgreSQLConfig.hpp"
 #include "logger-v1.hpp"
 #include <libpq-fe.h>
 #include <list>
@@ -76,10 +77,6 @@ class PostgreSQLDatabase : public Database
 public:
 	PostgreSQLDatabase() : m_unit( NULL )	{}
 	~PostgreSQLDatabase()			{}
-
-	void setUnit( PostgreSQLdbUnit* unit )	{ m_unit = unit; }
-	bool hasUnit() const			{ return m_unit != NULL; }
-	PostgreSQLdbUnit& dbUnit() const	{ return *m_unit; }
 
 	const std::string& ID() const;
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }

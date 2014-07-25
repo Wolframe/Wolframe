@@ -147,7 +147,6 @@ class PostgreSQLConfig
 	:public config::NamedConfiguration
 	,public PostgreSQLConfigStruct
 {
-	friend class PostgreSQLConstructor;
 public:
 	PostgreSQLConfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLConfig()			{}

@@ -36,6 +36,8 @@
 
 #ifndef _ORACLEQL_HPP_INCLUDED
 #define _ORACLEQL_HPP_INCLUDED
+
+#include "OracleConfig.hpp"
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
@@ -55,58 +57,6 @@
 
 namespace _Wolframe {
 namespace db {
-
-struct OracleConfigStruct
-{
-	OracleConfigStruct();
-
-	std::string	m_ID;			//< database identifier
-	std::string	m_host;			//< server host
-	unsigned short	m_port;			//< server port
-	std::string	m_dbName;		//< database name on server
-	std::string	m_user;			//< database user
-	std::string	m_password;		//< and password
-	unsigned short	connectTimeout;		//< connection timeout
-	unsigned short	connections;		//< number of database connection (pool size)
-	unsigned short	acquireTimeout;		//< timeout when acquiring a connection from the pool
-	unsigned	statementTimeout;	//< default timeout when executin a statement
-
-	//\brief Structure description for serialization/parsing
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
-//\brief Oracle server connection configuration
-class OracleConfig
-	:public config::NamedConfiguration
-	,public OracleConfigStruct
-{
-	friend class OracleConstructor;
-public:
-	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
-
-	OracleConfig( const char* name, const char* logParent, const char* logName );
-	~OracleConfig()			{}
-
-	bool parse( const config::ConfigurationNode& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	virtual bool check() const;
-	virtual void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	const std::string& host() const				{return m_host;}
-	unsigned short port() const				{return m_port;}
-	const std::string& dbName() const			{return m_dbName;}
-	const std::string& user() const				{return m_user;}
-	const std::string& password() const			{return m_password;}
-
-private:
-	//\brief Check the domains of the configured values and do some mappings (e.g. instantiating enum values from strings)
-	bool mapValueDomains();
-	config::ConfigurationTree::Position m_config_pos;
-};
-
-
-class OracleDbUnit;
 
 struct OracleLanguageDescription : public LanguageDescription
 {
@@ -129,10 +79,6 @@ class OracleDatabase : public Database
 public:
 	OracleDatabase() : m_unit( NULL )	{}
 	~OracleDatabase()			{}
-
-	void setUnit( OracleDbUnit* unit )	{ m_unit = unit; }
-	bool hasUnit() const			{ return m_unit != NULL; }
-	OracleDbUnit& dbUnit() const	{ return *m_unit; }
 
 	const std::string& ID() const;
 	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
@@ -170,7 +116,6 @@ public:
 	OracleDbUnit( const std::string& id,
 			  const std::string& host, unsigned short port, const std::string& dbName,
 			  const std::string& user, const std::string& password,
-			  unsigned short connectTimeout,
 			  size_t connections, unsigned short acquireTimeout,
 			  unsigned statementTimeout);
 	~OracleDbUnit();

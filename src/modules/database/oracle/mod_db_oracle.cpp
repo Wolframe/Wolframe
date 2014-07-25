@@ -68,7 +68,6 @@ OracleDbUnit* OracleConstructor::object( const config::NamedConfiguration& conf 
 
 	OracleDbUnit* m_db = new OracleDbUnit( cfg.m_ID, cfg.host(), cfg.port(), cfg.dbName(),
 						       cfg.user(), cfg.password(),
-						       cfg.connectTimeout,
 						       cfg.connections, cfg.acquireTimeout,
 						       cfg.statementTimeout);
 	LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";

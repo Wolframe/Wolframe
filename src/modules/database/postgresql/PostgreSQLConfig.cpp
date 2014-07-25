@@ -56,26 +56,26 @@ PostgreSQLConfigStruct::PostgreSQLConfigStruct()
 
 const serialize::StructDescriptionBase* PostgreSQLConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<PostgreSQLConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<PostgreSQLConfig>
 	{
 	ThisDescription()
 	{
 		(*this)
-		( "identifier", &PostgreSQLConfigStruct::m_ID)			.mandatory()
-		( "host", &PostgreSQLConfigStruct::m_host )			.optional()
-		( "port", &PostgreSQLConfigStruct::m_port )			.optional()
-		( "database", &PostgreSQLConfigStruct::m_dbName )		.optional()
-		( "user", &PostgreSQLConfigStruct::m_user )			.optional()
-		( "password", &PostgreSQLConfigStruct::m_password )		.optional()
-		( "sslMode", &PostgreSQLConfigStruct::sslMode )			.optional()
-		( "sslCert", &PostgreSQLConfigStruct::sslCert )			.optional()
-		( "sslKey", &PostgreSQLConfigStruct::sslKey )			.optional()
-		( "sslRootCert", &PostgreSQLConfigStruct::sslRootCert	)	.optional()
-		( "sslCRL", &PostgreSQLConfigStruct::sslCRL )			.optional()
-		( "connectionTimeout", &PostgreSQLConfigStruct::connectTimeout ).optional()
-		( "connections", &PostgreSQLConfigStruct::connections )		.optional()
-		( "acquireTimeout", &PostgreSQLConfigStruct::acquireTimeout )	.optional()
-		( "statementTimeout", &PostgreSQLConfigStruct::statementTimeout ).optional()
+		( "identifier", &PostgreSQLConfig::m_ID)			.mandatory()
+		( "host", &PostgreSQLConfig::m_host )			.optional()
+		( "port", &PostgreSQLConfig::m_port )			.optional()
+		( "database", &PostgreSQLConfig::m_dbName )		.optional()
+		( "user", &PostgreSQLConfig::m_user )			.optional()
+		( "password", &PostgreSQLConfig::m_password )		.optional()
+		( "sslMode", &PostgreSQLConfig::sslMode )			.optional()
+		( "sslCert", &PostgreSQLConfig::sslCert )			.optional()
+		( "sslKey", &PostgreSQLConfig::sslKey )			.optional()
+		( "sslRootCert", &PostgreSQLConfig::sslRootCert	)	.optional()
+		( "sslCRL", &PostgreSQLConfig::sslCRL )			.optional()
+		( "connectionTimeout", &PostgreSQLConfig::connectTimeout ).optional()
+		( "connections", &PostgreSQLConfig::connections )		.optional()
+		( "acquireTimeout", &PostgreSQLConfig::acquireTimeout )	.optional()
+		( "statementTimeout", &PostgreSQLConfig::statementTimeout ).optional()
 		;
 	}
 	};

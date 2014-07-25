@@ -48,7 +48,6 @@ namespace db {
 static const char* ORACLE_DB_CLASS_NAME = "Oracle";
 enum {
 	DEFAULT_ORACLE_CONNECTIONS = 4,
-	DEFAULT_ORACLE_CONNECTION_TIMEOUT = 30,
 	DEFAULT_ORACLE_STATEMENT_TIMEOUT = 30000
 };
 
@@ -93,28 +92,50 @@ public:
 	virtual void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
 
-	const std::string& ID() const				{ return m_ID; }
-	const std::string& filename() const			{ return m_filename; }
-	bool foreignKeys() const				{ return m_foreignKeys; }
-	bool profiling() const					{ return m_profiling; }
-	unsigned short connections() const			{ return m_connections; }
-	const std::vector< std::string > extensionFiles() const	{ return m_extensionFiles; }
+	const std::string& ID() const			{ return m_ID; }
+	const std::string& host() const			{ return m_host; }
+	unsigned short port() const			{ return m_port; }
+	const std::string& dbName() const		{ return m_dbName; }
+	const std::string& user() const			{ return m_user; }
+	const std::string& password() const		{ return m_password; }
+	unsigned short connections() const		{ return m_connections; }
+	unsigned short acquireTimeout() const		{ return m_acquireTimeout; }
+	unsigned statementTimeout() const		{ return m_statementTimeout; }
 
 public:
 	/// \brief Structure description for serialization/parsing
 	static const serialize::StructDescriptionBase* getStructDescription();
 
 private:
-	std::string	m_ID;
-	std::string	m_filename;
-	bool		m_foreignKeys;
-	bool		m_profiling;
-	unsigned short	m_connections;
-	std::vector< std::string > m_extensionFiles;	///< list of Sqlite extension modules to load
+	std::string	m_ID;			//< database identifier
+	std::string	m_host;			//< server host
+	unsigned short	m_port;			//< server port
+	std::string	m_dbName;		//< database name on server
+	std::string	m_user;			//< database user
+	std::string	m_password;		//< and password
+	unsigned short	m_connections;	 	//< number of database connection (pool size)
+	unsigned short	m_acquireTimeout;	//< timeout when acquiring a connection from the pool
+	unsigned	m_statementTimeout;	//< default timeout when executin a statement
 
 	config::ConfigurationTree::Position m_config_pos;
+
+private:
+	//\brief Check the domains of the configured values and do some mappings (e.g. instantiating enum values from strings)
+	bool mapValueDomains();
 };
 
 }} // _Wolframe::db
 
 #endif // _ORACLE_CONFIG_HPP_INCLUDED
+
+// TODO FROM HERE
+
+//\brief Oracle server connection configuration
+class OracleConfig
+	:public config::NamedConfiguration
+{
+public:
+	OracleConfig( const char* name, const char* logParent, const char* logName );
+	~OracleConfig()			{}
+};
+

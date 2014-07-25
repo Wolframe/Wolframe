@@ -37,6 +37,7 @@
 #ifndef _SQLITE_HPP_INCLUDED
 #define _SQLITE_HPP_INCLUDED
 
+#include "SQLiteConfig.hpp"
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
@@ -72,10 +73,6 @@ class SQLiteDatabase : public Database
 public:
 	SQLiteDatabase() : m_unit( NULL )	{}
 	 ~SQLiteDatabase()			{}
-
-	void setUnit( SQLiteDBunit* unit )	{ m_unit = unit; }
-	bool hasUnit() const			{ return m_unit != NULL; }
-	SQLiteDBunit& dbUnit() const		{ return *m_unit; }
 
 	const std::string& ID() const;
 	const char* className() const		{ return SQLITE_DB_CLASS_NAME; }

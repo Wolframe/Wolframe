@@ -55,17 +55,17 @@ SQLiteConfigStruct::SQLiteConfigStruct()
 
 const serialize::StructDescriptionBase* SQLiteConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<SQLiteConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<SQLiteConfig>
 	{
 	ThisDescription()
 	{
 		(*this)
-		( "identifier", &SQLiteConfigStruct::m_ID)			.mandatory()
-		( "file", &SQLiteConfigStruct::m_filename)			.mandatory()
-		( "foreignKeys", &SQLiteConfigStruct::m_foreignKeys)		.optional()
-		( "profiling", &SQLiteConfigStruct::m_profiling)		.optional()
-		( "connections", &SQLiteConfigStruct::m_connections)		.optional()
-		( "extension", &SQLiteConfigStruct::m_extensionFiles )
+		( "identifier", &SQLiteConfig::m_ID)		.mandatory()
+		( "file", &SQLiteConfig::m_filename)		.mandatory()
+		( "foreignKeys", &SQLiteConfig::m_foreignKeys)	.optional()
+		( "profiling", &SQLiteConfig::m_profiling)	.optional()
+		( "connections", &SQLiteConfig::m_connections)	.optional()
+		( "extension", &SQLiteConfig::m_extensionFiles )
 		;
 	}
 	};
