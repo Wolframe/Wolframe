@@ -34,7 +34,7 @@ public:
 		// ... get the unprocessed input here
 	}
 
-	virtual bool getNext( typename _Wolframe::langbind::InputFilter::ElementType& /*type*/, const void*& /*element*/, std::size_t& /*elementsize*/)
+	virtual bool getNext( _Wolframe::langbind::InputFilter::ElementType& /*type*/, const void*& /*element*/, std::size_t& /*elementsize*/)
 	{
 		// ... get the next element produced by this input filter here
 		// ... return false on error or end of buffer (state)
@@ -79,7 +79,7 @@ public:
 		return 0;
 	}
 
-	virtual bool print( typename _Wolframe::langbind::OutputFilter::ElementType /*type*/, const void* /*element*/, std::size_t /*elementsize*/)
+	virtual bool print( _Wolframe::langbind::OutputFilter::ElementType /*type*/, const void* /*element*/, std::size_t /*elementsize*/)
 	{
 		// ... do the output of one element here
 		// ... use the method write( const void*, std::size_t) for writing to sink

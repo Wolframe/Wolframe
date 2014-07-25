@@ -155,6 +155,14 @@ usr/local/include/wolframe/database/vmTransactionOutput.hpp
 usr/local/include/wolframe/database/statement.hpp
 usr/local/include/wolframe/database/baseStatement.hpp
 usr/local/include/wolframe/database/substitutingStatement.hpp
+usr/local/include/wolframe/database/vm/programImage.hpp
+usr/local/include/wolframe/database/vm/subroutineFrame.hpp
+usr/local/include/wolframe/database/vm/programInstance.hpp
+usr/local/include/wolframe/database/vm/instructionSet.hpp
+usr/local/include/wolframe/database/vm/programCode.hpp
+usr/local/include/wolframe/database/vm/output.hpp
+usr/local/include/wolframe/database/vm/valueTupleSet.hpp
+@dirrm usr/local/include/wolframe/database/vm
 @dirrm usr/local/include/wolframe/database
 usr/local/include/wolframe/config/configurationTree.hpp
 usr/local/include/wolframe/config/configurationBase.hpp
@@ -297,6 +305,30 @@ usr/local/include/wolframe/system/objectPool.hpp
 usr/local/include/wolframe/system/randomGenerator.hpp
 usr/local/include/wolframe/system/serverEndpoint.hpp
 @dirrm usr/local/include/wolframe/system
+usr/local/include/wolframe/appdevel/authenticationModuleMacros.hpp
+usr/local/include/wolframe/appdevel/module/normalizeFunctionBuilder.hpp
+usr/local/include/wolframe/appdevel/module/programTypeBuilder.hpp
+usr/local/include/wolframe/appdevel/module/authenticationConstructor.hpp
+usr/local/include/wolframe/appdevel/module/doctypeDetectorBuilder.hpp
+usr/local/include/wolframe/appdevel/module/ddlcompilerBuilder.hpp
+usr/local/include/wolframe/appdevel/module/cppFormFunctionTemplate.hpp
+usr/local/include/wolframe/appdevel/module/cppFormFunctionBuilder.hpp
+usr/local/include/wolframe/appdevel/module/runtimeEnvironmentConstructor.hpp
+usr/local/include/wolframe/appdevel/module/filterBuilder.hpp
+usr/local/include/wolframe/appdevel/module/customDataTypeBuilder.hpp
+@dirrm usr/local/include/wolframe/appdevel/module
+usr/local/include/wolframe/appdevel/customDataTypeModuleMacros.hpp
+usr/local/include/wolframe/appdevel/ddlCompilerModuleMacros.hpp
+usr/local/include/wolframe/appdevel/normalizeModuleMacros.hpp
+usr/local/include/wolframe/appdevel/doctypeModuleMacros.hpp
+usr/local/include/wolframe/appdevel/programTypeModuleMacros.hpp
+usr/local/include/wolframe/appdevel/moduleFrameMacros.hpp
+usr/local/include/wolframe/appdevel/cppFormFunctionModuleMacros.hpp
+usr/local/include/wolframe/appdevel/runtimeEnvironmentModuleMacros.hpp
+usr/local/include/wolframe/appdevel/filterModuleMacros.hpp
+usr/local/include/wolframe/appdevel/commandHandlerModuleMacros.hpp
+usr/local/include/wolframe/appdevel/databaseModuleMacros.hpp
+@dirrm usr/local/include/wolframe/appdevel
 @dirrm usr/local/include/wolframe
 usr/local/bin/wolfilter
 usr/local/bin/wolfwizard

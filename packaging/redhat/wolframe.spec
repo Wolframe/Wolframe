@@ -1446,6 +1446,8 @@ fi
 %{_includedir}/wolframe/cmdbind/*.hpp
 %dir %{_includedir}/wolframe/database/
 %{_includedir}/wolframe/database/*.hpp
+%dir %{_includedir}/wolframe/database/vm/
+%{_includedir}/wolframe/database/vm/*.hpp
 %dir %{_includedir}/wolframe/config/
 %{_includedir}/wolframe/config/*.hpp
 %dir %{_includedir}/wolframe/logger/
@@ -1476,6 +1478,10 @@ fi
 %{_includedir}/wolframe/prgbind/*.hpp
 %dir %{_includedir}/wolframe/system/
 %{_includedir}/wolframe/system/*.hpp
+%dir %{_includedir}/wolframe/appdevel/
+%{_includedir}/wolframe/appdevel/*.hpp
+%dir %{_includedir}/wolframe/appdevel/module/
+%{_includedir}/wolframe/appdevel/module/*.hpp
 
 %if %{with_pgsql}
 %files postgresql

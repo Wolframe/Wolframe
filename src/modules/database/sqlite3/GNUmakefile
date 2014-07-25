@@ -34,7 +34,6 @@ CPP_OBJS = \
 	SQLiteConstructor.o \
 	SQLiteConfig.o \
 	SQLiteTransactionExecStatemachine.o \
-	SQLiteProgram.o \
 	SQLiteModule.o \
 	SQLiteStatement.o
 
