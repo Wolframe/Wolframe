@@ -34,10 +34,9 @@
 ///
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
-#include "mainCommandHandler.hpp"
+#include "cmdbind/protocolHandler.hpp"
 #include "system/connectionHandler.hpp"
 #include "processor/execContext.hpp"
-#include "protocol/ioblocks.hpp"
 #include "types/keymap.hpp"
 #include <boost/shared_ptr.hpp>
 
@@ -45,9 +44,14 @@ namespace _Wolframe {
 namespace proc {
 
 /// \brief The wolframed connection handler
-class MainConnectionHandler : public net::ConnectionHandler
+class MainConnectionHandler
+	:public net::ConnectionHandler
 {
 public:
+	/// \brief Defines the chunk size for messages no the net
+	/// \todo Find a better place for the constant NeworkBufferSize than MainConnectionHandler::NeworkBufferSize
+	enum {NeworkBufferSize=4000};
+
 	/// \brief Constructor
 	MainConnectionHandler( const net::LocalEndpoint& local);
 
@@ -79,8 +83,10 @@ private:
 private:
 	std::string m_protocol;				///< name of the protocol to use
 	cmdbind::ProtocolHandlerR m_protocolHandler;	///< top level protocol handler
-	protocol::InputBlock m_input;			///< buffer for network read messages
-	protocol::OutputBlock m_output;			///< buffer for network write messages
+	char* m_input;					///< buffer for network read messages
+	std::size_t m_inputsize;			///< allocation size of m_input in bytes
+	char* m_output;					///< buffer for network write messages
+	std::size_t m_outputsize;			///< allocation size of m_output in bytes
 	bool m_terminated;				///< true, if a termination signal came from the network
 	std::string m_exceptionByeMessage;		///< message to terminate connection on exception
 	const char* m_exceptionByeMessagePtr;		///< reference to message to terminate connection on exception

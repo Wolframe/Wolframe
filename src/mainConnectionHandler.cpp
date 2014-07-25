@@ -135,22 +135,36 @@ const net::NetworkOperation MainConnectionHandler::nextOperation()
 }
 
 MainConnectionHandler::MainConnectionHandler( const net::LocalEndpoint& local)
-	:m_terminated(false)
+	:m_input(0)
+	,m_inputsize(0)
+	,m_output(0)
+	,m_outputsize(0)
+	,m_terminated(false)
 	,m_exceptionByeMessagePtr(0)
 {
+	m_input = (char*)std::malloc( NeworkBufferSize);
+	m_output = (char*)std::malloc( NeworkBufferSize);
+	if (!m_input || !m_output)
+	{
+		if (m_input) std::free( m_input);
+		if (m_output) std::free( m_output);
+		throw std::bad_alloc();
+	}
 	m_protocol = local.config().protocol;
 	if (m_protocol.empty())
 	{
 		m_protocol = "standard";
 	}
-	m_cmdhandler.setInputBuffer( m_input.ptr(), m_input.size());
-	m_cmdhandler.setOutputBuffer( m_output.ptr(), m_output.size());
+	m_cmdhandler.setInputBuffer( m_input, m_inputsize);
+	m_cmdhandler.setOutputBuffer( m_output, m_outputsize);
 	m_cmdhandler.setLocalEndPoint( local);
 	LOG_TRACE << "Created connection handler for " << local.toString();
 }
 
 MainConnectionHandler::~MainConnectionHandler()
 {
+	if (m_input) std::free( m_input);
+	if (m_output) std::free( m_output);
 	LOG_TRACE << "Connection handler destroyed";
 }
 
