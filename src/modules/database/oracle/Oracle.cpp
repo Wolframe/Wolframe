@@ -89,17 +89,32 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 	return ss.str( );
 }
 
-OracleDbUnit::OracleDbUnit(const std::string& id,
-				    const std::string& host, unsigned short port,
-				    const std::string& dbName,
-				    const std::string& user, const std::string& password,
-				    unsigned short /*connectTimeout*/,
-				    size_t connections, unsigned short acquireTimeout,
-				    unsigned statementTimeout)
-	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
-	  m_statementTimeout( statementTimeout )
+OracleDatabase::OracleDatabase( const OracleConfig& config)
+	:m_ID(config.ID())
+	,m_noConnections(config.connections())
+	,m_connPool(config.acquireTimeout())
 {
-	m_connStr = buildConnStr( host, port,  dbName );
+	init( config);
+}
+
+OracleDatabase::OracleDatabase( const std::string& id,
+			  const std::string& host, unsigned short port, const std::string& dbName,
+			  const std::string& user, const std::string& password,
+			  size_t connections, unsigned short acquireTimeout)
+	:m_ID(id_)
+	,m_noConnections(0)
+	,m_connPool(acquireTimeout_)
+{
+	OracleConfig config( id_, host_, port_, dbName_, user_, password_,
+		connections_, acquireTimeout_);
+	init( config);
+}		  
+			
+void OracleDatabase::init( const OracleConfig& config)
+{
+	int connections = config.connections();
+
+	m_connStr = buildConnStr( config.host, config.port, config.dbName );
 	LOG_DATA << "Oracle database '" << m_ID << "' connection string '" << m_connStr << "'";
 
 	sword status;
@@ -259,7 +274,7 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 	LOG_DEBUG << "Oracle database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
-OracleDbUnit::~OracleDbUnit()
+OracleDatabase::~OracleDatabase()
 {
 	size_t connections = 0;
 	bool hasErrors = false;
@@ -291,38 +306,15 @@ OracleDbUnit::~OracleDbUnit()
 	}
 
 	if ( m_noConnections != 0 )	{
-		LOG_ALERT << "Oracle database unit '" << m_ID << "' destructor: "
+		LOG_ALERT << "Oracle database '" << m_ID << "' destructor: "
 			      << m_noConnections << " connections not destroyed";
-		throw std::logic_error( "Oracle database unit destructor: not all connections destroyed" );
+		throw std::logic_error( "Oracle database destructor: not all connections destroyed" );
 	}
 
 	(void)OCIHandleFree( (dvoid *)m_db.m_env.envhp, OCI_HTYPE_ENV );
 	
-	LOG_TRACE << "Oracle database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
+	LOG_TRACE << "Oracle database '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
-
-/*****  Oracle database  ******************************************/
-const std::string& OracleDatabase::ID() const
-{
-	if ( m_unit )
-		return m_unit->ID();
-	else
-		throw std::runtime_error( "Oracle database unit not initialized" );
-}
-
-Transaction* OracleDatabase::transaction( const std::string& name)
-{
-	return new OracleTransaction( &m_env, *this, name);
-}
-
-void OracleDatabase::closeTransaction( Transaction *t )
-{
-	delete t;
-}
-
-/*****  Oracle transaction  ***************************************/
-OracleTransaction::OracleTransaction( OracleEnvirenment *env_, OracleDatabase& database, const std::string& name_)
-	: Transaction( name_, TransactionExecStatemachineR( new TransactionExecStatemachine_oracle( env_, &database.dbUnit( ) ) ) ) { }
 
 }} // _Wolframe::db
 

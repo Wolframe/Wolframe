@@ -78,41 +78,39 @@ public:
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLITE_DB_CLASS_NAME; }
 
-	Transaction* transaction( const std::string& name );
-	void closeTransaction( Transaction* t );
+	Transaction* transaction( const std::string& name_)
+	{
+		TransactionExecStatemachineR stm( new TransactionExecStatemachine_sqlite3( this));
+		return new Transaction( name_, stm);
+	}
+
+	void closeTransaction( Transaction* t )
+	{
+		delete t;
+	}
 
 	virtual const LanguageDescription* getLanguageDescription() const
 	{
 		static SQLiteLanguageDescription langdescr;
 		return &langdescr;
 	}
-};
-
-
-class SQLiteDBunit : public DatabaseUnit
-{
-	friend class SQLiteTransaction;
-public:
 
 	PoolObject<sqlite3*>* newConnection()	{return new PoolObject<sqlite3*>( m_connPool);}
+
+private:
+	void init( const SQLiteConfig& config);
 
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
-
-	SQLiteDatabase		m_db;
-	std::vector<std::string>m_extensionFiles;
+	std::vector<std::string>m_extensionFiles;	///< Sqlite extensions
 };
 
-///\class SQLiteTransaction
-class SQLiteTransaction
-	:public Transaction
+
+class SQLiteDBunit : public DatabaseUnit
 {
-public:
-	SQLiteTransaction( SQLiteDatabase& database, const std::string& name_);
-	virtual ~SQLiteTransaction(){}
 };
 
 }} // _Wolframe::db

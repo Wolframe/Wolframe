@@ -50,7 +50,6 @@ extern "C" void profiling_callback(  void * /*a*/, const char *b, sqlite3_uint64
 	LOG_DATA << b << " (time: " << c / 1000 << " ms)";
 }
 
-/*****  SQLite database  **********************************************/
 SQLiteDatabase::SQLiteDatabase( const SQLiteConfig& config)
 	:m_ID(config.ID())
 	,m_filename(config.filename())
@@ -80,7 +79,7 @@ void SQLiteDatabase::init( const SQLiteConfig& config)
 
 	if ( ! sqlite3_threadsafe() )	{
 		if ( connections != 1 )	{
-			LOG_WARNING << "SQLite database '" << config.ID()
+			LOG_WARNING << "SQLite database '" << m_ID
 				    << "' has not been compiled without the SQLITE_THREADSAFE parameter."
 				    << " Using only 1 connection instead of " << connections << ".";
 			connections = 1;
@@ -92,7 +91,7 @@ void SQLiteDatabase::init( const SQLiteConfig& config)
 			dbFlags |= SQLITE_OPEN_NOMUTEX;
 		}
 	}
-
+	
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
 		char* err;
@@ -164,13 +163,13 @@ void SQLiteDatabase::init( const SQLiteConfig& config)
 					continue;
 				}
 			}
-			LOG_DEBUG << "Extensions for SQLite database unit '" << m_ID << "' loaded";
+			LOG_DEBUG << "Extensions for SQLite database '" << m_ID << "' loaded";
 
 			m_connections.push_back( handle );
 			m_connPool.add( handle );
 		}
 	}
-	LOG_DEBUG << "SQLite database unit '" << m_ID << "' created with "
+	LOG_DEBUG << "SQLite database '" << m_ID << "' created with "
 		      << connections << " connections to file '" << m_filename << "'";
 }
 
@@ -180,7 +179,7 @@ SQLiteDatabase::~SQLiteDatabase()
 		sqlite3 *handle = m_connPool.get( );
 		sqlite3_close( handle );
 	}
-	LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
+	LOG_TRACE << "SQLite database '" << m_ID << "' destroyed";
 }
 
 }} // _Wolframe::db

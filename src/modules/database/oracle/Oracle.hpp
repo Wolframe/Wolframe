@@ -73,33 +73,6 @@ class OracleEnvirenment
 		OCIEnv *envhp; // OCI environemnt handle
 };
 
-class OracleDatabase : public Database
-{
-public:
-	OracleDatabase( const std::string& id,
-			  const std::string& host, unsigned short port, const std::string& dbName,
-			  const std::string& user, const std::string& password,
-			  size_t connections, unsigned short acquireTimeout,
-			  unsigned statementTimeout);
-	OracleDatabase( const OracleConfig& config);
-	 ~OracleDatabase();
-
-	const std::string& ID() const		{ return m_ID; }
-	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
-
-	Transaction* transaction( const std::string& name );
-	void closeTransaction( Transaction* t );
-
-	virtual const LanguageDescription* getLanguageDescription( ) const
-	{
-		static OracleLanguageDescription langdescr;
-		return &langdescr;
-	}
-
-public:
-	OracleEnvirenment m_env;	//< Oracle environment
-};
-
 class OracleConnection
 {
 	public:
@@ -110,32 +83,57 @@ class OracleConnection
 		OCITrans *transhp; // transaction handle
 };
 
-class OracleDbUnit : public DatabaseUnit
+class OracleDatabase : public Database
 {
-	friend class OracleTransaction;
 public:
-	~OracleDbUnit();
+	OracleDatabase( const std::string& id,
+			  const std::string& host, unsigned short port, const std::string& dbName,
+			  const std::string& user, const std::string& password,
+			  size_t connections, unsigned short acquireTimeout);
+	OracleDatabase( const OracleConfig& config);
+	 ~OracleDatabase();
 
-	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
+	const std::string& ID() const		{ return m_ID; }
+	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
+
+	Transaction* transaction( const std::string& name_)
+	{
+		TransactionExecStatemachineR stm( new TransactionExecStatemachine_oracle( m_env, this));
+		return new Transaction( name_, stm);
+	}
+	
+	void closeTransaction( Transaction* t )
+	{
+		delete t;
+	}
+
+	virtual const LanguageDescription* getLanguageDescription( ) const
+	{
+		static OracleLanguageDescription langdescr;
+		return &langdescr;
+	}
 
 	PoolObject<OracleConnection *> *newConnection( ) { return new PoolObject<OracleConnection *>( m_connPool ); }
+
+private:
+	void init( const OracleConfig& config);
 
 private:
 	const std::string	m_ID;			//< database ID
 	std::string		m_connStr;		//< connection string
 	size_t			m_noConnections;	//< number of connections
 	ObjectPool< OracleConnection* >	m_connPool;	//< pool of connections
-	unsigned		m_statementTimeout;	//< default statement execution timeout
-	OracleDatabase	m_db;				//< real database object
+
+public:
+	OracleEnvirenment m_env;	//< Oracle environment
 };
 
-class OracleTransaction : public Transaction
+class OracleDbUnit : public DatabaseUnit
 {
 public:
-	OracleTransaction( OracleEnvirenment *env_, OracleDatabase& database, const std::string& name_);
-	virtual ~OracleTransaction() {}
-};
 
+	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
+};
 
 }} // _Wolframe::db
 

@@ -73,17 +73,29 @@ public:
 	}
 
 	PostgreSQLConfig( const std::string& id_, const std::string& host_,
-			unsigned short port_,
+			unsigned short port_, const std::string& dbName_,
 			const std::string& user_, const std::string& password_,
-			unsigned short connections_,
-			const std::vector<std::string>& extensionFiles_ )
+			const std::string& sslMode_, const std::string& sslCert_,
+			const std::string& sslKey_, const std::string& sslRootCert_,
+			const std::string& sslCRL_,			
+			unsigned short connectTimeout_, unsigned short connections_,
+			unsigned short acquireTimeout_, unsigned statementTimeout_)
 		:_Wolframe::serialize::DescriptiveConfiguration(POSTGRESQL_DB_CLASS_NAME, "database", "postgresql", getStructDescription())
 		,m_ID(id_)
 		,m_host(host_)
 		,m_port(port_)
+		,m_dbName(dbName_)
 		,m_user(user_)
 		,m_password(password_)
-		,m_connections(connections_){}
+		,m_sslMode(sslMode_)
+		,m_sslCert(sslCert_)
+		,m_sslKey(sslKey_)
+		,m_sslRootCert(sslRootCert_)
+		,m_sslCRL(sslCRL_)
+		,m_connectTimeout(connectTimeout_)
+		,m_connections(connections_)
+		,m_acquireTimeout(acquireTimeout_)
+		,m_statementTimeout(statementTimeout_){}
 
 	PostgreSQLConfig( const char* title, const char* logprefix)
 		:_Wolframe::serialize::DescriptiveConfiguration( title, "database", logprefix, getStructDescription())

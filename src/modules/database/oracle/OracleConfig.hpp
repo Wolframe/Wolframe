@@ -49,8 +49,7 @@ static const char* ORACLE_DB_CLASS_NAME = "Oracle";
 enum {
 	DEFAULT_ORACLE_PORT = 1521,
 	DEFAULT_ORACLE_CONNECTIONS = 4,
-	DEFAULT_ORACLE_ACQUIRE_TIMEOUT = 0,
-	DEFAULT_ORACLE_STATEMENT_TIMEOUT = 30000
+	DEFAULT_ORACLE_ACQUIRE_TIMEOUT = 0
 };
 
 /// \brief SQLite database configuration
@@ -66,23 +65,24 @@ public:
 		,m_port(DEFAULT_ORACLE_PORT)
 		,m_connections(DEFAULT_ORACLE_CONNECTIONS)
 		,m_acquireTimeout(DEFAULT_ORACLE_ACQUIRE_TIMEOUT)
-		,m_statementTimeout(DEFAULT_ORACLE_STATEMENT_TIMEOUT)
 	{
 		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
 	}
 
 	OracleConfig( const std::string& id_, const std::string& host_,
-			unsigned short port_,
+			unsigned short port_,const std::string& dbName_,
 			const std::string& user_, const std::string& password_,
 			unsigned short connections_,
-			const std::vector<std::string>& extensionFiles_ )
+			unsigned short acquireTimeout_)
 		:_Wolframe::serialize::DescriptiveConfiguration(SQLite_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
 		,m_ID(id_)
 		,m_host(host_)
 		,m_port(port_)
+		,m_dbName(dbName_)
 		,m_user(user_)
 		,m_password(password_)
-		,m_connections(connections_){}
+		,m_connections(connections_)
+		,m_acquireTimeout(acquireTimeout_){}
 
 	OracleConfig( const char* title, const char* logprefix)
 		:_Wolframe::serialize::DescriptiveConfiguration( title, "database", logprefix, getStructDescription())
@@ -90,7 +90,6 @@ public:
 		,m_port(DEFAULT_ORACLE_PORT)
 		,m_connections(DEFAULT_ORACLE_CONNECTIONS)
 		,m_acquireTimeout(DEFAULT_ORACLE_ACQUIRE_TIMEOUT)
-		,m_statementTimeout(DEFAULT_ORACLE_STATEMENT_TIMEOUT)
 	{
 		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
 	}
@@ -108,7 +107,6 @@ public:
 	const std::string& password() const		{ return m_password; }
 	unsigned short connections() const		{ return m_connections; }
 	unsigned short acquireTimeout() const		{ return m_acquireTimeout; }
-	unsigned statementTimeout() const		{ return m_statementTimeout; }
 
 public:
 	/// \brief Structure description for serialization/parsing
@@ -123,7 +121,6 @@ private:
 	std::string	m_password;		//< and password
 	unsigned short	m_connections;	 	//< number of database connection (pool size)
 	unsigned short	m_acquireTimeout;	//< timeout when acquiring a connection from the pool
-	unsigned	m_statementTimeout;	//< default timeout when executin a statement
 
 	config::ConfigurationTree::Position m_config_pos;
 

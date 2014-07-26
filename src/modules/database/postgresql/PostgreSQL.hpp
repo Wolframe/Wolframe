@@ -77,10 +77,11 @@ public:
 	PostgreSQLDatabase( const std::string& id,
 			  const std::string& host, unsigned short port, const std::string& dbName,
 			  const std::string& user, const std::string& password,
-			  std::string sslMode, std::string sslCert, std::string sslKey,
-			  std::string sslRootCert, std::string sslCRL,
+			  const std::string& sslMode, const std::string& sslCert,
+			  const std::string& sslKey, const std::string& sslRootCert,
+			  const std::string& sslCRL,
 			  unsigned short connectTimeout,
-			  size_t connections, unsigned short acquireTimeout,
+			  unsigned short connections, unsigned short acquireTimeout,
 			  unsigned statementTimeout);
 	PostgreSQLDatabase( const PostgreSQLConfig& config);
 	 ~PostgreSQLDatabase();
@@ -88,16 +89,35 @@ public:
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 
-	Transaction* transaction( const std::string& name );
-	void closeTransaction( Transaction* t );
+	Transaction* transaction( const std::string& name_)
+	{
+		TransactionExecStatemachineR stm( new TransactionExecStatemachine_postgres( this));
+		return new Transaction( name_, stm);
+	}
+
+	void closeTransaction( Transaction* t )
+	{
+		delete t;
+	}
 
 	virtual const LanguageDescription* getLanguageDescription( ) const
 	{
 		static PostgreSQLLanguageDescription langdescr;
 		return &langdescr;
 	}
-};
 
+	PoolObject<PGconn*>* newConnection()	{return new PoolObject<PGconn*>( m_connPool);}
+
+private:
+	void init( const PostgreSQLConfig& config);
+
+private:
+	const std::string	m_ID;			//< database ID
+	std::string		m_connStr;		//< connection string
+	unsigned short		m_connections;		//< number of connections
+	PostgreSQLServerSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
+	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
+};
 
 class PostgreSQLdbUnit : public DatabaseUnit
 {
@@ -106,28 +126,8 @@ public:
 
 	static void noticeProcessor( void* this_void, const char * message);
 
-	PoolObject<PGconn*>* newConnection()	{return new PoolObject<PGconn*>( m_connPool);}
-
 	PostgreSQLServerSettings serverSettings() const
 						{ return m_serverSettings; }
-
-private:
-	const std::string	m_ID;			//< database ID
-	std::string		m_connStr;		//< connection string
-	size_t			m_noConnections;	//< number of connections
-	PostgreSQLServerSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
-	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
-	unsigned		m_statementTimeout;	//< default statement execution timeout
-	PostgreSQLDatabase	m_db;			//< real database object
-};
-
-///\class PostgreSQLtransaction
-class PostgreSQLtransaction
-	:public Transaction
-{
-public:
-	PostgreSQLtransaction( PostgreSQLDatabase& database, const std::string& name_);
-	virtual ~PostgreSQLtransaction(){}
 };
 
 }} // _Wolframe::db

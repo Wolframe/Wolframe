@@ -61,7 +61,6 @@ const serialize::StructDescriptionBase* OracleConfig::getStructDescription()
 		( "password", &OracleConfig::m_password )	.optional()
 		( "connections", &OracleConfig::connections )	.optional()
 		( "acquireTimeout", &OracleConfig::acquireTimeout ).optional()
-		( "statementTimeout", &OracleConfig::statementTimeout ).optional()
 		;
 	}
 	};
@@ -115,10 +114,6 @@ void OracleConfig::print( std::ostream& os, size_t indent ) const
 		os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;
 	else
 		os << indStr << "   Acquire database connection timeout: " << acquireTimeout << "s" << std::endl;
-	if ( statementTimeout == 0 )
-		os << indStr << "   Default statement execution timeout: 0 (wait indefinitely)" << std::endl;
-	else
-		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
 }
 
 bool OracleConfig::check() const

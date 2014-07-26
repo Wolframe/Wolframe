@@ -50,19 +50,36 @@ extern "C" void profiling_callback(  void * /*a*/, const char *b, sqlite3_uint64
 	LOG_DATA << b << " (time: " << c / 1000 << " ms)";
 }
 
-SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
-			    bool foreignKeys, bool profiling,
-			    unsigned short connections,
-			    const std::vector<std::string>& extensionFiles_)
-	: m_ID( id ), m_filename( filename ),
-	m_extensionFiles(extensionFiles_)
+SQLiteDatabase::SQLiteDatabase( const SQLiteConfig& config)
+	:m_ID(config.ID())
+	,m_filename(config.filename())
+	,m_extensionFiles(config.extensionFiles())
+{
+	init( config);
+}
+
+SQLiteDatabase::SQLiteDatabase(
+		const std::string& id_, const std::string& filename_,
+		bool foreignKeys_, bool profiling_,
+		unsigned short connections_,
+		const std::vector<std::string>& extensionFiles_ )
+	:m_ID(id_)
+	,m_filename(filename_)
+	,m_extensionFiles(extensionFiles_)
+{
+	SQLiteConfig config( id_, filename_, foreignKeys_, profiling_, connections_, extensionFiles_);
+	init( config);
+}
+
+void SQLiteDatabase::init( const SQLiteConfig& config)
 {
 	bool	checked = false;
 	int	dbFlags = SQLITE_OPEN_READWRITE;
+	int	connections = config.connections();
 
 	if ( ! sqlite3_threadsafe() )	{
 		if ( connections != 1 )	{
-			LOG_WARNING << "SQLite database '" << id
+			LOG_WARNING << "SQLite database '" << m_ID
 				    << "' has not been compiled without the SQLITE_THREADSAFE parameter."
 				    << " Using only 1 connection instead of " << connections << ".";
 			connections = 1;
@@ -72,10 +89,9 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 				throw std::runtime_error( "Unable to set SQLite in multithreaded mode" );
 			}
 			dbFlags |= SQLITE_OPEN_NOMUTEX;
-//			dbFlags |= SQLITE_OPEN_FULLMUTEX;
 		}
 	}
-
+	
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
 		char* err;
@@ -86,7 +102,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 					   NULL );
 #endif
 		if( res != SQLITE_OK )	{
-			LOG_ALERT << "Unable to open SQLite database '" << filename
+			LOG_ALERT << "Unable to open SQLite database '" << m_filename
 				      << "': " << sqlite3_errmsg( handle );
 				sqlite3_close( handle );	// really ?!?
 			throw std::runtime_error( "Unable to open SQLite database" );
@@ -95,7 +111,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			if ( !checked )	{
 				res = sqlite3_exec( handle, "PRAGMA integrity_check", NULL, NULL, &err );
 				if( res != SQLITE_OK )	{
-					LOG_ALERT << "Corrupt SQLite database '" << filename
+					LOG_ALERT << "Corrupt SQLite database '" << m_filename
 						      << "': " << err;
 					sqlite3_close( handle );
 				}
@@ -107,10 +123,10 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			}
 
 			// enable foreign keys
-			if ( foreignKeys )	{
+			if ( config.foreignKeys() )	{
 				res = sqlite3_exec( handle, "PRAGMA foreign_keys=true", NULL, NULL, &err );
 				if( res != SQLITE_OK ) {
-					LOG_ALERT << "Unable to enforce integrity checks in '" << filename
+					LOG_ALERT << "Unable to enforce integrity checks in '" << m_filename
 						      << "': " << err;
 				}
 				if( err ) {
@@ -118,7 +134,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 				}
 			}
 			// enable tracing and profiling of commands
-			if ( profiling )
+			if ( config.profiling() )
 				sqlite3_profile( handle, profiling_callback, NULL );
 
 			// enable extensions in every connection
@@ -147,48 +163,23 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 					continue;
 				}
 			}
-			LOG_DEBUG << "Extensions for SQLite database unit '" << m_ID << "' loaded";
+			LOG_DEBUG << "Extensions for SQLite database '" << m_ID << "' loaded";
 
 			m_connections.push_back( handle );
 			m_connPool.add( handle );
 		}
 	}
-	LOG_DEBUG << "SQLite database unit '" << m_ID << "' created with "
+	LOG_DEBUG << "SQLite database '" << m_ID << "' created with "
 		      << connections << " connections to file '" << m_filename << "'";
 }
 
-SQLiteDBunit::~SQLiteDBunit( )
+SQLiteDatabase::~SQLiteDatabase()
 {
 	while( m_connPool.available( ) > 0 ) {
 		sqlite3 *handle = m_connPool.get( );
 		sqlite3_close( handle );
 	}
-	LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
+	LOG_TRACE << "SQLite database '" << m_ID << "' destroyed";
 }
-
-/*****  SQLite database  **********************************************/
-const std::string& SQLiteDatabase::ID() const
-{
-	if ( m_unit )
-		return m_unit->ID();
-	else
-		throw std::runtime_error( "SQLite database unit not initialized" );
-}
-
-Transaction* SQLiteDatabase::transaction( const std::string& name)
-{
-	return new SQLiteTransaction( *this, name);
-}
-
-void SQLiteDatabase::closeTransaction( Transaction *t )
-{
-	delete t;
-}
-
-
-/*****  SQLite transaction  *******************************************/
-SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database, const std::string& name_)
-	:Transaction( name_, TransactionExecStatemachineR( new TransactionExecStatemachine_sqlite3( &database.dbUnit()))){}
-
 
 }} // _Wolframe::db
