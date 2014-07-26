@@ -67,22 +67,6 @@ const serialize::StructDescriptionBase* SQLiteConfig::getStructDescription()
 	return &rt;
 }
 
-bool SQLiteConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
-			  const module::ModulesDirectory* /*modules*/ )
-{
-	try
-	{
-		serialize::parseConfigStructure( *static_cast<SQLiteConfigStruct*>(this), pt);
-		m_config_pos = pt.position();
-		return true;
-	}
-	catch (const std::runtime_error& e)
-	{
-		LOG_FATAL << logPrefix() << e.what();
-		return false;
-	}
-}
-
 void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 {
 	std::string indStr( indent, ' ' );

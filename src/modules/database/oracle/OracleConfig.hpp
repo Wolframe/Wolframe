@@ -95,9 +95,10 @@ public:
 		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
 	}
 
+	virtual bool parse( const config::ConfigurationNode& cfgTree, const std::string& node,
+			    const module::ModulesDirectory* modules );
 	virtual bool check() const;
 	virtual void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
 
 	const std::string& ID() const			{ return m_ID; }
 	const std::string& host() const			{ return m_host; }

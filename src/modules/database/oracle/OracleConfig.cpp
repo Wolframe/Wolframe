@@ -80,24 +80,15 @@ bool OracleConfig::mapValueDomains()
 	return retVal;
 }
 
-bool OracleConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
-			      const module::ModulesDirectory* /*modules*/ )
+bool OracleConfig::parse( const config::ConfigurationNode& pt, const std::string& node,
+			      const module::ModulesDirectory* modules )
 {
-	try
-	{
-		serialize::parseConfigStructure( *static_cast<OracleConfigStruct*>(this), pt);
-		m_config_pos = pt.position();
-		return mapValueDomains();
+	bool rt;
+	rt = _Wolframe::serialize::DescriptiveConfiguration::parse( pt, node, modules);
+	if( rt ) {
+		rt = mapValueDomains( );
 	}
-	catch (const std::runtime_error& e)
-	{
-		LOG_FATAL << logPrefix() << e.what();
-		return false;
-	}
-}
-
-void OracleConfig::setCanonicalPathes( const std::string& refPath )
-{
+	return rt;
 }
 
 void OracleConfig::print( std::ostream& os, size_t indent ) const

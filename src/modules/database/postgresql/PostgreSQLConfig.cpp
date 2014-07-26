@@ -120,20 +120,15 @@ bool PostgreSQLConfig::mapValueDomains()
 	return retVal;
 }
 
-bool PostgreSQLConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
-			      const module::ModulesDirectory* /*modules*/ )
+bool PostgreSQLConfig::parse( const config::ConfigurationNode& pt, const std::string& node,
+			      const module::ModulesDirectory* modules )
 {
-	try
-	{
-		serialize::parseConfigStructure( *static_cast<PostgreSQLConfigStruct*>(this), pt);
-		m_config_pos = pt.position();
-		return mapValueDomains();
+	bool rt;
+	rt = _Wolframe::serialize::DescriptiveConfiguration::parse( pt, node, modules);
+	if( rt ) {
+		rt = mapValueDomains( );
 	}
-	catch (const std::runtime_error& e)
-	{
-		LOG_FATAL << logPrefix() << e.what();
-		return false;
-	}
+	return rt;
 }
 
 void PostgreSQLConfig::setCanonicalPathes( const std::string& refPath )
