@@ -111,23 +111,26 @@ public:
 private:
 	void init( const PostgreSQLConfig& config);
 
+	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
+
+	static void noticeProcessor( void* this_void, const char * message);
+
 private:
 	const std::string	m_ID;			//< database ID
 	std::string		m_connStr;		//< connection string
 	unsigned short		m_connections;		//< number of connections
 	PostgreSQLServerSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
 	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
+
+// needed? I don't we should give outsiders access to server settings
+//~ public:
+	//~ PostgreSQLServerSettings serverSettings() const
+						//~ { return m_serverSettings; }
 };
 
 class PostgreSQLdbUnit : public DatabaseUnit
 {
 public:	
-	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
-
-	static void noticeProcessor( void* this_void, const char * message);
-
-	PostgreSQLServerSettings serverSettings() const
-						{ return m_serverSettings; }
 };
 
 }} // _Wolframe::db

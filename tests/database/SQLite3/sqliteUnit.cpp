@@ -40,36 +40,33 @@ static std::string dberror_string( const TransactionR& trans)
 
 TEST_F( SQLiteModuleFixture, CreateSQLiteUnit_0 )
 {
-	SQLiteDBunit db( "testDB", "test.db", true, false, 3,
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
 			 std::vector<std::string>() );
 	EXPECT_STREQ( "SQLite", db.className());
 	EXPECT_STREQ( "testDB", db.ID().c_str());
-	EXPECT_STREQ( "testDB", db.database()->ID().c_str());
 }
 
 TEST_F( SQLiteModuleFixture, CreateSQLiteUnit_1 )
 {
-	SQLiteDBunit db( "testDB", "test.db", true, false, 3,
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
 			 std::vector<std::string>() );
 	EXPECT_STREQ( "SQLite", db.className());
 	EXPECT_STREQ( "testDB", db.ID().c_str());
-	EXPECT_STREQ( "testDB", db.database()->ID().c_str());
 }
 
 TEST_F( SQLiteModuleFixture, OpenGarbage )
 {
-	EXPECT_THROW( SQLiteDBunit db( "testDB", "garbage.db", true, false, 3,
+	EXPECT_THROW( SQLiteDatabase db( "testDB", "garbage.db", true, false, 3,
 				       std::vector<std::string>() ),
 		      std::runtime_error );
 }
 
 TEST_F( SQLiteModuleFixture, Transaction )
 {
-	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
-			     std::vector<std::string>() );
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
+			 std::vector<std::string>() );
 
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	// ok transaction
 	trans->begin( );
@@ -151,10 +148,9 @@ static void executeInsertStatements( const TransactionR& trans)
 
 TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 {
-	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
 			     std::vector<std::string>() );
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	// ok transaction create table statement with commit
 	trans->begin( );
@@ -249,10 +245,9 @@ TEST_F( SQLiteModuleFixture, ExecuteInstruction )
 
 TEST_F( SQLiteModuleFixture, ExceptionSyntaxError )
 {
-	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
 			     std::vector<std::string>() );
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 
@@ -272,10 +267,9 @@ TEST_F( SQLiteModuleFixture, ExceptionSyntaxError )
 
 TEST_F( SQLiteModuleFixture, TooFewBindParameter )
 {
-	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
 			     std::vector<std::string>() );
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));
@@ -300,10 +294,9 @@ TEST_F( SQLiteModuleFixture, TooFewBindParameter )
 
 TEST_F( SQLiteModuleFixture, TooManyBindParameter )
 {
-	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
 			     std::vector<std::string>() );
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));
@@ -330,10 +323,9 @@ TEST_F( SQLiteModuleFixture, TooManyBindParameter )
 
 TEST_F( SQLiteModuleFixture, IllegalBindParameter )
 {
-	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
 			     std::vector<std::string>() );
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));
@@ -359,10 +351,9 @@ TEST_F( SQLiteModuleFixture, IllegalBindParameter )
 
 TEST_F( SQLiteModuleFixture, ReusedBindParameter )
 {
-	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
 			     std::vector<std::string>() );
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));
@@ -395,10 +386,9 @@ TEST_F( SQLiteModuleFixture, ReusedBindParameter )
 
 TEST_F( SQLiteModuleFixture, ExpressionWithParametersAndTypeCoercion )
 {
-	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3,
+	SQLiteDatabase db( "testDB", "test.db", true, false, 3,
 			     std::vector<std::string>() );
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));

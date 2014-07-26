@@ -124,7 +124,7 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 	return ss.str();
 }
 
-_Wolframe::log::LogLevel::Level PostgreSQLdbUnit::getLogLevel( const std::string& severity)
+_Wolframe::log::LogLevel::Level PostgreSQLDatabase::getLogLevel( const std::string& severity)
 {
 	struct LogMsgMap :public std::map<std::string,_Wolframe::log::LogLevel::Level>
 	{
@@ -154,9 +154,9 @@ _Wolframe::log::LogLevel::Level PostgreSQLdbUnit::getLogLevel( const std::string
 	}
 }
 
-void PostgreSQLdbUnit::noticeProcessor( void* this_void, const char * message)
+void PostgreSQLDatabase::noticeProcessor( void* this_void, const char * message)
 {
-	PostgreSQLdbUnit* this_ = (PostgreSQLdbUnit*)this_void;
+	PostgreSQLDatabase* this_ = (PostgreSQLDatabase*)this_void;
 	std::size_t ii=0;
 	for (; message[ii] && message[ii] != ':'; ++ii);
 	if (message[ii])

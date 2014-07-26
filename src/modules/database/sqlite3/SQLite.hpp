@@ -108,11 +108,6 @@ private:
 	std::vector<std::string>m_extensionFiles;	///< Sqlite extensions
 };
 
-
-class SQLiteDBunit : public DatabaseUnit
-{
-};
-
 }} // _Wolframe::db
 
 #endif // _SQLITE_HPP_INCLUDED

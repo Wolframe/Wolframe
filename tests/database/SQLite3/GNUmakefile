@@ -20,12 +20,16 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	$(SQLITE3_LIB_DIRS)
 
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwfsingleton \
 	-lwolframe_database \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
 	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
