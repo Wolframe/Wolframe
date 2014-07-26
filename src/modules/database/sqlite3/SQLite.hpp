@@ -37,14 +37,11 @@
 #ifndef _SQLITE_HPP_INCLUDED
 #define _SQLITE_HPP_INCLUDED
 
+#include "SQLiteTransactionExecStatemachine.hpp"
 #include "SQLiteConfig.hpp"
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
-#include "config/configurationBase.hpp"
-#include "serialize/configSerialize.hpp"
-#include "types/keymap.hpp"
-#include "module/constructor.hpp"
 #include <list>
 #include <vector>
 #include "system/objectPool.hpp"
@@ -71,10 +68,14 @@ struct SQLiteLanguageDescription :public LanguageDescription
 class SQLiteDatabase : public Database
 {
 public:
-	SQLiteDatabase() : m_unit( NULL )	{}
-	 ~SQLiteDatabase()			{}
+	SQLiteDatabase( const std::string& id_, const std::string& filename_,
+			bool foreignKeys_, bool profiling_,
+			unsigned short connections_,
+			const std::vector<std::string>& extensionFiles_ );
+	SQLiteDatabase( const SQLiteConfig& config);
+	 ~SQLiteDatabase();
 
-	const std::string& ID() const;
+	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLITE_DB_CLASS_NAME; }
 
 	Transaction* transaction( const std::string& name );
@@ -91,17 +92,7 @@ public:
 class SQLiteDBunit : public DatabaseUnit
 {
 	friend class SQLiteTransaction;
-	friend class SQLiteUIlibrary;
 public:
-	SQLiteDBunit( const std::string& id, const std::string& filename,
-		      bool foreignKeys, bool profiling,
-		      unsigned short connections,
-		      const std::vector<std::string>& extensionFiles_ );
-	~SQLiteDBunit();
-
-	const std::string& ID() const		{ return m_ID; }
-	const char* className() const		{ return SQLITE_DB_CLASS_NAME; }
-	Database* database();
 
 	PoolObject<sqlite3*>* newConnection()	{return new PoolObject<sqlite3*>( m_connPool);}
 

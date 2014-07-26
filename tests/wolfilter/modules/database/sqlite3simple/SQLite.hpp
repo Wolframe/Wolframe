@@ -42,7 +42,6 @@
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
-#include "module/constructor.hpp"
 #include <list>
 #include <vector>
 #include "system/objectPool.hpp"
@@ -76,7 +75,7 @@ public:
 	SQLiteDatabase( const SQLiteConfig& config);
 	 ~SQLiteDatabase();
 
-	const std::string& ID() const		{ return m_ID;}
+	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLITE_DB_CLASS_NAME; }
 
 	Transaction* transaction( const std::string& name_)

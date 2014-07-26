@@ -319,13 +319,6 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 	LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
-Database* PostgreSQLdbUnit::database()
-{
-	return m_db.hasUnit() ? &m_db : NULL;
-}
-
-
-
 /*****  PostgreSQL database  ******************************************/
 const std::string& PostgreSQLDatabase::ID() const
 {

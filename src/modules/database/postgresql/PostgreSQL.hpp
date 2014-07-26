@@ -37,6 +37,7 @@
 #ifndef _POSTGRESQL_HPP_INCLUDED
 #define _POSTGRESQL_HPP_INCLUDED
 
+#include "PostgreSQLTransactionExecStatemachine.hpp"
 #include "PostgreSQLConfig.hpp"
 #include "logger-v1.hpp"
 #include <libpq-fe.h>
@@ -45,8 +46,6 @@
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "PostgreSQLServerSettings.hpp"
-#include "config/configurationBase.hpp"
-#include "serialize/configSerialize.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
 
@@ -75,10 +74,18 @@ struct PostgreSQLLanguageDescription : public LanguageDescription
 class PostgreSQLDatabase : public Database
 {
 public:
-	PostgreSQLDatabase() : m_unit( NULL )	{}
-	~PostgreSQLDatabase()			{}
+	PostgreSQLDatabase( const std::string& id,
+			  const std::string& host, unsigned short port, const std::string& dbName,
+			  const std::string& user, const std::string& password,
+			  std::string sslMode, std::string sslCert, std::string sslKey,
+			  std::string sslRootCert, std::string sslCRL,
+			  unsigned short connectTimeout,
+			  size_t connections, unsigned short acquireTimeout,
+			  unsigned statementTimeout);
+	PostgreSQLDatabase( const PostgreSQLConfig& config);
+	 ~PostgreSQLDatabase();
 
-	const std::string& ID() const;
+	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 
 	Transaction* transaction( const std::string& name );
@@ -94,20 +101,7 @@ public:
 
 class PostgreSQLdbUnit : public DatabaseUnit
 {
-public:
-	PostgreSQLdbUnit( const std::string& id,
-			  const std::string& host, unsigned short port, const std::string& dbName,
-			  const std::string& user, const std::string& password,
-			  std::string sslMode, std::string sslCert, std::string sslKey,
-			  std::string sslRootCert, std::string sslCRL,
-			  unsigned short connectTimeout,
-			  size_t connections, unsigned short acquireTimeout,
-			  unsigned statementTimeout);
-	~PostgreSQLdbUnit();
-
-	const std::string& ID() const		{ return m_ID; }
-	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
-	Database* database();
+public:	
 	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
 
 	static void noticeProcessor( void* this_void, const char * message);

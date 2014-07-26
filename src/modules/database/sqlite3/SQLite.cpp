@@ -166,12 +166,6 @@ SQLiteDBunit::~SQLiteDBunit( )
 	LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
 }
 
-Database* SQLiteDBunit::database()
-{
-	return m_db.hasUnit() ? &m_db : NULL;
-}
-
-
 /*****  SQLite database  **********************************************/
 const std::string& SQLiteDatabase::ID() const
 {

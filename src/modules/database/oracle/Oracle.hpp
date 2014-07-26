@@ -37,12 +37,11 @@
 #ifndef _ORACLEQL_HPP_INCLUDED
 #define _ORACLEQL_HPP_INCLUDED
 
+#include "OracleTransactionExecStatemachine.hpp"
 #include "OracleConfig.hpp"
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
-#include "config/configurationBase.hpp"
-#include "serialize/configSerialize.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
 #include "logger-v1.hpp"
@@ -77,10 +76,15 @@ class OracleEnvirenment
 class OracleDatabase : public Database
 {
 public:
-	OracleDatabase() : m_unit( NULL )	{}
-	~OracleDatabase()			{}
+	OracleDatabase( const std::string& id,
+			  const std::string& host, unsigned short port, const std::string& dbName,
+			  const std::string& user, const std::string& password,
+			  size_t connections, unsigned short acquireTimeout,
+			  unsigned statementTimeout);
+	OracleDatabase( const OracleConfig& config);
+	 ~OracleDatabase();
 
-	const std::string& ID() const;
+	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
 
 	Transaction* transaction( const std::string& name );
@@ -110,16 +114,8 @@ class OracleDbUnit : public DatabaseUnit
 {
 	friend class OracleTransaction;
 public:
-	OracleDbUnit( const std::string& id,
-			  const std::string& host, unsigned short port, const std::string& dbName,
-			  const std::string& user, const std::string& password,
-			  size_t connections, unsigned short acquireTimeout,
-			  unsigned statementTimeout);
 	~OracleDbUnit();
 
-	const std::string& ID() const		{ return m_ID; }
-	const char* className() const		{ return ORACLE_DB_CLASS_NAME; }
-	Database* database();
 	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
 
 	PoolObject<OracleConnection *> *newConnection( ) { return new PoolObject<OracleConnection *>( m_connPool ); }

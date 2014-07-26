@@ -301,13 +301,6 @@ OracleDbUnit::~OracleDbUnit()
 	LOG_TRACE << "Oracle database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
-Database* OracleDbUnit::database()
-{
-	return m_db.hasUnit() ? &m_db : NULL;
-}
-
-
-
 /*****  Oracle database  ******************************************/
 const std::string& OracleDatabase::ID() const
 {
