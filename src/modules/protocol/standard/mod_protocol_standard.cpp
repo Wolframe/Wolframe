@@ -35,10 +35,8 @@
 #include "appdevel/protocolHandlerModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
 #include "standardProtocolHandler.hpp"
-#include "contentOnlyProtocolHandler.hpp"
 
 WF_MODULE_BEGIN( "StandardProtocolHandler", "Wolframe standard protocol handler module")
  WF_PROTOCOL_HANDLER( "standard", _Wolframe::cmdbind::StandardProtocolHandlerUnit)
- WF_PROTOCOL_HANDLER( "wolfilter", _Wolframe::cmdbind::ContentOnlyProtocolHandlerUnit)
 WF_MODULE_END
 

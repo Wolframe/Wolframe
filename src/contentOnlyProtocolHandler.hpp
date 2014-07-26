@@ -35,7 +35,7 @@
 #ifndef _Wolframe_CONTENT_ONLY_PROTOCOL_HANDLER_HPP_INCLUDED
 #define _Wolframe_CONTENT_ONLY_PROTOCOL_HANDLER_HPP_INCLUDED
 #include "cmdbind/protocolHandler.hpp"
-#include "doctypeFilterProtocolHandler.hpp"
+#include "cmdbind/doctypeDetector.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -76,6 +76,7 @@ private:
 		Init,
 		DoctypeDetection,
 		Processing,
+		FlushingOutput,
 		Done
 	};
 	static const char* stateName( State s)
@@ -89,8 +90,14 @@ private:
 	std::string m_buffer;				///< buffer for input during document type detection
 	std::string m_cmdname;				///< name of command to execute -> command handler
 	cmdbind::CommandHandlerR m_commandHandler;	///< command handler for processing
-	protocol::InputBlock m_input;			///< buffer for read messages
-	protocol::OutputBlock m_output;			///< buffer for write messages
+	char* m_input;					///< buffer for read messages
+	std::size_t m_inputsize;			///< allocation size of m_input in bytes
+	char* m_output;					///< buffer for write messages
+	std::size_t m_outputsize;			///< allocation size of m_output in bytes
+	std::size_t m_outputpos;			///< position in m_output (chunk before belongs to caller)
+	const char* m_writeblock;			///< current block written
+	std::size_t m_writesize;			///< allocation size of m_writeblock
+	std::size_t m_writepos;				///< write position in m_writeblock
 	types::DoctypeInfoR m_doctypeInfo;		///< type/format attributes of processed document
 	State m_state;					///< processing state
 	bool m_eod;					///< got end of data marker

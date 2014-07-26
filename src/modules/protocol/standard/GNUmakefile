@@ -32,7 +32,6 @@ CPP_OBJS = \
 	interfaceProtocolHandler.o \
 	passwordChangeProtocolHandler.o \
 	standardProtocolHandler.o \
-	contentOnlyProtocolHandler.o \
 	mod_protocol_standard.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

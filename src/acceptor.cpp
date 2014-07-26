@@ -76,7 +76,8 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	}
 	endpoint.port( port );
 
-	ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( host, port, m_localEndpointConfig));
+	LocalEndpointR local( new LocalTCPendpoint( host, port, m_localEndpointConfig));
+	ConnectionHandler *handler = m_srvHandler.newConnection( local);
 	m_newConnection = connection_ptr( new connection( m_IOservice, &m_connList, handler ));
 
 	try	{
@@ -118,9 +119,10 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 		{
 			m_newConnection->deny_connection();
 		}
-		ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( m_acceptor.local_endpoint().address().to_string(),
-											   m_acceptor.local_endpoint().port(),
-											   m_localEndpointConfig));
+		LocalEndpointR local( new LocalTCPendpoint( m_acceptor.local_endpoint().address().to_string(),
+							    m_acceptor.local_endpoint().port(),
+							    m_localEndpointConfig));
+		ConnectionHandler *handler = m_srvHandler.newConnection( local);
 		m_newConnection.reset( new connection( m_IOservice, &m_connList, handler ));
 		m_acceptor.async_accept( m_newConnection->socket(),
 					 m_strand.wrap( boost::bind( &acceptor::handleAccept,
@@ -236,7 +238,8 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 	endpoint.port( port );
 
-	ConnectionHandler *handler = m_srvHandler.newConnection( LocalSSLendpoint( host, port, m_localEndpointConfig));
+	LocalEndpointR local( new LocalSSLendpoint( host, port, m_localEndpointConfig));
+	ConnectionHandler *handler = m_srvHandler.newConnection( local);
 	m_newConnection = SSLconnection_ptr( new SSLconnection( m_IOservice, m_SSLcontext, &m_connList, handler ));
 
 	m_acceptor.open( endpoint.protocol() );
@@ -272,9 +275,10 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 			m_newConnection->start();
 			LOG_ERROR << "Denied new connection on " << m_identifier << " from " << m_newConnection->socket().lowest_layer().remote_endpoint().address().to_string();
 		}
-		ConnectionHandler *handler = m_srvHandler.newConnection( LocalSSLendpoint( m_acceptor.local_endpoint().address().to_string(),
-												m_acceptor.local_endpoint().port(),
-												m_localEndpointConfig));
+		LocalEndpointR local( new LocalSSLendpoint( m_acceptor.local_endpoint().address().to_string(),
+							    m_acceptor.local_endpoint().port(),
+							    m_localEndpointConfig));
+		ConnectionHandler *handler = m_srvHandler.newConnection( local);
 		m_newConnection.reset( new SSLconnection( m_IOservice, m_SSLcontext, &m_connList, handler ));
 		m_acceptor.async_accept( m_newConnection->socket().lowest_layer(),
 					 m_strand.wrap( boost::bind( &SSLacceptor::handleAccept,

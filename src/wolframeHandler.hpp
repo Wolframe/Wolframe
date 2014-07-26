@@ -39,7 +39,7 @@
 
 #include "system/connectionHandler.hpp"
 #include "processor/execContext.hpp"
-#include "protocol/ioblocks.hpp"
+#include "cmdbind/protocolHandler.hpp"
 #include "database/database.hpp"
 #include "AAAA/AAAAprovider.hpp"
 #include "processor/procProvider.hpp"
@@ -74,10 +74,10 @@ private:
 class wolframeConnection : public net::ConnectionHandler
 {
 public:
-	wolframeConnection( const WolframeHandler& context, const net::LocalEndpoint& local );
+	wolframeConnection( const WolframeHandler& context, const net::LocalEndpointR& local );
 	~wolframeConnection();
 
-	void setPeer( const net::RemoteEndpoint& remote );
+	void setPeer( const net::RemoteEndpointR& remote );
 
 	/// Parse / get the incoming data.
 	void networkInput( const void *begin, std::size_t bytesTransferred );
@@ -118,13 +118,17 @@ private:
 	AAAA::Authorizer*		m_authorization;
 	AAAA::Auditor*			m_audit;
 
-	const net::LocalEndpoint*	m_localEP;		///< local endpoint
-	const net::RemoteEndpoint*	m_remoteEP;		///< remote endpoint
+	net::LocalEndpointR		m_localEP;		///< local endpoint
+	net::RemoteEndpointR		m_remoteEP;		///< remote endpoint
 
 	FSMstate			m_state;		///< top processor FSM state
 
-	protocol::InputBlock		m_readBuf;		///< network read buffer
-	protocol::OutputBlock		m_outputBuf;		///< network write buffer
+	void* m_input;						///< buffer for read messages
+	std::size_t m_inputsize;				///< allocation size of m_input in bytes
+	std::size_t m_inputpos;
+	void* m_output;						///< buffer for write messages
+	std::size_t m_outputsize;				///< allocation size of m_output in bytes
+
 	char*				m_dataStart;
 	std::size_t			m_dataSize;
 
@@ -132,7 +136,7 @@ private:
 	std::string			m_endDataSessionMarker;	///< buffer for message to interrupt data session for the client
 
 	proc::ExecContext		m_execContext;		///< execution context of the connection
-	cmdbind::MainCommandHandler	m_cmdHandler;		///< command handler
+	cmdbind::ProtocolHandlerR	m_protocolHandler;	///< protocol handler
 };
 
 /// The server handler container
@@ -142,7 +146,7 @@ public:
 	ServerHandlerImpl( const HandlerConfiguration* conf,
 			   const module::ModulesDirectory* modules );
 	~ServerHandlerImpl();
-	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
+	net::ConnectionHandler* newConnection( const net::LocalEndpointR& local );
 private:
 	WolframeHandler	m_globalContext;
 };

@@ -154,7 +154,7 @@ public:
 	virtual void signalOccured( NetworkSignal )	{}
 
 	/// Set the remote peer. The connection is up now.
-	virtual void setPeer( const RemoteEndpoint& remote ) = 0;
+	virtual void setPeer( const RemoteEndpointR& remote ) = 0;
 };
 
 } // namespace net
@@ -173,7 +173,7 @@ public:
 	~ServerHandler();
 
 	/// Create a new connection handler and return a pointer to it
-	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
+	net::ConnectionHandler* newConnection( const net::LocalEndpointR& local );
 
 private:
 	class ServerHandlerImpl;

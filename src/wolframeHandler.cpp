@@ -39,6 +39,7 @@
 #include "logger-v1.hpp"
 #include "standardConfigs.hpp"
 #include "handlerConfig.hpp"
+#include <stdexcept>
 
 #ifdef WITH_SSL
 #include "system/SSLcertificateInfo.hpp"
@@ -53,28 +54,47 @@
 namespace _Wolframe	{
 
 wolframeConnection::wolframeConnection( const WolframeHandler& context,
-					const net::LocalEndpoint& local )
+					const net::LocalEndpointR& local )
 	: m_globalCtx( context ),
-	  m_readBuf( 16536 ), m_outputBuf( 4096 ), m_execContext( &context.proc(), &context.aaaa())
+	  m_input(0), m_inputsize(16536), m_inputpos(0), m_output(0), m_outputsize( 4096 ), m_execContext( &context.proc(), &context.aaaa())
 {
-	m_remoteEP = NULL;
-	net::ConnectionEndpoint::ConnectionType type = local.type();
-
+	m_input = std::malloc( m_inputsize);
+	m_output = std::malloc( m_outputsize);
+	if (!m_input || !m_output)
+	{
+		if (m_input) std::free( m_input);
+		if (m_output) std::free( m_output);
+		throw std::bad_alloc();
+	}
+	net::ConnectionEndpoint::ConnectionType type = local->type();
+	std::string protocol;
+	if (local->config().protocol.empty())
+	{
+		protocol = "standard";
+	}
+	else
+	{
+		protocol = local->config().protocol;
+	}
+	m_protocolHandler.reset( m_execContext.provider()->protocolHandler( protocol));
+	if (!m_protocolHandler.get())
+	{
+		LOG_FATAL << "protocol '" << protocol << "' is not known (protocol module not loaded)";
+		abort();
+	}
 	switch ( type )	{
 		case net::ConnectionEndpoint::UDP:
 			LOG_FATAL << "UDP local connection type not implemented";
 			abort();
 
 		case net::ConnectionEndpoint::TCP:	{
-			const net::LocalTCPendpoint& lcl = dynamic_cast< const net::LocalTCPendpoint& >( local );
-			m_localEP = new net::LocalTCPendpoint( lcl );
+			m_localEP = local;
 			LOG_TRACE << "Created connection handler for " << m_localEP->toString();
 			break;
 		}
 #ifdef WITH_SSL
 		case net::ConnectionEndpoint::SSL:	{
-			const net::LocalSSLendpoint& lcl = dynamic_cast< const net::LocalSSLendpoint& >( local );
-			m_localEP = new net::LocalSSLendpoint( lcl );
+			m_localEP = local;
 			LOG_TRACE << "Created connection handler (SSL) for " << m_localEP->toString();
 			break;
 		}
@@ -94,19 +114,15 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 	m_authentication = NULL;
 	m_authorization = NULL;
 	m_audit = NULL;
-	m_cmdHandler.setInputBuffer( m_readBuf.charptr(), m_readBuf.size() );
-	m_cmdHandler.setOutputBuffer( m_outputBuf.charptr(), m_outputBuf.size() );
-	m_cmdHandler.setExecContext( &m_execContext);
-	m_cmdHandler.setLocalEndPoint( *m_localEP);
+	m_protocolHandler->setInputBuffer( m_input, m_inputsize);
+	m_protocolHandler->setOutputBuffer( m_output, m_outputsize, 0);
+	m_protocolHandler->setExecContext( &m_execContext);
+	m_protocolHandler->setLocalEndPoint( m_localEP);
 }
 
 
 wolframeConnection::~wolframeConnection()
 {
-	if ( m_localEP )
-		delete m_localEP;
-	if ( m_remoteEP )
-		delete m_remoteEP;
 	if ( m_authorization )	{
 		m_authorization->close();
 		m_authorization = NULL;
@@ -119,14 +135,16 @@ wolframeConnection::~wolframeConnection()
 		m_audit->close();
 		m_audit = NULL;
 	}
+	if (m_input) std::free( m_input);
+	if (m_output) std::free( m_output);
 
 	LOG_TRACE << "Connection handler destroyed";
 }
 
 
-void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
+void wolframeConnection::setPeer( const net::RemoteEndpointR& remote )
 {
-	net::ConnectionEndpoint::ConnectionType type = remote.type();
+	net::ConnectionEndpoint::ConnectionType type = remote->type();
 
 	switch ( type )	{
 		case net::ConnectionEndpoint::UDP:
@@ -134,8 +152,7 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 			abort();
 
 		case net::ConnectionEndpoint::TCP:	{
-			const net::RemoteTCPendpoint& rmt = dynamic_cast< const net::RemoteTCPendpoint& >( remote );
-			m_remoteEP = new net::RemoteTCPendpoint( rmt );
+			m_remoteEP = remote;
 			LOG_TRACE << "Peer set to " << m_remoteEP->toString() << ", connected at "
 				  << boost::posix_time::from_time_t( m_remoteEP->connectionTime());
 			break;
@@ -144,16 +161,17 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		case net::ConnectionEndpoint::SSL:
 #ifdef WITH_SSL
 		{
-			const net::RemoteSSLendpoint& rmt = dynamic_cast<const net::RemoteSSLendpoint&>( remote );
-			m_remoteEP = new net::RemoteSSLendpoint( rmt );
+			m_remoteEP = remote;
+			const net::RemoteSSLendpoint* rmt = dynamic_cast<const net::RemoteSSLendpoint*>( remote.get() );
+
 			LOG_TRACE << "Peer set to " << m_remoteEP->toString() << ", connected at " << boost::posix_time::from_time_t( m_remoteEP->connectionTime());
-			if ( rmt.SSLcertInfo() )	{
-				LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
-					  << ", issued by: " << rmt.SSLcertInfo()->issuer();
-				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore())
-					  << " to " <<  boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter());
-				LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
-				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
+			if ( rmt->SSLcertInfo() )	{
+				LOG_TRACE << "Peer SSL certificate serial number " << rmt->SSLcertInfo()->serialNumber()
+					  << ", issued by: " << rmt->SSLcertInfo()->issuer();
+				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt->SSLcertInfo()->notBefore())
+					  << " to " <<  boost::posix_time::from_time_t( rmt->SSLcertInfo()->notAfter());
+				LOG_TRACE << "Peer SSL certificate subject: " << rmt->SSLcertInfo()->subject();
+				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt->SSLcertInfo()->commonName();
 			}
 			break;
 		}
@@ -163,7 +181,7 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 			abort();
 	}
 	// Propagate setPeer to the command handler
-	m_cmdHandler.setPeer( *m_remoteEP);
+	m_protocolHandler->setPeer( m_remoteEP);
 
 	// Check if the connection is allowed
 	if (( m_authorization = m_globalCtx.aaaa().authorizer()))	{
@@ -275,8 +293,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 			case SEND_HELLO:	{
 				m_state = COMMAND_HANDLER;
-				m_cmdHandler.putInput( m_readBuf.charptr(), m_readBuf.pos());
-				return net::NetworkOperation( net::ReadData( m_readBuf.ptr(), m_readBuf.size(), 30 ));
+				return net::NetworkOperation( net::ReadData( m_input, m_inputsize, 30 ));
 			}
 
 			case TIMEOUT_OCCURED:	{
@@ -313,20 +330,21 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 				std::size_t inppsize;
 				const void* outpp;
 				std::size_t outppsize;
-				switch( m_cmdHandler.nextOperation() )	{
-					case cmdbind::CommandHandler::READ:
-						m_cmdHandler.getInputBlock( inpp, inppsize);
+
+				switch( m_protocolHandler->nextOperation() )	{
+					case cmdbind::ProtocolHandler::READ:
+						m_protocolHandler->getInputBlock( inpp, inppsize);
 						return net::ReadData( inpp, inppsize);
 
-					case cmdbind::CommandHandler::WRITE:
-						m_cmdHandler.getOutput( outpp, outppsize);
+					case cmdbind::ProtocolHandler::WRITE:
+						m_protocolHandler->getOutput( outpp, outppsize);
 						if ( _Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA)
 						{
 							logNetwork( "write", outpp, outppsize);
 						}
 						return net::SendData( outpp, outppsize);
 
-					case cmdbind::CommandHandler::CLOSE:
+					case cmdbind::ProtocolHandler::CLOSE:
 						m_state = FINISHED;
 						return net::NetworkOperation( net::CloseConnection());
 				}
@@ -348,7 +366,7 @@ void wolframeConnection::networkInput( const void* begin, std::size_t bytesTrans
 		logNetwork( "read", begin, bytesTransferred);
 	}
 	if ( m_state == COMMAND_HANDLER )	{
-		m_cmdHandler.putInput( begin, bytesTransferred );
+		m_protocolHandler->putInput( begin, bytesTransferred );
 	}
 	else	{
 		m_dataSize += bytesTransferred;
@@ -363,7 +381,7 @@ void wolframeConnection::signalOccured( NetworkSignal signal )
 			LOG_TRACE << "Processor received termination signal";
 			if ( m_state == COMMAND_HANDLER )
 			{
-				m_endDataSessionMarker = m_cmdHandler.interruptDataSessionMarker();
+				m_endDataSessionMarker = m_protocolHandler->interruptDataSessionMarker();
 			}
 			if ( m_state != TERMINATING && m_state != FINISHED )
 				m_state = SIGNALLED;
@@ -373,7 +391,7 @@ void wolframeConnection::signalOccured( NetworkSignal signal )
 			LOG_TRACE << "Processor received timeout signal";
 			if ( m_state == COMMAND_HANDLER )
 			{
-				m_endDataSessionMarker = m_cmdHandler.interruptDataSessionMarker();
+				m_endDataSessionMarker = m_protocolHandler->interruptDataSessionMarker();
 			}
 			if ( m_state != TERMINATING && m_state != FINISHED )
 				m_state = TIMEOUT_OCCURED;
@@ -406,7 +424,7 @@ void wolframeConnection::signalOccured( NetworkSignal signal )
 		case UNKNOWN_ERROR:
 			if ( m_state == COMMAND_HANDLER )
 			{
-				m_endDataSessionMarker = m_cmdHandler.interruptDataSessionMarker();
+				m_endDataSessionMarker = m_protocolHandler->interruptDataSessionMarker();
 			}
 			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
 			if ( m_state != TERMINATING && m_state != FINISHED )
@@ -450,7 +468,7 @@ WolframeHandler::~WolframeHandler()
 
 
 /// ServerHandler PIMPL
-net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpointR& local )
 {
 	return new wolframeConnection( m_globalContext, local );
 }
@@ -468,7 +486,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration* conf,
 
 ServerHandler::~ServerHandler()	{ delete m_impl; }
 
-net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpointR& local )
 {
 	return m_impl->newConnection( local );
 }

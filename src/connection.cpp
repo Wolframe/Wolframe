@@ -125,8 +125,11 @@ void connection::start()
 	LOG_TRACE << "Starting connection to " << identifier();
 
 	if ( m_connList->push( boost::static_pointer_cast< connection >( shared_from_this() )) )	{
-		m_connHandler->setPeer( RemoteTCPendpoint( socket().remote_endpoint().address().to_string(),
-							   socket().remote_endpoint().port()));
+		RemoteEndpointR remote(
+			new RemoteTCPendpoint( socket().remote_endpoint().address().to_string(),
+						socket().remote_endpoint().port()));
+		
+		m_connHandler->setPeer( remote);
 		nextOperation();
 	}
 	else	{
@@ -219,9 +222,11 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 			socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 		}
 		else if ( m_connList->push( boost::static_pointer_cast< SSLconnection >( shared_from_this() )) )	{
-			m_connHandler->setPeer( RemoteSSLendpoint( m_SSLsocket.lowest_layer().remote_endpoint().address().to_string(),
-								   m_SSLsocket.lowest_layer().remote_endpoint().port(),
-								   certInfo ));
+			RemoteEndpointR remote(
+				new RemoteSSLendpoint( m_SSLsocket.lowest_layer().remote_endpoint().address().to_string(),
+							m_SSLsocket.lowest_layer().remote_endpoint().port(),
+							certInfo ));
+			m_connHandler->setPeer( remote);
 			nextOperation();
 		}
 		else	{

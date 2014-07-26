@@ -33,6 +33,7 @@
 ///\file wolfilterIostreamFilter.cpp
 ///\brief Implementation of a kind of pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 #include "wolfilterIostreamFilter.hpp"
+#include "contentOnlyProtocolHandler.hpp"
 #include "serialize/ddlFormSerializer.hpp"
 #include "serialize/ddlFormParser.hpp"
 #include "serialize/ddl/ddlStructParser.hpp"
@@ -371,8 +372,16 @@ void langbind::iostreamfilter( proc::ExecContext* execContext, const std::string
 		{
 			LOG_TRACE << "Start executing command '" << proc << "'";
 
-			cmdbind::ProtocolHandlerR protocolhnd( provider->protocolHandler( protocol));
-			if (!protocolhnd.get()) throw std::runtime_error( std::string("protocol '") + protocol + "' is not defined");
+			cmdbind::ProtocolHandlerR protocolhnd;
+			if (protocol.empty())
+			{
+				protocolhnd.reset( new cmdbind::ContentOnlyProtocolHandler());
+			}
+			else
+			{
+				protocolhnd.reset( provider->protocolHandler( protocol));
+				if (!protocolhnd.get()) throw std::runtime_error( std::string("protocol '") + protocol + "' is not defined");
+			}
 			if (proc[ proc.size()-1] == '~')
 			{
 				protocolhnd->setArgumentString( std::string( proc.c_str(), proc.size()-1));
