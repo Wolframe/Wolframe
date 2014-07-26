@@ -36,42 +36,6 @@
 #include "appdevel/moduleFrameMacros.hpp"
 #include "Oracle.hpp"
 
-WF_MODULE_BEGIN( "OracleDatabase", "Database interface module for Oracle")
- WF_SIMPLE_DATABASE( "oracle", _Wolframe::db::OracleDatabase, _Wolframe::db::OracleConfig)
+WF_MODULE_BEGIN( "Oracle database", "Database interface module for Oracle")
+ WF_SIMPLE_DATABASE( "Oracle", _Wolframe::db::OracleDatabase, _Wolframe::db::OracleConfig)
 WF_MODULE_END
-
-namespace _Wolframe {
-namespace module {
-
-static BuilderBase* createOracleModule( void )
-{
-	static ConfiguredBuilderDescription< db::OracleConstructor,
-			db::OracleConfig > mod( "Oracle database", "database",
-						    "Oracle", "Oracle" );
-	return &mod;
-}
-
-static BuilderBase* (*containers[])() = {
-	createOracleModule, NULL
-};
-
-ModuleEntryPoint entryPoint( 0, "Oracle database", containers);
-
-}} // namespace _Wolframe::module
-
-namespace _Wolframe {
-namespace db {
-
-OracleDbUnit* OracleConstructor::object( const config::NamedConfiguration& conf )
-{
-	const OracleConfig& cfg = dynamic_cast< const OracleConfig& >( conf );
-
-	OracleDbUnit* m_db = new OracleDbUnit( cfg.m_ID, cfg.host(), cfg.port(), cfg.dbName(),
-						       cfg.user(), cfg.password(),
-						       cfg.connections, cfg.acquireTimeout,
-						       cfg.statementTimeout);
-	LOG_TRACE << "Oracle database unit for '" << cfg.m_ID << "' created";
-	return m_db;
-}
-
-}} // namespace _Wolframe::db

@@ -77,7 +77,7 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 	
 	// assume default Oracle listener port, if port is undefined
 	if( port == 0 ) port = 1521;
-
+	
 	// otherwise compose a connection string
 	// TODO: needs improvement!
 	ss << "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)"
@@ -256,9 +256,6 @@ OracleDbUnit::OracleDbUnit(const std::string& id,
 		m_connPool.add( conn );
 		m_noConnections++;
 	}
-
-	m_db.setUnit( this );
-
 	LOG_DEBUG << "Oracle database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
@@ -267,7 +264,6 @@ OracleDbUnit::~OracleDbUnit()
 	size_t connections = 0;
 	bool hasErrors = false;
 
-	m_db.setUnit( NULL );
 	m_connPool.timeout( 3 );
 
 	while( m_connPool.available( ) ) {

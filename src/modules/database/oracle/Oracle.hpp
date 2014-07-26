@@ -92,9 +92,6 @@ public:
 		return &langdescr;
 	}
 
-private:
-	OracleDbUnit*	m_unit;		//< parent database unit
-
 public:
 	OracleEnvirenment m_env;	//< Oracle environment
 };
@@ -136,27 +133,12 @@ private:
 	OracleDatabase	m_db;				//< real database object
 };
 
-
-//***  Oracle database constructor  ***************************************
-class OracleConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
-{
-public:
-	ObjectConstructorBase::ObjectType objectType() const
-						{ return DATABASE_OBJECT; }
-	const char* objectClassName() const	{ return ORACLE_DB_CLASS_NAME; }
-	OracleDbUnit* object( const config::NamedConfiguration& conf );
-};
-
-
 class OracleTransaction : public Transaction
 {
 public:
 	OracleTransaction( OracleEnvirenment *env_, OracleDatabase& database, const std::string& name_);
 	virtual ~OracleTransaction() {}
 };
-
-
-
 
 
 }} // _Wolframe::db

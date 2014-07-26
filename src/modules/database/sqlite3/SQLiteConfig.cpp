@@ -47,13 +47,7 @@
 namespace _Wolframe {
 namespace db {
 
-SQLiteConfigStruct::SQLiteConfigStruct()
-	:m_foreignKeys(true)
-	,m_profiling(false)
-	,m_connections(DEFAULT_SQLITE_CONNECTIONS)
-{}
-
-const serialize::StructDescriptionBase* SQLiteConfigStruct::getStructDescription()
+const serialize::StructDescriptionBase* SQLiteConfig::getStructDescription()
 {
 	struct ThisDescription :public serialize::StructDescription<SQLiteConfig>
 	{
@@ -88,10 +82,6 @@ bool SQLiteConfig::parse( const config::ConfigurationNode& pt, const std::string
 		return false;
 	}
 }
-
-SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
-	: config::NamedConfiguration( name, logParent, logName )
-{}
 
 void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 {

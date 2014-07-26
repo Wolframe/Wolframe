@@ -265,9 +265,6 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 			m_noConnections++;
 		}
 	}
-
-	m_db.setUnit( this );
-
 	LOG_DEBUG << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
@@ -277,7 +274,6 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 {
 	size_t connections = 0;
 
-	m_db.setUnit( NULL );
 	m_connPool.timeout( 3 );
 
 	while ( m_connPool.available() )	{

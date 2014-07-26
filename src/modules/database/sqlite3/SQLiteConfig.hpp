@@ -1,4 +1,4 @@
-************************************************************************
+/************************************************************************
 
  Copyright (C) 2011 - 2014 Project Wolframe.
  All rights reserved.
@@ -114,18 +114,3 @@ private:
 }} // _Wolframe::db
 
 #endif // _SQLITE_CONFIG_HPP_INCLUDED
-
-// TODO FROM HERE
-
-
-//\brief SQLite database configuration
-class SQLiteConfig
-	:public config::NamedConfiguration
-	,public SQLiteConfigStruct
-{
-public:
-	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	~SQLiteConfig(){}
-};
-
-

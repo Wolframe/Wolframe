@@ -46,34 +46,26 @@
 namespace _Wolframe {
 namespace db {
 
-PostgreSQLConfigStruct::PostgreSQLConfigStruct()
-	:m_port(0)
-	,connectTimeout(DEFAULT_POSTGRESQL_CONNECTION_TIMEOUT)
-	,connections(DEFAULT_POSTGRESQL_CONNECTIONS)
-	,acquireTimeout(0)
-	,statementTimeout(DEFAULT_POSTGRESQL_STATEMENT_TIMEOUT)
-{}
-
-const serialize::StructDescriptionBase* PostgreSQLConfigStruct::getStructDescription()
+const serialize::StructDescriptionBase* PostgreSQLConfig::getStructDescription()
 {
 	struct ThisDescription :public serialize::StructDescription<PostgreSQLConfig>
 	{
 	ThisDescription()
 	{
 		(*this)
-		( "identifier", &PostgreSQLConfig::m_ID)			.mandatory()
+		( "identifier", &PostgreSQLConfig::m_ID)		.mandatory()
 		( "host", &PostgreSQLConfig::m_host )			.optional()
 		( "port", &PostgreSQLConfig::m_port )			.optional()
 		( "database", &PostgreSQLConfig::m_dbName )		.optional()
 		( "user", &PostgreSQLConfig::m_user )			.optional()
 		( "password", &PostgreSQLConfig::m_password )		.optional()
-		( "sslMode", &PostgreSQLConfig::sslMode )			.optional()
-		( "sslCert", &PostgreSQLConfig::sslCert )			.optional()
+		( "sslMode", &PostgreSQLConfig::sslMode )		.optional()
+		( "sslCert", &PostgreSQLConfig::sslCert )		.optional()
 		( "sslKey", &PostgreSQLConfig::sslKey )			.optional()
 		( "sslRootCert", &PostgreSQLConfig::sslRootCert	)	.optional()
 		( "sslCRL", &PostgreSQLConfig::sslCRL )			.optional()
 		( "connectionTimeout", &PostgreSQLConfig::connectTimeout ).optional()
-		( "connections", &PostgreSQLConfig::connections )		.optional()
+		( "connections", &PostgreSQLConfig::connections )	.optional()
 		( "acquireTimeout", &PostgreSQLConfig::acquireTimeout )	.optional()
 		( "statementTimeout", &PostgreSQLConfig::statementTimeout ).optional()
 		;
@@ -82,11 +74,6 @@ const serialize::StructDescriptionBase* PostgreSQLConfigStruct::getStructDescrip
 	static const ThisDescription rt;
 	return &rt;
 }
-
-//***  PostgreSQL configuration functions  **********************************
-PostgreSQLConfig::PostgreSQLConfig( const char* cfgName, const char* logParent, const char* logName )
-	: config::NamedConfiguration( cfgName, logParent, logName )
-{}
 
 bool PostgreSQLConfig::mapValueDomains()
 {
@@ -154,9 +141,8 @@ void PostgreSQLConfig::setCanonicalPathes( const std::string& refPath )
 	if ( ! sslCert.empty() )	{
 		std::string oldPath = sslCert;
 		sslCert = utils::getCanonicalPath( sslCert, refPath);
-/* Aba: avoid "suggest explicit braces to avoid ambiguous ‘else’ [-Wparentheses]" */
 		if ( oldPath != sslCert ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute SSL certificate filename '" << sslCert
+			LOG_WARNING << logPrefix() << "Using absolute SSL certificate filename '" << sslCert
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -164,7 +150,7 @@ void PostgreSQLConfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = sslKey;
 		sslKey = utils::getCanonicalPath( sslKey, refPath );
 		if ( oldPath != sslKey ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute SSL key filename '" << sslKey
+			LOG_WARNING << logPrefix() << "Using absolute SSL key filename '" << sslKey
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -172,7 +158,7 @@ void PostgreSQLConfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = sslRootCert;
 		sslRootCert = utils::getCanonicalPath( sslRootCert, refPath );
 		if ( oldPath != sslRootCert ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute CA certificate filename '" << sslRootCert
+			LOG_WARNING << logPrefix() << "Using absolute CA certificate filename '" << sslRootCert
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -180,7 +166,7 @@ void PostgreSQLConfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = sslCRL;
 		sslCRL = utils::getCanonicalPath( sslCRL, refPath );
 		if ( oldPath != sslCRL ) {
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute CRL filename '" << sslCRL
+			LOG_WARNING << logPrefix() << "Using absolute CRL filename '" << sslCRL
 				       << "' instead of '" << oldPath << "'";
 		}
 	}

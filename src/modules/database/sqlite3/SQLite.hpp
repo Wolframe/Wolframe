@@ -85,9 +85,6 @@ public:
 		static SQLiteLanguageDescription langdescr;
 		return &langdescr;
 	}
-
-private:
-	SQLiteDBunit*	m_unit;			///< parent database unit
 };
 
 
@@ -118,19 +115,6 @@ private:
 	std::vector<std::string>m_extensionFiles;
 };
 
-
-///\class SQLiteConstructor
-///\brief SQLite database constructor
-class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
-{
-public:
-	ObjectConstructorBase::ObjectType objectType() const
-						{ return DATABASE_OBJECT; }
-	const char* objectClassName() const	{ return SQLITE_DB_CLASS_NAME; }
-	SQLiteDBunit* object( const config::NamedConfiguration& conf );
-};
-
-
 ///\class SQLiteTransaction
 class SQLiteTransaction
 	:public Transaction
@@ -139,8 +123,6 @@ public:
 	SQLiteTransaction( SQLiteDatabase& database, const std::string& name_);
 	virtual ~SQLiteTransaction(){}
 };
-
-
 
 }} // _Wolframe::db
 

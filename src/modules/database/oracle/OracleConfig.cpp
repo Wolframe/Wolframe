@@ -46,15 +46,7 @@
 namespace _Wolframe {
 namespace db {
 
-OracleConfigStruct::OracleConfigStruct()
-	:m_port(0)
-	,connectTimeout(DEFAULT_ORACLE_CONNECTION_TIMEOUT)
-	,connections(DEFAULT_ORACLE_CONNECTIONS)
-	,acquireTimeout(0)
-	,statementTimeout(DEFAULT_ORACLE_STATEMENT_TIMEOUT)
-{}
-
-const serialize::StructDescriptionBase* OracleConfigStruct::getStructDescription()
+const serialize::StructDescriptionBase* OracleConfig::getStructDescription()
 {
 	struct ThisDescription :public serialize::StructDescription<OracleConfig>
 	{
@@ -76,11 +68,6 @@ const serialize::StructDescriptionBase* OracleConfigStruct::getStructDescription
 	static const ThisDescription rt;
 	return &rt;
 }
-
-//***  Oracle configuration functions  **********************************
-OracleConfig::OracleConfig( const char* cfgName, const char* logParent, const char* logName )
-	: config::NamedConfiguration( cfgName, logParent, logName )
-{}
 
 bool OracleConfig::mapValueDomains()
 {

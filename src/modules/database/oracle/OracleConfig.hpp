@@ -47,7 +47,9 @@ namespace db {
 
 static const char* ORACLE_DB_CLASS_NAME = "Oracle";
 enum {
+	DEFAULT_ORACLE_PORT = 1521,
 	DEFAULT_ORACLE_CONNECTIONS = 4,
+	DEFAULT_ORACLE_ACQUIRE_TIMEOUT = 0,
 	DEFAULT_ORACLE_STATEMENT_TIMEOUT = 30000
 };
 
@@ -60,30 +62,35 @@ public:
 
 	OracleConfig()
 		:_Wolframe::serialize::DescriptiveConfiguration(ORACLE_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
-		,m_foreignKeys(true)
-		,m_profiling(false)
+		,m_host("")
+		,m_port(DEFAULT_ORACLE_PORT)
 		,m_connections(DEFAULT_ORACLE_CONNECTIONS)
+		,m_acquireTimeout(DEFAULT_ORACLE_ACQUIRE_TIMEOUT)
+		,m_statementTimeout(DEFAULT_ORACLE_STATEMENT_TIMEOUT)
 	{
 		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
 	}
 
-	OracleConfig( const std::string& id_, const std::string& filename_,
-			bool foreignKeys_, bool profiling_,
+	OracleConfig( const std::string& id_, const std::string& host_,
+			unsigned short port_,
+			const std::string& user_, const std::string& password_,
 			unsigned short connections_,
 			const std::vector<std::string>& extensionFiles_ )
 		:_Wolframe::serialize::DescriptiveConfiguration(SQLite_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
 		,m_ID(id_)
-		,m_filename(filename_)
-		,m_foreignKeys(foreignKeys_)
-		,m_profiling(profiling_)
-		,m_connections(connections_)
-		,m_extensionFiles(extensionFiles_){}
+		,m_host(host_)
+		,m_port(port_)
+		,m_user(user_)
+		,m_password(password_)
+		,m_connections(connections_){}
 
 	OracleConfig( const char* title, const char* logprefix)
 		:_Wolframe::serialize::DescriptiveConfiguration( title, "database", logprefix, getStructDescription())
-		,m_foreignKeys(true)
-		,m_profiling(false)
+		,m_host("")
+		,m_port(DEFAULT_ORACLE_PORT)
 		,m_connections(DEFAULT_ORACLE_CONNECTIONS)
+		,m_acquireTimeout(DEFAULT_ORACLE_ACQUIRE_TIMEOUT)
+		,m_statementTimeout(DEFAULT_ORACLE_STATEMENT_TIMEOUT)
 	{
 		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
 	}
@@ -125,17 +132,4 @@ private:
 };
 
 }} // _Wolframe::db
-
-#endif // _ORACLE_CONFIG_HPP_INCLUDED
-
-// TODO FROM HERE
-
-//\brief Oracle server connection configuration
-class OracleConfig
-	:public config::NamedConfiguration
-{
-public:
-	OracleConfig( const char* name, const char* logParent, const char* logName );
-	~OracleConfig()			{}
-};
 

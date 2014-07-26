@@ -36,38 +36,6 @@
 #include "appdevel/moduleFrameMacros.hpp"
 #include "SQLite.hpp"
 
-WF_MODULE_BEGIN( "Sqlite3Database", "Database interface module for Sqlite3")
- WF_SIMPLE_DATABASE( "sqlite3", _Wolframe::db::SQLiteDatabase, _Wolframe::db::SQLiteConfig)
+WF_MODULE_BEGIN( "SQLite database", "Database interface module for Sqlite3")
+ WF_SIMPLE_DATABASE( "SQLite", _Wolframe::db::SQLiteDatabase, _Wolframe::db::SQLiteConfig)
 WF_MODULE_END
-
-namespace _Wolframe {
-namespace module {
-
-static BuilderBase* createSQLiteModule( void )
-{
-	static module::ConfiguredBuilderDescription< db::SQLiteConstructor,
-			db::SQLiteConfig > mod( "SQLite database", "database",
-						"SQLite", "SQLite" );
-	return &mod;
-}
-
-static BuilderBase* (*containers[])() = {
-	createSQLiteModule, NULL
-};
-
-ModuleEntryPoint entryPoint( 0, "SQLite database", containers);
-
-SQLiteDBunit* SQLiteConstructor::object( const config::NamedConfiguration& conf )
-{
-	const SQLiteConfig& cfg = dynamic_cast< const SQLiteConfig& >( conf );
-
-	SQLiteDBunit* m_db = new SQLiteDBunit( cfg.ID(), cfg.filename(),
-					       cfg.foreignKeys(),
-					       cfg.profiling(),
-					       cfg.connections(),
-					       cfg.extensionFiles());
-	LOG_TRACE << "SQLite database unit for '" << cfg.ID() << "' created";
-	return m_db;
-}
-
-}} // namespace _Wolframe::db

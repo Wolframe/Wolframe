@@ -153,16 +153,12 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			m_connPool.add( handle );
 		}
 	}
-	m_db.setUnit( this );
-
 	LOG_DEBUG << "SQLite database unit '" << m_ID << "' created with "
 		      << connections << " connections to file '" << m_filename << "'";
 }
 
 SQLiteDBunit::~SQLiteDBunit( )
 {
-	m_db.setUnit( NULL );
-
 	while( m_connPool.available( ) > 0 ) {
 		sqlite3 *handle = m_connPool.get( );
 		sqlite3_close( handle );

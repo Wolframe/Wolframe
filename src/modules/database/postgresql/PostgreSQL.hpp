@@ -89,9 +89,6 @@ public:
 		static PostgreSQLLanguageDescription langdescr;
 		return &langdescr;
 	}
-
-private:
-	PostgreSQLdbUnit*	m_unit;		 //< parent database unit
 };
 
 
@@ -130,18 +127,6 @@ private:
 	PostgreSQLDatabase	m_db;			//< real database object
 };
 
-
-//***  PostgreSQL database constructor  ***************************************
-class PostgreSQLConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
-{
-public:
-	ObjectConstructorBase::ObjectType objectType() const
-						{ return DATABASE_OBJECT; }
-	const char* objectClassName() const	{ return POSTGRESQL_DB_CLASS_NAME; }
-	PostgreSQLdbUnit* object( const config::NamedConfiguration& conf );
-};
-
-
 ///\class PostgreSQLtransaction
 class PostgreSQLtransaction
 	:public Transaction
@@ -150,8 +135,6 @@ public:
 	PostgreSQLtransaction( PostgreSQLDatabase& database, const std::string& name_);
 	virtual ~PostgreSQLtransaction(){}
 };
-
-
 
 }} // _Wolframe::db
 
