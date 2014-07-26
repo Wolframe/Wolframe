@@ -77,6 +77,11 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   Filename: " << m_filename << std::endl;
 	os << indStr << "      Referential integrity: " << (m_foreignKeys ? "enabled" : "disabled") << std::endl;
 	os << indStr << "      Profiling: " << (m_profiling ? "enabled" : "disabled") << std::endl;
+	os << indStr << "      Extension modules:";
+	std::vector< std::string >::const_iterator it, end = m_extensionFiles.end( );
+	for( it = m_extensionFiles.begin( ); it != end; it++ ) {
+		os << indStr << "         " << *it << std::endl;
+	}
 }
 
 bool SQLiteConfig::check() const
@@ -94,7 +99,7 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = m_filename;
 		m_filename = utils::getCanonicalPath( m_filename, refPath);
 		if ( oldPath != m_filename )	{
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute database filename '" << m_filename
+			LOG_WARNING << logPrefix() << "Using absolute database filename '" << m_filename
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
