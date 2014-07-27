@@ -30,12 +30,10 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(SQLITE3_LIBS) \
+	$(TOPDIR)/src/modules/database/sqlite3/mod_db_sqlite3_lib.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem \
 	$(LIBS_DL) $(LIBS_LT) $(LIBS_NET)
-
-CPP_OBJS = \
-	sqliteModuleFiles.o
 
 CPP_BINS = \
 	createRandom$(EXE)
