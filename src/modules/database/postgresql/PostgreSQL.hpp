@@ -48,6 +48,8 @@
 #include "PostgreSQLServerSettings.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
+#include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
 
 #ifdef _WIN32
 #pragma warning(disable:4250)
@@ -106,7 +108,10 @@ public:
 		return &langdescr;
 	}
 
-	PoolObject<PGconn*>* newConnection()	{return new PoolObject<PGconn*>( m_connPool);}
+	boost::shared_ptr<PGconn> newConnection()
+	{
+		return boost::shared_ptr<PGconn>( m_connPool.get(), boost::bind( ObjectPool<PGconn*>::add, &m_connPool, _1));
+	}
 
 	PostgreSQLServerSettings serverSettings() const
 						{ return m_serverSettings; }

@@ -37,39 +37,6 @@
 #include "module/constructor.hpp"
 #include <boost/lexical_cast.hpp>
 
-/// \brief Defines a database interface
-#define WF_DATABASE(NAME,UNITCLASS,CONFIGCLASS) \
-{\
-	class Constructor :public _Wolframe::ConfiguredObjectConstructor<UNITCLASS>\
-	{\
-	public:\
-		_Wolframe::ObjectConstructorBase::ObjectType objectType() const\
-		{\
-			return DATABASE_OBJECT;\
-		}\
-		const char* objectClassName() const\
-		{\
-			return NAME "Database";\
-		}\
-		UNITCLASS* object( const config::NamedConfiguration& cfgi);\
-		{\
-			const CONFIGCLASS* cfg = dynamic_cast<const CONFIGCLASS*>(&cfgi);\
-			return new UNITCLASS(*cfg);\
-		}\
-	};\
-	struct Builder \
-	{\
-		static _Wolframe::module::BuilderBase* impl()\
-		{\
-			static _Wolframe::module::ConfiguredBuilderDescription<Constructor,CONFIGCLASS>\
-				mod( "Database interface to " NAME, "Database", NAME, NAME "Database");\
-			return &mod;\
-		}\
-	};\
-	(*this)(&Builder::impl);\
-}
-
-
 /// \brief Defines a simple database (one database object per unit) interface
 #define WF_SIMPLE_DATABASE(NAME,DBCLASS,CONFIGCLASS) \
 {\
@@ -94,7 +61,7 @@
 	private:\
 		DBCLASS m_db;\
 	};\
-	class Constructor :public _Wolframe::ObjectConstructorBase\
+	class Constructor :public _Wolframe::ConfiguredObjectConstructor< _Wolframe::db::DatabaseUnit >\
 	{\
 	public:\
 		virtual ~Constructor(){}\
@@ -106,9 +73,9 @@
 		{\
 			return NAME "Database";\
 		}\
-		Unit* object( const _Wolframe::config::NamedConfiguration& cfgi)\
+		_Wolframe::db::DatabaseUnit* object( const _Wolframe::config::NamedConfiguration& cfgi)\
 		{\
-		const CONFIGCLASS* cfg = dynamic_cast<const CONFIGCLASS*>(&cfgi);\
+			const CONFIGCLASS* cfg = dynamic_cast<const CONFIGCLASS*>(&cfgi);\
 			return new Unit(*cfg);\
 		}\
 	};\
@@ -161,8 +128,7 @@
 		}\
 		virtual const std::string& ID() const\
 		{\
-			static const std::string s_ID(NAME);\
-			return s_ID;\
+			return m_db.ID();\
 		}\
 		virtual DBCLASS* database()\
 		{\
@@ -172,7 +138,7 @@
 		DBINITCLASS m_dbinit;\
 		DBCLASS m_db;\
 	};\
-	class Constructor :public _Wolframe::ObjectConstructorBase\
+	class Constructor :public _Wolframe::ConfiguredObjectConstructor< _Wolframe::db::DatabaseUnit >\
 	{\
 	public:\
 		virtual ~Constructor(){}\
@@ -217,7 +183,7 @@
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			static BuilderDescription mod( "Database interface to " NAME, "Database", NAME, NAME "Database");\
+			static BuilderDescription mod( NAME "Database", "Database", NAME, NAME "Database");\
 			return &mod;\
 		}\
 	};\

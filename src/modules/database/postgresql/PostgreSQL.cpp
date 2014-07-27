@@ -173,7 +173,7 @@ void PostgreSQLDatabase::noticeProcessor( void* this_void, const char * message)
 
 PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLConfig& config)
 	:m_ID(config.ID())
-	,m_connections(config.connections())
+	,m_connections(0)
 	,m_connPool(config.acquireTimeout())
 {
 	init( config);

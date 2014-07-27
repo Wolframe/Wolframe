@@ -45,7 +45,6 @@
 namespace _Wolframe {
 namespace db {
 
-static const char* SQLITE_DB_CLASS_NAME = "SQLite";
 enum {DEFAULT_SQLITE_CONNECTIONS = 4};
 
 /// \brief SQLite database configuration
@@ -53,10 +52,8 @@ class SQLiteConfig
 	:public _Wolframe::serialize::DescriptiveConfiguration
 {
 public:
-	const char* className() const				{ return SQLITE_DB_CLASS_NAME; }
-
-	SQLiteConfig()
-		:_Wolframe::serialize::DescriptiveConfiguration(SQLITE_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
+	explicit SQLiteConfig( const char* sectionName_="sqlite", const char* logName_="Sqlite")
+		:_Wolframe::serialize::DescriptiveConfiguration( sectionName_, "database" /*log parent*/, logName_, getStructDescription())
 		,m_foreignKeys(true)
 		,m_profiling(false)
 		,m_connections(DEFAULT_SQLITE_CONNECTIONS)
@@ -68,22 +65,13 @@ public:
 			bool foreignKeys_, bool profiling_,
 			unsigned short connections_,
 			const std::vector<std::string>& extensionFiles_ )
-		:_Wolframe::serialize::DescriptiveConfiguration(SQLITE_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
+		:_Wolframe::serialize::DescriptiveConfiguration( "sqlite" /*section name*/, "database" /*log prefix*/, "sqlite" /*log name*/, getStructDescription())
 		,m_ID(id_)
 		,m_filename(filename_)
 		,m_foreignKeys(foreignKeys_)
 		,m_profiling(profiling_)
 		,m_connections(connections_)
 		,m_extensionFiles(extensionFiles_){}
-
-	SQLiteConfig( const char* title, const char* logprefix)
-		:_Wolframe::serialize::DescriptiveConfiguration( title, "database", logprefix, getStructDescription())
-		,m_foreignKeys(true)
-		,m_profiling(false)
-		,m_connections(DEFAULT_SQLITE_CONNECTIONS)
-	{
-		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
-	}
 
 	virtual bool check() const;
 	virtual void print( std::ostream& os, size_t indent ) const;

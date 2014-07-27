@@ -59,10 +59,8 @@ class PostgreSQLConfig
 	:public _Wolframe::serialize::DescriptiveConfiguration
 {
 public:
-	const char* className() const				{ return POSTGRESQL_DB_CLASS_NAME; }
-
-	PostgreSQLConfig()
-		:_Wolframe::serialize::DescriptiveConfiguration(POSTGRESQL_DB_CLASS_NAME, "database", "postgresql", getStructDescription())
+	explicit PostgreSQLConfig( const char* sectionName_="PostgreSQL", const char* logName_="PostgreSQL")
+		:_Wolframe::serialize::DescriptiveConfiguration( sectionName_, "database" /*log parent*/, logName_, getStructDescription())
 		,m_port(DEFAULT_POSTGRESQL_PORT)
 		,m_connectTimeout(DEFAULT_POSTGRESQL_CONNECTION_TIMEOUT)
 		,m_connections(DEFAULT_POSTGRESQL_CONNECTIONS)
@@ -80,7 +78,7 @@ public:
 			const std::string& sslCRL_,			
 			unsigned short connectTimeout_, unsigned short connections_,
 			unsigned short acquireTimeout_, unsigned statementTimeout_)
-		:_Wolframe::serialize::DescriptiveConfiguration(POSTGRESQL_DB_CLASS_NAME, "database", "postgresql", getStructDescription())
+		:_Wolframe::serialize::DescriptiveConfiguration( "PostgreSQL" /*section name*/, "database" /*log parent*/, "PostgreSQL" /*log name*/, getStructDescription())
 		,m_ID(id_)
 		,m_host(host_)
 		,m_port(port_)
@@ -96,17 +94,6 @@ public:
 		,m_connections(connections_)
 		,m_acquireTimeout(acquireTimeout_)
 		,m_statementTimeout(statementTimeout_){}
-
-	PostgreSQLConfig( const char* title, const char* logprefix)
-		:_Wolframe::serialize::DescriptiveConfiguration( title, "database", logprefix, getStructDescription())
-		,m_port(DEFAULT_POSTGRESQL_PORT)
-		,m_connectTimeout(DEFAULT_POSTGRESQL_CONNECTION_TIMEOUT)
-		,m_connections(DEFAULT_POSTGRESQL_CONNECTIONS)
-		,m_acquireTimeout(DEFAULT_POSTGRESQL_ACQUIRE_TIMEOUT)
-		,m_statementTimeout(DEFAULT_POSTGRESQL_STATEMENT_TIMEOUT)
-	{
-		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
-	}
 
 	virtual bool parse( const config::ConfigurationNode& cfgTree, const std::string& node,
 			    const module::ModulesDirectory* modules );

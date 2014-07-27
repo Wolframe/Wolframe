@@ -45,14 +45,11 @@
 namespace _Wolframe {
 
 /// Timeout exception for object pool
-class ObjectPoolTimeout : public std::exception
+class ObjectPoolTimeout : public std::runtime_error
 {
 public:
-//	ObjectPoolTimeout() throw();
-//	ObjectPoolTimeout( const ObjectPoolTimeout& ) throw();
-//	ObjectPoolTimeout& operator= ( const ObjectPoolTimeout& ) throw();
-//	virtual ~ObjectPoolTimeout() throw();
-//	virtual const char* what() const throw();
+	ObjectPoolTimeout()
+		:std::runtime_error( "object pool exception"){}
 };
 
 /// \class ObjectPool
@@ -103,6 +100,11 @@ public:
 		m_cond.notify_one();
 	}
 
+	static void add( ObjectPool* pool, objectType obj)
+	{
+		pool->add( obj);
+	}
+
 	unsigned timeout() const		{ return m_timeout; }
 	void timeout( unsigned to )		{ m_timeout = to; }
 private:
@@ -111,6 +113,7 @@ private:
 	boost::condition_variable	m_cond;		///< the condition variable
 	unsigned			m_timeout;	///< acquire timeout
 };
+
 
 
 /// \brief Simple template to use ObjectPool objects.

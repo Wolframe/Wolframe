@@ -63,12 +63,10 @@ TransactionExecStatemachine_postgres::TransactionExecStatemachine_postgres( Post
 	,m_idx_row(0)
 	,m_hasResult(false)
 	,m_database(database_)
-	,m_conn(0)
 	{}
 
 TransactionExecStatemachine_postgres::~TransactionExecStatemachine_postgres()
 {
-	if (m_conn) delete m_conn;
 	clear();
 	delete m_statement;
 }
@@ -217,10 +215,9 @@ bool TransactionExecStatemachine_postgres::begin()
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (m_conn) delete m_conn;
 	m_conn = m_database->newConnection();
-	static_cast<STATEMENT_CLASS *>( m_statement )->setConnection( **m_conn, m_database->serverSettings());
-	return status( PQexec( **m_conn, "BEGIN;"), Transaction);
+	static_cast<STATEMENT_CLASS *>( m_statement )->setConnection( m_conn.get(), m_database->serverSettings());
+	return status( PQexec( m_conn.get(), "BEGIN;"), Transaction);
 }
 
 bool TransactionExecStatemachine_postgres::commit()
@@ -234,11 +231,10 @@ bool TransactionExecStatemachine_postgres::commit()
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
-	bool rt = status( PQexec( **m_conn, "COMMIT;"), Init);
+	bool rt = status( PQexec( m_conn.get(), "COMMIT;"), Init);
 	if (rt)
 	{
-		delete m_conn;
-		m_conn = 0;
+		m_conn.reset();
 		m_state = Init;
 	}
 	return rt;
@@ -254,13 +250,12 @@ bool TransactionExecStatemachine_postgres::rollback()
 	{
 		return errorStatus( std::string( "call of rollback not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (m_conn)
+	if (m_conn.get())
 	{
-		bool rt = status( PQexec( **m_conn, "ROLLBACK;"), Init);
+		bool rt = status( PQexec( m_conn.get(), "ROLLBACK;"), Init);
 		if (rt)
 		{
-			delete m_conn;
-			m_conn = 0;
+			m_conn.reset();
 			m_state = Init;
 		}
 		return rt;

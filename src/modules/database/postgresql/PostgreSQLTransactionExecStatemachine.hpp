@@ -122,7 +122,7 @@ private:
 	std::size_t m_idx_row;
 	bool m_hasResult;
 	PostgreSQLDatabase* m_database;
-	PoolObject<PGconn*>* m_conn;		//< DB connection
+	boost::shared_ptr<PGconn> m_conn;	//< DB connection
 };
 
 }}//namespace

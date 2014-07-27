@@ -46,8 +46,8 @@ namespace db {
 class PostgreSQLTestConfig : public PostgreSQLConfig
 {
 public:
-	PostgreSQLTestConfig( const char* name, const char* logName )
-		: PostgreSQLConfig( name, logName )	{}
+	PostgreSQLTestConfig( const char* sectionName_, const char* logName_)
+		:PostgreSQLConfig( sectionName_, logName_){}
 
 	virtual ~PostgreSQLTestConfig(){}
 
