@@ -124,7 +124,7 @@ private:
 	boost::shared_ptr<db::DatabaseError> m_lasterror;	//< last error occurred
 	sqlite3_stmt* m_stm;					//< current statement
 	SQLiteDatabase* m_database;				//< database
-	PoolObject<sqlite3*>* m_conn;				//< database connection
+	boost::shared_ptr<sqlite3> m_conn;			//< database connection
 	Statement *m_statement;					//< the statement parser
 };
 

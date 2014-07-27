@@ -95,7 +95,10 @@ public:
 		return &langdescr;
 	}
 
-	PoolObject<sqlite3*>* newConnection()	{return new PoolObject<sqlite3*>( m_connPool);}
+	boost::shared_ptr<sqlite3> newConnection()
+	{
+		return boost::shared_ptr<sqlite3>( m_connPool.get(), boost::bind( ObjectPool<sqlite3*>::add, &m_connPool, _1));
+	}
 
 private:
 	void init( const SQLiteConfig& config);

@@ -61,7 +61,6 @@ TransactionExecStatemachine_sqlite3::TransactionExecStatemachine_sqlite3( SQLite
 	,m_hasRow(false)
 	,m_stm(0)
 	,m_database(database_)
-	,m_conn(0)
 	,m_statement( new SQLiteStatement( ) )
 {}
 
@@ -69,7 +68,6 @@ TransactionExecStatemachine_sqlite3::~TransactionExecStatemachine_sqlite3()
 {
 	clear();
 	delete m_statement;
-	if (m_conn) delete m_conn;
 }
 
 void TransactionExecStatemachine_sqlite3::clear()
@@ -91,8 +89,8 @@ void TransactionExecStatemachine_sqlite3::setDatabaseErrorMessage()
 {
 	// Aba: we cannot map those globally! They depende on
 	// the function which was called before..
-	int errcode = sqlite3_errcode( **m_conn);
-	const char* errmsg = sqlite3_errmsg( **m_conn);
+	int errcode = sqlite3_errcode( m_conn.get());
+	const char* errmsg = sqlite3_errmsg( m_conn.get());
 	const char* errtype = 0;
 	switch (errcode)
 	{
@@ -134,7 +132,7 @@ bool TransactionExecStatemachine_sqlite3::executeInstruction( const char* stmstr
 	m_curstm.clear();
 	sqlite3_stmt* inst = 0;
 	const char *stmtail;
-	int rc = wrap_sqlite3_prepare_v2( **m_conn, stmstr, -1, &inst, &stmtail);
+	int rc = wrap_sqlite3_prepare_v2( m_conn.get(), stmstr, -1, &inst, &stmtail);
 
 	if (rc != SQLITE_OK && rc != SQLITE_DONE) return status( rc, newstate);
 
@@ -156,7 +154,6 @@ bool TransactionExecStatemachine_sqlite3::begin()
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (m_conn) delete m_conn;
 	m_conn = m_database->newConnection();
 	return executeInstruction( "BEGIN TRANSACTION;", Transaction);
 }
@@ -175,8 +172,7 @@ bool TransactionExecStatemachine_sqlite3::commit()
 	bool rt = executeInstruction( "COMMIT TRANSACTION;", Init);
 	if (rt)
 	{
-		delete m_conn;
-		m_conn = 0;
+		m_conn.reset();
 	}
 	return rt;
 }
@@ -191,14 +187,13 @@ bool TransactionExecStatemachine_sqlite3::rollback()
 	{
 		return errorStatus( std::string( "call of rollback not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (m_conn)
+	if (m_conn.get())
 	{
 		bool rt = executeInstruction( "ROLLBACK TRANSACTION;", Init);
 		clear();
 		if (rt)
 		{
-			delete m_conn;
-			m_conn = 0;
+			m_conn.reset();
 		}
 		return rt;
 	}
@@ -249,7 +244,7 @@ bool TransactionExecStatemachine_sqlite3::start( const std::string& statement)
 	}
 	const char *stmtail = 0;
 
-	int rc = wrap_sqlite3_prepare_v2( **m_conn, m_curstm.c_str(), m_curstm.size(), &m_stm, &stmtail);
+	int rc = wrap_sqlite3_prepare_v2( m_conn.get(), m_curstm.c_str(), m_curstm.size(), &m_stm, &stmtail);
 	m_statement->init( m_curstm);
 	static_cast<SQLiteStatement *>( m_statement )->setStatement( m_stm );
 	if (rc == SQLITE_OK)
@@ -324,7 +319,7 @@ bool TransactionExecStatemachine_sqlite3::execute()
 	}
 	if (!m_hasResult)
 	{
-		LOG_TRACE << "[sqlite3 statement] CALL rows_affected(" << sqlite3_changes( **m_conn) << ")";
+		LOG_TRACE << "[sqlite3 statement] CALL rows_affected(" << sqlite3_changes( m_conn.get()) << ")";
 	}
 	else if (m_hasRow)
 	{

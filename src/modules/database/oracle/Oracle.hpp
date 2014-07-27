@@ -113,7 +113,10 @@ public:
 		return &langdescr;
 	}
 
-	PoolObject<OracleConnection *> *newConnection( ) { return new PoolObject<OracleConnection *>( m_connPool ); }
+	boost::shared_ptr<OracleConnection> newConnection()
+	{
+		return boost::shared_ptr<OracleConnection>( m_connPool.get(), boost::bind( ObjectPool<OracleConnection*>::add, &m_connPool, _1));
+	}
 
 private:
 	void init( const OracleConfig& config);
@@ -121,7 +124,7 @@ private:
 private:
 	const std::string	m_ID;			//< database ID
 	std::string		m_connStr;		//< connection string
-	unsigned short		m_connections;	//< number of connections
+	unsigned short		m_connections;		//< number of connections
 	ObjectPool< OracleConnection* >	m_connPool;	//< pool of connections
 
 public:

@@ -160,7 +160,7 @@ private:
 	bool m_hasResult;
 	bool m_hasRow;
 	OracleDatabase* m_database;
-	PoolObject<OracleConnection*> *m_conn;	//< DB connection
+	boost::shared_ptr<OracleConnection> m_conn;	//< DB connection
 };
 
 }}//namespace

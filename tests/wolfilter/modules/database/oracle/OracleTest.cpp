@@ -642,11 +642,6 @@ cleanup:
 	}
 }
 
-void OracleTestConstructor::createTestDatabase( const OracleTestConfig& cfg )
-{
-	createTestDatabase_( cfg.host(), cfg.port(), cfg.user(), cfg.password(), cfg.dbName(), cfg.input_filename());
-}
-
 config::ConfigurationNode OracleTestConfig::extractMyNodes( const config::ConfigurationNode& pt )
 {
 	config::ConfigurationNode rt;
@@ -671,9 +666,15 @@ void OracleTestConfig::setMyCanonicalPathes( const std::string& referencePath )
 		m_dump_filename = utils::getCanonicalPath( m_dump_filename, referencePath );
 }
 
-void OracleTestConfig::dump_database()
+
+void OracleTestDatabaseInitializer::initDatabase()
 {
-	dumpDatabase_( host(), port(), user(), password(), dbName(), m_dump_filename);
+	createTestDatabase_( m_host, m_port, m_user, m_password, m_dbname, m_input_filename);
+}
+
+void OracleTestDatabaseInitializer::dumpDatabase()
+{
+	dumpDatabase_( m_host, m_port, m_user, m_password, m_dbname, m_dump_filename);
 }
 
 
