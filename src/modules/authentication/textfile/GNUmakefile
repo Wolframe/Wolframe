@@ -28,7 +28,6 @@ CPP_OBJS = \
 	TextFileAuthConfig.o \
 	TextFileAuthConstructor.o \
 	TextFileAuth.o \
-	TextFileAuthModule.o \
 	$(PASSWD_OBJS)
 
 PASSWD_LDFLAGS = \

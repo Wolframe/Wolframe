@@ -34,8 +34,8 @@ all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:TextFileAuditModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_audit_textfile.obj
+	$(LINK) /dll /def:mod_audit_textfile.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 
