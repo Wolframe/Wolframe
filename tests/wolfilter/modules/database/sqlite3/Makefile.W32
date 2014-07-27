@@ -37,7 +37,7 @@ all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_sqlite3test.obj
 	$(LINK) /dll /def:mod_db_sqlite3test.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:

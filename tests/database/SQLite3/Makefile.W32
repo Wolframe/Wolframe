@@ -29,14 +29,11 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
-CPP_OBJS = \
-	sqliteModuleFiles.obj
-
 CPP_BINS = \
 	sqliteUnit.exe \
 	createRandom.exe
 
-sqliteUnit.exe: sqliteUnit.obj sqliteModuleFiles.obj
+sqliteUnit.exe: sqliteUnit.obj
 createRandom.exe: createRandom.obj
 
 all: $(OBJS) $(CPP_BINS)
