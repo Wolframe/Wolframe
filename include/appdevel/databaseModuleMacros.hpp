@@ -147,4 +147,83 @@
 }
 
 
+/// \brief Defines a test database interface (simple database with initializer class with configuration as constructor argument that is constructed before the database and destructed after)
+#define WF_TEST_DATABASE(NAME,DBCLASS,CONFIGCLASS,DBINITCLASS) \
+{\
+	class Unit :public _Wolframe::db::DatabaseUnit \
+	{\
+	public:\
+		Unit( const CONFIGCLASS& cfg)\
+			:m_dbinit(cfg),m_db(cfg){}\
+		virtual const char* className() const\
+		{\
+			return #DBCLASS "Unit";\
+		}\
+		virtual const std::string& ID() const\
+		{\
+			static const std::string s_ID(NAME);\
+			return s_ID;\
+		}\
+		virtual DBCLASS* database()\
+		{\
+			return &m_db;\
+		}\
+	private:\
+		DBINITCLASS m_dbinit;\
+		DBCLASS m_db;\
+	};\
+	class Constructor :public _Wolframe::ObjectConstructorBase\
+	{\
+	public:\
+		virtual ~Constructor(){}\
+		_Wolframe::ObjectConstructorBase::ObjectType objectType() const\
+		{\
+			return DATABASE_OBJECT;\
+		}\
+		const char* objectClassName() const\
+		{\
+			return NAME "Database";\
+		}\
+		Unit* object( const _Wolframe::config::NamedConfiguration& cfgi)\
+		{\
+			const CONFIGCLASS* cfg = dynamic_cast<const CONFIGCLASS*>(&cfgi);\
+			return new Unit(*cfg);\
+		}\
+	};\
+	class BuilderDescription : public _Wolframe::module::ConfiguredBuilder\
+	{\
+	public:\
+		BuilderDescription( const char* title, const char* section,\
+					const char* keyword, const char* className )\
+			:_Wolframe::module::ConfiguredBuilder( title, section, keyword, className ){}\
+		virtual ~BuilderDescription()\
+		{}\
+		virtual _Wolframe::config::NamedConfiguration* configuration( const char* logPrefix )\
+		{\
+			return new CONFIGCLASS( m_title, logPrefix);\
+		}\
+		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
+		{\
+			return m_constructor.objectType();\
+		}\
+		virtual _Wolframe::ObjectConstructorBase* constructor()\
+		{\
+			return &m_constructor;\
+		}\
+	private:\
+		Constructor m_constructor;\
+	};\
+	struct Builder \
+	{\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			static BuilderDescription mod( "Database interface to " NAME, "Database", NAME, NAME "Database");\
+			return &mod;\
+		}\
+	};\
+	(*this)(&Builder::impl);\
+}
+
+
+
 

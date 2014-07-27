@@ -116,6 +116,7 @@ private:
 
 	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
 
+public:
 	static void noticeProcessor( void* this_void, const char * message);
 
 private:
@@ -124,11 +125,6 @@ private:
 	unsigned short		m_connections;		//< number of connections
 	PostgreSQLServerSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
 	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
-};
-
-class PostgreSQLdbUnit : public DatabaseUnit
-{
-public:	
 };
 
 }} // _Wolframe::db
