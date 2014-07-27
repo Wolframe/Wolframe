@@ -97,11 +97,6 @@ public:
 		return new Transaction( name_, stm);
 	}
 
-	void closeTransaction( Transaction* t )
-	{
-		delete t;
-	}
-
 	virtual const LanguageDescription* getLanguageDescription( ) const
 	{
 		static PostgreSQLLanguageDescription langdescr;

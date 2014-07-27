@@ -40,6 +40,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {
