@@ -280,7 +280,8 @@ void PostgreSQLDatabase::init( const PostgreSQLConfig& config)
 
 			std::stringstream statement_timeout_s;
 			statement_timeout_s << "SET statement_timeout = " << config.statementTimeout();
-			PQexec( conn, statement_timeout_s.str( ).c_str( ) );
+			PGresult* res = PQexec( conn, statement_timeout_s.str( ).c_str( ) );
+			PQclear( res);
 
 			m_connPool.add( conn );
 			m_connections++;
