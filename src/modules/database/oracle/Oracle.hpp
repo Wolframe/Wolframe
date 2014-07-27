@@ -98,7 +98,7 @@ public:
 
 	Transaction* transaction( const std::string& name_)
 	{
-		TransactionExecStatemachineR stm( new TransactionExecStatemachine_oracle( m_env, this));
+		TransactionExecStatemachineR stm( new TransactionExecStatemachine_oracle( &m_env, this));
 		return new Transaction( name_, stm);
 	}
 	
@@ -121,7 +121,7 @@ private:
 private:
 	const std::string	m_ID;			//< database ID
 	std::string		m_connStr;		//< connection string
-	size_t			m_noConnections;	//< number of connections
+	unsigned short		m_connections;	//< number of connections
 	ObjectPool< OracleConnection* >	m_connPool;	//< pool of connections
 
 public:

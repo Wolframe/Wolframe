@@ -74,7 +74,7 @@ public:
 			const std::string& user_, const std::string& password_,
 			unsigned short connections_,
 			unsigned short acquireTimeout_)
-		:_Wolframe::serialize::DescriptiveConfiguration(SQLite_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
+		:_Wolframe::serialize::DescriptiveConfiguration(ORACLE_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
 		,m_ID(id_)
 		,m_host(host_)
 		,m_port(port_)
@@ -131,3 +131,4 @@ private:
 
 }} // _Wolframe::db
 
+#endif // _ORACLE_CONFIG_HPP_INCLUDED

@@ -34,7 +34,7 @@
 // Oracle configuration parser
 //
 
-#include "Oracle.hpp"
+#include "OracleConfig.hpp"
 #include "config/valueParser.hpp"
 #include "config/configurationTree.hpp"
 #include "serialize/struct/structDescription.hpp"
@@ -59,8 +59,8 @@ const serialize::StructDescriptionBase* OracleConfig::getStructDescription()
 		( "database", &OracleConfig::m_dbName )		.optional()
 		( "user", &OracleConfig::m_user )		.optional()
 		( "password", &OracleConfig::m_password )	.optional()
-		( "connections", &OracleConfig::connections )	.optional()
-		( "acquireTimeout", &OracleConfig::acquireTimeout ).optional()
+		( "connections", &OracleConfig::m_connections )	.optional()
+		( "acquireTimeout", &OracleConfig::m_acquireTimeout ).optional()
 		;
 	}
 	};
@@ -105,20 +105,15 @@ void OracleConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   Database user: " << (m_user.empty() ? "(not specified - same as server user)" : m_user)
 	   << ", password: " << (m_password.empty() ? "(not specified - no password used)" : m_password) << std::endl;
 
-	if ( connectTimeout == 0 )
-		os << indStr << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
-	else
-		os << indStr << "   Connect timeout: " << connectTimeout << "s" << std::endl;
-	os << indStr << "   Database connections: " << connections << std::endl;
-	if ( acquireTimeout == 0 )
+	if ( m_acquireTimeout == 0 )
 		os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;
 	else
-		os << indStr << "   Acquire database connection timeout: " << acquireTimeout << "s" << std::endl;
+		os << indStr << "   Acquire database connection timeout: " << m_acquireTimeout << "s" << std::endl;
 }
 
 bool OracleConfig::check() const
 {
-	if ( connections == 0 )	{
+	if ( m_connections == 0 )	{
 		LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
 		return false;
 	}

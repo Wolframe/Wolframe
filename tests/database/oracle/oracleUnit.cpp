@@ -29,50 +29,41 @@ class OracleFixture : public ::testing::Test
 
 TEST_F( OracleFixture, CreateOracleUnit )
 {
-	OracleDbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10);
+	OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 );
 	ASSERT_STREQ( "Oracle", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
-	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
 }
 
 TEST_F( OracleFixture, WrongHost )
 {
-	ASSERT_THROW( OracleDbUnit db( "testDB", "blabla", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10), std::runtime_error );
+	ASSERT_THROW( OracleDatabase db( "testDB", "blabla", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 ), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongPassword )
 {
-	ASSERT_THROW( OracleDbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-					   "wolfusr", "wolfpwdd", "", "", "", "", "",
-					   3, 4, 3, 10), std::runtime_error );
+	ASSERT_THROW( OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+					   "wolfusr", "wolfpwdd", 4, 3 ), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongUser )
 {
-	ASSERT_THROW( OracleDbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-					   "wolfusrr", "wolfpwd", "", "", "", "", "",
-					   3, 4, 3, 10), std::runtime_error );
+	ASSERT_THROW( OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+					   "wolfusrr", "wolfpwd", 4, 3 ), std::runtime_error );
 }
 
 TEST_F( OracleFixture, WrongDatabase )
 {
-	ASSERT_THROW( OracleDbUnit db( "testDB", "andreasbaumann.dyndns.org", 0, "orcle",
-					   "wolfusr", "wolfpwd", "", "", "", "", "",
-					   3, 4, 3, 10), std::runtime_error );
+	ASSERT_THROW( OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcle",
+					   "wolfusr", "wolfpwd", 4, 3 ), std::runtime_error );
 }
 
 TEST_F( OracleFixture, Transaction )
 {
-	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10);
-
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 );
+	TransactionR trans( db.transaction( "test" ));
 
 	// ok transaction
 	trans->begin( );
@@ -147,11 +138,9 @@ static void executeInsertStatements( const TransactionR& trans)
 
 TEST_F( OracleFixture, ExecuteInstruction )
 {
-	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 );
+	TransactionR trans( db.transaction( "test" ));
 
 	// ok transaction create table statement with commit
 	trans->begin( );
@@ -257,12 +246,9 @@ TEST_F( OracleFixture, ExecuteInstruction )
 
 TEST_F( OracleFixture, ExceptionSyntaxError )
 {
-	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10);
-
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 );
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 
@@ -284,11 +270,9 @@ TEST_F( OracleFixture, ExceptionSyntaxError )
 
 TEST_F( OracleFixture, TooFewBindParameter )
 {
-	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 );
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
@@ -313,11 +297,9 @@ TEST_F( OracleFixture, TooFewBindParameter )
 
 TEST_F( OracleFixture, TooManyBindParameter )
 {
-	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 );
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;");
@@ -344,11 +326,9 @@ TEST_F( OracleFixture, TooManyBindParameter )
 
 TEST_F( OracleFixture, IllegalBindParameter )
 {
-	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 );
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	std::vector<types::Variant> values;
@@ -374,11 +354,9 @@ TEST_F( OracleFixture, IllegalBindParameter )
 
 TEST_F( OracleFixture, ReusedBindParameter )
 {
-	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 );
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	if (!trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;")) throw std::runtime_error( dberror_string( trans));
@@ -411,11 +389,9 @@ TEST_F( OracleFixture, ReusedBindParameter )
 
 TEST_F( OracleFixture, ExpressionWithParametersAndTypeCoercion )
 {
-	OracleDbUnit dbUnit( "testDB", "andreasbaumann.dyndns.org", 0, "orcl",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	OracleDatabase db( "testDB", "andreasbaumann.dyndns.org", 1521, "orcl",
+			     "wolfusr", "wolfpwd", 4, 3 );
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	if (!trans->executeStatement( "begin execute immediate 'drop table TestTest'; exception when others then null; end;")) throw std::runtime_error( dberror_string( trans));
