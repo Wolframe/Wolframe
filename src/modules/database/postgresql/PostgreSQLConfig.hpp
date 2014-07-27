@@ -125,7 +125,7 @@ public:
 	const std::string& sslKey() const		{ return m_sslKey; }
 	const std::string& sslRootCert() const		{ return m_sslRootCert; }
 	const std::string& sslCRL() const		{ return m_sslCRL; }
-	unsigned short connectionTimeout() const	{ return m_connectionTimeout; }
+	unsigned short connectTimeout() const		{ return m_connectTimeout; }
 	unsigned short connections() const		{ return m_connections; }
 	unsigned short acquireTimeout() const		{ return m_acquireTimeout; }
 	unsigned statementTimeout() const		{ return m_statementTimeout; }

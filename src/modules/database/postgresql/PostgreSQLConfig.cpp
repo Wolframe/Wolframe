@@ -59,15 +59,15 @@ const serialize::StructDescriptionBase* PostgreSQLConfig::getStructDescription()
 		( "database", &PostgreSQLConfig::m_dbName )		.optional()
 		( "user", &PostgreSQLConfig::m_user )			.optional()
 		( "password", &PostgreSQLConfig::m_password )		.optional()
-		( "sslMode", &PostgreSQLConfig::sslMode )		.optional()
-		( "sslCert", &PostgreSQLConfig::sslCert )		.optional()
-		( "sslKey", &PostgreSQLConfig::sslKey )			.optional()
-		( "sslRootCert", &PostgreSQLConfig::sslRootCert	)	.optional()
-		( "sslCRL", &PostgreSQLConfig::sslCRL )			.optional()
-		( "connectionTimeout", &PostgreSQLConfig::connectTimeout ).optional()
-		( "connections", &PostgreSQLConfig::connections )	.optional()
-		( "acquireTimeout", &PostgreSQLConfig::acquireTimeout )	.optional()
-		( "statementTimeout", &PostgreSQLConfig::statementTimeout ).optional()
+		( "m_sslMode", &PostgreSQLConfig::m_sslMode )		.optional()
+		( "sslCert", &PostgreSQLConfig::m_sslCert )		.optional()
+		( "sslKey", &PostgreSQLConfig::m_sslKey )		.optional()
+		( "sslRootCert", &PostgreSQLConfig::m_sslRootCert )	.optional()
+		( "sslCRL", &PostgreSQLConfig::m_sslCRL )		.optional()
+		( "connectionTimeout", &PostgreSQLConfig::m_connectTimeout ).optional()
+		( "connections", &PostgreSQLConfig::m_connections )	.optional()
+		( "acquireTimeout", &PostgreSQLConfig::m_acquireTimeout ).optional()
+		( "statementTimeout", &PostgreSQLConfig::m_statementTimeout ).optional()
 		;
 	}
 	};
@@ -83,40 +83,40 @@ bool PostgreSQLConfig::mapValueDomains()
 		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": port must be defined as a non zero non negative number";
 		retVal = false;
 	}
-	if (!sslMode.empty())
+	if (!m_sslMode.empty())
 	{
-		if ( boost::algorithm::iequals( sslMode, "disable" ))
-			sslMode = "disable";
-		else if ( boost::algorithm::iequals( sslMode, "allow" ))
-			sslMode = "allow";
-		else if ( boost::algorithm::iequals( sslMode, "prefer" ))
-			sslMode = "prefer";
-		else if ( boost::algorithm::iequals( sslMode, "require" ))
-			sslMode = "require";
-		else if ( boost::algorithm::iequals( sslMode, "verify-ca" ))
-			sslMode = "verify-ca";
-		else if ( boost::algorithm::iequals( sslMode, "verify-full" ))
-			sslMode = "verify-full";
+		if ( boost::algorithm::iequals( m_sslMode, "disable" ))
+			m_sslMode = "disable";
+		else if ( boost::algorithm::iequals( m_sslMode, "allow" ))
+			m_sslMode = "allow";
+		else if ( boost::algorithm::iequals( m_sslMode, "prefer" ))
+			m_sslMode = "prefer";
+		else if ( boost::algorithm::iequals( m_sslMode, "require" ))
+			m_sslMode = "require";
+		else if ( boost::algorithm::iequals( m_sslMode, "verify-ca" ))
+			m_sslMode = "verify-ca";
+		else if ( boost::algorithm::iequals( m_sslMode, "verify-full" ))
+			m_sslMode = "verify-full";
 		else	{
-			LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": unknown SSL mode: '" << sslMode << "'";
+			LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": unknown SSL mode: '" << m_sslMode << "'";
 			retVal = false;
 		}
 	}
-	if ( !sslCert.empty() && sslKey.empty() )	{
+	if ( !m_sslCert.empty() && m_sslKey.empty() )	{
 		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": SSL certificate configured but no SSL key specified";
 		retVal = false;
 	}
-	if ( !sslCert.empty() && sslKey.empty() )	{
+	if ( !m_sslCert.empty() && m_sslKey.empty() )	{
 		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": SSL key configured but no SSL certificate specified";
 		retVal = false;
 	}
-	if ( boost::algorithm::iequals( sslMode, "verify-ca" ) ||
-	     boost::algorithm::iequals( sslMode, "verify-full" ))	{
+	if ( boost::algorithm::iequals( m_sslMode, "verify-ca" ) ||
+	     boost::algorithm::iequals( m_sslMode, "verify-full" ))	{
 		LOG_FATAL << logPrefix() << " " << m_config_pos.logtext() << ": server SSL certificate requested but no root CA specified";
 		retVal = false;
 	}
-	if ( sslMode.empty())
-		sslMode = "prefer";
+	if ( m_sslMode.empty())
+		m_sslMode = "prefer";
 	return retVal;
 }
 
@@ -133,35 +133,35 @@ bool PostgreSQLConfig::parse( const config::ConfigurationNode& pt, const std::st
 
 void PostgreSQLConfig::setCanonicalPathes( const std::string& refPath )
 {
-	if ( ! sslCert.empty() )	{
-		std::string oldPath = sslCert;
-		sslCert = utils::getCanonicalPath( sslCert, refPath);
-		if ( oldPath != sslCert ) {
-			LOG_WARNING << logPrefix() << "Using absolute SSL certificate filename '" << sslCert
+	if ( ! m_sslCert.empty() )	{
+		std::string oldPath = m_sslCert;
+		m_sslCert = utils::getCanonicalPath( m_sslCert, refPath);
+		if ( oldPath != m_sslCert ) {
+			LOG_WARNING << logPrefix() << "Using absolute SSL certificate filename '" << m_sslCert
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
-	if ( ! sslKey.empty() )	{
-		std::string oldPath = sslKey;
-		sslKey = utils::getCanonicalPath( sslKey, refPath );
-		if ( oldPath != sslKey ) {
-			LOG_WARNING << logPrefix() << "Using absolute SSL key filename '" << sslKey
+	if ( ! m_sslKey.empty() )	{
+		std::string oldPath = m_sslKey;
+		m_sslKey = utils::getCanonicalPath( m_sslKey, refPath );
+		if ( oldPath != m_sslKey ) {
+			LOG_WARNING << logPrefix() << "Using absolute SSL key filename '" << m_sslKey
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
-	if ( ! sslRootCert.empty() )	{
-		std::string oldPath = sslRootCert;
-		sslRootCert = utils::getCanonicalPath( sslRootCert, refPath );
-		if ( oldPath != sslRootCert ) {
-			LOG_WARNING << logPrefix() << "Using absolute CA certificate filename '" << sslRootCert
+	if ( ! m_sslRootCert.empty() )	{
+		std::string oldPath = m_sslRootCert;
+		m_sslRootCert = utils::getCanonicalPath( m_sslRootCert, refPath );
+		if ( oldPath != m_sslRootCert ) {
+			LOG_WARNING << logPrefix() << "Using absolute CA certificate filename '" << m_sslRootCert
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
-	if ( ! sslCRL.empty() )	{
-		std::string oldPath = sslCRL;
-		sslCRL = utils::getCanonicalPath( sslCRL, refPath );
-		if ( oldPath != sslCRL ) {
-			LOG_WARNING << logPrefix() << "Using absolute CRL filename '" << sslCRL
+	if ( ! m_sslCRL.empty() )	{
+		std::string oldPath = m_sslCRL;
+		m_sslCRL = utils::getCanonicalPath( m_sslCRL, refPath );
+		if ( oldPath != m_sslCRL ) {
+			LOG_WARNING << logPrefix() << "Using absolute CRL filename '" << m_sslCRL
 				       << "' instead of '" << oldPath << "'";
 		}
 	}
@@ -181,36 +181,36 @@ void PostgreSQLConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   Database name: " << (m_dbName.empty() ? "(not specified - server user default)" : m_dbName) << std::endl;
 	os << indStr << "   Database user: " << (m_user.empty() ? "(not specified - same as server user)" : m_user)
 	   << ", password: " << (m_password.empty() ? "(not specified - no password used)" : m_password) << std::endl;
-	if ( ! sslMode.empty())
-		os << indStr << "   Database connection SSL mode: " << sslMode << std::endl;
-	if ( ! sslCert.empty())	{
-		os << indStr << "   Client SSL certificate file: " << sslCert << std::endl;
-		if ( ! sslMode.empty())
-			os << indStr << "   Client SSL key file: " << sslKey << std::endl;
+	if ( ! m_sslMode.empty())
+		os << indStr << "   Database connection SSL mode: " << m_sslMode << std::endl;
+	if ( ! m_sslCert.empty())	{
+		os << indStr << "   Client SSL certificate file: " << m_sslCert << std::endl;
+		if ( ! m_sslMode.empty())
+			os << indStr << "   Client SSL key file: " << m_sslKey << std::endl;
 	}
-	if ( ! sslRootCert.empty())
-		os << indStr << "   SSL root CA file: " << sslRootCert << std::endl;
-	if ( ! sslCRL.empty())
-		os << indStr << "   SSL CRL file: " << sslCRL << std::endl;
+	if ( ! m_sslRootCert.empty())
+		os << indStr << "   SSL root CA file: " << m_sslRootCert << std::endl;
+	if ( ! m_sslCRL.empty())
+		os << indStr << "   SSL CRL file: " << m_sslCRL << std::endl;
 
-	if ( connectTimeout == 0 )
+	if ( m_connectTimeout == 0 )
 		os << indStr << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
 	else
-		os << indStr << "   Connect timeout: " << connectTimeout << "s" << std::endl;
-	os << indStr << "   Database connections: " << connections << std::endl;
-	if ( acquireTimeout == 0 )
+		os << indStr << "   Connect timeout: " << m_connectTimeout << "s" << std::endl;
+	os << indStr << "   Database connections: " << m_connections << std::endl;
+	if ( m_acquireTimeout == 0 )
 		os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;
 	else
-		os << indStr << "   Acquire database connection timeout: " << acquireTimeout << "s" << std::endl;
-	if ( statementTimeout == 0 )
+		os << indStr << "   Acquire database connection timeout: " << m_acquireTimeout << "s" << std::endl;
+	if ( m_statementTimeout == 0 )
 		os << indStr << "   Default statement execution timeout: 0 (wait indefinitely)" << std::endl;
 	else
-		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
+		os << indStr << "   Default statement execution timeout: " << m_statementTimeout << "ms" << std::endl;
 }
 
 bool PostgreSQLConfig::check() const
 {
-	if ( connections == 0 )	{
+	if ( m_connections == 0 )	{
 		LOG_ERROR << logPrefix() << " " << m_config_pos.logtext() << ": number of database connections cannot be 0";
 		return false;
 	}

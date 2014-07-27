@@ -33,7 +33,7 @@
 //\brief Implementation for higher data type transformations for libpq
 //\remark The implementation of the data types are taken from libpqtype but with another interface
 //\file PostgreSQLdatatypes.cpp
-#include "PostgreSQLdatatypes.hpp"
+#include "PostgreSQLDatatypes.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;

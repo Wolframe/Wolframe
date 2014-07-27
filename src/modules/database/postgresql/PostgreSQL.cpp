@@ -182,10 +182,11 @@ PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLConfig& config)
 PostgreSQLDatabase::PostgreSQLDatabase( const std::string& id_,
 		  const std::string& host_, unsigned short port_, const std::string& dbName_,
 		  const std::string& user_, const std::string& password_,
-		  std::string sslMode_, std::string sslCert_, std::string sslKey_,
-		  std::string sslRootCert_, std::string sslCRL_,
+		  const std::string& sslMode_, const std::string& sslCert_,
+		  const std::string& sslKey_, const std::string& sslRootCert_,
+		  const std::string& sslCRL_,
 		  unsigned short connectTimeout_,
-		  size_t connections_, unsigned short acquireTimeout_,
+		  unsigned short connections_, unsigned short acquireTimeout_,
 		  unsigned statementTimeout_)
 	:m_ID(id_)
 	,m_connections(0)
@@ -198,18 +199,18 @@ PostgreSQLDatabase::PostgreSQLDatabase( const std::string& id_,
 }
 
 // This function also needs a lot of work
-void PostgreSQLDatabase::init( const SQLiteConfig& config)
+void PostgreSQLDatabase::init( const PostgreSQLConfig& config)
 {
-	int	connections = config.connections();
+	int connections = config.connections();
 
-	m_connStr = buildConnStr( config.host, config.port, config.dbName,
-				  config.user, config.password,
-				  config.sslMode, config.sslCert, config.sslKey,
-				  config.sslRootCert, config.sslCRL,
-				  config.connectTimeout );
+	m_connStr = buildConnStr( config.host(), config.port(), config.dbName(),
+				  config.user(), config.password(),
+				  config.sslMode(), config.sslCert(), config.sslKey(),
+				  config.sslRootCert(), config.sslCRL(),
+				  config.connectTimeout() );
 	LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
 
-	for ( size_t i = 0; i < connections; i++ )	{
+	for ( unsigned short i = 0; i < connections; i++ )	{
 		PGconn* conn = PQconnectdb( m_connStr.c_str() );
 		if ( conn == NULL )
 			LOG_ALERT << "Failed to connect to PostgreSQL database '" << m_ID << "'";

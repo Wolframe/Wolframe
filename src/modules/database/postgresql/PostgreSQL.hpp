@@ -108,6 +108,9 @@ public:
 
 	PoolObject<PGconn*>* newConnection()	{return new PoolObject<PGconn*>( m_connPool);}
 
+	PostgreSQLServerSettings serverSettings() const
+						{ return m_serverSettings; }
+
 private:
 	void init( const PostgreSQLConfig& config);
 
@@ -121,11 +124,6 @@ private:
 	unsigned short		m_connections;		//< number of connections
 	PostgreSQLServerSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
 	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
-
-// needed? I don't we should give outsiders access to server settings
-//~ public:
-	//~ PostgreSQLServerSettings serverSettings() const
-						//~ { return m_serverSettings; }
 };
 
 class PostgreSQLdbUnit : public DatabaseUnit

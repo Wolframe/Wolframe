@@ -30,54 +30,50 @@ class PQmoduleFixture : public ::testing::Test
 
 TEST_F( PQmoduleFixture, CreatePostgreSQLunit )
 {
-	PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
 	ASSERT_STREQ( "PostgreSQL", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
-	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
 }
 
 TEST_F( PQmoduleFixture, WrongHost )
 {
 	// Aba: questionable! should't this be an exception?
-	PostgreSQLdbUnit db( "testDB", "blabla", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "blabla", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
 	ASSERT_STREQ( "PostgreSQL", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
-	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
 }
 
 TEST_F( PQmoduleFixture, WrongPassword )
 {
-	ASSERT_THROW( PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
+	ASSERT_THROW( PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 						"wolfusr", "wolfpwdd", "", "", "", "", "",
 						3, 4, 3, 30000), std::runtime_error );
 }
 
 TEST_F( PQmoduleFixture, WrongUser )
 {
-	ASSERT_THROW( PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
+	ASSERT_THROW( PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 						"wolfusrr", "wolfpwd", "", "", "", "", "",
 						3, 4, 3, 30000), std::runtime_error );
 }
 
 TEST_F( PQmoduleFixture, WrongDatabase )
 {
-	ASSERT_THROW( PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframee",
+	ASSERT_THROW( PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframee",
 						"wolfusr", "wolfpwd", "", "", "", "", "",
 						3, 4, 3, 30000), std::runtime_error );
 }
 
 TEST_F( PQmoduleFixture, Transaction )
 {
-	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
-
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	// ok transaction
 	trans->begin( );
@@ -152,11 +148,10 @@ static void executeInsertStatements( const TransactionR& trans)
 
 TEST_F( PQmoduleFixture, ExecuteInstruction )
 {
-	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	// ok transaction create table statement with commit
 	trans->begin( );
@@ -251,11 +246,10 @@ TEST_F( PQmoduleFixture, ExecuteInstruction )
 
 TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 {
-	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 
@@ -275,11 +269,10 @@ TEST_F( PQmoduleFixture, ExceptionSyntaxError )
 
 TEST_F( PQmoduleFixture, TooFewBindParameter )
 {
-	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
@@ -306,11 +299,10 @@ TEST_F( PQmoduleFixture, TooFewBindParameter )
 
 TEST_F( PQmoduleFixture, TooManyBindParameter )
 {
-	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	trans->executeStatement( "DROP TABLE IF EXISTS TestTest");
@@ -338,11 +330,10 @@ TEST_F( PQmoduleFixture, TooManyBindParameter )
 
 TEST_F( PQmoduleFixture, IllegalBindParameter )
 {
-	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	std::vector<types::Variant> values;
@@ -369,11 +360,10 @@ TEST_F( PQmoduleFixture, IllegalBindParameter )
 
 TEST_F( PQmoduleFixture, ReusedBindParameter )
 {
-	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));
@@ -406,11 +396,10 @@ TEST_F( PQmoduleFixture, ReusedBindParameter )
 
 TEST_F( PQmoduleFixture, ExpressionWithParametersAndTypeCoercion )
 {
-	PostgreSQLdbUnit dbUnit( "testDB", "localhost", 0, "wolframe",
+	PostgreSQLDatabase db( "testDB", "localhost", 0, "wolframe",
 				"wolfusr", "wolfpwd", "", "", "", "", "",
 				3, 4, 3, 30000);
-	Database* db = dbUnit.database( );
-	TransactionR trans( db->transaction( "test" ));
+	TransactionR trans( db.transaction( "test" ));
 
 	trans->begin( );
 	if (!trans->executeStatement( "DROP TABLE IF EXISTS TestTest")) throw std::runtime_error( dberror_string( trans));
