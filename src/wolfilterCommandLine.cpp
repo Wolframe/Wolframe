@@ -147,6 +147,7 @@ struct WolfilterOptionStruct
 			( "filter,e", po::value<std::string>(), "specify input/output filter by name (if not specified separately)" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "config,c", po::value<std::string>(), "specify configuration file to load" )
+			( "protocol,p", po::value<std::string>(), "specify protocol to use (default no protocol)" )
 			( "cmd", po::value<std::string>(), "name of the command to execute")
 			;
 
@@ -241,6 +242,10 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "input"))
 	{
 		m_inputfile = vmap["input"].as<std::string>();
+	}
+	if (vmap.count( "protocol"))
+	{
+		m_protocol = vmap["protocol"].as<std::string>();
 	}
 	std::string modulePath;
 #if defined( DEFAULT_MODULE_LOAD_DIR)

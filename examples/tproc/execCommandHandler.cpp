@@ -32,7 +32,7 @@
 ************************************************************************/
 #include "execCommandHandler.hpp"
 #include "processor/execContext.hpp"
-#include "protocol/ioblocks.hpp"
+#include "tprocProtocolFiles.hpp"
 #include "logger-v1.hpp"
 
 #undef _Wolframe_LOWLEVEL_DEBUG
@@ -41,8 +41,8 @@ using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::protocol;
 
-ExecCommandHandler::ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_)
-	:m_state(Init),m_buffer(1024),m_argBuffer(&m_buffer),m_cmdidx(-1),m_cmdhandler(0)
+ExecProtocolHandler::ExecProtocolHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_)
+	:m_state(Init),m_buffer(1024),m_argBuffer(&m_buffer),m_writeptr(0),m_writesize(0),m_writepos(0),m_cmdidx(-1),m_cmdhandler(0)
 {
 	m_itr = m_input.begin();
 	m_end = m_input.begin();
@@ -63,29 +63,25 @@ ExecCommandHandler::ExecCommandHandler( const std::vector<std::string>& rcmds_, 
 	}
 }
 
-ExecCommandHandler::~ExecCommandHandler()
+ExecProtocolHandler::~ExecProtocolHandler()
 {}
 
-void ExecCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
+void ExecProtocolHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
 	m_input = InputBlock( (char*)buf, allocsize);
 }
 
-void ExecCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
+void ExecProtocolHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
 	if (size < 16) throw std::logic_error("output buffer smaller than 16 bytes");
 	m_output = OutputBlock( buf, size, pos);
-	if (m_cmdhandler.get())
-	{
-		m_cmdhandler->setOutputBuffer( buf, size, pos);
-	}
 }
 
-void ExecCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
+void ExecProtocolHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	if (m_cmdhandler.get())
 	{
-		m_cmdhandler->putInput( begin, bytesTransferred);
+		m_cmdhandler->putInput( begin, bytesTransferred, false);
 	}
 	else
 	{
@@ -95,7 +91,7 @@ void ExecCommandHandler::putInput( const void *begin, std::size_t bytesTransferr
 	}
 }
 
-void ExecCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
+void ExecProtocolHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
 	if (m_cmdhandler.get())
 	{
@@ -107,21 +103,27 @@ void ExecCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 	}
 }
 
-void ExecCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
+void ExecProtocolHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
 	if (m_cmdhandler.get())
 	{
-		m_cmdhandler->getOutput( begin, bytesToTransfer);
+		begin = m_writeptr + m_writepos;
+		bytesToTransfer = m_writesize - m_writepos;
+		if (m_output.size() - m_output.pos() < bytesToTransfer)
+		{
+			bytesToTransfer = m_output.size() - m_output.pos();
+		}
+		if (!m_output.print( begin, bytesToTransfer))
+		{
+			throw std::bad_alloc();
+		}
 	}
-	else
-	{
-		begin = m_output.ptr();
-		bytesToTransfer = m_output.pos();
-		m_output.setPos(0);
-	}
+	begin = m_output.ptr();
+	bytesToTransfer = m_output.pos();
+	m_output.setPos(0);
 }
 
-void ExecCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
+void ExecProtocolHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
 	if (m_cmdhandler.get())
 	{
@@ -134,7 +136,7 @@ void ExecCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 	}
 }
 
-const char* ExecCommandHandler::getCommand( int& argc, const char**& argv)
+const char* ExecProtocolHandler::getCommand( int& argc, const char**& argv)
 {
 	if (m_cmdidx < 0) return 0;
 	if (m_cmdidx < m_nofParentCmds)
@@ -152,12 +154,12 @@ const char* ExecCommandHandler::getCommand( int& argc, const char**& argv)
 	}
 }
 
-CommandHandler::Operation ExecCommandHandler::nextOperation()
+ProtocolHandler::Operation ExecProtocolHandler::nextOperation()
 {
 	for (;;)
 	{
 #ifdef _Wolframe_LOWLEVEL_DEBUG
-		LOG_TRACE << "STATE ExecCommandHandler " << stateName( m_state);
+		LOG_TRACE << "STATE ExecProtocolHandler " << stateName( m_state);
 		// to blurry log message. Helped in the beginning, but got now useless
 #endif
 		switch( m_state)
@@ -327,6 +329,9 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 							return READ;
 						break;
 						case WRITE:
+							m_state = FlushingOutput;
+							m_cmdhandler->getOutput( m_writeptr, m_writesize);
+							m_writepos = 0;
 							return WRITE;
 						break;
 						case CLOSE:
@@ -360,6 +365,16 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					return CLOSE;
 				}
 			}
+			case FlushingOutput:
+				if (m_writepos == m_writesize)
+				{
+					m_state = Processing;
+					m_writeptr = 0;
+					m_writesize = 0;
+					m_writepos = 0;
+					continue;
+				}
+				return WRITE;
 
 			case ProtocolError:
 			{

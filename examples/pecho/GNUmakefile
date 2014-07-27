@@ -9,6 +9,7 @@ INCLUDE_CXXFLAGS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/src/modules/protocol/standard \
 	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(TOPDIR)/wtest/include
 
@@ -59,6 +60,7 @@ OBJS = \
 	appConfigDefinition.o \
 	pechoConfig.o \
 	pechoHandler.o \
+	pechoProtocolFiles.o \
 	$(TOPDIR)/src/posixMain.o
 
 CPP_BINS = \

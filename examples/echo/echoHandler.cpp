@@ -13,9 +13,9 @@
 
 namespace _Wolframe {
 
-echoConnection::echoConnection( const net::LocalEndpoint& local, unsigned short timeout )
+echoConnection::echoConnection( const net::LocalEndpointR& local, unsigned short timeout )
 {
-	net::ConnectionEndpoint::ConnectionType type = local.type();
+	net::ConnectionEndpoint::ConnectionType type = local->type();
 
 	switch ( type )	{
 		case net::ConnectionEndpoint::UDP:
@@ -23,14 +23,14 @@ echoConnection::echoConnection( const net::LocalEndpoint& local, unsigned short 
 			abort();
 
 		case net::ConnectionEndpoint::TCP:	{
-			const net::LocalTCPendpoint& lcl = static_cast<const net::LocalTCPendpoint&>( local );
-			LOG_TRACE << "Created connection handler for " << lcl.toString();
+			const net::LocalTCPendpoint* lcl = static_cast<const net::LocalTCPendpoint*>( local.get() );
+			LOG_TRACE << "Created connection handler for " << lcl->toString();
 			break;
 		}
 #ifdef WITH_SSL
 		case net::ConnectionEndpoint::SSL:	{
-			const net::LocalSSLendpoint& lcl = static_cast<const net::LocalSSLendpoint&>( local );
-			LOG_TRACE << "Created connection handler (SSL) for " << lcl.toString();
+			const net::LocalSSLendpoint* lcl = static_cast<const net::LocalSSLendpoint*>( local.get() );
+			LOG_TRACE << "Created connection handler (SSL) for " << lcl->toString();
 			break;
 		}
 #else
@@ -54,9 +54,9 @@ echoConnection::~echoConnection()
 }
 
 
-void echoConnection::setPeer( const net::RemoteEndpoint& remote )
+void echoConnection::setPeer( const net::RemoteEndpointR& remote )
 {
-	net::ConnectionEndpoint::ConnectionType type = remote.type();
+	net::ConnectionEndpoint::ConnectionType type = remote->type();
 
 	switch ( type )	{
 		case net::ConnectionEndpoint::UDP:
@@ -64,21 +64,21 @@ void echoConnection::setPeer( const net::RemoteEndpoint& remote )
 			abort();
 
 		case net::ConnectionEndpoint::TCP:	{
-			const net::RemoteTCPendpoint& rmt = static_cast<const net::RemoteTCPendpoint&>( remote );
-			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << rmt.connectionTime();
+			const net::RemoteTCPendpoint* rmt = static_cast<const net::RemoteTCPendpoint*>( remote.get() );
+			LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << rmt->connectionTime();
 			break;
 		}
 #ifdef WITH_SSL
 		case net::ConnectionEndpoint::SSL:	{
-			const net::RemoteSSLendpoint& rmt = static_cast<const net::RemoteSSLendpoint&>( remote );
-			LOG_TRACE << "Peer set to " << rmt.toString() << ", connected at " << boost::posix_time::from_time_t( rmt.connectionTime());
-			if ( rmt.SSLcertInfo() )	{
-				LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
-					  << ", issued by: " << rmt.SSLcertInfo()->issuer();
-				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore())
-					  << " to " <<  boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter());
-				LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
-				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
+			const net::RemoteSSLendpoint* rmt = static_cast<const net::RemoteSSLendpoint*>( remote.get() );
+			LOG_TRACE << "Peer set to " << rmt->toString() << ", connected at " << boost::posix_time::from_time_t( rmt->connectionTime());
+			if ( rmt->SSLcertInfo() )	{
+				LOG_TRACE << "Peer SSL certificate serial number " << rmt->SSLcertInfo()->serialNumber()
+					  << ", issued by: " << rmt->SSLcertInfo()->issuer();
+				LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt->SSLcertInfo()->notBefore())
+					  << " to " <<  boost::posix_time::from_time_t( rmt->SSLcertInfo()->notAfter());
+				LOG_TRACE << "Peer SSL certificate subject: " << rmt->SSLcertInfo()->subject();
+				LOG_TRACE << "Peer SSL certificate Common Name: " << rmt->SSLcertInfo()->commonName();
 			}
 			break;
 		}
@@ -217,7 +217,7 @@ void echoConnection::signalOccured( NetworkSignal signal )
 
 
 /// ServerHandler PIMPL
-net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpointR& local )
 {
 	return new echoConnection( local, timeout );
 }
@@ -229,7 +229,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration *conf,
 
 ServerHandler::~ServerHandler()	{ delete m_impl; }
 
-net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpointR& local )
 {
 	return m_impl->newConnection( local );
 }

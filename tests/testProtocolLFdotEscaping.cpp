@@ -37,10 +37,15 @@
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testReport.hpp"
+#include "wtest/pseudoRandomGenForTests.hpp"
 #include <iostream>
 #include <cstdlib>
 
 using namespace _Wolframe;
+
+static wtest::Random g_random;
+unsigned int g_random_seed = 0;
+bool g_random_seed_set = false;
 
 class LFdotEscapeTest : public ::testing::Test
 {
@@ -74,13 +79,19 @@ TEST_F( LFdotEscapeTest, tests)
 	std::vector<std::string> tests;
 	std::size_t testno;
 
+	if (g_random_seed_set)
+	{
+		g_random.setSeed( g_random_seed);
+	}
+	unsigned int seed = g_random.seed();
+
 	for (testno=0; testno < 100; ++testno)
 	{
 		std::size_t ibsize = ibar[ testno % ibarsize];
 		std::size_t obsize = obar[ testno % obarsize];
 
 		protocol::EscapeBuffer ebuf;
-		std::string input = randmsg( testno);
+		std::string input = randmsg( seed+testno);
 
 		char* ib = (char*)std::malloc( ibsize);
 		char* ob = (char*)std::malloc( obsize);

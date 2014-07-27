@@ -1,6 +1,6 @@
 #include "appdevel/commandHandlerModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "cmdbind/commandHandlerUnit.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "serialize/descriptiveConfiguration.hpp"
 #include <vector>
 

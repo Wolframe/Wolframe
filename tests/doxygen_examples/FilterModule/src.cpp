@@ -86,6 +86,11 @@ public:
 		return false;
 	}
 
+	virtual void getOutput( const void*&, std::size_t&)
+	{
+		// ... return the filter output buffer reference and the number of bytes written here
+	}
+
 	virtual bool close()
 	{
 		// ... do check if the final close has been called (it does not have to) and do the final actions of the output filter

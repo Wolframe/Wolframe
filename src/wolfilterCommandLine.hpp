@@ -60,6 +60,7 @@ public:
 	const std::string& cmd() const					{return m_cmd;}
 	const std::string& inputfilter() const				{return m_inputfilter;}
 	const std::string& outputfilter() const				{return m_outputfilter;}
+	const std::string& protocol() const				{return m_protocol;}
 	const AAAA::AAAAconfiguration& aaaaProviderConfig() const	{return *m_aaaaProviderConfig;}
 	const db::DBproviderConfig& dbProviderConfig() const		{return *m_dbProviderConfig;}
 	const proc::ProcProviderConfig& procProviderConfig() const	{return *m_procProviderConfig;}
@@ -86,6 +87,7 @@ private:
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;
+	std::string m_protocol;
 	boost::shared_ptr<AAAA::AAAAconfiguration> m_aaaaProviderConfig;
 	boost::shared_ptr<proc::ProcProviderConfig> m_procProviderConfig;
 	boost::shared_ptr<db::DBproviderConfig> m_dbProviderConfig;

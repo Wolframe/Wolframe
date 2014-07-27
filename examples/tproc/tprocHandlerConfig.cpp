@@ -36,6 +36,7 @@
 #include "tprocHandlerConfig.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
+#include "cmdbind/protocolHandler.hpp"
 #include "serialize/configSerialize.hpp"
 #include "serialize/struct/structDescription.hpp"
 #include <string>

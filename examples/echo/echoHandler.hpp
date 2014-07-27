@@ -13,11 +13,11 @@ namespace _Wolframe {
 	class echoConnection : public net::ConnectionHandler
 	{
 	public:
-		echoConnection( const net::LocalEndpoint& local, unsigned short timeout );
+		echoConnection( const net::LocalEndpointR& local, unsigned short timeout );
 
 		~echoConnection();
 
-		void setPeer( const net::RemoteEndpoint& remote );
+		void setPeer( const net::RemoteEndpointR& remote );
 
 		/// Parse incoming data. The return value indicates how much of the
 		/// input has been consumed.
@@ -62,7 +62,7 @@ namespace _Wolframe {
 		{
 			timeout = conf->echoConfig->timeout;
 		}
-		net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
+		net::ConnectionHandler* newConnection( const net::LocalEndpointR& local );
 
 	private:
 		short unsigned timeout;

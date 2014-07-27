@@ -116,19 +116,6 @@ struct OutputFilterImpl :public OutputFilter
 		}
 	}
 
-	bool emptybuf()
-	{
-		std::size_t nn = m_elembuf.size() - m_elemitr;
-		m_elemitr += write( m_elembuf.c_str() + m_elemitr, nn);
-		if (m_elemitr == m_elembuf.size())
-		{
-			m_elembuf.clear();
-			m_elemitr = 0;
-			return true;
-		}
-		return false;
-	}
-
 	/// \brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
 	/// \param [in] type type of the element to print
 	/// \param [in] element pointer to the element to print
@@ -137,21 +124,15 @@ struct OutputFilterImpl :public OutputFilter
 	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
-		if (m_elemitr < m_elembuf.size())
+		if (m_elemitr == m_elembuf.size())
 		{
-			// there is something to print left from last time
-			if (!emptybuf())
-			{
-				setState( EndOfBuffer);
-				return false;
-			}
-			//... we've done the emptying of the buffer left
-			return true;
+			m_elembuf.clear();
+			m_elemitr = 0;
 		}
 		m_elembuf.push_back( getElementTag( type));
 		printToBufferEscEOL( (const char*)element, elementsize, m_elembuf);
 		m_elembuf.push_back( '\n');
-		if (!emptybuf())
+		if (m_elembuf.size() > outputChunkSize())
 		{
 			setState( EndOfBuffer);
 			return false;
@@ -160,6 +141,14 @@ struct OutputFilterImpl :public OutputFilter
 	}
 
 	virtual bool close() {return true;}
+
+	/// \brief Implementation of OutputFilter::getOutput( const void*&,std::size_t&)
+	virtual void getOutput( const void*& buf, std::size_t& bufsize)
+	{
+		buf = (const void*)(m_elembuf.c_str() + m_elemitr);
+		bufsize = m_elembuf.size() - m_elemitr;
+		m_elemitr = m_elembuf.size();
+	}
 
 private:
 	std::string m_elembuf;				///< buffer for the currently printed element

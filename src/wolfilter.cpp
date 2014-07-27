@@ -99,11 +99,11 @@ int main( int argc, char **argv )
 			std::ifstream fh;
 			fh.open( cmdline.inputfile().c_str());
 
-			langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, fh, std::cout);
+			langbind::iostreamfilter( &execContext, cmdline.protocol(), cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, fh, std::cout);
 		}
 		else
 		{
-			langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, std::cin, std::cout);
+			langbind::iostreamfilter( &execContext, cmdline.protocol(), cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, std::cin, std::cout);
 		}
 	}
 	catch (const std::bad_alloc& e)

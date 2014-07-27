@@ -35,8 +35,8 @@
 #ifndef _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
-#include "protocol/ioblocks.hpp"
-#include "protocol/parser.hpp"
+#include "cmdbind/protocolHandler.hpp"
+#include "tprocProtocolFiles.hpp"
 #include "system/connectionHandler.hpp"
 #include "types/countedReference.hpp"
 #include "logger-v1.hpp"
@@ -46,9 +46,9 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-/// \class ExecCommandHandler
+/// \class ExecProtocolHandler
 /// \brief Command handler for a list of predefined protocol commands. Represents one state in the protocol statemachine.
-class ExecCommandHandler :public CommandHandler
+class ExecProtocolHandler :public ProtocolHandler
 {
 public:
 	struct Command
@@ -64,10 +64,10 @@ public:
 	/// \brief Constructor
 	/// \param[in] rcmds_ array of commands that should return control to the caller
 	/// \param[in] cmds_ array of command handlers with commands executed by this command handler
-	ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_);
+	ExecProtocolHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_);
 
 	/// \brief Destructor
-	virtual ~ExecCommandHandler();
+	virtual ~ExecProtocolHandler();
 
 	/// \brief See Parent::setInputBuffer(void*,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
@@ -103,6 +103,7 @@ private:
 		ParseArgs,			//< parse command arguments
 		ParseArgsEOL,			//< parse end of line after command arguments
 		Processing,			//< running a command
+		FlushingOutput,			//< flushing output
 		ProtocolError,			//< a protocol error (bad command etc) appeared and the rest of the line has to be discarded
 		PrintCapabilities,		//< print capabilities
 		Terminate			//< terminate application processor session (close for network)
@@ -117,6 +118,7 @@ private:
 			"ParseArgs",
 			"ParseArgsEOL",
 			"Processing",
+			"FlushingOutput",
 			"ProtocolError",
 			"PrintCapabilities",
 			"Terminate"
@@ -130,7 +132,9 @@ private:
 
 	protocol::InputBlock m_input;					//< buffer for network read messages
 	protocol::OutputBlock m_output;					//< buffer for network write messages
-
+	const char* m_writeptr;						//< message from command handler
+	std::size_t m_writesize;					//< size of message from command handler in bytes
+	std::size_t m_writepos;						//< position in message from command handler
 	protocol::InputBlock::iterator m_itr;				//< iterator to scan protocol input
 	protocol::InputBlock::iterator m_end;				//< iterator pointing to end of message buffer
 

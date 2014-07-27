@@ -53,7 +53,7 @@ public:
 		,m_input_bufsize(1024)
 		,m_output_bufsize(1024) {}
 
-	Configuration( const std::vector<cmdbind::ExecCommandHandler::Command>& cc, std::size_t ib, std::size_t ob)
+	Configuration( const std::vector<cmdbind::ExecProtocolHandler::Command>& cc, std::size_t ib, std::size_t ob)
 		:config::ConfigurationBase("tproc", 0, "tproc")
 		,m_commands(cc)
 		,m_input_bufsize(ib)
@@ -83,10 +83,10 @@ public:
 	std::size_t output_bufsize() const						{return m_output_bufsize;}
 
 	///\brief return all currently available commands
-	const std::vector<cmdbind::ExecCommandHandler::Command>& commands() const	{return m_commands;}
+	const std::vector<cmdbind::ExecProtocolHandler::Command>& commands() const	{return m_commands;}
 
 private:
-	std::vector<cmdbind::ExecCommandHandler::Command> m_commands;			//< command definitions
+	std::vector<cmdbind::ExecProtocolHandler::Command> m_commands;			//< command definitions
 	std::size_t m_input_bufsize;							//< size of input network message buffers in bytes (not configured, but hardcoded by the messaging layer)
 	std::size_t m_output_bufsize;							//< size of output network message buffers in bytes (not configured, but hardcoded by the messaging layer)
 

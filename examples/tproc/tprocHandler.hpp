@@ -37,19 +37,19 @@
 #define _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #include "system/connectionHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "cmdbind/lineCommandHandler.hpp"
+#include "cmdbind/protocolHandler.hpp"
+#include "tprocProtocolFiles.hpp"
 #include "processor/procProviderInterface.hpp"
 #include "handlerConfig.hpp"
-#include "protocol/ioblocks.hpp"
 
 namespace _Wolframe {
 namespace tproc {
 
-class CommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
+class ProtocolHandler :public cmdbind::LineProtocolHandlerTemplate<ProtocolHandler>
 {
 public:
-	CommandHandler( const cmdbind::LineCommandHandlerSTM* stm, const Configuration* cfg)
-		:cmdbind::LineCommandHandlerTemplate<CommandHandler>( stm),m_config(cfg){}
+	ProtocolHandler( const cmdbind::LineProtocolHandlerSTM* stm, const Configuration* cfg)
+		:cmdbind::LineProtocolHandlerTemplate<ProtocolHandler>( stm),m_config(cfg){}
 
 	//methods called by the protocol and implemented here
 	int doHello( int argc, const char** argv, std::ostream& out);
@@ -59,7 +59,7 @@ public:
 	int doCmd2A( int argc, const char** argv, std::ostream& out);
 	int doCmd2B( int argc, const char** argv, std::ostream& out);
 	int doCmd3A( int argc, const char** argv, std::ostream& out);
-	int endRun( cmdbind::CommandHandler* ch, std::ostream& out);
+	int endRun( cmdbind::ProtocolHandler* ch, std::ostream& out);
 	int doRun( int argc, const char** argv, std::ostream& out);
 	int doCmdQUIT( int argc, const char** argv, std::ostream& out);
 private:
@@ -101,7 +101,7 @@ public:
 	}
 
 private:
-	CommandHandler m_cmdhandler;			//< top level instance executing commands
+	ProtocolHandler m_cmdhandler;			//< top level instance executing commands
 	protocol::InputBlock m_input;			//< buffer for network read messages
 	protocol::OutputBlock m_output;			//< buffer for network write messages
 	bool m_terminated;				//< true, if a termination signal came from the network
