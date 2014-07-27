@@ -57,10 +57,8 @@ class OracleConfig
 	:public _Wolframe::serialize::DescriptiveConfiguration
 {
 public:
-	const char* className() const				{ return ORACLE_DB_CLASS_NAME; }
-
-	OracleConfig()
-		:_Wolframe::serialize::DescriptiveConfiguration(ORACLE_DB_CLASS_NAME, "database", "sqlite", getStructDescription())
+	OracleConfig( const char* sectionName_="Oracle", const char* logName_="Oracle")
+		:_Wolframe::serialize::DescriptiveConfiguration( sectionName_, "database", logName_, getStructDescription())
 		,m_host("")
 		,m_port(DEFAULT_ORACLE_PORT)
 		,m_connections(DEFAULT_ORACLE_CONNECTIONS)
@@ -83,16 +81,6 @@ public:
 		,m_password(password_)
 		,m_connections(connections_)
 		,m_acquireTimeout(acquireTimeout_){}
-
-	OracleConfig( const char* title, const char* logprefix)
-		:_Wolframe::serialize::DescriptiveConfiguration( title, "database", logprefix, getStructDescription())
-		,m_host("")
-		,m_port(DEFAULT_ORACLE_PORT)
-		,m_connections(DEFAULT_ORACLE_CONNECTIONS)
-		,m_acquireTimeout(DEFAULT_ORACLE_ACQUIRE_TIMEOUT)
-	{
-		setBasePtr( (void*)this); // ... mandatory to set pointer to start of configuration
-	}
 
 	virtual bool parse( const config::ConfigurationNode& cfgTree, const std::string& node,
 			    const module::ModulesDirectory* modules );
