@@ -25,8 +25,7 @@ CPP_OBJS = \
 	mylangInterpreter.o \
 	mylangStructure.o \
 	mylangStructureBuilder.o \
-	mylangFunctionProgramType.o \
-	mod_command_mylang.o
+	mylangFunctionProgramType.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -1,7 +1,0 @@
-#include "PostgreSQLConfig.cpp"
-#include "PostgreSQL.cpp"
-#include "PostgreSQLDatatypes.cpp"
-#include "PostgreSQLServerSettings.cpp"
-#include "PostgreSQLStatement.cpp"
-#include "PostgreSQLSubstitutingStatement.cpp"
-#include "PostgreSQLTransactionExecStatemachine.cpp"

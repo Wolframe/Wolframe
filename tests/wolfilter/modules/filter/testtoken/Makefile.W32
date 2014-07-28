@@ -26,15 +26,14 @@ DYNAMIC_MODULE = \
 	mod_filter_testtoken.dll
 
 CPP_OBJS = \
-	testtoken_filter.obj \
-	mod_filter_testtoken.obj
+	testtoken_filter.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:TestTokenFilter.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_filter_testtoken.obj
+	$(LINK) /dll /def:mod_filter_testtoken.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

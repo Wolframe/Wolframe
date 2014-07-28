@@ -25,8 +25,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_auth_test.so
 
 CPP_OBJS = \
-	testAuthentication.o \
-	mod_auth_test.o
+	testAuthentication.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

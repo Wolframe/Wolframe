@@ -1,0 +1,4 @@
+LIBRARY not_a_mod
+
+EXPORTS
+entryPoint	@1

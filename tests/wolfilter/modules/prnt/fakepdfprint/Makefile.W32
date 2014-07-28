@@ -28,15 +28,14 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	pdfPrinterFiles.obj \
-	pdfPrinterDocumentImpl.obj \
-	mod_print_testpdf.obj
+	pdfPrinterDocumentImpl.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModPrintTestPdf.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_print_testpdf.obj
+	$(LINK) /dll /def:mod_print_testpdf.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 
