@@ -114,9 +114,8 @@ WF_MODULE_END
          See \ref AuthenticatorModule. As a real example we suggest to have a look at tests/modules/authentication/fakeauth/.
     - \b Database \b interface:
          Wolframe has interfaces to execute queries on Sqlite3 and PostgreSQL databases.
-         To define a new database interface, we have to implement at least the following interfaces:
+         To define a new database interface, we have to implement the following interfaces:
               - configuration (implements _Wolframe::config::NamedConfiguration)
-              - database language description (override the methods you want from _Wolframe::db::LanguageDescription, that describes SQL)
               - database (implements _Wolframe::db::Database)
               - transaction execution statemachine (implements _Wolframe::db::TransactionExecStatemachine)
               .
@@ -812,12 +811,11 @@ WF_MODULE_END
 * \endcode
 
 * \page DatabaseModule Database interface module
-This example shows the simplest case of a database. The macro for its declaration is called WF_SIMPLE_DATABASE because of that. 
-The base classes allow to handle more complex system configurations. 
+This example shows the declaration of a database.
 The configuration of the database example is defined in a descriptive way.
-If you want to learn more about how to define a configuration by declaring first the
-data members and then the description for introspection, you will find an example
-at \ref ConfigDescription
+If you want to learn more about how to define a configuration by 
+declaring first the data members and then the description for 
+introspection, you will find an example at \ref ConfigDescription
 
 * \code
 #include "appdevel/databaseModuleMacros.hpp"
@@ -958,13 +956,13 @@ public:
 
 	virtual const _Wolframe::db::LanguageDescription* getLanguageDescription() const
 	{
-		static _Wolframe::db::LanguageDescription langdescr;
+		static _Wolframe::db::LanguageDescriptionSQL langdescr;
 		return &langdescr;
 	}
 };
 
 WF_MODULE_BEGIN( "MyDatabase", "my database module")
- WF_SIMPLE_DATABASE( "MyDB", MyDatabase, MyDatabaseConfig)
+ WF_DATABASE( "MyDB", MyDatabase, MyDatabaseConfig)
 WF_MODULE_END
 * \endcode
 

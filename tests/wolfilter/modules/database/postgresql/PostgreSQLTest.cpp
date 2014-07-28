@@ -91,7 +91,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 		PQfinish( conn );
 		throw std::runtime_error( msg );
 	}
-	PQsetNoticeProcessor( conn, &PostgreSQLdbUnit::noticeProcessor, 0);
+	PQsetNoticeProcessor( conn, &PostgreSQLDatabase::noticeProcessor, 0);
 
 	// Get a list of tables (in the public schema)
 	PGresult* res = PQexec( conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'" );
@@ -231,11 +231,6 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 	PQfinish( conn );
 }
 
-void PostgreSQLTestConstructor::createTestDatabase( const PostgreSQLTestConfig& cfg )
-{
-	createTestDatabase_( cfg.host(), cfg.port(), cfg.user(), cfg.password(), cfg.dbName(), cfg.input_filename());
-}
-
 config::ConfigurationNode PostgreSQLTestConfig::extractMyNodes( const config::ConfigurationNode& pt )
 {
 	config::ConfigurationNode rt;
@@ -260,9 +255,13 @@ void PostgreSQLTestConfig::setMyCanonicalPathes( const std::string& referencePat
 		m_dump_filename = utils::getCanonicalPath( m_dump_filename, referencePath );
 }
 
-void PostgreSQLTestConfig::dump_database()
+void PostgreSQLTestDatabaseInitializer::dumpDatabase()
 {
-	dumpDatabase_( host(), port(), user(), password(), dbName(), m_dump_filename);
+	dumpDatabase_( m_host, m_port, m_user, m_password, m_dbname, m_dump_filename);
 }
 
+void PostgreSQLTestDatabaseInitializer::initDatabase()
+{
+	createTestDatabase_( m_host, m_port, m_user, m_password, m_dbname, m_input_filename);
+}
 

@@ -38,6 +38,7 @@
 #include <vector>
 #include "Oracle.hpp"
 #include "database/baseStatement.hpp"
+#include <oci.h>
 
 namespace _Wolframe {
 namespace db {
@@ -53,6 +54,9 @@ struct OracleData {
 	
 	OracleData( ) { s = 0; }
 };
+
+class OracleEnvirenment;
+class OracleConnection;
 
 class OracleStatement : public BaseStatement
 {

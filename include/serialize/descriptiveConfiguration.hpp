@@ -45,8 +45,9 @@ class DescriptiveConfiguration
 	:public config::NamedConfiguration
 {
 public:
-	DescriptiveConfiguration( const char* classname_, const char* logparent, const char* logname, const serialize::StructDescriptionBase* descr_)
-		:config::NamedConfiguration(classname_,logparent,logname),m_classname(classname_)
+	DescriptiveConfiguration( const char* sectionName_, const char* logParent_, const char* logName_, const serialize::StructDescriptionBase* descr_)
+		:config::NamedConfiguration( sectionName_,logParent_,logName_)
+		,m_classname(sectionName_)
 		,m_descr(descr_)
 		,m_baseptr(0)
 	{}

@@ -33,7 +33,6 @@ STATIC_LIB = \
 
 CPP_OBJS = \
 	SQLite.obj \
-	SQLiteConstructor.obj \
 	SQLiteConfig.obj \
 	SQLiteTransactionExecStatemachine.obj \
 	SQLiteStatement.obj

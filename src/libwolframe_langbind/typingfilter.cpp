@@ -41,8 +41,8 @@ using namespace langbind;
 bool TypingInputFilter::getNext( ElementType& type, types::VariantConst& element)
 {
 	if (!m_inputfilter.get()) return false;
-	const void* charptr;
-	std::size_t charsize;
+	const void* charptr = 0;
+	std::size_t charsize = 0;
 	bool rt = m_inputfilter->getNext( type, charptr, charsize);
 	if (!rt)
 	{

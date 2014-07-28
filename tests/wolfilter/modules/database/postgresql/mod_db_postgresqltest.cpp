@@ -30,32 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file  mod_db_postgresqltest.cpp
-/// \brief Module for a database implementation used for tests
-///  based on the postgres database module
-
+///\file mod_db_postgresqltest.cpp
+///\brief Database interface test module for PostgreSQL
+#include "appdevel/databaseModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "PostgreSQLTest.hpp"
-#include "module/moduleInterface.hpp"
-#include "logger-v1.hpp"
 
-namespace _Wolframe {
-namespace module {
-
-typedef ConfiguredBuilder* (*CreateBuilderFunc)();
-
-static BuilderBase* createDatabase()
-{
-	static module::ConfiguredBuilderDescription< db::PostgreSQLTestConstructor,
-		db::PostgreSQLTestConfig > mod( "test PostgreSQL database", "database", "PostgreSQLTest", db::POSTGRESQL_DB_CLASS_NAME);
-	return &mod;
-}
-
-static createBuilderFunc containers[] =
-{
-	createDatabase, NULL
-};
-
-ModuleEntryPoint entryPoint( 0, "PostgreSQL test database", containers );
-
-}} // namespace _Wolframe::module
+WF_MODULE_BEGIN( "PostgreSQL database", "Database interface module for PostgreSQL")
+ WF_TEST_DATABASE( "PostgreSQLTest", _Wolframe::db::PostgreSQLDatabase, _Wolframe::db::PostgreSQLTestConfig, _Wolframe::db::PostgreSQLTestDatabaseInitializer)
+WF_MODULE_END
 

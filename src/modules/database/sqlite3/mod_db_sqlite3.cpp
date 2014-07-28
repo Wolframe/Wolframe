@@ -30,29 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// SQLite module
-//
-
+///\file mod_db_sqlite3.cpp
+///\brief Database interface module for Sqlite3
+#include "appdevel/databaseModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "SQLite.hpp"
-#include "module/moduleInterface.hpp"
-#include "logger-v1.hpp"
 
-namespace _Wolframe {
-namespace module {
-
-static BuilderBase* createSQLiteModule( void )
-{
-	static module::ConfiguredBuilderDescription< db::SQLiteConstructor,
-			db::SQLiteConfig > mod( "SQLite database", "database",
-						"SQLite", "SQLite" );
-	return &mod;
-}
-
-static BuilderBase* (*containers[])() = {
-	createSQLiteModule, NULL
-};
-
-ModuleEntryPoint entryPoint( 0, "SQLite database", containers);
-
-}} // namespace _Wolframe::module
+WF_MODULE_BEGIN( "SQLite database", "Database interface module for Sqlite3")
+ WF_DATABASE( "SQLite", _Wolframe::db::SQLiteDatabase, _Wolframe::db::SQLiteConfig)
+WF_MODULE_END
