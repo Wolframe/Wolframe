@@ -94,13 +94,13 @@ public:
 		throw std::logic_error( "Logic error #1 in ObjectPool" );
 	}
 
-	void add ( objectType obj )	{
+	void add( objectType obj )	{
 		boost::lock_guard<boost::mutex> lock( m_mutex );
 		m_availList.push_back( obj );
 		m_cond.notify_one();
 	}
 
-	static void add( ObjectPool* pool, objectType obj)
+	static void static_add( ObjectPool* pool, objectType obj)
 	{
 		pool->add( obj);
 	}

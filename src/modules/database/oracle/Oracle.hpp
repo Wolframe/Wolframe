@@ -110,7 +110,7 @@ public:
 
 	boost::shared_ptr<OracleConnection> newConnection()
 	{
-		return boost::shared_ptr<OracleConnection>( m_connPool.get(), boost::bind( ObjectPool<OracleConnection*>::add, &m_connPool, _1));
+		return boost::shared_ptr<OracleConnection>( m_connPool.get(), boost::bind( ObjectPool<OracleConnection*>::static_add, &m_connPool, _1));
 	}
 
 private:

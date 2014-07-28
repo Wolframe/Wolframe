@@ -122,7 +122,7 @@ public:
 	{
 		for ( std::size_t i = 0; i < count; )	{
 			try	{
-				boost::shared_ptr<testObject> tstObj( pool->get(), boost::bind( _Wolframe::ObjectPool<testObject*>::add, pool, _1) );
+				boost::shared_ptr<testObject> tstObj( pool->get(), boost::bind( _Wolframe::ObjectPool<testObject*>::static_add, pool, _1) );
 				tstObj->doSomething();
 				i++;
 			}
@@ -136,7 +136,7 @@ public:
 	{
 		for ( std::size_t i = 0; i < count; )	{
 			try	{
-				boost::shared_ptr<testObject> tstObj( pool->get(), boost::bind( _Wolframe::ObjectPool<testObject*>::add, pool, _1) );
+				boost::shared_ptr<testObject> tstObj( pool->get(), boost::bind( _Wolframe::ObjectPool<testObject*>::static_add, pool, _1) );
 				tstObj->sleepSomething();
 				i++;
 			}

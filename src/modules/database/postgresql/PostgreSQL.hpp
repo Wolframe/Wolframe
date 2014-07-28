@@ -105,7 +105,7 @@ public:
 
 	boost::shared_ptr<PGconn> newConnection()
 	{
-		return boost::shared_ptr<PGconn>( m_connPool.get(), boost::bind( ObjectPool<PGconn*>::add, &m_connPool, _1));
+		return boost::shared_ptr<PGconn>( m_connPool.get(), boost::bind( ObjectPool<PGconn*>::static_add, &m_connPool, _1));
 	}
 
 	PostgreSQLServerSettings serverSettings() const

@@ -92,7 +92,7 @@ public:
 
 	boost::shared_ptr<sqlite3> newConnection()
 	{
-		return boost::shared_ptr<sqlite3>( m_connPool.get(), boost::bind( ObjectPool<sqlite3*>::add, &m_connPool, _1));
+		return boost::shared_ptr<sqlite3>( m_connPool.get(), boost::bind( ObjectPool<sqlite3*>::static_add, &m_connPool, _1));
 	}
 
 private:
