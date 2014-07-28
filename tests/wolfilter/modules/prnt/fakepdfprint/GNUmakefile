@@ -15,12 +15,12 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwolframe
+	-lwolframe \
+	$(TOPDIR)/src/modules/prnt/harupdfprint/mod_print_harupdf_lib.a	
 
 DYNAMIC_MODULE = mod_print_testpdf.so
 
 CPP_OBJS = \
-	pdfPrinterFiles.o \
 	pdfPrinterDocumentImpl.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

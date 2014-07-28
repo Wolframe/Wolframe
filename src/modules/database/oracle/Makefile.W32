@@ -28,6 +28,9 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = \
 	mod_db_oracle.dll
 
+STATIC_LIB = \
+	static_db_oracle.lib
+
 CPP_OBJS = \
 	OracleConfig.obj \
 	Oracle.obj \
@@ -40,6 +43,9 @@ all: $(DYNAMIC_MODULE)
 
 $(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_oracle.obj
 	$(LINK) /dll /def:mod_db_oracle.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+$(STATIC_LIB): $(CPP_OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
 
 local_all:
 

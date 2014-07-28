@@ -27,11 +27,9 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
 	"$(ORACLE_DIR)\sdk\lib\msvc\oci.lib" \
+	$(TOPDIR)\src\modules\database\oracle\static_db_oracle.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
-
-CPP_OBJS = \
-	PostgreSQLModuleFiles.obj
 
 CPP_BINS = \
 	oracleUnit.exe \
@@ -40,7 +38,7 @@ CPP_BINS = \
 TEST_CPP_BINS = \
 	oracleUnit.exe
 
-oracleUnit.exe: oracleUnit.obj OracleModuleFiles.obj
+oracleUnit.exe: oracleUnit.obj
 dbPing.exe: dbPing.obj
 
 all: $(OBJS) $(CPP_BINS)

@@ -29,6 +29,9 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = \
 	mod_print_harupdf.dll
 
+STATIC_LIB = \
+	static_print_harupdf.lib
+
 CPP_OBJS = \
 	pdfPrinter.obj \
 	pdfPrinterExpression.obj \
@@ -43,6 +46,9 @@ all: $(DYNAMIC_MODULE)
 
 $(DYNAMIC_MODULE): $(CPP_OBJS) mod_print_harupdf.obj
 	$(LINK) /dll /def:mod_print_harupdf.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+$(STATIC_LIB): $(CPP_OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
 
 local_all:
 

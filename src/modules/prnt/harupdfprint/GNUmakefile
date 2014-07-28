@@ -28,6 +28,7 @@ INCLUDE_LDFLAGS += \
 INCLUDE_LIBS += \
 	$(LIBHPDF_LIBS)
 
+NOINST_STATIC_LIB = mod_print_harupdf_lib.a
 
 DYNAMIC_MODULE = mod_print_harupdf.so
 
