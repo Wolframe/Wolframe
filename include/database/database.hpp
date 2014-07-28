@@ -63,20 +63,12 @@ public:
 	/// \brief Get a database transaction object
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
-	virtual const LanguageDescription* getLanguageDescription() const
-	{
-		static LanguageDescription langdescr;
-		return &langdescr;
-	}
-
-	/// Close the database connetion
-	/// This exists for no good reason (mostly to make the code look uniform)
-	virtual void close()			{}
+	virtual const LanguageDescription* getLanguageDescription() const=0;
 };
 
 
 /// \class DatabaseUnit
-/// \brief This is the base class for database unit implementations
+/// \brief This is the base class for virtual constructors of databases
 class DatabaseUnit
 {
 public:

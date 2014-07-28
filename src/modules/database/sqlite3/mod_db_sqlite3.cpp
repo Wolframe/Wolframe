@@ -37,5 +37,5 @@
 #include "SQLite.hpp"
 
 WF_MODULE_BEGIN( "SQLite database", "Database interface module for Sqlite3")
- WF_SIMPLE_DATABASE( "SQLite", _Wolframe::db::SQLiteDatabase, _Wolframe::db::SQLiteConfig)
+ WF_DATABASE( "SQLite", _Wolframe::db::SQLiteDatabase, _Wolframe::db::SQLiteConfig)
 WF_MODULE_END

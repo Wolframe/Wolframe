@@ -37,5 +37,5 @@
 #include "PostgreSQL.hpp"
 
 WF_MODULE_BEGIN( "PostgreSQL database", "Database interface module for PostgreSQL")
- WF_SIMPLE_DATABASE( "PostgreSQL", _Wolframe::db::PostgreSQLDatabase, _Wolframe::db::PostgreSQLConfig)
+ WF_DATABASE( "PostgreSQL", _Wolframe::db::PostgreSQLDatabase, _Wolframe::db::PostgreSQLConfig)
 WF_MODULE_END

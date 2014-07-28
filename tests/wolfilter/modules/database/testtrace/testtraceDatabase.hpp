@@ -111,11 +111,16 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/ );
 
+	virtual const _Wolframe::db::LanguageDescription* getLanguageDescription() const
+	{
+		static _Wolframe::db::LanguageDescriptionSQL langdescr;
+		return &langdescr;
+	}
+
 	const std::string& outfilename() const
 	{
 		return m_outfilename;
 	}
-
 private:
 	std::string m_id;
 	std::string m_outfilename;

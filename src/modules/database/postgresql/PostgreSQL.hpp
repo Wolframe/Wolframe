@@ -63,7 +63,7 @@ enum {
 	POSTGRESQL_MIN_PROTOCOL_VERSION = 3
 };
 
-struct PostgreSQLLanguageDescription : public LanguageDescription
+struct PostgreSQLLanguageDescription : public LanguageDescriptionSQL
 {
 	virtual std::string stm_argument_reference( int index) const
 	{

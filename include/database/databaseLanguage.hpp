@@ -41,41 +41,69 @@
 namespace _Wolframe {
 namespace db {
 
-/// \brief Interface to properties of the database language (SQL)
+/// \brief Interface to properties of the database language used
 /// \class LanguageDescription
 class LanguageDescription
 {
 public:
-	/// \brief Default constructor
-	LanguageDescription(){}
 	/// \brief Destructor
 	virtual ~LanguageDescription(){}
 
 	/// \brief Operator marking the start of an end of line comment.
-	/// Default is the SQL standard EOLN comment marker
-	virtual const char* eoln_commentopr() const
-	{
-		return "--";
-	}
+	virtual const char* eoln_commentopr() const=0;
 
 	/// \brief String used for declaring a reference to an argument by index (starting with 1).
 	/// Default is the SQL standard argument reference in embedded database statements.
-	virtual std::string stm_argument_reference( int index) const;
+	virtual std::string stm_argument_reference( int index) const=0;
 
 	/// \brief Evaluate if the start of the block specified as argument is forming an embedded statement in the database language
-	virtual bool isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const;
+	virtual bool isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const=0;
 
 	/// \brief Parse an embedded statement in the database language
-	virtual std::string parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
+	virtual std::string parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const=0;
 
 	/// \brief Substitute all template arguments in the specified embedded database statement
 	/// \param[in] cmd embedded database statement
 	/// \param[in] arg template arguments to substitute in the embedded database statement
 	typedef std::pair<std::string,std::string> TemplateArgumentAssignment;
-	virtual std::string substituteTemplateArguments( const std::string& cmd, const std::vector<TemplateArgumentAssignment>& arg) const;
+	virtual std::string substituteTemplateArguments( const std::string& cmd, const std::vector<TemplateArgumentAssignment>& arg) const=0;
 
 	/// \brief Define if a database is case-insensitive. This has influence on TDL parsing
 	/// Default is according SQL standard 'false'
+	virtual bool isCaseSensitive() const=0;
+};
+
+/// \brief Interface to properties of the database language (SQL)
+/// \class LanguageDescription
+class LanguageDescriptionSQL
+	:public LanguageDescription
+{
+public:
+	/// \brief Default constructor
+	LanguageDescriptionSQL(){}
+	/// \brief Destructor
+	virtual ~LanguageDescriptionSQL(){}
+
+	/// \brief Implement LanguageDescription::eoln_commentopr() const
+	virtual const char* eoln_commentopr() const
+	{
+		return "--";
+	}
+
+	/// \brief Implement LanguageDescription::stm_argument_reference( int index) const;
+	virtual std::string stm_argument_reference( int index) const;
+
+	/// \brief Implement LanguageDescription::isEmbeddedStatement( std::string::const_iterator, std::string::const_iterator) const;
+	virtual bool isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const;
+
+	/// \brief Implement LanguageDescription::parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const
+	virtual std::string parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
+
+	/// \brief Implement LanguageDescription::substituteTemplateArguments( const std::string&,const std::vector<TemplateArgumentAssignment>&) const
+	typedef std::pair<std::string,std::string> TemplateArgumentAssignment;
+	virtual std::string substituteTemplateArguments( const std::string& cmd, const std::vector<TemplateArgumentAssignment>& arg) const;
+
+	/// \brief Implement LanguageDescription::isCaseSensitive()
 	virtual bool isCaseSensitive() const
 	{
 		return false;

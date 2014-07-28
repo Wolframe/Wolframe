@@ -37,5 +37,5 @@
 #include "Oracle.hpp"
 
 WF_MODULE_BEGIN( "Oracle database", "Database interface module for Oracle")
- WF_SIMPLE_DATABASE( "Oracle", _Wolframe::db::OracleDatabase, _Wolframe::db::OracleConfig)
+ WF_DATABASE( "Oracle", _Wolframe::db::OracleDatabase, _Wolframe::db::OracleConfig)
 WF_MODULE_END

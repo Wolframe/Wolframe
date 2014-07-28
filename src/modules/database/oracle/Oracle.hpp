@@ -57,7 +57,7 @@
 namespace _Wolframe {
 namespace db {
 
-struct OracleLanguageDescription : public LanguageDescription
+struct OracleLanguageDescription : public LanguageDescriptionSQL
 {
 	virtual std::string stm_argument_reference( int index) const
 	{

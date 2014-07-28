@@ -54,7 +54,7 @@
 namespace _Wolframe {
 namespace db {
 
-struct SQLiteLanguageDescription :public LanguageDescription
+struct SQLiteLanguageDescription :public LanguageDescriptionSQL
 {
 	///\brief String used for declaring a reference to an argument by index (starting with 1).
 	virtual std::string stm_argument_reference( int index) const

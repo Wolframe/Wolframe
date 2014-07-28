@@ -38,7 +38,7 @@
 #include <boost/lexical_cast.hpp>
 
 /// \brief Defines a simple database (one database object per unit) interface
-#define WF_SIMPLE_DATABASE(NAME,DBCLASS,CONFIGCLASS) \
+#define WF_DATABASE(NAME,DBCLASS,CONFIGCLASS) \
 {\
 	class Unit :public _Wolframe::db::DatabaseUnit \
 	{\
