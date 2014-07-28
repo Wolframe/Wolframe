@@ -32,15 +32,14 @@ CPP_OBJS = \
 	directmapProgram.obj \
 	directmapCommandHandler.obj \
 	directmapCommandHandlerUnit.obj \
-	directmapCommandHandlerConfig.obj \
-	mod_command_directmap.obj
+	directmapCommandHandlerConfig.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModDirectmapCommandHandler.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_command_directmap.obj
+	$(LINK) /dll /def:mod_command_directmap.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

@@ -27,15 +27,14 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	simpleFormLexer.obj \
-	simpleFormCompiler.obj \
-	mod_ddlcompiler_simpleform.obj
+	simpleFormCompiler.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModDdlCompilerSimpleForm.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:mod_ddlcompiler_simpleform.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

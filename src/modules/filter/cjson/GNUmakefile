@@ -29,8 +29,7 @@ DYNAMIC_MODULE = mod_filter_cjson.so
 CPP_OBJS = \
 	inputfilterImpl.o \
 	outputfilterImpl.o \
-	cjson_filter.o \
-	mod_filter_cjson.o
+	cjson_filter.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

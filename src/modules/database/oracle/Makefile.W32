@@ -32,15 +32,14 @@ CPP_OBJS = \
 	OracleConfig.obj \
 	Oracle.obj \
 	OracleTransactionExecStatemachine.obj \
-	OracleStatement.obj \
-	mod_db_oracle.obj
+	OracleStatement.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:OracleModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_oracle.obj
+	$(LINK) /dll /def:mod_db_oracle.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

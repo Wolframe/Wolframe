@@ -23,8 +23,7 @@ DYNAMIC_MODULE = mod_ddlcompiler_simpleform.so
 
 CPP_OBJS = \
 	simpleFormLexer.o \
-	simpleFormCompiler.o \
-	mod_ddlcompiler_simpleform.o
+	simpleFormCompiler.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -22,7 +22,6 @@ CPP_OBJS = \
 	scheduleDB.o \
 	scheduleDBconstructor.o \
 	scheduleDBconfig.o \
-	scheduleDBmodule.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

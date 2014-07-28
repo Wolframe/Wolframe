@@ -35,8 +35,7 @@ CPP_OBJS = \
 	PostgreSQL.o \
 	PostgreSQLTransactionExecStatemachine.o \
 	PostgreSQLStatement.o \
-	PostgreSQLSubstitutingStatement.o \
-	mod_db_postgresql.o
+	PostgreSQLSubstitutingStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

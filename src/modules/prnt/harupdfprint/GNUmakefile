@@ -39,8 +39,7 @@ CPP_OBJS = \
 	pdfPrinterMethod.o \
 	pdfPrinterVariable.o \
 	pdfPrintProgramType.o \
-	pdfPrinterDocumentImpl.o \
-	mod_print_harupdf.o
+	pdfPrinterDocumentImpl.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

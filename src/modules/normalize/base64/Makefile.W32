@@ -25,15 +25,14 @@ DYNAMIC_MODULE = \
 	mod_normalize_base64.dll
 
 CPP_OBJS = \
-	base64NormalizeFunction.obj \
-	mod_normalize_base64.obj
+	base64NormalizeFunction.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModBase64Normalize.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_normalize_base64.obj
+	$(LINK) /dll /def:mod_normalize_base64.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

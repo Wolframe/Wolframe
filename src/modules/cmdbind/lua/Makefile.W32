@@ -42,15 +42,14 @@ CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
 	luaCommandHandler.obj \
 	luaCommandHandlerUnit.obj \
-	luaCommandHandlerConfig.obj \
-	mod_command_lua.obj
+	luaCommandHandlerConfig.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModLuaCommandHandler.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_command_lua.obj
+	$(LINK) /dll /def:mod_command_lua.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

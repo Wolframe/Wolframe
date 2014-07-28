@@ -42,15 +42,14 @@ CPP_OBJS = \
 	pythonInterpreterInstance.obj \
 	pythonStructure.obj \
 	pythonStructureBuilder.obj \
-	pythonFunctionProgramType.obj \
-	mod_command_python.obj
+	pythonFunctionProgramType.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModPythonCommandHandler.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_command_python.obj
+	$(LINK) /dll /def:mod_command_python.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

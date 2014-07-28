@@ -35,15 +35,15 @@ CPP_OBJS = \
 	PostgreSQL.obj \
 	PostgreSQLTransactionExecStatemachine.obj \
 	PostgreSQLStatement.obj \
-	PostgreSQLSubstitutingStatement.obj \
-	mod_db_postgresql.obj
+	PostgreSQLSubstitutingStatement.obj	
+	PostgreSQLSubstitutingStatement.obj	
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:PostgreSQLmodule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_postgresql.obj
+	$(LINK) /dll /def:mod_db_postgresql.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

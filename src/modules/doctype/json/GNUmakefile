@@ -20,9 +20,8 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_doctype_json.so
 
 CPP_OBJS = \
-	doctypeDetectorJson.o \
-	mod_doctype_json.o
-
+	doctypeDetectorJson.o
+	
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

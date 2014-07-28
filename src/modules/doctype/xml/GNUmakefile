@@ -22,8 +22,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_doctype_xml.so
 
 CPP_OBJS = \
-	doctypeDetectorXml.o \
-	mod_doctype_xml.o
+	doctypeDetectorXml.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -20,9 +20,8 @@ DYNAMIC_MODULE = mod_datatype_datetime.so
 
 CPP_OBJS = \
 	dateArithmetic.o \
-	datatypeDate.o \
-	mod_datatype_datetime.o
-
+	datatypeDate.o
+	
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

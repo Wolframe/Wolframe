@@ -43,15 +43,14 @@ DOTNET_INTEROP_CPP_OBJS = \
 
 CPP_OBJS = \
 	$(DOTNET_INTEROP_CPP_OBJS) \
-	$(DOTNET_CPP_OBJS) \
-	mod_command_dotnet.obj
+	$(DOTNET_CPP_OBJS)
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModDotnetCommandHandler.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_command_dotnet.obj
+	$(LINK) /dll /def:mod_command_dotnet.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 
