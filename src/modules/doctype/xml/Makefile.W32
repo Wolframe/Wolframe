@@ -26,15 +26,14 @@ DYNAMIC_MODULE = \
 	mod_doctype_xml.dll
 
 CPP_OBJS = \
-	doctypeDetectorXml.obj \
-	mod_doctype_xml.obj
+	doctypeDetectorXml.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:DoctypeDetectionXml.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_doctype_xml.obj
+	$(LINK) /dll /def:mod_doctype_xml.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

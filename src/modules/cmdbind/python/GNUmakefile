@@ -34,8 +34,7 @@ CPP_OBJS = \
 	pythonInterpreterInstance.o \
 	pythonStructure.o \
 	pythonStructureBuilder.o \
-	pythonFunctionProgramType.o \
-	mod_command_python.o
+	pythonFunctionProgramType.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

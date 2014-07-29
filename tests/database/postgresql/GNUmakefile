@@ -33,11 +33,9 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(PGSQL_LIBS) \
+	$(TOPDIR)/src/modules/database/postgresql/mod_db_postgresql_lib.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem
-
-CPP_OBJS = \
-	PostgreSQLModuleFiles.o
 
 CPP_BINS = \
 	dbPing$(EXE)

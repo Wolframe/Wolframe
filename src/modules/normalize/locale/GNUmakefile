@@ -31,8 +31,7 @@ endif
 DYNAMIC_MODULE = mod_normalize_locale.so
 
 CPP_OBJS = \
-	localeNormalize.o \
-	mod_normalize_locale.o
+	localeNormalize.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

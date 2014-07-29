@@ -22,8 +22,7 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 CPP_OBJS = \
-	aaMapProgram.obj \
-	mod_command_aamap.obj
+	aaMapProgram.obj
 
 DYNAMIC_MODULE = \
 	mod_command_aamap.dll
@@ -32,8 +31,8 @@ all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModAaMapLanguageBinding.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_command_aamap.obj
+	$(LINK) /dll /def:mod_command_aamap.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

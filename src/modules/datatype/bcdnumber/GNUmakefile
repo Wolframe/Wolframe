@@ -22,8 +22,7 @@ CPP_OBJS = \
 	bcdArithmetic.o \
 	fxpArithmetic.o \
 	datatypeBigint.o \
-	datatypeBigfxp.o \
-	mod_datatype_bcdnumber.o
+	datatypeBigfxp.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -15,9 +15,6 @@ INCLUDE_LIBS =
 DYNAMIC_MODULE = \
 	not_a_mod.so
 
-CPP_OBJS = \
-	not_a_mod.o
-
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

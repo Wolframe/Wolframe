@@ -24,22 +24,22 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	"$(ORACLE_DIR)\sdk\lib\msvc\oci.lib" \
+	$(TOPDIR)\src\modules\database\oracle\static_db_oracle.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_db_oracletest.dll
 
 CPP_OBJS = \
-	OracleModuleFiles.obj \
-	OracleTest.obj \
-	mod_db_oracletest.obj
+	OracleTest.obj
+
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:OracleTestModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_oracletest.obj
+	$(LINK) /dll /def:mod_db_oracletest.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

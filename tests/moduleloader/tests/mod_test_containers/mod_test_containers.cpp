@@ -36,7 +36,7 @@
 
 #include "module/moduleInterface.hpp"
 #include "logger-v1.hpp"
-#include "mod_test.hpp"
+#include "mod_test_containers.hpp"
 
 namespace _Wolframe {
 namespace module {

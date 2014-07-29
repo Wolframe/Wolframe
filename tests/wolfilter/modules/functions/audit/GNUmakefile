@@ -20,7 +20,6 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_audit.so
 
 CPP_OBJS = \
-	mod_audit.o \
 	audit.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

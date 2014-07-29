@@ -23,15 +23,14 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_database \
 	-lboost_filesystem \
-	$(PGSQL_LIBS)
+	$(PGSQL_LIBS) \
+	$(TOPDIR)/src/modules/database/postgresql/mod_db_postgresql_lib.a
 
 DYNAMIC_MODULE = \
 	mod_db_postgresqltest.so
 
 CPP_OBJS = \
-	PostgreSQLModuleFiles.o \
-	PostgreSQLTest.o \
-	mod_db_postgresqltest.o
+	PostgreSQLTest.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

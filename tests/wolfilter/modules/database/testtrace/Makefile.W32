@@ -31,15 +31,14 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	testtraceDatabase.obj \
-	testtraceTransaction.obj \
-	mod_db_testtrace.obj
+	testtraceTransaction.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:TesttraceDatabaseModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_testtrace.obj
+	$(LINK) /dll /def:mod_db_testtrace.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

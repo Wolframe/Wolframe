@@ -17,7 +17,6 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
-
 	
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
@@ -29,21 +28,26 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = \
 	mod_print_harupdf.dll
 
+STATIC_LIB = \
+	static_print_harupdf.lib
+
 CPP_OBJS = \
 	pdfPrinter.obj \
 	pdfPrinterExpression.obj \
 	pdfPrinterMethod.obj \
 	pdfPrinterVariable.obj \
 	pdfPrintProgramType.obj \
-	pdfPrinterDocumentImpl.obj \
-	mod_print_harupdf.obj
+	pdfPrinterDocumentImpl.obj
 
-all: $(DYNAMIC_MODULE)
+all: $(DYNAMIC_MODULE) $(STATIC_LIB)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModHaruPdfPrinter.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_print_harupdf.obj
+	$(LINK) /dll /def:mod_print_harupdf.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+$(STATIC_LIB): $(CPP_OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
 
 local_all:
 

@@ -23,8 +23,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_command_aamap.so
 
 CPP_OBJS = \
-	aaMapProgram.o \
-	mod_command_aamap.o
+	aaMapProgram.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -22,15 +22,14 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_database \
 	-lboost_filesystem \
-	$(SQLITE3_LIBS)
+	$(SQLITE3_LIBS) \
+	$(TOPDIR)/src/modules/database/sqlite3/mod_db_sqlite3_lib.a
 
 DYNAMIC_MODULE = \
 	mod_db_sqlite3test.so
 
 CPP_OBJS = \
-	SQLiteModuleFiles.o \
 	SQLiteTest.o \
-	mod_db_sqlite3test.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

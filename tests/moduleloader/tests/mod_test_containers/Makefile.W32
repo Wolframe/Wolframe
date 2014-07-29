@@ -24,13 +24,10 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = \
 	mod_test_containers.dll
 
-CPP_OBJS = \
-	mod_test.obj
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_test_containers.obj
+	$(LINK) /dll /def:mod_test_containers.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

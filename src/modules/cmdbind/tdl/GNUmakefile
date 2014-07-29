@@ -51,8 +51,7 @@ CPP_OBJS = \
 	tdlTransactionPreprocStep.o \
 	loadTransactionProgram.o \
 	tdl2vmTranslator.o \
-	transactionProgram.o \
-	mod_command_tdl.o
+	transactionProgram.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -27,6 +27,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
+	$(TOPDIR)\src\modules\database\postgresql\static_db_postgresql.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
 
@@ -40,7 +41,7 @@ CPP_BINS = \
 TEST_CPP_BINS = \
 	postgresUnit.exe
 
-postgresUnit.exe: postgresUnit.obj PostgreSQLModuleFiles.obj
+postgresUnit.exe: postgresUnit.obj
 dbPing.exe: dbPing.obj
 
 all: $(OBJS) $(CPP_BINS)

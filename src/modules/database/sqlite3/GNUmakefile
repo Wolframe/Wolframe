@@ -33,8 +33,7 @@ CPP_OBJS = \
 	SQLite.o \
 	SQLiteConfig.o \
 	SQLiteTransactionExecStatemachine.o \
-	SQLiteStatement.o \
-	mod_db_sqlite3.o
+	SQLiteStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

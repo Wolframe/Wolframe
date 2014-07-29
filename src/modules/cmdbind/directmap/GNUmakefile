@@ -27,8 +27,7 @@ CPP_OBJS = \
 	directmapProgram.o \
 	directmapCommandHandler.o \
 	directmapCommandHandlerUnit.o \
-	directmapCommandHandlerConfig.o \
-	mod_command_directmap.o
+	directmapCommandHandlerConfig.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

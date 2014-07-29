@@ -28,19 +28,24 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = \
 	mod_db_sqlite3.dll
 
+STATIC_LIB = \
+	static_db_sqlite3.lib
+
 CPP_OBJS = \
 	SQLite.obj \
 	SQLiteConfig.obj \
 	SQLiteTransactionExecStatemachine.obj \
-	SQLiteStatement.obj \
-	mod_db_sqlite3.obj
+	SQLiteStatement.obj
 
-all: $(DYNAMIC_MODULE)
+all: $(DYNAMIC_MODULE) $(STATIC_LIB)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:SQLiteModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_sqlite3.obj
+	$(LINK) /dll /def:mod_db_sqlite3.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+$(STATIC_LIB): $(CPP_OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
 
 local_all:
 

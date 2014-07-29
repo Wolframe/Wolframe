@@ -27,15 +27,14 @@ DYNAMIC_MODULE = \
 	mod_auth_test.dll
 
 CPP_OBJS = \
-	testAuthentication.obj \
-	mod_auth_test.obj
+	testAuthentication.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:TestAuthentication.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_auth_test.obj
+	$(LINK) /dll /def:mod_auth_test.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

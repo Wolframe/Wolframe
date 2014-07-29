@@ -23,9 +23,6 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = \
 	resolvable_symbol.so
 
-CPP_OBJS = \
-	resolvable_symbol.o
-
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

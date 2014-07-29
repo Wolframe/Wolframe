@@ -88,6 +88,10 @@ ifneq ($(MAKECMDGOALS),distclean)
 -include $(CPP_BIN_OBJS:.o=.d)
 -include $(TEST_BIN_OBJS:.o=.d)
 -include $(TEST_CPP_BIN_OBJS:.o=.d)
+ifneq "$(DYNAMIC_MODULE)" ""
+DYNAMIC_MODULE_OBJ=$(DYNAMIC_MODULE:.so=.o)
+-include $(DYNAMIC_MODULE_OBJ:.o=.d)
+endif
 
 .PHONY: depend_recursive
 depend_recursive:
@@ -95,7 +99,7 @@ depend_recursive:
 	  (set -e; $(MAKE) -C $$d depend || exit 1); done)
 
 .PHONY: depend
-depend: depend_recursive $(OBJS:.o=.d) $(CPP_OBJS:.o=.d) $(BIN_OBJS:.o=.d) $(CPP_BIN_OBJS:.o=.d) $(TEST_BIN_OBJS:.o=.d) $(TEST_CPP_BIN_OBJS:.o=.d)
+depend: depend_recursive $(OBJS:.o=.d) $(CPP_OBJS:.o=.d) $(BIN_OBJS:.o=.d) $(CPP_BIN_OBJS:.o=.d) $(TEST_BIN_OBJS:.o=.d) $(TEST_CPP_BIN_OBJS:.o=.d) $(DYNAMIC_MODULE_OBJ:.o=.d)
 
 endif
 endif

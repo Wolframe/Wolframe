@@ -21,9 +21,6 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = \
 	mod_test_containers.so
 
-CPP_OBJS = \
-	mod_test.o
-
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

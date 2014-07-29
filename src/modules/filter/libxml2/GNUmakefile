@@ -43,8 +43,7 @@ CPP_OBJS = \
 	outputfilterImpl.o \
 	xsltMapper.o \
 	xsltProgramType.o \
-	libxml2_filter.o \
-	mod_filter_libxml2.o
+	libxml2_filter.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

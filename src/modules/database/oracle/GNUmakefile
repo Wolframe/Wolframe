@@ -30,8 +30,7 @@ CPP_OBJS = \
 	OracleConfig.o \
 	Oracle.o \
 	OracleTransactionExecStatemachine.o \
-	OracleStatement.o \
-	mod_db_oracle.o
+	OracleStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
