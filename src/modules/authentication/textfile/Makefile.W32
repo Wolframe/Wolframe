@@ -32,15 +32,14 @@ CPP_OBJS = \
 	TextFileAuthConfig.obj \
 	TextFileAuthConstructor.obj \
 	TextFileAuth.obj \
-	TextFileAuthModule.obj \
 	$(PASSWD_OBJS)
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:TextFileAuthModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_auth_textfile.obj
+	$(LINK) /dll /def:mod_auth_textfile.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

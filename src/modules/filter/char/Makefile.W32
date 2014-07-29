@@ -25,15 +25,14 @@ DYNAMIC_MODULE = \
 	mod_filter_char.dll
 
 CPP_OBJS = \
-	char_filter.obj \
-	mod_filter_char.obj
+	char_filter.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:CharFilterModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_filter_char.obj
+	$(LINK) /dll /def:mod_filter_char.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

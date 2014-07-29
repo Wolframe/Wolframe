@@ -58,7 +58,7 @@ static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
 static boost::filesystem::path g_outputdir;
-static LanguageDescription g_dblang;
+static LanguageDescriptionSQL g_dblang;
 static std::string g_selectedTestName;
 
 class CompileTDLTest

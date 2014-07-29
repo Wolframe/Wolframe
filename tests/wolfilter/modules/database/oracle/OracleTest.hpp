@@ -46,13 +46,8 @@ namespace db {
 class OracleTestConfig : public OracleConfig
 {
 public:
-	OracleTestConfig( const char* name, const char* logParent, const char* logName )
-		: OracleConfig( name, logParent, logName )	{}
-
-	virtual ~OracleTestConfig()
-	{
-		dump_database();
-	}
+	OracleTestConfig( const char* sectionName_, const char* logName_ )
+		: OracleConfig( sectionName_, logName_ )	{}
 
 	virtual bool parse( const config::ConfigurationNode& pt, const std::string& node,
 			    const module::ModulesDirectory* modules )
@@ -78,21 +73,41 @@ private:
 	std::string m_dump_filename;
 };
 
-class OracleTestConstructor : public OracleConstructor
+
+class OracleTestDatabaseInitializer
 {
 public:
-	OracleTestConstructor()		{}
-	virtual ~OracleTestConstructor()	{}
-
-	virtual OracleDbUnit* object( const config::NamedConfiguration& conf )
+	OracleTestDatabaseInitializer( const OracleTestConfig& config)
+		:m_host(config.host())
+		,m_port(config.port())
+		,m_dbname(config.dbName())
+		,m_user(config.user())
+		,m_password(config.password())
+		,m_dump_filename(config.dump_filename())
+		,m_input_filename(config.input_filename())
 	{
-		const OracleTestConfig& cfg = dynamic_cast< const OracleTestConfig& >( conf );
-		createTestDatabase( cfg );
-		return OracleConstructor::object( conf );
+		initDatabase();
+	}
+
+	~OracleTestDatabaseInitializer()
+	{
+		dumpDatabase();
 	}
 
 private:
-	static void createTestDatabase( const OracleTestConfig& cfg );
+	/// \brief Dumps the content of the database to file
+	void dumpDatabase();
+	/// \brief Creates the tables needed for the test
+	void initDatabase();
+
+private:
+	std::string m_host;
+	unsigned short m_port;
+	std::string m_dbname;
+	std::string m_user;
+	std::string m_password;
+	std::string m_dump_filename;
+	std::string m_input_filename;
 };
 
 }} // _Wolframe::db

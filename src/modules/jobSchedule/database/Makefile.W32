@@ -21,20 +21,19 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_job_schedule_DB.dll
+	mod_job_schedule_db.dll
 
 CPP_OBJS = \
 	scheduleDB.obj \
 	scheduleDBconstructor.obj \
-	scheduleDBconfig.obj \
-	scheduleDBmodule.obj
+	scheduleDBconfig.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:scheduleDBmodule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_job_schedule_db.obj
+	$(LINK) /dll /def:mod_job_schedule_db.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

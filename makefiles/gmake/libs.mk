@@ -119,8 +119,9 @@ endif
 
 # build rule for a dynamic module, no soname is added to the library
 ifneq "$(DYNAMIC_MODULE)" ""
-$(DYNAMIC_MODULE) : $(OBJS) $(CPP_OBJS)
-	$(CXX_LINK) $(SO_MOD_FLAGS) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $(LIBS)
+DYNAMIC_MODULE_OBJ=$(DYNAMIC_MODULE:.so=.o)
+$(DYNAMIC_MODULE) : $(OBJS) $(CPP_OBJS) $(DYNAMIC_MODULE_OBJ)
+	$(CXX_LINK) $(SO_MOD_FLAGS) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $(DYNAMIC_MODULE_OBJ) $(LIBS)
 else
 $(DYNAMIC_MODULE) :
 endif

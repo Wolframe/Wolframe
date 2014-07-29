@@ -37,7 +37,7 @@
 #include "logger-v1.hpp"
 #include "PostgreSQL.hpp"
 #include "utils/fileUtils.hpp"
-#include "PostgreSQLtransactionExecStatemachine.hpp"
+#include "PostgreSQLTransactionExecStatemachine.hpp"
 #include <string>
 #include <sstream>
 
@@ -124,7 +124,7 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 	return ss.str();
 }
 
-_Wolframe::log::LogLevel::Level PostgreSQLdbUnit::getLogLevel( const std::string& severity)
+_Wolframe::log::LogLevel::Level PostgreSQLDatabase::getLogLevel( const std::string& severity)
 {
 	struct LogMsgMap :public std::map<std::string,_Wolframe::log::LogLevel::Level>
 	{
@@ -154,9 +154,9 @@ _Wolframe::log::LogLevel::Level PostgreSQLdbUnit::getLogLevel( const std::string
 	}
 }
 
-void PostgreSQLdbUnit::noticeProcessor( void* this_void, const char * message)
+void PostgreSQLDatabase::noticeProcessor( void* this_void, const char * message)
 {
-	PostgreSQLdbUnit* this_ = (PostgreSQLdbUnit*)this_void;
+	PostgreSQLDatabase* this_ = (PostgreSQLDatabase*)this_void;
 	std::size_t ii=0;
 	for (; message[ii] && message[ii] != ':'; ++ii);
 	if (message[ii])
@@ -171,25 +171,46 @@ void PostgreSQLdbUnit::noticeProcessor( void* this_void, const char * message)
 	LOG_ERROR << "Unknown log message type from PostgreSQL database '" << ((this_)?this_->ID():"") << "': " << message;
 }
 
-// This function also needs a lot of work
-PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
-				    const std::string& host, unsigned short port,
-				    const std::string& dbName,
-				    const std::string& user, const std::string& password,
-				    std::string sslMode, std::string sslCert, std::string sslKey,
-				    std::string sslRootCert, std::string sslCRL ,
-				    unsigned short connectTimeout,
-				    size_t connections, unsigned short acquireTimeout,
-				    unsigned statementTimeout)
-	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
-	  m_statementTimeout( statementTimeout )
+PostgreSQLDatabase::PostgreSQLDatabase( const PostgreSQLConfig& config)
+	:m_ID(config.ID())
+	,m_connections(0)
+	,m_connPool(config.acquireTimeout())
 {
-	m_connStr = buildConnStr( host, port,  dbName, user, password,
-				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,
-				  connectTimeout );
+	init( config);
+}
+
+PostgreSQLDatabase::PostgreSQLDatabase( const std::string& id_,
+		  const std::string& host_, unsigned short port_, const std::string& dbName_,
+		  const std::string& user_, const std::string& password_,
+		  const std::string& sslMode_, const std::string& sslCert_,
+		  const std::string& sslKey_, const std::string& sslRootCert_,
+		  const std::string& sslCRL_,
+		  unsigned short connectTimeout_,
+		  unsigned short connections_, unsigned short acquireTimeout_,
+		  unsigned statementTimeout_)
+	:m_ID(id_)
+	,m_connections(0)
+	,m_connPool(acquireTimeout_)
+{
+	PostgreSQLConfig config( id_, host_, port_, dbName_, user_, password_,
+		sslMode_, sslCert_, sslKey_, sslRootCert_, sslCRL_,
+		connectTimeout_, connections_, acquireTimeout_, statementTimeout_);
+	init( config);
+}
+
+// This function also needs a lot of work
+void PostgreSQLDatabase::init( const PostgreSQLConfig& config)
+{
+	int connections = config.connections();
+
+	m_connStr = buildConnStr( config.host(), config.port(), config.dbName(),
+				  config.user(), config.password(),
+				  config.sslMode(), config.sslCert(), config.sslKey(),
+				  config.sslRootCert(), config.sslCRL(),
+				  config.connectTimeout() );
 	LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
 
-	for ( size_t i = 0; i < connections; i++ )	{
+	for ( unsigned short i = 0; i < connections; i++ )	{
 		PGconn* conn = PQconnectdb( m_connStr.c_str() );
 		if ( conn == NULL )
 			LOG_ALERT << "Failed to connect to PostgreSQL database '" << m_ID << "'";
@@ -258,26 +279,23 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 			}
 
 			std::stringstream statement_timeout_s;
-			statement_timeout_s << "SET statement_timeout = " << m_statementTimeout;
-			PQexec( conn, statement_timeout_s.str( ).c_str( ) );
+			statement_timeout_s << "SET statement_timeout = " << config.statementTimeout();
+			PGresult* res = PQexec( conn, statement_timeout_s.str( ).c_str( ) );
+			PQclear( res);
 
 			m_connPool.add( conn );
-			m_noConnections++;
+			m_connections++;
 		}
 	}
-
-	m_db.setUnit( this );
-
-	LOG_DEBUG << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
+	LOG_DEBUG << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_connections << " connections";
 }
 
 
 // This function needs a lot of work and thinking...
-PostgreSQLdbUnit::~PostgreSQLdbUnit()
+PostgreSQLDatabase::~PostgreSQLDatabase()
 {
 	size_t connections = 0;
 
-	m_db.setUnit( NULL );
 	m_connPool.timeout( 3 );
 
 	while ( m_connPool.available() )	{
@@ -291,67 +309,38 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 			case PQTRANS_IDLE:
 				PQfinish( conn );
 				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " idle";
-				m_noConnections--, connections++;
+				m_connections--, connections++;
 				break;
 			case PQTRANS_ACTIVE:
 				PQfinish( conn );
 				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " active";
-				m_noConnections--, connections++;
+				m_connections--, connections++;
 				break;
 			case PQTRANS_INTRANS:
 				PQfinish( conn );
 				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction";
-				m_noConnections--, connections++;
+				m_connections--, connections++;
 				break;
 			case PQTRANS_INERROR:
 				PQfinish( conn );
 				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " in transaction error";
-				m_noConnections--, connections++;
+				m_connections--, connections++;
 				break;
 			case PQTRANS_UNKNOWN:
 				PQfinish( conn );
 				LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: Connection " << connections << " status unknown";
-				m_noConnections--, connections++;
+				m_connections--, connections++;
 				break;
 		}
 	}
-	if ( m_noConnections != 0 )	{
-		LOG_ALERT << "PostgreSQL database unit '" << m_ID << "' destructor: "
-			      << m_noConnections << " connections not destroyed";
-		throw std::logic_error( "PostgreSQL database unit destructor: not all connections destroyed" );
+	if ( m_connections != 0 )	{
+		LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: "
+			      << m_connections << " connections not destroyed";
+		throw std::logic_error( "PostgreSQL database destructor: not all connections destroyed" );
 	}
-	LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
+	LOG_TRACE << "PostgreSQL database '" << m_ID << "' destroyed, " << connections << " connections destroyed";
+	LOG_TRACE << "PostgreSQL database '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
-
-Database* PostgreSQLdbUnit::database()
-{
-	return m_db.hasUnit() ? &m_db : NULL;
-}
-
-
-
-/*****  PostgreSQL database  ******************************************/
-const std::string& PostgreSQLdatabase::ID() const
-{
-	if ( m_unit )
-		return m_unit->ID();
-	else
-		throw std::runtime_error( "PostgreSQL database unit not initialized" );
-}
-
-Transaction* PostgreSQLdatabase::transaction( const std::string& name)
-{
-	return new PostgreSQLtransaction( *this, name);
-}
-
-void PostgreSQLdatabase::closeTransaction( Transaction *t )
-{
-	delete t;
-}
-
-
-PostgreSQLtransaction::PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_)
-	:Transaction( name_, TransactionExecStatemachineR( new TransactionExecStatemachine_postgres( &database.dbUnit()))){}
 
 }} // _Wolframe::db
 

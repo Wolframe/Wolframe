@@ -22,8 +22,7 @@ DYNAMIC_MODULE = mod_normalize_number.so
 CPP_OBJS = \
 	integerNormalizeFunction.o \
 	floatNormalizeFunction.o \
-	normalizeFunctionUtils.o \
-	mod_normalize_number.o
+	normalizeFunctionUtils.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

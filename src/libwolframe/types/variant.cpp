@@ -437,7 +437,7 @@ static typename boost::enable_if_c<boost::is_same<TYPE,double>::value,TYPE>::typ
 		case Variant::UInt:
 			return boost::numeric_cast<double>( o.data().value.UInt);
 		case Variant::String:
-			return boost::lexical_cast<double>( std::string( o.data().value.String));
+			return boost::lexical_cast<double>( std::string( o.data().value.String, o.data().dim.size));
 		case Variant::BigNumber:
 			return o.data().value.BigNumberRef->todouble();
 		case Variant::Timestamp:

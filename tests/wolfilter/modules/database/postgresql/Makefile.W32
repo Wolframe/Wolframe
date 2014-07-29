@@ -24,22 +24,21 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
+	$(TOPDIR)\src\modules\database\postgresql\static_db_postgresql.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_db_postgresqltest.dll
 
 CPP_OBJS = \
-	PostgreSQLTest.obj \
-	PostgreSQLModuleFiles.obj \
-	mod_db_postgresqltest.obj
+	PostgreSQLTest.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:PostgreSQLTestModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_postgresqltest.obj
+	$(LINK) /dll /def:mod_db_postgresqltest.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

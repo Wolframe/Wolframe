@@ -23,15 +23,14 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_database \
 	-lboost_filesystem \
-	$(ORACLE_LIBS)
+	$(ORACLE_LIBS) \
+	$(TOPDIR)/src/modules/database/oracle/mod_db_oracle_lib.a
 
 DYNAMIC_MODULE = \
 	mod_db_oracletest.so
 
 CPP_OBJS = \
-	OracleModuleFiles.o \
-	OracleTest.o \
-	mod_db_oracletest.o
+	OracleTest.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

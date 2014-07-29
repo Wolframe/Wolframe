@@ -20,8 +20,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_normalize_base64.so
 
 CPP_OBJS = \
-	base64NormalizeFunction.o \
-	mod_normalize_base64.o
+	base64NormalizeFunction.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

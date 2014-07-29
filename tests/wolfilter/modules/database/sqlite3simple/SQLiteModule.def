@@ -1,5 +1,0 @@
-LIBRARY mod_db_sqlite3
-
-EXPORTS
-entryPoint	@1
-

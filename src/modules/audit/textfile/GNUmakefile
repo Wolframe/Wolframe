@@ -23,8 +23,7 @@ DYNAMIC_MODULE = mod_audit_textfile.so
 CPP_OBJS = \
 	TextFileAuditConfig.o \
 	TextFileAuditConstructor.o \
-	TextFileAudit.o \
-	TextFileAuditModule.o
+	TextFileAudit.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

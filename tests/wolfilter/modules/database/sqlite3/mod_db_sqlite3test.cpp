@@ -32,28 +32,11 @@
 ************************************************************************/
 ///\file modules/database/testtrace/mod_db_sqlite3test.cpp
 ///\brief Module for a database implementation used for tests based on the sqlite3 database module
+#include "appdevel/databaseModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "SQLiteTest.hpp"
-#include "module/moduleInterface.hpp"
-#include "logger-v1.hpp"
 
-namespace _Wolframe {
-namespace module {
-
-typedef ConfiguredBuilder* (*CreateBuilderFunc)();
-
-static BuilderBase* createDatabase()
-{
-	static module::ConfiguredBuilderDescription< db::SQLiteTestConstructor,
-		db::SQLiteTestConfig > mod( "test sqlite database", "database", "SQLiteTest", db::SQLite_DB_CLASS_NAME);
-	return &mod;
-}
-
-static createBuilderFunc containers[] =
-{
-	createDatabase, NULL
-};
-
-ModuleEntryPoint entryPoint( 0, "SQLite3 test database", containers );
-
-}} // namespace _Wolframe::module
+WF_MODULE_BEGIN( "SQLite 3 database", "Database interface module for SQLite 3")
+ WF_TEST_DATABASE( "SQLiteTest", _Wolframe::db::SQLiteDatabase, _Wolframe::db::SQLiteTestConfig, _Wolframe::db::SQLiteTestDatabaseInitializer)
+WF_MODULE_END
 

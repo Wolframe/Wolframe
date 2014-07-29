@@ -28,15 +28,14 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	DBauthzConfig.obj \
 	DBauthzConstructor.obj \
-	DBauthz.obj \
-	DBauthzModule.obj
+	DBauthz.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:DBauthzModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:mod_authz_database.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

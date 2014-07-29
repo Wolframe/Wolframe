@@ -1,0 +1,4 @@
+LIBRARY missing_symbol
+
+EXPORTS
+entryPoint	@1

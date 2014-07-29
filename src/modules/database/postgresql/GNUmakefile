@@ -29,15 +29,13 @@ NOINST_STATIC_LIB = mod_db_postgresql_lib.a
 DYNAMIC_MODULE = mod_db_postgresql.so
 
 CPP_OBJS = \
-	PostgreSQLdatatypes.o \
-	PostgreSQLserverSettings.o \
-	PostgreSQLconfig.o \
-	PostgreSQLconstructor.o \
+	PostgreSQLDatatypes.o \
+	PostgreSQLServerSettings.o \
+	PostgreSQLConfig.o \
 	PostgreSQL.o \
-	PostgreSQLtransactionExecStatemachine.o \
-	PostgreSQLstatement.o \
-	PostgreSQLsubstitutingStatement.o \
-	PostgreSQLmodule.o
+	PostgreSQLTransactionExecStatemachine.o \
+	PostgreSQLStatement.o \
+	PostgreSQLSubstitutingStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -37,13 +37,11 @@
 #ifndef _SQLITE_HPP_INCLUDED
 #define _SQLITE_HPP_INCLUDED
 
+#include "SQLiteTransactionExecStatemachine.hpp"
+#include "SQLiteConfig.hpp"
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
-#include "config/configurationBase.hpp"
-#include "serialize/configSerialize.hpp"
-#include "types/keymap.hpp"
-#include "module/constructor.hpp"
 #include <list>
 #include <vector>
 #include "system/objectPool.hpp"
@@ -56,54 +54,7 @@
 namespace _Wolframe {
 namespace db {
 
-static const char* SQLite_DB_CLASS_NAME = "SQLite";
-
-struct SQLiteConfigStruct
-{
-	SQLiteConfigStruct();
-
-	std::string	m_ID;
-	std::string	m_filename;
-	bool		m_foreignKeys;
-	bool		m_profiling;
-	unsigned short	m_connections;
-	std::vector< std::string > m_extensionFiles;		//< list of Sqlite extension modules to load
-
-	//\brief Structure description for serialization/parsing
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
-
-//\brief SQLite database configuration
-class SQLiteConfig
-	:public config::NamedConfiguration
-	,public SQLiteConfigStruct
-{
-public:
-	const char* className() const				{ return SQLite_DB_CLASS_NAME; }
-
-	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	~SQLiteConfig(){}
-
-	bool parse( const config::ConfigurationNode& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	const std::string& ID() const				{ return m_ID; }
-	const std::string& filename() const			{ return m_filename; }
-	bool foreignKeys() const				{ return m_foreignKeys; }
-	bool profiling() const					{ return m_profiling; }
-	unsigned short connections() const			{ return m_connections; }
-	const std::vector< std::string > extensionFiles() const	{ return m_extensionFiles; }
-private:
-	config::ConfigurationTree::Position m_config_pos;
-};
-
-
-
-struct SQLiteLanguageDescription :public LanguageDescription
+struct SQLiteLanguageDescription :public LanguageDescriptionSQL
 {
 	///\brief String used for declaring a reference to an argument by index (starting with 1).
 	virtual std::string stm_argument_reference( int index) const
@@ -114,23 +65,24 @@ struct SQLiteLanguageDescription :public LanguageDescription
 	}
 };
 
-class SQLiteDBunit;
-
 class SQLiteDatabase : public Database
 {
 public:
-	SQLiteDatabase() : m_unit( NULL )	{}
-	 ~SQLiteDatabase()			{}
+	SQLiteDatabase( const std::string& id_, const std::string& filename_,
+			bool foreignKeys_, bool profiling_,
+			unsigned short connections_,
+			const std::vector<std::string>& extensionFiles_ );
+	SQLiteDatabase( const SQLiteConfig& config);
+	 ~SQLiteDatabase();
 
-	void setUnit( SQLiteDBunit* unit )	{ m_unit = unit; }
-	bool hasUnit() const			{ return m_unit != NULL; }
-	SQLiteDBunit& dbUnit() const		{ return *m_unit; }
+	const std::string& ID() const		{ return m_ID; }
+	const char* className() const		{ return "SQLite"; }
 
-	const std::string& ID() const;
-	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
-
-	Transaction* transaction( const std::string& name );
-	void closeTransaction( Transaction* t );
+	Transaction* transaction( const std::string& name_)
+	{
+		TransactionExecStatemachineR stm( new TransactionExecStatemachine_sqlite3( this));
+		return new Transaction( name_, stm);
+	}
 
 	virtual const LanguageDescription* getLanguageDescription() const
 	{
@@ -138,61 +90,21 @@ public:
 		return &langdescr;
 	}
 
+	boost::shared_ptr<sqlite3> newConnection()
+	{
+		return boost::shared_ptr<sqlite3>( m_connPool.get(), boost::bind( ObjectPool<sqlite3*>::static_add, &m_connPool, _1));
+	}
+
 private:
-	SQLiteDBunit*	m_unit;			///< parent database unit
-};
-
-
-class SQLiteDBunit : public DatabaseUnit
-{
-	friend class SQLiteTransaction;
-	friend class SQLiteUIlibrary;
-public:
-	SQLiteDBunit( const std::string& id, const std::string& filename,
-		      bool foreignKeys, bool profiling,
-		      unsigned short connections,
-		      const std::vector<std::string>& extensionFiles_ );
-	~SQLiteDBunit();
-
-	const std::string& ID() const		{ return m_ID; }
-	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
-	Database* database();
-
-	PoolObject<sqlite3*>* newConnection()	{return new PoolObject<sqlite3*>( m_connPool);}
+	void init( const SQLiteConfig& config);
 
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
-
-	SQLiteDatabase		m_db;
-	std::vector<std::string>m_extensionFiles;
+	std::vector<std::string>m_extensionFiles;	///< Sqlite extensions
 };
-
-
-///\class SQLiteConstructor
-///\brief SQLite database constructor
-class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
-{
-public:
-	ObjectConstructorBase::ObjectType objectType() const
-						{ return DATABASE_OBJECT; }
-	const char* objectClassName() const	{ return SQLite_DB_CLASS_NAME; }
-	SQLiteDBunit* object( const config::NamedConfiguration& conf );
-};
-
-
-///\class SQLiteTransaction
-class SQLiteTransaction
-	:public Transaction
-{
-public:
-	SQLiteTransaction( SQLiteDatabase& database, const std::string& name_);
-	virtual ~SQLiteTransaction(){}
-};
-
-
 
 }} // _Wolframe::db
 

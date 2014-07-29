@@ -31,15 +31,14 @@ CPP_OBJS = \
 	mylangInterpreter.obj \
 	mylangStructure.obj \
 	mylangStructureBuilder.obj \
-	mylangFunctionProgramType.obj \
-	mod_command_mylang.obj
+	mylangFunctionProgramType.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModMylangCommandHandler.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_command_mylang.obj
+	$(LINK) /dll /def:mod_command_mylang.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

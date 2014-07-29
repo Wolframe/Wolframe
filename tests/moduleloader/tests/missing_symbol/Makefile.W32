@@ -24,13 +24,10 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = \
 	missing_symbol.dll
 
-CPP_OBJS = \
-	missing_symbol.obj
-
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) missing_symbol.obj
+	$(LINK) /dll /def:missing_symbol.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

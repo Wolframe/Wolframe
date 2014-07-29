@@ -26,15 +26,14 @@ DYNAMIC_MODULE = \
 	mod_normalize_locale.dll
 
 CPP_OBJS = \
-	localeNormalize.obj \
-	mod_normalize_locale.obj
-
+	localeNormalize.obj
+	
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModLocaleNormalize.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_normalize_locale.obj
+	$(LINK) /dll /def:mod_normalize_locale.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

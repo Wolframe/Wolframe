@@ -38,6 +38,7 @@ ifneq "$(NOINST_DYNAMIC_LIB)" ""
 	-@rm -rf $(NOINST_DYNAMIC_LIB) 2>/dev/null
 endif
 ifneq "$(DYNAMIC_MODULE)" ""
+	-@rm -rf $(DYNAMIC_MODULE_OBJ) 2>/dev/null
 	-@rm -rf $(DYNAMIC_MODULE) 2>/dev/null
 endif
 ifneq "$(NOINST_DYNAMIC_MODULE)" ""

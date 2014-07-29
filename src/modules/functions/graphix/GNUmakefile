@@ -27,7 +27,6 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_graphix.so
 
 CPP_OBJS = \
-	mod_graphix.o \
 	graphix.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

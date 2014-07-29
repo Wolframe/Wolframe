@@ -46,7 +46,7 @@
 namespace _Wolframe {
 namespace db {
 
-class SQLiteDBunit;
+class SQLiteDatabase;
 
 ///\class TransactionExecStatemachine_sqlite3
 ///\brief Implementation of the standard database transaction execution statemechine for sqlite (Sqlite3)
@@ -55,7 +55,7 @@ struct TransactionExecStatemachine_sqlite3
 	:public TransactionExecStatemachine
 {
 	///\brief Constructor
-	explicit TransactionExecStatemachine_sqlite3( SQLiteDBunit* dbunit_);
+	explicit TransactionExecStatemachine_sqlite3( SQLiteDatabase* database_);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_sqlite3();
@@ -123,8 +123,8 @@ private:
 	bool m_hasRow;						//< last command executed result set has at least one result row
 	boost::shared_ptr<db::DatabaseError> m_lasterror;	//< last error occurred
 	sqlite3_stmt* m_stm;					//< current statement
-	SQLiteDBunit* m_dbunit;					//< database unit
-	PoolObject<sqlite3*>* m_conn;				//< database connection
+	SQLiteDatabase* m_database;				//< database
+	boost::shared_ptr<sqlite3> m_conn;			//< database connection
 	Statement *m_statement;					//< the statement parser
 };
 

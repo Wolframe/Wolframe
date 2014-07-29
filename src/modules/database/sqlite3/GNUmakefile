@@ -31,10 +31,8 @@ DYNAMIC_MODULE = mod_db_sqlite3.so
 
 CPP_OBJS = \
 	SQLite.o \
-	SQLiteConstructor.o \
 	SQLiteConfig.o \
 	SQLiteTransactionExecStatemachine.o \
-	SQLiteModule.o \
 	SQLiteStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

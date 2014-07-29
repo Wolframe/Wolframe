@@ -26,8 +26,7 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	testtraceDatabase.o \
-	testtraceTransaction.o \
-	mod_db_testtrace.o
+	testtraceTransaction.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

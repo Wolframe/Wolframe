@@ -50,8 +50,7 @@ CPP_OBJS = \
 	tdlTransactionPreprocStep.obj \
 	loadTransactionProgram.obj \
 	tdl2vmTranslator.obj \
-	transactionProgram.obj \
-	mod_command_tdl.obj
+	transactionProgram.obj
 
 DYNAMIC_MODULE = \
 	mod_command_tdl.dll
@@ -60,8 +59,8 @@ all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModTdlLanguageBinding.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_command_tdl.obj
+	$(LINK) /dll /def:mod_command_tdl.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

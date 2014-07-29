@@ -28,23 +28,27 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = \
 	mod_db_postgresql.dll
 
-CPP_OBJS = \
-	PostgreSQLdatatypes.obj \
-	PostgreSQLserverSettings.obj \
-	PostgreSQLconfig.obj \
-	PostgreSQLconstructor.obj \
-	PostgreSQL.obj \
-	PostgreSQLtransactionExecStatemachine.obj \
-	PostgreSQLstatement.obj \
-	PostgreSQLsubstitutingStatement.obj \
-	PostgreSQLmodule.obj
+STATIC_LIB = \
+	static_db_postgresql.lib
 
-all: $(DYNAMIC_MODULE)
+CPP_OBJS = \
+	PostgreSQLDatatypes.obj \
+	PostgreSQLServerSettings.obj \
+	PostgreSQLConfig.obj \
+	PostgreSQL.obj \
+	PostgreSQLTransactionExecStatemachine.obj \
+	PostgreSQLStatement.obj \
+	PostgreSQLSubstitutingStatement.obj	
+
+all: $(DYNAMIC_MODULE) $(STATIC_LIB)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:PostgreSQLmodule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_postgresql.obj
+	$(LINK) /dll /def:mod_db_postgresql.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+$(STATIC_LIB): $(CPP_OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
 
 local_all:
 

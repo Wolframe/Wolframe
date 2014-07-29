@@ -37,41 +37,8 @@
 #include "module/constructor.hpp"
 #include <boost/lexical_cast.hpp>
 
-/// \brief Defines a database interface
-#define WF_DATABASE(NAME,UNITCLASS,CONFIGCLASS) \
-{\
-	class Constructor :public _Wolframe::ConfiguredObjectConstructor<UNITCLASS>\
-	{\
-	public:\
-		_Wolframe::ObjectConstructorBase::ObjectType objectType() const\
-		{\
-			return DATABASE_OBJECT;\
-		}\
-		const char* objectClassName() const\
-		{\
-			return NAME "Database";\
-		}\
-		UNITCLASS* object( const config::NamedConfiguration& cfgi);\
-		{\
-			const CONFIGCLASS* cfg = dynamic_cast<const CONFIGCLASS*>(&cfgi);\
-			return new UNITCLASS(*cfg);\
-		}\
-	};\
-	struct Builder \
-	{\
-		static _Wolframe::module::BuilderBase* impl()\
-		{\
-			static _Wolframe::module::ConfiguredBuilderDescription<Constructor,CONFIGCLASS>\
-				mod( "Database interface to " NAME, "Database", NAME, NAME "Database");\
-			return &mod;\
-		}\
-	};\
-	(*this)(&Builder::impl);\
-}
-
-
 /// \brief Defines a simple database (one database object per unit) interface
-#define WF_SIMPLE_DATABASE(NAME,DBCLASS,CONFIGCLASS) \
+#define WF_DATABASE(NAME,DBCLASS,CONFIGCLASS) \
 {\
 	class Unit :public _Wolframe::db::DatabaseUnit \
 	{\
@@ -94,7 +61,7 @@
 	private:\
 		DBCLASS m_db;\
 	};\
-	class Constructor :public _Wolframe::ObjectConstructorBase\
+	class Constructor :public _Wolframe::ConfiguredObjectConstructor< _Wolframe::db::DatabaseUnit >\
 	{\
 	public:\
 		virtual ~Constructor(){}\
@@ -106,9 +73,9 @@
 		{\
 			return NAME "Database";\
 		}\
-		Unit* object( const _Wolframe::config::NamedConfiguration& cfgi)\
+		_Wolframe::db::DatabaseUnit* object( const _Wolframe::config::NamedConfiguration& cfgi)\
 		{\
-		const CONFIGCLASS* cfg = dynamic_cast<const CONFIGCLASS*>(&cfgi);\
+			const CONFIGCLASS* cfg = dynamic_cast<const CONFIGCLASS*>(&cfgi);\
 			return new Unit(*cfg);\
 		}\
 	};\
@@ -145,6 +112,84 @@
 	};\
 	(*this)(&Builder::impl);\
 }
+
+
+/// \brief Defines a test database interface (simple database with initializer class with configuration as constructor argument that is constructed before the database and destructed after)
+#define WF_TEST_DATABASE(NAME,DBCLASS,CONFIGCLASS,DBINITCLASS) \
+{\
+	class Unit :public _Wolframe::db::DatabaseUnit \
+	{\
+	public:\
+		Unit( const CONFIGCLASS& cfg)\
+			:m_dbinit(cfg),m_db(cfg){}\
+		virtual const char* className() const\
+		{\
+			return #DBCLASS "Unit";\
+		}\
+		virtual const std::string& ID() const\
+		{\
+			return m_db.ID();\
+		}\
+		virtual DBCLASS* database()\
+		{\
+			return &m_db;\
+		}\
+	private:\
+		DBINITCLASS m_dbinit;\
+		DBCLASS m_db;\
+	};\
+	class Constructor :public _Wolframe::ConfiguredObjectConstructor< _Wolframe::db::DatabaseUnit >\
+	{\
+	public:\
+		virtual ~Constructor(){}\
+		_Wolframe::ObjectConstructorBase::ObjectType objectType() const\
+		{\
+			return DATABASE_OBJECT;\
+		}\
+		const char* objectClassName() const\
+		{\
+			return NAME "Database";\
+		}\
+		Unit* object( const _Wolframe::config::NamedConfiguration& cfgi)\
+		{\
+			const CONFIGCLASS* cfg = dynamic_cast<const CONFIGCLASS*>(&cfgi);\
+			return new Unit(*cfg);\
+		}\
+	};\
+	class BuilderDescription : public _Wolframe::module::ConfiguredBuilder\
+	{\
+	public:\
+		BuilderDescription( const char* title, const char* section,\
+					const char* keyword, const char* className )\
+			:_Wolframe::module::ConfiguredBuilder( title, section, keyword, className ){}\
+		virtual ~BuilderDescription()\
+		{}\
+		virtual _Wolframe::config::NamedConfiguration* configuration( const char* logPrefix )\
+		{\
+			return new CONFIGCLASS( m_title, logPrefix);\
+		}\
+		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
+		{\
+			return m_constructor.objectType();\
+		}\
+		virtual _Wolframe::ObjectConstructorBase* constructor()\
+		{\
+			return &m_constructor;\
+		}\
+	private:\
+		Constructor m_constructor;\
+	};\
+	struct Builder \
+	{\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			static BuilderDescription mod( NAME "Database", "Database", NAME, NAME "Database");\
+			return &mod;\
+		}\
+	};\
+	(*this)(&Builder::impl);\
+}
+
 
 
 

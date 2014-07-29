@@ -88,7 +88,11 @@ public:
 
 public:
 	DoctypeDetectorJson()
-		:m_state(ParseStart),m_endbrk(0),m_lastchar(0){}
+		:m_state(ParseStart)
+		,m_keytype(KeyNone)
+		,m_endbrk(0)
+		,m_lastchar(0)
+		,m_escapestate(false){}
 
 	/// \brief Destructor
 	virtual ~DoctypeDetectorJson(){}

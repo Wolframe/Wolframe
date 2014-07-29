@@ -149,12 +149,12 @@ public:
 
 	virtual const _Wolframe::db::LanguageDescription* getLanguageDescription() const
 	{
-		static _Wolframe::db::LanguageDescription langdescr;
+		static _Wolframe::db::LanguageDescriptionSQL langdescr;
 		return &langdescr;
 	}
 };
 
 WF_MODULE_BEGIN( "MyDatabase", "my database module")
- WF_SIMPLE_DATABASE( "MyDB", MyDatabase, MyDatabaseConfig)
+ WF_DATABASE( "MyDB", MyDatabase, MyDatabaseConfig)
 WF_MODULE_END
 
