@@ -64,7 +64,9 @@ tests/base64Utility
 tests/xmlselectHandlerTest
 tests/protocolArgumentParsing
 tests/poolTest
-tests/protocol/src/testProtocol
+tests/protocol/protocol/src/testProtocol
+tests/protocol/lfdotescape/protocolLFdotEscaping
+tests/protocol/argparse/protocolArgumentParsing
 tests/resolvePathTest
 tests/mtprocHandler
 tests/ptreeGenerator

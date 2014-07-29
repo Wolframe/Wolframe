@@ -33,7 +33,7 @@
 ///\file testProtocolLFdotEscaping.cpp
 ///\brief Test program for testing the escaping of LF DOT sequences in both directions
 
-#include "protocol/ioblocks.hpp"
+#include "ioblocks.hpp"
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testReport.hpp"
@@ -71,6 +71,28 @@ static std::string randmsg( unsigned int seed)
 	return rt;
 }
 
+static std::string beautified( const std::string& str)
+{
+	std::ostringstream rt;
+	std::string::const_iterator si = str.begin(), se = str.end();
+	for (; si != se; ++si)
+	{
+		if (*si == '\r')
+		{
+			rt << 'r';
+		}
+		else if (*si == '\n')
+		{
+			rt << 'n';
+		}
+		else
+		{
+			rt << *si;
+		}
+	}
+	return rt.str();
+}
+
 TEST_F( LFdotEscapeTest, tests)
 {
 	enum {ibarsize=11,obarsize=7,EoDBufferSize=4};
@@ -90,26 +112,24 @@ TEST_F( LFdotEscapeTest, tests)
 		std::size_t ibsize = ibar[ testno % ibarsize];
 		std::size_t obsize = obar[ testno % obarsize];
 
-		protocol::EscapeBuffer ebuf;
+		protocol::EscapeSTM estm;
 		std::string input = randmsg( seed+testno);
 
+		std::cout << "INPUT  {" << beautified(input) << "}" << std::endl;
 		char* ib = (char*)std::malloc( ibsize);
+		protocol::OutputBlock oib( ib, ibsize);
 		char* ob = (char*)std::malloc( obsize);
 		std::string mid,output;
-		std::size_t ibpos,obpos;
-		for (ibpos=0; ibpos<input.size(); ibpos+=ibsize)
+		std::size_t obpos;
+
+		estm.setNextBlock( &oib, input.c_str(), input.size());
+		while (estm.hasMore())
 		{
-			std::size_t nn = (ibpos+ibsize>input.size())?(input.size()-ibpos):ibsize;
-			std::memcpy( ib, input.c_str()+ibpos, nn);
-			ebuf.process( ib, ibsize, nn);
-			mid.append( ib, nn);
-			if (ebuf.hasData())
-			{
-				nn = 0;
-				ebuf.process( ib, ibsize, nn);
-				mid.append( ib, nn);
-			}
+			estm.process();
+			mid.append( oib.charptr(), oib.pos());
+			oib.setPos(0);
 		}
+		std::cout << "INESC  {" << beautified(mid) << "}" << std::endl;
 		protocol::InputBlock oblk( ob, obsize, 0);
 		void* bb;
 		std::size_t bbsize;
@@ -126,6 +146,7 @@ TEST_F( LFdotEscapeTest, tests)
 		}
 		if (!oblk.getNetworkMessageRead( bb, bbsize)) throw std::runtime_error( "buffer too small to hold EoD");
 		output.append( oblk.charptr(), oblk.pos());
+		std::cout << "OUTPUT {" << beautified(output) << "}" << std::endl;
 		EXPECT_EQ( input, output);
 		std::free( ib);
 		std::free( ob);

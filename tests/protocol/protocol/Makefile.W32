@@ -1,6 +1,6 @@
-TOPDIR = ..\..
+TOPDIR = ..\..\..
 
-SUBDIRS = argparse lfdotescape protocol
+SUBDIRS = src
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

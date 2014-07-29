@@ -1,0 +1,52 @@
+TOPDIR = ..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I$(TOPDIR)\src \
+	/I$(TOPDIR)\src\modules\protocol\standard \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\3rdParty\gtest\include \
+	/I$(TOPDIR)\wtest\include
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Advapi32.lib Ws2_32.lib \
+	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
+	$(TOPDIR)\wtest\wtest.lib \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
+
+CPP_OBJS = \
+	protocolArgumentParsingFiles.obj
+
+TEST_CPP_BINS = \
+	protocolArgumentParsing.exe
+
+all: $(TEST_OBJS) $(TEST_CPP_BINS)
+
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+protocolArgumentParsing.exe: protocolArgumentParsing.obj protocolArgumentParsingFiles.obj $(TOPDIR)\src\wolframe.lib
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll . >NUL
+	@-protocolArgumentParsing.exe
+

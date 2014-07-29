@@ -1,6 +1,6 @@
-TOPDIR = ../..
+TOPDIR = ../../..
 
-SUBDIRS = argparse lfdotescape protocol
+SUBDIRS = src
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -11,3 +11,7 @@ local_clean:
 local_distclean:
 
 local_test:
+
+local_install:
+
+local_uninstall:

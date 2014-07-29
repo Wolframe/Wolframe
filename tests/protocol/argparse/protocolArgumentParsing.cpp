@@ -1,5 +1,5 @@
-#include "protocol/parser.hpp"
-#include "protocol/buffers.hpp"
+#include "parser.hpp"
+#include "buffers.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testReport.hpp"
 #include <stdlib.h>
