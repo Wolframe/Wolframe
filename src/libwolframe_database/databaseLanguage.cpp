@@ -43,7 +43,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-std::string LanguageDescription::stm_argument_reference( int index) const
+std::string LanguageDescriptionSQL::stm_argument_reference( int index) const
 {
 	std::ostringstream rt;
 	rt << "$" << index;
@@ -75,7 +75,7 @@ public:
 static SQL_KeywordMap g_keywordMap;
 
 
-bool LanguageDescription::isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const
+bool LanguageDescriptionSQL::isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const
 {
 	while (si != se && (*si > 0 && *si <= 32)) ++si;
 	std::string::const_iterator start = si;
@@ -99,7 +99,7 @@ bool LanguageDescription::isEmbeddedStatement( std::string::const_iterator si, s
 
 static const utils::CharTable g_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 
-std::string LanguageDescription::parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const
+std::string LanguageDescriptionSQL::parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const
 {
 	std::string rt;
 	std::string tok;
@@ -145,7 +145,7 @@ static bool isAlpha( char ch)
 	return false;
 }
 
-std::string LanguageDescription::substituteTemplateArguments( const std::string& cmd, const std::vector<TemplateArgumentAssignment>& arg) const
+std::string LanguageDescriptionSQL::substituteTemplateArguments( const std::string& cmd, const std::vector<TemplateArgumentAssignment>& arg) const
 {
 	const char* commentopr = eoln_commentopr();
 	std::vector<TemplateArgumentAssignment>::const_iterator ai = arg.begin(), ae = arg.end();

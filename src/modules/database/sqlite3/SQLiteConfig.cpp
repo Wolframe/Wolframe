@@ -47,53 +47,25 @@
 namespace _Wolframe {
 namespace db {
 
-enum {DEFAULT_SQLITE_CONNECTIONS = 4};
-
-SQLiteConfigStruct::SQLiteConfigStruct()
-	:m_foreignKeys(true)
-	,m_profiling(false)
-	,m_connections(DEFAULT_SQLITE_CONNECTIONS)
-{}
-
-const serialize::StructDescriptionBase* SQLiteConfigStruct::getStructDescription()
+const serialize::StructDescriptionBase* SQLiteConfig::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<SQLiteConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<SQLiteConfig>
 	{
 	ThisDescription()
 	{
 		(*this)
-		( "identifier", &SQLiteConfigStruct::m_ID)			.mandatory()
-		( "file", &SQLiteConfigStruct::m_filename)			.mandatory()
-		( "foreignKeys", &SQLiteConfigStruct::m_foreignKeys)		.optional()
-		( "profiling", &SQLiteConfigStruct::m_profiling)		.optional()
-		( "connections", &SQLiteConfigStruct::m_connections)		.optional()
-		( "extension", &SQLiteConfigStruct::m_extensionFiles )
+		( "identifier", &SQLiteConfig::m_ID)		.mandatory()
+		( "file", &SQLiteConfig::m_filename)		.mandatory()
+		( "foreignKeys", &SQLiteConfig::m_foreignKeys)	.optional()
+		( "profiling", &SQLiteConfig::m_profiling)	.optional()
+		( "connections", &SQLiteConfig::m_connections)	.optional()
+		( "extension", &SQLiteConfig::m_extensionFiles )
 		;
 	}
 	};
 	static const ThisDescription rt;
 	return &rt;
 }
-
-bool SQLiteConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
-			  const module::ModulesDirectory* /*modules*/ )
-{
-	try
-	{
-		serialize::parseConfigStructure( *static_cast<SQLiteConfigStruct*>(this), pt);
-		m_config_pos = pt.position();
-		return true;
-	}
-	catch (const std::runtime_error& e)
-	{
-		LOG_FATAL << logPrefix() << e.what();
-		return false;
-	}
-}
-
-SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
-	: config::NamedConfiguration( name, logParent, logName )
-{}
 
 void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 {
@@ -105,6 +77,11 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   Filename: " << m_filename << std::endl;
 	os << indStr << "      Referential integrity: " << (m_foreignKeys ? "enabled" : "disabled") << std::endl;
 	os << indStr << "      Profiling: " << (m_profiling ? "enabled" : "disabled") << std::endl;
+	os << indStr << "      Extension modules:";
+	std::vector< std::string >::const_iterator it, end = m_extensionFiles.end( );
+	for( it = m_extensionFiles.begin( ); it != end; it++ ) {
+		os << indStr << "         " << *it << std::endl;
+	}
 }
 
 bool SQLiteConfig::check() const
@@ -122,7 +99,7 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 		std::string oldPath = m_filename;
 		m_filename = utils::getCanonicalPath( m_filename, refPath);
 		if ( oldPath != m_filename )	{
-/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute database filename '" << m_filename
+			LOG_WARNING << logPrefix() << "Using absolute database filename '" << m_filename
 				       << "' instead of '" << oldPath << "'";
 		}
 	}

@@ -37,13 +37,12 @@
 #include "database/transactionExecStatemachine.hpp"
 #include "database/statement.hpp"
 #include "database/databaseError.hpp"
-#include "Oracle.hpp"
-#include "OracleStatement.hpp"
-#include "types/keymap.hpp"
+#include "system/objectPool.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
 #include <boost/shared_ptr.hpp>
+#include <oci.h>
 
 namespace _Wolframe {
 namespace db {
@@ -81,13 +80,17 @@ struct OracleColumnDescription {
 
 typedef boost::shared_ptr<OracleColumnDescription> OracleColumnDescriptionPtr;
 
+class OracleEnvirenment;
+class OracleDatabase;
+class OracleConnection;
+
 ///\class TransactionExecStatemachine_oracle
 ///\brief Implementation of the standard database transaction execution statemechine for Oracle
 ///\remark The Oracle connection is opened, closed, created and disposed by the caller
 struct TransactionExecStatemachine_oracle :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDbUnit *dbUnit_);
+	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDatabase *database_);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_oracle();
@@ -156,8 +159,8 @@ private:
 	Statement *m_statement;
 	bool m_hasResult;
 	bool m_hasRow;
-	OracleDbUnit* m_dbUnit;
-	PoolObject<OracleConnection*> *m_conn;	//< DB connection
+	OracleDatabase* m_database;
+	boost::shared_ptr<OracleConnection> m_conn;	//< DB connection
 };
 
 }}//namespace

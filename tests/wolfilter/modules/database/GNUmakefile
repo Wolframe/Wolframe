@@ -16,7 +16,7 @@ endif
 
 # sqlite3
 ifeq ($(WITH_SQLITE3),1)
-SUBDIRS += sqlite3 sqlite3simple
+SUBDIRS += sqlite3
 endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

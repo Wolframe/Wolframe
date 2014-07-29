@@ -45,14 +45,11 @@
 namespace _Wolframe {
 
 /// Timeout exception for object pool
-class ObjectPoolTimeout : public std::exception
+class ObjectPoolTimeout : public std::runtime_error
 {
 public:
-//	ObjectPoolTimeout() throw();
-//	ObjectPoolTimeout( const ObjectPoolTimeout& ) throw();
-//	ObjectPoolTimeout& operator= ( const ObjectPoolTimeout& ) throw();
-//	virtual ~ObjectPoolTimeout() throw();
-//	virtual const char* what() const throw();
+	ObjectPoolTimeout()
+		:std::runtime_error( "object pool exception"){}
 };
 
 /// \class ObjectPool
@@ -97,10 +94,15 @@ public:
 		throw std::logic_error( "Logic error #1 in ObjectPool" );
 	}
 
-	void add ( objectType obj )	{
+	void add( objectType obj )	{
 		boost::lock_guard<boost::mutex> lock( m_mutex );
 		m_availList.push_back( obj );
 		m_cond.notify_one();
+	}
+
+	static void static_add( ObjectPool* pool, objectType obj)
+	{
+		pool->add( obj);
 	}
 
 	unsigned timeout() const		{ return m_timeout; }
@@ -110,28 +112,6 @@ private:
 	boost::mutex			m_mutex;	///< condition variable associated mutex
 	boost::condition_variable	m_cond;		///< the condition variable
 	unsigned			m_timeout;	///< acquire timeout
-};
-
-
-/// \brief Simple template to use ObjectPool objects.
-/// \class PoolObject
-template < typename objectType >
-class PoolObject
-{
-public:
-	explicit PoolObject( ObjectPool< objectType >& pool )
-		: m_pool( pool ), m_object( pool.get())	{}
-	~PoolObject()				{ m_pool.add( m_object ); }
-
-	/// the real object
-	objectType object() const		{ return m_object; }
-	/// access to object member by dereferencing
-	objectType operator ->() const		{ return m_object; }
-	/// dereferencing the PoolObject gives us the object
-	objectType operator *() const		{ return m_object; }
-private:
-	ObjectPool< objectType >&	m_pool;		///< the connected object pool
-	objectType			m_object;	///< the actual object
 };
 
 } // namespace _Wolframe

@@ -55,41 +55,42 @@ class ConfigurationBase
 {
 public:
 	/// Class constructor.
-	///\param[in]	name	the name that will be displayed for this
-	///			configuration section in messages (log, print ...)
-	///			It has no other processing purpose
-	///\param[in]	logParent the logging prefix of the parent.
-	///\param[in]	logName	the logging name of this section. Combined with
-	///			the logParent parameter will form the whole logging
-	///			prefix for of the section.
-	ConfigurationBase( const char* name, const char* logParent, const char* logName )
+	/// \param[in]	sectionName_	the name that will be displayed for this
+	///				configuration section in messages (log, print ...)
+	///				It has no other processing purpose
+	/// \param[in]	logParent_	 the logging prefix of the parent.
+	/// \param[in]	logName_	the logging name of this section. Combined with
+	///				the logParent parameter will form the whole logging
+	///				prefix for of the section.
+	ConfigurationBase( const char* sectionName_, const char* logParent_, const char* logName_ )
 	{
-		m_sectionName = name ? name : "";
-		m_logPrefix = logParent ? logParent : "";
-		if ( logName && *logName != '\0' )	{
-			m_logPrefix += logName; m_logPrefix += ": ";
+		m_sectionName = sectionName_ ? sectionName_ : "";
+		m_logPrefix = logParent_ ? logParent_ : "";
+		if ( logName_ && *logName_ != '\0' )	{
+			m_logPrefix += logName_;
+			m_logPrefix += ": ";
 		}
 	}
 
 	virtual ~ConfigurationBase()			{}
 
-	///\brief The display string (name) for the configuration section
-	///\return	a reference to the name set by the constructor
+	/// \brief The display string (name) for the configuration section
+	/// \return	a reference to the name set by the constructor
 	const std::string& sectionName() const		{ return m_sectionName; }
 
 	/// The prefix for logging messages for this configuration section
-	///\return	a reference to the prefix set by the constructor
+	/// \return	a reference to the prefix set by the constructor
 	const std::string& logPrefix() const		{ return m_logPrefix; }
 
-	///\brief Parse the configuration section
-	///\param[in]	pt		property tree node
-	///\param[in]	node		the label of the node. It should be
+	/// \brief Parse the configuration section
+	/// \param[in]	pt		property tree node
+	/// \param[in]	node		the label of the node. It should be
 	///				the same (case insensitive) as it->first
 	virtual bool parse( const ConfigurationNode& cfgTree, const std::string& node,
 			    const module::ModulesDirectory* modules ) = 0;
 
 	/// Set the pathes in the configuration to absolute values
-	///\param[in]	refPath	use this path as reference when computing
+	/// \param[in]	refPath	use this path as reference when computing
 	///			the absolute pathes
 	virtual void setCanonicalPathes( const std::string& /* refPath */ )	{}
 
@@ -98,7 +99,7 @@ public:
 	/// Be aware that this function does NOT test if the configuration
 	/// can be used. It only tests if it MAY be valid.
 	/// This function will log errors / warnings
-	///\return	true if the configuration has no errors, false
+	/// \return	true if the configuration has no errors, false
 	///		otherwise
 	virtual bool check() const			{ return true; }
 
@@ -110,8 +111,8 @@ public:
 	/// This function is supposed to print the running configuration, this means
 	/// all the configuration parameters, not only those that were set in the
 	/// configuration file.
-	///\param[in]	os	stream to use for printing
-	///\param[in]	indent	print indented with this number of spaces
+	/// \param[in]	os	stream to use for printing
+	/// \param[in]	indent	print indented with this number of spaces
 	virtual void print( std::ostream& os, size_t indent = 0 ) const = 0;
 
 private:
@@ -126,8 +127,8 @@ class NamedConfiguration : public ConfigurationBase
 {
 public:
 	/// Class constructor.
-	NamedConfiguration( const char* name, const char* logParent, const char* logName )
-		: ConfigurationBase( name, logParent, logName )	{}
+	NamedConfiguration( const char* sectionName_, const char* logParent_, const char* logPrefix_ )
+		: ConfigurationBase( sectionName_, logParent_, logPrefix_ )	{}
 
 	virtual ~NamedConfiguration()				{}
 

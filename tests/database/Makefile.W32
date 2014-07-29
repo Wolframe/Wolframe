@@ -7,19 +7,19 @@ SUBDIRS =
 # PostgreSQL
 !IFDEF WITH_PGSQL
 SUBDIRS = \
-	$(SUBDIRS) PostgreSQL
+	$(SUBDIRS) postgresql
 !ENDIF
 
 # Oracle
 !IFDEF WITH_ORACLE
 SUBDIRS = \
-	$(SUBDIRS) Oracle
+	$(SUBDIRS) oracle
 !ENDIF
 
 # sqlite3
 !IFDEF WITH_SQLITE3
 SUBDIRS = \
-	$(SUBDIRS) SQLite3
+	$(SUBDIRS) sqlite3
 !ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

@@ -28,11 +28,10 @@ DYNAMIC_MODULE = mod_db_oracle.so
 
 CPP_OBJS = \
 	OracleConfig.o \
-	OracleConstructor.o \
 	Oracle.o \
 	OracleTransactionExecStatemachine.o \
 	OracleStatement.o \
-	OracleModule.o
+	mod_db_oracle.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -1,0 +1,78 @@
+TOPDIR = ..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\src\modules\database\postgresql \
+	/I$(TOPDIR)\3rdParty\gtest\include \
+	/I$(TOPDIR)\wtest\include \
+	/I"$(PGSQL_DIR)\include"
+
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
+	$(TOPDIR)\wtest\wtest.lib \
+	"$(PGSQL_DIR)\lib\libpq.lib" \
+	kernel32.lib advapi32.lib Ws2_32.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
+
+CPP_OBJS = \
+	PostgreSQLModuleFiles.obj
+
+CPP_BINS = \
+	postgresUnit.exe \
+	dbPing.exe
+
+TEST_CPP_BINS = \
+	postgresUnit.exe
+
+postgresUnit.exe: postgresUnit.obj PostgreSQLModuleFiles.obj
+dbPing.exe: dbPing.obj
+
+all: $(OBJS) $(CPP_BINS)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+
+local_distclean:
+
+local_test: dbPing.exe
+	@-copy $(TOPDIR)\src\libwfsingleton\wfsingleton.dll . >NUL
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" . >NUL
+!IFDEF PGDLL_WITH_I18N
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" . >NUL
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >NUL
+!ENDIF
+!IFDEF WITH_SSL
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >NUL
+!ENDIF
+	@-echo @echo off > test.bat
+	@-echo dbping localhost wolfusr wolfpwd wolframe >> test.bat
+	@-echo if errorlevel 1 goto skip >> test.bat
+	@-echo echo continue >> test.bat
+	@-echo postgresUnit >> test.bat
+	@-echo goto end >> test.bat
+	@-echo :skip >> test.bat
+	@-echo echo No properly configured database for tests >> test.bat
+	@-echo :end >> test.bat
+	@test.bat
+

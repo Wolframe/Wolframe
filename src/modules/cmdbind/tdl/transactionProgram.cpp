@@ -51,7 +51,7 @@ bool TransactionDefinitionProgram::is_mine( const std::string& filename) const
 
 void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename)
 {
-	static const db::LanguageDescription defaultLanguageDescr;
+	static const db::LanguageDescriptionSQL defaultLanguageDescr;
 	const db::LanguageDescription* languageDescr = (transactionDB)?transactionDB->getLanguageDescription():&defaultLanguageDescr;
 
 	LOG_DEBUG << "Loading transaction program '" << filename << "':";
