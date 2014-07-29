@@ -17,7 +17,6 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
-
 	
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
@@ -40,7 +39,7 @@ CPP_OBJS = \
 	pdfPrintProgramType.obj \
 	pdfPrinterDocumentImpl.obj
 
-all: $(DYNAMIC_MODULE)
+all: $(DYNAMIC_MODULE) $(STATIC_LIB)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

@@ -27,8 +27,7 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	TextFileAuditConfig.obj \
 	TextFileAuditConstructor.obj \
-	TextFileAudit.obj \
-	TextFileAuditModule.obj
+	TextFileAudit.obj
 
 all: $(DYNAMIC_MODULE)
 

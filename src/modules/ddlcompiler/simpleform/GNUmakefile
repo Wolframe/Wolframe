@@ -13,11 +13,13 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_serialize
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_langbind
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwolframe_serialize
+	-lwolframe_serialize \
+	-lwolframe_langbind
 
 DYNAMIC_MODULE = mod_ddlcompiler_simpleform.so
 

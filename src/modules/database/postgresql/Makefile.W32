@@ -39,7 +39,6 @@ CPP_OBJS = \
 	PostgreSQLTransactionExecStatemachine.obj \
 	PostgreSQLStatement.obj \
 	PostgreSQLSubstitutingStatement.obj	
-	PostgreSQLSubstitutingStatement.obj	
 
 all: $(DYNAMIC_MODULE) $(STATIC_LIB)
 

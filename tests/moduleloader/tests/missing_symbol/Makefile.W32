@@ -21,6 +21,9 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	wfsingleton.lib
 
+DYNAMIC_MODULE = \
+	missing_symbol.dll
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS) missing_symbol.obj

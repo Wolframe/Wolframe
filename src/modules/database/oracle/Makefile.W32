@@ -37,7 +37,7 @@ CPP_OBJS = \
 	OracleTransactionExecStatemachine.obj \
 	OracleStatement.obj
 
-all: $(DYNAMIC_MODULE)
+all: $(DYNAMIC_MODULE) $(STATIC_LIB)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
