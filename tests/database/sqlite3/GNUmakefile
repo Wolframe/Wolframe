@@ -28,12 +28,12 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwfsingleton \
 	-lwolframe_database \
-	-lwolframe_serialize \
-	-lwolframe_langbind \
 	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/modules/database/sqlite3/mod_db_sqlite3_lib.a \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
 	$(SQLITE3_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem \

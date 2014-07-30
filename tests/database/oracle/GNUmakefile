@@ -27,12 +27,12 @@ INCLUDE_LIBS = \
 	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_database \
-	-lwolframe_serialize \
-	-lwolframe_langbind \
 	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/modules/database/oracle/mod_db_oracle_lib.a \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
 	$(ORACLE_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem

@@ -27,13 +27,13 @@ INCLUDE_LIBS = \
 	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_database \
-	-lwolframe_serialize \
-	-lwolframe_langbind \
 	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
 	$(TOPDIR)/src/modules/database/postgresql/mod_db_postgresql_lib.a \
 	$(PGSQL_LIBS) \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem
 
