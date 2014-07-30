@@ -16,15 +16,19 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR) \
 	-L$(ORACLE_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwolframe_database \
 	-lboost_filesystem \
+	$(TOPDIR)/src/modules/database/oracle/mod_db_oracle_lib.a \
 	$(ORACLE_LIBS) \
-	$(TOPDIR)/src/modules/database/oracle/mod_db_oracle_lib.a
+	-lwolframe_database \
+	-lwolframe_serialize \
+	-lwolframe_langbind
 
 DYNAMIC_MODULE = \
 	mod_db_oracletest.so

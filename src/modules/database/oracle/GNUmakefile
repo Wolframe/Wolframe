@@ -13,6 +13,7 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR) \
 	$(ORACLE_LIB_DIRS)
 
@@ -20,6 +21,7 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_serialize \
 	-lwolframe_database \
+	-lwolframe_langbind \
 	$(ORACLE_LIBS)
 
 NOINST_STATIC_LIB = mod_db_oracle_lib.a
