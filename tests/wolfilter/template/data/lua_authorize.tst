@@ -20,6 +20,7 @@ Processor
 		lua
 		{
 			program authorize_test.lua
+			filter #FILTER#
 		}
 	}
 }

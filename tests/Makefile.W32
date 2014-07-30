@@ -65,8 +65,6 @@ TEST_CPP_BINS = \
 	base64Utility.exe \
 	poolTest.exe \
 	logTest.exe \
-	protocolArgumentParsing.exe \
-	testProtocolLFdotEscaping.exe \
 	testVariantStruct.exe \
 	testNumberBaseConversion.exe \
 	testString.exe \
@@ -104,12 +102,10 @@ byte2hexTest.exe: byte2hexTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Test.exe: base64Test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Utility.exe: base64Utility.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 logTest.exe: logTest.obj
-protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 testArrayDoublingAllocator.exe: testArrayDoublingAllocator.obj $(TOPDIR)\src\wolframe.lib
 testTestAllocator.exe: testTestAllocator.obj $(TOPDIR)\src\wolframe.lib
 configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
-testProtocolLFdotEscaping.exe: testProtocolLFdotEscaping.obj $(TOPDIR)\src\wolframe.lib
 testVariantStruct.exe: testVariantStruct.obj $(TOPDIR)\src\wolframe.lib
 testNumberBaseConversion.exe: testNumberBaseConversion.obj $(TOPDIR)\src\wolframe.lib
 testString.exe: testString.obj $(TOPDIR)\src\wolframe.lib
@@ -172,8 +168,6 @@ local_test:
 	@-base64Test 
 	@-testRand 
 	@-testTimestamp 
-	@-protocolArgumentParsing 
-	@-testProtocolLFdotEscaping 
 	@-testVariantStruct 
 	@-testNumberBaseConversion 
 	@-testString 

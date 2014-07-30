@@ -432,7 +432,7 @@ TEST_F( MainProtocolTest, tests)
 				net::LocalTCPendpoint* localEndPointPtr = new net::LocalTCPendpoint( "127.0.0.1", 7661, localEndpointConfig);
 				net::LocalEndpointR localEndPoint( localEndPointPtr);
 
-				cmdbind::ProtocolHandlerR protocolhandler( processingContext.execContext()->provider()->protocolHandler( "standard"));
+				cmdbind::ProtocolHandlerR protocolhandler( processingContext.execContext()->provider()->protocolHandler( "wolframe"));
 				processingContext.resetExecContext();
 				protocolhandler.setExecContext( processingContext.execContext());
 				protocolhandler.setPeer( client);

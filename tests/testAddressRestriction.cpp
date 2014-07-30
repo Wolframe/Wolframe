@@ -32,8 +32,6 @@ Project Wolframe.
 /// \file testAddressRestriction.cpp
 /// \brief Test for types/addressRestriction.hpp
 #include "types/addressRestriction.hpp"
-#include "protocol/parser.hpp"
-#include "protocol/buffers.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testReport.hpp"
 #include <stdlib.h>

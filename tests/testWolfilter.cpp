@@ -153,10 +153,10 @@ TEST_P( WolfilterTest, tests)
 
 		execContext.setUser( fakeuser);
 		net::LocalEndpointConfig localEndpointConfig( "fakeSocketIdentifier");
-		net::LocalTCPendpoint localEndPointFake( "localhost", 9876, localEndpointConfig);
-		net::RemoteTCPendpoint remoteEndPointFake( "123.123.123.123", 9876);
+		net::LocalEndpointR localEndPointFake( new net::LocalTCPendpoint( "localhost", 9876, localEndpointConfig));
+		net::RemoteEndpointR remoteEndPointFake( new net::RemoteTCPendpoint( "123.123.123.123", 9876));
 		
-		execContext.setConnectionData( &remoteEndPointFake, &localEndPointFake);
+		execContext.setConnectionData( remoteEndPointFake, localEndPointFake);
 
 		if (!processorProvider.resolveDB( databaseProvider))
 		{
@@ -171,7 +171,7 @@ TEST_P( WolfilterTest, tests)
 
 		try
 		{
-			langbind::iostreamfilter( &execContext, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
+			langbind::iostreamfilter( &execContext, "", cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
 		}
 		catch (const std::runtime_error& e)
 		{

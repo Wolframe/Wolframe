@@ -55,7 +55,15 @@ CommandHandler* LuaCommandHandlerUnit::createCommandHandler( const std::string& 
 	}
 	else
 	{
-		return new LuaCommandHandler( interp, cmdname, docformat, langbind::FilterDef());
+		fi = m_filtermap.find( "");
+		if (fi != m_filtermap.end())
+		{
+			return new LuaCommandHandler( interp, cmdname, docformat, fi->second);
+		}
+		else
+		{
+			return new LuaCommandHandler( interp, cmdname, docformat, langbind::FilterDef());
+		}
 	}
 }
 

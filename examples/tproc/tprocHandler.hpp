@@ -72,14 +72,14 @@ class Connection : public net::ConnectionHandler
 {
 public:
 	///\brief Constructor
-	Connection( const net::LocalEndpoint& local, const Configuration* config);
+	Connection( const net::LocalEndpointR& local, const Configuration* config);
 
 	///\brief Destructor
 	virtual ~Connection();
 
 	///\brief Set the remote peer and indicate that the connection is up now.
 	///\param [in] remote remote peer
-	virtual void setPeer( const net::RemoteEndpoint& remote);
+	virtual void setPeer( const net::RemoteEndpointR& remote);
 
 	///\brief Handle a request and produce a reply (statemachine of the processor)
 	virtual const net::NetworkOperation nextOperation();
@@ -116,7 +116,7 @@ public:
 	ServerHandlerImpl( const HandlerConfiguration *config)
 		:m_config(config){}
 
-	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local);
+	net::ConnectionHandler* newConnection( const net::LocalEndpointR& local);
 private:
 	const HandlerConfiguration* m_config;
 };

@@ -49,16 +49,18 @@ class Input
 public:
 	/// \brief Constructor
 	Input()
-		:m_used(false){}
+		:m_used(false)
+		,m_contentsize(0)
+		,m_isProcessorInput(false)
+		,m_gotEoD(false){}
 
 	/// \brief Copy constructor
 	/// \param[in] o copied item
 	Input( const Input& o);
 
 	/// \brief Constructor by input filter
-	/// \param[in] inputfilter_ input filter reference
 	/// \param[in] docformat_ document format
-	Input( const InputFilterR& inputfilter_, const std::string& docformat_);
+	Input( const std::string& docformat_);
 
 	/// \brief Constructor by content
 	/// \param[in] docformat_ document format
@@ -94,9 +96,18 @@ public:
 	/// \return the content string size or 0, if not defined
 	std::size_t documentsize() const		{return m_isProcessorInput?0:m_contentsize;}
 
-	/// \brief Allocate a copy of the content to the input for a filter attached
-	/// \return the copy (managed by the input object)
-	const void* allocContentCopy( const void* ptr, std::size_t size);
+	/// \brief Put input data to filter or buffer it
+	/// \param[in] data pointer to input data
+	/// \param[in] datasize size of input data in bytes
+	/// \param[in] eod end of data
+	void putInput( const void* data, std::size_t datasize, bool eod);
+
+	/// \brief Defined the input filter and attach unconsumed input
+	/// \param[in] filter input filter
+	void setInputFilter( const InputFilterR& filter);
+
+	/// \brief Find out if the input has reached end of data
+	bool gotEoD() const				{return m_gotEoD;}
 
 private:
 	bool m_used;					///< only one iterator can be created from input. This is the guard for checking this.
@@ -105,6 +116,8 @@ private:
 	boost::shared_ptr<char> m_content;		///< content source string is input is not from network
 	std::size_t m_contentsize;			///< size of content in bytes
 	bool m_isProcessorInput;			///< true, if this Input object represents a document and not the processor input
+	std::string m_unconsumedInput;			///< unconsumed network input
+	bool m_gotEoD;					///< Got end of data
 };
 
 }}//namespace

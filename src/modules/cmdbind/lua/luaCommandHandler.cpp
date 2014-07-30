@@ -53,36 +53,13 @@ void LuaCommandHandler::initcall()
 {
 	if (!execContext()) throw std::logic_error( "execution context is not defined");
 
-	m_interp->init( Input(m_inputfilter,m_docformat), Output(m_outputfilter), execContext());
-
 	if (m_default_filter.filtertype)
 	{
 		types::CountedReference<langbind::Filter> filter( m_default_filter.create());
-		if (!filter->inputfilter().get())
-		{
-			throw std::runtime_error( std::string( "input filter not defined for '") + m_default_filter.filtertype->name() + "'");
-		}
-		if (m_inputfilter.get())
-		{
-			setFilterAs( filter->inputfilter());
-		}
-		else
-		{
-			m_inputfilter = filter->inputfilter();
-		}
-		if (!filter->outputfilter().get())
-		{
-			throw std::runtime_error( std::string( "output filter not defined '") + m_default_filter.filtertype->name() + "'");
-		}
-		if (m_outputfilter.get())
-		{
-			setFilterAs( filter->outputfilter());
-		}
-		else
-		{
-			m_outputfilter = filter->outputfilter();
-		}
+		setInputFilter( filter->inputfilter());
+		setOutputFilter( filter->outputfilter());
 	}
+	m_interp->init( input(), output(), execContext());
 }
 
 LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
@@ -114,15 +91,10 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 			rt = lua_resume( m_interp->thread(), NULL, 0);
 			if (rt == LUA_YIELD)
 			{
-				// call the function (subsequently until termination)
-				rt = lua_resume( m_interp->thread(), NULL, 0);
-				if (rt == LUA_YIELD)
+				if ((inputfilter().get() && inputfilter()->state() != InputFilter::Open)
+				||  (outputfilter().get() && outputfilter()->state() != OutputFilter::Open))
 				{
-					if ((m_inputfilter.get() && m_inputfilter->state() != InputFilter::Open)
-					||  (m_outputfilter.get() && m_outputfilter->state() != OutputFilter::Open))
-					{
-						return Yield;
-					}
+					return Yield;
 				}
 			}
 		}
@@ -138,13 +110,23 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	}
 	else
 	{
-		if (!m_inputfilter->getMetaData())
+		if (inputfilter().get())
 		{
-			return Yield;
+			if (!inputfilter()->getMetaData())
+			{
+				return Yield;
+			}
+			if (outputfilter().get())
+			{
+				if (!outputfilter()->close())
+				{
+					return Yield;
+				}
+			}
 		}
-		if (!m_outputfilter->close())
+		else
 		{
-			return Yield;
+			LOG_WARNING << "lua script terminated without input filter not defined";
 		}
 	}
 	return Ok;

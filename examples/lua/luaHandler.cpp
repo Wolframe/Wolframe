@@ -195,12 +195,12 @@ void luaConnection::printMemStats( )
 }
 #endif
 
-luaConnection::luaConnection( const net::LocalEndpoint& local, const luaConfig config_ )
+luaConnection::luaConnection( const net::LocalEndpointR& local, const luaConfig config_ )
 	: config( config_ )
 {
 	LOG_TRACE	<< "Created connection handler "
-			<< ( ( local.type( ) == _Wolframe::net::ConnectionEndpoint::SSL ) ? "(SSL) " : "" )
-			<< "for " << local.toString( );
+			<< ( ( local->type( ) == _Wolframe::net::ConnectionEndpoint::SSL ) ? "(SSL) " : "" )
+			<< "for " << local->toString( );
 
 	createVM( );
 }
@@ -212,22 +212,22 @@ luaConnection::~luaConnection()
 	destroyVM( );
 }
 
-void luaConnection::setPeer( const net::RemoteEndpoint& remote )
+void luaConnection::setPeer( const net::RemoteEndpointR& remote )
 {
-	LOG_TRACE	<< "Peer set to " << remote.toString( )
-			<< ", connected at " << boost::posix_time::from_time_t( remote.connectionTime( ) );
+	LOG_TRACE	<< "Peer set to " << remote->toString( )
+			<< ", connected at " << boost::posix_time::from_time_t( remote->connectionTime( ) );
 
 
 #ifdef WITH_SSL
-	if( remote.type( ) == _Wolframe::net::ConnectionEndpoint::SSL ) {
-		const _Wolframe::net::RemoteSSLendpoint& rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint&>( remote );
-		if ( rmt.SSLcertInfo( ) ) {
-			LOG_TRACE << "Peer SSL certificate serial number " << rmt.SSLcertInfo()->serialNumber()
-				  << ", issued by: " << rmt.SSLcertInfo()->issuer();
-			LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore())
-				  << " to " <<  boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter());
-			LOG_TRACE << "Peer SSL certificate subject: " << rmt.SSLcertInfo()->subject();
-			LOG_TRACE << "Peer SSL certificate Common Name: " << rmt.SSLcertInfo()->commonName();
+	if( remote->type( ) == _Wolframe::net::ConnectionEndpoint::SSL ) {
+		const _Wolframe::net::RemoteSSLendpoint* rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint*>( remote.get() );
+		if ( rmt->SSLcertInfo( ) ) {
+			LOG_TRACE << "Peer SSL certificate serial number " << rmt->SSLcertInfo()->serialNumber()
+				  << ", issued by: " << rmt->SSLcertInfo()->issuer();
+			LOG_TRACE << "Peer SSL certificate valid from " << boost::posix_time::from_time_t( rmt->SSLcertInfo()->notBefore())
+				  << " to " <<  boost::posix_time::from_time_t( rmt->SSLcertInfo()->notAfter());
+			LOG_TRACE << "Peer SSL certificate subject: " << rmt->SSLcertInfo()->subject();
+			LOG_TRACE << "Peer SSL certificate Common Name: " << rmt->SSLcertInfo()->commonName();
 		} else {
 			LOG_TRACE << "No SSL information available, illegal client certificate or server is not requesting a client certificate";
 		}
@@ -238,39 +238,39 @@ void luaConnection::setPeer( const net::RemoteEndpoint& remote )
 //	lua_pushstring( l, "new_connection" );
 //	lua_gettable( l, LUA_GLOBALSINDEX );
 	lua_getglobal( l, "new_connection" );
-	lua_pushstring( l, remote.host( ).c_str( ) );
-	lua_pushinteger( l, remote.port( ) );
+	lua_pushstring( l, remote->host( ).c_str( ) );
+	lua_pushinteger( l, remote->port( ) );
 
 #ifdef WITH_SSL
-	_Wolframe::net::ConnectionEndpoint::ConnectionType type = remote.type( );
+	_Wolframe::net::ConnectionEndpoint::ConnectionType type = remote->type( );
 	if( type == _Wolframe::net::ConnectionEndpoint::SSL ) {
-		const _Wolframe::net::RemoteSSLendpoint& rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint&>( remote );
-		if ( rmt.SSLcertInfo( ) ) {
+		const _Wolframe::net::RemoteSSLendpoint* rmt = static_cast<const _Wolframe::net::RemoteSSLendpoint*>( remote.get() );
+		if ( rmt->SSLcertInfo( ) ) {
 			lua_newtable( l );
 			int top = lua_gettop( l );
 
 			lua_pushstring( l, "serialNumber" );
-			lua_pushinteger( l, rmt.SSLcertInfo()->serialNumber( ) );
+			lua_pushinteger( l, rmt->SSLcertInfo()->serialNumber( ) );
 			lua_settable( l, top );
 
 			lua_pushstring( l, "issuer" );
-			lua_pushstring( l, rmt.SSLcertInfo()->issuer( ).c_str( ) );
+			lua_pushstring( l, rmt->SSLcertInfo()->issuer( ).c_str( ) );
 			lua_settable( l, top );
 
 			lua_pushstring( l, "validFrom" );
-			lua_pushstring( l, boost::posix_time::to_simple_string( boost::posix_time::from_time_t( rmt.SSLcertInfo()->notBefore( ) ) ).c_str( ) );
+			lua_pushstring( l, boost::posix_time::to_simple_string( boost::posix_time::from_time_t( rmt->SSLcertInfo()->notBefore( ) ) ).c_str( ) );
 			lua_settable( l, top );
 
 			lua_pushstring( l, "validTo" );
-			lua_pushstring( l, boost::posix_time::to_simple_string( boost::posix_time::from_time_t( rmt.SSLcertInfo()->notAfter( ) ) ).c_str( ) );
+			lua_pushstring( l, boost::posix_time::to_simple_string( boost::posix_time::from_time_t( rmt->SSLcertInfo()->notAfter( ) ) ).c_str( ) );
 			lua_settable( l, top );
 
 			lua_pushstring( l, "subject" );
-			lua_pushstring( l, rmt.SSLcertInfo( )->subject( ).c_str( ) );
+			lua_pushstring( l, rmt->SSLcertInfo( )->subject( ).c_str( ) );
 			lua_settable( l, top );
 
 			lua_pushstring( l, "commonName" );
-			lua_pushstring( l, rmt.SSLcertInfo( )->commonName( ).c_str( ) );
+			lua_pushstring( l, rmt->SSLcertInfo( )->commonName( ).c_str( ) );
 			lua_settable( l, top );
 		} else {
 			lua_pushnil( l );
@@ -435,7 +435,7 @@ ServerHandler::ServerHandlerImpl::ServerHandlerImpl( const HandlerConfiguration 
 	config_.knownLuaModules = config->luaConfig->knownLuaModules;
 }
 
-net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpointR& local )
 {
 	return new luaConnection( local, config_ );
 }
@@ -446,7 +446,7 @@ ServerHandler::ServerHandler( const HandlerConfiguration *config,
 
 ServerHandler::~ServerHandler()	{ delete m_impl; }
 
-net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpointR& local )
 {
 	return m_impl->newConnection( local );
 }

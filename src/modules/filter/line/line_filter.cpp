@@ -95,21 +95,24 @@ struct OutputFilterImpl :public OutputFilter
 	/// \return true, if success, false else
 	virtual bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		setState( Open);
-		if (m_elemitr == m_elembuf.size())
+		if (m_elembuf.size() > outputChunkSize() && outputChunkSize())
 		{
-			m_elembuf.clear();
-			m_elemitr = 0;
-		}
-		if (type == Value)
-		{
-			printToBuffer( (const char*)element, elementsize, m_elembuf);
-			m_output.print( '\n', m_elembuf);
-			if (m_elembuf.size() > outputChunkSize())
+			if (m_elemitr == m_elembuf.size())
+			{
+				m_elembuf.clear();
+				m_elemitr = 0;
+			}
+			else
 			{
 				setState( EndOfBuffer);
 				return false;
 			}
+		}
+		setState( Open);
+		if (type == Value)
+		{
+			printToBuffer( (const char*)element, elementsize, m_elembuf);
+			m_output.print( '\n', m_elembuf);
 		}
 		return true;
 	}
@@ -183,17 +186,14 @@ struct InputFilterImpl :public InputFilter
 		,m_srcend(o.m_srcend)
 		,m_srcclosed(o.m_srcclosed)
 		,m_linecomplete(o.m_linecomplete)
-		{}
+		{
+			m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
+		}
 
 	/// \brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
-	}
-	/// \brief Implement InputFilter::initcopy()
-	virtual InputFilter* initcopy() const
-	{
-		return new InputFilterImpl( *getMetaDataRef(), m_charset);
 	}
 
 	/// \brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
@@ -205,14 +205,6 @@ struct InputFilterImpl :public InputFilter
 		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
 	}
 
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	{
-		std::size_t pos = m_itr.getPosition();
-		ptr = m_src + pos;
-		size = (m_srcsize > pos)?(m_srcsize - pos):0;
-		end = m_srcend;
-	}
-
 	/// \brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
@@ -222,7 +214,7 @@ struct InputFilterImpl :public InputFilter
 			m_linecomplete = false;
 		}
 		setState( Open);
-		if (!m_srcend && setjmp(m_eom) != 0)
+		if (setjmp(m_eom) != 0)
 		{
 			setState( EndOfMessage);
 			return 0;

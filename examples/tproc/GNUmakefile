@@ -79,7 +79,7 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
-	execCommandHandler.o \
+	execProtocolHandler.o \
 	tprocHandler.o \
 	tprocHandlerConfig.o \
 	tprocProtocolFiles.o \

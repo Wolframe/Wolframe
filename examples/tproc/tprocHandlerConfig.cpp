@@ -34,7 +34,6 @@
 ///\brief Implementation of the tproc connection handler configuration
 #include "types/countedReference.hpp"
 #include "tprocHandlerConfig.hpp"
-#include "cmdbind/ioFilterCommandHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/protocolHandler.hpp"
 #include "serialize/configSerialize.hpp"
@@ -85,11 +84,11 @@ bool Configuration::parse( const config::ConfigurationNode& pt, const std::strin
 
 			if (std::getline( cmdstr, nam, '='))
 			{
-				m_commands.push_back( cmdbind::ExecCommandHandler::Command( nam, cmdstr.str()));
+				m_commands.push_back( cmdbind::ExecProtocolHandler::Command( nam, cmdstr.str()));
 			}
 			else
 			{
-				m_commands.push_back( cmdbind::ExecCommandHandler::Command( *itr));
+				m_commands.push_back( cmdbind::ExecProtocolHandler::Command( *itr));
 			}
 			++itr;
 		}
@@ -114,7 +113,7 @@ bool Configuration::check() const
 
 void Configuration::print( std::ostream& o, size_t i) const
 {
-	std::vector<cmdbind::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin(),end=m_commands.end();
+	std::vector<cmdbind::ExecProtocolHandler::Command>::const_iterator itr=m_commands.begin(),end=m_commands.end();
 	std::string ind( i, '\t');
 	for (;itr!=end; ++itr)
 	{

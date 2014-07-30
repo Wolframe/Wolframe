@@ -38,41 +38,43 @@
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
-void IOFilterCommandHandler::setFilterAs( const langbind::InputFilterR& in)
+void IOFilterCommandHandler::setInputFilter( const langbind::InputFilterR& in)
 {
-	if (m_inputfilter->state() != langbind::InputFilter::Start)
-	{
-		throw std::runtime_error( "cannot change input filter after first read");
-	}
-	m_inputfilter.reset( in->copy());
+	m_input.setInputFilter( in);
 
 	// synchronize inherited meta data:
-	if (m_outputfilter.get())
+	if (m_input.inputfilter().get() && m_output.outputfilter().get())
 	{
-		m_outputfilter->inheritMetaData( m_inputfilter->getMetaDataRef());
+		m_output.outputfilter()->inheritMetaData( m_input.inputfilter()->getMetaDataRef());
 	}
 }
 
-void IOFilterCommandHandler::setFilterAs( const langbind::OutputFilterR& out)
+void IOFilterCommandHandler::setOutputFilter( const langbind::OutputFilterR& out)
 {
-	if (m_outputfilter->state() != langbind::OutputFilter::Start)
-	{
-		throw std::runtime_error( "cannot change output filter after first print");
-	}
-	langbind::OutputFilter* of = out->copy();
-	of->setOutputChunkSize( m_outputfilter->outputChunkSize());
-	m_outputfilter.reset( of);;
+	m_output.setOutputFilter( out);
+
 	// synchronize inherited meta data:
-	m_outputfilter->inheritMetaData( m_inputfilter->getMetaDataRef());
+	if (m_input.inputfilter().get() && m_output.outputfilter().get())
+	{
+		m_output.outputfilter()->inheritMetaData( m_input.inputfilter()->getMetaDataRef());
+	}
 }
 
 IOFilterCommandHandler::Operation IOFilterCommandHandler::nextOperation()
 {
+	if (m_done) return CLOSE;
+
 	const char* errmsg = 0;
 	for (;;) switch (call( errmsg))
 	{
 		case Ok:
-			return CLOSE;
+			m_done = true;
+			if (!m_output.outputfilter().get())
+			{
+				return CLOSE;
+			}
+			m_output.outputfilter()->getOutput( m_writeptr, m_writesize);
+			return m_writesize?WRITE:CLOSE;
 
 		case Error:
 		{
@@ -85,9 +87,9 @@ IOFilterCommandHandler::Operation IOFilterCommandHandler::nextOperation()
 		}
 		case Yield:
 		{
-			if (m_inputfilter.get())
+			if (m_input.inputfilter().get())
 			{
-				switch (m_inputfilter->state())
+				switch (m_input.inputfilter()->state())
 				{
 					case langbind::InputFilter::Start:
 					case langbind::InputFilter::Open:
@@ -95,7 +97,7 @@ IOFilterCommandHandler::Operation IOFilterCommandHandler::nextOperation()
 	
 					case langbind::InputFilter::EndOfMessage:
 						
-						if (m_gotEoD)
+						if (m_input.gotEoD())
 						{
 							LOG_ERROR << "error in input filter: unexpected end of input";
 							setLastError( "unexpected end of input");
@@ -104,23 +106,24 @@ IOFilterCommandHandler::Operation IOFilterCommandHandler::nextOperation()
 						return READ;
 	
 					case langbind::InputFilter::Error:
-						errmsg = m_inputfilter->getError();
+						errmsg = m_input.inputfilter()->getError();
 						LOG_ERROR << "error in input filter: " << (errmsg?errmsg:"unknown");
 						setLastError( std::string( "error in input: ") + (errmsg?errmsg:"unknown"));
 						return CLOSE;
 				}
 			}
-			if (m_outputfilter.get())
+			if (m_output.outputfilter().get())
 			{
-				switch (m_outputfilter->state())
+				switch (m_output.outputfilter()->state())
 				{
 					case langbind::OutputFilter::Start:
 					case langbind::OutputFilter::Open:
 					case langbind::OutputFilter::EndOfBuffer:
+						m_output.outputfilter()->getOutput( m_writeptr, m_writesize);
 						return WRITE;
-	
+
 					case langbind::OutputFilter::Error:
-						errmsg = m_outputfilter->getError();
+						errmsg = m_output.outputfilter()->getError();
 						LOG_ERROR << "error in output filter: " << (errmsg?errmsg:"unknown");
 						setLastError( std::string("error in output: ") + (errmsg?errmsg:"unknown"));
 						return CLOSE;
@@ -133,14 +136,15 @@ IOFilterCommandHandler::Operation IOFilterCommandHandler::nextOperation()
 	}
 }
 
-void IOFilterCommandHandler::putInput( const void* begin, std::size_t bytesTransferred, bool eod)
+void IOFilterCommandHandler::putInput( const void* chunk_, std::size_t chunksize_, bool eod)
 {
-	m_gotEoD = eod;
-	m_inputfilter->putInput( (const char*)begin, bytesTransferred, eod);
+	m_input.putInput( (const char*)chunk_, chunksize_, eod);
 }
 
-void IOFilterCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
+void IOFilterCommandHandler::getOutput( const void*& chunk_, std::size_t& chunksize_)
 {
-	m_outputfilter->getOutput( begin, bytesToTransfer);
+	chunk_ = m_writeptr;
+	chunksize_ = m_writesize;
+	m_writesize = 0;
 }
 

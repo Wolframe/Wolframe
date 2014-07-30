@@ -33,7 +33,7 @@
 ///\file tprocHandler.cpp
 
 #include "tprocHandler.hpp"
-#include "execCommandHandler.hpp"
+#include "execProtocolHandler.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -47,30 +47,30 @@ enum State
 	State3
 };
 
-struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
+struct STM :public cmdbind::LineProtocolHandlerSTMTemplate<ProtocolHandler>
 {
 	STM()
 	{
 		(*this)
 			[State1]
-				.cmd< &CommandHandler::doHello >( "HELLO")
-				.cmd< &CommandHandler::doCmd1A >( "CMD1A")
-				.cmd< &CommandHandler::doCmd1B >( "CMD1B")
-				.cmd< &CommandHandler::doCmd1C >( "CMD1B")
-				.cmd< &CommandHandler::doCmdQUIT >( "QUIT")
+				.cmd< &ProtocolHandler::doHello >( "HELLO")
+				.cmd< &ProtocolHandler::doCmd1A >( "CMD1A")
+				.cmd< &ProtocolHandler::doCmd1B >( "CMD1B")
+				.cmd< &ProtocolHandler::doCmd1C >( "CMD1B")
+				.cmd< &ProtocolHandler::doCmdQUIT >( "QUIT")
 			[State2]
-				.cmd< &CommandHandler::doCmd2A >( "CMD2A")
-				.cmd< &CommandHandler::doCmd2B >( "CMD2B")
+				.cmd< &ProtocolHandler::doCmd2A >( "CMD2A")
+				.cmd< &ProtocolHandler::doCmd2B >( "CMD2B")
 			[State3]
-				.cmd< &CommandHandler::doCmd3A >( "CMD3A")
-				.cmd< &CommandHandler::doCmdQUIT >( "QUIT")
+				.cmd< &ProtocolHandler::doCmd3A >( "CMD3A")
+				.cmd< &ProtocolHandler::doCmdQUIT >( "QUIT")
 		;
 	}
 };
 static STM stm;
 
 
-int CommandHandler::doCmd1A( int argc, const char** argv, std::ostream& out)
+int ProtocolHandler::doCmd1A( int argc, const char** argv, std::ostream& out)
 {
 	out << "OK CMD1A";
 	if (argc == 0)
@@ -89,7 +89,7 @@ int CommandHandler::doCmd1A( int argc, const char** argv, std::ostream& out)
 	}
 }
 
-int CommandHandler::doCmd1B( int argc, const char** argv, std::ostream& out)
+int ProtocolHandler::doCmd1B( int argc, const char** argv, std::ostream& out)
 {
 	out << "OK CMD1B";
 	if (argc == 0)
@@ -108,7 +108,7 @@ int CommandHandler::doCmd1B( int argc, const char** argv, std::ostream& out)
 	}
 }
 
-int CommandHandler::doCmd1C( int argc, const char** argv, std::ostream& out)
+int ProtocolHandler::doCmd1C( int argc, const char** argv, std::ostream& out)
 {
 	out << "OK CMD1C";
 	if (argc == 0)
@@ -127,7 +127,7 @@ int CommandHandler::doCmd1C( int argc, const char** argv, std::ostream& out)
 	}
 }
 
-int CommandHandler::doCmd2A( int argc, const char** argv, std::ostream& out)
+int ProtocolHandler::doCmd2A( int argc, const char** argv, std::ostream& out)
 {
 	out << "OK CMD2A";
 	if (argc == 0)
@@ -146,7 +146,7 @@ int CommandHandler::doCmd2A( int argc, const char** argv, std::ostream& out)
 	}
 }
 
-int CommandHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
+int ProtocolHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
 {
 	out << "OK CMD2B";
 	if (argc == 0)
@@ -165,9 +165,9 @@ int CommandHandler::doCmd2B( int argc, const char** argv, std::ostream& out)
 	}
 }
 
-int CommandHandler::endRun( cmdbind::CommandHandler* ch, std::ostream& out)
+int ProtocolHandler::endRun( cmdbind::ProtocolHandler* ch, std::ostream& out)
 {
-	cmdbind::ExecCommandHandler* chnd = dynamic_cast<cmdbind::ExecCommandHandler*>( ch);
+	cmdbind::ExecProtocolHandler* chnd = dynamic_cast<cmdbind::ExecProtocolHandler*>( ch);
 	int argc;
 	const char** argv;
 	const char* lastcmd = chnd->getCommand( argc, argv);
@@ -190,7 +190,7 @@ int CommandHandler::endRun( cmdbind::CommandHandler* ch, std::ostream& out)
 	return rt;
 }
 
-int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
+int ProtocolHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 {
 	out << "OK CMD3A";
 	if (argc == 0)
@@ -207,9 +207,9 @@ int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 		out << endl();
 		try
 		{
-			CommandHandler* ch = (CommandHandler*)new cmdbind::ExecCommandHandler( cmds(), m_config->commands());
+			ProtocolHandler* ch = (ProtocolHandler*)new cmdbind::ExecProtocolHandler( cmds(), m_config->commands());
 			ch->setExecContext( execContext());
-			delegateProcessing<&CommandHandler::endRun>( ch);
+			delegateProcessing<&ProtocolHandler::endRun>( ch);
 		}
 		catch (const std::exception& e)
 		{
@@ -219,7 +219,7 @@ int CommandHandler::doCmd3A( int argc, const char** argv, std::ostream& out)
 	}
 }
 
-int CommandHandler::doCmdQUIT( int argc, const char**, std::ostream& out)
+int ProtocolHandler::doCmdQUIT( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
@@ -233,7 +233,7 @@ int CommandHandler::doCmdQUIT( int argc, const char**, std::ostream& out)
 	}
 }
 
-int CommandHandler::doHello( int argc, const char**, std::ostream& out)
+int ProtocolHandler::doHello( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
@@ -242,9 +242,9 @@ int CommandHandler::doHello( int argc, const char**, std::ostream& out)
 	}
 	try
 	{
-		CommandHandler* ch = (CommandHandler*)new cmdbind::ExecCommandHandler( cmds(), m_config->commands());
+		ProtocolHandler* ch = (ProtocolHandler*)new cmdbind::ExecProtocolHandler( cmds(), m_config->commands());
 		ch->setExecContext( execContext());
-		delegateProcessing<&CommandHandler::endRun>( ch);
+		delegateProcessing<&ProtocolHandler::endRun>( ch);
 	}
 	catch (const std::exception& e)
 	{
@@ -276,21 +276,21 @@ const net::NetworkOperation Connection::nextOperation()
 	}
 	switch(m_cmdhandler.nextOperation())
 	{
-		case cmdbind::CommandHandler::READ:
+		case cmdbind::ProtocolHandler::READ:
 			m_cmdhandler.getInputBlock( inpp, inppsize);
 			return net::ReadData( inpp, inppsize);
 
-		case cmdbind::CommandHandler::WRITE:
+		case cmdbind::ProtocolHandler::WRITE:
 			m_cmdhandler.getOutput( outpp, outppsize);
 			return net::SendData( outpp, outppsize);
 
-		case cmdbind::CommandHandler::CLOSE:
+		case cmdbind::ProtocolHandler::CLOSE:
 			return net::CloseConnection();
 	}
 	return net::CloseConnection();
 }
 
-Connection::Connection( const net::LocalEndpoint& local, const Configuration* config)
+Connection::Connection( const net::LocalEndpointR& local, const Configuration* config)
 	:m_cmdhandler( &stm, config)
 	,m_input(config->input_bufsize())
 	,m_output(config->output_bufsize())
@@ -298,7 +298,7 @@ Connection::Connection( const net::LocalEndpoint& local, const Configuration* co
 {
 	m_cmdhandler.setInputBuffer( m_input.ptr(), m_input.size());
 	m_cmdhandler.setOutputBuffer( m_output.ptr(), m_output.size());
-	LOG_TRACE << "Created connection handler for " << local.toString();
+	LOG_TRACE << "Created connection handler for " << local->toString();
 }
 
 Connection::~Connection()
@@ -306,12 +306,12 @@ Connection::~Connection()
 	LOG_TRACE << "Connection handler destroyed";
 }
 
-void Connection::setPeer( const net::RemoteEndpoint& remote)
+void Connection::setPeer( const net::RemoteEndpointR& remote)
 {
-	LOG_TRACE << "Peer set to " << remote.toString();
+	LOG_TRACE << "Peer set to " << remote->toString();
 }
 
-net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local)
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpointR& local)
 {
 	return new tproc::Connection( local, m_config->m_appConfig);
 }
@@ -325,7 +325,7 @@ ServerHandler::~ServerHandler()
 	delete m_impl;
 }
 
-net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local)
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpointR& local)
 {
 	return m_impl->newConnection( local);
 }

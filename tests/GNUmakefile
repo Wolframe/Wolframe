@@ -127,8 +127,6 @@ TEST_CPP_BINS = \
 	base64Utility$(EXE) \
 	poolTest$(EXE) \
 	logTest$(EXE) \
-	protocolArgumentParsing$(EXE) \
-	testProtocolLFdotEscaping$(EXE) \
 	testVariantStruct$(EXE) \
 	testNumberBaseConversion$(EXE) \
 	configValueParser$(EXE) \
@@ -148,8 +146,6 @@ TEST_CPP_BINS = \
 
 logTest$(EXE): $(TOPDIR)/src/libwolframed.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-protocolArgumentParsing$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
-testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testVariantStruct$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testNumberBaseConversion$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 configValueParser$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
@@ -231,13 +227,9 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testTimestamp
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./protocolArgumentParsing
-	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./configValueParser
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./configStructParser config/structparser.conf
-	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testProtocolLFdotEscaping
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testVariantStruct
 	@echo

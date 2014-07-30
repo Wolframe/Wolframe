@@ -96,3 +96,16 @@ bool Output::print( const char* tag, unsigned int tagsize, const char* val, unsi
 	}
 }
 
+void Output::setOutputFilter( const OutputFilterR& filter)
+{
+	if (m_outputfilter.get() && m_outputfilter->state() != OutputFilter::Start)
+	{
+		throw std::runtime_error( "cannot reset output filter already used");
+	}
+	else
+	{
+		m_outputfilter.reset( filter->copy());
+		m_outputfilter->setOutputChunkSize( m_outputChunkSize);
+	}
+}
+

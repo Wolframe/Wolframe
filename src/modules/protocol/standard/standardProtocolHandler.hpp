@@ -51,8 +51,9 @@ public:
 	StandardProtocolHandler();
 	virtual ~StandardProtocolHandler(){}
 
-	void setPeer( const net::RemoteEndpointR& remote);
-	void setLocalEndPoint( const net::LocalEndpointR& local);
+	virtual void setPeer( const net::RemoteEndpointR& remote);
+	virtual void setLocalEndPoint( const net::LocalEndpointR& local);
+	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
 
 public:
 	int doAuth( int argc, const char** argv, std::ostream& out);
@@ -85,6 +86,7 @@ private:
 	net::LocalEndpointR m_localEndpoint;
 	std::string m_command;
 	std::string m_commandtag;
+	std::size_t m_outputChunkSize;
 };
 
 
@@ -109,3 +111,4 @@ public:
 
 }}//namespace
 #endif
+

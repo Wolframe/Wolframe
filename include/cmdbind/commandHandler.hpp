@@ -83,6 +83,7 @@ public:
 	/// \param [out] bytesToTransfer size of the output chunk to send in bytes
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer)=0;
 
+
 	/// \brief Get the last error message of command execution to be returned to the client
 	const char* lastError() const
 	{
@@ -97,7 +98,7 @@ public:
 
 	/// \brief Pass the reference to the execution context to the command handler
 	/// \param[in] c the reference to the execution context owned by the caller (connection)
-	void setExecContext( proc::ExecContext* c)
+	virtual void setExecContext( proc::ExecContext* c)
 	{
 		m_execContext = c;
 	}
@@ -116,15 +117,28 @@ public:
 	}
 
 	/// \brief Set info about processed document type
-	void setDoctypeInfo( const types::DoctypeInfoR& doctypeinfo_)
+	virtual void setDoctypeInfo( const types::DoctypeInfoR& doctypeinfo_)
 	{
 		m_doctypeinfo = doctypeinfo_;
 	}
 
+	/// \brief Get a hint for the size of output chunks in bytes
+	std::size_t outputChunkSize() const
+	{
+		return m_outputChunkSize;
+	}
+
+	/// \brief Set a hint for the size of output chunks in bytes
+	virtual void setOutputChunkSize( std::size_t outputChunkSize_)
+	{
+		m_outputChunkSize = outputChunkSize_;
+	}
+
 private:
-	std::string m_lastError;		//< error operation for the client
-	proc::ExecContext* m_execContext;	//< the reference to the execution context of the connection
-	types::DoctypeInfoR m_doctypeinfo;	//< document type information
+	std::string m_lastError;		///< Error operation for the client
+	proc::ExecContext* m_execContext;	///< The reference to the execution context of the connection
+	types::DoctypeInfoR m_doctypeinfo;	///< Document type information
+	std::size_t m_outputChunkSize;		///< Hint for the size of output chunks
 };
 
 typedef boost::shared_ptr<CommandHandler> CommandHandlerR;

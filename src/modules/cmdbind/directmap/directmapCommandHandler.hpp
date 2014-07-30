@@ -72,8 +72,8 @@ private:
 	int m_state;								///< internal state
 	types::FormR m_inputform;						///< (optional) form for validating and formating input
 	types::FormR m_outputform;						///< (optional) form for validating and formating output
-	langbind::TypedInputFilterR m_input;					///< structure for input
-	langbind::TypedOutputFilterR m_output;					///< structure for output
+	langbind::TypedInputFilterR m_inputfilter;				///< structure for input
+	langbind::TypedOutputFilterR m_outputfilter;				///< structure for output
 	langbind::FormFunctionClosureR m_functionclosure;			///< processor for the transaction
 	boost::shared_ptr<serialize::DDLStructParser> m_inputform_parser;	///< parser to map the input to the input form
 	langbind::RedirectFilterClosure m_outputprinter;			///< processor for redirection of the transaction call result or if defined the output form content to output

@@ -130,20 +130,23 @@ struct OutputFilterImpl :public OutputFilter
 	/// \return true, if success, false else
 	virtual bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		setState( Open);
-		if (m_elemitr == m_elembuf.size())
+		if (m_elembuf.size() > outputChunkSize() && outputChunkSize())
 		{
-			m_elembuf.clear();
-			m_elemitr = 0;
+			if (m_elemitr == m_elembuf.size())
+			{
+				m_elembuf.clear();
+				m_elemitr = 0;
+			}
+			else
+			{
+				setState( EndOfBuffer);
+				return false;
+			}
 		}
+		setState( Open);
 		m_output.print( getElementTag( type), m_elembuf);
 		printToBufferEscEOL( (const char*)element, elementsize, m_elembuf);
 		m_output.print( '\n', m_elembuf);
-		if (m_elembuf.size() > outputChunkSize())
-		{
-			setState( EndOfBuffer);
-			return false;
-		}
 		return true;
 	}
 
@@ -224,18 +227,15 @@ struct InputFilterImpl :public InputFilter
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend)
 		,m_linecomplete(o.m_linecomplete)
-		,m_eolnread(o.m_eolnread){}
+		,m_eolnread(o.m_eolnread)
+	{
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
+	}
 
 	/// \brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
-	}
-
-	/// \brief Implement InputFilter::initcopy()
-	virtual InputFilter* initcopy() const
-	{
-		return new InputFilterImpl( *getMetaDataRef(), m_charset);
 	}
 
 	/// \brief Implement InputFilterImpl::putInput(const void*,std::size_t,bool)

@@ -348,14 +348,6 @@ struct InputFilterImpl
 		return new InputFilterImpl( *this);
 	}
 
-	/// \brief Implement InputFilter::initcopy()
-	virtual InputFilter* initcopy() const
-	{
-		InputFilterImpl* rt = new InputFilterImpl();
-		rt->m_withEmpty = m_withEmpty;
-		return rt;
-	}
-
 	/// \brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
@@ -1174,12 +1166,20 @@ struct OutputFilterImpl :public OutputFilter
 	/// \return true, if success, false else
 	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		setState( Open);
-		if (m_elemitr == m_elembuf.size())
+		if (m_elembuf.size() > outputChunkSize() && outputChunkSize())
 		{
-			m_elembuf.clear();
-			m_elemitr = 0;
+			if (m_elemitr == m_elembuf.size())
+			{
+				m_elembuf.clear();
+				m_elemitr = 0;
+			}
+			else
+			{
+				setState( EndOfBuffer);
+				return false;
+			}
 		}
+		setState( Open);
 		if (!m_headerPrinted)
 		{
 			if (!printHeader())
@@ -1238,11 +1238,6 @@ struct OutputFilterImpl :public OutputFilter
 					return false;
 				}
 				break;
-		}
-		if (m_elembuf.size() > outputChunkSize())
-		{
-			setState( EndOfBuffer);
-			return false;
 		}
 		return true;
 	}

@@ -36,7 +36,7 @@
 #include "appdevel/moduleFrameMacros.hpp"
 #include "standardProtocolHandler.hpp"
 
-WF_MODULE_BEGIN( "StandardProtocolHandler", "Wolframe standard protocol handler module")
- WF_PROTOCOL_HANDLER( "standard", _Wolframe::cmdbind::StandardProtocolHandlerUnit)
+WF_MODULE_BEGIN( "WolframeProtocolHandler", "Wolframe (standard) protocol handler module")
+ WF_PROTOCOL_HANDLER( "wolframe", _Wolframe::cmdbind::StandardProtocolHandlerUnit)
 WF_MODULE_END
 

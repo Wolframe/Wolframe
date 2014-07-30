@@ -352,5 +352,38 @@ std::string::const_iterator _Wolframe::protocol::unescapeStringDLF( const std::s
 	return buf.end();
 }
 
+void EscapeSTM::process()
+{
+	while (m_blkpos < m_blksize)
+	{
+		char ch = m_blk[m_blkpos];
+		switch (m_state)
+		{
+			case SRC:
+				if (!m_output->print( ch)) return;
+				if (ch == '\n')
+				{
+					m_state = LF;
+				}
+				break;
+			case LF:
+				if (!m_output->print( ch)) return;
+				/*no break here!*/
+			case LFdot:
+				if (ch == '.')
+				{
+					m_state = LFdot;
+					if (!m_output->print( '.')) return;
+					m_state = SRC;
+				}
+				else if (ch != '\n')
+				{
+					m_state = SRC;
+				}
+				break;
+		}
+		++m_blkpos;
+	}
+}
 
 

@@ -36,6 +36,8 @@
 #ifndef _Wolframe_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
 #define _Wolframe_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
 #include "filter/filter.hpp"
+#include "langbind/input.hpp"
+#include "langbind/output.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "system/connectionHandler.hpp"
 
@@ -49,35 +51,49 @@ class IOFilterCommandHandler
 {
 public:
 	/// \brief Constructor
-	IOFilterCommandHandler()
-		:m_gotEoD(false){}
+	explicit IOFilterCommandHandler()
+		:m_writeptr(0)
+		,m_writesize(0)
+		,m_done(false){}
+	/// \brief Constructor
+	IOFilterCommandHandler( const std::string& docformat_)
+		:m_input(docformat_)
+		,m_writeptr(0)
+		,m_writesize(0)
+		,m_done(false){}
 
 	/// \brief Destructor
 	virtual ~IOFilterCommandHandler(){}
 
-	void setFilter( const langbind::InputFilterR& in)
-	{
-		m_inputfilter = in;
-	}
+	/// \brief Define the input filter to use (makes an own copy of it)
+	void setInputFilter( const langbind::InputFilterR& in);
 
-	void setFilter( const langbind::OutputFilterR& out)
-	{
-		m_outputfilter = out;
-	}
+	/// \brief Define the output filter to use (makes an own copy of it)
+	void setOutputFilter( const langbind::OutputFilterR& out);
 
+	/// \brief Get a reference to the input filter
 	langbind::InputFilterR inputfilter()
 	{
-		return m_inputfilter;
+		return m_input.inputfilter();
 	}
 
+	/// \brief Get a const reference to the output object
+	const langbind::Output& output()
+	{
+		return m_output;
+	}
+
+	/// \brief Get a const reference to the input object
+	const langbind::Input& input()
+	{
+		return m_input;
+	}
+
+	/// \brief Get a reference to the output filter
 	langbind::OutputFilterR outputfilter()
 	{
-		return m_outputfilter;
+		return m_output.outputfilter();
 	}
-
-	void setFilterAs( const langbind::InputFilterR& in);
-
-	void setFilterAs( const langbind::OutputFilterR& out);
 
 	/// \brief Get the next operation to do for the connection handler
 	/// \return the next operation for the connection handler
@@ -103,21 +119,31 @@ public:
 		Yield		//< call interrupted with request for a network operation
 	};
 
+	/// \brief Get an enumeration value of call states as string
 	static const char* callResultName( CallResult cr)
 	{
 		static const char* ar[] = {"Ok","Error","Yield"};
 		return ar[ (int)cr];
 	}
 
+	/// \brief Hook to call function to execute
 	/// \param[out] err error code in case of error
 	/// \return CallResult status of the filter input for the state machine of this command handler
 	virtual CallResult call( const char*& err)=0;
 
+	/// \brief Overloaded setter of the size of output chunk, setting it also in output
+	virtual void setOutputChunkSize( std::size_t outputChunkSize_)
+	{
+		CommandHandler::setOutputChunkSize( outputChunkSize_);
+		m_output.setOutputChunkSize( outputChunkSize_);
+	}
 
-protected:
-	langbind::InputFilterR m_inputfilter;		///< input interface for this command handler
-	langbind::OutputFilterR m_outputfilter;		///< output interface for this command handler
-	bool m_gotEoD;					///< true, if we got end of data
+private:
+	langbind::Input m_input;			///< Input interface for this command handler
+	langbind::Output m_output;			///< Output interface for this command handler
+	const void* m_writeptr;				///< What to write next
+	std::size_t m_writesize;			///< Size of what to write next in bytes
+	bool m_done;					///< Terminated
 };
 }}
 #endif

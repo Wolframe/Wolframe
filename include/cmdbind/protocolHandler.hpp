@@ -58,6 +58,9 @@ public:
 		WRITE=cmdbind::CommandHandler::WRITE,	/// <request to write data
 		CLOSE=cmdbind::CommandHandler::CLOSE	/// <request to terminate processing
 	};
+	/// \brief Default constructor
+	ProtocolHandler()
+		:m_execContext(0){}
 
 	/// \brief Destructor
 	virtual ~ProtocolHandler(){}

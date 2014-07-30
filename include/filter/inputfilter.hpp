@@ -88,10 +88,6 @@ public:
 	/// \return allocated pointer to copy of this
 	virtual InputFilter* copy() const=0;
 
-	/// \brief Get an instance copy of this in its initial state
-	/// \return allocated pointer to an instance copy in its initial state
-	virtual InputFilter* initcopy() const=0;
-
 	/// \brief Declare the next input chunk to the filter
 	/// \param [in] ptr the start of the input chunk
 	/// \param [in] size the size of the input chunk in bytes

@@ -45,18 +45,21 @@ class Output
 public:
 	/// \brief Constructor
 	Output()
-		:m_state(0)
+		:m_outputChunkSize(0)
+		,m_state(0)
 		,m_called(false){}
 	/// \brief Copy constructor
 	/// \param[in] o copied item
 	Output( const Output& o)
 		:m_outputfilter(o.m_outputfilter)
+		,m_outputChunkSize(o.m_outputChunkSize)
 		,m_state(o.m_state)
 		,m_called(o.m_called){}
 	/// \brief Constructor by output filter
 	/// \param[in] flt output filter reference
 	Output( const OutputFilterR& flt)
 		:m_outputfilter(flt)
+		,m_outputChunkSize(0)
 		,m_state(0)
 		,m_called(false){}
 	/// \brief Destructor
@@ -72,12 +75,24 @@ public:
 
 	const OutputFilterR& outputfilter() const		{return m_outputfilter;}
 	OutputFilterR& outputfilter()				{return m_outputfilter;}
+	void setOutputFilter( const OutputFilterR& filter);
 
 	bool called() const					{return m_called;}
 	void called( bool yes)					{m_called=yes;}
 
+	void setOutputChunkSize( unsigned int outputChunkSize_)
+	{
+		m_outputChunkSize = outputChunkSize_;
+	}
+
+	unsigned int outputChunkSize() const
+	{
+		return m_outputChunkSize;
+	}
+
 private:
 	OutputFilterR m_outputfilter;				///< output filter reference
+	std::size_t m_outputChunkSize;				///< chunk size for output
 	unsigned int m_state;					///< current state for outputs with more than one elements
 	bool m_called;						///< has already been called
 };

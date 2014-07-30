@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "execCommandHandler.hpp"
+#include "execProtocolHandler.hpp"
 #include "processor/execContext.hpp"
 #include "tprocProtocolFiles.hpp"
 #include "logger-v1.hpp"
@@ -42,8 +42,10 @@ using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::protocol;
 
 ExecProtocolHandler::ExecProtocolHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_)
-	:m_state(Init),m_buffer(1024),m_argBuffer(&m_buffer),m_writeptr(0),m_writesize(0),m_writepos(0),m_cmdidx(-1),m_cmdhandler(0)
+	:m_state(Init),m_writeptr(0),m_writesize(0),m_writepos(0),m_cmdidx(-1)
 {
+	m_arg[0] = 0;
+	m_arg[1] = 0;
 	m_itr = m_input.begin();
 	m_end = m_input.begin();
 
@@ -79,9 +81,9 @@ void ExecProtocolHandler::setOutputBuffer( void* buf, std::size_t size, std::siz
 
 void ExecProtocolHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	if (m_cmdhandler.get())
+	if (m_protocolHandler.get())
 	{
-		m_cmdhandler->putInput( begin, bytesTransferred, false);
+		m_protocolHandler->putInput( begin, bytesTransferred);
 	}
 	else
 	{
@@ -93,9 +95,9 @@ void ExecProtocolHandler::putInput( const void *begin, std::size_t bytesTransfer
 
 void ExecProtocolHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
-	if (m_cmdhandler.get())
+	if (m_protocolHandler.get())
 	{
-		m_cmdhandler->getInputBlock( begin, maxBlockSize);
+		m_protocolHandler->getInputBlock( begin, maxBlockSize);
 	}
 	else if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
 	{
@@ -105,7 +107,7 @@ void ExecProtocolHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize
 
 void ExecProtocolHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
-	if (m_cmdhandler.get())
+	if (m_protocolHandler.get())
 	{
 		begin = m_writeptr + m_writepos;
 		bytesToTransfer = m_writesize - m_writepos;
@@ -125,9 +127,9 @@ void ExecProtocolHandler::getOutput( const void*& begin, std::size_t& bytesToTra
 
 void ExecProtocolHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	if (m_cmdhandler.get())
+	if (m_protocolHandler.get())
 	{
-		m_cmdhandler->getDataLeft( begin, nofBytes);
+		m_protocolHandler->getDataLeft( begin, nofBytes);
 	}
 	else
 	{
@@ -142,8 +144,16 @@ const char* ExecProtocolHandler::getCommand( int& argc, const char**& argv)
 	if (m_cmdidx < m_nofParentCmds)
 	{
 		const char* rt = m_parser.getcmd( m_cmdidx);
-		argc = m_argBuffer.argc();
-		argv = m_argBuffer.argv();
+		argc = m_argBuffer.size()?1:0;
+		if (argc)
+		{
+			m_arg[0] = m_argBuffer.c_str();
+		}
+		else
+		{
+			m_arg[0] = 0;
+		}
+		argv = m_arg;
 		return rt;
 	}
 	else
@@ -168,7 +178,6 @@ ProtocolHandler::Operation ExecProtocolHandler::nextOperation()
 			{
 				//start:
 				m_state = EnterCommand;
-				m_buffer.clear();
 				m_argBuffer.clear();
 				m_output.print( "OK enter cmd\r\n");
 				m_capastr = m_parser.capabilities();
@@ -180,7 +189,7 @@ ProtocolHandler::Operation ExecProtocolHandler::nextOperation()
 			{
 				//the empty command is for an empty line for not bothering the client with obscure error messages.
 				//the next state should read one character for sure otherwise it may result in an endless loop
-				m_cmdidx = m_parser.getCommand( m_itr, m_end, m_buffer);
+				m_cmdidx = m_parser.getCommand( m_itr, m_end, m_argBuffer);
 				if (m_cmdidx < 0)
 				{
 					if (m_itr == m_end)
@@ -252,7 +261,7 @@ ProtocolHandler::Operation ExecProtocolHandler::nextOperation()
 				else if (m_cmdidx == m_nofParentCmds+1)
 				{
 					///.. empty command
-					if (m_argBuffer.argc())
+					if (m_argBuffer.size())
 					{
 						m_state = ProtocolError;
 						m_output.print( "ERR empty command with arguments\r\n");
@@ -260,7 +269,6 @@ ProtocolHandler::Operation ExecProtocolHandler::nextOperation()
 					}
 					else
 					{
-						m_buffer.clear();
 						m_argBuffer.clear();
 						m_state = EnterCommand;
 						continue;
@@ -282,27 +290,27 @@ ProtocolHandler::Operation ExecProtocolHandler::nextOperation()
 							LOG_ERROR << "Processor provider undefined";
 							m_output.print( "ERR command not defined\r\n");
 							m_state = EnterCommand;
-							m_buffer.clear();
 							m_argBuffer.clear();
 							return WRITE;
 						}
-						m_cmdhandler.reset( execContext()->provider()->cmdhandler( procname, ""));
-						if (!m_cmdhandler.get())
+						cmdbind::CommandHandlerR cmdhnd( execContext()->provider()->cmdhandler( procname, ""));
+						if (!cmdhnd.get())
 						{
 							LOG_ERROR << "Command handler not found for '" << procname << "'";
 							m_output.print( "ERR command not defined\r\n");
 							m_state = EnterCommand;
-							m_buffer.clear();
 							m_argBuffer.clear();
 							return WRITE;
 
 						}
-						m_cmdhandler->setExecContext( execContext());
-						m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
+						cmdhnd->setExecContext( execContext());
+						m_protocolHandler.reset( new EscDlfProtocolHandler( cmdhnd));
+						m_protocolHandler->setExecContext( execContext());
+						m_protocolHandler->setArgumentString( m_argBuffer);
 						m_state = Processing;
-						m_cmdhandler->setInputBuffer( m_input.ptr(), m_input.size());
-						m_cmdhandler->putInput( m_itr.ptr(), m_end-m_itr);
-						m_cmdhandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+						m_protocolHandler->setInputBuffer( m_input.ptr(), m_input.size());
+						m_protocolHandler->putInput( m_itr.ptr(), m_end-m_itr);
+						m_protocolHandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
 					}
 					catch (std::exception& e)
 					{
@@ -323,25 +331,26 @@ ProtocolHandler::Operation ExecProtocolHandler::nextOperation()
 
 				try
 				{
-					switch (m_cmdhandler->nextOperation())
+					switch (m_protocolHandler->nextOperation())
 					{
 						case READ:
 							return READ;
 						break;
 						case WRITE:
 							m_state = FlushingOutput;
-							m_cmdhandler->getOutput( m_writeptr, m_writesize);
+							m_protocolHandler->getOutput( content, m_writesize);
+							m_writeptr = (const char*)content;
 							m_writepos = 0;
 							return WRITE;
 						break;
 						case CLOSE:
-							m_cmdhandler->getDataLeft( content, contentsize);
+							m_protocolHandler->getDataLeft( content, contentsize);
 							pos = (const char*)content - m_input.charptr();
 							m_input.setPos( pos + contentsize);
 							m_itr = m_input.at( pos);
 							m_end = m_input.end();
-							err = m_cmdhandler.get()->lastError();
-							m_cmdhandler.reset();
+							err = m_protocolHandler->lastError();
+							m_protocolHandler.reset();
 							m_state = EnterCommand;
 							if (err)
 							{

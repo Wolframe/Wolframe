@@ -361,32 +361,7 @@ public:
 		m_blkpos = 0;
 	}
 
-	void process()
-	{
-		while (m_blkpos < m_blksize)
-		{
-			char ch = m_blk[m_blkpos];
-			if (!m_output->print( ch)) return;
-
-			if (m_state == SRC)
-			{
-				if (ch == '\n') m_state = LF;
-			}
-			else if (m_state == LF)
-			{
-				if (ch == '.')
-				{
-					if (!m_output->print( ch)) return;
-					m_state = SRC;
-				}
-				else if (ch != '\n')
-				{
-					m_state = SRC;
-				}
-			}
-			++m_blkpos;
-		}
-	}
+	void process();
 
 	bool hasMore() const
 	{
@@ -399,7 +374,8 @@ private:
 	enum State
 	{
 		SRC,			///< parsing content
-		LF			///< detected an LineFeed in state SRC
+		LF,			///< detected a LineFeed in state SRC
+		LFdot			///< detected a dot in state LF
 	};
 	State m_state;
 	OutputBlock* m_output;

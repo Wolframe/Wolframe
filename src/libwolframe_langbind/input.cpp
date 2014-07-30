@@ -44,14 +44,16 @@ Input::Input( const Input& o)
 	,m_content(o.m_content)
 	,m_contentsize(o.m_contentsize)
 	,m_isProcessorInput(o.m_isProcessorInput)
+	,m_unconsumedInput(o.m_unconsumedInput)
+	,m_gotEoD(o.m_gotEoD)
 {}
 
-Input::Input( const InputFilterR& inputfilter_, const std::string& docformat_)
+Input::Input( const std::string& docformat_)
 	:m_used(false)
-	,m_inputfilter(inputfilter_)
 	,m_docformat(docformat_)
 	,m_contentsize(0)
 	,m_isProcessorInput(true)
+	,m_gotEoD(false)
 {}
 
 Input::Input( const std::string& docformat_, const std::string& content_)
@@ -59,6 +61,7 @@ Input::Input( const std::string& docformat_, const std::string& content_)
 	,m_docformat(docformat_)
 	,m_contentsize(0)
 	,m_isProcessorInput(false)
+	,m_gotEoD(false)
 {
 	char* mem = (char*)std::malloc( content_.size());
 	if (!mem) throw std::bad_alloc();
@@ -67,14 +70,37 @@ Input::Input( const std::string& docformat_, const std::string& content_)
 	std::memcpy( mem, content_.c_str(), content_.size());
 }
 
-const void* Input::allocContentCopy( const void* ptr, std::size_t size)
+void Input::putInput( const void* data, std::size_t datasize, bool eod)
 {
-	char* mem = (char*)std::malloc( size);
-	if (!mem) throw std::bad_alloc();
-	m_content = boost::shared_ptr<char>( mem, std::free);
-	m_contentsize = size;
-	std::memcpy( mem, ptr, size);
-	return m_content.get();
+	m_gotEoD |= eod;
+	if (m_inputfilter.get())
+	{
+		m_inputfilter->putInput( data, datasize, eod);
+	}
+	else
+	{
+		m_unconsumedInput.append( (const char*)data, datasize);
+	}
+}
+
+void Input::setInputFilter( const InputFilterR& filter)
+{
+	if (m_inputfilter.get() && m_inputfilter->state() != InputFilter::Start)
+	{
+		throw std::runtime_error( "cannot reset input filter already used");
+	}
+	else
+	{
+		m_inputfilter.reset( filter->copy());
+		if (m_unconsumedInput.size() || m_gotEoD)
+		{
+			m_inputfilter->putInput( m_unconsumedInput.c_str(), m_unconsumedInput.size(), m_gotEoD);
+		}
+		else if (isDocument())
+		{
+			m_inputfilter->putInput( documentptr(), documentsize(), true);
+		}
+	}
 }
 
 InputFilterR& Input::getIterator()

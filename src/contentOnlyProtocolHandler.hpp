@@ -75,19 +75,22 @@ private:
 	{
 		Init,
 		DoctypeDetection,
+		InitProcessing,
 		Processing,
 		FlushingOutput,
+		DiscardInput,
 		Done
 	};
 	static const char* stateName( State s)
 	{
-		static const char* ar[] = {"Init","DoctypeDetection","Processing","Done"};
+		static const char* ar[] = {"Init","DoctypeDetection","InitProcessing","Processing","FlushingOutput","DiscardInput","Done"};
 		return ar[s];
 	}
 	net::RemoteEndpointR m_remoteEndpoint;		///< remote end point
 	net::LocalEndpointR m_localEndpoint;		///< connection endpoint
 	cmdbind::DoctypeDetectorR m_doctypeDetector;	///< document type detection
 	std::string m_buffer;				///< buffer for input during document type detection
+	std::size_t m_bufferpos;			///< content processed position in m_buffer 
 	std::string m_cmdname;				///< name of command to execute -> command handler
 	cmdbind::CommandHandlerR m_commandHandler;	///< command handler for processing
 	char* m_input;					///< buffer for read messages

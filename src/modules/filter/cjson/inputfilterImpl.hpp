@@ -79,14 +79,6 @@ struct InputFilterImpl :public InputFilter
 	{
 		return new InputFilterImpl(*this);
 	}
-	/// \brief Implements InputFilter::initcopy()
-	virtual InputFilter* initcopy() const
-	{
-		return new InputFilterImpl();
-	}
-
-	/// \brief Implements InputFilter::getRest( const void*&,std::size_t&,bool&);
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end);
 
 	/// \brief Implements FilterBase::getValue(const char*,std::string&) const
 	virtual bool getValue( const char* name, std::string& val) const;

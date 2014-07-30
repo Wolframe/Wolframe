@@ -34,8 +34,7 @@ CPP_OBJS = \
 	doctypeFilterProtocolHandler.obj \
 	interfaceProtocolHandler.obj \
 	passwordChangeProtocolHandler.obj \
-	standardProtocolHandler.obj \
-	mod_protocol_standard.obj
+	standardProtocolHandler.obj
 
 all: $(DYNAMIC_MODULE)
 

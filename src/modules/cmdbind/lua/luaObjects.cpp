@@ -844,7 +844,7 @@ LUA_FUNCTION_THROWS( "<type>()", function_datetime_constructor)
 	}
 }
 
-LUA_FUNCTION_THROWS( "type()", function_type)
+LUA_FUNCTION_THROWS( "provider.type()", function_type)
 {
 	int nn = lua_gettop( ls);
 	std::vector<types::Variant> initializerList;
@@ -1516,8 +1516,14 @@ LUA_FUNCTION_THROWS( "provider.filter(..)", function_filter)
 				}
 				else
 				{
-					Filter flt( langbind::InputFilterR(input->inputfilter()->copy()), langbind::OutputFilterR( output->outputfilter()->copy()));
-					LuaObject<Filter>::push_luastack( ls, flt);
+					langbind::InputFilterR ifl;
+					langbind::OutputFilterR ofl;
+					if (input->inputfilter().get())
+					{
+						ifl.reset( input->inputfilter()->copy());
+						ofl.reset( output->outputfilter()->copy());
+					}
+					LuaObject<Filter>::push_luastack( ls, Filter( ifl, ofl));
 				}
 				return 1;
 			}
@@ -1585,36 +1591,17 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 	{
 		throw std::runtime_error( "filter object expected as first argument");
 	}
-	InputFilter* ff = 0;
 	if (filter->inputfilter().get())
 	{
-		ff = filter->inputfilter()->initcopy();
-		if (input->isDocument())
-		{
-			input->inputfilter().reset( ff);
-			const char* cstr = input->documentptr();
-			std::size_t csize = input->documentsize();
-			ff->putInput( cstr, csize, true);
-		}
-		else if (input->inputfilter().get())
-		{
-			if (input->inputfilter()->state() != langbind::InputFilter::Start)
-			{
-				throw std::runtime_error( "cannot change input filter after first read");
-			}
-			input->inputfilter().reset( ff);
-		}
-		else
-		{
-			input->inputfilter().reset( ff);
-		}
+		input->setInputFilter( filter->inputfilter());
+
 		if (input == LuaObject<Input>::getGlobal( ls, "input"))
 		{
 			//... the global input and output share the attributes
 			Output* output = LuaObject<Output>::getGlobal( ls, "output");
 			if (output && output->outputfilter().get())
 			{
-				output->outputfilter()->inheritMetaData( ff->getMetaDataRef());
+				output->outputfilter()->inheritMetaData( input->inputfilter()->getMetaDataRef());
 			}
 		}
 	}
@@ -1807,30 +1794,24 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			std::runtime_error( "string (doctype id), table (doctype) or filter expected as argument");
 		}
 	}
-	OutputFilter* ff = 0;
 	if (filter)
 	{
 		if (filter->outputfilter().get())
 		{
-			ff = filter->outputfilter()->copy();
-			if (output->outputfilter().get())
+			output->setOutputFilter( filter->outputfilter());
+			if (output == LuaObject<Output>::getGlobal( ls, "output"))
 			{
-				if (output == LuaObject<Output>::getGlobal( ls, "output"))
+				//... the global input and output share the attributes
+				Input* input = LuaObject<Input>::getGlobal( ls, "input");
+				if (input && input->inputfilter().get())
 				{
-					//... the global input and output share the attributes
-					Input* input = LuaObject<Input>::getGlobal( ls, "input");
-					if (input)
-					{
-						ff->inheritMetaData( input->inputfilter()->getMetaDataRef());
-					}
+					output->outputfilter()->inheritMetaData( input->inputfilter()->getMetaDataRef());
 				}
-				ff->setOutputChunkSize( output->outputfilter()->outputChunkSize());
 			}
-			output->outputfilter().reset( ff);
 		}
 		else
 		{
-			throw std::runtime_error( "called with undefined output for the argument filter object");
+			throw std::runtime_error( "called with undefined filter argument");
 		}
 	}
 	types::DocMetaData allmetadata;

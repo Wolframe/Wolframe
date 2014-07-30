@@ -43,7 +43,8 @@ using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 
 ContentOnlyProtocolHandler::ContentOnlyProtocolHandler()
-	:m_input(0)
+	:m_bufferpos(0)
+	,m_input(0)
 	,m_inputsize(0)
 	,m_output(0)
 	,m_outputsize(0)
@@ -104,11 +105,23 @@ ProtocolHandler::Operation ContentOnlyProtocolHandler::nextOperation()
 				m_doctypeDetector.reset( execContext()->provider()->doctypeDetector());
 				if (!m_doctypeDetector.get())
 				{
-					LOG_ERROR << "no document type detection defined";
-					return CLOSE;
+					if (m_cmdname.empty() || m_cmdname[m_cmdname.size()-1] != '!')
+					{
+						LOG_ERROR << "no document type detection defined";
+						return CLOSE;
+					}
+					else
+					{
+						LOG_WARNING << "no document type detection defined, skipping it";
+						m_cmdname.resize( m_cmdname.size()-1);
+						m_state = InitProcessing;
+						continue;
+					}
 				}
+
 				m_state = DoctypeDetection;
 				/* no break here ! */
+
 			case DoctypeDetection:
 				if (!m_doctypeDetector->run())
 				{
@@ -141,12 +154,23 @@ ProtocolHandler::Operation ContentOnlyProtocolHandler::nextOperation()
 				{
 					m_cmdname.append( m_doctypeInfo->doctype());
 				}
-				m_commandHandler.reset( execContext()->provider()->cmdhandler( m_cmdname, m_doctypeInfo->docformat()));
+				/*no break here!*/
+
+			case InitProcessing:
+				if (m_doctypeInfo.get())
+				{
+					m_commandHandler.reset( execContext()->provider()->cmdhandler( m_cmdname, m_doctypeInfo->docformat()));
+				}
+				else
+				{
+					m_commandHandler.reset( execContext()->provider()->cmdhandler( m_cmdname, ""));
+				}
 				if (!m_commandHandler.get())
 				{
 					throw std::runtime_error( std::string("no command handler defined for command '") + m_cmdname + "'");
 				}
-				m_commandHandler->putInput( m_buffer.c_str(), m_buffer.size(), m_eod);
+				m_commandHandler->setExecContext( execContext());
+				m_commandHandler->setOutputChunkSize( (m_outputsize * 8) - (m_outputsize / 16));
 				m_state = Processing;
 				/* no break here ! */
 	
@@ -154,10 +178,32 @@ ProtocolHandler::Operation ContentOnlyProtocolHandler::nextOperation()
 				switch (m_commandHandler->nextOperation())
 				{
 					case CommandHandler::CLOSE:
-						m_state = Done;
-						return CLOSE;
+						if (m_eod)
+						{
+							m_state = Done;
+							return CLOSE;
+						}
+						else
+						{
+							m_state = DiscardInput;
+							return READ;
+						}
 					case CommandHandler::READ:
-						if (!m_eod)
+						if (m_buffer.size() > 0)
+						{
+							if (m_bufferpos == m_buffer.size())
+							{
+								m_bufferpos = 0;
+								m_buffer.clear();
+							}
+							else
+							{
+								m_commandHandler->putInput( m_buffer.c_str(), m_buffer.size(), m_eod);
+								m_bufferpos = m_buffer.size();
+								continue;
+							}
+						}
+						if (m_eod)
 						{
 							throw std::runtime_error( "unexpected end of file in processing");
 						}
@@ -177,7 +223,7 @@ ProtocolHandler::Operation ContentOnlyProtocolHandler::nextOperation()
 				}
 				LOG_ERROR << "internal: illegal state in processing";
 				return CLOSE;
-	
+
 			case FlushingOutput:
 				if (m_writepos == m_writesize)
 				{
@@ -188,6 +234,9 @@ ProtocolHandler::Operation ContentOnlyProtocolHandler::nextOperation()
 				}
 				return WRITE;
 	
+			case DiscardInput:
+				return m_eod?CLOSE:READ;
+
 			case Done:
 				LOG_ERROR << "internal: got called again after CLOSE";
 				return CLOSE;
@@ -205,6 +254,7 @@ ProtocolHandler::Operation ContentOnlyProtocolHandler::nextOperation()
 void ContentOnlyProtocolHandler::putEOF()
 {
 	m_eod = true;
+	m_commandHandler->putInput( "", 0, m_eod);
 }
 
 void ContentOnlyProtocolHandler::putInput( const void* chunk, std::size_t chunksize)
@@ -219,16 +269,21 @@ void ContentOnlyProtocolHandler::putInput( const void* chunk, std::size_t chunks
 			m_buffer.append( (const char*)chunk, chunksize);
 			break;
 
+		case DiscardInput:
+			//... input is discarded, respectively ignored
+			break;
+
 		case Processing:
 			m_commandHandler->putInput( (const char*)chunk, chunksize, m_eod);
 			break;
 
+		case InitProcessing:
+			throw std::runtime_error( "internal error: put input in init processing state");
 		case FlushingOutput:
 			throw std::runtime_error( "internal error: put input in flushing output state");
 		case Done:
 			throw std::runtime_error( "internal error: put input after CLOSE");
 	}
-	throw std::runtime_error( "internal: illegal state in put input");
 }
 
 void ContentOnlyProtocolHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)

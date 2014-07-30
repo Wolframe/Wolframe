@@ -67,6 +67,7 @@ public:
 	OutputFilter( const char* name_, const types::DocMetaDataR& inheritMetadata_)
 		:FilterBase(name_)
 		,m_state(Start)
+		,m_outputChunkSize(0)
 		,m_inheritMetadata(inheritMetadata_)
 	{}
 
@@ -74,6 +75,7 @@ public:
 	explicit OutputFilter( const char* name_)
 		:FilterBase(name_)
 		,m_state(Start)
+		,m_outputChunkSize(0)
 	{}
 
 	/// \brief Copy constructor
@@ -81,6 +83,7 @@ public:
 	OutputFilter( const OutputFilter& o)
 		:FilterBase(o)
 		,m_state(o.m_state)
+		,m_outputChunkSize(o.m_outputChunkSize)
 		,m_inheritMetadata(o.m_inheritMetadata)
 		,m_metadata(o.m_metadata)
 		{}

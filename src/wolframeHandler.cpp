@@ -70,7 +70,7 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 	std::string protocol;
 	if (local->config().protocol.empty())
 	{
-		protocol = "standard";
+		protocol = "wolframe";
 	}
 	else
 	{

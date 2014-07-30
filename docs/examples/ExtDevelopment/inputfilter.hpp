@@ -27,9 +27,6 @@ public:
     // Get a self copy
     virtual InputFilter* copy() const=0;
 
-    // Get an instance copy of this in its initial state
-    virtual InputFilter* initcopy() const=0;
-
     // Declare the next input chunk to the filter
     virtual void putInput(
         const void* ptr,

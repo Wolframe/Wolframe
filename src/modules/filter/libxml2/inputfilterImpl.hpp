@@ -103,12 +103,6 @@ struct InputFilterImpl :public InputFilter
 		return new InputFilterImpl(*this);
 	}
 
-	/// \brief Implements InputFilter::initcopy()
-	virtual InputFilter* initcopy() const
-	{
-		return new InputFilterImpl( m_xsltMapper, m_withEmpty);
-	}
-
 	/// \brief Implements FilterBase::getValue(const char*,std::string&) const
 	virtual bool getValue( const char* id, std::string& val) const;
 

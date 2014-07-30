@@ -68,12 +68,6 @@ public:
 		return new BufferingInputFilter( *this);
 	}
 
-	/// \brief Implements InputFilter::initcopy()const
-	virtual InputFilter* initcopy() const
-	{
-		return new BufferingInputFilter( m_ref, m_ref->name());
-	}
-
 	/// \brief Implements InputFilter::getRest(const void*&,std::size_t&,bool)
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end_)
 	{
@@ -109,9 +103,9 @@ public:
 		}
 		else
 		{
-			setState( Start);
 			m_ref->setState( Start);
 		}
+		setState( Open);
 	}
 
 	/// \brief Implements InputFilter::getNext(ElementType&,const void*&,std::size_t&)

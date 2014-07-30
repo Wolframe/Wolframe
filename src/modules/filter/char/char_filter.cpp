@@ -99,17 +99,13 @@ struct InputFilterImpl :public InputFilter
 	{
 		m_elembuf.resize( o.m_elembuf.size());
 		std::memcpy( m_elembufmem, o.m_elembufmem, o.m_elembuf.size());
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
 	}
 
 	/// \brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
-	}
-	/// \brief Implement InputFilter::initcopy()
-	virtual InputFilter* initcopy() const
-	{
-		return new InputFilterImpl( *getMetaDataRef(), m_charset);
 	}
 
 	/// \brief Implement InputFilter::putInput(const void*,std::size_t,bool)
@@ -233,20 +229,23 @@ struct OutputFilterImpl :public OutputFilter
 	/// \return true, if success, false else
 	bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		setState( Open);
-		if (m_elemitr == m_elembuf.size())
+		if (m_elembuf.size() > outputChunkSize() && outputChunkSize())
 		{
-			m_elembuf.clear();
-			m_elemitr = 0;
-		}
-		if (type == Value)
-		{
-			printToBuffer( (const char*)element, elementsize, m_elembuf);
-			if (m_elembuf.size() > outputChunkSize())
+			if (m_elemitr == m_elembuf.size())
+			{
+				m_elembuf.clear();
+				m_elemitr = 0;
+			}
+			else
 			{
 				setState( EndOfBuffer);
 				return false;
 			}
+		}
+		setState( Open);
+		if (type == Value)
+		{
+			printToBuffer( (const char*)element, elementsize, m_elembuf);
 		}
 		return true;
 	}

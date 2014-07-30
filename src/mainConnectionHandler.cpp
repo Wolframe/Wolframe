@@ -172,7 +172,7 @@ void MainConnectionHandler::setExecContext( proc::ExecContext* context_)
 	std::string protocol = m_localEndPoint->config().protocol;
 	if (protocol.empty())
 	{
-		protocol = "standard";
+		protocol = "wolframe";
 	}
 	m_protocolHandler.reset( context_->provider()->protocolHandler( protocol));
 	if (!m_protocolHandler.get())

@@ -51,7 +51,7 @@ class LuaCommandHandler
 public:
 	///\brief Constructor
 	explicit LuaCommandHandler( const langbind::LuaScriptInstanceR& interp_, const std::string& cmdname_, const std::string& docformat_, const langbind::FilterDef& default_filter_)
-		:m_interp(interp_),m_cmdname(cmdname_),m_docformat(docformat_),m_default_filter(default_filter_),m_called(false),m_done(false){}
+		:IOFilterCommandHandler(docformat_),m_interp(interp_),m_cmdname(cmdname_),m_default_filter(default_filter_),m_called(false),m_done(false){}
 
 	///\brief Destructor
 	virtual ~LuaCommandHandler(){}
@@ -73,7 +73,6 @@ private:
 private:
 	langbind::LuaScriptInstanceR m_interp;
 	std::string m_cmdname;			///< name of the command executed
-	std::string m_docformat;		///< document format identifier, e.g. "XML","JSON", etc.
 	langbind::FilterDef m_default_filter;	///< default filter to use
 	std::string m_lasterror;		///< buffer for the error string returned in call(const char*&)
 	bool m_called;				///< already called once

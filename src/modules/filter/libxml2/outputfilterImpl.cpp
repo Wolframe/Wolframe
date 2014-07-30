@@ -244,14 +244,14 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 		}
 		xmlout = m_doc.get();
 	}
-	if (m_elemitr && m_elembuf.size() == m_elemitr)
-	{
-		m_elembuf.clear();
-		m_elemitr = 0;
-	}
 	if (m_taglevel == 0)
 	{
-		if (m_elembuf.size() > outputChunkSize())
+		if (m_elemitr == m_elembuf.size())
+		{
+			m_elembuf.clear();
+			m_elemitr = 0;
+		}
+		else
 		{
 			setState( EndOfBuffer);
 			return false;
@@ -331,6 +331,13 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 			rt = false;
 	}
 	return rt;
+}
+
+void OutputFilterImpl::getOutput( const void*& buf, std::size_t& bufsize)
+{
+	buf = (const void*)(m_elembuf.c_str() + m_elemitr);
+	bufsize = m_elembuf.size() - m_elemitr;
+	m_elemitr = m_elembuf.size();
 }
 
 bool OutputFilterImpl::getValue( const char* id, std::string& val) const

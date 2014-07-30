@@ -329,10 +329,18 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 {
 	try
 	{
-		if (m_elemitr && m_elemitr == m_elembuf.size())
+		if (m_elembuf.size() > outputChunkSize() && outputChunkSize())
 		{
-			m_elembuf.clear();
-			m_elemitr = 0;
+			if (m_elemitr == m_elembuf.size())
+			{
+				m_elembuf.clear();
+				m_elemitr = 0;
+			}
+			else
+			{
+				setState( EndOfBuffer);
+				return false;
+			}
 		}
 		if (m_stk.empty())
 		{
@@ -380,11 +388,6 @@ bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t
 				return false;
 		}
 		m_lastelemtype = type;
-		if (m_elembuf.size() > outputChunkSize())
-		{
-			setState( EndOfBuffer);
-			return false;
-		}
 		return true;
 	}
 	catch (const std::bad_alloc& e)

@@ -17,11 +17,6 @@ public:
 		// ... create a copy of this input filter here
 	}
 
-	virtual _Wolframe::langbind::InputFilter* initcopy() const
-	{
-		// ... create a copy of this in first initialization state here
-	}
-
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		// ... feed the filter with the next input chunk here

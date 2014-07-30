@@ -63,12 +63,6 @@ struct InputFilterImpl :public InputFilter
 		return new InputFilterImpl( *this);
 	}
 
-	//\brief Implement InputFilter::initcopy()
-	virtual InputFilter* initcopy() const
-	{
-		return new InputFilterImpl();
-	}
-
 	//\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{

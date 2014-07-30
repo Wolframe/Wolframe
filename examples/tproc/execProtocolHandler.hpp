@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file execCommandHandler.hpp
-/// \brief Command handler for the selection and execution of commands defined as a list of command handlers. Includes interpreting of commands that belong to the caller and return control to the caller, if any of them is issued. Includes also a 'Capabilities' command for showing the list of available commands
-#ifndef _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
+/// \file execProtocolHandler.hpp
+/// \brief Protocol handler for the selection and execution of commands defined as a list of command handlers. Includes interpreting of commands that belong to the caller and return control to the caller, if any of them is issued. Includes also a 'Capabilities' command for showing the list of available commands
+#ifndef _Wolframe_EXEC_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_EXEC_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/protocolHandler.hpp"
 #include "tprocProtocolFiles.hpp"
@@ -42,6 +42,7 @@
 #include "logger-v1.hpp"
 #include <vector>
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -126,9 +127,8 @@ private:
 		return ar[i];
 	}
 	State m_state;							//< processing state of the command handler
-
-	protocol::Buffer m_buffer;					//< context (sub state) for partly parsed input lines
-	protocol::CArgBuffer<protocol::Buffer> m_argBuffer;		//< buffer for the arguments
+	std::string m_argBuffer;					//< buffer for the arguments
+	const char* m_arg[2];						//< buffer for retured arguments
 
 	protocol::InputBlock m_input;					//< buffer for network read messages
 	protocol::OutputBlock m_output;					//< buffer for network write messages
@@ -138,11 +138,11 @@ private:
 	protocol::InputBlock::iterator m_itr;				//< iterator to scan protocol input
 	protocol::InputBlock::iterator m_end;				//< iterator pointing to end of message buffer
 
-	protocol::CmdParser<protocol::Buffer> m_parser;			//< context dependent command parser definition
+	protocol::CmdParser<std::string> m_parser;			//< context dependent command parser definition
 	int m_cmdidx;							//< command parsed
 	int m_nofParentCmds;						//< number of commands passed by the owner to get control back
 	std::vector<std::string> m_cmds;				//< list of commands available
-	types::CountedReference<CommandHandler> m_cmdhandler;		//< currently executed command
+	boost::shared_ptr<ProtocolHandler> m_protocolHandler;		//< protocol handler for currently executed command
 	std::string m_capastr;						//< capability string to print
 	std::size_t m_capaitr;						//< index in capabilities
 };

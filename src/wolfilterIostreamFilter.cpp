@@ -175,6 +175,11 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, InputF
 
 static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbind::ProtocolHandler* cmdh)
 {
+	if (is.eof())
+	{
+		cmdh->putEOF();
+		return;
+	}
 	std::size_t pp = 0;
 	while (pp < bufsize && !is.eof())
 	{
@@ -186,10 +191,6 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbin
 		throw std::runtime_error("unexpected end of file");
 	}
 	cmdh->putInput( buf, pp);
-	if (is.eof())
-	{
-		cmdh->putEOF();
-	}
 }
 
 
@@ -203,7 +204,20 @@ static void checkUnconsumedInput( std::istream& is)
 		is.read( &ch, sizeof(char));
 		if ((unsigned char)ch > 32)
 		{
-			throw std::runtime_error( "unconsumed input left");
+			std::string str;
+			str.push_back( (unsigned char)ch < 32?'.':ch);
+
+			std::size_t pp = 0;
+			while (pp < 20 && !is.eof())
+			{
+				is.read( &ch, sizeof(char));
+				if (!is.eof())
+				{
+					str.push_back( (unsigned char)ch < 32?'.':ch);
+					++pp;
+				}
+			}
+			throw std::runtime_error( std::string("unconsumed input left [") + str + "...]");
 		}
 		end = is.eof();
 	}
@@ -382,6 +396,7 @@ void langbind::iostreamfilter( proc::ExecContext* execContext, const std::string
 				protocolhnd.reset( provider->protocolHandler( protocol));
 				if (!protocolhnd.get()) throw std::runtime_error( std::string("protocol '") + protocol + "' is not defined");
 			}
+			protocolhnd->setExecContext( execContext);
 			if (proc[ proc.size()-1] == '~')
 			{
 				protocolhnd->setArgumentString( std::string( proc.c_str(), proc.size()-1));
@@ -398,17 +413,7 @@ void langbind::iostreamfilter( proc::ExecContext* execContext, const std::string
 				throw std::runtime_error( lasterr);
 			}
 			// Check if there is unconsumed input left (must not happen):
-			bool end = false;
-			while (!end)
-			{
-				char ch = 0;
-				is.read( &ch, sizeof(char));
-				if ((unsigned char)ch > 32)
-				{
-					throw std::runtime_error( "unconsumed input left");
-				}
-				end = is.eof();
-			}
+			checkUnconsumedInput( is);
 			return;
 		}
 	}

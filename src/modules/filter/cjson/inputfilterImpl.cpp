@@ -42,33 +42,6 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-void InputFilterImpl::getRest( const void*& ptr, std::size_t& size, bool& end)
-{
-	if (m_root.get())
-	{
-		if (m_stk.size() == 1
-			&& m_stk.back().m_node == m_firstnode
-			&& m_stk.back().m_state == StackElement::StateOpen)
-		{
-			//... initial state, no element fetched yet
-			ptr = (const void*)m_content.c_str();
-			size = m_content.size();
-		}
-		else
-		{
-			ptr = 0;
-			size = 0;
-		}
-		end = true;
-	}
-	else
-	{
-		ptr = (const void*)m_content.c_str();
-		size = m_content.size();
-		end = false;
-	}
-}
-
 bool InputFilterImpl::getValue( const char* id, std::string& val) const
 {
 	return Parent::getValue( id, val);
@@ -144,7 +117,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 {
 	try
 	{
-		setState( Start);
+		setState( Open);
 		m_content.append( (const char*)content, contentsize);
 		if (end)
 		{

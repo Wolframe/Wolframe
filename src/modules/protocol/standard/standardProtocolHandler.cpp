@@ -87,7 +87,7 @@ struct MainSTM :public cmdbind::LineProtocolHandlerSTMTemplate<StandardProtocolH
 static MainSTM mainstm;
 
 StandardProtocolHandler::StandardProtocolHandler()
-	:cmdbind::LineProtocolHandlerTemplate<StandardProtocolHandler>(&mainstm){}
+	:cmdbind::LineProtocolHandlerTemplate<StandardProtocolHandler>(&mainstm),m_outputChunkSize(0){}
 
 void StandardProtocolHandler::setPeer( const net::RemoteEndpointR& remote)
 {
@@ -435,37 +435,60 @@ int StandardProtocolHandler::endDoctypeDetection( cmdbind::ProtocolHandler* ch, 
 	else
 	{
 		exec->setDoctypeInfo( info);
+		exec->setExecContext( execContext());
+		exec->setOutputChunkSize( (m_outputChunkSize * 4) - (m_outputChunkSize/16));
 
 		EscDlfProtocolHandler* execch = new EscDlfProtocolHandler( cmdbind::CommandHandlerR( exec));
 		execch->setExecContext( execContext());
-
-		if (m_commandtag.empty())
+		try
 		{
-			out << "ANSWER" << endl();
-		}
-		else
-		{
-			out << "ANSWER " << '&' << m_commandtag << endl();
-		}
-		if (redirectConsumedInput( chnd, execch, out))
-		{
-			delegateProcessing<&StandardProtocolHandler::endRequest>( execch);
-		}
-		else
-		{
-			if (execch->lastError())
+			if (m_commandtag.empty())
 			{
-				std::string errstr( execch->lastError());
-				std::replace_if( errstr.begin(), errstr.end(), IsCntrl, ' ');
-				out << "ERR REQUEST " << m_command << " " << errstr << endl();
+				out << "ANSWER" << endl();
 			}
 			else
 			{
-				out << "OK REQUEST " << m_command << endl();
+				out << "ANSWER " << '&' << m_commandtag << endl();
 			}
-			delete execch;
+			cmdbind::ProtocolHandler::Operation op = execch->nextOperation();
+			while (op == cmdbind::ProtocolHandler::WRITE)
+			{
+				const void* blk;
+				std::size_t blksize;
+				execch->getOutput( blk, blksize);
+				out << std::string( (const char*)blk, blksize);
+				op = execch->nextOperation();
+			}
+			if (op == cmdbind::ProtocolHandler::CLOSE)
+			{
+				delete execch;
+				execch = new EscDlfProtocolHandler();
+			}
+			if (redirectConsumedInput( chnd, execch, out))
+			{
+				delegateProcessing<&StandardProtocolHandler::endRequest>( execch);
+			}
+			else
+			{
+				if (execch->lastError())
+				{
+					std::string errstr( execch->lastError());
+					std::replace_if( errstr.begin(), errstr.end(), IsCntrl, ' ');
+					out << "ERR REQUEST " << m_command << " " << errstr << endl();
+				}
+				else
+				{
+					out << "OK REQUEST " << m_command << endl();
+				}
+				delete execch;
+			}
+			return stateidx();
 		}
-		return stateidx();
+		catch (const std::runtime_error& err)
+		{
+			delete execch;
+			throw err;
+		}
 	}
 }
 
@@ -507,4 +530,12 @@ int StandardProtocolHandler::doRequest( int argc, const char** argv, std::ostrea
 	delegateProcessing<&StandardProtocolHandler::endDoctypeDetection>( ch);
 	return stateidx();
 }
+
+
+void StandardProtocolHandler::setOutputBuffer( void* buf_, std::size_t size_, std::size_t pos_)
+{
+	Parent::setOutputBuffer( buf_, size_, pos_);
+	m_outputChunkSize = size_;
+}
+
 

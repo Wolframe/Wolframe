@@ -52,8 +52,8 @@ DirectmapCommandHandler::DirectmapCommandHandler( const langbind::DirectmapComma
 	,m_state(0)
 	,m_outputprinter(true)
 {
-	setFilterAs( inputfilter_);
-	setFilterAs( outputfilter_);
+	setInputFilter( inputfilter_);
+	setOutputFilter( outputfilter_);
 }
 
 void DirectmapCommandHandler::initcall()
@@ -81,15 +81,15 @@ void DirectmapCommandHandler::initcall()
 	}
 
 	// Initialize filters:
-	if (m_inputfilter.get())
+	if (inputfilter().get())
 	{
-		m_inputfilter->setValue( "empty", "false");
+		inputfilter()->setValue( "empty", "false");
 	}
-	m_outputfilter->inheritMetaData( m_inputfilter->getMetaDataRef());
-	m_outputfilter->setMetaData( m_cmd->outputmetadata);
+	outputfilter()->inheritMetaData( inputfilter()->getMetaDataRef());
+	outputfilter()->setMetaData( m_cmd->outputmetadata);
 
-	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));
-	m_output.reset( new langbind::TypingOutputFilter( m_outputfilter));
+	m_inputfilter.reset( new langbind::TypingInputFilter( inputfilter()));
+	m_outputfilter.reset( new langbind::TypingOutputFilter( outputfilter()));
 }
 
 IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& err)
@@ -107,7 +107,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				{
 					m_inputform_parser.reset( new serialize::DDLStructParser( m_inputform.get()));
 					serialize::Flags::Enum flags = (serialize::Flags::Enum)((int)serialize::Flags::ValidateAttributes|(int)serialize::Flags::ValidateInitialization);
-					m_inputform_parser->init( m_input, flags);
+					m_inputform_parser->init( m_inputfilter, flags);
 					m_state = 2;
 					/* no break here ! */;
 				}
@@ -120,10 +120,10 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			{
 				// Fill the form with the serialized input to validate it:
 				if (!m_inputform_parser->call()) return IOFilterCommandHandler::Yield;
-				m_input.reset( new serialize::DDLStructSerializer( m_inputform.get()));
+				m_inputfilter.reset( new serialize::DDLStructSerializer( m_inputform.get()));
 
 				// Validate the input meta data depending on what is required in th filter:
-				if (!m_inputfilter->checkMetaData( m_cmd->inputform->metadata()))
+				if (!inputfilter()->checkMetaData( m_cmd->inputform->metadata()))
 				{
 					LOG_ERROR << "error validating input form metadata: " << m_inputfilter->getError();
 					throw std::runtime_error( "input validation failed");
@@ -137,12 +137,12 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				{
 					//... if we have execution context arguments, we have to join them with the input as new input structure:
 					TypedInputFilterR ecinput( new langbind::ExecContextInputFilter( m_cmd->execContextElements, *execContext(), ""));
-					TypedInputFilterR joinedinput( new langbind::JoinInputFilter( "dmapinput", ecinput, m_input));
-					m_input = joinedinput;
+					TypedInputFilterR joinedinput( new langbind::JoinInputFilter( "dmapinput", ecinput, m_inputfilter));
+					m_inputfilter = joinedinput;
 				}
 				// Initialize the function execution context:
 				m_functionclosure.reset( m_cmd->function->createClosure());
-				m_functionclosure->init( execContext(), m_input);
+				m_functionclosure->init( execContext(), m_inputfilter);
 				m_state = 4;
 				/* no break here ! */
 			case 4:
@@ -177,13 +177,13 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					}
 					// Pass serializer of the data in the output form ro printer:
 					langbind::TypedInputFilterR outputform_serialize( new serialize::DDLStructSerializer( m_outputform.get()));
-					m_outputprinter.init( outputform_serialize, m_output);
+					m_outputprinter.init( outputform_serialize, m_outputfilter);
 					m_state = 5;
 				}
 				else 
 				{
 					// SKIP output -> Pass function result iterator directly to printer:
-					m_outputprinter.init( m_functionclosure->result(), m_output);
+					m_outputprinter.init( m_functionclosure->result(), m_outputfilter);
 					m_state = 5;
 				}
 				/* no break here ! */

@@ -126,7 +126,7 @@ class TProcHandlerTestInstance
 {
 public:
 	TProcHandlerTestInstance( const wtest::TestDescription& descr, TestConfiguration* config, std::size_t ib, std::size_t ob)
-		:ep( "127.0.0.1", 12345)
+		:ep( new net::LocalTCPendpoint( "127.0.0.1", 12345))
 		,m_connection(0)
 		,m_config( config)
 		,m_input( descr.input)
@@ -155,7 +155,7 @@ public:
 	}
 
 private:
-	net::LocalTCPendpoint ep;
+	net::LocalEndpointR ep;
 	tproc::Connection* m_connection;
 	boost::shared_ptr<proc::ProcessorProvider> m_provider;
 	prgbind::ProgramLibrary m_prglib;
