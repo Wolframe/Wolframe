@@ -22,8 +22,8 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_database \
 	-lboost_filesystem \
-	$(SQLITE3_LIBS) \
-	$(TOPDIR)/src/modules/database/sqlite3/mod_db_sqlite3_lib.a
+	$(TOPDIR)/src/modules/database/sqlite3/mod_db_sqlite3_lib.a \
+	$(SQLITE3_LIBS)
 
 DYNAMIC_MODULE = \
 	mod_db_sqlite3test.so

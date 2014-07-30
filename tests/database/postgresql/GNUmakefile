@@ -32,8 +32,8 @@ INCLUDE_LIBS = \
 	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(PGSQL_LIBS) \
 	$(TOPDIR)/src/modules/database/postgresql/mod_db_postgresql_lib.a \
+	$(PGSQL_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem
 

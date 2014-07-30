@@ -32,8 +32,8 @@ INCLUDE_LIBS = \
 	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(ORACLE_LIBS) \
 	$(TOPDIR)/src/modules/database/oracle/mod_db_oracle_lib.a \
+	$(ORACLE_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem
 

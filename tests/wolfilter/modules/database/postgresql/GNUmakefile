@@ -23,8 +23,8 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_database \
 	-lboost_filesystem \
-	$(PGSQL_LIBS) \
-	$(TOPDIR)/src/modules/database/postgresql/mod_db_postgresql_lib.a
+	$(TOPDIR)/src/modules/database/postgresql/mod_db_postgresql_lib.a \
+	$(PGSQL_LIBS)
 
 DYNAMIC_MODULE = \
 	mod_db_postgresqltest.so
