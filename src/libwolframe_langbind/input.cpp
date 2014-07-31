@@ -43,7 +43,6 @@ Input::Input( const Input& o)
 	,m_docformat(o.m_docformat)
 	,m_content(o.m_content)
 	,m_contentsize(o.m_contentsize)
-	,m_isProcessorInput(o.m_isProcessorInput)
 	,m_unconsumedInput(o.m_unconsumedInput)
 	,m_gotEoD(o.m_gotEoD)
 {}
@@ -52,7 +51,6 @@ Input::Input( const std::string& docformat_)
 	:m_used(false)
 	,m_docformat(docformat_)
 	,m_contentsize(0)
-	,m_isProcessorInput(true)
 	,m_gotEoD(false)
 {}
 
@@ -60,7 +58,6 @@ Input::Input( const std::string& docformat_, const std::string& content_)
 	:m_used(false)
 	,m_docformat(docformat_)
 	,m_contentsize(0)
-	,m_isProcessorInput(false)
 	,m_gotEoD(false)
 {
 	char* mem = (char*)std::malloc( content_.size());

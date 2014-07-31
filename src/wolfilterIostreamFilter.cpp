@@ -156,7 +156,7 @@ static Filter getFilter( const proc::ProcessorProviderInterface* provider, const
 	return rt;
 }
 
-static void readInput( char* buf, unsigned int bufsize, std::istream& is, InputFilter& iflt)
+static void readFilterInput( char* buf, unsigned int bufsize, std::istream& is, InputFilter& iflt)
 {
 	std::size_t pp = 0;
 	while (pp < bufsize && !is.eof())
@@ -173,12 +173,12 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, InputF
 	}
 }
 
-static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbind::ProtocolHandler* cmdh)
+static bool readProtocolInput( char* buf, unsigned int bufsize, std::istream& is, cmdbind::ProtocolHandler* cmdh)
 {
 	if (is.eof())
 	{
 		cmdh->putEOF();
-		return;
+		return false;
 	}
 	std::size_t pp = 0;
 	while (pp < bufsize && !is.eof())
@@ -188,9 +188,14 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, cmdbin
 	}
 	if (pp == 0 && is.eof())
 	{
-		throw std::runtime_error("unexpected end of file");
+		cmdh->putEOF();
+		return false;
 	}
-	cmdh->putInput( buf, pp);
+	else
+	{
+		cmdh->putInput( buf, pp);
+		return true;
+	}
 }
 
 
@@ -262,7 +267,7 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 
 		case InputFilter::EndOfMessage:
 			if (is.eof()) throw std::runtime_error( "unexpected end of input (EOF)");
-			readInput( buf.inbuf, buf.insize, is, *iflt);
+			readFilterInput( buf.inbuf, buf.insize, is, *iflt);
 			return;
 
 		case InputFilter::Error:
@@ -293,12 +298,14 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 
 static bool processProtocolHandler( BufferStruct& buf, cmdbind::ProtocolHandler* cmdh, std::istream& is, std::ostream& os, std::string& lasterr)
 {
+	bool eod = false;
 	cmdh->setInputBuffer( buf.inbuf, buf.insize);
 
 	for (;;) switch (cmdh->nextOperation())
 	{
 		case cmdbind::ProtocolHandler::READ:
-			readInput( buf.inbuf, buf.insize, is, cmdh);
+			if (eod) throw std::runtime_error( "protocol handler trying to read after end of data");
+			eod = !readProtocolInput( buf.inbuf, buf.insize, is, cmdh);
 			continue;
 
 		case cmdbind::ProtocolHandler::WRITE:

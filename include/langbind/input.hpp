@@ -51,7 +51,6 @@ public:
 	Input()
 		:m_used(false)
 		,m_contentsize(0)
-		,m_isProcessorInput(false)
 		,m_gotEoD(false){}
 
 	/// \brief Copy constructor
@@ -88,13 +87,13 @@ public:
 
 	/// \brief Eval if this represents a document
 	/// \return true, if yes
-	bool isDocument() const				{return !m_isProcessorInput;}
+	bool isDocument() const				{return !!m_content.get();}
 	/// \brief Get content source string if input is not from network
 	/// \return the content string pointer or NULL, if not defined
-	const char* documentptr() const			{return m_isProcessorInput?0:m_content.get();}
+	const char* documentptr() const			{return m_content.get();}
 	/// \brief Get size of the content source string if input is not from network
 	/// \return the content string size or 0, if not defined
-	std::size_t documentsize() const		{return m_isProcessorInput?0:m_contentsize;}
+	std::size_t documentsize() const		{return m_content.get()?m_contentsize:0;}
 
 	/// \brief Put input data to filter or buffer it
 	/// \param[in] data pointer to input data
@@ -115,7 +114,6 @@ private:
 	std::string m_docformat;			///< document format as recognized by the document type detection as string {"xml","json",...}
 	boost::shared_ptr<char> m_content;		///< content source string is input is not from network
 	std::size_t m_contentsize;			///< size of content in bytes
-	bool m_isProcessorInput;			///< true, if this Input object represents a document and not the processor input
 	std::string m_unconsumedInput;			///< unconsumed network input
 	bool m_gotEoD;					///< Got end of data
 };

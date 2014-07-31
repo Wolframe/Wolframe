@@ -32,12 +32,13 @@
 ************************************************************************/
 ///\file testProtocol.cpp
 ///\brief Test program for the wolframe main protocol
-
+#include "cmdbind/protocolHandler.hpp"
 #include "utils/fileUtils.hpp"
 #include "processor/procProvider.hpp"
 #include "AAAA/AAAAprovider.hpp"
 #include "module/moduleDirectory.hpp"
 #include "mainConnectionHandler.hpp"
+#include "standardProtocolHandler.hpp"
 #include "wtest/pseudoRandomGenForTests.hpp"
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
@@ -78,8 +79,13 @@ struct BufferStruct
 	}
 };
 
-static void readInput( cmdbind::CommandHandler& protocolhandler, std::istream& is)
+static bool readProtocolInput( cmdbind::ProtocolHandler& protocolhandler, std::istream& is)
 {
+	if (is.eof())
+	{
+		protocolhandler.putEOF();
+		return false;
+	}
 	char* buf;
 	std::size_t bufsize;
 	void* buf_void;
@@ -95,9 +101,14 @@ static void readInput( cmdbind::CommandHandler& protocolhandler, std::istream& i
 	}
 	if (pp == 0 && is.eof())
 	{
-		throw std::runtime_error("unexpected end of file");
+		protocolhandler.putEOF();
+		return false;
 	}
-	protocolhandler.putInput( buf, pp);
+	else
+	{
+		protocolhandler.putInput( buf, pp);
+		return true;
+	}
 }
 
 static std::string normalizeOutputCRLF( const std::string& output, const std::string& expected)
@@ -153,26 +164,28 @@ static std::string normalizeOutputCRLF( const std::string& output, const std::st
 	}
 }
 
-static void processCommandHandlerSTM( cmdbind::CommandHandler& protocolhandler, BufferStruct& buf, std::istream& is, std::ostream& os)
+static void processProtocolHandlerSTM( cmdbind::ProtocolHandler& protocolhandler, BufferStruct& buf, std::istream& is, std::ostream& os)
 {
+	bool eod = false;
 	const void* cmdh_output;
 	std::size_t cmdh_outputsize;
 	const char* error;
 	protocolhandler.setInputBuffer( buf.inbuf, buf.insize);
-	protocolhandler.setOutputChunkSize( buf.outsize);
+	protocolhandler.setOutputBuffer( buf.outbuf, buf.outsize, 0);
 
 	for (;;) switch (protocolhandler.nextOperation())
 	{
-		case cmdbind::CommandHandler::READ:
-			readInput( protocolhandler, is);
+		case cmdbind::ProtocolHandler::READ:
+			if (eod) throw std::runtime_error( "protocol handler trying to read after end of data");
+			eod = !readProtocolInput( protocolhandler, is);
 			continue;
 
-		case cmdbind::CommandHandler::WRITE:
+		case cmdbind::ProtocolHandler::WRITE:
 			protocolhandler.getOutput( cmdh_output, cmdh_outputsize);
 			os << std::string( (const char*)cmdh_output, cmdh_outputsize);
 			continue;
 
-		case cmdbind::CommandHandler::CLOSE:
+		case cmdbind::ProtocolHandler::CLOSE:
 			error = protocolhandler.lastError();
 			if (error)
 			{ 
@@ -189,7 +202,7 @@ static void processProtocolHandler( cmdbind::ProtocolHandler& protocolhandler, c
 	BufferStruct buf( ibsize, obsize);
 	std::istringstream is( input);
 	std::ostringstream os;
-	processCommandHandlerSTM( protocolhandler, buf, is, os);
+	processProtocolHandlerSTM( protocolhandler, buf, is, os);
 
 	// Check if there is unconsumed input left (must not happen):
 	bool end = false;
@@ -433,15 +446,16 @@ TEST_F( MainProtocolTest, tests)
 				net::LocalEndpointR localEndPoint( localEndPointPtr);
 
 				cmdbind::ProtocolHandlerR protocolhandler( processingContext.execContext()->provider()->protocolHandler( "wolframe"));
+				if (!protocolhandler.get()) throw std::runtime_error( "no protocol 'wolframe' defined");
 				processingContext.resetExecContext();
-				protocolhandler.setExecContext( processingContext.execContext());
-				protocolhandler.setPeer( client);
-				protocolhandler.setLocalEndPoint( localEndPoint);
+				protocolhandler->setExecContext( processingContext.execContext());
+				protocolhandler->setPeer( client);
+				protocolhandler->setLocalEndPoint( localEndPoint);
 
 				std::string output;
 				try
 				{
-					processProtocolHandler( protocolhandler, input, ibar[ii], output, obar[oo]);
+					processProtocolHandler( *protocolhandler, input, ibar[ii], output, obar[oo]);
 				}
 				catch (const std::runtime_error& e)
 				{
