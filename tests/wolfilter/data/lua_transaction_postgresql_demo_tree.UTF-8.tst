@@ -47,6 +47,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter textwolf
 		}
 	}
 }

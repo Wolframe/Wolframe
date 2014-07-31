@@ -17,6 +17,7 @@ Processor
 		lua
 		{
 			program no_operation.lua
+			filter #FILTER#
 		}
 	}
 }

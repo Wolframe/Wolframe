@@ -108,7 +108,7 @@ void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bo
 	if (!m_doc.get())
 	{
 		xmlError* err = xmlGetLastError();
-		setState( Error, err->message);
+		setState( Error, err?err->message:"unknown error");
 	}
 	else
 	{

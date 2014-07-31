@@ -187,6 +187,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter libxml2
 		}
 	}
 }
