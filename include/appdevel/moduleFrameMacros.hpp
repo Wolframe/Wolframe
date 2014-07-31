@@ -35,10 +35,11 @@
 #include "appdevel/module/customDataTypeBuilder.hpp"
 
 /// \brief Marks the start of the Wolframe C++ custom datatype module after the includes section.
+// Aba: DESCRIPTION is not used?!?
 #define WF_MODULE_BEGIN(NAME,DESCRIPTION)\
-	static const char* _Wolframe__moduleDescription()\
+	static const char* _Wolframe__moduleName()\
 	{\
-		return DESCRIPTION;\
+		return NAME;\
 	}\
 	namespace {\
 	struct CreateBuilderArray\
@@ -71,6 +72,6 @@
 	}\
 	static CreateBuilderArrayImpl createBuilderArray;\
 	extern "C" { \
-		_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), createBuilderArray.ar); \
+		_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), createBuilderArray.ar); \
 	}
 
