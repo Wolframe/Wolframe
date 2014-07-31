@@ -27,13 +27,13 @@ INCLUDE_LIBS = \
 	-lwfsingleton \
 	-lwolframe \
 	-lwolframe_database \
-	-lwolframe_serialize \
-	-lwolframe_langbind \
 	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(PGSQL_LIBS) \
 	$(TOPDIR)/src/modules/database/postgresql/mod_db_postgresql_lib.a \
+	$(PGSQL_LIBS) \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem
 
@@ -43,7 +43,7 @@ CPP_BINS = \
 TEST_CPP_BINS = \
 	postgresUnit$(EXE) \
 
-LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

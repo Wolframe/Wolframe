@@ -28,13 +28,13 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwfsingleton \
 	-lwolframe_database \
-	-lwolframe_serialize \
-	-lwolframe_langbind \
 	-lwolftest \
 	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(SQLITE3_LIBS) \
 	$(TOPDIR)/src/modules/database/sqlite3/mod_db_sqlite3_lib.a \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
+	$(SQLITE3_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem \
 	$(LIBS_DL) $(LIBS_LT) $(LIBS_NET)
@@ -48,7 +48,7 @@ TEST_CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_serialize"
 
 
 local_all:

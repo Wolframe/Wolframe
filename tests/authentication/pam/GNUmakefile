@@ -35,6 +35,8 @@ CPP_OBJS = \
 TEST_CPP_BINS = \
 	pamTest$(EXE)
 
+pamTest$(EXE): pamTest.o $(CPP_OBJS)
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
@@ -43,15 +45,13 @@ local_clean:
 
 local_distclean:
 
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/wtest:$(LD_LIBRARY_PATH):$(PAM_LIB_DIR)"
+
 local_test: $(TEST_CPP_BINS)
-
-LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/wtest"
-
-LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(PAM_LIB_DIR)"
 ifeq ($(RUN_TESTS),1)
 # Aba: running PAM tests needs to much from the system, can't test automatically currently
 #ifeq ($(WITH_PAM),1)
-#	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./pamTest
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./pamTest
 #	@echo
 #endif
 endif

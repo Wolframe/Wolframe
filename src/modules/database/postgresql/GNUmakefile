@@ -14,6 +14,7 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR) \
 	-L$(PGSQL_LIB_DIR)
 
@@ -22,6 +23,7 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_serialize \
 	-lwolframe_database \
+	-lwolframe_langbind \
 	$(PGSQL_LIBS)
 
 NOINST_STATIC_LIB = mod_db_postgresql_lib.a

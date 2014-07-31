@@ -33,7 +33,9 @@ CPP_OBJS = \
 	$(TOPDIR)/src/modules/authentication/sasl/SaslAuth.o
 
 TEST_CPP_BINS = \
-#	saslTest$(EXE)
+	saslTest$(EXE)
+
+saslTest$(EXE): saslTest.o $(CPP_OBJS)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -46,7 +48,7 @@ local_distclean:
 
 sasl.db:
 ifeq ($(WITH_SASL),1)
-	echo "xx" | $(SASL_DIR)/sbin/saslpasswd2 -f sasl.db -p test
+	echo "wolfpwd" | $(SASL_DIR)/sbin/saslpasswd2 -a wolframe -f sasl.db -u wolframe -c -p wolfusr
 ifeq "$(PLATFORM)" "FREEBSD"
 	mv sasl.db.db sasl.db
 endif
@@ -55,6 +57,15 @@ ifeq "$(PLATFORM)" "NETBSD"
 endif
 endif
 
+LD_LIBRARY_PATH = "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/wtest:$(LD_LIBRARY_PATH):$(PAM_LIB_DIR)"
+
 local_test: sasl.db $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
+# Aba: disabled for now
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./saslTest
+#	@echo	
 endif
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
+

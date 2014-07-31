@@ -106,5 +106,54 @@ const char** SaslAuthUnit::mechs() const
 	return m;
 }
 
+AuthenticatorSlice* SaslAuthUnit::slice( const std::string& /*mech*/,
+					const net::RemoteEndpoint& /*client*/ )
+{
+	return new SaslAuthSlice( *this );
+}
+
+User* SaslAuthUnit::authenticatePlain(	const std::string& /*username*/,
+					const std::string& /*password*/ ) const
+{
+	return NULL;
+}
+
+SaslAuthSlice::SaslAuthSlice( const SaslAuthUnit& backend )
+	: m_backend( backend )
+{
+}
+
+SaslAuthSlice::~SaslAuthSlice()
+{
+}
+
+void SaslAuthSlice::dispose()
+{
+	delete this;
+}
+
+/// The input message
+void SaslAuthSlice::messageIn( const std::string& /*message*/ )
+{
+}
+
+/// The output message
+std::string SaslAuthSlice::messageOut()
+{	
+	return std::string( );
+}
+
+/// The current status of the authenticator slice
+AuthenticatorSlice::Status SaslAuthSlice::status() const
+{
+	return SYSTEM_FAILURE;
+}
+	
+/// The authenticated user or NULL if not authenticated
+User* SaslAuthSlice::user()
+{
+	return NULL;
+}
+
 }} // namespace _Wolframe::AAAA
 

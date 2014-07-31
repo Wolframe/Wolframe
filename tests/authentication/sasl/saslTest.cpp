@@ -31,13 +31,13 @@
 
 ************************************************************************/
 //
-// low-level SASL authenticator tests
+// low-level Sasl authenticator tests
 //
 
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
 
-#include "SASLAuth.hpp"
+#include "SaslAuth.hpp"
 
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe::log;
@@ -60,14 +60,14 @@ protected:
 
 TEST_F( AuthenticationFixture, typeName )
 {
-	SASLAuthUnit authenticator( "", "wolframe" );
-	EXPECT_STREQ( authenticator.className( ), "SASLAuth" );
+	SaslAuthUnit authenticator( "test", "wolframe", "./sasl.conf" );
+	EXPECT_STREQ( authenticator.className( ), "SaslAuth" );
 }
 
 TEST_F( AuthenticationFixture, validUserAndPassword )
 {
 	User*	user;
-	SASLAuthUnit authenticator( "test", "wolframe" );
+	SaslAuthUnit authenticator( "test", "wolframe", "./sasl.conf" );
 
 	user = authenticator.authenticatePlain( "wolfusr", "wolfpwd" );
 	ASSERT_TRUE( user != NULL );
@@ -78,7 +78,7 @@ TEST_F( AuthenticationFixture, validUserAndPassword )
 TEST_F( AuthenticationFixture, validUserAndWrongPassword )
 {
 	User*	user;
-	SASLAuthUnit authenticator( "test", "wolframe" );
+	SaslAuthUnit authenticator( "test", "wolframe", "./sasl.conf" );
 
 	user = authenticator.authenticatePlain( "wolfusr", "xx" );
 	ASSERT_TRUE( user == NULL );
@@ -87,7 +87,7 @@ TEST_F( AuthenticationFixture, validUserAndWrongPassword )
 TEST_F( AuthenticationFixture, unknownUser )
 {
 	User*	user;
-	SASLAuthUnit authenticator( "test", "wolframe" );
+	SaslAuthUnit authenticator( "test", "wolframe", "./sasl.conf" );
 
 	user = authenticator.authenticatePlain( "wolfusr2", "xx" );
 	ASSERT_TRUE( user == NULL );
@@ -96,8 +96,8 @@ TEST_F( AuthenticationFixture, unknownUser )
 TEST_F( AuthenticationFixture, AuthenticationSliceUserPassword )
 {
 	User* user = NULL;
-	SASLAuthUnit authUnit( "test", "wolframe" );
-	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-SASL", net::RemoteTCPendpoint( "localhost", 2222 ));
+	SaslAuthUnit authUnit( "test", "wolframe", "./sasl.conf" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-Sasl", net::RemoteTCPendpoint( "localhost", 2222 ));
 
 	ASSERT_TRUE( slice != NULL );
 
@@ -132,7 +132,7 @@ TEST_F( AuthenticationFixture, AuthenticationSliceUserPassword )
 TEST_F( AuthenticationFixture, AuthenticationWrongPassword )
 {
 	User* user = NULL;
-	SASLAuthUnit authUnit( "test", "wolframe" );
+	SaslAuthUnit authUnit( "test", "wolframe", "./sasl.conf" );
 	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-SASL", net::RemoteTCPendpoint( "localhost", 2222 ));
 
 	ASSERT_TRUE( slice != NULL );
@@ -161,8 +161,8 @@ TEST_F( AuthenticationFixture, AuthenticationWrongPassword )
 TEST_F( AuthenticationFixture, AuthenticationWrongUser )
 {
 	User* user = NULL;
-	SASLAuthUnit authUnit( "test", "wolframe" );
-	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-SASL", net::RemoteTCPendpoint( "localhost", 2222 ));
+	SaslAuthUnit authUnit( "test", "wolframe", "./sasl.conf" );
+	AAAA::AuthenticatorSlice* slice = authUnit.slice( "WOLFRAME-Sasl", net::RemoteTCPendpoint( "localhost", 2222 ));
 
 	ASSERT_TRUE( slice != NULL );
 	ASSERT_TRUE( slice != NULL );
