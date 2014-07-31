@@ -65,7 +65,7 @@ function submitRequest()
 		}
 		form = document.getElementById("customer");
 
-		xmlhttp.open("POST", "http://127.0.0.1/wolframe/webclient_form_xml.php", false);
+		xmlhttp.open("POST", "webclient_form_xml.php", false);
 		var formdata = new FormData();
 		for(i=0; i<form.elements.length; i++)
 		{
@@ -123,6 +123,9 @@ function submitRequest()
 <form id='customer' name='customer'>
 Name: <input type="text" id="name" name="name" value=""></br>
 Address: <textarea id="address" name="address" rows="3" cols="40"></textarea></br>
+<input type="hidden" id="ssl" name="SSL" value="no">
+<input type="hidden" id="username" name="USERNAME" value="wolfusr">
+<input type="hidden" id="password" name="PASSWORD" value="wolfpwd">
 <input type="hidden" id="doctype" name="DOCTYPE" value="Customer customer">
 <input type="hidden" id="cmd" name="CMD" value="Insert">
 <input id='doinsert' type="submit" name="cmdcall" value="Insert" onclick="submitRequest();">

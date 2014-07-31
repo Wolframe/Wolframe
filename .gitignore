@@ -80,6 +80,7 @@ tests/moduleloader/moduleTest
 tests/authentication/sasl/sasl.db
 tests/authentication/sasl/saslTest
 tests/authentication/pam/pamTest
+tests/authentication/pam/genpwd
 tests/authentication/textfile/passwdFileTest
 tests/authentication/textfile/passwdHashTest
 tests/authentication/textfile/textFileTest

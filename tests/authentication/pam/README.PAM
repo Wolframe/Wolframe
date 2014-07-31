@@ -9,10 +9,12 @@ can't access /etc/shadow as normal user!
 
 2) Create user
 
-create a user 'wolfusr' with password 'wolfpwd' in this file
+Build 'genpwd' with:
 
-Use 'genpwd.c' to generate a hash for a file called
-'/etc/wolframeusers':
+gcc -l crypt -o genpwd genpwd.c
+
+Use 'genpwd' to generate a hash for a file called
+'/etc/wolframeusers' with user 'wolfusr' and password 'wolfpwd':
 
 wolfusr:$1$3glYHJaH$n2HsIXJg9dRW7vbegCC2B/
 
