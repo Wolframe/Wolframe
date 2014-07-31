@@ -37,7 +37,7 @@ local_clean:
 
 local_distclean:
 
-LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(ICU_LIB_DIR)"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(ICU_LIB_DIR)"
 
 # for now we test whether the locale is installed, if not we don't
 # execute the test. In the future we should make sure the test environment

@@ -52,7 +52,7 @@ local_clean:
 
 local_distclean:
 
-LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton:$(TOPDIR)/src/libwolframe"
 
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
