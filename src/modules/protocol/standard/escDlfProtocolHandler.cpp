@@ -130,7 +130,6 @@ ProtocolHandler::Operation EscDlfProtocolHandler::nextOperation()
 			case FlushingOutput:
 				if (!m_cmdhandler.get())
 				{
-					LOG_ERROR << "Command handler undefined";
 					setLastError( "internal: command handler undefined");
 					m_state = DiscardInput;
 					return READ;
@@ -177,11 +176,13 @@ ProtocolHandler::Operation EscDlfProtocolHandler::nextOperation()
 					case CommandHandler::WRITE:
 						if (getCommandHandlerWriteData())
 						{
+							m_state = FlushingOutput;
 							return WRITE;
 						}
 						else
 						{
-							LOG_ERROR << "illegal state: got WRITE from command handler but no data";
+							m_state = Terminated;
+							setLastError( "illegal state: got WRITE from command handler but no data");
 							return CLOSE;
 						}
 
@@ -192,10 +193,6 @@ ProtocolHandler::Operation EscDlfProtocolHandler::nextOperation()
 							m_state = DiscardInput;
 							continue;
 						}
-						else if (m_gotEoD)
-						{
-							return CLOSE;
-						}
 						else
 						{
 							m_state = DiscardInput;
@@ -205,7 +202,8 @@ ProtocolHandler::Operation EscDlfProtocolHandler::nextOperation()
 				break;
 			}
 		}
-		LOG_ERROR << "illegal state";
+		m_state = Terminated;
+		setLastError( "internal: illegal state");
 		return CLOSE;
 	}
 }
@@ -233,14 +231,14 @@ bool EscDlfProtocolHandler::consumeInput()
 	return false;
 }
 
-void EscDlfProtocolHandler::putInput( const void *begin, std::size_t bytesTransferred)
+void EscDlfProtocolHandler::putInput( const void* chunk_, std::size_t chunksize_)
 {
-	std::size_t startidx = (const char*)begin - m_input.charptr();
-	if (bytesTransferred + startidx > m_input.size())
+	std::size_t startidx = (const char*)chunk_ - m_input.charptr();
+	if (chunksize_ + startidx > m_input.size())
 	{
 		throw std::logic_error( "illegal input range passed to EscDlfProtocolHandler");
 	}
-	m_input.setPos( bytesTransferred + startidx);
+	m_input.setPos( chunksize_ + startidx);
 	if (m_itrpos != 0)
 	{
 		if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
@@ -266,10 +264,11 @@ void EscDlfProtocolHandler::getInputBlock( void*& begin, std::size_t& maxBlockSi
 	m_itrpos = ((const char*)begin - m_input.charptr());
 }
 
-void EscDlfProtocolHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
+void EscDlfProtocolHandler::getOutput( const void*& chunk_, std::size_t& chunksize_)
 {
-	begin = m_writedata;
-	bytesToTransfer = m_writedatasize;
+	chunk_ = m_writedata;
+	chunksize_ = m_writedatasize;
+	m_writedatasize = 0;
 }
 
 void EscDlfProtocolHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)

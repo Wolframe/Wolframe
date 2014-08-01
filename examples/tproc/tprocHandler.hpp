@@ -97,14 +97,14 @@ public:
 	///\param[in] c execution context reference
 	void setExecContext( proc::ExecContext* c)
 	{
-		m_cmdhandler.setExecContext( c);
+		m_protocolhandler.setExecContext( c);
 	}
 
 private:
-	ProtocolHandler m_cmdhandler;			//< top level instance executing commands
-	protocol::InputBlock m_input;			//< buffer for network read messages
-	protocol::OutputBlock m_output;			//< buffer for network write messages
-	bool m_terminated;				//< true, if a termination signal came from the network
+	ProtocolHandler m_protocolhandler;		///< top level instance executing commands
+	protocol::InputBlock m_input;			///< buffer for network read messages
+	protocol::OutputBlock m_output;			///< buffer for network write messages
+	bool m_terminated;				///< true, if a termination signal came from the network
 };
 } // namespace tproc
 

@@ -119,6 +119,7 @@ void ExecProtocolHandler::getOutput( const void*& begin, std::size_t& bytesToTra
 		{
 			throw std::bad_alloc();
 		}
+		m_writepos += bytesToTransfer;
 	}
 	begin = m_output.ptr();
 	bytesToTransfer = m_output.pos();

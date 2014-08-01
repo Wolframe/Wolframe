@@ -40,6 +40,7 @@ function run( )
 	output:as( f)
 
 	for c,t in input:get() do
+		logger.printc( "VISIT ", t, " = ", c)
 		output:print( c, t)
 	end
 end

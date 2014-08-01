@@ -67,13 +67,13 @@ public:
 	virtual Operation nextOperation();
 
 	/// \brief See CommandHandler::putInput(const void*,std::size_t);
-	virtual void putInput( const void *begin, std::size_t bytesTransferred);
+	virtual void putInput( const void* chunk_, std::size_t chunksize_);
 
 	/// \brief See CommandHandler::getInputBlock(void*&,std::size_t&)
 	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
 
 	/// \brief See CommandHandler::getOutput(const void*&,std::size_t&)
-	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
+	virtual void getOutput( const void*& chunk_, std::size_t& chunksize_);
 
 	/// \brief See CommandHandler::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);

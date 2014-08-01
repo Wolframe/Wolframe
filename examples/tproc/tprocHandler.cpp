@@ -255,7 +255,7 @@ int ProtocolHandler::doHello( int argc, const char**, std::ostream& out)
 
 void Connection::networkInput( const void* dt, std::size_t nofBytes)
 {
-	m_cmdhandler.putInput( dt, nofBytes);
+	m_protocolhandler.putInput( dt, nofBytes);
 }
 
 void Connection::signalOccured( NetworkSignal)
@@ -274,14 +274,14 @@ const net::NetworkOperation Connection::nextOperation()
 	{
 		return net::CloseConnection();
 	}
-	switch(m_cmdhandler.nextOperation())
+	switch(m_protocolhandler.nextOperation())
 	{
 		case cmdbind::ProtocolHandler::READ:
-			m_cmdhandler.getInputBlock( inpp, inppsize);
+			m_protocolhandler.getInputBlock( inpp, inppsize);
 			return net::ReadData( inpp, inppsize);
 
 		case cmdbind::ProtocolHandler::WRITE:
-			m_cmdhandler.getOutput( outpp, outppsize);
+			m_protocolhandler.getOutput( outpp, outppsize);
 			return net::SendData( outpp, outppsize);
 
 		case cmdbind::ProtocolHandler::CLOSE:
@@ -291,13 +291,13 @@ const net::NetworkOperation Connection::nextOperation()
 }
 
 Connection::Connection( const net::LocalEndpointR& local, const Configuration* config)
-	:m_cmdhandler( &stm, config)
+	:m_protocolhandler( &stm, config)
 	,m_input(config->input_bufsize())
 	,m_output(config->output_bufsize())
 	,m_terminated(false)
 {
-	m_cmdhandler.setInputBuffer( m_input.ptr(), m_input.size());
-	m_cmdhandler.setOutputBuffer( m_output.ptr(), m_output.size());
+	m_protocolhandler.setInputBuffer( m_input.ptr(), m_input.size());
+	m_protocolhandler.setOutputBuffer( m_output.ptr(), m_output.size());
 	LOG_TRACE << "Created connection handler for " << local->toString();
 }
 

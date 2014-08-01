@@ -71,28 +71,6 @@ static std::string randmsg( unsigned int seed)
 	return rt;
 }
 
-static std::string beautified( const std::string& str)
-{
-	std::ostringstream rt;
-	std::string::const_iterator si = str.begin(), se = str.end();
-	for (; si != se; ++si)
-	{
-		if (*si == '\r')
-		{
-			rt << 'r';
-		}
-		else if (*si == '\n')
-		{
-			rt << 'n';
-		}
-		else
-		{
-			rt << *si;
-		}
-	}
-	return rt.str();
-}
-
 TEST_F( LFdotEscapeTest, tests)
 {
 	enum {ibarsize=11,obarsize=7,EoDBufferSize=4};
@@ -115,7 +93,6 @@ TEST_F( LFdotEscapeTest, tests)
 		protocol::EscapeSTM estm;
 		std::string input = randmsg( seed+testno);
 
-		std::cout << "INPUT  {" << beautified(input) << "}" << std::endl;
 		char* ib = (char*)std::malloc( ibsize);
 		protocol::OutputBlock oib( ib, ibsize);
 		char* ob = (char*)std::malloc( obsize);
@@ -129,7 +106,6 @@ TEST_F( LFdotEscapeTest, tests)
 			mid.append( oib.charptr(), oib.pos());
 			oib.setPos(0);
 		}
-		std::cout << "INESC  {" << beautified(mid) << "}" << std::endl;
 		protocol::InputBlock oblk( ob, obsize, 0);
 		void* bb;
 		std::size_t bbsize;
@@ -146,7 +122,6 @@ TEST_F( LFdotEscapeTest, tests)
 		}
 		if (!oblk.getNetworkMessageRead( bb, bbsize)) throw std::runtime_error( "buffer too small to hold EoD");
 		output.append( oblk.charptr(), oblk.pos());
-		std::cout << "OUTPUT {" << beautified(output) << "}" << std::endl;
 		EXPECT_EQ( input, output);
 		std::free( ib);
 		std::free( ob);
