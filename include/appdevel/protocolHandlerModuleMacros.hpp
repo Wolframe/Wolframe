@@ -80,8 +80,7 @@
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			static ProtocolHandlerBuilder rt;\
-			return &rt;\
+			return new ProtocolHandlerBuilder();\
 		}\
 	};\
 	(*this)(&Constructor ::impl);\

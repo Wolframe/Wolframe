@@ -203,6 +203,7 @@ struct InputFilterImpl :public InputFilter
 		m_srcend = end;
 		m_srcsize = size;
 		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
+		setState( Open);
 	}
 
 	/// \brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)

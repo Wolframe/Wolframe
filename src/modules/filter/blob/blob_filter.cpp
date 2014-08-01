@@ -72,6 +72,7 @@ struct InputFilterImpl :public InputFilter
 	{
 		m_elembuf.append( (const char*)ptr, size);
 		m_end = end;
+		setState( Open);
 	}
 
 	///\brief implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)

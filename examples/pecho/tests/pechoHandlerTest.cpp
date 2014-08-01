@@ -143,7 +143,7 @@ class pechoHandlerFixture : public ::testing::Test
 public:
 	std::string input;
 	std::string expected;
-	net::LocalTCPendpoint ep;
+	net::LocalEndpointR ep;
 	pecho::Connection* connection;
 	enum
 	{
@@ -152,7 +152,9 @@ public:
 	};
 
 protected:
-	pechoHandlerFixture() :ep( "127.0.0.1", 12345),connection(0) {}
+	pechoHandlerFixture()
+		:ep( new net::LocalTCPendpoint( "127.0.0.1", 12345))
+		,connection(0) {}
 
 	virtual void SetUp()
 	{

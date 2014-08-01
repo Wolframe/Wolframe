@@ -66,7 +66,6 @@ struct InputFilterImpl :public InputFilter
 		,m_srcend(false)
 	{
 		setAttribute( "encoding", encoding);
-		setState( Open);
 		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
 	}
 
@@ -81,7 +80,6 @@ struct InputFilterImpl :public InputFilter
 		,m_srcsize(0)
 		,m_srcend(false)
 	{
-		setState( Open);
 		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, &m_eom));
 	}
 
@@ -115,21 +113,12 @@ struct InputFilterImpl :public InputFilter
 		m_srcend = end;
 		m_srcsize = size;
 		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
-	}
-
-	/// \brief Implement InputFilter::getRest(const void*&,std::size_t&,bool&)
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	{
-		std::size_t pos = m_itr.getPosition();
-		ptr = m_src + pos;
-		size = (m_srcsize > pos)?(m_srcsize - pos):0;
-		end = m_srcend;
+		setState( Open);
 	}
 
 	/// \brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
-		setState( Open);
 		if (!m_srcend && setjmp(m_eom) != 0)
 		{
 			setState( EndOfMessage);
@@ -144,6 +133,7 @@ struct InputFilterImpl :public InputFilter
 			element = m_elembuf.ptr();
 			elementsize = m_elembuf.size();
 			m_elembuf.clear();
+			setState( Open);
 			return true;
 		}
 		return false;

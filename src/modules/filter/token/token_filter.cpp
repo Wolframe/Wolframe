@@ -245,14 +245,7 @@ struct InputFilterImpl :public InputFilter
 		m_srcend = end;
 		m_srcsize = size;
 		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, end?0:&m_eom));
-	}
-
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	{
-		std::size_t pos = m_itr.getPosition();
-		ptr = m_src + pos;
-		size = (m_srcsize > pos)?(m_srcsize - pos):0;
-		end = m_srcend;
+		setState( Open);
 	}
 
 	/// \brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
@@ -296,6 +289,7 @@ struct InputFilterImpl :public InputFilter
 				type = CloseTag;
 				element = "";
 				elementsize = 0;
+				setState( Open);
 				return true;
 			}
 			if (!getElementType( m_elemtype, tg))
@@ -355,6 +349,7 @@ struct InputFilterImpl :public InputFilter
 			m_tag = '\0';
 			m_linecomplete = true;
 			m_eolnread = false;
+			setState( Open);
 			return true;
 		}
 		return false;

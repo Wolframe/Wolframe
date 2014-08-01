@@ -251,6 +251,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 		}
 		return false;
 	}
+	setState( Open);
 	while (!m_stk.empty())
 	{
 		const cJSON* nd = m_stk.back().m_node;

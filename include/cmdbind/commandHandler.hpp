@@ -149,6 +149,9 @@ typedef boost::shared_ptr<CommandHandler> CommandHandlerR;
 class CommandHandlerUnit
 {
 public:
+	/// \brief Destructor
+	virtual ~CommandHandlerUnit(){}
+
 	/// \brief Load all configured programs
 	virtual bool loadPrograms( const proc::ProcessorProviderInterface* provider)=0;
 

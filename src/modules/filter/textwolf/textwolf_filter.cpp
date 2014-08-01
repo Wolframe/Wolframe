@@ -386,6 +386,10 @@ struct InputFilterImpl
 			{
 				setState( Error, "xml header not not terminated");
 			}
+			else
+			{
+				setState( Open);
+			}
 		}
 		else
 		{
@@ -397,21 +401,6 @@ struct InputFilterImpl
 			);
 			setState( Open);
 		}
-	}
-
-	/// \brief Implement InputFilter::getRest(const void*&,std::size_t&,bool&)
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	{
-		std::size_t pp = 0;
-		if (m_parser)
-		{
-			DOWITH_XMLScanner( 
-				pp = ((XMLScanner*)m_parser)->getPosition();
-			);
-		}
-		ptr = m_src + pp;
-		size = (m_srcsize > pp)?(m_srcsize-pp):0;
-		end = m_srcend;
 	}
 
 	static int getElementType( textwolf::XMLScannerBase::ElementType et)
@@ -594,6 +583,7 @@ struct InputFilterImpl
 #ifdef _Wolframe_LOWLEVEL_DEBUG
 			LOG_DATA2 << "[textwolf filter] " << metadataStateName() << " fetch element " << textwolf::XMLScannerBase::getElementTypeName(et) << " '" << std::string(ee,elementsize) << "'";
 #endif
+			setState( Open);
 			return true;
 		}
 		return false;
