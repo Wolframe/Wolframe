@@ -157,7 +157,7 @@ private:
 
 /// \brief Lua script reference
 /// \note Because of of potential circular references this has to be a types::SharedReference and not a boost::shared_ptr
-typedef types::SharedReference<LuaScriptInstance> LuaScriptInstanceR;
+typedef boost::shared_ptr<LuaScriptInstance> LuaScriptInstanceR;
 
 
 ///\class LuaFunctionMap
