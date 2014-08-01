@@ -264,7 +264,7 @@ class IProcHandlerTest : public ::testing::Test
 public:
 	std::string m_input;
 	std::string m_expected;
-	net::LocalTCPendpoint ep;
+	net::LocalEndpointR ep;
 	boost::shared_ptr<proc::ProcessorProvider> m_provider;
 	boost::shared_ptr<iproc::Connection> m_connection;
 	IProcTestConfiguration m_config;
@@ -277,7 +277,7 @@ public:
 	};
 protected:
 	IProcHandlerTest()
-		:ep( "127.0.0.1", 12345)
+		:ep( new net::LocalTCPendpoint( "127.0.0.1", 12345))
 		,m_config(
 			g_testdir / "scripts/test_echo_char.lua",
 			TestDescription().inputBufferSize + EoDBufferSize,

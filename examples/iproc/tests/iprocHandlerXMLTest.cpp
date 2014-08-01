@@ -243,7 +243,7 @@ TEST_F( IProcHandlerXMLTest, tests)
 		std::size_t ib[] = {16000,127,1,2,3,5,7,8,11,13,17};
 		std::size_t ob[] = {16000,127,1,2,5,7,8};
 
-		net::LocalTCPendpoint  ep( "127.0.0.1", 12345);
+		net::LocalEndpointR ep( new net::LocalTCPendpoint( "127.0.0.1", 12345));
 		wtest::Data data( testDescriptions[ti].name, testDescriptions[ti].datafile, g_gtest_ARGV[0]);
 
 		unsigned int rr = testSeed();

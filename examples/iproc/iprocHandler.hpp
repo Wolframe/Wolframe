@@ -87,6 +87,7 @@ private:
 	enum State
 	{
 		Init,				//< start state, called first time in this session
+		StartCommand,			//< start parsing command
 		EnterCommand,			//< parse command
 		ParseArgs,			//< parse command arguments
 		ParseArgsEOL,			//< parse end of line after command arguments
@@ -98,7 +99,7 @@ private:
 	///\param [in] i state to get as string
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","Terminate"};
+		static const char* ar[] = {"Init","StartCommand","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","Terminate"};
 		return ar[i];
 	}
 	///\enum State

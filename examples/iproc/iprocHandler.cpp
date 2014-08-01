@@ -104,11 +104,15 @@ const net::NetworkOperation Connection::nextOperation()
 			case Init:
 			{
 				//start:
-				m_state = EnterCommand;
+				m_state = StartCommand;
 				m_argBuffer.clear();
 				return WriteLine( "OK expecting command");
 			}
 
+			case StartCommand:
+				m_state = EnterCommand;
+				m_argBuffer.clear();
+				/*no break here!*/
 			case EnterCommand:
 			{
 				//the empty command is for an empty line for not bothering the client with obscure error messages.
@@ -120,6 +124,7 @@ const net::NetworkOperation Connection::nextOperation()
 					case capa:
 					case quit:
 					{
+						m_argBuffer.clear();
 						m_state = ParseArgs;
 						continue;
 					}
@@ -127,6 +132,7 @@ const net::NetworkOperation Connection::nextOperation()
 					{
 						if (m_cmdidx >= NofCommands && (unsigned int)(m_cmdidx - NofCommands) < m_config->commands().size())
 						{
+							m_argBuffer.clear();
 							m_state = ParseArgs;
 							continue;
 						}
@@ -145,7 +151,6 @@ const net::NetworkOperation Connection::nextOperation()
 
 			case ParseArgs:
 			{
-				m_argBuffer.clear();
 				if (!protocol::CmdParser<std::string>::getLine( m_itr, m_end, m_argBuffer))
 				{
 					if (m_itr == m_end)
@@ -186,8 +191,7 @@ const net::NetworkOperation Connection::nextOperation()
 						}
 						else
 						{
-							m_argBuffer.clear();
-							m_state = EnterCommand;
+							m_state = StartCommand;
 							continue;
 						}
 					case capa:
@@ -198,8 +202,8 @@ const net::NetworkOperation Connection::nextOperation()
 						}
 						else
 						{
+							m_state = StartCommand;
 							return WriteLine( "OK capa quit", m_parser.capabilities().c_str());
-							m_state = EnterCommand;
 							continue;
 						}
 					case quit:
@@ -300,7 +304,7 @@ const net::NetworkOperation Connection::nextOperation()
 
 							err = m_protocolHandler.get()->lastError();
 							m_protocolHandler.reset();
-							m_state = EnterCommand;
+							m_state = StartCommand;
 							if (err)
 							{
 								return WriteLine( "ERR", err);
@@ -321,6 +325,7 @@ const net::NetworkOperation Connection::nextOperation()
 
 			case ProtocolError:
 			{
+				m_argBuffer.clear();
 				if (!protocol::CmdParser<protocol::Buffer>::skipLine( m_itr, m_end)
 				||  !protocol::CmdParser<protocol::Buffer>::consumeEOL( m_itr, m_end))
 				{
