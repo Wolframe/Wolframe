@@ -34,9 +34,9 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "filter/filter.hpp"
-#include "types/countedReference.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace module {
@@ -75,7 +75,7 @@ private:
 	langbind::CreateFilterType m_createFilterType;
 };
 
-typedef types::CountedReference<FilterConstructor> FilterConstructorR;
+typedef boost::shared_ptr<FilterConstructor> FilterConstructorR;
 
 
 /// \class FilterBuilder

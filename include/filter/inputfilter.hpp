@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
-#include "types/countedReference.hpp"
+#include "types/sharedReference.hpp"
 #include "types/docmetadata.hpp"
 #include "filter/filterbase.hpp"
 #include <string>
@@ -151,7 +151,7 @@ private:
 
 /// \typedef InputFilterR
 /// \brief Shared input filter (langbind::InputFilter) reference 
-typedef types::CountedReference<InputFilter> InputFilterR;
+typedef types::SharedReference<InputFilter> InputFilterR;
 
 
 }}//namespace

@@ -38,7 +38,6 @@ Project Wolframe.
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/xmlhdrparser.hpp"
 #include "textwolf/xmlprinter.hpp"
-#include "types/countedReference.hpp"
 #include "logger-v1.hpp"
 #include <string>
 #include <cstddef>

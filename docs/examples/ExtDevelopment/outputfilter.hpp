@@ -53,7 +53,7 @@ protected:
 
 ///\typedef OutputFilterR
 // Shared output filter reference
-typedef types::CountedReference<OutputFilter> OutputFilterR;
+typedef types::SharedReference<OutputFilter> OutputFilterR;
 
 }}//namespace
 #endif

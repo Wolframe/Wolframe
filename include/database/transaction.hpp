@@ -39,10 +39,10 @@
 #include "database/vmTransactionOutput.hpp"
 #include "database/transactionExecStatemachine.hpp"
 #include "database/databaseError.hpp"
-#include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {
@@ -133,7 +133,7 @@ private:
 };
 
 
-typedef types::CountedReference<Transaction> TransactionR;
+typedef boost::shared_ptr<Transaction> TransactionR;
 
 }} // namespace _Wolframe::db
 

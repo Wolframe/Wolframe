@@ -35,7 +35,6 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_INPUTFILTER_SCOPE_HPP_INCLUDED
 #define _Wolframe_FILTER_INPUTFILTER_SCOPE_HPP_INCLUDED
 #include "filter/inputfilter.hpp"
-#include "types/countedReference.hpp"
 #include <stdexcept>
 
 namespace _Wolframe {

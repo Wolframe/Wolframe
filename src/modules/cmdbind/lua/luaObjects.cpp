@@ -53,6 +53,7 @@ Project Wolframe.
 #include <cstddef>
 #include <cstdarg>
 #include <boost/type_traits/remove_cv.hpp>
+#include <boost/shared_ptr.hpp>
 extern "C"
 {
 #include "lua.h"
@@ -1572,7 +1573,7 @@ LUA_FUNCTION_THROWS( "provider.filter(..)", function_filter)
 			{
 				throw std::runtime_error( std::string( "filter type '") + name + "' is not defined");
 			}
-			types::CountedReference<Filter> flt( filtertype->create( arg));
+			boost::shared_ptr<Filter> flt( filtertype->create( arg));
 
 			LuaObject<Filter>::push_luastack( ls, *flt);
 			return 1;

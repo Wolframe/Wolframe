@@ -35,7 +35,6 @@ Project Wolframe.
 #define _Wolframe_PRNT_HARU_PDF_PRINT_FUNCTION_HPP_INCLUDED
 #include "langbind/formFunction.hpp"
 #include "pdfPrinterDocument.hpp"
-#include "types/countedReference.hpp"
 #include <string>
 
 namespace _Wolframe {

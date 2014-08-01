@@ -35,7 +35,6 @@ Project Wolframe.
 #ifndef _Wolframe_CJSON_INPUT_FILTER_HPP_INCLUDED
 #define _Wolframe_CJSON_INPUT_FILTER_HPP_INCLUDED
 #include "filter/inputfilter.hpp"
-#include "types/countedReference.hpp"
 #include "types/string.hpp"
 #include "types/docmetadata.hpp"
 extern "C"

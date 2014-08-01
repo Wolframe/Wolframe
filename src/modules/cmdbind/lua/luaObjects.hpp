@@ -42,6 +42,7 @@ Project Wolframe.
 #include <map>
 #include <list>
 #include <boost/shared_ptr.hpp>
+#include "types/sharedReference.hpp"
 
 extern "C" {
 	#include "lua.h"
@@ -154,7 +155,9 @@ private:
 	LuaScriptInstance( const LuaScriptInstance&){} //non copyable
 };
 
-typedef boost::shared_ptr<LuaScriptInstance> LuaScriptInstanceR;
+/// \brief Lua script reference
+/// \note Because of of potential circular references this has to be a types::SharedReference and not a boost::shared_ptr
+typedef types::SharedReference<LuaScriptInstance> LuaScriptInstanceR;
 
 
 ///\class LuaFunctionMap

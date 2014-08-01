@@ -34,9 +34,9 @@ Project Wolframe.
 #ifndef _Wolframe_MODULE_DOCYPE_DETECTOR_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_DOCYPE_DETECTOR_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "cmdbind/doctypeDetector.hpp"
-#include "types/countedReference.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace module {
@@ -84,8 +84,8 @@ private:
 	cmdbind::CreateDoctypeDetector m_createDoctypeDetector;
 };
 
-/// \brief Shared doctype detector constructor reference
-typedef types::CountedReference<DoctypeDetectorConstructor> DoctypeDetectorConstructorR;
+/// \brief Shared doctype detector constructor
+typedef boost::shared_ptr<DoctypeDetectorConstructor> DoctypeDetectorConstructorR;
 
 
 /// \brief Document type and format detector builder

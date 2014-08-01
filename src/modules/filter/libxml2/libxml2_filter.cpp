@@ -36,7 +36,6 @@ Project Wolframe.
 #include "xsltMapper.hpp"
 #include "filter/bufferingfilter.hpp"
 #include "types/docmetadata.hpp"
-#include "types/countedReference.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>

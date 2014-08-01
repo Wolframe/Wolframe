@@ -37,7 +37,6 @@ Project Wolframe.
 #include "processor/procProvider.hpp"
 #include "processor/execContext.hpp"
 #include "logger-v1.hpp"
-#include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include <vector>
 #include <string>

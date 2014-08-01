@@ -58,7 +58,7 @@ public:
 };
 
 // Shared input filter reference
-typedef types::CountedReference<InputFilter> InputFilterR;
+typedef boost::shared_ptr<InputFilter> InputFilterR;
 
 
 }}//namespace

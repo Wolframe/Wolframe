@@ -37,6 +37,7 @@ Project Wolframe.
 #include "logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
+#include <boost/shared_ptr.hpp>
 
 extern "C"
 {
@@ -55,7 +56,7 @@ void LuaCommandHandler::initcall()
 
 	if (m_default_filter.filtertype)
 	{
-		types::CountedReference<langbind::Filter> filter( m_default_filter.create());
+		boost::shared_ptr<langbind::Filter> filter( m_default_filter.create());
 		setInputFilter( filter->inputfilter());
 		setOutputFilter( filter->outputfilter());
 	}

@@ -35,7 +35,6 @@ Project Wolframe.
 #define _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
 #include "filter/inputfilterScope.hpp"
 #include "filter/typedfilterScope.hpp"
-#include "types/countedReference.hpp"
 #include <boost/shared_ptr.hpp>
 
 #if WITH_LUA

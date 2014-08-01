@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
-#include "types/countedReference.hpp"
+#include "types/sharedReference.hpp"
 #include "types/docmetadata.hpp"
 #include "filter/filterbase.hpp"
 #include <string>
@@ -197,7 +197,7 @@ private:
 
 /// \typedef OutputFilterR
 /// \brief Shared output filter (langbind::OutputFilter) reference
-typedef types::CountedReference<OutputFilter> OutputFilterR;
+typedef types::SharedReference<OutputFilter> OutputFilterR;
 
 }}//namespace
 #endif

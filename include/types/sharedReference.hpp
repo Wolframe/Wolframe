@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#ifndef _Wolframe_COUNTED_REFERENCE_HPP_INCLUDED
-#define _Wolframe_COUNTED_REFERENCE_HPP_INCLUDED
-/// \file types/countedReference.hpp
+#ifndef _Wolframe_SHARED_REFERENCE_HPP_INCLUDED
+#define _Wolframe_SHARED_REFERENCE_HPP_INCLUDED
+/// \file types/sharedReference.hpp
 /// \brief Shared reference to an object exchangeable in a single thread context
 
 #include <cstddef>
@@ -40,11 +40,11 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-/// \class CountedReference
+/// \class SharedReference
 /// \brief Shared reference to an object exchangeable for all owners in a single thread context
 /// \tparam OBJ object type referenced
 template <class OBJ>
-class CountedReference
+class SharedReference
 {
 public:
 	/// \class Pointer
@@ -65,19 +65,19 @@ public:
 
 	/// \brief Copy constructor
 	/// \param[in] o shared reference to copy
-	CountedReference( const CountedReference& o)
+	SharedReference( const SharedReference& o)
 		:m_ref(o.m_ref){}
 
 	/// \brief Constructor
 	/// \param[in] ptr object pointer
-	CountedReference( OBJ* ptr=0)
+	SharedReference( OBJ* ptr=0)
 		:m_ref(boost::shared_ptr<Pointer>( new Pointer( ptr))){}
 
 	/// \brief Destructor
-	virtual ~CountedReference(){}
+	virtual ~SharedReference(){}
 
 	/// \brief Assignment
-	CountedReference& operator =( const CountedReference& o)
+	SharedReference& operator =( const SharedReference& o)
 	{
 		m_ref = o.m_ref;
 		return *this;

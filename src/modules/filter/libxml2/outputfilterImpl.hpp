@@ -36,7 +36,6 @@ Project Wolframe.
 #define _Wolframe_LIBXML2_OUTPUT_FILTER_HPP_INCLUDED
 #include "documentWriter.hpp"
 #include "xsltMapper.hpp"
-#include "types/countedReference.hpp"
 #include "types/docmetadata.hpp"
 #include "filter/outputfilter.hpp"
 #include "libxml/parser.h"

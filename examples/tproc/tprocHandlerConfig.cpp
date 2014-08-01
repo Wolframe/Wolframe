@@ -32,7 +32,6 @@
 ************************************************************************/
 ///\file tprocHandlerConfig.cpp
 ///\brief Implementation of the tproc connection handler configuration
-#include "types/countedReference.hpp"
 #include "tprocHandlerConfig.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/protocolHandler.hpp"
