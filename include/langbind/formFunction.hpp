@@ -78,8 +78,11 @@ typedef boost::shared_ptr<FormFunctionClosure> FormFunctionClosureR;
 class FormFunction
 {
 public:
+	/// \brief Destructor
 	virtual ~FormFunction(){}
+	/// \brief Optional function to implement if there is anything to be initialized after creation of all functions
 	virtual bool initializeContext(){return true;}
+	/// \brief Creates and returns a closure to execute this function
 	virtual FormFunctionClosure* createClosure() const=0;
 };
 

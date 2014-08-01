@@ -2904,15 +2904,17 @@ void LuaFunctionMap::defineLuaFunction( const std::string& name, const LuaScript
 	m_procmap[ nam] = scriptId;
 }
 
-bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const
+LuaScriptInstance* LuaFunctionMap::createLuaScriptInstance( const std::string& procname) const
 {
 	std::string nam( procname);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 
 	std::map<std::string,std::size_t>::const_iterator ii=m_procmap.find( nam),ee=m_procmap.end();
-	if (ii == ee) return false;
-	rt = LuaScriptInstanceR( new LuaScriptInstance( m_ar[ ii->second].get(), m_modulemap));
-	return true;
+	if (ii == ee)
+	{
+		throw std::runtime_error( std::string("function '") + nam + "' is not defined in script");
+	}
+	return new LuaScriptInstance( m_ar[ ii->second].get(), m_modulemap);
 }
 
 std::vector<std::string> LuaFunctionMap::commands() const

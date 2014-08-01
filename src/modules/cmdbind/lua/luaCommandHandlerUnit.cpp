@@ -43,11 +43,7 @@ using namespace _Wolframe::langbind;
 
 CommandHandler* LuaCommandHandlerUnit::createCommandHandler( const std::string& cmdname, const std::string& docformat)
 {
-	langbind::LuaScriptInstanceR interp;
-	if (!m_ctx.funcmap.getLuaScriptInstance( cmdname, interp))
-	{
-		throw std::runtime_error( std::string( "unknown lua script '") + cmdname + "'");
-	}
+	langbind::LuaScriptInstanceR interp( m_ctx.funcmap.createLuaScriptInstance( cmdname));
 	types::keymap<langbind::FilterDef>::const_iterator fi = m_filtermap.find( docformat);
 	if (fi != m_filtermap.end())
 	{

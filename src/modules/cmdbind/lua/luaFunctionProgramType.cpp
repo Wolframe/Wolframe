@@ -78,7 +78,9 @@ public:
 	{}
 
 	virtual ~LuaFormFunctionClosure()
-	{}
+	{
+		m_interp.reset();
+	}
 
 	virtual bool call()
 	{
@@ -144,8 +146,7 @@ public:
 
 	virtual FormFunctionClosure* createClosure() const
 	{
-		langbind::LuaScriptInstanceR interp;
-		if (!m_context->funcmap.getLuaScriptInstance( m_name, interp)) return 0;
+		langbind::LuaScriptInstanceR interp( m_context->funcmap.createLuaScriptInstance( m_name));
 		return new LuaFormFunctionClosure( interp, m_name);
 	}
 

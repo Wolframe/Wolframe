@@ -107,7 +107,7 @@ public:
 	///\param[in] script script executed by this instance
 	///\param[in] modulemap_ map of modules that can be loaded
 	LuaScriptInstance( const LuaScript* script, const LuaModuleMap* modulemap_);
-	~LuaScriptInstance();
+	virtual ~LuaScriptInstance();
 
 	lua_State* ls()				{return m_ls;}
 	lua_State* thread()			{return m_thread;}
@@ -173,8 +173,8 @@ public:
 	///\param[in] procname name of the function
 	///\param[in] script with the function
 	void defineLuaFunction( const std::string& procname, const LuaScript& script);
-	///\brief Get an empty the context for a Lua script
-	bool getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const;
+	///\brief Get an empty interpreter instance for a Lua script
+	LuaScriptInstance* createLuaScriptInstance( const std::string& procname) const;
 
 	///\brief Get the list of commands
 	std::vector<std::string> commands() const;
