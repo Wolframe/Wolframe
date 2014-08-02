@@ -90,11 +90,11 @@ public:
 	Auditor* auditor() const;
 
 private:
-	AAAAprovider( const AAAAprovider&){}			///< non copyable
-	AAAAprovider& operator=( const AAAAprovider&){}		///< non copyable
+	AAAAprovider( const AAAAprovider&){}				///< non copyable
+	AAAAprovider& operator=( const AAAAprovider&){return *this;}	///< non copyable
 
-	class AAAAprovider_Impl;				///< PIMPL class
-	AAAAprovider_Impl* m_impl;				///< PIMPL
+	class AAAAprovider_Impl;					///< PIMPL class
+	AAAAprovider_Impl* m_impl;					///< PIMPL
 };
 
 }}// namespace

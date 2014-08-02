@@ -562,7 +562,7 @@ struct InputFilterImpl
 		}
 		for (;;)
 		{
-			const char* ee;
+			const char* ee = 0;
 			textwolf::XMLScannerBase::ElementType et = getNextItem( ee, elementsize);
 			element = (const void*)ee;
 			if (!mapElementType( type, et, ee))
@@ -709,8 +709,8 @@ struct InputFilterImpl
 		}
 		while (m_metadatastate != MS_Done && m_metadatastate != MS_DoneElemCached)
 		{
-			const char* ee;
-			std::size_t eesize;
+			const char* ee = 0;
+			std::size_t eesize = 0;
 			textwolf::XMLScannerBase::ElementType et = getNextItem( ee, eesize);
 #ifdef _Wolframe_LOWLEVEL_DEBUG
 			LOG_DATA2 << "[textwolf filter] " << metadataStateName() << " fetch element " << textwolf::XMLScannerBase::getElementTypeName(et) << " '" << std::string(ee,eesize) << "'";
