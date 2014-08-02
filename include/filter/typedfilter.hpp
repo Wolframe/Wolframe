@@ -43,6 +43,17 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+/// \class TypedFilterData
+/// \brief Private object bound to a filter to hold some data to be freed with the release of this filter (to solve some object life time dependency problems)
+struct TypedFilterData
+{
+	TypedFilterData(){}
+	virtual ~TypedFilterData()
+	{
+		/*[-]*/std::cout << "DELETE ~ResultData" << std::endl;
+	}
+};
+
 /// \class TypedInputFilter
 /// \brief Input filter with atomic values having a type
 class TypedInputFilter
@@ -50,30 +61,24 @@ class TypedInputFilter
 {
 public:
 	typedef InputFilter::State State;
-	/// \class Data
-	/// \brief Private object bound to this filter to hold some data to be freed with the release of this filter (to solve some object life time dependency problems)
-	struct Data
-	{
-		Data(){}
-		virtual Data* copy() const=0;
-		virtual ~Data(){}
-	};
 
 	/// \brief Constructor
 	explicit TypedInputFilter( const char* name_)
 		:FilterBase(name_)
-		,m_state(InputFilter::Start)
-		,m_data(0){}
+		,m_state(InputFilter::Start){}
 
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)
 		:FilterBase(o)
 		,m_state(o.m_state)
-		,m_data(o.m_data?o.m_data->copy():0){}
+		,m_data(o.m_data){}
 
 	/// \brief Destructor
-	virtual ~TypedInputFilter()			{if (m_data) delete m_data;}
+	virtual ~TypedInputFilter()
+	{
+		/*[-]*/std::cout << "DELETE ~TypedInputFilter " << name() << (uintptr_t)m_data.get() << std::endl;
+	}
 
 	/// \brief Get a self copy
 	/// \return allocated pointer to copy of this
@@ -100,11 +105,15 @@ public:
 	virtual void resetIterator(){}
 
 	/// \brief Set data that belongs to filter scope
-	void setData( Data* data_)			{if (m_data) delete m_data; m_data = data_;}
+	void setData( const boost::shared_ptr<TypedFilterData>& data_)
+	{
+		/*[-]*/std::cout << "SET Data " << name() << " " << (uintptr_t)data_.get() << std::endl;
+		m_data = data_;
+	}
 
 private:
-	State m_state;			///< state
-	Data* m_data;			///< data bound to the filter
+	State m_state;					///< state
+	boost::shared_ptr<TypedFilterData> m_data;	///< data bound to the filter
 };
 
 /// \typedef TypedInputFilterR
