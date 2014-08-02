@@ -297,6 +297,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 
 		_Wolframe::module::ModulesDirectory modDir( configurationPath);
 		_Wolframe::config::ApplicationConfiguration conf;
+		conf.addModules( &modDir );
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
 				_Wolframe::config::ApplicationConfiguration::fileType( configFile, cmdLineCfg.cfgType );
@@ -306,7 +307,6 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 			return;
 		if ( ! modDir.loadModules( conf.moduleList() ))
 			return;
-		conf.addModules( &modDir );
 		if ( !conf.parse( configFile, cfgType ))
 			return;
 
