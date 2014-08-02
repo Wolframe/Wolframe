@@ -6,6 +6,9 @@ LoadModules {
 ; if relative it has this configuration file as basis to compute the path
 ;    Directory modules
 
+; protocol modules
+    Module mod_protocol_wolframe
+
 $(if test $VARIANT = "monolythic"; then eval "echo \"$(cat dbmodules.tmpl)\""; fi)
 
 ; authentication modules
