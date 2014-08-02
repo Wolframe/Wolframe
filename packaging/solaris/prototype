@@ -152,11 +152,6 @@ f none opt/csw/include/wolframe/langbind/formFunction.hpp 0644 root staff
 f none opt/csw/include/wolframe/langbind/input.hpp 0644 root staff
 f none opt/csw/include/wolframe/langbind/output.hpp 0644 root staff
 f none opt/csw/include/wolframe/langbind/runtimeEnvironment.hpp 0644 root staff
-d none opt/csw/include/wolframe/protocol 0755 root root
-f none opt/csw/include/wolframe/protocol/buffers.hpp 0644 root staff
-f none opt/csw/include/wolframe/protocol/ioblocks.hpp 0644 root staff
-f none opt/csw/include/wolframe/protocol/iterators.hpp 0644 root staff
-f none opt/csw/include/wolframe/protocol/parser.hpp 0644 root staff
 d none opt/csw/include/wolframe/cmdbind 0755 root root
 f none opt/csw/include/wolframe/cmdbind/commandHandler.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/commandHandlerUnit.hpp 0644 root staff

@@ -131,11 +131,6 @@ usr/local/include/wolframe/langbind/input.hpp
 usr/local/include/wolframe/langbind/output.hpp
 usr/local/include/wolframe/langbind/runtimeEnvironment.hpp
 @dirrm usr/local/include/wolframe/langbind
-usr/local/include/wolframe/protocol/buffers.hpp
-usr/local/include/wolframe/protocol/ioblocks.hpp
-usr/local/include/wolframe/protocol/iterators.hpp
-usr/local/include/wolframe/protocol/parser.hpp
-@dirrm usr/local/include/wolframe/protocol
 usr/local/include/wolframe/cmdbind/commandHandler.hpp
 usr/local/include/wolframe/cmdbind/commandHandlerUnit.hpp
 usr/local/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp

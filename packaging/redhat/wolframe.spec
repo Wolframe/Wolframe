@@ -1442,8 +1442,6 @@ fi
 %{_includedir}/wolframe/*.hpp
 %dir %{_includedir}/wolframe/langbind/
 %{_includedir}/wolframe/langbind/*.hpp
-%dir %{_includedir}/wolframe/protocol/
-%{_includedir}/wolframe/protocol/*.hpp
 %dir %{_includedir}/wolframe/cmdbind/
 %{_includedir}/wolframe/cmdbind/*.hpp
 %dir %{_includedir}/wolframe/database/
