@@ -40,8 +40,8 @@ all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModProtocolWolframe.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_protocol_wolframe.obj
+	$(LINK) /dll /def:mod_protocol_wolframe.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

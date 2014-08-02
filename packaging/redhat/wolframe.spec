@@ -1370,6 +1370,8 @@ fi
 
 %dir %{_libdir}/wolframe/modules
 
+%{_libdir}/wolframe/modules/mod_protocol_wolframe.so
+
 %{_libdir}/wolframe/modules/mod_audit_textfile.so
 %{_libdir}/wolframe/modules/mod_audit_database.so
 
@@ -1440,8 +1442,6 @@ fi
 %{_includedir}/wolframe/*.hpp
 %dir %{_includedir}/wolframe/langbind/
 %{_includedir}/wolframe/langbind/*.hpp
-%dir %{_includedir}/wolframe/protocol/
-%{_includedir}/wolframe/protocol/*.hpp
 %dir %{_includedir}/wolframe/cmdbind/
 %{_includedir}/wolframe/cmdbind/*.hpp
 %dir %{_includedir}/wolframe/database/

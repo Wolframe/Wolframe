@@ -30,6 +30,7 @@ usr/pkg/lib/wolframe/libwolframe_langbind.a
 usr/pkg/lib/wolframe/libwolframe_langbind.so.0.0.0
 usr/pkg/lib/wolframe/libwolframe_langbind.so.0
 usr/pkg/lib/wolframe/libwolframe_langbind.so
+usr/pkg/lib/wolframe/modules/mod_protocol_wolframe.so
 usr/pkg/lib/wolframe/modules/mod_db_postgresql.so
 usr/pkg/lib/wolframe/modules/mod_db_sqlite3.so
 usr/pkg/lib/wolframe/modules/mod_audit_database.so
@@ -141,11 +142,6 @@ usr/pkg/include/wolframe/langbind/input.hpp
 usr/pkg/include/wolframe/langbind/output.hpp
 usr/pkg/include/wolframe/langbind/runtimeEnvironment.hpp
 @dirrm usr/pkg/include/wolframe/langbind
-usr/pkg/include/wolframe/protocol/buffers.hpp
-usr/pkg/include/wolframe/protocol/ioblocks.hpp
-usr/pkg/include/wolframe/protocol/iterators.hpp
-usr/pkg/include/wolframe/protocol/parser.hpp
-@dirrm usr/pkg/include/wolframe/protocol
 usr/pkg/include/wolframe/cmdbind/commandHandler.hpp
 usr/pkg/include/wolframe/cmdbind/commandHandlerUnit.hpp
 usr/pkg/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
