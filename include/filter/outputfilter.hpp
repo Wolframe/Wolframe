@@ -50,9 +50,6 @@ class OutputFilter
 	:public FilterBase
 {
 public:
-	enum {
-
-	};
 	/// \enum State
 	/// \brief State of the input filter used in the application processor iterating loop to decide what to do
 	enum State
