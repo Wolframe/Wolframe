@@ -10,7 +10,7 @@ INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/3rdParty/gtest/include \
-	-I$(TOPDIR)/src/modules/protocol/standard \
+	-I$(TOPDIR)/src/modules/protocol/wolframe \
 	-I$(TOPDIR)/wtest/include
 
 INCLUDE_LDFLAGS = \

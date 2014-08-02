@@ -20,7 +20,7 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_langbind
 
-DYNAMIC_MODULE = mod_protocol_standard.so
+DYNAMIC_MODULE = mod_protocol_wolframe.so
 
 CPP_OBJS = \
 	ioblocks.o \
@@ -31,7 +31,7 @@ CPP_OBJS = \
 	doctypeFilterProtocolHandler.o \
 	interfaceProtocolHandler.o \
 	passwordChangeProtocolHandler.o \
-	standardProtocolHandler.o
+	mainProtocolHandler.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

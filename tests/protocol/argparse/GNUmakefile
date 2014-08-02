@@ -8,7 +8,7 @@ INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
-	-I$(TOPDIR)/src/modules/protocol/standard \
+	-I$(TOPDIR)/src/modules/protocol/wolframe \
 	-I$(TOPDIR)/wtest/include \
 	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(BOOST_INCLUDE_DIR)

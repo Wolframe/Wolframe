@@ -23,7 +23,7 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_protocol_standard.dll
+	mod_protocol_wolframe.dll
 
 CPP_OBJS = \
 	ioblocks.obj \
@@ -34,14 +34,14 @@ CPP_OBJS = \
 	doctypeFilterProtocolHandler.obj \
 	interfaceProtocolHandler.obj \
 	passwordChangeProtocolHandler.obj \
-	standardProtocolHandler.obj
+	mainProtocolHandler.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModProtocolStandard.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:ModProtocolWolframe.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

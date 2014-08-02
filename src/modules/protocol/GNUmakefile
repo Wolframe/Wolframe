@@ -4,7 +4,7 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-SUBDIRS += standard
+SUBDIRS += wolframe
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

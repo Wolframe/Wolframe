@@ -38,7 +38,7 @@
 #include "AAAA/AAAAprovider.hpp"
 #include "module/moduleDirectory.hpp"
 #include "mainConnectionHandler.hpp"
-#include "standardProtocolHandler.hpp"
+#include "mainProtocolHandler.hpp"
 #include "wtest/pseudoRandomGenForTests.hpp"
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"

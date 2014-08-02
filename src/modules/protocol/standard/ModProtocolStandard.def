@@ -1,3 +1,0 @@
-LIBRARY mod_protocol_standard
-EXPORTS
-entryPoint	@1

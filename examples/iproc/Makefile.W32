@@ -13,7 +13,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\3rdParty\gtest\include \
-	/I$(TOPDIR)\src\modules\protocol\standard \
+	/I$(TOPDIR)\src\modules\protocol\wolframe \
 	/I$(TOPDIR)\wtest\include
 
 # Note: libraries are picked automatically on Windows!

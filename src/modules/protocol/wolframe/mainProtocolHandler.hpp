@@ -30,10 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file standardProtocolHandler.hpp
+///\file mainProtocolHandler.hpp
+///\brief Main (top level) protocol handler of the Wolframe protocol
 
-#ifndef _Wolframe_STANDARD_PROTOCOL_HANDLER_HPP_INCLUDED
-#define _Wolframe_STANDARD_PROTOCOL_HANDLER_HPP_INCLUDED
+#ifndef _Wolframe_WOLFRAME_MAIN_PROTOCOL_HANDLER_HPP_INCLUDED
+#define _Wolframe_WOLFRAME_MAIN_PROTOCOL_HANDLER_HPP_INCLUDED
 #include "cmdbind/protocolHandler.hpp"
 #include "lineProtocolHandler.hpp"
 #include "doctypeFilterProtocolHandler.hpp"
@@ -42,14 +43,14 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-class StandardProtocolHandler
-	:public LineProtocolHandlerTemplate<StandardProtocolHandler>
+class MainProtocolHandler
+	:public LineProtocolHandlerTemplate<MainProtocolHandler>
 {
 public:
-	typedef cmdbind::LineProtocolHandlerTemplate<StandardProtocolHandler> Parent;
+	typedef cmdbind::LineProtocolHandlerTemplate<MainProtocolHandler> Parent;
 
-	StandardProtocolHandler();
-	virtual ~StandardProtocolHandler(){}
+	MainProtocolHandler();
+	virtual ~MainProtocolHandler(){}
 
 	virtual void setPeer( const net::RemoteEndpointR& remote);
 	virtual void setLocalEndPoint( const net::LocalEndpointR& local);
@@ -90,22 +91,22 @@ private:
 };
 
 
-/// \class StandardProtocolHandlerUnit
-/// \brief Class that defines the Wolframe standard protocol handler 
-class StandardProtocolHandlerUnit
+/// \class MainProtocolHandlerUnit
+/// \brief Class that defines the Wolframe Main protocol handler 
+class MainProtocolHandlerUnit
 	:public ProtocolHandlerUnit
 {
 public:
-	/// \brief Get the name of the Wolframe standard protocol handler
+	/// \brief Get the name of the Wolframe Main protocol handler
 	virtual const char* protocol() const
 	{
 		return "wolframe";
 	}
 
-	/// \brief Create an instance of the Wolframe standard protocol handler
+	/// \brief Create an instance of the Wolframe main protocol handler
 	virtual ProtocolHandler* createProtocolHandler()
 	{
-		return new StandardProtocolHandler();
+		return new MainProtocolHandler();
 	}
 };
 

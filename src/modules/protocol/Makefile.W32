@@ -5,7 +5,7 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 SUBDIRS = \
-	$(SUBDIRS) standard
+	$(SUBDIRS) wolframe
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

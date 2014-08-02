@@ -9,7 +9,7 @@ INCLUDE_CXXFLAGS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
-	-I$(TOPDIR)/src/modules/protocol/standard \
+	-I$(TOPDIR)/src/modules/protocol/wolframe \
 	-I$(TOPDIR)/3rdParty/gtest/include \
 	-I$(TOPDIR)/wtest/include
 

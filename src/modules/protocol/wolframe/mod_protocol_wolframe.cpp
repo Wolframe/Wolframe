@@ -30,13 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_protocol_standard.cpp
-///\brief Module for the standard Wolframe protocol handler 
+///\file mod_protocol_wolframe.cpp
+///\brief Module for the handler of the Wolframe protocol
 #include "appdevel/protocolHandlerModuleMacros.hpp"
 #include "appdevel/moduleFrameMacros.hpp"
-#include "standardProtocolHandler.hpp"
+#include "mainProtocolHandler.hpp"
 
 WF_MODULE_BEGIN( "WolframeProtocolHandler", "Wolframe (standard) protocol handler module")
- WF_PROTOCOL_HANDLER( "wolframe", _Wolframe::cmdbind::StandardProtocolHandlerUnit)
+ WF_PROTOCOL_HANDLER( "wolframe", _Wolframe::cmdbind::MainProtocolHandlerUnit)
 WF_MODULE_END
 
