@@ -40,6 +40,9 @@ Project Wolframe.
 #include "filter/outputfilter.hpp"
 #include <boost/shared_ptr.hpp>
 
+// temporarily for output below
+#include <iostream>
+
 namespace _Wolframe {
 namespace langbind {
 
