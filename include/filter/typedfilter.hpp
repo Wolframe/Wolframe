@@ -47,11 +47,7 @@ namespace langbind {
 /// \brief Private object bound to a filter to hold some data to be freed with the release of this filter (to solve some object life time dependency problems)
 struct TypedFilterData
 {
-	TypedFilterData(){}
-	virtual ~TypedFilterData()
-	{
-		/*[-]*/std::cout << "DELETE ~ResultData" << std::endl;
-	}
+	virtual ~TypedFilterData(){}
 };
 
 /// \class TypedInputFilter
@@ -75,10 +71,7 @@ public:
 		,m_data(o.m_data){}
 
 	/// \brief Destructor
-	virtual ~TypedInputFilter()
-	{
-		/*[-]*/std::cout << "DELETE ~TypedInputFilter " << name() << (uintptr_t)m_data.get() << std::endl;
-	}
+	virtual ~TypedInputFilter(){}
 
 	/// \brief Get a self copy
 	/// \return allocated pointer to copy of this
@@ -107,7 +100,6 @@ public:
 	/// \brief Set data that belongs to filter scope
 	void setData( const boost::shared_ptr<TypedFilterData>& data_)
 	{
-		/*[-]*/std::cout << "SET Data " << name() << " " << (uintptr_t)data_.get() << std::endl;
 		m_data = data_;
 	}
 

@@ -60,7 +60,6 @@ public:
 
 	virtual ~ResultData()
 	{
-		/*[-]*/std::cout << "DELETE ~ResultData" << std::endl;
 	}
 
 private:
