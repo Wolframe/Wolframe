@@ -34,13 +34,10 @@
 /// \brief Execution context
 #ifndef _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
 #define _WOLFRAME_PROCESSOR_EXEC_CONTEXT_HPP_INCLUDED
-#include "processor/procProviderInterface.hpp"
 #include "types/secureReference.hpp"
 #include "types/keymap.hpp"
-#include "AAAA/user.hpp"
-#include "AAAA/authorization.hpp"
-#include "AAAA/authenticator.hpp"
-#include "AAAA/AAAAprovider.hpp"
+#include "processor/procProviderInterface.hpp"
+#include "AAAA/AAAAproviderInterface.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -54,7 +51,7 @@ public:
 	ExecContext()
 		:m_provider(0),m_authorizer(0),m_aaaaProvider(0),m_default_timeout(0){}
 	/// \brief Constructor
-	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAprovider* a)
+	ExecContext( const ProcessorProviderInterface* p, const AAAA::AAAAproviderInterface* a)
 		:m_provider(p),m_authorizer(0),m_aaaaProvider(a),m_default_timeout(0){}
 
 	/// \brief Get the processor provider interface
@@ -149,7 +146,7 @@ private:
 	const ProcessorProviderInterface* m_provider;		///< processor provider interface
 	types::SecureReference<AAAA::User> m_user;		///< user instance
 	const AAAA::Authorizer* m_authorizer;			///< instance to query for execution permission based on login data
-	const AAAA::AAAAprovider* m_aaaaProvider;		///< instance to query for an authenticator
+	const AAAA::AAAAproviderInterface* m_aaaaProvider;	///< instance to query for an authenticator
 	unsigned int m_default_timeout;				///< default timeout
 	net::RemoteEndpointR m_remoteEndpoint;			///< remote end point of the connection
 	net::LocalEndpointR m_localEndpoint;			///< local end point of the connection

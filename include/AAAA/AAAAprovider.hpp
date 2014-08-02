@@ -31,12 +31,12 @@
 
 ************************************************************************/
 /// \file AAAA/AAAAprovider.hpp
-/// \brief AAAA provider interface
+/// \brief AAAA provider object
 
 #ifndef _AAAA_PROVIDER_HPP_INCLUDED
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
-#include "authenticator.hpp"
+#include "AAAAproviderInterface.hpp"
 #include "passwordChanger.hpp"
 #include "authorization.hpp"
 #include "audit.hpp"
@@ -48,7 +48,7 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// Configuration for AAAA (Authentication, Authorization, Audit, Accounting)
+/// \brief Configuration for AAAA (Authentication, Authorization, Audit, Accounting)
 class AAAAconfiguration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
@@ -72,8 +72,9 @@ private:
 	std::list< config::NamedConfiguration* >	m_auditConfig;
 };
 
-/// Global provider interface to create AAAA related objects
-class AAAAprovider : public boost::noncopyable
+/// \brief Global provider object to create AAAA related objects
+class AAAAprovider
+	:public AAAAproviderInterface
 {
 public:
 	AAAAprovider( const AAAAconfiguration* conf,
@@ -87,11 +88,15 @@ public:
 					  const net::RemoteEndpoint& client ) const;
 	Authorizer* authorizer() const;
 	Auditor* auditor() const;
+
 private:
-	class AAAAprovider_Impl;
-	AAAAprovider_Impl*	m_impl;
+	AAAAprovider( const AAAAprovider&){}			///< non copyable
+	AAAAprovider& operator=( const AAAAprovider&){}		///< non copyable
+
+	class AAAAprovider_Impl;				///< PIMPL class
+	AAAAprovider_Impl* m_impl;				///< PIMPL
 };
 
-}} // namespace _Wolframe::AAAA
+}}// namespace
 
-#endif // _AAAA_PROVIDER_HPP_INCLUDED
+#endif

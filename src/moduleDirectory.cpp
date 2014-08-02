@@ -147,7 +147,12 @@ std::string ModulesDirectory::getAbsoluteModulePath( const std::string& moduleNa
 {
 	// Add the module extension, if not defined
 	std::string moduleName_ = moduleName;
-#if !defined(_WIN32)
+#if defined(_WIN32)
+	if (utils::getFileExtension( moduleName).empty())
+	{
+		moduleName_.append( ".dll");
+	}
+#else
 	if (utils::getFileExtension( moduleName).empty())
 	{
 		moduleName_.append( ".so");

@@ -30,48 +30,41 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file audit.hpp
-/// \brief top-level header file for AAAA audit
-///
+/// \file AAAA/AAAAproviderInterface.hpp
+/// \brief AAAA provider interface
 
-#ifndef _AUDIT_HPP_INCLUDED
-#define _AUDIT_HPP_INCLUDED
+#ifndef _AAAA_PROVIDER_INTERFACE_HPP_INCLUDED
+#define _AAAA_PROVIDER_INTERFACE_HPP_INCLUDED
 
-#include "AAAA/AAAAinformation.hpp"
-#include "database/DBprovider.hpp"
+#include "authenticator.hpp"
+#include "passwordChanger.hpp"
+#include "authorization.hpp"
+#include "audit.hpp"
+#include "user.hpp"
+#include "system/connectionEndpoint.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-/// Virtual base (interface) for auditor classes
-class Auditor {
-public:
-	virtual ~Auditor(){}
-
-	/// \brief Close the auditor
-	virtual void close(){}
-
-	virtual bool audit( const Information& auditObject ) = 0;
-};
-
-
-/// Audit Unit
-/// This is the base class for audit unit implementations
-class AuditUnit
+/// \class AAAAproviderInterface
+/// \brief Provider interface to create AAAA related objects
+class AAAAproviderInterface
 {
 public:
-	virtual ~AuditUnit()				{}
+	/// \brief Destructor
+	virtual ~AAAAproviderInterface(){}
 
-	virtual const char* className() const = 0;
-
-	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
-							{ return true; }
-	virtual bool required() = 0;
-
-	virtual bool audit( const Information& auditObject ) = 0;
+	/// \brief Create an return an authenticator object
+	virtual Authenticator* authenticator( const net::RemoteEndpoint& client) const=0;
+	/// \brief Create an return a password changer object
+	virtual PasswordChanger* passwordChanger( const User& user,
+					  const net::RemoteEndpoint& client ) const=0;
+	/// \brief Create an return an authorizer object
+	virtual Authorizer* authorizer() const=0;
+	/// \brief Create an return an auditor object
+	virtual Auditor* auditor() const=0;
 };
 
-}} // namespace _Wolframe::AAAA
+}}// namespace
+#endif
 
-#endif // _AUDIT_HPP_INCLUDED

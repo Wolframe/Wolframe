@@ -72,6 +72,7 @@
 #include <grp.h>
 #include <pwd.h>
 #include <boost/interprocess/sync/file_lock.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 // Solaris has no BSD daemon function, provide our own
