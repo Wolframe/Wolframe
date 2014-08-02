@@ -1370,6 +1370,8 @@ fi
 
 %dir %{_libdir}/wolframe/modules
 
+%{_libdir}/wolframe/modules/mod_protocol_wolframe.so
+
 %{_libdir}/wolframe/modules/mod_audit_textfile.so
 %{_libdir}/wolframe/modules/mod_audit_database.so
 

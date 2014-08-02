@@ -44,6 +44,7 @@ s none opt/csw/lib/wolframe/libwolframe_database.so.0=libwolframe_database.so.0.
 s none opt/csw/lib/wolframe/libwolframe_database.so=libwolframe_database.so.0.0.0
 f none opt/csw/lib/wolframe/libwolframe_langbind.a 0644 root staff
 d none opt/csw/lib/wolframe/modules 0775 root root
+f none opt/csw/lib/wolframe/modules/mod_protocol_wolframe.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_audit_database.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_audit_textfile.so 0775 root staff
 f none opt/csw/lib/wolframe/modules/mod_auth_database.so 0775 root staff

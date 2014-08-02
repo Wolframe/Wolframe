@@ -30,6 +30,7 @@ usr/local/lib/wolframe/libwolframe_langbind.a
 usr/local/lib/wolframe/libwolframe_langbind.so.0.0.0
 usr/local/lib/wolframe/libwolframe_langbind.so.0
 usr/local/lib/wolframe/libwolframe_langbind.so
+usr/local/lib/wolframe/modules/mod_protocol_wolframe.so
 usr/local/lib/wolframe/modules/mod_db_postgresql.so
 usr/local/lib/wolframe/modules/mod_db_sqlite3.so
 usr/local/lib/wolframe/modules/mod_audit_database.so
