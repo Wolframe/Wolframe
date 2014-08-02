@@ -150,6 +150,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				// Call the function:
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
 				langbind::TypedInputFilterR res = m_functionclosure->result();
+
 				if (!m_cmd->has_result)
 				{
 					// Validate that there is no result if the function did not declare it:
@@ -170,7 +171,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				{
 					// Validate the output with form -> Fill the output form:
 					serialize::DDLStructParser formparser( m_outputform.get());
-					formparser.init( m_functionclosure->result(), serialize::Flags::ValidateInitialization);
+					formparser.init( res, serialize::Flags::ValidateInitialization);
 					if (!formparser.call())
 					{
 						throw std::runtime_error( "internal: output form serialization is not complete");
@@ -183,7 +184,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				else 
 				{
 					// SKIP output -> Pass function result iterator directly to printer:
-					m_outputprinter.init( m_functionclosure->result(), m_outputfilter);
+					m_outputprinter.init( res, m_outputfilter);
 					m_state = 5;
 				}
 				/* no break here ! */

@@ -51,29 +51,28 @@ using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
 namespace {
-struct ResultData
-	:public langbind::TypedInputFilter::Data
-{
-	ResultData( const langbind::LuaScriptInstanceR& interp_)
-		:m_interp(interp_){}
-
-	ResultData( const ResultData& o)
-		:m_interp(o.m_interp){}
-
-	virtual ~ResultData(){}
-
-	virtual Data* copy() const
-		{return new ResultData(*this);}
-
-private:
-	langbind::LuaScriptInstanceR m_interp;
-};
-
-class LuaFormFunctionClosure
-	:public langbind::FormFunctionClosure
+class ResultData
+	:public TypedFilterData
 {
 public:
-	LuaFormFunctionClosure( const langbind::LuaScriptInstanceR& interp_, const std::string& name_)
+	explicit ResultData( const LuaScriptInstanceR& interp_)
+		:m_interp(interp_){}
+
+	virtual ~ResultData()
+	{
+		/*[-]*/std::cout << "DELETE ~ResultData" << std::endl;
+	}
+
+private:
+	LuaScriptInstanceR m_interp;
+};
+
+
+class LuaFormFunctionClosure
+	:public FormFunctionClosure
+{
+public:
+	LuaFormFunctionClosure( const LuaScriptInstanceR& interp_, const std::string& name_)
 		:m_interp(interp_),m_name(name_),m_firstcall(false)
 	{}
 
@@ -102,13 +101,6 @@ public:
 			LOG_ERROR << "error calling lua form function '" << m_name.c_str() << "':" << m_interp->luaErrorMessage( m_interp->thread());
 			throw std::runtime_error( m_interp->luaUserErrorMessage( m_interp->thread()));
 		}
-		m_result = m_interp->getObject( -1);
-		if (!m_result.get())
-		{
-			LOG_ERROR << "lua function returned no result or nil (structure expected)";
-			throw std::runtime_error( "called lua function without result");
-		}
-		m_result->setData( new ResultData( m_interp));
 		return true;
 	}
 
@@ -124,19 +116,25 @@ public:
 
 	virtual TypedInputFilterR result() const
 	{
-		return m_result;
+		TypedInputFilterR res = m_interp->getObject( -1);
+		if (!res.get())
+		{
+			throw std::runtime_error( "lua function called returned no result or nil (structure expected)");
+		}
+		boost::shared_ptr<TypedFilterData> data( new ResultData( m_interp)); 
+		res->setData( data);
+		return res;
 	}
 
 private:
-	langbind::LuaScriptInstanceR m_interp;
-	TypedInputFilterR m_result;
+	LuaScriptInstanceR m_interp;
 	std::string m_name;
 	TypedInputFilterR m_arg;
 	bool m_firstcall;
 };
 
 class LuaFormFunction
-	:public langbind::FormFunction
+	:public FormFunction
 {
 public:
 	LuaFormFunction( const LuaScriptContext* context_, const std::string& name_)
@@ -146,7 +144,7 @@ public:
 
 	virtual FormFunctionClosure* createClosure() const
 	{
-		langbind::LuaScriptInstanceR interp( m_context->funcmap.createLuaScriptInstance( m_name));
+		LuaScriptInstanceR interp( m_context->funcmap.createLuaScriptInstance( m_name));
 		return new LuaFormFunctionClosure( interp, m_name);
 	}
 
@@ -169,7 +167,7 @@ void LuaProgramType::loadProgram( prgbind::ProgramLibrary& library, db::Database
 	std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
 	for (; fi != fe; ++fi)
 	{
-		langbind::FormFunctionR ff( new LuaFormFunction( &m_context, *fi));
+		FormFunctionR ff( new LuaFormFunction( &m_context, *fi));
 		library.defineFormFunction( *fi, ff);
 	}
 }
