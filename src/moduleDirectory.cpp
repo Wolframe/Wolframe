@@ -37,9 +37,11 @@
 #include <boost/algorithm/string.hpp>
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
+#include "module/moduleLoader.hpp"
+#include "utils/fileUtils.hpp"
 
-namespace _Wolframe {
-namespace module {
+using namespace _Wolframe;
+using namespace _Wolframe::module;
 
 ModulesDirectory::~ModulesDirectory()
 {
@@ -133,4 +135,87 @@ ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& objectClassN
 	return NULL;
 }
 
-}} // namespace _Wolframe::module
+
+#define DO_STRINGIFY(x)	#x
+#define STRINGIFY(x)	DO_STRINGIFY(x)
+
+#if defined( DEFAULT_MODULE_LOAD_DIR )
+std::string ModulesDirectory::getAbsoluteModulePath( const std::string& moduleName, const std::string& configuredDirectory, bool useDefaultModuleDir) const
+#else
+std::string ModulesDirectory::getAbsoluteModulePath( const std::string& moduleName, const std::string& configuredDirectory, bool) const
+#endif
+{
+	// Add the module extension, if not defined
+	std::string moduleName_ = moduleName;
+#if !defined(_WIN32)
+	if (utils::getFileExtension( moduleName).empty())
+	{
+		moduleName_.append( ".so");
+	}
+#endif
+	// Building up list of module directories ascending in order of picking priority:
+	std::vector<std::string> pathpriolist;
+	if (!configuredDirectory.empty())
+	{
+		std::string configuredDirectoryAbsolute = utils::getCanonicalPath( configuredDirectory, m_confDir);
+		pathpriolist.push_back( configuredDirectoryAbsolute);
+	}
+#if defined( DEFAULT_MODULE_LOAD_DIR )
+	if (useDefaultModuleDir)
+	{
+		pathpriolist.push_back( std::string( STRINGIFY( DEFAULT_MODULE_LOAD_DIR )));
+	}
+#endif
+	pathpriolist.push_back( m_confDir);
+
+	// Find the first match of an existing file in the module path priority list:
+	std::vector<std::string>::const_iterator pi = pathpriolist.begin(), pe = pathpriolist.end();
+	for (; pi != pe; ++pi)
+	{
+		std::string modulePathAbsolute = utils::getCanonicalPath( moduleName_, *pi);
+		if (utils::fileExists( modulePathAbsolute))
+		{
+			return modulePathAbsolute;
+		}
+	}
+
+	// Return empty string, if not found
+	return std::string();
+}
+
+bool module::ModulesDirectory::loadModules( const std::list< std::string >& modFiles)
+{
+	bool retVal = true;
+
+	for ( std::list< std::string >::const_iterator it = modFiles.begin();
+							it != modFiles.end(); it++ )
+	{
+		ModuleEntryPoint* entry = loadModuleEntryPoint( *it);
+		if ( !entry )
+		{
+			LOG_ERROR << "Failed to load module '" << *it << "'";
+			retVal = false;
+			break;
+		}
+		for ( unsigned short i = 0; entry->createBuilder[ i ]; i++ )
+		{
+			BuilderBase* builder = entry->createBuilder[ i ]();
+			SimpleBuilder* simpleBuilder = dynamic_cast<SimpleBuilder*>(builder);
+			ConfiguredBuilder* configuredBuilder = dynamic_cast<ConfiguredBuilder*>(builder);
+			if (configuredBuilder)
+			{
+				addBuilder( configuredBuilder);
+			}
+			else if (simpleBuilder)
+			{
+				addBuilder( simpleBuilder);
+			}
+			else
+			{
+				LOG_ERROR << "Unknown type of builder in module '" << entry->name << "'";
+			}
+		}
+		LOG_DEBUG << "Module '" << entry->name << "' loaded";
+	}
+	return retVal;
+}

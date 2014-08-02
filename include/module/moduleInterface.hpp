@@ -32,7 +32,6 @@
 ************************************************************************/
 /// \brief Basic interface classes that to build objects and the Wolframe module interface
 /// \file module/moduleInterface.hpp
-///
 
 #ifndef _MODULE_INTERFACE_HPP_INCLUDED
 #define _MODULE_INTERFACE_HPP_INCLUDED

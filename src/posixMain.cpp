@@ -187,7 +187,9 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		}
 
-		_Wolframe::module::ModulesDirectory modDir;
+		std::string configurationPath = boost::filesystem::path( configFile).branch_path().string();
+
+		_Wolframe::module::ModulesDirectory modDir( configurationPath);
 		_Wolframe::config::ApplicationConfiguration conf;
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
@@ -196,7 +198,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		if ( !conf.parseModules( configFile, cfgType ))
 			return _Wolframe::ErrorCode::FAILURE;
-		if ( ! _Wolframe::module::LoadModules( modDir, conf.moduleList() ))
+		if ( ! modDir.loadModules( conf.moduleList() ))
 			return _Wolframe::ErrorCode::FAILURE;
 		conf.addModules( &modDir );
 		if ( !conf.parse( configFile, cfgType ))

@@ -9,6 +9,8 @@
 
 #include "tests/mod_test/common.hpp"
 #include "tests/mod_test_containers/common.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
 #include <string>
 #include <list>
@@ -21,6 +23,8 @@ using namespace _Wolframe::module;
 using namespace _Wolframe::log;
 using namespace _Wolframe;
 using namespace std;
+
+static std::string g_execdir;
 
 // The fixture for testing class _Wolframe::module
 class ModuleFixture : public ::testing::Test
@@ -38,7 +42,7 @@ class ModuleFixture : public ::testing::Test
 
 TEST_F( ModuleFixture, LoadingModuleFromDir )
 {
-	ModulesDirectory modDir;
+	ModulesDirectory modDir( g_execdir);
 	list<string> modFiles;
 
 #ifndef _WIN32
@@ -46,7 +50,7 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 #else
 	modFiles.push_back( ".\\tests\\mod_test\\mod_test.dll" );
 #endif
-	bool res = LoadModules( modDir, modFiles );
+	bool res = modDir.loadModules( modFiles );
 	ASSERT_TRUE( res );
 
 	ConfiguredBuilder* builder = modDir.getBuilder( "TestObject" );
@@ -68,7 +72,7 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 
 TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 {
-	ModulesDirectory modDir;
+	ModulesDirectory modDir( g_execdir);
 	list<string> modFiles;
 
 #ifndef _WIN32
@@ -76,7 +80,7 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 #else
 	modFiles.push_back( ".\\tests\\mod_test_containers\\mod_test_containers.dll" );
 #endif
-	bool res = LoadModules( modDir, modFiles );
+	bool res = modDir.loadModules( modFiles );
 	ASSERT_TRUE( res );
 
 	ConfiguredBuilder* builder1 = modDir.getBuilder( "TestObject1" );
@@ -112,7 +116,7 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 TEST_F( ModuleFixture, ModuleLogging )
 {
 	std::stringstream buffer;
-	ModulesDirectory modDir;
+	ModulesDirectory modDir( g_execdir);
 	list<string> modFiles;
 
 #ifndef _WIN32
@@ -120,7 +124,7 @@ TEST_F( ModuleFixture, ModuleLogging )
 #else
 	modFiles.push_back( ".\\tests\\mod_test\\mod_test.dll" );
 #endif
-	bool res = LoadModules( modDir, modFiles );
+	bool res = modDir.loadModules( modFiles );
 	ASSERT_TRUE( res );
 
 	ConfiguredBuilder* builder = modDir.getBuilder( "TestObject" );
@@ -153,7 +157,7 @@ TEST_F( ModuleFixture, ModuleLogging )
 
 TEST_F( ModuleFixture, LoadingMissingModuleFile )
 {
-	ModulesDirectory modDir;
+	ModulesDirectory modDir( g_execdir);
 	list<string> modFiles;
 
 #ifndef _WIN32
@@ -161,13 +165,13 @@ TEST_F( ModuleFixture, LoadingMissingModuleFile )
 #else
 	modFiles.push_back( ".\\tests\\not_there\\not_there.dll" );
 #endif
-	bool res = LoadModules( modDir, modFiles );
+	bool res = modDir.loadModules( modFiles );
 	ASSERT_FALSE( res );
 }
 
 TEST_F( ModuleFixture, LoadingNotAWolframeModule )
 {
-	ModulesDirectory modDir;
+	ModulesDirectory modDir( g_execdir);
 	list<string> modFiles;
 
 #ifndef _WIN32
@@ -175,13 +179,13 @@ TEST_F( ModuleFixture, LoadingNotAWolframeModule )
 #else
 	modFiles.push_back( ".\\tests\\not_a_mod\\not_a_mod.dll" );
 #endif
-	bool res = LoadModules( modDir, modFiles );
+	bool res = modDir.loadModules( modFiles );
 	ASSERT_FALSE( res );
 }
 
 TEST_F( ModuleFixture, LoadingModuleWithoutExtension )
 {
-	ModulesDirectory modDir;
+	ModulesDirectory modDir( g_execdir);
 	list<string> modFiles;
 
 #ifndef _WIN32
@@ -189,13 +193,13 @@ TEST_F( ModuleFixture, LoadingModuleWithoutExtension )
 #else
 	modFiles.push_back( ".\\tests\\mod_test\\mod_test" );
 #endif
-	bool res = LoadModules( modDir, modFiles );
+	bool res = modDir.loadModules( modFiles );
 	ASSERT_TRUE( res );
 }
 
 TEST_F( ModuleFixture, LoadingModuleLackingASymbol )
 {
-	ModulesDirectory modDir;
+	ModulesDirectory modDir( g_execdir);
 	list<string> modFiles;
 
 #ifndef _WIN32
@@ -203,13 +207,13 @@ TEST_F( ModuleFixture, LoadingModuleLackingASymbol )
 #else
 	modFiles.push_back( ".\\tests\\missing_symbol\\missing_symbol.dll" );
 #endif
-	bool res = LoadModules( modDir, modFiles );
+	bool res = modDir.loadModules( modFiles );
 	ASSERT_FALSE( res );
 }
 
 TEST_F( ModuleFixture, LoadingModuleResolvableSymbol )
 {
-	ModulesDirectory modDir;
+	ModulesDirectory modDir( g_execdir);
 	list<string> modFiles;
 
 #ifdef _WIN32
@@ -221,13 +225,14 @@ TEST_F( ModuleFixture, LoadingModuleResolvableSymbol )
 #else
 	modFiles.push_back( ".\\tests\\resolvable_symbol\\resolvable_symbol.dll" );
 #endif
-	bool res = LoadModules( modDir, modFiles );
+	bool res = modDir.loadModules( modFiles );
 	ASSERT_TRUE( res );
 }
 
 int main( int argc, char **argv )
 {
-	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
+	g_execdir = boost::filesystem::system_complete( argv[0]).parent_path().string();
+	WOLFRAME_GTEST_REPORT( argv[0], g_execdir);
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS( );
 }

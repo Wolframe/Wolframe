@@ -50,7 +50,7 @@ namespace config {
 class WolfilterCommandLine
 {
 public:
-	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined);
+	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined);
 	~WolfilterCommandLine(){}
 
 	bool printhelp() const						{return m_printhelp;}
@@ -64,15 +64,15 @@ public:
 	const AAAA::AAAAconfiguration& aaaaProviderConfig() const	{return *m_aaaaProviderConfig;}
 	const db::DBproviderConfig& dbProviderConfig() const		{return *m_dbProviderConfig;}
 	const proc::ProcProviderConfig& procProviderConfig() const	{return *m_procProviderConfig;}
-	const module::ModulesDirectory& modulesDirectory() const	{return m_modulesDirectory;}
-	const std::string& referencePath() const			{return m_referencePath;}
+	const module::ModulesDirectory& modulesDirectory() const	{return *m_modulesDirectory;}
+	const std::string& configurationPath() const			{return m_configurationPath;}
 
 	static void print( std::ostream &);
 
 private:
 	config::ConfigurationTree getProcProviderConfigTree() const;
 	config::ConfigurationTree getDBProviderConfigTree( const std::string& dbopt) const;
-	std::vector<std::string> configModules( const std::string& refpath) const;
+	std::vector<std::string> configModules( bool useDefaultModuleDir) const;
 	config::ConfigurationNode getConfigNode( const std::string& name) const;
 
 private:
@@ -91,8 +91,8 @@ private:
 	boost::shared_ptr<AAAA::AAAAconfiguration> m_aaaaProviderConfig;
 	boost::shared_ptr<proc::ProcProviderConfig> m_procProviderConfig;
 	boost::shared_ptr<db::DBproviderConfig> m_dbProviderConfig;
-	module::ModulesDirectory m_modulesDirectory;
-	std::string m_referencePath;
+	module::ModulesDirectory* m_modulesDirectory;
+	std::string m_configurationPath;
 };
 
 }}//namespace

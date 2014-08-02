@@ -42,8 +42,6 @@
 #include "wtest/pseudoRandomGenForTests.hpp"
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -52,6 +50,8 @@
 #include <sstream>
 #include <iostream>
 #include <time.h>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
 
@@ -245,7 +245,8 @@ struct GlobalContext
 	}
 
 	explicit GlobalContext( const std::string& configfile)
-		:m_databaseProvider(0)
+		:m_modulesDirectory( g_testdir.string())
+		,m_databaseProvider(0)
 		,m_processorProvider(0)
 		,m_execContext(0)
 	{
@@ -255,7 +256,7 @@ struct GlobalContext
 
 		std::list<std::string> modfiles;
 		std::copy( m_modules.begin(), m_modules.end(), std::back_inserter( modfiles));
-		if (!LoadModules( m_modulesDirectory, modfiles))
+		if (!m_modulesDirectory.loadModules( modfiles))
 		{
 			throw std::runtime_error( "Modules could not be loaded");
 		}

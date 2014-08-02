@@ -55,10 +55,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::config;
 
-//\brief Macros to stringify compile options
-#define DO_STRINGIFY2(x) #x
-#define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
-
 //TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a src/libwolframed.a -> Issue #95)
 static const char* defaultMainConfig()		{
 #ifdef DEFAULT_MAIN_CONFIGURATION_FILE
@@ -92,7 +88,7 @@ config::ConfigurationNode WolfilterCommandLine::getConfigNode( const std::string
 	return m_config.root().getChildrenJoined( name);
 }
 
-std::vector<std::string> WolfilterCommandLine::configModules( const std::string& refpath) const
+std::vector<std::string> WolfilterCommandLine::configModules( bool useDefaultModuleDir) const
 {
 	std::vector<std::string> rt;
 	config::ConfigurationNode module_section = getConfigNode( "LoadModules");
@@ -104,20 +100,21 @@ std::vector<std::string> WolfilterCommandLine::configModules( const std::string&
 		if (boost::algorithm::iequals( mi->first, "directory"))
 		{
 			if (!directory.empty()) throw std::runtime_error( "duplicate definition of 'directory' in section LoadModules");
-			directory = utils::getCanonicalPath( mi->second.data(), refpath);
+			directory = mi->second.data();
 			if (directory.empty()) throw std::runtime_error( "empty definition of 'directory' in section LoadModules");
 		}
-	}
-	if (directory.empty())
-	{
-		directory = refpath;
 	}
 	mi = module_section.begin();
 	for (; mi != me; ++mi)
 	{
 		if (boost::algorithm::iequals( mi->first, "module"))
 		{
-			rt.push_back( utils::getCanonicalPath( mi->second.data(), directory));
+			std::string absmodpath = m_modulesDirectory->getAbsoluteModulePath( mi->second.data(), directory, useDefaultModuleDir);
+			if (absmodpath.empty())
+			{
+				throw std::runtime_error( std::string("could not resolve configured module path '") + mi->second.data() + "'");
+			}
+			rt.push_back( absmodpath);
 		}
 	}
 	return rt;
@@ -155,15 +152,12 @@ struct WolfilterOptionStruct
 	}
 };
 
-#if defined( DEFAULT_MODULE_LOAD_DIR)
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined)
-#else
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool, bool useDefaultConfigIfNotDefined)
-#endif
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined)
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_loglevel(_Wolframe::log::LogLevel::LOGLEVEL_WARNING)
-	,m_referencePath(referencePath_)
+	,m_modulesDirectory(0)
+	,m_configurationPath(referencePath)
 {
 	static const WolfilterOptionStruct ost;
 	po::variables_map vmap;
@@ -209,9 +203,9 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "config"))
 	{
 		configfile = vmap["config"].as<std::string>();
-		if (currentPath.size() != 0)
+		if (m_configurationPath.size() != 0)
 		{
-			configfile = utils::getCanonicalPath( configfile, currentPath);
+			configfile = utils::getCanonicalPath( configfile, m_configurationPath);
 		}
 		hasConfig = true;
 	}
@@ -225,20 +219,24 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 			configfile = defaultConfigFile;
 			hasConfig = true;
 		}
-#endif
-		if (!hasConfig)
+#else
+		if (useDefaultConfigIfNotDefined)
 		{
-			LOG_DEBUG << "Running without configuration";
+			LOG_TRACE << "No configuration file specified on command line";
 		}
+#endif
 	}
 	if (hasConfig)
 	{
-		m_referencePath = boost::filesystem::path( configfile ).branch_path().string();
-		LOG_DEBUG << "Loading configuration file '" << configfile << "' and setting reference path to '" << m_referencePath << "'";
-
+		m_configurationPath = boost::filesystem::path( configfile ).branch_path().string();
 		m_config = utils::readPropertyTreeFile( configfile);
-		hasConfig = true;
 	}
+	else
+	{
+		LOG_DEBUG << "Running without configuration";
+	}
+	m_modulesDirectory = new module::ModulesDirectory( m_configurationPath);
+
 	if (vmap.count( "input"))
 	{
 		m_inputfile = vmap["input"].as<std::string>();
@@ -247,22 +245,9 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 		m_protocol = vmap["protocol"].as<std::string>();
 	}
-	std::string modulePath;
-#if defined( DEFAULT_MODULE_LOAD_DIR)
-	if (useDefaultModuleDir)
-	{
-		modulePath = DO_STRINGIFY( DEFAULT_MODULE_LOAD_DIR);
-	}
-	else
-	{
-		modulePath = m_referencePath;
-	}
-#else
-	modulePath = m_referencePath;
-#endif
 	if (hasConfig)
 	{
-		std::vector<std::string> cfgmod = configModules( modulePath);
+		std::vector<std::string> cfgmod = configModules( useDefaultModuleDir);
 		std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
 	}
 	if (vmap.count( "module"))
@@ -271,24 +256,19 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::iterator mi=mods.begin(), me=mods.end();
 		for (; mi != me; ++mi)
 		{
-			if (mi->size() == 0 || (*mi).at(0) != '.')
+			std::string absmodpath = m_modulesDirectory->getAbsoluteModulePath( *mi, m_configurationPath, useDefaultModuleDir);
+			if (absmodpath.empty())
 			{
-				m_modules.push_back( utils::getCanonicalPath( *mi, modulePath));
+				throw std::runtime_error( std::string("could not resolve command line module path '") + *mi + "'");
 			}
-			else if (!currentPath.empty())
-			{
-				m_modules.push_back( utils::getCanonicalPath( *mi, currentPath));
-			}
-			else
-			{
-				m_modules.push_back( *mi);
-			}
-			LOG_DEBUG << "Defined additional module to load '" << m_modules.back() << "'";
+			m_modules.push_back( absmodpath);
+			LOG_DEBUG << "Defined additional module to load '" << absmodpath << "'";
 		}
 	}
 	std::list<std::string> modfiles;
 	std::copy( m_modules.begin(), m_modules.end(), std::back_inserter( modfiles));
-	if (!LoadModules( m_modulesDirectory, modfiles))
+
+	if (!m_modulesDirectory->loadModules( modfiles))
 	{
 		throw std::runtime_error( "Modules could not be loaded");
 	}
@@ -313,11 +293,11 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	LOG_DEBUG << "Database provider configuration:";
 	LOG_DEBUG << configurationTree_tostring( m_dbconfig);
 
-	if (!m_dbProviderConfig->parse( m_dbconfig, "", &m_modulesDirectory))
+	if (!m_dbProviderConfig->parse( m_dbconfig, "", m_modulesDirectory))
 	{
 		throw std::runtime_error( "database provider configuration could not be parsed");
 	}
-	m_dbProviderConfig->setCanonicalPathes( m_referencePath);
+	m_dbProviderConfig->setCanonicalPathes( m_configurationPath);
 	if (!m_dbProviderConfig->check())
 	{
 		throw std::runtime_error( "error in database provider configuration");
@@ -329,11 +309,11 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 		ppcfg = getConfigNode( "Processor");
 	}
-	if (!m_procProviderConfig->parse( ppcfg, "", &m_modulesDirectory))
+	if (!m_procProviderConfig->parse( ppcfg, "", m_modulesDirectory))
 	{
 		throw std::runtime_error( "processor provider configuration could not be parsed");
 	}
-	m_procProviderConfig->setCanonicalPathes( m_referencePath);
+	m_procProviderConfig->setCanonicalPathes( m_configurationPath);
 	if (!m_procProviderConfig->check())
 	{
 		throw std::runtime_error( "error in processor provider configuration");
@@ -345,11 +325,11 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 		aacfg = getConfigNode( "AAAA");
 	}
-	if (!m_aaaaProviderConfig->parse( aacfg, "", &m_modulesDirectory))
+	if (!m_aaaaProviderConfig->parse( aacfg, "", m_modulesDirectory))
 	{
 		throw std::runtime_error( "AAAA provider configuration could not be parsed");
 	}
-	m_aaaaProviderConfig->setCanonicalPathes( m_referencePath);
+	m_aaaaProviderConfig->setCanonicalPathes( m_configurationPath);
 	if (!m_aaaaProviderConfig->check())
 	{
 		throw std::runtime_error( "error in AAAA provider configuration");

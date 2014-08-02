@@ -76,8 +76,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	wolfwizardCommandLine.obj \
 	mainConnectionHandler.obj \
 	contentOnlyProtocolHandler.obj \
-	loadModules.obj \
 	moduleDirectory.obj \
+	moduleLoader.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	appConfig.obj \

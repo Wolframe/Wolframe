@@ -30,50 +30,20 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfwizardCommandLine.hpp
-///\brief Interface for the wolfwizard call command line
-#ifndef _Wolframe_WOLFWIZARD_COMMANDLINE_HPP_INCLUDED
-#define _Wolframe_WOLFWIZARD_COMMANDLINE_HPP_INCLUDED
+/// \file module/moduleLoader.hpp
+/// \brief Loader of the module entrypoint
+/// \note Implements the operating system specific handling of module loading
+
+#ifndef _MODULE_LOADER_HPP_INCLUDED
+#define _MODULE_LOADER_HPP_INCLUDED
 #include <string>
-#include <vector>
-#include <iostream>
-#include "module/moduleDirectory.hpp"
-#include "processor/procProvider.hpp"
-#include "types/propertyTree.hpp"
+#include "module/moduleInterface.hpp"
 
 namespace _Wolframe {
-namespace config {
+namespace module {
 
-class WolfwizardCommandLine
-{
-public:
-	WolfwizardCommandLine( int argc, char **argv, const std::string& referencePath_);
-	~WolfwizardCommandLine(){}
+ModuleEntryPoint* loadModuleEntryPoint( const std::string& absoluteModulePath);
 
-	bool printhelp() const						{return m_printhelp;}
-	bool printversion() const					{return m_printversion;}
-	const std::string& configfile() const				{return m_configfile;}
-
-	static void print( std::ostream& out);
-	const config::ConfigurationNode& providerconfig() const		{return m_providerconfig;}
-	const std::string& configurationPath() const			{return m_configurationPath;}
-	const module::ModulesDirectory& modulesDirectory() const	{return *m_modulesDirectory;}
-
-private:
-	std::list<std::string> configModules() const;
-	config::ConfigurationNode getConfigNode( const std::string& name) const;
-
-private:
-	bool m_printhelp;
-	bool m_printversion;
-	std::string m_configfile;
-	config::ConfigurationTree m_config;
-	config::ConfigurationNode m_providerconfig;
-	module::ModulesDirectory* m_modulesDirectory;
-	std::string m_configurationPath;
-	std::list<std::string> m_modules;
-};
-
-}}//namespace
+}} // namespace _Wolframe::module
 #endif
 

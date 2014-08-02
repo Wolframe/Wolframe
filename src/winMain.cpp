@@ -293,8 +293,9 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 		_Wolframe::config::CmdLineConfig cmdLineCfg; // empty for a service with --service
 		cmdLineCfg.command = _Wolframe::config::CmdLineConfig::RUN_SERVICE;
 		const char *configFile = serviceConfig.c_str( ); // configuration comes from main thread
+		std::string configurationPath = boost::filesystem::path( configFile).branch_path().string();
 
-		_Wolframe::module::ModulesDirectory modDir;
+		_Wolframe::module::ModulesDirectory modDir( configurationPath);
 		_Wolframe::config::ApplicationConfiguration conf;
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
@@ -303,7 +304,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 			return;
 		if ( !conf.parseModules( configFile, cfgType ))
 			return;
-		if ( ! _Wolframe::module::LoadModules( modDir, conf.moduleList() ))
+		if ( ! modDir.loadModules( conf.moduleList() ))
 			return;
 		conf.addModules( &modDir );
 		if ( !conf.parse( configFile, cfgType ))

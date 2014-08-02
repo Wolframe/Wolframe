@@ -1,5 +1,5 @@
 #include "moduleDirectory.cpp"
-#include "loadModules.cpp"
+#include "moduleLoader.cpp"
 #include "provider/Audit.cpp"
 #include "provider/Authentication.cpp"
 #include "provider/Authorization.cpp"

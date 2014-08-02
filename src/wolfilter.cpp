@@ -55,14 +55,14 @@ int main( int argc, char **argv )
 	bool doExit = false;
 	try
 	{
-		static boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
 		if (argc == 1)
 		{
 			std::cerr << "no arguments specified" << std::endl;
 			config::WolfilterCommandLine::print( std::cerr);
 			return 0;
 		}
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), "", true, true);
+		boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), true, true);
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";

@@ -35,6 +35,7 @@
 #include "wolframe.hpp"
 #include "wolfwizardCommandLine.hpp"
 #include "module/moduleInterface.hpp"
+#include "module/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
 #include "types/variantStruct.hpp"
 #include "types/variantStructDescription.hpp"
@@ -47,9 +48,6 @@
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
-
-#define DO_STRINGIFY(x)	#x
-#define STRINGIFY(x)	DO_STRINGIFY(x)
 
 struct StackElement
 {
@@ -317,13 +315,8 @@ int main( int argc, char **argv )
 	try
 	{
 		static boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
-		module::ModulesDirectory modDir;
 
-#if defined( DEFAULT_MODULE_LOAD_DIR)
-		config::WolfwizardCommandLine cmdline( argc, argv, execdir.string(), STRINGIFY( DEFAULT_MODULE_LOAD_DIR));
-#else
-		config::WolfwizardCommandLine cmdline( argc, argv, execdir.string(), execdir.string());
-#endif
+		config::WolfwizardCommandLine cmdline( argc, argv, execdir.string());
 		doPrintHelpOnError = false;
 		if (cmdline.printversion())
 		{
@@ -338,23 +331,19 @@ int main( int argc, char **argv )
 		}
 		if (doExit) return 0;
 
-		if (!LoadModules( modDir, cmdline.modules()))
-		{
-			throw std::runtime_error( "Modules could not be loaded");
-		}
 		proc::ProcProviderConfig providerconf;
-		if (!providerconf.parse( cmdline.providerconfig(), "", &modDir))
+		if (!providerconf.parse( cmdline.providerconfig(), "", &cmdline.modulesDirectory()))
 		{
 			throw std::runtime_error( "Processor provider configuration could not be created from command line");
 		}
-		providerconf.setCanonicalPathes( cmdline.referencePath());
+		providerconf.setCanonicalPathes( cmdline.configurationPath());
 		if (!providerconf.check())
 		{
 			throw std::runtime_error( "error in command line. failed to setup a valid processor provider configuration");
 		}
 
 		prgbind::ProgramLibrary* programLibrary = new prgbind::ProgramLibrary();
-		proc::ProcessorProvider* processorProvider = new proc::ProcessorProvider( &providerconf, &modDir, programLibrary);
+		proc::ProcessorProvider* processorProvider = new proc::ProcessorProvider( &providerconf, &cmdline.modulesDirectory(), programLibrary);
 
 		if (!processorProvider->loadPrograms())
 		{

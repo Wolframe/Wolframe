@@ -22,7 +22,8 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(TOPDIR)/src/loadModules.o \
+	$(TOPDIR)/src/moduleDirectory.o \
+	$(TOPDIR)/src/moduleLoader.o \
 	$(TOPDIR)/src/libwolframed.a \
 	-lwolftest \
 	-lwolframe -lwfsingleton \

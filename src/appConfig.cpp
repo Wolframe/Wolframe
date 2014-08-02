@@ -37,6 +37,7 @@
 #include "config/configurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "appConfig.hpp"
+#include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"
 #include "wolframedCommandLine.hpp"
 #include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
@@ -204,6 +205,7 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 			if ( isXML && it->first == "<xmlcomment>" )
 				continue;
 			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))	{
+				// Parse LoadModules section:
 				for ( types::PropertyTree::Node::const_iterator L2it = it->second.begin();
 										L2it != it->second.end(); L2it++ )	{
 					if ( boost::algorithm::iequals( L2it->first, "module" ))	{
@@ -236,43 +238,28 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 							    << L2it->first << "'";
 					}
 				}
-				// resolv relative pathes
-				if ( ! m_modFolder.empty() )	{
-					std::string basePath = m_modFolder;
-					boost::filesystem::path bp( basePath );
-					if ( !bp.is_absolute() )	{
-#if defined( DEFAULT_MODULE_LOAD_DIR )
-						basePath = utils::getCanonicalPath( basePath, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
-						LOG_DEBUG << MODULE_SECTION_MSG << "using directory '" << basePath << "' for modules";
-#else
-						basePath = utils::getCanonicalPath( basePath, boost::filesystem::path( configFile ).branch_path().string() );
-/*MBa - maybe WARNING ? */			LOG_NOTICE << MODULE_SECTION_MSG << "using absolute directory path '" << basePath
-							   << "' for modules, instead of '" << m_modFolder << "'";
-#endif
+				// Resolve relative module pathes:
+				if (!m_modDir) throw std::runtime_error( "Module directory structure not defined");
+				std::list< std::string >::iterator pi = m_modFiles.begin(), pe = m_modFiles.end();
+				for (; pi != pe; ++pi)
+				{
+					if (pi->empty())
+					{
+						LOG_ERROR << MODULE_SECTION_MSG << "Configured empty module name";
+						continue;
 					}
-					for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
-										Pit != m_modFiles.end(); Pit++ )	{
-						*Pit = utils::getCanonicalPath( *Pit, basePath );
-						assert( ! Pit->empty() );
-						LOG_TRACE << MODULE_SECTION_MSG << "added module file '" << *Pit << "'";
+					boost::filesystem::path modfile( *pi);
+					if (modfile.is_absolute())
+					{
+						LOG_NOTICE << MODULE_SECTION_MSG << "Module configured has absolute module path '" << *pi << "'";
 					}
-				}
-				else	{
-					for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
-										Pit != m_modFiles.end(); Pit++ )	{
-						std::string oldPath = *Pit;
-#if defined( DEFAULT_MODULE_LOAD_DIR )
-						*Pit = utils::getCanonicalPath( *Pit, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
-#else
-						*Pit = utils::getCanonicalPath( *Pit, boost::filesystem::path( configFile ).branch_path().string() );
-						assert( ! Pit->empty() );
-						if ( oldPath != *Pit )	{
-							LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << *Pit
-								   << "' for modules, instead of '" << oldPath << "'";
-						}
-#endif
-						LOG_TRACE << MODULE_SECTION_MSG << "added module file '" << *Pit << "'";
+					else
+					{
+						std::string modpath = m_modDir->getAbsoluteModulePath( *pi, m_modFolder);
+						LOG_NOTICE << MODULE_SECTION_MSG << "Resolved relative module path '" << *pi << "' as '" << modpath << "'";
+						*pi = modpath;
 					}
+					LOG_TRACE << MODULE_SECTION_MSG << "Added module file '" << *pi << "'";
 				}
 			}
 		}

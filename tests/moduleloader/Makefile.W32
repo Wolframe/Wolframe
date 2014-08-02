@@ -21,7 +21,8 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
-	$(TOPDIR)\src\loadModules.obj \
+	$(TOPDIR)\src\moduleDirectory.obj \
+	$(TOPDIR)\src\moduleLoader.obj \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \

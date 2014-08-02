@@ -59,17 +59,54 @@ struct WolfwizardOptionStruct
 		fopt.add_options()
 			( "version,v", "print version" )
 			( "help,h", "print help message" )
-			( "config,c", po::value<std::string>(), "specify configuration file to load" )
+			( "config", po::value<std::string>(), "specify configuration file to load" )
 			;
+		popt.add( "cmd", 1);
 	}
 };
 
+config::ConfigurationNode WolfwizardCommandLine::getConfigNode( const std::string& name) const
+{
+	return m_config.root().getChildrenJoined( name);
+}
 
-WolfwizardCommandLine::WolfwizardCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& modulePath)
+std::list<std::string> WolfwizardCommandLine::configModules() const
+{
+	std::list<std::string> rt;
+	config::ConfigurationNode module_section = getConfigNode( "LoadModules");
+	std::string directory;
+
+	types::PropertyTree::Node::const_iterator mi = module_section.begin(), me = module_section.end();
+	for (; mi != me; ++mi)
+	{
+		if (boost::algorithm::iequals( mi->first, "directory"))
+		{
+			if (!directory.empty()) throw std::runtime_error( "duplicate definition of 'directory' in section LoadModules");
+			directory = mi->second.data();
+			if (directory.empty()) throw std::runtime_error( "empty definition of 'directory' in section LoadModules");
+		}
+	}
+	mi = module_section.begin();
+	for (; mi != me; ++mi)
+	{
+		if (boost::algorithm::iequals( mi->first, "module"))
+		{
+			std::string absmodpath = m_modulesDirectory->getAbsoluteModulePath( mi->second.data(), directory);
+			if (absmodpath.empty())
+			{
+				throw std::runtime_error( std::string("could not resolve configured module path '") + mi->second.data() + "'");
+			}
+			rt.push_back( absmodpath);
+		}
+	}
+	return rt;
+}
+
+WolfwizardCommandLine::WolfwizardCommandLine( int argc, char** argv, const std::string& referencePath_)
 	:m_printhelp(false)
 	,m_printversion(false)
-	,m_referencePath(referencePath_)
-	,m_modulePath(modulePath)
+	,m_modulesDirectory(0)
+	,m_configurationPath(referencePath_)
 {
 	static const WolfwizardOptionStruct ost;
 	po::variables_map vmap;
@@ -87,33 +124,15 @@ WolfwizardCommandLine::WolfwizardCommandLine( int argc, char** argv, const std::
 	if (vmap.count( "config"))
 	{
 		m_configfile = vmap["config"].as<std::string>();
-		if (m_configfile.size() == 0 || m_configfile[0] != '.')
-		{
-			m_configfile = utils::getCanonicalPath( m_configfile, m_referencePath);
-		} else {
-			m_referencePath = boost::filesystem::path( m_configfile ).branch_path().string();
-		}
+		m_configfile = utils::getCanonicalPath( m_configfile, m_configurationPath);
+		m_configurationPath = boost::filesystem::path( m_configfile ).branch_path().string();
 		m_config = utils::readPropertyTreeFile( m_configfile);
+		m_modulesDirectory = new module::ModulesDirectory( m_configurationPath);
+		m_modules = configModules();
 
-		config::ConfigurationNode::const_iterator gi = m_config.begin(), ge = m_config.end();
-		for (; gi != ge; ++gi)
+		if (!m_modulesDirectory->loadModules( m_modules))
 		{
-			if (boost::algorithm::iequals( gi->first, "Processor"))
-			{
-				m_providerconfig = gi->second;
-				break;
-			}
-			if (boost::algorithm::iequals( gi->first, "LoadModules"))
-			{
-				config::ConfigurationNode::const_iterator mi = gi->second.begin(), me = gi->second.end();
-				for (; mi != me; ++mi)
-				{
-					if (boost::algorithm::iequals( mi->first, "module"))
-					{
-						m_modules.push_back( utils::getCanonicalPath( mi->second.data(), m_modulePath));
-					}
-				}
-			}
+			throw std::runtime_error( "Modules could not be loaded");
 		}
 	}
 }

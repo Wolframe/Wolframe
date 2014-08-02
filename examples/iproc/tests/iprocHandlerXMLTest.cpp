@@ -279,9 +279,9 @@ int main( int argc, char **argv )
 	g_testdir = boost::filesystem::system_complete( utils::resolvePath( argv[0])).parent_path();
 	g_referencePath = g_testdir / "temp";
 	std::string topdir = g_testdir.parent_path().parent_path().parent_path().string();
-	g_modulesDirectory = new module::ModulesDirectory();
+	g_modulesDirectory = new module::ModulesDirectory( g_testdir.string());
 
-	if (!LoadModules( *g_modulesDirectory, wtest::getTestModuleList( topdir)))
+	if (!g_modulesDirectory->loadModules( wtest::getTestModuleList( topdir)))
 	{
 		std::cerr << "failed to load modules" << std::endl;
 		return 2;

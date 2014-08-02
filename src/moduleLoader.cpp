@@ -30,13 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// loadModules.cpp
-//
+/// \file moduleLoader.cpp
 
 #include "logger-v1.hpp"
-#include "module/moduleDirectory.hpp"
-#include "module/moduleInterface.hpp"
+#include "module/moduleLoader.hpp"
 #include "utils/fileUtils.hpp"
 
 #if !defined(_WIN32)	// POSIX module loader
@@ -92,8 +89,7 @@ char *getLastError( char *buf, size_t buflen )
 
 #endif		// defined(_WIN32)
 
-using namespace _Wolframe;
-
+namespace {
 class LocalGarbageCollector
 {
 public:
@@ -109,89 +105,62 @@ private:
 	std::list< _Wolframe_MODULE_HANDLE >	m_handle;
 
 };
+}// anonymous namespace
 
-static LocalGarbageCollector	handleList;
+static LocalGarbageCollector g_handleList;
 
+using namespace _Wolframe;
+using namespace _Wolframe::module;
 
-bool _Wolframe::module::LoadModules( ModulesDirectory& modDir,
-				     const std::list< std::string >& modFiles, const std::string & /*modFolder*/ )
+ModuleEntryPoint* module::loadModuleEntryPoint( const std::string& absoluteModulePath)
 {
-	bool retVal = true;
-
-	for ( std::list< std::string >::const_iterator it = modFiles.begin();
-							it != modFiles.end(); it++ )	{
-		LOG_TRACE << "Loading module '" << *it << "'";
+	LOG_TRACE << "Loading module '" << absoluteModulePath << "'";
 #if !defined(_WIN32)	// POSIX module loader
-		void* hndl;
-		if ( utils::getFileExtension( *it).empty() )	{
-			std::string path = *it + ".so";
-			hndl = dlopen( path.c_str(), RTLD_NOW | RTLD_LOCAL );
-		}
-		else	{
-			hndl = dlopen( it->c_str(), RTLD_NOW | RTLD_LOCAL );
-		}
-		if ( !hndl )	{
-			LOG_ERROR << "Module loader: " << dlerror()
-				  << ", (while loading module '" << *it << "')";
-			retVal = false;
-			break;
-		}
-
-		ModuleEntryPoint* entry = (ModuleEntryPoint*)dlsym( hndl, "entryPoint" );
-		if ( !entry )	{
-			LOG_ERROR << "Module entry point not found: " << dlerror()
-				  << ", (module '" << *it << "')";
-			retVal = false;
-			dlclose( hndl );
-			break;
-		}
-#else
-		HMODULE hndl = LoadLibrary( it->c_str( ) );
-		if ( !hndl )	{
-			char buf[LOCAL_ERROR_BUFFER_SIZE];
-			LOG_ERROR << "Module loader: " << getLastError( buf, LOCAL_ERROR_BUFFER_SIZE )
-				  << ", (module '" << *it << "')";
-			retVal = false;
-			break;
-		}
-		ModuleEntryPoint* entry = (ModuleEntryPoint*)GetProcAddress( hndl, "entryPoint" );
-		if ( !entry )	{
-			char buf[LOCAL_ERROR_BUFFER_SIZE];
-			LOG_ERROR << "Module entry point not found: " << getLastError( buf, LOCAL_ERROR_BUFFER_SIZE )
-				  << ", (module '" << *it << "')";
-			retVal = false;
-			(void)FreeLibrary( hndl );
-			break;
-		}
-#endif
-		if( !entry->name ) {
-			LOG_ERROR << "Module entry point has no name, something is here '" << *it << "')";
-			retVal = false;
-			_Wolframe_DLL_CLOSE( hndl );
-			break;
-		}
-
-		for ( unsigned short i = 0; entry->createBuilder[ i ]; i++ )	{
-			BuilderBase* builder = entry->createBuilder[ i ]();
-			SimpleBuilder* simpleBuilder = dynamic_cast<SimpleBuilder*>(builder);
-			ConfiguredBuilder* configuredBuilder = dynamic_cast<ConfiguredBuilder*>(builder);
-			if (configuredBuilder)
-			{
-				modDir.addBuilder( configuredBuilder);
-			}
-			else if (simpleBuilder)
-			{
-				modDir.addBuilder( simpleBuilder);
-			}
-			else
-			{
-				LOG_ERROR << "Unknown type of builder in module '" << entry->name << "'";
-			}
-		}
-		handleList.addHandle( hndl );
-		LOG_DEBUG << "Module '" << entry->name << "' loaded";
+	std::string absoluteModulePath_ = absoluteModulePath;
+	if (utils::getFileExtension( absoluteModulePath_).empty())
+	{
+		absoluteModulePath_.append( ".so");
 	}
-	return retVal;
+	void* hndl = dlopen( absoluteModulePath_.c_str(), RTLD_NOW | RTLD_LOCAL );
+	if ( !hndl )	{
+		LOG_ERROR << "Module loader: " << dlerror()
+			  << ", (while loading module '" << absoluteModulePath_ << "')";
+		return 0;
+	}
+
+	ModuleEntryPoint* entry = (ModuleEntryPoint*)dlsym( hndl, "entryPoint" );
+	if ( !entry )	{
+		LOG_ERROR << "Module entry point not found: " << dlerror()
+			  << ", (module '" << absoluteModulePath_ << "')";
+		dlclose( hndl );
+		return 0;
+	}
+#else
+	HMODULE hndl = LoadLibrary( absoluteModulePath.c_str( ) );
+	if ( !hndl )	{
+		char buf[LOCAL_ERROR_BUFFER_SIZE];
+		LOG_ERROR << "Module loader: " << getLastError( buf, LOCAL_ERROR_BUFFER_SIZE )
+			  << ", (module '" << absoluteModulePath << "')";
+		return 0;
+	}
+	ModuleEntryPoint* entry = (ModuleEntryPoint*)GetProcAddress( hndl, "entryPoint" );
+	if ( !entry )	{
+		char buf[LOCAL_ERROR_BUFFER_SIZE];
+		LOG_ERROR << "Module entry point not found: " << getLastError( buf, LOCAL_ERROR_BUFFER_SIZE )
+			  << ", (module '" << absoluteModulePath << "')";
+		(void)FreeLibrary( hndl );
+		return 0;
+	}
+#endif
+	if( !entry->name ) {
+		LOG_ERROR << "Module entry point has no name, something is here '" << absoluteModulePath << "')";
+		_Wolframe_DLL_CLOSE( hndl );
+		return 0;
+	}
+
+	g_handleList.addHandle( hndl );
+	LOG_DEBUG << "Module '" << entry->name << "' loaded";
+	return entry;
 }
 
 

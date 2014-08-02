@@ -47,8 +47,11 @@
 #include "crypto/HMAC.hpp"
 #include "AAAA/passwordHash.hpp"
 #include "AAAA/CRAM.hpp"
-
 #include <boost/algorithm/string.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+
+static std::string g_execdir;
 
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe::log;
@@ -72,7 +75,7 @@ protected:
 		logBack.setConsoleLevel( LogLevel::LOGLEVEL_INFO );
 
 		// Build the modules directory
-		ModulesDirectory modDir;
+		ModulesDirectory modDir( g_execdir);
 		static module::ConfiguredBuilderDescription< AAAA::TextFileAuthConstructor,
 				AAAA::TextFileAuthConfig > builder( "Authentication file", "Authentication",
 								    "TextFile", "TextFileAuth" );
@@ -116,6 +119,7 @@ protected:
 
 int main( int argc, char **argv )
 {
+	g_execdir = boost::filesystem::system_complete( argv[0]).parent_path().string();
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS( );
 }

@@ -400,8 +400,8 @@ int main( int argc, char **argv )
 	g_referencePath = g_testdir / "temp";
 	std::string topdir = g_testdir.parent_path().parent_path().parent_path().string();
 
-	g_modulesDirectory = new module::ModulesDirectory();
-	if (!LoadModules( *g_modulesDirectory, wtest::getTestModuleList( topdir)))
+	g_modulesDirectory = new module::ModulesDirectory( g_testdir.string());
+	if (!g_modulesDirectory->loadModules( wtest::getTestModuleList( topdir)))
 	{
 		std::cerr << "failed to load modules" << std::endl;
 		return 2;

@@ -225,16 +225,16 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 	}
 
 	// Build the lists of objects without configuration
-	for ( module::ModulesDirectory::simpleBuilder_iterator it = modules->objectsBegin();
-								it != modules->objectsEnd(); it++ )	{
-		switch( it->objectType() )	{
+	for ( module::ModulesDirectory::simpleBuilder_iterator it = modules->simpleBuilderObjectsBegin();
+								it != modules->simpleBuilderObjectsEnd(); it++ )	{
+		switch( (*it)->objectType() )	{
 			case ObjectConstructorBase::PROTOCOL_HANDLER_OBJECT:
 			{
 				typedef SimpleObjectConstructor<cmdbind::ProtocolHandlerUnit> ThisConstructor;
-				boost::shared_ptr<ThisConstructor> constructor( dynamic_cast<ThisConstructor*>( it->constructor()));
+				boost::shared_ptr<ThisConstructor> constructor( dynamic_cast<ThisConstructor*>( (*it)->constructor()));
 
 				if (!constructor.get())	{
-					LOG_ALERT << "Wolframe Processor Provider: '" << it->objectClassName()
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
 						  << "' is not a protocol handler";
 					throw std::logic_error( "Object is not a protocolHandler. See log." );
 				}
@@ -425,7 +425,7 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 			case ObjectConstructorBase::RUNTIME_ENVIRONMENT_OBJECT:
 			case ObjectConstructorBase::TEST_OBJECT:
 				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-					  << "' is marked as '" << ObjectConstructorBase::objectTypeName( it->objectType())
+					  << "' is marked as '" << ObjectConstructorBase::objectTypeName( (*it)->objectType())
 					  << "' object but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
