@@ -34,7 +34,6 @@ Project Wolframe.
 #include "inputfilterImpl.hpp"
 #include "outputfilterImpl.hpp"
 #include "xsltMapper.hpp"
-#include "filter/bufferingfilter.hpp"
 #include "types/docmetadata.hpp"
 #include <cstddef>
 #include <cstring>
@@ -74,8 +73,7 @@ struct Libxml2Filter :public Filter
 {
 	Libxml2Filter( const char* encoding=0)
 	{
-		InputFilterImpl impl;
-		m_inputfilter.reset( new BufferingInputFilter( &impl,"libxml2"));
+		m_inputfilter.reset( new InputFilterImpl());
 		OutputFilterImpl* oo = new OutputFilterImpl( m_inputfilter->getMetaDataRef());
 		m_outputfilter.reset( oo);
 		if (encoding)

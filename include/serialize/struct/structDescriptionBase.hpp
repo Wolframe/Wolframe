@@ -34,7 +34,6 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_BASE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_DESCRIPTION_BASE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "filter/bufferingfilter.hpp"
 #include "types/variant.hpp"
 #include "serialize/mapContext.hpp"
 #include "serialize/struct/parseStack.hpp"

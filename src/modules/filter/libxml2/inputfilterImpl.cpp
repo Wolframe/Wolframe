@@ -71,22 +71,25 @@ bool InputFilterImpl::setValue( const char* id, const std::string& value)
 
 void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
 {
-	if (!end) throw std::logic_error( "internal: need buffering input filter");
-	m_nodestk.clear();
+	if (contentsize) setState( Open);
+	m_contentbuf.append( (const char*)content, contentsize);
+	if (!end) return;
 
+	m_endofcontent = true;
+	m_nodestk.clear();
 	try
 	{
 #if WITH_LIBXSLT
 		if (m_xsltMapper.defined())
 		{
-			m_doc = m_xsltMapper.apply( DocumentReader( (const char*)content, contentsize));
+			m_doc = m_xsltMapper.apply( DocumentReader( m_contentbuf.c_str(), m_contentbuf.size()));
 		}
 		else
 		{
-			m_doc = DocumentReader( (const char*)content, contentsize);
+			m_doc = DocumentReader( m_contentbuf.c_str(), m_contentbuf.size());
 		}
 #else
-		m_doc = DocumentReader( (const char*)content, contentsize);
+		m_doc = DocumentReader( m_contentbuf.c_str(), m_contentbuf.size());
 #endif
 	}
 	catch (const std::runtime_error& err)
@@ -239,6 +242,11 @@ void InputFilterImpl::getRootAttribute( FilterBase::ElementType& type, const voi
 
 bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 {
+	if (!m_endofcontent)
+	{
+		setState( EndOfMessage);
+		return false;
+	}
 	if (state() == Error) return false;
 	setState( Open);
 	bool rt = true;
@@ -357,7 +365,7 @@ AGAIN:
 
 const types::DocMetaData* InputFilterImpl::getMetaData()
 {
-	if (!m_doc.get())
+	if (!m_endofcontent)
 	{
 		setState( EndOfMessage);
 		return 0;

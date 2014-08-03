@@ -34,7 +34,6 @@ Project Wolframe.
 #include "cjson_filter.hpp"
 #include "inputfilterImpl.hpp"
 #include "outputfilterImpl.hpp"
-#include "filter/bufferingfilter.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>

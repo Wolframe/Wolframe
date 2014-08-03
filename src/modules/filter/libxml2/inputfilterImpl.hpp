@@ -63,8 +63,10 @@ struct InputFilterImpl :public InputFilter
 		,m_propvalues(0)
 		,m_taglevel(0)
 		,m_withEmpty(withEmpty_)
+		,m_endofcontent(false)
 		,m_rootAttributeIdx(0)
-		,m_rootAttributeState(0){}
+		,m_rootAttributeState(0)
+		{}
 
 	/// \brief Default constructor
 	InputFilterImpl()
@@ -75,8 +77,10 @@ struct InputFilterImpl :public InputFilter
 		,m_propvalues(0)
 		,m_taglevel(0)
 		,m_withEmpty(false)
+		,m_endofcontent(false)
 		,m_rootAttributeIdx(0)
-		,m_rootAttributeState(0){}
+		,m_rootAttributeState(0)
+		{}
 
 	/// \brief Copy constructor
 	InputFilterImpl( const InputFilterImpl& o)
@@ -91,6 +95,8 @@ struct InputFilterImpl :public InputFilter
 		,m_nodestk(o.m_nodestk)
 		,m_withEmpty(o.m_withEmpty)
 		,m_elembuf(o.m_elembuf)
+		,m_contentbuf(o.m_contentbuf)
+		,m_endofcontent(o.m_endofcontent)
 		,m_rootAttributes(o.m_rootAttributes)
 		,m_rootAttributeIdx(o.m_rootAttributeIdx)
 		,m_rootAttributeState(o.m_rootAttributeState)
@@ -145,6 +151,8 @@ private:
 	std::vector<xmlNode*> m_nodestk;	//< stack of nodes
 	bool m_withEmpty;			//< return empty tokens as W3C requires too
 	std::string m_elembuf;			//< buffer for current element
+	std::string m_contentbuf;		//< buffer for buffered content
+	bool m_endofcontent;			//< finished buffering content
 
 	struct RootAttribute
 	{
