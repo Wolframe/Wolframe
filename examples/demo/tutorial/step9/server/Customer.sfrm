@@ -1,60 +1,50 @@
 FORM CustomerListRequest
+    -root customer
 {
-	customer {
-	}
 }
 
 FORM CustomerList
+    -root list
 {
-	list { 
-		customer []
-		{
-			id !@string
-			name string
-			address string
-		}
-	}
+    customer []
+    {
+        id !@string
+        name string
+        address string
+    }
 }
 
 FORM CustomerRequest
+    -root customer
 {
-	customer {
-		id !@string
-	}
+    id !@string
 }
 
 FORM Customer
+    -root customer
 {
-	customer
-	{
-		id !@string
-		name string
-		address string
-	}
+    id !@string
+    name string
+    address string
 }
 
 FORM CustomerUpdate
+    -root customer
 {
-	customer
-	{
-		id !@string
-		name string
-		address string
-	}
+    id !@string
+    name string
+    address string
 }
 
 FORM CustomerCreate
+    -root customer
 {
-	customer
-	{
-		name string
-		address string
-	}
+    name string
+    address string
 }
 
 FORM CustomerDelete
+    -root customer
 {
-	customer {
-		id !@string
-	}
+    id !@string
 }

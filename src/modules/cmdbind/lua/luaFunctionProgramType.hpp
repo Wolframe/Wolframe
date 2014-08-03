@@ -34,11 +34,27 @@ Project Wolframe.
 #ifndef _Wolframe_LUA_FUNCTION_PROGRAM_TYPE_HPP_INCLUDED
 #define _Wolframe_LUA_FUNCTION_PROGRAM_TYPE_HPP_INCLUDED
 #include "prgbind/program.hpp"
+#include "luaScriptContext.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-prgbind::Program* createLuaProgramType();
+class LuaProgramType
+	:public prgbind::Program
+{
+public:
+	LuaProgramType()
+		:prgbind::Program( prgbind::Program::Function){}
+
+	virtual ~LuaProgramType(){}
+
+	virtual bool is_mine( const std::string& filename) const;
+
+	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
+
+private:
+	LuaScriptContext m_context;
+};
 
 }} //namespace
 #endif

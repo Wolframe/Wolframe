@@ -12,7 +12,7 @@ QUIT
 **file:example_3.lua
 
 function run( )
-	f = filter( "textwolf")
+	f = provider.filter( "textwolf")
 	input:as(f)
 	output:as(f)
 	for c,t in input:get() do
@@ -27,6 +27,7 @@ provider
 		lua
 		{
 			program example_3.lua
+			filter char
 		}
 	}
 }
@@ -38,7 +39,6 @@ proc
 OK enter cmd
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <recipe><item amount="100g">chocolate</item><item amount="0.5l">milk</item></recipe>
-
 
 .
 OK

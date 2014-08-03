@@ -14,17 +14,15 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwolframe \
-	$(LIBS_DL)
-
+	-lwolframe
 
 DYNAMIC_MODULE = mod_datatype_bcdnumber.so
 
 CPP_OBJS = \
 	bcdArithmetic.o \
+	fxpArithmetic.o \
 	datatypeBigint.o \
-	datatypeBigfxp.o \
-	mod_datatype_bcdnumber.o
+	datatypeBigfxp.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

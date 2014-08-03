@@ -35,6 +35,7 @@ Project Wolframe.
 #include "langbind/formFunction.hpp"
 #include "luaScriptContext.hpp"
 #include "processor/procProvider.hpp"
+#include "processor/execContext.hpp"
 #include "luaObjects.hpp"
 #include "logger-v1.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
@@ -50,29 +51,11 @@ using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
 namespace {
-struct ResultData
-	:public langbind::TypedInputFilter::Data
-{
-	ResultData( const langbind::LuaScriptInstanceR& interp_)
-		:m_interp(interp_){}
-
-	ResultData( const ResultData& o)
-		:m_interp(o.m_interp){}
-
-	virtual ~ResultData(){}
-
-	virtual Data* copy() const
-		{return new ResultData(*this);}
-
-private:
-	langbind::LuaScriptInstanceR m_interp;
-};
-
 class LuaFormFunctionClosure
-	:public langbind::FormFunctionClosure
+	:public FormFunctionClosure
 {
 public:
-	LuaFormFunctionClosure( const langbind::LuaScriptInstanceR& interp_, const std::string& name_)
+	LuaFormFunctionClosure( const LuaScriptInstanceR& interp_, const std::string& name_)
 		:m_interp(interp_),m_name(name_),m_firstcall(false)
 	{}
 
@@ -102,17 +85,15 @@ public:
 		m_result = m_interp->getObject( -1);
 		if (!m_result.get())
 		{
-			LOG_ERROR << "lua function returned no result or nil (structure expected)";
-			throw std::runtime_error( "called lua function without result");
+			throw std::runtime_error( "lua function called returned no result or nil (structure expected)");
 		}
-		m_result->setData( new ResultData( m_interp));
 		return true;
 	}
 
 	///\remark Flags ignored because lua has no strict typing does not validate input parameter structure on its own
-	virtual void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& arg, serialize::Context::Flags)
+	virtual void init( proc::ExecContext* ctx, const TypedInputFilterR& arg, serialize::Flags::Enum)
 	{
-		m_interp->init( provider);
+		m_interp->init( ctx);
 		m_arg = arg;
 		m_arg->setFlags( TypedInputFilter::SerializeWithIndices);
 		//... SerializeWithIndices because lua has no strict typing and needs arrays to be delivered with indices to make single element arrays to appear as arrays too
@@ -125,15 +106,15 @@ public:
 	}
 
 private:
-	langbind::LuaScriptInstanceR m_interp;
-	TypedInputFilterR m_result;
+	LuaScriptInstanceR m_interp;
 	std::string m_name;
 	TypedInputFilterR m_arg;
+	TypedInputFilterR m_result;
 	bool m_firstcall;
 };
 
 class LuaFormFunction
-	:public langbind::FormFunction
+	:public FormFunction
 {
 public:
 	LuaFormFunction( const LuaScriptContext* context_, const std::string& name_)
@@ -143,8 +124,7 @@ public:
 
 	virtual FormFunctionClosure* createClosure() const
 	{
-		langbind::LuaScriptInstanceR interp;
-		if (!m_context->funcmap.getLuaScriptInstance( m_name, interp)) return 0;
+		LuaScriptInstanceR interp( m_context->funcmap.createLuaScriptInstance( m_name));
 		return new LuaFormFunctionClosure( interp, m_name);
 	}
 
@@ -152,41 +132,25 @@ private:
 	const LuaScriptContext* m_context;
 	std::string m_name;
 };
-
-class LuaProgramType
-	:public prgbind::Program
-{
-public:
-	LuaProgramType()
-		:prgbind::Program( prgbind::Program::Function){}
-
-	virtual ~LuaProgramType(){}
-
-	virtual bool is_mine( const std::string& filename) const
-	{
-		boost::filesystem::path p( filename);
-		return p.extension().string() == ".lua";
-	}
-
-	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
-	{
-		std::vector<std::string> funcs = m_context.loadProgram( filename);
-		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
-		for (; fi != fe; ++fi)
-		{
-			langbind::FormFunctionR ff( new LuaFormFunction( &m_context, *fi));
-			library.defineFormFunction( *fi, ff);
-		}
-	}
-
-private:
-	LuaScriptContext m_context;
-};
 }//anonymous namespace
 
-prgbind::Program* langbind::createLuaProgramType()
+
+bool LuaProgramType::is_mine( const std::string& filename) const
 {
-	return new LuaProgramType();
+	boost::filesystem::path p( filename);
+	return p.extension().string() == ".lua";
 }
+
+void LuaProgramType::loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
+{
+	std::vector<std::string> funcs = m_context.loadProgram( filename);
+	std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
+	for (; fi != fe; ++fi)
+	{
+		FormFunctionR ff( new LuaFormFunction( &m_context, *fi));
+		library.defineFormFunction( *fi, ff);
+	}
+}
+
 
 

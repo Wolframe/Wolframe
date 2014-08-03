@@ -1,0 +1,8 @@
+
+TRANSACTION insertPerson
+BEGIN
+	DO INSERT INTO Person (name, address) VALUES ($(name), $(address));
+	DO UNIQUE SELECT id from Person WHERE name = $(name);
+END
+AUDIT CRITICAL auditMutation1( operation="insert", $RESULT.id, newvalue=$(name))
+

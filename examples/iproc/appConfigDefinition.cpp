@@ -54,12 +54,12 @@ ApplicationConfiguration::ApplicationConfiguration()
 
 	// add sections, the parse function will select the
 	// appropriate action
-	addConfig( "service", serviceCfg );
-	addConfig( "daemon", serviceCfg);
+	addConfig( "Service", serviceCfg );
+	addConfig( "Daemon", serviceCfg);
 
-	addConfig( "listen", serverCfg );
-	addConfig( "logging", loggerCfg );
-	addConfig( "application", handlerCfg->m_appConfig );
+	addConfig( "Server", serverCfg );
+	addConfig( "Logging", loggerCfg );
+	addConfig( "Application", handlerCfg->m_appConfig );
 }
 
 ApplicationConfiguration::~ApplicationConfiguration()

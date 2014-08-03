@@ -22,6 +22,7 @@ provider
 		lua
 		{
 			program $1
+			filter $2
 		}
 	}
 }

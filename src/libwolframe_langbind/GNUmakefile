@@ -14,15 +14,11 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR) \
-	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_database \
-	-L$(TOPDIR)/src/libwolframe_serialize
+	-L$(TOPDIR)/src/libwfsingleton \
+	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
-	-lwolframe -lwolframe_serialize -lwolframe_database \
-	-lboost_filesystem
+	-lwfsingleton -lwolframe
 
 STATIC_LIB = libwolframe_langbind.a
 
@@ -32,19 +28,18 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
-	protocol_ioblocks.o \
-	appObjects.o \
+	filterdef.o \
+	input.o \
+	output.o \
 	null_filter.o \
 	typingfilter.o \
 	typedfilterScope.o \
 	inputfilterScope.o \
+	joinfilter.o \
 	tostringfilter.o \
 	ptreefilter.o \
-	cmdbind_lineCommandHandler.o \
-	cmdbind_execCommandHandler.o \
-	cmdbind_doctypeFilterCommandHandler.o \
-	cmdbind_contentBufferCommandHandlerEscDLF.o \
-	cmdbind_ioFilterCommandHandlerEscDLF.o
+	execContextInputFilter.o \
+	ioFilterCommandHandler.o \
 
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

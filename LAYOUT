@@ -16,6 +16,7 @@ docs/ ................ documentation (Doxygen, Docbook)
 examples/ ............ programming examples
 XML/ ................. DTDs, Scheams, Relax-NG
 database/ ............ initialization schemas and data for database
+wtest/ ............... Wolframe test library (wolfilter tests)
 tests/ ............... tests, not distributed in released source tarball
 makefiles/ ........... GNU makefile and NMAKEfile system
 po/ .................. translations (i18n)
@@ -23,8 +24,12 @@ packaging/ ........... all things needed by packagers
 packaging/patches .... patches for 3rdParty software to be able to
                        build on some systems
 contrib/ ............. various things coming from other people (little helpers)
+config/ .............. configuration templates for example configurations and
+                       use for configuration files used in packaging
+interfaces/ .......... processor interface for .NET
+scripts/ ............. various scripts
 
-TO BE DISCUSSED or moved:
+TO BE DISCUSSED or to be moved:
 
 Wolframe.sln
 Wolframe.config
@@ -32,6 +37,3 @@ Wolframe.creator
 Wolframe.files
 Wolframe.includes
 XML (--> maybe schemas? So JSON would also fit.)
-contrib
-scripts
-wtest

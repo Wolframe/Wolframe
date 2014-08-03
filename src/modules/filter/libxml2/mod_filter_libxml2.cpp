@@ -32,47 +32,23 @@
 ************************************************************************/
 ///\file mod_filter_libxml2.cpp
 ///\brief Module for libxml2 XML filters
-#include "module/filterBuilder.hpp"
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "libxml2_filter.hpp"
+
 #if WITH_LIBXSLT
 #include "xsltProgramType.hpp"
-#endif
-#include "logger-v1.hpp"
-#include <cstring>
+#include "appdevel/programTypeModuleMacros.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-namespace lb = _Wolframe::langbind;
+WF_MODULE_BEGIN( "libxml2Filter", "xml/xslt filter module based on libxml2")
+WF_PROGRAM_TYPE( "xslt", _Wolframe::langbind::XsltProgramType)
+WF_FILTER_TYPE( "libxml2", _Wolframe::langbind::Libxml2FilterType)
+WF_MODULE_END
 
-namespace {
-struct Libxml2FilterObject
-{
-	static SimpleBuilder* xmlfilter_builder()
-		{return new FilterBuilder( "Libxml2Filter", "libxml2", lb::createLibxml2FilterType);}
-#if WITH_LIBXSLT
-	static SimpleBuilder* xsltfilter_builder()
-		{return new ProgramTypeBuilder( "XsltProgramType", "xslt", langbind::createXsltProgramType);}
-#endif
-};
-}//anonymous namespace
-
-
-#if WITH_LIBXSLT
-enum {NofObjects=2};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	Libxml2FilterObject::xmlfilter_builder,
-	Libxml2FilterObject::xsltfilter_builder
-};
 #else
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	Libxml2FilterObject::xmlfilter_builder
-};
+
+WF_MODULE_BEGIN( "libxml2Filter", "xml filter module based on libxml2")
+WF_FILTER_TYPE( "libxml2", _Wolframe::langbind::Libxml2FilterType)
+WF_MODULE_END
 #endif
-
-ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", 0, 0, NofObjects, objdef);
-
 

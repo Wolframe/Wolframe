@@ -136,56 +136,15 @@ FakeResult::FakeResult( const std::string& str)
 }
 
 
-static void printTransactionInput( std::ostream& out, const TransactionInput& input)
-{
-	TransactionInput::cmd_const_iterator ci = input.begin(), ce = input.end();
-	for (; ci != ce; ++ci)
-	{
-		out << ci->statement();
-		TransactionInput::Command::arg_const_iterator ai = ci->begin(), ae = ci->end();
-		if (ai != ae) out << " ";
-
-		for (; ai != ae; ++ai)
-		{
-			switch (ai->type())
-			{
-				case TransactionInput::Command::Argument::ResultColumn:
-					if (ai->scope_functionidx() >= 0)
-					{
-						out << "#[" << ai->scope_functionidx() << "." << ai->value().touint() << "]";
-					}
-					else
-					{
-						out << "#[" << ai->value().touint() << "]";
-					}
-					break;
-				case TransactionInput::Command::Argument::Value:
-					if (ai->value().defined())
-					{
-						out << "#" << ai->value().tostring();
-					}
-					else
-					{
-						out << "#NULL";
-					}
-					break;
-			}
-		}
-		out << std::endl;
-	}
-	out << std::endl;
-}
-
-
-class TransactionHandler :public TransactionExecStatemachine
+class TransactionHandler
+	:public TransactionExecStatemachine
 {
 public:
 	typedef TransactionExecStatemachine Parent;
 
 	///\brief Constructor
 	TransactionHandler( const std::string& outfilename, const std::vector<std::string>& res)
-		:TransactionExecStatemachine("TEST")
-		,m_res(res)
+		:m_res(res)
 		,m_out(outfilename.c_str())
 	{
 		m_resitr = m_res.begin();
@@ -287,12 +246,6 @@ public:
 	///\brief Find out if the database is case sensitive or not
 	virtual bool isCaseSensitive()	{return false;}
 
-	void doTransaction( const TransactionInput& input, TransactionOutput& output)
-	{
-		printTransactionInput( m_out, input);
-		Parent::doTransaction( input, output);
-	}
-
 private:
 	std::vector<std::string> m_res;
 	std::vector<std::string>::const_iterator m_resitr;
@@ -302,11 +255,16 @@ private:
 
 
 TesttraceTransaction::TesttraceTransaction( const TesttraceDatabase* dbref_, const std::vector<std::string>& result_)
-	:StatemachineBasedTransaction( "TEST", new TransactionHandler( dbref_->outfilename().c_str(), result_))
-	,m_dbref(dbref_)
+	:Transaction( "TEST", TransactionExecStatemachineR( new TransactionHandler( dbref_->outfilename().c_str(), result_)))
 	,m_result(result_)
 {}
 
+bool TesttraceTransaction::execute( const VmTransactionInput& input, VmTransactionOutput& output)
+{
+	TransactionHandler* handler = dynamic_cast<TransactionHandler*>( execStatemachine());
+	input.print( handler->out());
+	return Transaction::execute( input, output);
+}
 
 
 

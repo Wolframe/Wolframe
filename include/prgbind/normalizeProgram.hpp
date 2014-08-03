@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//\brief Interface for loading programs for token normalization
-//\file prgbind/normalizeProgram.hpp
+/// \brief Interface for loading programs for token normalization
+/// \file prgbind/normalizeProgram.hpp
 
 #ifndef _PRGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
@@ -42,18 +42,22 @@
 namespace _Wolframe {
 namespace prgbind {
 
-//\class NormalizeProgram
-//\brief Program type for normalizer functions (.wnmp files) used for atomic types in form data description languages.
+/// \class NormalizeProgram
+/// \brief Program type for normalizer functions (.wnmp files) used for atomic types in form data description languages.
 class NormalizeProgram
 	:public Program
 {
 public:
+	/// \brief Default constructor
 	NormalizeProgram()
 		:Program( FormType){}
 
+	/// \brief Destructor
 	virtual ~NormalizeProgram(){}
 
+	/// \brief Implementation of Program::is_mine( const std::string&) const;
 	virtual bool is_mine( const std::string& filename) const;
+	/// \brief Implementation of Program::loadProgram( ProgramLibrary&, db::Database*, const std::string&);
 	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
 };
 

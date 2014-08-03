@@ -33,11 +33,10 @@ Project Wolframe.
 ///\brief Implementation of the function to create a form function program type object for mylang scripts
 #include "mylangFunctionProgramType.hpp"
 #include "mylangStructureBuilder.hpp"
-#include "mylangInterpreter.hpp"
 #include "langbind/formFunction.hpp"
 #include "processor/procProvider.hpp"
+#include "processor/execContext.hpp"
 #include "logger-v1.hpp"
-#include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include <vector>
 #include <string>
@@ -56,7 +55,7 @@ class MyLangResult
 {
 public:
 	MyLangResult( const mylang::StructureR& data_)
-		:types::TypeSignature("langbind::MyLangResult", __LINE__)
+		:TypedInputFilter("mylangresult")
 		,m_data(data_)
 		,m_bufidx(0)
 	{
@@ -64,8 +63,7 @@ public:
 	}
 
 	MyLangResult( const MyLangResult& o)
-		:types::TypeSignature("langbind::MyLangResult", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_data(o.m_data)
 		,m_buf(o.m_buf)
 		,m_bufidx(o.m_bufidx)
@@ -207,7 +205,7 @@ class MylangFormFunctionClosure
 {
 public:
 	MylangFormFunctionClosure( const std::string& name_, const mylang::InterpreterInstanceR& instance_)
-		:m_name(name_),m_initialized(false),m_instance(instance_),m_provider(0){}
+		:m_name(name_),m_initialized(false),m_instance(instance_),m_context(0){}
 
 	virtual ~MylangFormFunctionClosure(){}
 
@@ -293,7 +291,7 @@ public:
 		}
 		try
 		{
-			m_output = m_instance->call( m_provider, m_input);
+			m_output = m_instance->call( m_context, m_input);
 			LOG_TRACE << "Calling function '" << m_name << "' with argument: " << m_input->tostring() << "returns " << m_output->tostring();
 			m_result.reset( new MyLangResult( m_output));
 		}
@@ -304,9 +302,9 @@ public:
 		return true;
 	}
 
-	virtual void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& arg, serialize::Context::Flags /*f*/)
+	virtual void init( proc::ExecContext* ctx, const TypedInputFilterR& arg, serialize::Flags::Enum /*f*/)
 	{
-		m_provider = provider;
+		m_context = ctx;
 		m_arg = arg;
 		if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
 		{
@@ -323,16 +321,16 @@ public:
 	}
 
 private:
-	TypedInputFilterR m_result;			//< result of the function call
-	std::string m_name;				//< name of the function called for error messages
-	TypedInputFilterR m_arg;			//< call argument as input filter
-	bool m_initialized;				//< true, if the input has been initialized
-	std::string m_tagbuf;				//< buffer for attribute name to handle Attribute+Value pair
-	mylang::StructureBuilder m_inputbuilder;	//< structure input builder object
-	mylang::StructureR m_input;			//< pointer to input structure
-	mylang::StructureR m_output;			//< pointer to output structure
-	mylang::InterpreterInstanceR m_instance;	//< interpreter instance
-	const proc::ProcessorProvider* m_provider;	//< pointer to processor provider
+	TypedInputFilterR m_result;				//< result of the function call
+	std::string m_name;					//< name of the function called for error messages
+	TypedInputFilterR m_arg;				//< call argument as input filter
+	bool m_initialized;					//< true, if the input has been initialized
+	std::string m_tagbuf;					//< buffer for attribute name to handle Attribute+Value pair
+	mylang::StructureBuilder m_inputbuilder;		//< structure input builder object
+	mylang::StructureR m_input;				//< pointer to input structure
+	mylang::StructureR m_output;				//< pointer to output structure
+	mylang::InterpreterInstanceR m_instance;		//< interpreter instance
+	proc::ExecContext* m_context;				//< execution context reference
 };
 
 
@@ -358,43 +356,21 @@ private:
 	const mylang::Interpreter* m_interpreter;
 	std::string m_name;
 };
-
-///\class MylangProgramType
-///\brief Program type of mylang programs
-class MylangProgramType
-	:public prgbind::Program
-{
-public:
-	MylangProgramType()
-		:prgbind::Program( prgbind::Program::Function){}
-
-	virtual ~MylangProgramType(){}
-
-	virtual bool is_mine( const std::string& filename) const
-	{
-		boost::filesystem::path p( filename);
-		return p.extension().string() == ".mlg";
-	}
-
-	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
-	{
-		std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
-		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
-		for (; fi != fe; ++fi)
-		{
-			langbind::FormFunctionR ff( new MylangFormFunction( &m_interpreter, *fi));
-			library.defineFormFunction( *fi, ff);
-		}
-	}
-
-private:
-	mylang::Interpreter m_interpreter;
-};
 }//anonymous namespace
 
-prgbind::Program* langbind::createMylangProgramType()
+bool MylangProgramType::is_mine( const std::string& filename) const
 {
-	return new MylangProgramType();
+	boost::filesystem::path p( filename);
+	return p.extension().string() == ".mlg";
 }
 
-
+void MylangProgramType::loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
+{
+	std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
+	std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
+	for (; fi != fe; ++fi)
+	{
+		langbind::FormFunctionR ff( new MylangFormFunction( &m_interpreter, *fi));
+		library.defineFormFunction( *fi, ff);
+	}
+}

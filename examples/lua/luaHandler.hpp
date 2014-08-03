@@ -17,11 +17,11 @@ namespace _Wolframe {
 	class luaConnection : public net::ConnectionHandler
 	{
 	public:
-		luaConnection( const net::LocalEndpoint& local, const luaConfig config );
+		luaConnection( const net::LocalEndpointR& local, const luaConfig config );
 
 		~luaConnection();
 
-		void setPeer( const net::RemoteEndpoint& remote );
+		void setPeer( const net::RemoteEndpointR& remote );
 
 		void networkInput( const void *begin, std::size_t bytesTransferred );
 		void signalOccured( NetworkSignal );
@@ -46,7 +46,7 @@ namespace _Wolframe {
 	public:
 		ServerHandlerImpl( const HandlerConfiguration *config );
 
-		net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
+		net::ConnectionHandler* newConnection( const net::LocalEndpointR& local );
 
 	private:
 		luaConfig config_;

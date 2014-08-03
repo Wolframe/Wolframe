@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/tostringfilter.hpp
-///\brief Interface for tostring methods in language bindings
+/// \file filter/tostringfilter.hpp
+/// \brief Interface for tostring methods in language bindings
 
 #ifndef _Wolframe_FILTER_TOSTRING_FILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_TOSTRING_FILTER_INTERFACE_HPP_INCLUDED
@@ -40,44 +40,56 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class ToStringFilter
-///\brief Output filter for tostring methods in language bindings
+/// \class ToStringFilter
+/// \brief Output filter for tostring methods in language bindings
 class ToStringFilter :public TypedOutputFilter
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	explicit ToStringFilter( const std::string indentstr_="")
-		:types::TypeSignature("langbind::ToStringFilter", __LINE__)
+		:TypedOutputFilter("tostring")
+		,m_contentpos(0)
 		,m_lasttype(FilterBase::OpenTag)
-		,m_indentstr(indentstr_) {}
+		,m_indentstr(indentstr_)
+		,m_taglevel(0){}
 
-	///\brief Copy constructor
-	///\param[in] o typed output filter to copy
+	/// \brief Copy constructor
+	/// \param[in] o typed output filter to copy
 	ToStringFilter( const ToStringFilter& o)
-		:types::TypeSignature("langbind::ToStringFilter", __LINE__)
-		,TypedOutputFilter(o)
+		:TypedOutputFilter(o)
 		,m_content(o.m_content)
+		,m_contentpos(o.m_contentpos)
 		,m_lasttype(o.m_lasttype)
 		,m_indent(o.m_indent)
-		,m_indentstr(o.m_indentstr){}
-	///\brief Destructor
+		,m_indentstr(o.m_indentstr)
+		,m_taglevel(o.m_taglevel){}
+	/// \brief Destructor
 	virtual ~ToStringFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const		{return new ToStringFilter(*this);}
 
-	///\brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
+	/// \brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
 	virtual bool print( ElementType type, const types::VariantConst& element);
 
-	///\brief Get the content
+	virtual void getOutput( const void*& buf, std::size_t& bufsize)
+	{
+		buf = (const void*)(m_content.c_str() + m_contentpos);
+		bufsize = m_content.size() - m_contentpos;
+		m_contentpos = m_content.size();
+	}
+
+	/// \brief Get the content
 	const std::string& content() const		{return m_content;}
 
 private:
-	std::string m_content;				//< content string
-	FilterBase::ElementType m_lasttype;		//< last parsed element type
-	std::string m_indent;				//< indent array
-	std::string m_indentstr;			//< indentiation string
+	std::string m_content;				///< content string
+	std::size_t m_contentpos;			///< position in content string
+	FilterBase::ElementType m_lasttype;		///< last parsed element type
+	std::string m_indent;				///< indent array
+	std::string m_indentstr;			///< indentiation string
+	int m_taglevel;					///< count of open tags
 };
 
 }}//namespace

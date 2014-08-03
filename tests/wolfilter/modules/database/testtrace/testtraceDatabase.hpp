@@ -36,7 +36,7 @@
 #define _TESTTRACE_FAKE_DATABASE_HPP_INCLUDED
 #include "database/database.hpp"
 #include "config/configurationBase.hpp"
-#include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include "module/constructor.hpp"
 #include <list>
 #include <string>
@@ -63,7 +63,7 @@ public:
 		return TESTTRACE_DATABASE_CLASSNAME;
 	}
 
-	virtual bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules);
+	virtual bool parse( const config::ConfigurationNode& pt, const std::string& node, const module::ModulesDirectory* modules);
 	virtual bool check() const;
 	void print( std::ostream& os, size_t indent) const;
 	virtual void setCanonicalPathes( const std::string& referencePath);
@@ -111,15 +111,16 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/ );
 
-	virtual void addProgram( const std::string& source);
-	virtual void loadProgram( const std::string& filename);
-	virtual void loadAllPrograms(){}
+	virtual const _Wolframe::db::LanguageDescription* getLanguageDescription() const
+	{
+		static _Wolframe::db::LanguageDescriptionSQL langdescr;
+		return &langdescr;
+	}
 
 	const std::string& outfilename() const
 	{
 		return m_outfilename;
 	}
-
 private:
 	std::string m_id;
 	std::string m_outfilename;
@@ -158,18 +159,6 @@ public:
 	{
 		return &m_db;
 	}
-
-	virtual void addProgram( const std::string& source)
-	{
-		m_db.addProgram( source);
-	}
-
-	virtual void loadProgram( const std::string& filename)
-	{
-		m_db.loadProgram( filename);
-	}
-
-	virtual void loadAllPrograms(){}
 
 private:
 	std::string m_id;

@@ -2,9 +2,10 @@
 testname=`basename $0 ".tst"`				# name of the test
 luascript=print_table_libxml2.lua
 testcmd="-c wolframe.conf run"				# command to execute by the test
-docin=invoice_example					# input document name
+docin=invoice_example_envelop				# input document name
 docout=lua_print_table_testtrace			# output document name
 testdata="
+**requires:LIBHPDF
 **file:wolframe.conf
 LoadModules
 {
@@ -13,6 +14,7 @@ LoadModules
 	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 	module ../../src/modules/filter/blob/mod_filter_blob
 	module ../wolfilter/modules/prnt/fakepdfprint/mod_print_testpdf
 }
@@ -26,6 +28,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter #FILTER#
 		}
 	}
 }

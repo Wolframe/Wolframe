@@ -32,15 +32,16 @@ Project Wolframe.
 ///\file configStructParser.cpp
 ///\brief test for configuration parser with wolframe example configuration
 
-#include "config/structSerialize.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/configSerialize.hpp"
+#include "utils/fileUtils.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include <boost/filesystem.hpp>
 #include "utils/fileUtils.hpp"
+#include "logger/logLevel.hpp"
 #ifdef _WIN32
 #pragma warning(disable:4127)
 #endif
 #include <iostream>
-#include <boost/property_tree/info_parser.hpp>
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
@@ -155,8 +156,9 @@ struct DatabaseConfig
 	std::string password;
 	unsigned short connections;
 	unsigned short acquireTimeout;
+	bool foreignKeys;
 
-	DatabaseConfig() :port(0),connections(0),acquireTimeout(0) {}
+	DatabaseConfig() :port(0),connections(0),acquireTimeout(0),foreignKeys(false) {}
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
@@ -356,7 +358,9 @@ const serialize::StructDescriptionBase* DatabaseConfig::getStructDescription()
 			( "user",		&DatabaseConfig::user)
 			( "password",		&DatabaseConfig::password)
 			( "connections",	&DatabaseConfig::connections)
-			( "acquireTimeout",	&DatabaseConfig::acquireTimeout);
+			( "acquireTimeout",	&DatabaseConfig::acquireTimeout)
+			( "foreignKeys",	&DatabaseConfig::foreignKeys)
+			;
 		}
 	};
 	static const ThisDescription rt;
@@ -405,7 +409,9 @@ const serialize::StructDescriptionBase* Configuration::getStructDescription()
 			( "service",		&Configuration::service)
 			( "daemon",		&Configuration::daemon)
 			( "logging",		&Configuration::logger)
-			( "net",		&Configuration::net);
+			( "net",		&Configuration::net)
+			( "database",		&Configuration::database)
+			;
 		}
 	};
 	static const ThisDescription rt;
@@ -420,6 +426,7 @@ int main( int argc, const char** argv)
 	if (argc <= 1)
 	{
 		std::cerr << "missing argument configuration file" << std::endl;
+		return 1;
 	}
 	std::string filename( argv[1]);
 
@@ -427,16 +434,15 @@ int main( int argc, const char** argv)
 	if (!utils::fileExists( configfile))
 	{
 		std::cerr << "Configuration file " << configfile << " does not exist." << std::endl;
-		return false;
+		return 2;
 	}
 
 	std::string errmsg;
-	boost::property_tree::ptree pt;
 	try
 	{
-		boost::property_tree::read_info( configfile, pt);
-		config::parseConfigStructure( cfg, pt);
-		std::cout << config::structureToString( cfg) << std::endl;
+		config::ConfigurationTree pt = utils::readPropertyTreeFile( configfile);
+		serialize::parseConfigStructure( cfg, pt.root());
+		std::cout << serialize::structureToString( cfg) << std::endl;
 	}
 	catch (std::exception& e)
 	{
@@ -445,6 +451,7 @@ int main( int argc, const char** argv)
 	if (!errmsg.empty())
 	{
 		std::cerr << "Error in configuration: " << errmsg << std::endl;
+		return 2;
 	}
 	return 0;
 }

@@ -37,9 +37,11 @@ Project Wolframe.
 #include "pdfPrinterExpression.hpp"
 #include "pdfPrinterDocument.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include "textwolf/xmlpathautomatonparse.hpp"
 #include "textwolf/xmlpathselect.hpp"
 #include "filter/singlefilter.hpp"
+#include "processor/execContext.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cstdlib>
@@ -121,8 +123,8 @@ public:
 		}
 		catch (const std::runtime_error& e)
 		{
-			utils::LineInfo pos = utils::getLineInfo( src.begin(), itr);
-			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(pos.line) + " of PDF printer layout description source (" + e.what() + ")");
+			utils::SourceLineInfo pos = utils::getSourceLineInfo( src.begin(), itr);
+			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(pos.line()) + " of PDF printer layout description source (" + e.what() + ")");
 		}
 	}
 
@@ -171,8 +173,8 @@ class PrintFunctionClosure
 {
 public:
 	explicit PrintFunctionClosure( const HaruPdfPrintFunction::Impl* func_)
-		:m_provider(0)
-		,m_flags(serialize::Context::None)
+		:m_execContext(0)
+		,m_flags(serialize::Flags::None)
 		,m_state(0)
 		,m_document(func_->createDocument())
 		,m_func(func_)
@@ -183,8 +185,6 @@ public:
 
 	void pushElement( langbind::FilterBase::ElementType type, const types::VariantConst& element)
 	{
-		if (m_taglevel == -1) throw std::runtime_error( "input tags for print function call not balanced");
-
 		std::string elemstr = element.tostring();
 		textwolf::XMLScannerBase::ElementType xtype = textwolf::XMLScannerBase::None;
 		switch (type)
@@ -230,7 +230,7 @@ public:
 		m_lasttype = type;
 
 		// Execute methods triggered:
-		XMLPathSelect::iterator itr = m_selectState.find( xtype, elemstr.c_str(), elemstr.size());
+		XMLPathSelect::iterator itr = m_selectState.push( xtype, elemstr.c_str(), elemstr.size());
 		XMLPathSelect::iterator end = m_selectState.end();
 		for (; itr!=end; itr++)
 		{
@@ -264,10 +264,12 @@ public:
 
 				while (m_input->getNext( elemtype, elem))
 				{
+					if (m_taglevel == 0 && elemtype == langbind::FilterBase::CloseTag) break;
 					pushElement( elemtype, elem);
 				}
 				switch (m_input->state())
 				{
+					case langbind::InputFilter::Start:
 					case langbind::InputFilter::Open:
 						m_resultpdfcontent = m_document->tostring();
 						m_result.reset( new langbind::SingleElementInputFilter( types::VariantConst( m_resultpdfcontent)));
@@ -285,9 +287,9 @@ public:
 		throw std::runtime_error( "internal: illegal state in print function closure automaton");
 	}
 
-	virtual void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f)
 	{
-		m_provider = p;
+		m_execContext = c;
 		m_input = i;
 		m_flags = f;
 		m_state = 1;
@@ -299,11 +301,11 @@ public:
 	}
 
 private:
-	const proc::ProcessorProvider* m_provider;
+	proc::ExecContext* m_execContext;
 	langbind::TypedInputFilterR m_input;
 	std::string m_resultpdfcontent;
 	langbind::TypedInputFilterR m_result;
-	serialize::Context::Flags m_flags;
+	serialize::Flags::Enum m_flags;
 	int m_state;
 	boost::shared_ptr<Document> m_document;
 	VariableScope m_variableScope;

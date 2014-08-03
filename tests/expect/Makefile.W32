@@ -13,5 +13,5 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-"$(EXPECT)" testEcho.exp
-	@-"$(EXPECT)" testPEcho.exp
+#	@-"$(EXPECT)" testEcho.ex
+#	@-"$(EXPECT)" testPEcho.ex

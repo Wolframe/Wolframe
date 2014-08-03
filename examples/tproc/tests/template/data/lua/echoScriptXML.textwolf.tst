@@ -36,7 +36,7 @@ recode lat1..ibmpc >> $output <<!TEST
 QUIT
 --file:echo.lua
 function run( )
-	f = filter( "textwolf")
+	f = provider.filter( "textwolf")
 	f.empty = false
 
 	input:as( f)
@@ -48,7 +48,7 @@ function run( )
 end
 --config
 !TEST
-./output_provider_cfg.sh echo.lua >> $output
+./output_provider_cfg.sh echo.lua char >> $output
 recode lat1..ibmpc >> $output <<!TEST
 --output
 OK enter cmd

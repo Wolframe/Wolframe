@@ -5,49 +5,26 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C98728D4-70D9-4717-85E7-28DAE67ADCAF}</ProjectGuid>
+    <ProjectGuid>{CA8F5570-94E0-4265-8E81-863633BC727D}</ProjectGuid>
     <RootNamespace>libwolframe</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -55,118 +32,74 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetExt />
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Boost\include;C:\Data\Projects\Wolframe\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;C:\Boost\boost-1.55.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Boost\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Boost\include;C:\Data\Projects\Wolframe\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Boost\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>C:\Boost\include\boost-1_48;C:\Data\Projects\Wolframe\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <CompileAsManaged>false</CompileAsManaged>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;C:\Boost\boost-1.55.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Boost\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>C:\Boost\include\boost-1_48;C:\Data\Projects\Wolframe\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <CompileAsManaged>false</CompileAsManaged>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Boost\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="logger\logBackendConsole.hpp" />
-    <ClInclude Include="logger\logBackendEventlog.hpp" />
-    <ClInclude Include="logger\logBackendFile.hpp" />
-    <ClInclude Include="logger\logBackendImpl.hpp" />
-    <ClInclude Include="logger\logBackendSyslog.hpp" />
-    <ClInclude Include="logger\syslog_win32.h" />
-    <ClInclude Include="provider\AAAAproviderImpl.hpp" />
-    <ClInclude Include="provider\DBproviderImpl.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="logger\logBackendConsole.cpp" />
-    <ClCompile Include="logger\logBackendEventlog.cpp" />
-    <ClCompile Include="logger\logBackendFile.cpp" />
-    <ClCompile Include="logger\logBackendImpl.cpp" />
-    <ClCompile Include="logger\logBackendSyslog.cpp" />
-    <ClCompile Include="logger\logComponent.cpp" />
-    <ClCompile Include="logger\logError.cpp" />
-    <ClCompile Include="logger\logger.cpp" />
-    <ClCompile Include="logger\loggerConfig.cpp" />
-    <ClCompile Include="logger\logLevel.cpp" />
-    <ClCompile Include="logger\logSyslogFacility.cpp" />
-    <ClCompile Include="logger\syslog_win32.c" />
-    <ClCompile Include="moduleDirectory.cpp" />
-    <ClCompile Include="provider\AAAAprovider.cpp" />
-    <ClCompile Include="provider\AAAAproviderConfig.cpp" />
-    <ClCompile Include="provider\DBprovider.cpp" />
-    <ClCompile Include="provider\DBproviderConfig.cpp" />
-    <ClCompile Include="referenceConfig.cpp" />
-    <ClCompile Include="resolvePath.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="logger\wolframemsg.mc">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mc %(FullPath)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling Messages...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).rc;%(Filename).h;MSG0409.bin</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">mc %(FullPath)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling Messages...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).rc;%(Filename).h;MSG0409.bin</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mc %(FullPath)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling Messages...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).rc;%(Filename).h;MSG0409.bin</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">mc %(FullPath)</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling Messages...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).rc;%(Filename).h;MSG0409.bin</Outputs>
-    </CustomBuild>
+    <ClCompile Include="b64decode.c" />
+    <ClCompile Include="b64encode.c" />
+    <ClCompile Include="byte2hex.c" />
+    <ClCompile Include="HMAC.cpp" />
+    <ClCompile Include="hmac_sha1.c" />
+    <ClCompile Include="hmac_sha256.c" />
+    <ClCompile Include="logError.cpp" />
+    <ClCompile Include="logObject.cpp" />
+    <ClCompile Include="md5.c" />
+    <ClCompile Include="PBKDF2.cpp" />
+    <ClCompile Include="sha1.c" />
+    <ClCompile Include="sha2.c" />
+    <ClCompile Include="types\bcdToBinaryConversionTable.cpp" />
+    <ClCompile Include="types\bignumber.cpp" />
+    <ClCompile Include="types\binaryToBcdConversionTable.cpp" />
+    <ClCompile Include="types\conversions.cpp" />
+    <ClCompile Include="types\customDataType.cpp" />
+    <ClCompile Include="types\datetime.cpp" />
+    <ClCompile Include="types\form.cpp" />
+    <ClCompile Include="types\numberBaseConversion.cpp" />
+    <ClCompile Include="types\propertyTree.cpp" />
+    <ClCompile Include="types\string.cpp" />
+    <ClCompile Include="types\variant.cpp" />
+    <ClCompile Include="types\variantStruct.cpp" />
+    <ClCompile Include="types\variantStructDescription.cpp" />
+    <ClCompile Include="user.cpp" />
+    <ClCompile Include="utils\allocators.cpp" />
+    <ClCompile Include="utils\fileUtils.cpp" />
+    <ClCompile Include="utils\malloc.cpp" />
+    <ClCompile Include="utils\parseUtils.cpp" />
+    <ClCompile Include="utils\printFormats.cpp" />
+    <ClCompile Include="utils\stringUtils.cpp" />
+    <ClCompile Include="utils\typeSignature.cpp" />
+    <ClCompile Include="version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

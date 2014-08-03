@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY username "Wolframe Team">
+<!ENTITY email "contact@wolframe.net">
+<!ENTITY year "2010-2014">
+<!ENTITY section "5">
+<!-- TITLE should be something like "User commands" or similar (see
+	http://www.tldp.org/HOWTO/Man-Page/q2.html). --><!ENTITY dhtitle "Wolframe User Manual">
+<!ENTITY dhucpackage "wolframe">
+<!ENTITY dhpackage "wolframe-mod_db_sqlite3">
+]>
+<!--
+************************************************************************
+
+ Copyright (C) 2011 - 2014 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************
+-->
+<refentry>
+	<refentryinfo>
+		<title>&dhtitle;</title>
+		<productname>&dhpackage;</productname>
+		<authorgroup>
+			<author>
+				<contrib>This manual was written by the Wolframe Team.</contrib>
+				<address>
+					<email>&email;</email>
+				</address>
+			</author>
+		</authorgroup>
+		<copyright>
+			<year>&year;</year>
+			<holder>&username;</holder>
+		</copyright>
+		<legalnotice>
+			<para>The authors grant permission to copy, distribute and/or modify this manual page
+				under the terms of the GNU General Public License Version 3 or newer (GPLv3).
+			</para>
+		</legalnotice>
+	</refentryinfo>
+	<refmeta>
+		<refentrytitle>&dhucpackage;</refentrytitle>
+		<manvolnum>&section;</manvolnum>
+	</refmeta>
+	<refnamediv>
+		<refname>&dhpackage;</refname>
+		<refpurpose>Wolframe database module for Sqlite3</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+		<cmdsynopsis>
+			<command>/etc/wolframe/wolframe.conf, /etc/wolframe/conf.d/mod_db_sqlite3.conf</command>
+		</cmdsynopsis>
+	</refsynopsisdiv>
+
+	<refsect1 id="description">
+		<title>DESCRIPTION</title>
+		<para>
+			This manual page documents briefly the configuration
+			option available for the SQLite3 database module of the 
+			Wolframe system.
+		</para>
+	</refsect1>
+
+<!-- configuration options: from most to more to less to least important -->
+
+	<refsect1 id="options">
+		<title>OPTIONS</title>
+		
+		<para>
+			The module adds a new directive <emphasis role="bold">SQLite</emphasis>
+			to the global configuration section <emphasis role="bold">database</emphasis>.
+		</para>
+		
+		<refsect2 id="SQLite">
+			<title>SQLite</title>
+		
+		<para>
+			The following directives are valid in this section:
+			<variablelist>
+				<varlistentry>
+					<term>
+						<option>Identifier <replaceable>identifier</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Register the configured database connection with
+							name <replaceable>identifier</replaceable>. You can later
+							reference it by that name when an identifier of a
+							database connection is needed. This parameter is required.
+						</para>
+					</listitem>
+				</varlistentry>
+
+				<varlistentry>
+					<term>
+						<option>File <replaceable>filename</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Store the SQLite database into <replaceable>filename</replaceable>.
+							This parameter is required.
+						</para>
+					</listitem>
+				</varlistentry>
+
+				<varlistentry>
+					<term>
+						<option>Connections <replaceable>connections</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Number of parallel connections used to connect to the database.
+							This creates a pool of size <replaceable>connections</replaceable>
+							of database connections available to the business layer.
+						</para>
+					</listitem>
+				</varlistentry>
+
+				<varlistentry>
+					<term>
+						<option>ForeignKeys
+						<replaceable>yes</replaceable> | <replaceable>no</replaceable> 
+						</option>
+					</term>
+					<listitem>
+						<para>
+							Setting 'foreignKeys' to 'yes'
+							enables referential integrity in the database.
+							This is actually the same as executing 'PRAGMA foreign_keys=true'.
+							The default is 'yes'.
+						</para>
+					</listitem>
+				</varlistentry>
+
+				<varlistentry>
+					<term>
+						<option>Profiling
+						<replaceable>yes</replaceable> | <replaceable>no</replaceable> 
+						</option>
+					</term>
+					<listitem>
+						<para>
+							Shows the SQL commands being executed and their execution
+							time in milliseconds. Default is 'no'.
+						</para>
+					</listitem>
+				</varlistentry>
+				
+				<varlistentry>
+					<term>
+						<option>Extension <replaceable>filename</replaceable></option>
+					</term>
+					<listitem>
+						<para>
+							Loads an SQLite3 extension module named
+							<replaceable>filename</replaceable>. This is useful
+							to load native code into SQLite3 imlementing for
+							instance new database functions.
+							Have a look at the SQLite3 'Run-Time Loadable Extensions'
+							section at
+							<ulink url="http://www.sqlite.org/loadext.html"/>.							
+						</para>
+					</listitem>
+				</varlistentry>
+				
+
+			</variablelist>
+		</para>
+		</refsect2>
+	</refsect1>
+
+	<refsect1 id="bugs">
+		<!-- Or use this section to tell about upstream BTS. -->
+		<title>BUGS</title>
+			<para>
+				Find issues and bugs on <acronym>Github</acronym> at
+				<ulink url="https://github.com/Wolframe/Wolframe/issues"/>.
+			</para>
+	</refsect1>
+	<refsect1 id="see_also">
+		<title>SEE ALSO</title>
+		<!-- In alpabetical order. -->
+		<para>
+			<citerefentry>
+				<refentrytitle>wolframe.conf</refentrytitle>
+				<manvolnum>5</manvolnum>
+			</citerefentry>
+		</para>
+	</refsect1>
+</refentry>

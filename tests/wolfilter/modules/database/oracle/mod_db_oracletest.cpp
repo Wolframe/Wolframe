@@ -30,33 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file  mod_db_oracletest.cpp
-/// \brief Module for a database implementation used for tests
-///  based on the postgres database module
-
+///\file mod_db_oracletest.cpp
+///\brief Database interface test module for Oracle
+#include "appdevel/databaseModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "OracleTest.hpp"
-#include "module/moduleInterface.hpp"
-#include "logger-v1.hpp"
 
-namespace _Wolframe {
-namespace module {
-
-typedef ConfiguredBuilder* (*CreateBuilderFunc)();
-
-static ConfiguredBuilder* createDatabase()
-{
-	static module::ConfiguredBuilderDescription< db::OracleTestConstructor,
-		db::OracleTestConfig > mod( "test Oracle database", "database", "OracleTest", db::ORACLE_DB_CLASS_NAME);
-	return &mod;
-}
-
-enum { NofObjects = 1 };
-static CreateBuilderFunc containers[ NofObjects] =
-{
-	createDatabase
-};
-
-ModuleEntryPoint entryPoint( 0, "Oracle test database", NofObjects, containers, 0, 0);
-
-}} // namespace _Wolframe::module
+WF_MODULE_BEGIN( "Oracle database", "Database interface module for Oracle")
+ WF_TEST_DATABASE( "OracleTest", _Wolframe::db::OracleDatabase, _Wolframe::db::OracleTestConfig, _Wolframe::db::OracleTestDatabaseInitializer)
+WF_MODULE_END
 

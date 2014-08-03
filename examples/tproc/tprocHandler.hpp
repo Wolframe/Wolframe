@@ -37,18 +37,19 @@
 #define _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #include "system/connectionHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "cmdbind/lineCommandHandler.hpp"
+#include "cmdbind/protocolHandler.hpp"
+#include "tprocProtocolFiles.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "handlerConfig.hpp"
-#include "protocol/ioblocks.hpp"
 
 namespace _Wolframe {
 namespace tproc {
 
-class CommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
+class ProtocolHandler :public cmdbind::LineProtocolHandlerTemplate<ProtocolHandler>
 {
 public:
-	CommandHandler( const cmdbind::LineCommandHandlerSTM* stm, const Configuration* cfg)
-		:cmdbind::LineCommandHandlerTemplate<CommandHandler>( stm),m_config(cfg){}
+	ProtocolHandler( const cmdbind::LineProtocolHandlerSTM* stm, const Configuration* cfg)
+		:cmdbind::LineProtocolHandlerTemplate<ProtocolHandler>( stm),m_config(cfg){}
 
 	//methods called by the protocol and implemented here
 	int doHello( int argc, const char** argv, std::ostream& out);
@@ -58,7 +59,7 @@ public:
 	int doCmd2A( int argc, const char** argv, std::ostream& out);
 	int doCmd2B( int argc, const char** argv, std::ostream& out);
 	int doCmd3A( int argc, const char** argv, std::ostream& out);
-	int endRun( cmdbind::CommandHandler* ch, std::ostream& out);
+	int endRun( cmdbind::ProtocolHandler* ch, std::ostream& out);
 	int doRun( int argc, const char** argv, std::ostream& out);
 	int doCmdQUIT( int argc, const char** argv, std::ostream& out);
 private:
@@ -71,14 +72,14 @@ class Connection : public net::ConnectionHandler
 {
 public:
 	///\brief Constructor
-	Connection( const net::LocalEndpoint& local, const Configuration* config);
+	Connection( const net::LocalEndpointR& local, const Configuration* config);
 
 	///\brief Destructor
 	virtual ~Connection();
 
 	///\brief Set the remote peer and indicate that the connection is up now.
 	///\param [in] remote remote peer
-	virtual void setPeer( const net::RemoteEndpoint& remote);
+	virtual void setPeer( const net::RemoteEndpointR& remote);
 
 	///\brief Handle a request and produce a reply (statemachine of the processor)
 	virtual const net::NetworkOperation nextOperation();
@@ -92,18 +93,18 @@ public:
 	///\brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
 	virtual void signalOccured( NetworkSignal);
 
-	///\brief Set the reference to the prcessor provider
-	void setProcessorProvider( proc::ProcessorProvider* provider_)
+	///\brief Set the execution context reference
+	///\param[in] c execution context reference
+	void setExecContext( proc::ExecContext* c)
 	{
-		m_cmdhandler.setProcProvider( provider_);
+		m_protocolhandler.setExecContext( c);
 	}
 
 private:
-	const Configuration* m_config;			//< configuration reference
-	CommandHandler m_cmdhandler;			//< top level instance executing commands
-	protocol::InputBlock m_input;			//< buffer for network read messages
-	protocol::OutputBlock m_output;			//< buffer for network write messages
-	bool m_terminated;				//< true, if a termination signal came from the network
+	ProtocolHandler m_protocolhandler;		///< top level instance executing commands
+	protocol::InputBlock m_input;			///< buffer for network read messages
+	protocol::OutputBlock m_output;			///< buffer for network write messages
+	bool m_terminated;				///< true, if a termination signal came from the network
 };
 } // namespace tproc
 
@@ -115,7 +116,7 @@ public:
 	ServerHandlerImpl( const HandlerConfiguration *config)
 		:m_config(config){}
 
-	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local);
+	net::ConnectionHandler* newConnection( const net::LocalEndpointR& local);
 private:
 	const HandlerConfiguration* m_config;
 };

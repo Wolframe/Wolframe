@@ -15,7 +15,6 @@
 # - testname		name of the test
 # - testcmd		command to execute by the test
 # - cset		character set encoding name
-# - testscripts		list of scripts of the test
 # - docin		input document name
 # - docout		output document name
 # - dumpout		(optional) file to dump to expected output too
@@ -66,23 +65,20 @@ fi
 if [ x"$testdata" != x ]; then
 	echo "$testdata" | sed "s/#FILTER#/$inputfilter/g" >> $output
 fi
-for script in $testscripts
-do
-	echo "**file: `basename $script`" >> $output
-	cat ../scripts/$script >> $output
-done
-echo '**output' >> $output
-if [ x"$docout" != x ]; then
-	if [ -f doc/$docout.UTF-8.$docformat ]; then
-		cat doc/$docout.UTF-8.$docformat | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
-		echo "" | recode UTF-8..$cset >> $output
-	elif [ -f doc/$docout.$docformat ]; then
-		cat doc/$docout.$docformat >> $output
-	else
-		echo "OUTPUT FILE doc/$docout.UTF-8.$docformat OR doc/$docout.$docformat NOT FOUND !"
+if [ x"$docout" != x ] || [ x"$dumpout" != "x" ]; then
+	echo '**output' >> $output
+	if [ x"$docout" != x ]; then
+		if [ -f doc/$docout.UTF-8.$docformat ]; then
+			cat doc/$docout.UTF-8.$docformat | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
+			echo "" | recode UTF-8..$cset >> $output
+		elif [ -f doc/$docout.$docformat ]; then
+			cat doc/$docout.$docformat >> $output
+		else
+			echo "OUTPUT FILE doc/$docout.UTF-8.$docformat OR doc/$docout.$docformat NOT FOUND !"
+		fi
 	fi
-fi
-if [ x"$dumpout" != "x" ]; then
-	cat $dumpout >> $output
+	if [ x"$dumpout" != "x" ]; then
+		cat $dumpout >> $output
+	fi
 fi
 echo '**end' >> $output

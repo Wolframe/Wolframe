@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_null_filter.cpp
-///\brief Filter implementation failing on read and write, but buffering one input chunk
+//\file filter_null_filter.cpp
+//\brief Filter implementation failing on read and write, but buffering one input chunk
 #include "filter/null_filter.hpp"
 
 using namespace _Wolframe;
@@ -38,34 +38,32 @@ using namespace langbind;
 
 namespace {
 
-///\class InputFilterImpl
-///\brief input filter failing on read, but buffering one input chunk
+//\class InputFilterImpl
+//\brief input filter failing on read, but buffering one input chunk
 struct InputFilterImpl :public InputFilter
 {
-	///\brief Constructor
+	//\brief Constructor
 	InputFilterImpl()
-		:types::TypeSignature("langbind::InputFilterImpl (null_filter)", __LINE__)
+		:InputFilter("null")
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false){}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	//\brief Copy constructor
+	//\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:types::TypeSignature("langbind::InputFilterImpl (null_filter)", __LINE__)
-		,InputFilter( o)
+		:InputFilter( o)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend){}
 
-	///\brief self copy
-	///\return copy of this
+	//\brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
+	//\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_src = (const char*)ptr;
@@ -73,23 +71,16 @@ struct InputFilterImpl :public InputFilter
 		m_srcsize = size;
 	}
 
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	{
-		ptr = m_src;
-		size = m_srcsize;
-		end = m_srcend;
-	}
-
-	virtual const char* getEncoding() const
-	{
-		return 0;
-	}
-
-	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	//\brief Implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType&, const void*&, std::size_t&)
 	{
 		setState( Error, "input filter not defined");
 		return false;
+	}
+
+	virtual const types::DocMetaData* getMetaData()
+	{
+		return getMetaDataRef().get();
 	}
 
 private:
@@ -98,34 +89,40 @@ private:
 	bool m_srcend;				//< true if end of message is in current chunk parsed
 };
 
-///\class OutputFilterImpl
-///\brief output filter filter failing on write
+//\class OutputFilterImpl
+//\brief output filter filter failing on write
 struct OutputFilterImpl :public OutputFilter
 {
-	///\brief Constructor
+	//\brief Constructor
 	OutputFilterImpl()
-		:types::TypeSignature("langbind::OutputFilterImpl (null_filter)", __LINE__){}
+		:OutputFilter("null"){}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	//\brief Copy constructor
+	//\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (null_filter)", __LINE__)
-		,OutputFilter(o){}
+		:OutputFilter(o){}
 
-	///\brief self copy
-	///\return copy of this
+	//\brief self copy
+	//\return copy of this
 	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
-	///\return false with error always
+	//\brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
+	//\return false with error always
 	bool print( OutputFilter::ElementType, const void*, std::size_t)
 	{
 		setState( Error, "output filter not defined");
 		return false;
 	}
+	virtual void getOutput( const void*& buf, std::size_t& bufsize)
+	{
+		buf = 0;
+		bufsize = 0;
+	}
+
+	virtual bool close(){return true;}
 };
 }//end anonymous namespace
 
@@ -139,12 +136,17 @@ struct NullFilter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createNullFilter( const std::string&, const std::string&)
+Filter _Wolframe::langbind::createNullFilter()
 {
 	return NullFilter();
 }
 
-Filter* _Wolframe::langbind::createNullFilterPtr( const std::string& name, const std::string& arg)
+Filter* _Wolframe::langbind::createNullFilterPtr( const std::string&, const std::vector<FilterArgument>& arg)
 {
-	return new Filter( createNullFilter( name, arg));
+	if (!arg.empty())
+	{
+		throw std::runtime_error("no arguments expected for null filter");
+	}
+	return new Filter( createNullFilter());
 }
+

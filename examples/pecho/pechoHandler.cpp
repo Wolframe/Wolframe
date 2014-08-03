@@ -31,8 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///\file pechoHandler.cpp
 
-#include "protocol/parser.hpp"
-#include "protocol/ioblocks.hpp"
+#include "pechoProtocolFiles.hpp"
 #include "pechoHandler.hpp"
 #include "logger-v1.hpp"
 
@@ -324,9 +323,9 @@ struct Connection::Private
 				case StartProcessing:
 				{
 					//read the rest of the line and reject more arguments than expected.
-					//go on with processing, if this is clear. do not cosnsume the first end of line because it could be
+					//go on with processing, if this is clear. do not consume the first end of line because it could be
 					//the first character of the EOF sequence.
-					input.resetEoD();
+					(void)input.skipEoD();
 					if (!ProtocolParser::skipSpaces( itr, eoM))
 					{
 						return readDataOp();;
@@ -397,42 +396,42 @@ struct Connection::Private
 };
 
 
-Connection::Connection( const net::LocalEndpoint& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
+Connection::Connection( const net::LocalEndpointR& local, unsigned int inputBufferSize, unsigned int outputBufferSize)
 {
-		data = new Private( inputBufferSize, outputBufferSize);
-		LOG_TRACE << "Created connection handler for " << local.toString();
+	data = new Private( inputBufferSize, outputBufferSize);
+	LOG_TRACE << "Created connection handler for " << local->toString();
 }
 
 Connection::~Connection()
 {
-		LOG_TRACE << "Connection handler destroyed";
-		delete data;
+	LOG_TRACE << "Connection handler destroyed";
+	delete data;
 }
 
-void Connection::setPeer( const net::RemoteEndpoint& remote)
+void Connection::setPeer( const net::RemoteEndpointR& remote)
 {
-		LOG_TRACE << "Peer set to " << remote.toString();
+	LOG_TRACE << "Peer set to " << remote->toString();
 }
 
 void Connection::networkInput( const void* bytes, std::size_t nofBytes)
 {
-		data->networkInput( bytes, nofBytes);
+	data->networkInput( bytes, nofBytes);
 }
 
 void Connection::signalOccured( NetworkSignal )
 {
-		data->signalTerminate();
+	data->signalTerminate();
 }
 
 const Connection::Operation Connection::nextOperation()
 {
-		return data->nextOperation();
+	return data->nextOperation();
 }
 
 /// ServerHandler PIMPL
-net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::ServerHandlerImpl::newConnection( const net::LocalEndpointR& local )
 {
-		return new pecho::Connection( local );
+	return new pecho::Connection( local );
 }
 
 
@@ -442,9 +441,9 @@ ServerHandler::ServerHandler( const HandlerConfiguration*,
 
 ServerHandler::~ServerHandler()  { delete m_impl; }
 
-net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpoint& local )
+net::ConnectionHandler* ServerHandler::newConnection( const net::LocalEndpointR& local )
 {
-		return m_impl->newConnection( local );
+	return m_impl->newConnection( local );
 }
 
 

@@ -30,22 +30,37 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/cppFormFunctionModuleMacros.hpp
-///\brief Macros and templates for building C++ an application form function module
+/// \file appdevel/cppFormFunctionModuleMacros.hpp
+/// \brief Macros and templates for building C++ an application form function module
 
-#include "appdevel/cppFormFunctionTemplate.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/module/cppFormFunctionTemplate.hpp"
+#include "appdevel/module/cppFormFunctionBuilder.hpp"
+#include "appdevel/module/cppFormFunctionTemplate.hpp"
 
-//\brief Marks the start if the Wolframe C++ form function module after the includes section.
-#define CPP_APPLICATION_FORM_FUNCTION_MODULE(NAME)\
-	static const char* _Wolframe__moduleName()\
+/// \brief Defines normalization function
+#define WF_FORM_FUNCTION(NAME,FUNCTION,OUTPUT,INPUT)\
+{\
+	struct Constructor\
 	{\
-	return NAME;\
-	}\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			_Wolframe::serialize::CppFormFunction func = _Wolframe::appdevel::CppFormFunction<OUTPUT,INPUT,FUNCTION>::declaration();\
+			return new _Wolframe::module::CppFormFunctionBuilder( "CppFormFunction_" NAME, NAME, func);\
+		}\
+	};\
+	(*this)(&Constructor ::impl);\
+}
 
-//\brief Marks the end if the Wolframe C++ form function module.
-//\param[in] NofObjects Number of functions to export from the module
-//\param[in] Objects Array of function declarations to export from the module
-#define CPP_APPLICATION_FORM_FUNCTION_MODULE_END( NofObjects, Objects)\
-	module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleName(), 0, 0, NofObjects, Objects);
-
+/// \brief Defines normalization function without return value (empty result)
+#define WF_FORM_PROCEDURE(NAME,PROCEDURE,INPUT)\
+{\
+	struct Constructor\
+	{\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			_Wolframe::serialize::CppFormFunction func = _Wolframe::appdevel::CppFormFunction<_Wolframe::serialize::EmptyStruct,INPUT,PROCEDURE>::declaration();\
+			return new _Wolframe::module::CppFormFunctionBuilder( "CppFormFunction_" NAME, NAME, func);\
+		}\
+	};\
+	(*this)(&Constructor ::impl);\
+}

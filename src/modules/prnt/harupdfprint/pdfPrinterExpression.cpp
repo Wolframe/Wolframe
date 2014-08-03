@@ -33,7 +33,7 @@ Project Wolframe.
 #include "pdfPrinterExpression.hpp"
 #include "pdfPrinterVariable.hpp"
 #include "utils/parseUtils.hpp"
-#include "utils/conversions.hpp"
+#include "types/conversions.hpp"
 #include "types/integer.hpp"
 #include <stdexcept>
 #include <iostream>
@@ -100,7 +100,7 @@ public:
 			for (++vi; vi != ve && *vi != '.'; ++vi,++m_fracdigits) xx.push_back(*vi);
 		}
 		if (vi != ve) throw std::runtime_error( "illegal variable value");
-		m_value = utils::toint_cast( xx);
+		m_value = types::toint_cast( xx);
 	}
 
 	explicit Number( const std::string& v)
@@ -239,7 +239,7 @@ public:
 
 	std::string tostring() const
 	{
-		std::string dg( utils::tostring_cast( m_value));
+		std::string dg( types::tostring_cast( m_value));
 		if (m_fracdigits < 0)
 		{
 			dg.append( (std::size_t)-m_fracdigits, '0');

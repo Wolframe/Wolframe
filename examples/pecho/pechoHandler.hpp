@@ -42,38 +42,38 @@ Project Wolframe.
 namespace _Wolframe {
 namespace pecho {
 
-   /// The connection handler
-   class Connection : public net::ConnectionHandler
-   {
-   public:
-      typedef net::NetworkOperation Operation;
+	/// The connection handler
+	class Connection : public net::ConnectionHandler
+	{
+	public:
+		typedef net::NetworkOperation Operation;
 
-      Connection( const net::LocalEndpoint& local, unsigned int inputBufferSize=128, unsigned int outputBufferSize=128);
+		Connection( const net::LocalEndpointR& local, unsigned int inputBufferSize=128, unsigned int outputBufferSize=128);
 
-      virtual ~Connection();
+		virtual ~Connection();
 
-      virtual void setPeer( const net::RemoteEndpoint& remote);
+		virtual void setPeer( const net::RemoteEndpointR& remote);
 
-      /// Handle a request and produce a reply.
-      virtual const Operation nextOperation();
-      virtual void networkInput( const void *begin, std::size_t bytesTransferred);
+		/// Handle a request and produce a reply.
+		virtual const Operation nextOperation();
+		virtual void networkInput( const void *begin, std::size_t bytesTransferred);
 
-      virtual void signalOccured( NetworkSignal);
+		virtual void signalOccured( NetworkSignal);
 
-   public:
-      struct Private;
-   private:
-      Private* data;
-   };
+	public:
+		struct Private;
+	private:
+		Private* data;
+	};
 
 } // namespace pecho
 
 /// The server handler container
-   class ServerHandler::ServerHandlerImpl
-   {
-   public:
-      net::ConnectionHandler* newConnection( const net::LocalEndpoint& local);
-   };
+	class ServerHandler::ServerHandlerImpl
+	{
+	public:
+		net::ConnectionHandler* newConnection( const net::LocalEndpointR& local);
+	};
 
 } // namespace _Wolframe
 

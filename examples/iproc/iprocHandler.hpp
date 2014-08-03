@@ -38,10 +38,12 @@
 #include "system/connectionHandler.hpp"
 #include "handlerConfig.hpp"
 #include "cmdbind/commandHandler.hpp"
+#include "cmdbind/protocolHandler.hpp"
+#include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
+#include "iprocProtocolFiles.hpp"
 #include "filter/filter.hpp"
-#include "protocol/ioblocks.hpp"
-#include "protocol/parser.hpp"
-#include "types/countedReference.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace iproc {
@@ -52,14 +54,14 @@ class Connection : public net::ConnectionHandler
 {
 public:
 	///\brief Constructor
-	Connection( const net::LocalEndpoint& local, const Configuration* config);
+	Connection( const net::LocalEndpointR& local, const Configuration* config);
 
 	///\brief Destructor
 	virtual ~Connection();
 
 	///\brief Set the remote peer and indicate that the connection is up now.
 	///\param [in] remote remote peer
-	virtual void setPeer( const net::RemoteEndpoint& remote);
+	virtual void setPeer( const net::RemoteEndpointR& remote);
 
 	///\brief Handle a request and produce a reply (statemachine of the processor)
 	virtual const net::NetworkOperation nextOperation();
@@ -74,9 +76,9 @@ public:
 	virtual void signalOccured( NetworkSignal);
 
 	///\brief Set the reference to the prcessor provider
-	void setProcessorProvider( proc::ProcessorProvider* provider_)
+	void setExecContext( proc::ExecContext* context_)
 	{
-		m_provider = provider_;
+		m_execContext = context_;
 	}
 
 private:
@@ -85,6 +87,7 @@ private:
 	enum State
 	{
 		Init,				//< start state, called first time in this session
+		StartCommand,			//< start parsing command
 		EnterCommand,			//< parse command
 		ParseArgs,			//< parse command arguments
 		ParseArgsEOL,			//< parse end of line after command arguments
@@ -96,7 +99,7 @@ private:
 	///\param [in] i state to get as string
 	static const char* stateName( State i)
 	{
-		static const char* ar[] = {"Init","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","Terminate"};
+		static const char* ar[] = {"Init","StartCommand","EnterCommand","ParseArgs","ParseArgsEOL","Processing","ProtocolError","Terminate"};
 		return ar[i];
 	}
 	///\enum State
@@ -120,8 +123,7 @@ private:
 
 	State m_state;								//< state of the processor (protocol main statemachine)
 
-	protocol::Buffer m_buffer;						//< context (sub state) for partly parsed input lines
-	protocol::CArgBuffer<protocol::Buffer> m_argBuffer;			//< buffer for the arguments
+	std::string m_argBuffer;						//< buffer for the arguments
 
 	protocol::InputBlock m_input;						//< buffer for network read messages
 	protocol::OutputBlock m_output;						//< buffer for network write messages
@@ -133,10 +135,10 @@ private:
 	protocol::InputBlock::iterator m_end;					//< iterator pointing to end of message buffer
 
 	const Configuration* m_config;						//< configuration
-	protocol::CmdParser<protocol::Buffer> m_parser;				//< context dependent command parser definition
+	protocol::CmdParser<std::string> m_parser;				//< context dependent command parser definition
 	int m_cmdidx;								//< command parsed
-	types::CountedReference<cmdbind::CommandHandler> m_cmdhandler;		//< currently executed command
-	proc::ProcessorProvider* m_provider;					//< processor provider
+	boost::shared_ptr<cmdbind::ProtocolHandler> m_protocolHandler;		//< currently executed command
+	proc::ExecContext* m_execContext;					//< execution context
 
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write
@@ -164,7 +166,7 @@ public:
 	ServerHandlerImpl( const HandlerConfiguration *config)
 		:m_config(config){}
 
-	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local);
+	net::ConnectionHandler* newConnection( const net::LocalEndpointR& local);
 private:
 	const HandlerConfiguration* m_config;
 };

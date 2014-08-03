@@ -1,9 +1,13 @@
-<chapter>
+<sect1>
 <title>Filters</title>
 <para>
-Filters describe the transformation of serialized data to a unified serialization of hierarchical structured data and back.
-The application does not care about data formats as long as there exists a filter providing
-the unified form of serialization.
+Filters describe the transformation of serialized data to a unified element sequence
+of hierarchical structured data and to document meta data and back. The application does 
+not care about data formats as long as there exists a filter providing the unified form 
+of data. This unified data format is represented as iterator visiting the nodes of the 
+document tree and plus a contract to level out language differences. 
+Additioally each document type has some metadata defined. A filter interprets all meta data
+it understands (his) and uses them for output.
 </para>
 <para>
 This chapter describes how filters for different data formats are linked to the logic tier. For each data format
@@ -22,4 +26,4 @@ of <application>Wolframe</application> has to be extended for its availability.
 	&AppFilterXML;
 	&AppFilterJSON;
 	&AppFilterXSLT;
-</chapter>
+</sect1>

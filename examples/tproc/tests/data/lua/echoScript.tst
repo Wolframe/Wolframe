@@ -11,10 +11,11 @@ CMD3A 4
 QUIT
 --file:echo.lua
 function run( )
-	input:as( filter( "char"))
+	input:as( provider.filter( "char"))
 	for ch,t in input:get() do
+		logger.printc( "OUTPUT [", ch, "]")
 		output:print( ch,t)
-		output:print( 'X')
+		output:print( '_')
 	end
 end
 --output
@@ -37,6 +38,7 @@ provider
 		lua
 		{
 			program echo.lua
+			filter char
 		}
 	}
 }

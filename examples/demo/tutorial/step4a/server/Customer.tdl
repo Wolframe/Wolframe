@@ -1,0 +1,24 @@
+TRANSACTION SelectCustomerList
+BEGIN
+	INTO customer DO SELECT * from Customer;
+END
+
+TEMPLATE <TableWithID> SUBROUTINE getLastInsertedID
+DATABASE PostgreSQL
+BEGIN
+	DO NONEMPTY UNIQUE SELECT DISTINCT currval( pg_get_serial_sequence( 'TableWithID', 'id'));
+END
+
+TEMPLATE <TableWithID> SUBROUTINE getLastInsertedID
+DATABASE SQLite
+BEGIN
+	DO NONEMPTY UNIQUE SELECT DISTINCT last_insert_rowid( ) AS "id" FROM TableWithID;
+END
+
+TRANSACTION insertCustomer
+BEGIN
+	DO INSERT INTO Customer (name,address) VALUES ($(name),$(address));
+	DO getLastInsertedID<Customer>();
+	INTO . DO SELECT * FROM Customer WHERE ID=$RESULT.id;
+END
+

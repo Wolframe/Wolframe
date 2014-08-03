@@ -1,0 +1,78 @@
+; ------------ Language
+STRUCT Language
+{
+    parentid    !@ID
+    name        !entityname
+    status        enumname
+    description    string
+}
+
+STRUCT LanguageTreeNode
+{
+    name        @entityname
+    status        @enumname
+    description    ?string
+    language    ^LanguageTreeNode[]
+}
+
+FORM LanguageTree
+    -root languages
+{
+    language LanguageTreeNode[]
+}
+
+STRUCT LanguageInserted
+{
+    id        !@ID
+    _        Language
+}
+
+STRUCT LanguageRef
+{
+    id        !@ID
+    _        entityname
+}
+
+STRUCT LanguageRefTreeNode
+{
+    id        !@ID
+    name        !entityname
+    language    ^LanguageRefTreeNode[]
+}
+
+FORM LanguageRefTree
+    -root languages
+{
+    language    LanguageRefTreeNode[]
+}
+
+FORM InsertLanguage    -root language        { _ Language }
+FORM UpdateLanguage    -root language        { _ LanguageInserted }
+FORM DeleteLanguage    -root language        { id !@ID }
+FORM GetLanguage    -root language        { id !@ID }
+FORM GetLanguageTreeNode -root language        { id !@ID }
+FORM GetLanguageTree    -root language        { }
+FORM GetLanguageTreeStructure -root language    { }
+FORM LanguageResult    -root language        { _ LanguageInserted }
+FORM LanguageListResult    -root languages        { language LanguageInserted[] }
+
+FORM LanguageSelection
+    -root language
+{
+    id        !@ID
+    name        !entityname
+}
+FORM LanguageSelectionRef
+    -root language
+{
+    id        !@ID
+}
+FORM LanguageSelectionList
+    -root language
+{
+    selected LanguageSelection[]
+}
+FORM SaveSelectedLanguageList    -root language        {selected LanguageSelectionRef[] }
+FORM GetLanguageList        -root language        {}
+FORM GetSelectedLanguageList    -root language        {selected LanguageSelectionRef[] }
+

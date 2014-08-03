@@ -33,19 +33,20 @@ recode lat1..ibmpc >> $output <<!TEST
 QUIT
 --file:echo.lua
 function run( )
-	f = filter( "libxml2")
+	f = provider.filter( "libxml2")
 	f.empty = false
 
 	input:as( f)
 	output:as( f)
 
 	for c,t in input:get() do
+		logger.printc( "VISIT ", t, " = ", c)
 		output:print( c, t)
 	end
 end
 --config
 !TEST
-./output_provider_cfg.sh echo.lua >> $output
+./output_provider_cfg.sh echo.lua char >> $output
 recode lat1..ibmpc >> $output <<!TEST
 --output
 OK enter cmd

@@ -37,6 +37,8 @@
 #include "types/customDataType.hpp"
 #include "types/variant.hpp"
 #include "dateArithmetic.hpp"
+#include <vector>
+#include <string>
 
 namespace _Wolframe {
 namespace types {
@@ -45,18 +47,26 @@ class DateDataInitializer
 	:public CustomDataInitializer
 {
 public:
-	DateDataInitializer( const std::string& description_)
-		:m_description( description_)
+	DateDataInitializer( const std::vector<types::Variant>& arg)
+		:m_format(0)
 	{
-		m_format = m_description.c_str();
+		if (arg.size() > 1) throw std::runtime_error("to many arguments in date initializer");
+		if (arg.size())
+		{
+			m_description = arg.at(0).tostring();
+			m_format = m_description.c_str();
+		}
 	}
 	virtual ~DateDataInitializer(){}
 
-	const char* format() const	{return m_format;}
-
-	static CustomDataInitializer* create( const std::string& description_)
+	const char* format() const
 	{
-		return new DateDataInitializer( description_);
+		return m_format;
+	}
+
+	static CustomDataInitializer* create( const std::vector<types::Variant>& arg)
+	{
+		return new DateDataInitializer( arg);
 	}
 
 private:
@@ -96,38 +106,15 @@ public:
 
 	virtual ~DateDataValue(){};
 
-	virtual int compare( const CustomDataValue& o) const
-	{
-		if (o.type() != type())
-		{
-			return ((uintptr_t)type() > (uintptr_t)o.type())?1:-1;
-		}
-		else
-		{
-			const DateDataValue* odt = reinterpret_cast<const DateDataValue*>(&o);
-			int rt = -1;
-			rt += (int)(Date::operator>=(*odt));
-			rt += (int)(Date::operator>(*odt));
-			return rt;
-		}
-	}
+	virtual int compare( const CustomDataValue& o) const;
 
 	virtual std::string tostring() const
 	{
 		return Date::tostring( format());
 	}
 
-	virtual void assign( const Variant& o)
-	{
-		if (o.type() == Variant::String)
-		{
-			Date::operator=( Date( o.tostring()));
-		}
-		else
-		{
-			Date::operator=( Date(1970,1,1) + o.toint());
-		}
-	}
+	virtual void assign( const Variant& o);
+	virtual bool getBaseTypeValue( Variant& dest) const;
 
 	virtual CustomDataValue* copy() const
 	{
@@ -153,8 +140,11 @@ public:
 		define( Decrement, &decrement);
 		define( Add, &add);
 		define( Subtract, &subtract);
-		define( ToTimestamp, &toTimestamp);
 		define( ToInt, &toInt);
+		define( "year", &getYear);
+		define( "month", &getMonth);
+		define( "day", &getDay);
+		define( "unixdate", &toUnixDate);
 	}
 
 	static CustomDataType* create( const std::string& name)
@@ -163,11 +153,14 @@ public:
 	}
 
 private:
+	static types::Variant getYear( const CustomDataValue& operand, const std::vector<types::Variant>& arg);
+	static types::Variant getMonth( const CustomDataValue& operand, const std::vector<types::Variant>& arg);
+	static types::Variant getDay( const CustomDataValue& operand, const std::vector<types::Variant>& arg);
+	static types::Variant toUnixDate( const CustomDataValue& operand, const std::vector<types::Variant>& arg);
 	static types::Variant increment( const CustomDataValue& operand);
 	static types::Variant decrement( const CustomDataValue& operand);
 	static types::Variant add( const CustomDataValue& operand, const Variant& arg);
 	static types::Variant subtract( const CustomDataValue& operand, const Variant& arg);
-	static types::Variant toTimestamp( const CustomDataValue& operand);
 	static types::Variant toInt( const CustomDataValue& operand);
 };
 

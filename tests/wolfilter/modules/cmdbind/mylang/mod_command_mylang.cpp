@@ -32,27 +32,10 @@
 ************************************************************************/
 ///\file mod_command_mylang.cpp
 ///\brief Example module for a new language binding
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/programTypeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "mylangFunctionProgramType.hpp"
-#include "logger-v1.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-
-static SimpleBuilder* mylangProgramTypeBuilder()
-{
-	return new ProgramTypeBuilder( "MylangProgramType", "mylang", langbind::createMylangProgramType);
-}
-
-enum {NofConfiguredBuilder=0};
-enum {NofSimpleBuilder=1};
-static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
-{
-	mylangProgramTypeBuilder
-};
-
-ModuleEntryPoint entryPoint( 0, "form function handler for mylang",
-				NofConfiguredBuilder, 0,
-				NofSimpleBuilder, simpleBuilder);
-
-
+WF_MODULE_BEGIN( "MylangProgramType", "example language binding")
+ WF_PROGRAM_TYPE( "mylang", _Wolframe::langbind::MylangProgramType)
+WF_MODULE_END

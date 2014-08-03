@@ -16,21 +16,24 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwolframe_database \
 	-lboost_filesystem \
+	$(TOPDIR)/src/modules/database/sqlite3/mod_db_sqlite3_lib.a \
+	-lwolframe_database \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
 	$(SQLITE3_LIBS)
 
 DYNAMIC_MODULE = \
 	mod_db_sqlite3test.so
 
 CPP_OBJS = \
-	SQLiteModuleFiles.o \
 	SQLiteTest.o \
-	mod_db_sqlite3test.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -38,10 +38,12 @@
 #define _Wolframe_HANDLER_HPP_INCLUDED
 
 #include "system/connectionHandler.hpp"
-#include "protocol/ioblocks.hpp"
+#include "processor/execContext.hpp"
+#include "cmdbind/protocolHandler.hpp"
 #include "database/database.hpp"
 #include "AAAA/AAAAprovider.hpp"
 #include "processor/procProvider.hpp"
+#include "processor/execContext.hpp"
 #include "mainConnectionHandler.hpp"
 
 namespace _Wolframe {
@@ -58,6 +60,7 @@ public:
 	const db::DatabaseProvider& db() const		{ return m_db; }
 	const AAAA::AAAAprovider& aaaa() const		{ return m_aaaa; }
 	const proc::ProcessorProvider& proc() const	{ return m_proc; }
+
 private:
 	const std::string		m_banner;
 	db::DatabaseProvider		m_db;
@@ -71,10 +74,10 @@ private:
 class wolframeConnection : public net::ConnectionHandler
 {
 public:
-	wolframeConnection( const WolframeHandler& context, const net::LocalEndpoint& local );
+	wolframeConnection( const WolframeHandler& context, const net::LocalEndpointR& local );
 	~wolframeConnection();
 
-	void setPeer( const net::RemoteEndpoint& remote );
+	void setPeer( const net::RemoteEndpointR& remote );
 
 	/// Parse / get the incoming data.
 	void networkInput( const void *begin, std::size_t bytesTransferred );
@@ -108,46 +111,32 @@ private:
 		return names[ state ];
 	}
 
-	///\enum Commands
-	///\brief Enumeration of commands in the protocol at first FSM level
-	enum Command	{
-		EMPTY,				///< empty line (to not get an error for no command)
-		CAPABILITIES,			///< get the protocol capabilities
-		HELP,				///< print a help text to the client
-		QUIT				///< BYE and terminate
-	};
-
-	///\brief Returns the command name as string for instantiating the protocol command parser
-	static const char* commandName( Command cmd )
-	{
-		const char* names[] = { "EMPTY", "CAPABILITIES", "HELP", "QUIT", NULL };
-		return names[ cmd ];
-	}
-
 	/// Back link to global context
 	const WolframeHandler&		m_globalCtx;
-///*************
+
 	AAAA::Authenticator*		m_authentication;
 	AAAA::Authorizer*		m_authorization;
 	AAAA::Auditor*			m_audit;
-//	AAAA::Accountant*		m_accounting;
-///*************
-//	proc::Processor*		m_proc;
 
-	const net::LocalEndpoint*	m_localEP;		///< local endpoint
-	const net::RemoteEndpoint*	m_remoteEP;		///< remote endpoint
+	net::LocalEndpointR		m_localEP;		///< local endpoint
+	net::RemoteEndpointR		m_remoteEP;		///< remote endpoint
 
 	FSMstate			m_state;		///< top processor FSM state
 
-	protocol::InputBlock		m_readBuf;		///< network read buffer
-	protocol::OutputBlock		m_outputBuf;
+	void* m_input;						///< buffer for read messages
+	std::size_t m_inputsize;				///< allocation size of m_input in bytes
+	std::size_t m_inputpos;
+	void* m_output;						///< buffer for write messages
+	std::size_t m_outputsize;				///< allocation size of m_output in bytes
+
 	char*				m_dataStart;
 	std::size_t			m_dataSize;
-	/// Output buffer
-	std::string			m_outMsg;
 
-	// Adding protocol
-	proc::CommandHandler		m_cmdHandler;
+	std::string			m_outMsg;		///< output buffer for initial handshake messages
+	std::string			m_endDataSessionMarker;	///< buffer for message to interrupt data session for the client
+
+	proc::ExecContext		m_execContext;		///< execution context of the connection
+	cmdbind::ProtocolHandlerR	m_protocolHandler;	///< protocol handler
 };
 
 /// The server handler container
@@ -157,7 +146,7 @@ public:
 	ServerHandlerImpl( const HandlerConfiguration* conf,
 			   const module::ModulesDirectory* modules );
 	~ServerHandlerImpl();
-	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
+	net::ConnectionHandler* newConnection( const net::LocalEndpointR& local );
 private:
 	WolframeHandler	m_globalContext;
 };

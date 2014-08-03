@@ -31,31 +31,12 @@
 
 ************************************************************************/
 ///\file mod_filter_cjson.cpp
-///\brief Module for JSON filters based on the cJSON library
-#include "module/filterBuilder.hpp"
-#include "module/programTypeBuilder.hpp"
+///\brief Module for JSON filter based on the cJSON library
+#include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "cjson_filter.hpp"
-#include "logger-v1.hpp"
-#include <cstring>
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-namespace lb = _Wolframe::langbind;
-
-namespace {
-struct CJsonFilterObject
-{
-	static SimpleBuilder* filter_builder()
-		{return new FilterBuilder( "CJsonFilter", "cjson", lb::createCJsonFilterType);}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	CJsonFilterObject::filter_builder
-};
-
-ModuleEntryPoint entryPoint( 0, "JSON (cJSON) filter", 0, 0, NofObjects, objdef);
-
+WF_MODULE_BEGIN( "jsonFilter", "JSON filter based on cJSON")
+ WF_FILTER_TYPE( "cjson", _Wolframe::langbind::CJsonFilterType)
+WF_MODULE_END
 

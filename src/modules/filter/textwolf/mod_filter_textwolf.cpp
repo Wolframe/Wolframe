@@ -31,31 +31,11 @@
 
 ************************************************************************/
 ///\file mod_filter_textwolf.cpp
-///\brief Module for textwolf XML filters
-#include "module/filterBuilder.hpp"
+///\brief Module for an XML filter based on textwolf
+#include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "textwolf_filter.hpp"
-#include "logger-v1.hpp"
-#include <cstring>
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-namespace lb = _Wolframe::langbind;
-
-namespace {
-
-struct TextwolfXMLFilterObject
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder( "TextwolfXMLFilter", "textwolf", lb::createTextwolfXmlFilterType);}
-};
-
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	TextwolfXMLFilterObject::builder
-};
-
-
-ModuleEntryPoint entryPoint( 0, "textwolf XML filter", 0, 0, NofObjects, objdef);
+WF_MODULE_BEGIN( "textwolfFilter", "xml filter based on textwolf")
+ WF_FILTER_TYPE( "textwolf", _Wolframe::langbind::TextwolfXmlFilterType)
+WF_MODULE_END

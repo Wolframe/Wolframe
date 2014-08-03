@@ -18,28 +18,34 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	"$(ORACLE_DIR)\sdk\lib\msvc\oci.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_db_oracle.dll
 
+STATIC_LIB = \
+	static_db_oracle.lib
+
 CPP_OBJS = \
 	OracleConfig.obj \
-	OracleConstructor.obj \
 	Oracle.obj \
 	OracleTransactionExecStatemachine.obj \
-	OracleStatement.obj \
-	OracleProgram.obj \
-	OracleModule.obj
+	OracleStatement.obj
 
-all: $(DYNAMIC_MODULE)
+all: $(DYNAMIC_MODULE) $(STATIC_LIB)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:OracleModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_oracle.obj
+	$(LINK) /dll /def:mod_db_oracle.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+$(STATIC_LIB): $(CPP_OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
 
 local_all:
 

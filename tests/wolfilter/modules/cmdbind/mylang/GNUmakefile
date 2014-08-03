@@ -16,9 +16,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwolframe_langbind \
-	$(LIBS_DL)
-
+	-lwolframe_langbind
 
 DYNAMIC_MODULE = mod_command_mylang.so
 
@@ -27,8 +25,7 @@ CPP_OBJS = \
 	mylangInterpreter.o \
 	mylangStructure.o \
 	mylangStructureBuilder.o \
-	mylangFunctionProgramType.o \
-	mod_command_mylang.o
+	mylangFunctionProgramType.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

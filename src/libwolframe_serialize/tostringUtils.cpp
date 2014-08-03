@@ -33,7 +33,7 @@
 ///\brief Implementation of tostring utility functions
 ///\file tostringUtils.cpp
 #include "serialize/tostringUtils.hpp"
-#include "serialize/ddl/filtermapDDLSerialize.hpp"
+#include "serialize/ddl/ddlStructSerializer.hpp"
 #include "filter/tostringfilter.hpp"
 
 using namespace _Wolframe;
@@ -64,6 +64,7 @@ std::string serialize::typedInputFilterToString( const langbind::TypedInputFilte
 	}
 	switch (inp->state())
 	{
+		case langbind::InputFilter::Start: break;
 		case langbind::InputFilter::Open: break;
 		case langbind::InputFilter::Error: throw std::runtime_error( inp->getError());
 		case langbind::InputFilter::EndOfMessage: throw std::runtime_error( "input not complete and cannot yield execution here. tostring failed");

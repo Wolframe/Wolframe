@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/xmlpathautomaton.hpp
+/// \brief Automaton to select path expressions from an XML iterator
+
 #ifndef __TEXTWOLF_XML_PATH_AUTOMATON_HPP__
 #define __TEXTWOLF_XML_PATH_AUTOMATON_HPP__
 #include "textwolf/char.hpp"
@@ -713,14 +716,14 @@ public:
 		///\return *this
 		PathElement& selectAttribute( const char* name) throw(exception)		{return doSelect( Attribute, name).defineOutput( ThisAttributeValue);}
 
-		//\brief Find tag with one attribute,value condition
+		///\brief Find tag with one attribute,value condition
 		///\remark same as ifAttribute(const char*,const char*)
 		///\param [in] name name of the attribute
 		///\param [in] value value of the attribute
 		///\return *this
 		PathElement& operator ()( const char* name, const char* value) throw(exception)	{return doSelect( Attribute, name).doSelect( ThisAttributeValue, value);}
 
-		//\brief Find tag with one attribute,value condition
+		///\brief Find tag with one attribute,value condition
 		///\param [in] name name of the attribute
 		///\param [in] value value of the attribute
 		///\return *this

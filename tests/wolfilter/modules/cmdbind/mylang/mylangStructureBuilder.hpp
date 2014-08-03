@@ -35,7 +35,6 @@ Project Wolframe.
 #define _Wolframe_Mylang_STRUCTURE_BUILDER_HPP_INCLUDED
 #include "mylangStructure.hpp"
 #include "types/variant.hpp"
-#include "types/countedReference.hpp"
 #include "utils/printFormats.hpp"
 #include <vector>
 #include <string>

@@ -30,13 +30,15 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file luaObjects.hpp
-///\brief interface to system objects for processor language bindings
+///\brief Interface to handling and executing Lua scripts
 #ifndef _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #include "luaDump.hpp"
 #include "filter/filter.hpp"
-#include "langbind/appObjects.hpp"
-#include "processor/procProvider.hpp"
+#include "langbind/input.hpp"
+#include "langbind/output.hpp"
+#include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <map>
 #include <list>
 #include <boost/shared_ptr.hpp>
@@ -75,10 +77,12 @@ public:
 	const LuaDump* content() const					{return m_content.get();}
 
 private:
-	std::vector<std::string> m_functions;
-	std::string m_path;
-	boost::shared_ptr<LuaDump> m_content;
+	std::vector<std::string> m_functions;	//< list of exported functions implemented in the script
+	std::string m_path;			//< path of the stript for error messages
+	boost::shared_ptr<LuaDump> m_content;	//< binary dump of the script
 };
+
+typedef boost::shared_ptr<LuaScript> LuaScriptR;
 
 
 ///\class LuaModuleMap
@@ -103,7 +107,7 @@ public:
 	///\param[in] script script executed by this instance
 	///\param[in] modulemap_ map of modules that can be loaded
 	LuaScriptInstance( const LuaScript* script, const LuaModuleMap* modulemap_);
-	~LuaScriptInstance();
+	virtual ~LuaScriptInstance();
 
 	lua_State* ls()				{return m_ls;}
 	lua_State* thread()			{return m_thread;}
@@ -115,12 +119,12 @@ public:
 	///\brief Create the context for executing a Lua script with all objects initialized
 	///\param[in] input_ input definition for the input to process
 	///\param[in] output_ output definition for the output to print
-	///\param[in] provider_ processor provider for allocation of objects accessed
-	void init( const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_);
+	///\param[in] ctx_ execution context
+	void init( const Input& input_, const Output& output_, proc::ExecContext* ctx_);
 
 	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
-	///\param[in] provider_ processor provider for allocation of objects accessed
-	void init( const proc::ProcessorProvider* provider_);
+	///\param[in] ctx_ execution context
+	void init( proc::ExecContext* ctx_);
 
 	///\brief Fetch a lua object as typed input filter from the lua stack of the executed lua thread context
 	///\param[in] idx index of the object on the lua stack
@@ -133,9 +137,9 @@ public:
 
 private:
 	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
-	///\param[in] provider_ processor provider for allocation of objects accessed
+	///\param[in] ctx_ execution context
 	///\param[in] callMain wheter to call the script for initialization of its objects or not
-	void initbase( const proc::ProcessorProvider* provider_, bool callMain);
+	void initbase( proc::ExecContext* ctx_, bool callMain);
 
 private:
 	friend class LuaScript;
@@ -150,6 +154,7 @@ private:
 	LuaScriptInstance( const LuaScriptInstance&){} //non copyable
 };
 
+/// \brief Lua script reference
 typedef boost::shared_ptr<LuaScriptInstance> LuaScriptInstanceR;
 
 
@@ -163,23 +168,23 @@ public:
 		:m_modulemap(modulemap_){}
 
 	///\brief Destructor
-	virtual ~LuaFunctionMap();
+	virtual ~LuaFunctionMap(){}
 
 	///\brief Define a lua function
 	///\param[in] procname name of the function
 	///\param[in] script with the function
 	void defineLuaFunction( const std::string& procname, const LuaScript& script);
-	///\brief Get an empty the context for a Lua script
-	bool getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const;
+	///\brief Get an empty interpreter instance for a Lua script
+	LuaScriptInstance* createLuaScriptInstance( const std::string& procname) const;
 
 	///\brief Get the list of commands
-	std::list<std::string> commands() const;
+	std::vector<std::string> commands() const;
 
 private:
 	LuaFunctionMap( const LuaFunctionMap&){}	//non copyable
 
 private:
-	std::vector<LuaScript*> m_ar;
+	std::vector<LuaScriptR> m_ar;
 	std::map<std::string,std::size_t> m_pathmap;
 	std::map<std::string,std::size_t> m_procmap;
 	const LuaModuleMap* m_modulemap;

@@ -83,19 +83,76 @@ void SaslAuthConfig::setCanonicalPathes( const std::string& refPath )
 	}
 }
 
-SaslAuthenticator::SaslAuthenticator( const std::string& Identifier,
+//*********   SASL Authentication Unit   ************************************
+
+SaslAuthUnit::SaslAuthUnit( const std::string& Identifier,
 		   const std::string& service, const std::string& confPath )
 	: AuthenticationUnit( Identifier ),
 	  m_service( service ), m_confPath( confPath )
 {
-	LOG_DEBUG << "SASL authenticator created for service '" << m_service << "'";
+	LOG_DEBUG << "SASL authentication unit created for service '" << m_service << "'";
 	if( !m_confPath.empty( ) ) {
 		LOG_DEBUG << "     and with SASL configuration '" << confPath << "'";
 	}
 }
 
-SaslAuthenticator::~SaslAuthenticator()
+SaslAuthUnit::~SaslAuthUnit()
 {
+}
+
+const char** SaslAuthUnit::mechs() const
+{
+	static const char* m[] = { "WOLFRAME-SASL", NULL };
+	return m;
+}
+
+AuthenticatorSlice* SaslAuthUnit::slice( const std::string& /*mech*/,
+					const net::RemoteEndpoint& /*client*/ )
+{
+	return new SaslAuthSlice( *this );
+}
+
+User* SaslAuthUnit::authenticatePlain(	const std::string& /*username*/,
+					const std::string& /*password*/ ) const
+{
+	return NULL;
+}
+
+SaslAuthSlice::SaslAuthSlice( const SaslAuthUnit& backend )
+	: m_backend( backend )
+{
+}
+
+SaslAuthSlice::~SaslAuthSlice()
+{
+}
+
+void SaslAuthSlice::dispose()
+{
+	delete this;
+}
+
+/// The input message
+void SaslAuthSlice::messageIn( const std::string& /*message*/ )
+{
+}
+
+/// The output message
+std::string SaslAuthSlice::messageOut()
+{	
+	return std::string( );
+}
+
+/// The current status of the authenticator slice
+AuthenticatorSlice::Status SaslAuthSlice::status() const
+{
+	return SYSTEM_FAILURE;
+}
+	
+/// The authenticated user or NULL if not authenticated
+User* SaslAuthSlice::user()
+{
+	return NULL;
 }
 
 }} // namespace _Wolframe::AAAA

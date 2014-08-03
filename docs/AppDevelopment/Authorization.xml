@@ -1,0 +1,63 @@
+<sect1>
+	<title>Authorization</title>
+	<para>Authorization in Wolframe has two levels.
+	The first level is authorization based on connection info, e.g. 
+	is a client allowed/denied to connect from a certain ip or network.
+	Connection info based authorization happens on connect to the server.
+	</para>
+	<para>
+	The second level is command authorization based on identity 
+	(user attributes, connection characteristics) that is
+	done on execution of a function. Identity based authorization can
+	can be defined for the access of resources. It's is up to us
+	to define the access control matrix 
+	</para>
+	<sect2>
+		<title>Authorization based on connection info</title>
+		<para>The authorization based on connection info is implemented
+		in the server configuration as IP restrictions (see 
+		<link linkend="sectionIpRestrictions">chapter "IP restrictions"</link>).
+		</para>
+	</sect2>
+	<sect2>
+		<title>Authorization based on identity</title>
+		<para>
+		Authorization 
+		The aspect of authorization is configured in the 
+			subsection <code>Authorization</code> of the <code>AAAA</code> section
+			in the server configuration.
+
+		The only working configuration is the
+		default <code>Authorization</code> configuration with 
+		the setting to allow access to anybody authenticated 
+		that is not explicitely denied:
+		<programlisting language='text'>
+AAAA
+{
+    Authorization
+    {
+        Authorization {
+            default allow
+        }
+    }
+}
+		</programlisting>
+		</para>
+	</sect2>
+	<sect2>
+	<title>Command execution authorization</title>
+		<sect3>
+		<title>Development status</title>
+		<para>The command execution authorization is not implemented 
+		yet completely. The idea is to have programs that map
+		authorization function calls to Wolframe function calls.
+		The language to describe these programs is not yet defined.
+		The mechanism to map the authorize requests to the function
+		calls already exists.
+		Authorization based on command execution
+		will be a subject of the next release.
+		</para>
+		</sect3>
+	</sect2>
+</sect1>
+

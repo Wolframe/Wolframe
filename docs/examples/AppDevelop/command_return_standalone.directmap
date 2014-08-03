@@ -1,2 +1,4 @@
 
-COMMAND process Document CALL doProcessDocument RETURN STANDALONE list;
+COMMAND process Document
+	CALL doProcessDocument
+	RETURN SKIP {standalone='yes',root='list'};

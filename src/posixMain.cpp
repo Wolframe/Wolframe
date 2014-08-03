@@ -72,6 +72,7 @@
 #include <grp.h>
 #include <pwd.h>
 #include <boost/interprocess/sync/file_lock.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 // Solaris has no BSD daemon function, provide our own
@@ -187,8 +188,11 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		}
 
-		_Wolframe::module::ModulesDirectory modDir;
+		std::string configurationPath = boost::filesystem::path( configFile).branch_path().string();
+
+		_Wolframe::module::ModulesDirectory modDir( configurationPath);
 		_Wolframe::config::ApplicationConfiguration conf;
+		conf.addModules( &modDir );
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
 				_Wolframe::config::ApplicationConfiguration::fileType( configFile, cmdLineCfg.cfgType );
@@ -196,9 +200,8 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		if ( !conf.parseModules( configFile, cfgType ))
 			return _Wolframe::ErrorCode::FAILURE;
-		if ( ! _Wolframe::module::LoadModules( modDir, conf.moduleList() ))
+		if ( ! modDir.loadModules( conf.moduleList() ))
 			return _Wolframe::ErrorCode::FAILURE;
-		conf.addModules( &modDir );
 		if ( !conf.parse( configFile, cfgType ))
 			return _Wolframe::ErrorCode::FAILURE;
 

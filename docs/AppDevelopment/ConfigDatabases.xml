@@ -1,0 +1,12 @@
+<sect1>
+	<title>Database configuration</title>
+	<para>
+	The Databases for Wolframe are configured in the <code>Database</code>
+	section of the configuration.
+	</para>
+
+	&AppConfigDatabasePostgreSQL;
+	&AppConfigDatabaseSqlite;
+	&AppConfigDatabaseOracle;
+</sect1>
+

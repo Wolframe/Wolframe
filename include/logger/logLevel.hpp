@@ -38,13 +38,20 @@
 #ifndef _LOG_LEVEL_HPP_INCLUDED
 #define _LOG_LEVEL_HPP_INCLUDED
 
+#if defined( _MSC_VER )
+	#define WOLFRAME_EXPORT __declspec( dllexport )
+#else
+	#define WOLFRAME_EXPORT
+#endif
+
 #include <string>
 #include <iosfwd>
 
 namespace _Wolframe	{
 namespace log	{
 
-class LogLevel
+/// Logger levels describing the severity of the logged message
+class WOLFRAME_EXPORT LogLevel
 {
 public:
 	enum Level	{
@@ -68,7 +75,7 @@ public:
 };
 
 
-/// output loglevel to an output stream
+/// Output loglevel to an output stream
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< CharT, TraitsT >& s,
 							  LogLevel::Level l )

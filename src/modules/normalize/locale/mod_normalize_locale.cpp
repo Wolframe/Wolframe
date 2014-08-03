@@ -30,51 +30,26 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/locale/mod_normalize_locale.hpp
+///\file mod_normalize_locale.hpp
 ///\brief Module for normalization functions based on boost locale (ICU)
-#include "module/normalizeFunctionBuilder.hpp"
+#include "appdevel/normalizeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "logger-v1.hpp"
 #include "localeNormalize.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+using namespace _Wolframe::langbind;
 
-static types::NormalizeResourceHandle* createLocaleResourceHandle()
-{
-	return new langbind::LocaleResourceHandle();
-}
-
-static NormalizeFunctionDef normalizeFunctions[] =
-{
-	{"tolower", &langbind::create_tolower_NormalizeFunction},
-	{"toupper", &langbind::create_toupper_NormalizeFunction},
-	{"totitle", &langbind::create_totitle_NormalizeFunction},
-	{"foldcase", &langbind::create_foldcase_NormalizeFunction},
-	{"conv_nfd", &langbind::create_nfd_NormalizeFunction},
-	{"conv_nfc", &langbind::create_nfc_NormalizeFunction},
-	{"conv_nfkd", &langbind::create_nfkd_NormalizeFunction},
-	{"conv_nfkc", &langbind::create_nfkc_NormalizeFunction},
-	{"latinword", &langbind::create_latinword_NormalizeFunction},
-	{"ascii_de", &langbind::create_ascii_de_NormalizeFunction},
-	{"ascii_eu", &langbind::create_ascii_eu_NormalizeFunction},
-	{0,0}
-};
-
-namespace {
-struct NormalizeProcessor
-{
-	static SimpleBuilder* builder()
-	{
-		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", normalizeFunctions, &createLocaleResourceHandle);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	NormalizeProcessor::builder
-};
-
-ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", 0, 0, NofObjects, objdef);
-
+WF_MODULE_BEGIN( "Base64Normalizer", "base 64 encoding/decoding as normalization functions")
+ WF_NORMALIZER_RESOURCE( LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "tolower", ToLowerNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "toupper", ToUpperNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "totitle", ToTitleNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "foldcase", ToFoldcaseNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "conv_nfd", NFDNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "conv_nfc", NFCNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "conv_nfkd", NFKDNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "conv_nfkc", NFKCNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "latinword", LatinwordNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "ascii_de", AsciiDeNormalizeFunction, LocaleResourceHandle)
+ WF_NORMALIZER_WITH_RESOURCE( "ascii_eu", AsciiEuNormalizeFunction, LocaleResourceHandle)
+WF_MODULE_END

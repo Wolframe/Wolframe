@@ -30,14 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// Sort of a pseudo-singleton
-//
+/// \file system/globalRngGen.hpp
+/// \brief Global random generator 
 
 #ifndef _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 #define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 
 #include <string>
+#include <system/randomGenerator.hpp>
 
 #if defined( _MSC_VER )
 	#define WOLFRAME_EXPORT __declspec( dllexport )
@@ -47,13 +47,15 @@
 
 namespace _Wolframe	{
 
-class RandomGenerator
+/// \class GlobalRandomGenerator
+/// \brief Global random generator (sort of a pseudo-singleton)
+class GlobalRandomGenerator : public crypto::RandomGenerator
 {
 public:
-	~RandomGenerator();
+	~GlobalRandomGenerator();
 
-	WOLFRAME_EXPORT static RandomGenerator& instance();
-	WOLFRAME_EXPORT static RandomGenerator& instance( const std::string &rndDev );
+	WOLFRAME_EXPORT static GlobalRandomGenerator& instance();
+	WOLFRAME_EXPORT static GlobalRandomGenerator& instance( const std::string &rndDev );
 
 	WOLFRAME_EXPORT void device( const std::string &rndDev );
 	WOLFRAME_EXPORT const std::string& device() const;
@@ -61,13 +63,13 @@ public:
 	WOLFRAME_EXPORT void generate( unsigned char* buffer, size_t bytes ) const;
 
 protected:
-	RandomGenerator();
-	RandomGenerator( const std::string &rndDev );
+	GlobalRandomGenerator();
+	GlobalRandomGenerator( const std::string &rndDev );
 
 private:
 	// make it noncopyable
-	RandomGenerator( const RandomGenerator& );
-	const RandomGenerator& operator= ( const RandomGenerator& );
+	GlobalRandomGenerator( const GlobalRandomGenerator& );
+	const GlobalRandomGenerator& operator= ( const GlobalRandomGenerator& );
 
 	// Real object data
 	std::string	m_device;		///< random generator device

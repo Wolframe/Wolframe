@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// Header file for the Version class
-///
+/// \file version.hpp
+/// \brief Header file for the Version class
 
 #ifndef _VERSION_HPP_INCLUDED
 #define _VERSION_HPP_INCLUDED
@@ -51,24 +50,40 @@ private:
 	unsigned	m_build;		///< Build number.
 	bool		m_hasBuild;		///< Is build number present ?
 public:
-	/// Empty Version constructor.
-	Version();
-	///\brief Parse a version string
-	///\param[in] version the version string to parse
-	///\param[in] format the format string of the version:
-	//	%M = Major version
-	//	%m = Minor version
-	//	%r = revision
-	//	%b = build number
-	//	%% = %
-	//	%| = Accepted end of version string (if the version string ends here, the input is accepted. If not parsing is continued with the rest of the format string as pattern)
+	/// \brief Empty Version constructor.
+	/// This will contruct a Version object having major and minor versions set to 0,
+	/// no revision number and no build number.
+	Version()
+		: m_major( 0 ), m_minor( 0 ),
+		  m_revision( 0 ), m_hasRevision( false ),
+		  m_build( 0 ), m_hasBuild( false )
+	{}
+	Version( const Version& o)
+		: m_major( o.m_major ), m_minor( o.m_minor ),
+		  m_revision( o.m_revision ), m_hasRevision( o.m_hasRevision ),
+		  m_build( o.m_build ), m_hasBuild( o.m_hasBuild )
+	{}
+
+	/// \brief	Parse a version string
+	/// \param[in]	version the version string to parse
+	/// \param[in]	format the format string of the version:
+	/// \li		%M = Major version
+	/// \li		%m = Minor version
+	/// \li		%r = revision
+	/// \li		%b = build number
+	/// \li		%% = %
+	/// \li		%| = Accepted end of version string (if the version string ends
+	///		here, the input is accepted. If not parsing is continued with
+	///		the rest of the format string as pattern)
 	explicit Version( const char* version, const char* format="%M.%m%|.%r%|.%b");
+
+	/// \brief	Build a version object from an unsigned long
+	///		The format of the number is MMmmrrbbb
 	Version( unsigned long version );
 	Version( unsigned short M, unsigned short m );
 	Version( unsigned short M, unsigned short m, unsigned short r );
 	Version( unsigned short M, unsigned short m, unsigned short r, unsigned b );
 
-	// Aba: clashes on FreeBSD with sys/types.h major and minor
 	/// Returns the major number of the version.
 	unsigned short Major() const		{ return m_major; }
 	/// Returns the minor number of the version.
@@ -90,16 +105,18 @@ public:
 	/// using the usual OSS versioning schemas
 	bool isCompatible( const Version &other ) const;
 
-	/// \brief Print the version in 'major.minor.revision.build' format.
+	/// \brief	Print the version in 'major.minor.revision.build' format.
 	std::string toString() const;
 
-	/// \brief Print the version using custom format.
+	/// \brief	Print the version using custom format.
 	/// \param	format	the format string
 	std::string toString( const char* format ) const;
 
-	/// \brief Output the version as an unsigned long
-	/// The format of the output is MMmmrrbb
-	/// \note All numbers (major, minor...) will be cut to the 2 most significant decimal digits
+	/// \brief	Output the version as an unsigned long
+	///		The format of the output is MMmmrrbbb
+	/// \note	All numbers (major, minor...) will be cut to the 2 most significant
+	///		decimal digits except for the build number which will be cut
+	///		to 3 decimal digits
 	unsigned long toNumber() const;
 };
 

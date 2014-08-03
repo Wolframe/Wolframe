@@ -13,6 +13,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\3rdParty\gtest\include \
+	/I$(TOPDIR)\src\modules\protocol\wolframe \
 	/I$(TOPDIR)\wtest\include
 
 # Note: libraries are picked automatically on Windows!
@@ -23,6 +24,7 @@ INCLUDE_LIBS = \
 	Advapi32.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
@@ -51,6 +53,7 @@ OBJS = \
 	appConfigDefinition.obj \
 	iprocHandler.obj \
 	iprocHandlerConfig.obj \
+	iprocProtocolFiles.obj \
 	$(TOPDIR)\src\winMain.obj
 
 
@@ -78,56 +81,40 @@ local_clean:
 	@-erase tests\*.exe.manifest 2>NUL
 	@-erase tests\*.ilk 2>NUL
 	@-erase tests\*.pdb 2>NUL
+	@-erase tests\*.exp 2>NUL
+	@-erase tests\*.lib 2>NUL
 	@-erase /q tests\result 2>NUL
+	@-erase /q tests\temp 2>NUL
 
 local_distclean:
 
-local_test: $(TEST_CPP_BINS)
-	@-echo @echo off > test.bat
+copy_prereq:
+	@-copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests\. >NUL
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests\. >NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests\. >NUL
 !ENDIF
 !IFDEF WITH_LIBXML2
-	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" tests >> test.bat
-	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" tests >> test.bat
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" tests\. >NUL
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" tests\. >NUL
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" tests\. >NUL
 !ENDIF
 !IFDEF WITH_LIBXSLT
-	@-echo copy "$(LIBXSLT_DIR)\lib\libxslt.dll" tests >> test.bat
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" tests\. >NUL
 !ENDIF
 !IFNDEF DEBUG
-	@-echo copy "$(PYTHON_DIR)\libs\python33.dll" tests >> test.bat
+	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_MAJOR_VERSION).dll" tests\. >NUL
 !ELSE
-	@-echo copy "$(PYTHON_DIR)\libs\python33_d.dll" tests >> test.bat
+	@-copy "$(PYTHON_DLL_DIR)\python$(PYTHON_VERSION)_d.dll" tests\. >NUL
 !ENDIF
-	@-echo cd tests >> test.bat
-!IFDEF WITH_LUA
-	@-echo iprocHandlerTest.exe >> test.bat
-	@-echo iprocHandlerXMLTest.exe >> test.bat
-!ENDIF
-	@-test.bat
 
-run:
-	@-echo @echo off > test.bat
-!IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
-!ENDIF
-!IFDEF WITH_LIBXML2
-	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
-	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >> test.bat
-!ENDIF
-!IFDEF WITH_LIBXSLT
-	@-echo copy "$(LIBXSLT_DIR)\lib\libxslt.dll" . >> test.bat
-!ENDIF
+local_test: $(TEST_CPP_BINS) copy_prereq
 !IFDEF WITH_LUA
-	@-echo copy "$(LUA_DIR)\src\lua52.dll" . >> test.bat
+	@-cd tests & iprocHandlerTest.exe
+	@-cd tests & iprocHandlerXMLTest.exe
 !ENDIF
-!IFNDEF DEBUG
-	@-echo copy "$(PYTHON_DIR)\libs\python33.dll" . >> test.bat
-!ELSE
-	@-echo copy "$(PYTHON_DIR)\libs\python33_d.dll" . >> test.bat
-!ENDIF
-	@-echo echo Running the Wolframe iproc example... >> test.bat
-	@-echo iprocd.exe -c iproc.conf >> test.bat
-	@-test.bat
+
+run: copy_prereq
+	@-copy tests\*.dll >NUL
+	@-echo Running the Wolframe iproc example...
+	@-iprocd.exe -c iproc.conf

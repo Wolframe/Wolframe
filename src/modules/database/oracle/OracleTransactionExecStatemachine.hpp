@@ -37,13 +37,12 @@
 #include "database/transactionExecStatemachine.hpp"
 #include "database/statement.hpp"
 #include "database/databaseError.hpp"
-#include "Oracle.hpp"
-#include "OracleStatement.hpp"
-#include "types/keymap.hpp"
+#include "system/objectPool.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
 #include <boost/shared_ptr.hpp>
+#include <oci.h>
 
 namespace _Wolframe {
 namespace db {
@@ -53,16 +52,37 @@ struct OracleColumnDescription {
 	ub2 fetchType; // how do we want to fetch the column (not the same as dataType!)
 	std::string name; // name of the column in the result
 	std::size_t bufsize; // size of column in bytes
-	char *buf; // container for Oracle result for this column
+	union {
+		char *cbuf;
+		double *dbuf;
+	} buf; // container for Oracle result for this column
 	OCIDefine *defhp; // handle to the column definition
 	sb2 ind; // NULL indicator for a value in this column
 	ub2 len; // length of the returned data
 	ub2 errcode; // error code on field level
+
+	OracleColumnDescription( ) { }
+
+	OracleColumnDescription( const OracleColumnDescription& o )
+		: dataType( o.dataType ),
+		fetchType( o.fetchType ),
+		name( o.name ),
+		bufsize( o.bufsize ),
+		defhp( o.defhp ),
+		ind( o.ind ),
+		len( o.len ),
+		errcode( o.errcode ) {
+		buf.cbuf = o.buf.cbuf; // intentionally not copying data here!
+	}
 	
-	~OracleColumnDescription( ) { free( buf ); }
+	~OracleColumnDescription( ) { free( buf.cbuf ); }
 };
 
 typedef boost::shared_ptr<OracleColumnDescription> OracleColumnDescriptionPtr;
+
+class OracleEnvirenment;
+class OracleDatabase;
+class OracleConnection;
 
 ///\class TransactionExecStatemachine_oracle
 ///\brief Implementation of the standard database transaction execution statemechine for Oracle
@@ -70,12 +90,12 @@ typedef boost::shared_ptr<OracleColumnDescription> OracleColumnDescriptionPtr;
 struct TransactionExecStatemachine_oracle :public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, const std::string& name_, OracleDbUnit *dbUnit_);
+	TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDatabase *database_);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_oracle();
 
-	//\brief Get the database identifier
+	///\brief Get the database identifier
 	virtual const std::string& databaseID() const;
 
 	///\brief Begin transaction
@@ -139,8 +159,8 @@ private:
 	Statement *m_statement;
 	bool m_hasResult;
 	bool m_hasRow;
-	OracleDbUnit* m_dbUnit;
-	PoolObject<OracleConnection*> *m_conn;	//< DB connection
+	OracleDatabase* m_database;
+	boost::shared_ptr<OracleConnection> m_conn;	//< DB connection
 };
 
 }}//namespace

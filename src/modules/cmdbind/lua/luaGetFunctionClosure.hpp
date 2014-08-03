@@ -33,10 +33,8 @@ Project Wolframe.
 ///\brief Interface to the Closure of the :get int the lua binding
 #ifndef _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
-#include "langbind/appObjects.hpp"
 #include "filter/inputfilterScope.hpp"
 #include "filter/typedfilterScope.hpp"
-#include "types/countedReference.hpp"
 #include <boost/shared_ptr.hpp>
 
 #if WITH_LUA

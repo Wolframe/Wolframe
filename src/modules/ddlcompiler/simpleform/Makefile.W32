@@ -20,21 +20,22 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_ddlcompiler_simpleform.dll
 
 CPP_OBJS = \
-	simpleFormCompiler.obj \
-	mod_ddlcompiler_simpleform.obj
+	simpleFormLexer.obj \
+	simpleFormCompiler.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModDdlCompilerSimpleForm.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_ddlcompiler_simpleform.obj
+	$(LINK) /dll /def:mod_ddlcompiler_simpleform.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

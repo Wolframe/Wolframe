@@ -1,0 +1,4 @@
+
+AUDIT auditMutation1 auditMutation1( user=username );
+
+

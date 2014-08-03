@@ -12,16 +12,18 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/3rdParty/textwolf/include
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(BOOST_LIB_DIR)
 
-INCLUDE_LIBS =
+INCLUDE_LIBS = \
+	-lwfsingleton \
+	-lwolframe
 
 DYNAMIC_MODULE = mod_filter_textwolf.so
 
 CPP_OBJS = \
-	textwolf_filter.o \
-	mod_filter_textwolf.o
+	textwolf_filter.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -2,6 +2,7 @@ TOPDIR = ..\..\..
 
 SUBDIRS = database textfile
 
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:

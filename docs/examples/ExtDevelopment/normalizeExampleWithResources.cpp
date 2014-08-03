@@ -16,32 +16,29 @@ class NormalizeInt
         :public types::NormalizeFunction
 {
 public:
-    explicit NormalizeInt( const ConversionResources* res_)
-        :res(res_){}
+    explicit NormalizeInt( const types::NormalizeResourceHandle* res_,
+			   const std::vector<types::Variant>&)
+	:res(dynamic_cast<const ConversionResources*>(res_)){}
     virtual ~NormalizeInt()
         {}
     virtual const char* name() const
         {return "int";}
     virtual types::Variant execute( const types::Variant& i) const
         {return types::Variant( i.toint());}
-
-    static types::NormalizeFunction* create(
-        types::NormalizeResourceHandle* reshnd, const std::string&)
-    {
-        ConversionResources* res
-            = dynamic_cast<ConversionResources*>(reshnd);
-        return new NormalizeInt( res);
-    }
+    virtual types::NormalizeFunction* copy() const
+        {return new NormalizeInt(*this);}
 private:
     const ConversionResources* res;
 };
 
-NORMALIZER_MODULE_WITH_RESOURCE( 
+WF_MODULE_BEGIN(
     "example2",
-    "normalizer module with resources",
-    ConversionResources)
+    "normalizer module with resources")
 
-NORMALIZER_FUNCTION( "Int", NormalizeInt::create)
-NORMALIZER_MODULE_END
+    WF_NORMALIZER_RESOURCE( ConversionResources)
+    WF_NORMALIZER_WITH_RESOURCE(
+	"Int", NormalizeInt, ConversionResources)
+WF_MODULE_END
+
 
 

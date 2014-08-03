@@ -24,15 +24,14 @@ DYNAMIC_MODULE = \
 	mod_filter_blob.dll
 
 CPP_OBJS = \
-	blob_filter.obj \
-	mod_filter_blob.obj
+	blob_filter.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:BlobFilterModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_filter_blob.obj
+	$(LINK) /dll /def:mod_filter_blob.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

@@ -1,18 +1,16 @@
 FORM CDCatalog
+	-root CATALOG
 {
-	CATALOG
+	CD []
 	{
-		CD []
+		TITLE string
+		ARTIST string
+		RELEASE
 		{
-			TITLE string
-			ARTIST string
-			RELEASE
-			{
-				COUNTRY string
-				COMPANY string
-				PRICE string
-				YEAR int
-			}
+			COUNTRY string
+			COMPANY string
+			PRICE string
+			YEAR int
 		}
 	}
 }

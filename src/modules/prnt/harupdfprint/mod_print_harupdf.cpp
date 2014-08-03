@@ -33,7 +33,7 @@
 ///\file mod_printer_harupdf.cpp
 ///\brief Module for printing PDFs with a simple command interpreter calling functions of libhpdf
 
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/module/programTypeBuilder.hpp"
 #include "pdfPrinter.hpp"
 #include "pdfPrinterDocumentImpl.hpp"
 #include "pdfPrintProgramType.hpp"
@@ -49,18 +49,18 @@ struct PdfPrinter
 	{
 		return new prnt::SimplePdfPrintProgram( prnt::createLibHpdfDocument);
 	}
-	static SimpleBuilder* constructor()
+	static BuilderBase* constructor()
 	{
 		return new ProgramTypeBuilder( "HaruPdfPrintFunction", "simplepdf", PdfPrinter::createProgram);
 	}
 };
 }//anonymous namespace
 
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
+static createBuilderFunc objdef[] =
 {
-	PdfPrinter::constructor
+	PdfPrinter::constructor, NULL
 };
 
-ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", 0, 0, NofObjects, objdef);
-
+extern "C" {
+	ModuleEntryPoint entryPoint( 0, "simple PDF print function based on libhpdf", objdef);
+}

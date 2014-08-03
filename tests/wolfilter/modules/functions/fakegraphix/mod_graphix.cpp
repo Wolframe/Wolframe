@@ -32,49 +32,16 @@
 ************************************************************************/
 ///\file mod_graphix.cpp
 ///\brief Fake implementation of module for graphic functions with FreeImage for testing
-#include "module/cppFormFunctionBuilder.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/cppFormFunctionModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "graphix.hpp"
 
 using namespace _Wolframe;
-using namespace _Wolframe::module;
 using namespace _Wolframe::graphix;
 
-namespace {
-
-struct graphix_info_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = Image::getStructDescription( );
-		static const serialize::StructDescriptionBase* result = ImageInfo::getStructDescription( );
-		langbind::CppFormFunction func( imageInfo, param, result );
-
-		return new CppFormFunctionBuilder( "imageInfo", func);
-	}
-};
-
-struct graphix_thumb_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = ImageThumb::getStructDescription( );
-		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
-		langbind::CppFormFunction func( imageThumb, param, result );
-
-		return new CppFormFunctionBuilder( "imageThumb", func);
-	}
-};
-
-} //anonymous namespace
-
-enum { NofObjects = 2 };
-
-static createBuilderFunc objdef[NofObjects] =
-{
-	graphix_info_func::constructor,
-	graphix_thumb_func::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "graphic functions", 0, 0, NofObjects, objdef );
+WF_MODULE_BEGIN( "FreeImageFunctions", "graphic functions based on the FreeImage library")
+WF_FORM_FUNCTION( "imageInfo", ImageImpl::info, ImageInfo, Image)
+WF_FORM_FUNCTION( "imageThumb", ImageImpl::thumb, Image, ImageThumb)
+WF_FORM_FUNCTION( "imageRescale", ImageImpl::rescale, Image, ImageRescale)
+WF_MODULE_END
 

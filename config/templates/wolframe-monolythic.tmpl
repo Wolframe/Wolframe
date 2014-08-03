@@ -1,0 +1,21 @@
+; Wolframe main configuration file
+
+$(eval "echo \"$(cat loadmodules.tmpl)\"")
+
+$(cat global.tmpl)
+
+$(cat daemon.tmpl)
+
+$(eval "echo \"$(cat logging.tmpl)\"")
+
+$(eval "echo \"$(cat listen.tmpl)\"")
+
+$(if test "x$WITH_SQLITE3" = "x1"; then eval "echo \"$(cat sqlite.tmpl | sed 's/^\(.*\)/;\1/g')\""; fi)
+
+$(if test "x$WITH_PGSQL" = "x1"; then eval "echo \"$(cat postgresql.tmpl | sed 's/^\(.*\)/;\1/g')\""; fi)
+
+$(if test "x$WITH_ORACLE" = "x1"; then eval "echo \"$(cat oracle.tmpl | sed 's/^\(.*\)/;\1/g')\""; fi)
+
+$(eval "echo \"$(cat aaaa-simple.tmpl)\"")
+
+$(eval "echo \"$(cat processors.tmpl)\"")

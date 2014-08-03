@@ -57,6 +57,9 @@ struct TestDescription
 		,requires(o.requires)
 		,exception(o.exception)
 	{}
+
+	static std::string normalizeOutputCRLF( const std::string& output, const std::string& expected_);
+	std::string normalizeOutputCRLF( const std::string& output);
 };
 
 }} //namespace

@@ -34,15 +34,16 @@
 //
 
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include "system/globalRngGen.hpp"
 
 TEST( Random, Randomness )
 {
 	unsigned char buf[39];
 
-	_Wolframe::RandomGenerator::instance( "" );
+	_Wolframe::GlobalRandomGenerator::instance( "" );
 
-	_Wolframe::RandomGenerator& rng = _Wolframe::RandomGenerator::instance();
+	_Wolframe::GlobalRandomGenerator& rng = _Wolframe::GlobalRandomGenerator::instance();
 
 	rng.generate( buf, 39 );
 
@@ -58,6 +59,7 @@ TEST( Random, Randomness )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS( );
 }

@@ -30,33 +30,38 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for programs loaded by the processor provider
-///\file prgbind/program.hpp
+/// \brief Interface for programs loaded by the processor provider
+/// \file prgbind/program.hpp
 
 #ifndef _PRGBIND_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_HPP_INCLUDED
-#include "database/database.hpp"
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
+namespace db {
+	/// \brief Forward declaration
+	class Database;
+}
 namespace prgbind {
 
-///\brief Forward declaration
+/// \brief Forward declaration
 class ProgramLibrary;
 
-///\class Program
-///\brief Interface for programs of a program library
+/// \class Program
+/// \brief Interface for programs of a program library
 struct Program
 {
-	///\enum Category
-	///\brief Category of the program. Determines ascending load order (dependencies)
+	/// \enum Category
+	/// \brief Category of the program. Determines ascending load order (dependencies)
 	enum Category
 	{
 		Core=10,
 		FormType=20,
 		Form=30,
-		Function=40
+		Function=40,
+		SuperFunction=50
 	};
 
 	explicit Program( Category category_)

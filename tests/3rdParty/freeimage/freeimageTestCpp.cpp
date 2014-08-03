@@ -3,6 +3,7 @@
 //
 
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -51,8 +52,8 @@ TEST_F( FreeImagePlusFixture, ImageInfo )
 	unsigned int width = image.getWidth( );
 	unsigned int height = image.getHeight( );
 	//std::cout << "size is " << width << " x " << height << std::endl;
-	ASSERT_EQ( width, 312 );
-	ASSERT_EQ( height, 312 );
+	ASSERT_EQ( width, 312U );
+	ASSERT_EQ( height, 312U );
 	
 // make thumbnail
 	fipImage thumb( image );
@@ -62,8 +63,8 @@ TEST_F( FreeImagePlusFixture, ImageInfo )
 	unsigned int widthThumb = thumb.getWidth( );
 	unsigned int heightThumb = thumb.getHeight( );
 	//std::cout << "size of thumb is " << widthThumb << " x " << heightThumb << std::endl;
-	ASSERT_EQ( widthThumb, 50 );
-	ASSERT_EQ( heightThumb, 50 );
+	ASSERT_EQ( widthThumb, 50U );
+	ASSERT_EQ( heightThumb, 50U );
 	
 // save image (for debugging mainly)
 	thumb.save( THUMB, 0 );
@@ -90,8 +91,8 @@ TEST_F( FreeImagePlusFixture, ImageFromMemory )
 	unsigned int width = image.getWidth( );
 	unsigned int height = image.getHeight( );
 	//std::cout << "size is " << width << " x " << height << std::endl;
-	ASSERT_EQ( width, 312 );
-	ASSERT_EQ( height, 312 );
+	ASSERT_EQ( width, 312U );
+	ASSERT_EQ( height, 312U );
 
 // create freeimage memory handle for result
 	fipMemoryIO outIO;
@@ -112,6 +113,7 @@ TEST_F( FreeImagePlusFixture, ImageFromMemory )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS( );
 }

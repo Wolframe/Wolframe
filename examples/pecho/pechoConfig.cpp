@@ -35,26 +35,24 @@
 //
 
 #include "handlerConfig.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "logger-v1.hpp"
 
-#include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <ostream>
 
 static const unsigned short DEFAULT_TIMEOUT = 180;
 
 namespace _Wolframe {
 
-bool pEchoConfiguration::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+bool pEchoConfiguration::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 				const module::ModulesDirectory* /*modules*/ )
 {
 	bool retVal = true;
 	bool isSet = false;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "idle" ))	{
 			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, timeout ))
 				retVal = false;

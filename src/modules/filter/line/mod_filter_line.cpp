@@ -31,32 +31,11 @@
 
 ************************************************************************/
 ///\file mod_filter_line.cpp
-///\brief Module for line filters
-#include "module/filterBuilder.hpp"
+///\brief Module for a unicode line by line filter
+#include "appdevel/filterModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "line_filter.hpp"
-#include "logger-v1.hpp"
-#include <cstring>
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-namespace lb = _Wolframe::langbind;
-
-namespace {
-
-struct LineFilterObject
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder( "LineFilter", "line", lb::createLineFilterType);}
-};
-
-}//anonymous namespace
-
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	LineFilterObject::builder
-};
-
-ModuleEntryPoint entryPoint( 0, "line filter", 0, 0, NofObjects, objdef);
-
+WF_MODULE_BEGIN( "lineFilter", "unicode line by line filter")
+ WF_FILTER_TYPE( "line", _Wolframe::langbind::LineFilterType)
+WF_MODULE_END

@@ -37,10 +37,9 @@ Project Wolframe.
 #include "modules/ddlcompiler/simpleform/simpleFormCompiler.hpp"
 #include "modules/normalize/number/integerNormalizeFunction.hpp"
 #include "modules/normalize/number/floatNormalizeFunction.hpp"
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/info_parser.hpp>
 #include <iostream>
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <boost/thread/thread.hpp>
 #include <boost/algorithm/string.hpp>
 #include <stdexcept>
@@ -56,8 +55,8 @@ public:
 
 	virtual const types::NormalizeFunction* get( const std::string& name) const
 	{
-		static IntegerNormalizeFunction int_( true, 8, 1000000000);
-		static IntegerNormalizeFunction uint_( false, 8, 1000000000);
+		static IntegerNormalizeFunction int_( 8, 1000000000);
+		static UnsignedNormalizeFunction uint_( 8, 1000000000);
 		static FloatNormalizeFunction float_( 8, 8, 1000000000.0);
 		if (boost::algorithm::iequals( name, "int")) return &int_;
 		if (boost::algorithm::iequals( name, "uint")) return &uint_;
@@ -99,7 +98,7 @@ TEST_F( SimpleFormCompilerTest, tests)
 		std::string srcfile = pp.string() + ".simpleform";
 		langbind::SimpleFormCompiler mm;
 		DDLTypeMap typemap;
-		std::vector<types::FormDescriptionR> sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
+		std::vector<types::FormDescriptionR> sr = mm.compile( srcfile, &typemap);
 		std::vector<types::FormDescriptionR>::const_iterator si = sr.begin(), se = sr.end();
 		for (; si != se; ++si)
 		{
@@ -110,8 +109,9 @@ TEST_F( SimpleFormCompilerTest, tests)
 
 int main( int argc, char **argv )
 {
-	::testing::InitGoogleTest( &argc, argv );
 	g_testdir = boost::filesystem::path( utils::getParentPath( argv[0], 2));
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
+	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }
 

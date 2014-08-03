@@ -1,20 +1,21 @@
 
 Available targets:
 
-make [all]              create all artifacts
-make test               create test binaries and execute fast tests
-make longtest           execute all tests, including long lasting ones
-make clean              clean up build artifacts
-make distclean          clean up all generated artifacts
-make install            install (set 'DESTDIR' and 'prefix' at will)
-make uninstall          uninstall (set 'DESTDIR' and 'prefix' at will)
-make dist[-Z|-gz|-bz2]  create tarball containing all sources
-make help               show this very help page
-make config             show the configuration used during build
-make depend             build dependency files (extension .d)
-make init-po            create initial version of the gettext files
-make merge-po           merge the gettext files after changes
-make check-po           check sanity of gettext files
+make [all]                 create all artifacts
+make test                  create test binaries and execute fast tests
+make longtest              execute all tests, including long lasting ones
+make testreport            execute tests as with 'test', then create a report
+make clean                 clean up build artifacts
+make distclean             clean up all generated artifacts
+make install               install (set 'DESTDIR' and 'prefix' at will)
+make uninstall             uninstall (set 'DESTDIR' and 'prefix' at will)
+make dist[-Z|-gz|-bz2|-xz] create tarball containing all sources
+make help                  show this very help page
+make config                show the configuration used during build
+make depend                build dependency files (extension .d)
+make init-po               create initial version of the gettext files
+make merge-po              merge the gettext files after changes
+make check-po              check sanity of gettext files
 
 Available optional features:
 
@@ -52,7 +53,7 @@ WITH_EXPECT=1           use Expect/Tcl for system testing
 Example:
 make WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
      WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_SYSTEM_FREEIMAGE=1 \
+     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 \
      WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1
 
 To build the documentation call:

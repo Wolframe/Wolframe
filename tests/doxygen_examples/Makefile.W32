@@ -1,0 +1,14 @@
+TOPDIR = ..\..
+
+SUBDIRS = CommandHandlerModule DoctypeDetectionModule FilterModule FormFunctionModule ProgramTypeModule DDLCompilerModule CustomDataTypeModule NormalizerModule RuntimeEnvironmentModule AuthenticatorModule DatabaseModule
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:
+

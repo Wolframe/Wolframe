@@ -4,16 +4,15 @@
 **requires:PGSQL
 **input
 {
-  "doctype" : "AllDataRequest",
-  "data": {
-  }
+	"-doctype" : "AllDataRequest"
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf AllDataRequest
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json -c wolframe.conf AllDataRequest
 
 **file:wolframe.conf
 LoadModules
 {
 	module ./../wolfilter/modules/database/postgresql/mod_db_postgresqltest
+	module ./../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ./../../src/modules/cmdbind/lua/mod_command_lua
 	module ./../../src/modules/normalize/number/mod_normalize_number
 	module ./../../src/modules/normalize/string/mod_normalize_string
@@ -222,16 +221,29 @@ INSERT INTO PersonCompanyRel (ID,companyid) VALUES (2,8);
 INSERT INTO PersonCompanyRel (ID,companyid) VALUES (3,8);
 **file:preprocess.lua
 function run( inp )
+	logger.printc( "RUN 1")
 	it = inp:table()
+	logger.printc( "RUN 2")
 	getData = provider.formfunction("getData")
+	logger.printc( "RUN 3")
 	res = getData( it)
+	logger.printc( "RUN 4")
 	rt = res:table()
+	logger.printc( "RUN 5")
 	insertWords = provider.formfunction("insertWords")
+	logger.printc( "RUN 6")
 	insertWords( { data = rt } )
+	logger.printc( "RUN 7")
 	getDataFiltered = provider.formfunction("getDataFiltered")
+	logger.printc( "RUN 8")
 	resfiltered = getDataFiltered( it)
+	logger.printc( "RUN 9")
 	resfilteredtab = resfiltered:table()
-	table.insert( rt, resfilteredtab)
+	logger.printc( "RUN 10")
+	for k,v in ipairs(  resfilteredtab['person']) do
+		table.insert( rt.person, v)
+	end
+	logger.printc( "RUN 11")
 	return rt
 end
 
@@ -245,7 +257,7 @@ function luanorm( inp )
 				if k == "id" or k == "tag" then
 					rt[ k] = tonumber(v) + 100
 				else
-					local nf = provider.normalizer( "normname")
+					local nf = provider.type( "normname")
 					rt[ k] = nf( v)
 				end
 			end
@@ -265,26 +277,26 @@ function addSuffixToName( inp)
 	return rec
 end
 **file:preprocess.dmap
-COMMAND (AllDataRequest) CALL(run) RETURN(Data);
+COMMAND AllDataRequest CALL run RETURN Data;
 **file:preprocess.sfrm
-FORM PersonRef
+STRUCT PersonRef
 {
 	prename string
 	surname string
 }
 
-FORM AddressRef
+STRUCT AddressRef
 {
 	street string
 	town string
 }
 
-FORM CompanyRef
+STRUCT CompanyRef
 {
 	name string
 }
 
-FORM Person
+STRUCT Person
 {
 	company CompanyRef[]
 	id int
@@ -296,7 +308,7 @@ FORM Person
 	tag ?int
 }
 
-FORM Company
+STRUCT Company
 {
 	id int
 	parent string
@@ -307,18 +319,14 @@ FORM Company
 }
 
 FORM Data
+	-root data
 {
-	data
-	{
-		person Person[]
-	}
+	person Person[]
 }
 
 FORM AllDataRequest
+	-root data
 {
-	data
-	{
-	}
 }
 **file:preprocess.tdl
 
@@ -328,7 +336,6 @@ BEGIN
 END
 
 SUBROUTINE getPerson( id)
-RESULT INTO person
 BEGIN
 	INTO company DO SELECT Company.name FROM Company,PersonCompanyRel
 		WHERE PersonCompanyRel.companyid = Company.ID
@@ -353,7 +360,7 @@ END
 TRANSACTION getData
 BEGIN
 	DO SELECT ID FROM Person;
-	FOREACH RESULT INTO . DO getPerson( $1);
+	FOREACH RESULT INTO person DO getPerson( $1);
 END
 
 TRANSACTION getDataFiltered
@@ -390,220 +397,218 @@ normname= convdia,lcname;
 **outputfile:DBDUMP
 **output
 {
-	"doctype":	"Data.simpleform",
-	"data":	{
-		"person":	[{
-				"company":	[{
-						"name":	"Baluba Inc."
-					}, {
-						"name":	"Carimba Inc."
-					}, {
-						"name":	"Dereno Inc."
-					}, {
-						"name":	"Huratz Inc."
-					}],
-				"id":	"1",
-				"child":	[{
-						"prename":	"Beno",
-						"surname":	"Beret"
-					}, {
-						"prename":	"Carla",
-						"surname":	"Carlson"
-					}, {
-						"prename":	"Dorothe",
-						"surname":	"Dubi"
-					}, {
-						"prename":	"Hubert",
-						"surname":	"Hauer"
-					}],
-				"prename":	"Aufru",
-				"surname":	"Alano",
-				"location":	[{
-						"street":	"Butterweg 23",
-						"town":	"Bendorf"
-					}, {
-						"street":	"Camelstreet 34",
-						"town":	"Carassa"
-					}, {
-						"street":	"Demotastrasse 45",
-						"town":	"Durnfo"
-					}, {
-						"street":	"Hurtika 89",
-						"town":	"Hof"
-					}],
-				"tag":	"1001"
-			}, {
-				"company":	[{
-						"name":	"Carimba Inc."
-					}, {
-						"name":	"Dereno Inc."
-					}, {
-						"name":	"Etungo Inc."
-					}, {
-						"name":	"Huratz Inc."
-					}],
-				"id":	"2",
-				"child":	[{
-						"prename":	"Carla",
-						"surname":	"Carlson"
-					}, {
-						"prename":	"Dorothe",
-						"surname":	"Dubi"
-					}, {
-						"prename":	"Erik",
-						"surname":	"Ertki"
-					}, {
-						"prename":	"Hubert",
-						"surname":	"Hauer"
-					}],
-				"prename":	"Beno",
-				"surname":	"Beret",
-				"location":	[{
-						"street":	"Camelstreet 34",
-						"town":	"Carassa"
-					}, {
-						"street":	"Demotastrasse 45",
-						"town":	"Durnfo"
-					}, {
-						"street":	"Erakimolstrasse 56",
-						"town":	"Enden"
-					}, {
-						"street":	"Hurtika 89",
-						"town":	"Hof"
-					}],
-				"tag":	"1001"
-			}, {
-				"company":	[{
-						"name":	"Dereno Inc."
-					}, {
-						"name":	"Etungo Inc."
-					}, {
-						"name":	"Figaji Inc."
-					}, {
-						"name":	"Huratz Inc."
-					}],
-				"id":	"3",
-				"child":	[{
-						"prename":	"Dorothe",
-						"surname":	"Dubi"
-					}, {
-						"prename":	"Erik",
-						"surname":	"Ertki"
-					}, {
-						"prename":	"Fran",
-						"surname":	"Fuioko"
-					}, {
-						"prename":	"Hubert",
-						"surname":	"Hauer"
-					}],
-				"prename":	"Carla",
-				"surname":	"Carlson",
-				"location":	[{
-						"street":	"Demotastrasse 45",
-						"town":	"Durnfo"
-					}, {
-						"street":	"Erakimolstrasse 56",
-						"town":	"Enden"
-					}, {
-						"street":	"Fabelweg 67",
-						"town":	"Formkon"
-					}, {
-						"street":	"Hurtika 89",
-						"town":	"Hof"
-					}],
-				"tag":	"1001"
-			}, {
-				"company":	[{
-						"name":	"Etungo Inc."
-					}],
-				"id":	"4",
-				"child":	[{
-						"prename":	"Erik",
-						"surname":	"Ertki"
-					}],
-				"prename":	"Dorothe",
-				"surname":	"Dubi",
-				"location":	[{
-						"street":	"Erakimolstrasse 56",
-						"town":	"Enden"
-					}],
-				"tag":	"1001"
-			}, {
-				"company":	[{
-						"name":	"Figaji Inc."
-					}],
-				"id":	"5",
-				"child":	[{
-						"prename":	"Fran",
-						"surname":	"Fuioko"
-					}],
-				"prename":	"Erik",
-				"surname":	"Ertki",
-				"location":	[{
-						"street":	"Fabelweg 67",
-						"town":	"Formkon"
-					}],
-				"tag":	"1001"
-			}, {
-				"id":	"6",
-				"prename":	"Fran",
-				"surname":	"Fuioko",
-				"tag":	"1001"
-			}, {
-				"company":	[{
-						"name":	"Huratz Inc."
-					}],
-				"id":	"7",
-				"child":	[{
-						"prename":	"Hubert",
-						"surname":	"Hauer"
-					}],
-				"prename":	"Gerd",
-				"surname":	"Golto",
-				"location":	[{
-						"street":	"Hurtika 89",
-						"town":	"Hof"
-					}],
-				"tag":	"1001"
-			}, {
-				"id":	"8",
-				"prename":	"Hubert",
-				"surname":	"Hauer",
-				"tag":	"1001"
-			}, {
-				"id":	"1",
-				"prename":	"Aufru1",
-				"surname":	"Alano"
-			}, {
-				"id":	"2",
-				"prename":	"Beno2",
-				"surname":	"Beret"
-			}, {
-				"id":	"3",
-				"prename":	"Carla3",
-				"surname":	"Carlson"
-			}, {
-				"id":	"4",
-				"prename":	"Dorothe4",
-				"surname":	"Dubi"
-			}, {
-				"id":	"5",
-				"prename":	"Erik5",
-				"surname":	"Ertki"
-			}, {
-				"id":	"6",
-				"prename":	"Fran6",
-				"surname":	"Fuioko"
-			}, {
-				"id":	"7",
-				"prename":	"Gerd7",
-				"surname":	"Golto"
-			}, {
-				"id":	"8",
-				"prename":	"Hubert8",
-				"surname":	"Hauer"
-			}]
-	}
+	"-doctype":	"Data",
+	"person":	[{
+			"company":	[{
+					"name":	"Baluba Inc."
+				}, {
+					"name":	"Carimba Inc."
+				}, {
+					"name":	"Dereno Inc."
+				}, {
+					"name":	"Huratz Inc."
+				}],
+			"id":	"1",
+			"child":	[{
+					"prename":	"Beno",
+					"surname":	"Beret"
+				}, {
+					"prename":	"Carla",
+					"surname":	"Carlson"
+				}, {
+					"prename":	"Dorothe",
+					"surname":	"Dubi"
+				}, {
+					"prename":	"Hubert",
+					"surname":	"Hauer"
+				}],
+			"prename":	"Aufru",
+			"surname":	"Alano",
+			"location":	[{
+					"street":	"Butterweg 23",
+					"town":	"Bendorf"
+				}, {
+					"street":	"Camelstreet 34",
+					"town":	"Carassa"
+				}, {
+					"street":	"Demotastrasse 45",
+					"town":	"Durnfo"
+				}, {
+					"street":	"Hurtika 89",
+					"town":	"Hof"
+				}],
+			"tag":	"1001"
+		}, {
+			"company":	[{
+					"name":	"Carimba Inc."
+				}, {
+					"name":	"Dereno Inc."
+				}, {
+					"name":	"Etungo Inc."
+				}, {
+					"name":	"Huratz Inc."
+				}],
+			"id":	"2",
+			"child":	[{
+					"prename":	"Carla",
+					"surname":	"Carlson"
+				}, {
+					"prename":	"Dorothe",
+					"surname":	"Dubi"
+				}, {
+					"prename":	"Erik",
+					"surname":	"Ertki"
+				}, {
+					"prename":	"Hubert",
+					"surname":	"Hauer"
+				}],
+			"prename":	"Beno",
+			"surname":	"Beret",
+			"location":	[{
+					"street":	"Camelstreet 34",
+					"town":	"Carassa"
+				}, {
+					"street":	"Demotastrasse 45",
+					"town":	"Durnfo"
+				}, {
+					"street":	"Erakimolstrasse 56",
+					"town":	"Enden"
+				}, {
+					"street":	"Hurtika 89",
+					"town":	"Hof"
+				}],
+			"tag":	"1001"
+		}, {
+			"company":	[{
+					"name":	"Dereno Inc."
+				}, {
+					"name":	"Etungo Inc."
+				}, {
+					"name":	"Figaji Inc."
+				}, {
+					"name":	"Huratz Inc."
+				}],
+			"id":	"3",
+			"child":	[{
+					"prename":	"Dorothe",
+					"surname":	"Dubi"
+				}, {
+					"prename":	"Erik",
+					"surname":	"Ertki"
+				}, {
+					"prename":	"Fran",
+					"surname":	"Fuioko"
+				}, {
+					"prename":	"Hubert",
+					"surname":	"Hauer"
+				}],
+			"prename":	"Carla",
+			"surname":	"Carlson",
+			"location":	[{
+					"street":	"Demotastrasse 45",
+					"town":	"Durnfo"
+				}, {
+					"street":	"Erakimolstrasse 56",
+					"town":	"Enden"
+				}, {
+					"street":	"Fabelweg 67",
+					"town":	"Formkon"
+				}, {
+					"street":	"Hurtika 89",
+					"town":	"Hof"
+				}],
+			"tag":	"1001"
+		}, {
+			"company":	[{
+					"name":	"Etungo Inc."
+				}],
+			"id":	"4",
+			"child":	[{
+					"prename":	"Erik",
+					"surname":	"Ertki"
+				}],
+			"prename":	"Dorothe",
+			"surname":	"Dubi",
+			"location":	[{
+					"street":	"Erakimolstrasse 56",
+					"town":	"Enden"
+				}],
+			"tag":	"1001"
+		}, {
+			"company":	[{
+					"name":	"Figaji Inc."
+				}],
+			"id":	"5",
+			"child":	[{
+					"prename":	"Fran",
+					"surname":	"Fuioko"
+				}],
+			"prename":	"Erik",
+			"surname":	"Ertki",
+			"location":	[{
+					"street":	"Fabelweg 67",
+					"town":	"Formkon"
+				}],
+			"tag":	"1001"
+		}, {
+			"id":	"6",
+			"prename":	"Fran",
+			"surname":	"Fuioko",
+			"tag":	"1001"
+		}, {
+			"company":	[{
+					"name":	"Huratz Inc."
+				}],
+			"id":	"7",
+			"child":	[{
+					"prename":	"Hubert",
+					"surname":	"Hauer"
+				}],
+			"prename":	"Gerd",
+			"surname":	"Golto",
+			"location":	[{
+					"street":	"Hurtika 89",
+					"town":	"Hof"
+				}],
+			"tag":	"1001"
+		}, {
+			"id":	"8",
+			"prename":	"Hubert",
+			"surname":	"Hauer",
+			"tag":	"1001"
+		}, {
+			"id":	"1",
+			"prename":	"Aufru1",
+			"surname":	"Alano"
+		}, {
+			"id":	"2",
+			"prename":	"Beno2",
+			"surname":	"Beret"
+		}, {
+			"id":	"3",
+			"prename":	"Carla3",
+			"surname":	"Carlson"
+		}, {
+			"id":	"4",
+			"prename":	"Dorothe4",
+			"surname":	"Dubi"
+		}, {
+			"id":	"5",
+			"prename":	"Erik5",
+			"surname":	"Ertki"
+		}, {
+			"id":	"6",
+			"prename":	"Fran6",
+			"surname":	"Fuioko"
+		}, {
+			"id":	"7",
+			"prename":	"Gerd7",
+			"surname":	"Golto"
+		}, {
+			"id":	"8",
+			"prename":	"Hubert8",
+			"surname":	"Hauer"
+		}]
 }
 address:
 id, street, town

@@ -2,13 +2,17 @@
 **requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<aa>1</aa>
+<doc><aa>1</aa></doc>
 **config
 --config wolframe.conf --filter textwolf testcall
 **file:wolframe.conf
 LoadModules
 {
 	module ../../src/modules/filter/textwolf/mod_filter_textwolf
+<<<<<<< HEAD
+=======
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
+>>>>>>> 974f42f509317b90fc22b74f21479acc18fabb3e
 	module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 }
 Database
@@ -27,19 +31,32 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION testcall
-RESULT INTO result
 BEGIN
-	INTO . DO run( /aa);
+INTO result
+BEGIN
+	INTO . DO SELECT run( $(/aa));
+END
 END
 **file: DBRES
 #id#1
 **outputfile:DBOUT
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result><id>1</id></result>
-run #1
-
-start( 'run' );
+<doc><result><id>1</id></result></doc>
+Code:
+[0] OUTPUT_OPEN TAG result
+[1] RESULT_SET_INIT
+[2] DBSTM_START STM (SELECT run( $1))
+[3] DBSTM_BIND_CONST CONST '1'
+[4] DBSTM_EXEC
+[5] OPEN_ITER_LAST_RESULT
+[6] NOT_IF_COND GOTO @10
+[7] OUTPUT_ITR_COLUMN
+[8] NEXT
+[9] IF_COND GOTO @7
+[10] OUTPUT_CLOSE
+[11] RETURN
+start( 'SELECT run( $1)' );
 bind( 1, '1' );
 execute();
 nofColumns(); returns 1

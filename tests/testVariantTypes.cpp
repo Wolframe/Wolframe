@@ -36,13 +36,13 @@
 
 #include "gtest/gtest.h"
 #include "types/variant.hpp"
-#include "types/malloc.hpp"
 #include <string>
 #include <sstream>
 #include <boost/cstdint.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cfloat>
 #include <stdint.h>
+#include "wtest/testReport.hpp"
 
 using namespace _Wolframe;
 using namespace types;
@@ -80,7 +80,7 @@ TEST( variantTypeFixture, casts )
 	v.convert( Variant::String );
 	ASSERT_EQ( "47", v.tostring( ) );
 	v.convert( Variant::UInt );
-	ASSERT_EQ( 47, v.touint( ) );
+	ASSERT_EQ( 47u, v.touint( ) );
 	v.convert( Variant::Double );
 	ASSERT_DOUBLE_EQ( 47.0, v.todouble( ) );
 	v = 1;
@@ -206,6 +206,7 @@ TEST( variantTypeFixture, illegal_values )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

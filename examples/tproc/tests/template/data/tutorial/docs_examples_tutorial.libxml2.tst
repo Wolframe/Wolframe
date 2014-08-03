@@ -1,6 +1,6 @@
 #!/bin/sh
 TOP=../../../../
-MAIN=$TOP/docs/examples/SDKTutorial/
+MAIN=$TOP/docs/examples/AppDevelop/
 for example in 4; do
 
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$example.tst"
@@ -26,7 +26,7 @@ cat $MAIN/lua_script_$example.lua >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **config
 !TEST
-./output_provider_cfg.sh example_$example.lua >> $output
+./output_provider_cfg.sh example_$example.lua char >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **output
 OK enter cmd

@@ -1,0 +1,44 @@
+<!-- AAAA -->
+<chapter id="chapterAAAA">
+	<title>AAAA</title>
+	<sect1>
+		<title>Introduction</title>
+		<para>
+			AAAA is an acronym for authentication,authorization,
+			accounting and auditing.
+			The different aspects of AAAA in the application are
+			linked together as they all are based on the identity
+			of the user. The identitiy of a user is authenticated 
+			after his login. Depending on the identity and the method
+			the user was authenticated, he gets privileges to access
+			resources or execute procedures. Wolframe provides
+			hooks for calling authorization to enforce checks of
+			these privileges. Every request and every transaction 
+			can be bound to authorization. Every function executed
+			can use authorization functions to check privileges.
+		</para>
+		<para>
+			Accounting and auditing functions use the identity
+			of the user to log the actions of a session.
+		</para>
+	</sect1>
+	<sect1>
+		<title>Embedding AAAA into an existing infrastructure</title>
+		<para>
+			Wolframe defines authentification methods as 
+			configurable modules. New modules can be added easily.
+			Authorization and auditing calls are implemented as ordinary
+			functions that can be written in any language that
+			has bindings for Wolframe. A layer inbetween declares
+			what data of the users context is passed to authorization
+			or audit/accounting functions. This makes it easy to
+			enforce rules how to handle sensible login data in a
+			controlled way.
+		</para>
+	</sect1>
+	&AppAAAAConfig;
+	&AppAuthentication;
+	&AppAuthorization;
+	&AppAuditingAndAccounting;
+</chapter>
+

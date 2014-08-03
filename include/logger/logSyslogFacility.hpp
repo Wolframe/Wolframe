@@ -32,11 +32,17 @@
 ************************************************************************/
 ///
 /// \file logSyslogFacility.hpp
-/// \brief Defines facilities of the system logger (Unix only)
+/// \brief Defines facilities of the system logger
 ///
 
 #ifndef _LOG_SYSLOG_FACILITY_HPP_INCLUDED
 #define _LOG_SYSLOG_FACILITY_HPP_INCLUDED
+
+#if defined( _MSC_VER )
+	#define WOLFRAME_EXPORT __declspec( dllexport )
+#else
+	#define WOLFRAME_EXPORT
+#endif
 
 #include <string>
 #include <iosfwd>
@@ -44,7 +50,9 @@
 namespace _Wolframe {
 namespace log {
 
-class SyslogFacility {
+/// \brief Facility (sink) for syslog
+/// \class SyslogFacility
+class WOLFRAME_EXPORT SyslogFacility {
 public:
 	enum Facility	{
 		WOLFRAME_SYSLOG_FACILITY_KERN,		///< kernel messages

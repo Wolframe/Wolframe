@@ -4,9 +4,11 @@ redhat          - Redhat, Centos, OpenSUSE/SLES
 debian          - Debian, Ubuntu
 archlinux       - ArchLinux
 slackware       - Slackware packaging
-freebsd         - FreeBSD standalone package (not ports, not pkgng)
+freebsd         - FreeBSD standalone package (not ports, pkg for 8,9 and pkgng for 10)
 netbsd          - NetBSD standalon package (not ports, not pkgsrc)
+solaris         - packaging for Solaris
 windows         - WIX MSI installer setup creation
 obs             - OpenSUSE build service (build.opensuse.org)
-patches         - patches for all kind of sofwaere and systems,
-                  needed when building Wolfame
+patches         - patches for all kind of software and systems,
+                  needed when building Wolframe
+tools           - various tools to build a release and to to build packages

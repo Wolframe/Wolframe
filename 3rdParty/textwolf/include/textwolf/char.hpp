@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,8 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/char.hpp
+/// \brief Definition of unicode characters
 #ifndef __TEXTWOLF_CHAR_HPP__
 #define __TEXTWOLF_CHAR_HPP__
 #include <cstddef>
@@ -39,8 +41,8 @@
 #ifdef BOOST_VERSION
 #include <boost/cstdint.hpp>
 namespace textwolf {
-	///\typedef UChar
-	///\brief Unicode character type
+	/// \typedef UChar
+	/// \brief Unicode character type
 	typedef boost::uint32_t UChar;
 	typedef boost::uint64_t EChar;
 }//namespace
@@ -49,16 +51,16 @@ namespace textwolf {
 #pragma warning(disable:4290)
 #include <BaseTsd.h>
 namespace textwolf {
-	///\typedef UChar
-	///\brief Unicode character type
+	/// \typedef UChar
+	/// \brief Unicode character type
 	typedef DWORD32 UChar;
 	typedef DWORD64 EChar;
 }//namespace
 #else
 #include <stdint.h>
 namespace textwolf {
-	///\typedef UChar
-	///\brief Unicode character type
+	/// \typedef UChar
+	/// \brief Unicode character type
 	typedef uint32_t UChar;
 	typedef uint64_t EChar;
 }//namespace
@@ -66,11 +68,11 @@ namespace textwolf {
 #endif
 
 namespace textwolf {
-///\class CharMap
-///\brief Character map for fast typing of a character byte
-///\tparam RESTYPE result type of the map
-///\tparam nullvalue_ default intitialization value of the map
-///\tparam RANGE domain of the input values of the map
+/// \class CharMap
+/// \brief Character map for fast typing of a character byte
+/// \tparam RESTYPE result type of the map
+/// \tparam nullvalue_ default intitialization value of the map
+/// \tparam RANGE domain of the input values of the map
 template <typename RESTYPE, RESTYPE nullvalue_, int RANGE=256>
 class CharMap
 {
@@ -81,25 +83,25 @@ public:
 private:
 	RESTYPE ar[ RANGE];		//< the map elements
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	CharMap()									{for (unsigned int ii=0; ii<RANGE; ii++) ar[ii]=(valuetype)nullvalue;}
-	///\brief Define the values of the elements in the interval [from,to]
-	///\param[in] from start of the input intervall (belongs also to the input)
-	///\param[in] to end of the input intervall (belongs also to the input)
-	///\param[in] value value assigned to all elements in  [from,to]
+	/// \brief Define the values of the elements in the interval [from,to]
+	/// \param[in] from start of the input intervall (belongs also to the input)
+	/// \param[in] to end of the input intervall (belongs also to the input)
+	/// \param[in] value value assigned to all elements in  [from,to]
 	CharMap& operator()( unsigned char from, unsigned char to, valuetype value)	{for (unsigned int ii=from; ii<=to; ii++) ar[ii]=value; return *this;}
-	///\brief Define the values of the single element at 'at'
-	///\param[in] at the input element
-	///\param[in] value value assigned to the element 'at'
+	/// \brief Define the values of the single element at 'at'
+	/// \param[in] at the input element
+	/// \param[in] value value assigned to the element 'at'
 	CharMap& operator()( unsigned char at, valuetype value)				{ar[at] = value; return *this;}
-	///\brief Read the element assigned to 'ii'
-	///\param[in] ii the input element queried
-	///\return the element at 'ii'
+	/// \brief Read the element assigned to 'ii'
+	/// \param[in] ii the input element queried
+	/// \return the element at 'ii'
 	valuetype operator []( unsigned char ii) const					{return ar[ii];}
 };
 
-///\enum ControlCharacter
-///\brief Enumeration of control characters needed as events for XML scanner statemachine
+/// \enum ControlCharacter
+/// \brief Enumeration of control characters needed as events for XML scanner statemachine
 enum ControlCharacter
 {
 	Undef=0,		//< not defined (beyond ascii)
@@ -112,25 +114,26 @@ enum ControlCharacter
 	Equal,			//< equal '='
 	Gt,			//< greater than '>'
 	Slash,			//< slash '/'
+	Dash,			//< en dash (minus) '-'
 	Exclam,			//< exclamation mark '!'
 	Questm,			//< question mark '?'
 	Sq,			//< single quote
 	Dq,			//< double quote
 	Osb,			//< open square bracket '['
 	Csb,			//< close square bracket ']'
-	Any,			//< any ascii character with meaning
-	NofControlCharacter=17	//< total number of control characters
+	Any			//< any ascii character with meaning
 };
+enum {NofControlCharacter=18};	//< total number of control characters
 
-///\class ControlCharacterM
-///\brief Map of the enumeration of control characters to their names for debug messages
+/// \class ControlCharacterM
+/// \brief Map of the enumeration of control characters to their names for debug messages
 struct ControlCharacterM
 {
-	///\brief Get the name of a control character as string
-	///\param [in] c the control character to map
+	/// \brief Get the name of a control character as string
+	/// \param [in] c the control character to map
 	static const char* name( ControlCharacter c)
 	{
-		static const char* name[ NofControlCharacter] = {"Undef", "EndOfText", "EndOfLine", "Cntrl", "Space", "Amp", "Lt", "Equal", "Gt", "Slash", "Exclam", "Questm", "Sq", "Dq", "Osb", "Csb", "Any"};
+		static const char* name[ NofControlCharacter] = {"Undef", "EndOfText", "EndOfLine", "Cntrl", "Space", "Amp", "Lt", "Equal", "Gt", "Slash", "Dash", "Exclam", "Questm", "Sq", "Dq", "Osb", "Csb", "Any"};
 		return name[ (unsigned int)(unsigned char)c];
 	}
 };

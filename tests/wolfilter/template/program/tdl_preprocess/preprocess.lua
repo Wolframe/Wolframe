@@ -1,14 +1,27 @@
 function run( inp )
+	logger.printc( "RUN 1")
 	it = inp:table()
+	logger.printc( "RUN 2")
 	getData = provider.formfunction("getData")
+	logger.printc( "RUN 3")
 	res = getData( it)
+	logger.printc( "RUN 4")
 	rt = res:table()
+	logger.printc( "RUN 5")
 	insertWords = provider.formfunction("insertWords")
+	logger.printc( "RUN 6")
 	insertWords( { data = rt } )
+	logger.printc( "RUN 7")
 	getDataFiltered = provider.formfunction("getDataFiltered")
+	logger.printc( "RUN 8")
 	resfiltered = getDataFiltered( it)
+	logger.printc( "RUN 9")
 	resfilteredtab = resfiltered:table()
-	table.insert( rt, resfilteredtab)
+	logger.printc( "RUN 10")
+	for k,v in ipairs(  resfilteredtab['person']) do
+		table.insert( rt.person, v)
+	end
+	logger.printc( "RUN 11")
 	return rt
 end
 
@@ -22,7 +35,7 @@ function luanorm( inp )
 				if k == "id" or k == "tag" then
 					rt[ k] = tonumber(v) + 100
 				else
-					local nf = provider.normalizer( "normname")
+					local nf = provider.type( "normname")
 					rt[ k] = nf( v)
 				end
 			end

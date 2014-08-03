@@ -29,12 +29,13 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file comauto/function.hpp
-//\brief Interface to execute form functions written in .NET
+///\file comauto/function.hpp
+///\brief Interface to execute form functions written in .NET
 #ifndef _Wolframe_COM_AUTOMATION_FUNCTION_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_FUNCTION_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "langbind/formFunction.hpp"
+#include "processor/execContext.hpp"
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
@@ -43,7 +44,7 @@ struct ITypeInfo;
 namespace _Wolframe {
 namespace comauto {
 
-//\brief Forward declarations
+///\brief Forward declarations
 class TypeLib;
 class CommonLanguageRuntime;
 class DotnetFunction;
@@ -57,7 +58,7 @@ public:
 
 	virtual bool call();
 
-	virtual void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None);
+	virtual void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f=serialize::Flags::None);
 
 	virtual langbind::TypedInputFilterR result() const;
 

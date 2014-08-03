@@ -32,9 +32,7 @@
 ************************************************************************/
 ///\file mainConnectionHandler.cpp
 #include "mainConnectionHandler.hpp"
-#include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
-#include "cmdbind/authCommandHandler.hpp"
-#include "interfaceCommandHandler.hpp"
+#include "processor/execContext.hpp"
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
@@ -44,338 +42,45 @@
 using namespace _Wolframe;
 using namespace _Wolframe::proc;
 
-enum State
+void MainConnectionHandler::initSessionExceptionBYE()
 {
-	Unauthorized,
-	Authorization,
-	Authorized
-};
-
-struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
-{
-	STM()
-	{
-		(*this)
-			[Unauthorized]
-				.cmd< &CommandHandler::doAuth >( "AUTH")
-				.cmd< &CommandHandler::doQuit >( "QUIT")
-				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
-			[Authorization]
-				.cmd< &CommandHandler::doMech >( "MECH")
-				.cmd< &CommandHandler::doQuit >( "QUIT")
-				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
-			[Authorized]
-				.cmd< &CommandHandler::doRequest >( "REQUEST")
-				.cmd< &CommandHandler::doInterface >( "INTERFACE")
-				.cmd< &CommandHandler::doAuth >( "AUTH")
-				.cmd< &CommandHandler::doQuit >( "QUIT")
-				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
-		;
-	}
-};
-static STM stm;
-
-CommandHandler::CommandHandler()
-	:cmdbind::LineCommandHandlerTemplate<CommandHandler>( &stm ){}
-
-int CommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
-{
-	if (argc != 0)
-	{
-		out << "ERR unexpected arguments" << endl();
-		return stateidx();
-	}
-	else
-	{
-		out << "OK" << boost::algorithm::join( cmds(), " ") << endl();
-		return stateidx();
-	}
+	const char* termCommandStr = m_protocolHandler.get()?m_protocolHandler->interruptDataSessionMarker():"";
+	m_exceptionByeMessage.append( termCommandStr?termCommandStr:"");
+	m_exceptionByeMessage.append( "BYE\r\n");
+	m_exceptionByeMessagePtr = m_exceptionByeMessage.c_str();
 }
 
-int CommandHandler::doQuit( int argc, const char**, std::ostream& out)
+void MainConnectionHandler::networkInput( const void* dt, std::size_t nofBytes)
 {
-	if (argc != 0)
+	try
 	{
-		out << "ERR unexpected arguments" << endl();
-		return stateidx();
+		m_protocolHandler->putInput( dt, nofBytes);
+		return;
 	}
-	else
+	catch (const std::runtime_error& err)
 	{
-		out << "BYE" << endl();
-		return -1;
+		LOG_ERROR << "must terminate connection because of uncaught runtime error exception in command handler (putInput): " << err.what();
 	}
-}
-
-int CommandHandler::doAuth( int argc, const char**, std::ostream& out)
-{
-	if (argc != 0)
+	catch (const std::bad_alloc& err)
 	{
-		out << "ERR AUTH no arguments expected" << endl();
-		return stateidx();
+		LOG_ERROR << "must terminate connection because of uncaught out of memory exception in command handler (putInput): " << err.what();
 	}
-	else
+	catch (const std::logic_error& err)
 	{
-		out << "MECHS " << boost::algorithm::join( m_authMechanisms.list(), " ") << "NONE" << endl();
-		return Authorization;
+		LOG_ERROR << "must terminate connection because of uncaught logic error exception in command handler (putInput): " << err.what();
 	}
-}
-
-int CommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
-{
-	cmdbind::AuthCommandHandler* chnd = dynamic_cast<cmdbind::AuthCommandHandler*>( ch);
-	cmdbind::CommandHandlerR chr( ch);
-	const char* error = ch->lastError();
-	if (error)
-	{
-		out << "ERR authorization " << error << endl();
-		return -1;
-	}
-	else
-	{
-		out << "OK authorization" << endl();
-		m_authtickets.push_back( chnd->ticket());
-		return Authorized;
-	}
-}
-
-int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
-{
-	if (argc == 0)
-	{
-		out << "ERR argument (mechanism identifier) expected for MECH" << endl();
-		return stateidx();
-	}
-	if (argc >= 2)
-	{
-		out << "ERR to many arguments for MECH" << endl();
-		return stateidx();
-	}
-	if (boost::iequals( std::string(argv[0]), "NONE"))
-	{
-		out << "OK authorization" << endl();
-		m_authtickets.push_back( "none");
-		return Authorized;
-	}
-	cmdbind::AuthCommandHandler* authch = m_authMechanisms.get( argv[0]);
-	if (!authch)
-	{
-		out << "ERR no handler defined for authorization mechanism " << argv[0] << "'" << endl();
-		return stateidx();
-	}
-	authch->setProcProvider( m_provider);
-	delegateProcessing<&CommandHandler::endMech>( authch);
-	return stateidx();
-}
-
-int CommandHandler::endInterface( cmdbind::CommandHandler* ch, std::ostream&)
-{
-	delete ch;
-	int rt = stateidx();
-	return rt;
-}
-
-int CommandHandler::doInterface( int argc, const char**, std::ostream& out)
-{
-	if (argc != 0)
-	{
-		out << "ERR INTERFACE unexpected arguments" << endl();
-		return stateidx();
-	}
-	cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new InterfaceCommandHandler( roles());
-	out << "OK INTERFACE enter commands" << endl();
-	delegateProcessing<&CommandHandler::endInterface>( delegate_ch);
-	return stateidx();
-}
-
-static bool IsCntrl( char ch) {return ch>0 && ch <=32;}
-
-int CommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out)
-{
-	cmdbind::CommandHandlerR chr( chnd);
-	int rt = stateidx();
-	const char* error = chnd->lastError();
-	if (error)
-	{
-		std::string errstr( error?error:"unspecified error");
-		std::replace_if( errstr.begin(), errstr.end(), IsCntrl, ' ');
-		out << "ERR REQUEST " << errstr << endl();
-		LOG_ERROR << "error in execution of REQUEST " << m_command << ":" << errstr;
-	}
-	else
-	{
-		out << "OK REQUEST " << m_command << endl();
-	}
-	return rt;
-}
-
-bool CommandHandler::redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out)
-{
-	void* buf;
-	std::size_t bufsize;
-	fromh->getInputBuffer( buf, bufsize);
-	return Parent::redirectInput( buf, bufsize, toh, out);
-}
-
-int CommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out)
-{
-	cmdbind::CommandHandlerR chr( ch);
-	const char* err = ch->lastError();
-	out << "ERR " << (err?err:"document type")<< LineCommandHandler::endl();
-	return stateidx();
-}
-
-int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out)
-{
-	cmdbind::DoctypeFilterCommandHandler* chnd = dynamic_cast<cmdbind::DoctypeFilterCommandHandler*>( ch);
-	cmdbind::CommandHandlerR chr( ch);
-	std::string doctype = chnd->doctypeid();
-	std::string docformat = chnd->docformatid();
-	const char* docformatptr = docformat.c_str();
-
-	const char* error = ch->lastError();
-	if (error)
-	{
-		std::ostringstream msg;
-		msg << "failed to retrieve document type (" << error << ")";
-		cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
-		if (m_commandtag.empty())
-		{
-			out << "ANSWER" << endl();
-		}
-		else
-		{
-			out << "ANSWER " << '&' << m_commandtag << endl();
-		}
-		if (redirectConsumedInput( chnd, delegate_ch, out))
-		{
-			delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
-		}
-		else
-		{
-			out << "ERR doctype detection " << error << endl();
-			delete delegate_ch;
-		}
-		return stateidx();
-	}
-	if (!doctype.empty())
-	{
-		m_command.append(doctype);
-	}
-	cmdbind::CommandHandler* execch = m_provider->cmdhandler( m_command);
-	if (!execch)
-	{
-		std::ostringstream msg;
-		if (m_command.empty())
-		{
-			msg << "ERR got no document type and no command defined (empty request ?)";
-		}
-		else
-		{
-			msg << "no command handler for '" << m_command << "'";
-		}
-		execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
-		if (m_commandtag.empty())
-		{
-			out << "ANSWER" << endl();
-		}
-		else
-		{
-			out << "ANSWER " << '&' << m_commandtag << endl();
-		}
-		if (redirectConsumedInput( chnd, execch, out))
-		{
-			delegateProcessing<&CommandHandler::endErrDocumentType>( execch);
-		}
-		else
-		{
-			out << "ERR " << msg.str() << endl();
-			delete execch;
-		}
-		return stateidx();
-	}
-	else
-	{
-		execch->passParameters( m_command, 1, &docformatptr);
-		execch->setProcProvider( m_provider);
-		if (m_commandtag.empty())
-		{
-			out << "ANSWER" << endl();
-		}
-		else
-		{
-			out << "ANSWER " << '&' << m_commandtag << endl();
-		}
-		if (redirectConsumedInput( chnd, execch, out))
-		{
-			delegateProcessing<&CommandHandler::endRequest>( execch);
-		}
-		else
-		{
-			if (execch->lastError())
-			{
-				std::string errstr( execch->lastError());
-				std::replace_if( errstr.begin(), errstr.end(), IsCntrl, ' ');
-				out << "ERR REQUEST " << m_command << " " << errstr << endl();
-			}
-			else
-			{
-				out << "OK REQUEST " << m_command << endl();
-			}
-			delete execch;
-		}
-		return stateidx();
-	}
-}
-
-int CommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
-{
-	m_command.clear();
-	m_commandtag.clear();
-	if (argc)
-	{
-		bool has_commandtag = false;
-		bool has_command = false;
-		for (int ii=0; ii<argc; ++ii)
-		{
-			if (argv[ii][0] == '&')
-			{
-				if (has_commandtag)
-				{
-					out << "ERR more than one command tag" << endl();
-					return stateidx();
-				}
-				has_commandtag = true;
-				m_commandtag.append( argv[ii]+1);
-			}
-			else
-			{
-				if (has_command)
-				{
-					out << "ERR to many arguments" << endl();
-					return stateidx();
-				}
-				has_command = true;
-				m_command.append( argv[ii]);
-			}
-		}
-	}
-	CommandHandler* ch = (CommandHandler*)new cmdbind::DoctypeFilterCommandHandler();
-	delegateProcessing<&CommandHandler::endDoctypeDetection>( ch);
-	return stateidx();
-}
-
-void Connection::networkInput( const void* dt, std::size_t nofBytes)
-{
-	m_cmdhandler.putInput( dt, nofBytes);
-}
-
-void Connection::signalOccured( NetworkSignal)
-{
-	LOG_TRACE << "Got signal";
+	initSessionExceptionBYE();
 	m_terminated = true;
 }
 
-const net::NetworkOperation Connection::nextOperation()
+void MainConnectionHandler::signalOccured( NetworkSignal)
+{
+	LOG_TRACE << "Got signal";
+	// ... on a signal we terminate immediately without sending a session exception BYE message
+	m_terminated = true;
+}
+
+const net::NetworkOperation MainConnectionHandler::nextOperation()
 {
 	void* inpp;
 	std::size_t inppsize;
@@ -383,41 +88,101 @@ const net::NetworkOperation Connection::nextOperation()
 	std::size_t outppsize;
 	if (m_terminated)
 	{
+		if (m_exceptionByeMessagePtr)
+		{
+			m_exceptionByeMessagePtr = 0;
+			return net::SendData( m_exceptionByeMessage.c_str(), m_exceptionByeMessage.size());
+		}
 		return net::CloseConnection();
 	}
-	switch(m_cmdhandler.nextOperation())
+	try
 	{
-		case cmdbind::CommandHandler::READ:
-			m_cmdhandler.getInputBlock( inpp, inppsize);
-			return net::ReadData( inpp, inppsize);
-
-		case cmdbind::CommandHandler::WRITE:
-			m_cmdhandler.getOutput( outpp, outppsize);
-			return net::SendData( outpp, outppsize);
-
-		case cmdbind::CommandHandler::CLOSE:
-			return net::CloseConnection();
+		switch(m_protocolHandler->nextOperation())
+		{
+			case cmdbind::CommandHandler::READ:
+				m_protocolHandler->getInputBlock( inpp, inppsize);
+				return net::ReadData( inpp, inppsize, m_protocolHandler->execContext()->defaultTimeout());
+	
+			case cmdbind::CommandHandler::WRITE:
+				m_protocolHandler->getOutput( outpp, outppsize);
+				return net::SendData( outpp, outppsize);
+	
+			case cmdbind::CommandHandler::CLOSE:
+				return net::CloseConnection();
+		}
+		return net::CloseConnection();
 	}
-	return net::CloseConnection();
+	catch (const std::runtime_error& err)
+	{
+		LOG_ERROR << "must terminate connection because of uncaught runtime error exception in command handler (nextOperation): " << err.what();
+	}
+	catch (const std::bad_alloc& err)
+	{
+		LOG_ERROR << "must terminate connection because of uncaught out of memory exception in command handler (nextOperation): " << err.what();
+	}
+	catch (const std::logic_error& err)
+	{
+		LOG_ERROR << "must terminate connection because of uncaught logic error exception in command handler (nextOperation): " << err.what();
+	}
+	initSessionExceptionBYE();
+	m_exceptionByeMessagePtr = 0;
+	m_terminated = true;
+	return net::SendData( m_exceptionByeMessage.c_str(), m_exceptionByeMessage.size());
 }
 
-Connection::Connection( const net::LocalEndpoint& local)
-	:m_cmdhandler()
+MainConnectionHandler::MainConnectionHandler( const net::LocalEndpointR& local)
+	:m_localEndPoint(local)
+	,m_input(0)
+	,m_inputsize(0)
+	,m_output(0)
+	,m_outputsize(0)
 	,m_terminated(false)
+	,m_exceptionByeMessagePtr(0)
 {
-	m_cmdhandler.setInputBuffer( m_input.ptr(), m_input.size());
-	m_cmdhandler.setOutputBuffer( m_output.ptr(), m_output.size());
-	LOG_TRACE << "Created connection handler for " << local.toString();
+	m_input = (char*)std::malloc( NeworkBufferSize);
+	m_output = (char*)std::malloc( NeworkBufferSize);
+	if (!m_input || !m_output)
+	{
+		if (m_input) std::free( m_input);
+		if (m_output) std::free( m_output);
+		throw std::bad_alloc();
+	}
+	LOG_TRACE << "Created connection handler for " << local->toString();
 }
 
-Connection::~Connection()
+MainConnectionHandler::~MainConnectionHandler()
 {
+	if (m_input) std::free( m_input);
+	if (m_output) std::free( m_output);
 	LOG_TRACE << "Connection handler destroyed";
 }
 
-void Connection::setPeer( const net::RemoteEndpoint& remote)
+void MainConnectionHandler::setPeer( const net::RemoteEndpointR& remote)
 {
-	LOG_TRACE << "Peer set to " << remote.toString();
+	LOG_TRACE << "Peer set to " << remote->toString();
+	m_remoteEndPoint = remote;
+	if (m_protocolHandler.get())
+	{
+		m_protocolHandler->setPeer( m_remoteEndPoint);
+	}
 }
 
+void MainConnectionHandler::setExecContext( proc::ExecContext* context_)
+{
+	std::string protocol = m_localEndPoint->config().protocol;
+	if (protocol.empty())
+	{
+		protocol = "wolframe";
+	}
+	m_protocolHandler.reset( context_->provider()->protocolHandler( protocol));
+	if (!m_protocolHandler.get())
+	{
+		throw std::runtime_error( std::string("protocol '") + protocol + "' is not defined");
+	}
+	m_protocolHandler->setExecContext( context_);
+	m_protocolHandler->setInputBuffer( m_input, m_inputsize);
+	m_protocolHandler->setOutputBuffer( m_output, m_outputsize, 0);
+	m_protocolHandler->setLocalEndPoint( m_localEndPoint);
+	m_protocolHandler->setPeer( m_remoteEndPoint);
+}
 

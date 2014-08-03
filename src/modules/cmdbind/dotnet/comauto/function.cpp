@@ -59,19 +59,19 @@ public:
 	~Impl();
 	bool call();
 
-	void init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None);
+	void init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f=serialize::Flags::None);
 
 	langbind::TypedInputFilterR result() const;
 
 private:
-	const proc::ProcessorProvider* m_provider;		//< processor provider reference for function called
+	proc::ExecContext* m_context;					//< execution context reference for function called
 	const DotnetFunction* m_func;					//< function to call
 	langbind::TypedInputFilterR m_input;				//< input parameters
-	serialize::Context::Flags m_flags;				//< flag passed by called to stear validation strictness
+	serialize::Flags::Enum m_flags;					//< flag passed by called to stear validation strictness
 	VARIANT* m_param;						//< array of function parameters to initialize
 	enum {null_paramidx=0xFFFF};
 	std::size_t m_paramidx;						//< currently selected parameter of the function [0,1,.. n-1]
-	AssignmentClosureR m_paramclosure;			//< closure for current parameter assignment
+	AssignmentClosureR m_paramclosure;				//< closure for current parameter assignment
 	std::map<std::size_t,std::vector<VARIANT> > m_arrayparam;	//< temporary buffer for parameters passed as array (with their name)
 	IDispatch* m_providerdispatch;					//< IDispatch Interface of processor provider
 	langbind::TypedInputFilterR m_result;				//< reference to result of the function call
@@ -432,9 +432,9 @@ const comauto::DotnetFunction::Impl::Parameter* comauto::DotnetFunction::Impl::g
 }
 
 comauto::DotnetFunctionClosure::Impl::Impl( const DotnetFunction* func_)
-		:m_provider(0)
+		:m_context(0)
 		,m_func(func_)
-		,m_flags(serialize::Context::None)
+		,m_flags(serialize::Flags::None)
 		,m_param(0)
 		,m_paramidx(null_paramidx)
 		,m_providerdispatch(0)
@@ -469,9 +469,9 @@ comauto::DotnetFunctionClosure::Impl::~Impl()
 	}
 }
 
-void comauto::DotnetFunctionClosure::Impl::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+void comauto::DotnetFunctionClosure::Impl::init( proc::ExecContext* c, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f)
 {
-	m_provider = p;
+	m_context = c;
 	m_input = i;
 	m_flags = f;
 	std::size_t ii = 0,nn = m_func->m_impl->nofParameter();
@@ -610,7 +610,7 @@ AGAIN:
 			m_param[ pi->first] = comauto::createVariantArray( pi->second[0].vt, recinfo, pi->second);
 		}
 		// function signature validation:
-		if ((m_flags & serialize::Context::ValidateAttributes) != 0)
+		if ((m_flags & serialize::Flags::ValidateAttributes) != 0)
 		{
 			// ... ignored because XML attributes are unknown in .NET structures ...
 		}
@@ -621,7 +621,7 @@ AGAIN:
 			{
 				const DotnetFunction::Impl::Parameter* param = m_func->m_impl->getParameter( ii);
 
-				if ((m_flags & serialize::Context::ValidateInitialization) != 0)
+				if ((m_flags & serialize::Flags::ValidateInitialization) != 0)
 				{
 					throw std::runtime_error( std::string( "missing parameter '") + param->name + "'");
 				}
@@ -665,7 +665,7 @@ AGAIN:
 					case DotnetFunction::Impl::Parameter::ProcProvider:
 						if (!m_providerdispatch)
 						{
-							m_providerdispatch = ProcessorProviderDispatch::create( m_provider, m_func->m_impl->typelib(), m_func->m_impl->typelib()->getProviderInterface());
+							m_providerdispatch = ProcessorProviderDispatch::create( m_context, m_func->m_impl->typelib(), m_func->m_impl->typelib()->getProviderInterface());
 						}
 						m_param[ ii].vt = VT_DISPATCH | VT_BYREF;
 						m_providerdispatch->AddRef();
@@ -713,9 +713,9 @@ bool DotnetFunctionClosure::call()
 	return m_impl->call();
 }
 
-void DotnetFunctionClosure::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
+void DotnetFunctionClosure::init( proc::ExecContext* e, const langbind::TypedInputFilterR& i, serialize::Flags::Enum f)
 {
-	m_impl->init( p, i, f);
+	m_impl->init( e, i, f);
 }
 
 langbind::TypedInputFilterR DotnetFunctionClosure::result() const

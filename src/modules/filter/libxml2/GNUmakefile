@@ -16,12 +16,14 @@ INCLUDE_CXXFLAGS += \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwfsingleton \
 	$(LIBXML2_LIB_DIRS) \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	$(LIBXML2_LIBS)
-
+	$(LIBXML2_LIBS) \
+	-lwfsingleton \
+	-lwolframe
 
 # libxslt
 
@@ -41,8 +43,7 @@ CPP_OBJS = \
 	outputfilterImpl.o \
 	xsltMapper.o \
 	xsltProgramType.o \
-	libxml2_filter.o \
-	mod_filter_libxml2.o
+	libxml2_filter.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

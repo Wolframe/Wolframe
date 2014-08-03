@@ -42,6 +42,9 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\stage\lib"
 ##############################
 PGSQL_DIR = C:\Program Files (x86)\PostgreSQL\9.3
 
+# OpenSSL
+###########
+OPENSSL_DIR=C:\OpenSSL-Win32\include
 
 # win_iconv
 ###########
@@ -50,3 +53,7 @@ WIN_ICONV_DIR = C:\Iconv\iconv-1.9.2
 # libxml2
 #########
 LIBXML2_DIR = C:\LibXML2\libxml2-2.7.8
+
+# Oracle
+########
+ORACLE_DIR = C:\Oracle\sdk-nt-12.1.0.1.0\instantclient_12_1

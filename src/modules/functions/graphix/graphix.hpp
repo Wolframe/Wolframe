@@ -34,8 +34,9 @@
 ///\brief Interface for graphix functions
 #ifndef _Wolframe_MODULE_FUNCTIONS_GRAPHIX_HPP_INCLUDED
 #define _Wolframe_MODULE_FUNCTIONS_GRAPHIX_HPP_INCLUDED
-#include "serialize/struct/filtermapDescription.hpp"
-#include "processor/procProvider.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
+#include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <string>
 #include <vector>
 
@@ -81,15 +82,10 @@ class ImageImpl
 		static std::string encode( const std::string &data );
 		
 	public:
-		static const serialize::StructDescriptionBase *getStructDescription( );
-		static int info( ImageInfo &res, const Image &param );
-		static int thumb( Image &res, const ImageThumb &param );
-		static int rescale( Image &res, const ImageRescale &param );
+		static int info( proc::ExecContext* ctx, ImageInfo &res, const Image &param );
+		static int thumb( proc::ExecContext* ctx, Image &res, const ImageThumb &param );
+		static int rescale( proc::ExecContext* ctx, Image &res, const ImageRescale &param );
 };
-
-int imageInfoExec( const proc::ProcessorProvider* provider, void *res, const void *param );
-int imageThumbExec( const proc::ProcessorProvider* provider, void *res, const void *param );
-int imageRescaleExec( const proc::ProcessorProvider* provider, void *res, const void *param );
 
 }}
 #endif

@@ -39,6 +39,7 @@
 
 #include <string>
 
+#include "config/configurationTree.hpp"
 #include "AAAA/audit.hpp"
 #include "module/constructor.hpp"
 
@@ -57,7 +58,7 @@ public:
 	const char* className() const		{ return FILE_AUDIT_CLASS_NAME; }
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -65,6 +66,7 @@ public:
 private:
 	bool		m_required;
 	std::string	m_file;
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 

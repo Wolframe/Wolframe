@@ -1,4 +1,4 @@
-<chapter>
+<sect1>
 <title>Forms</title>
 <para>
 Forms are data structures used to validate input and output data and to do some basic normalization
@@ -24,4 +24,4 @@ a section that describes how the server configuration of <application>Wolframe</
 </para>
 	&AppProgramForms;
 	&AppProgramFormDataTypes;
-</chapter>
+</sect1>

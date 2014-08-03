@@ -27,14 +27,22 @@ clean: clean_recursive clean_po local_clean
 	-@rm -f *.core  2>/dev/null
 	-@rm -rf $(STATIC_LIB) 2>/dev/null
 	-@rm -rf $(NOINST_STATIC_LIB) 2>/dev/null
-	-@rm -f $(SH_OBJS) rm -f $(SHPP_OBJS) 2>/dev/null
 ifneq "$(DYNAMIC_LIB)" ""
 	-@rm -rf $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) 2>/dev/null
 	-@rm -rf $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR) 2>/dev/null
 	-@rm -rf $(DYNAMIC_LIB) 2>/dev/null
 endif
+ifneq "$(NOINST_DYNAMIC_LIB)" ""
+	-@rm -rf $(NOINST_DYNAMIC_LIB).$(NOINST_DYNAMIC_LIB_MAJOR).$(NOINST_DYNAMIC_LIB_MINOR).$(NOINST_DYNAMIC_LIB_PATCH) 2>/dev/null
+	-@rm -rf $(NOINST_DYNAMIC_LIB).$(NOINST_DYNAMIC_LIB_MAJOR) 2>/dev/null
+	-@rm -rf $(NOINST_DYNAMIC_LIB) 2>/dev/null
+endif
 ifneq "$(DYNAMIC_MODULE)" ""
+	-@rm -rf $(DYNAMIC_MODULE_OBJ) 2>/dev/null
 	-@rm -rf $(DYNAMIC_MODULE) 2>/dev/null
+endif
+ifneq "$(NOINST_DYNAMIC_MODULE)" ""
+	-@rm -rf $(NOINST_DYNAMIC_MODULE) 2>/dev/null
 endif
 
 

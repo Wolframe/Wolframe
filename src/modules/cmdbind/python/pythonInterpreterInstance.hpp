@@ -33,9 +33,10 @@ Project Wolframe.
 ///\brief Interface to interpreter instances created for running one form function call to python
 #ifndef _Wolframe_PYTHON_INTERPRETER_INSTANCE_HPP_INCLUDED
 #define _Wolframe_PYTHON_INTERPRETER_INSTANCE_HPP_INCLUDED
+#include "processor/execContext.hpp"
 #include "pythonStructure.hpp"
 #include "types/variant.hpp"
-#include "processor/procProvider.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <utility>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -55,7 +56,7 @@ public:
 	virtual ~InterpreterInstance(){}
 
 	///\brief Call a function written in 'Mylang'
-	StructureR call( const proc::ProcessorProvider* provider, const StructureR& arg);
+	StructureR call( proc::ExecContext* ctx, const StructureR& arg);
 };
 
 typedef boost::shared_ptr<InterpreterInstance> InterpreterInstanceR;

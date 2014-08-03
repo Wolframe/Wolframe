@@ -17,6 +17,7 @@ INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	Advapi32.lib
 
 # openssl
@@ -59,21 +60,18 @@ local_clean:
 
 local_distclean:
 
-local_test:
-# Aba: doesn't work on Windows yet, Windows telnet trouble
+copy_prereq:
+	@-copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" . >NUL
+!IFDEF WITH_SSL
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >NUL
+!ENDIF
+
+local_test: copy_prereq
+# Aba: doesn't work on Windows, tcl crashes!
 #!IFDEF WITH_EXPECT
-#!IFDEF WITH_SSL
-#	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
-#	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
-#!ENDIF
 #	@-"$(EXPECT)" testEcho
 #!ENDIF
 
-run: $(CPP_BINS)
-	@-echo @echo off > test.bat
-!IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
-!ENDIF
-	@-echo echod.exe -c echo.conf >> test.bat
-	@-test.bat
+run: $(CPP_BINS) copy_prereq
+	@-echod.exe -c echo.conf

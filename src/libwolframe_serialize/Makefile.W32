@@ -22,15 +22,19 @@ LIBRARIES = \
 	wolframe_serialize.lib
 
 CPP_OBJS = \
-	ddl_filtermapParse.obj \
-	ddl_filtermapSerialize.obj \
+	ddl\ddlStructParser.obj \
+	ddl\ddlStructSerializer.obj \
 	mapContext.obj \
 	serializationErrorException.obj \
-	struct_filtermapBase.obj \
-	struct_filtermapParse.obj \
-	struct_filtermapParseStack.obj \
-	struct_filtermapSerialize.obj \
-	struct_filtermapSerializeStack.obj \
+	cppFormFunction.obj \
+	configSerialize.obj \
+	struct\intrusiveParser.obj \
+	struct\intrusiveSerializer.obj \
+	struct\parseStack.obj \
+	struct\serializeStack.obj \
+	struct\structDescriptionBase.obj \
+	struct\structParser.obj \
+	struct\structSerializer.obj \
 	structOptionParser.obj \
 	tostringUtils.obj
 
@@ -44,6 +48,7 @@ wolframe_serialize.lib: $(OBJS) $(CPP_OBJS)
 local_all:
 
 local_clean:
+	-@erase ddl\*.obj struct\*.obj >NUL 2>NUL
 
 local_distclean:
 

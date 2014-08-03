@@ -11,9 +11,11 @@ testdata="
 LoadModules
 {
 	module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../../src/modules/cmdbind/lua/mod_command_lua
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 }
 Database
 {
@@ -35,6 +37,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter #FILTER#
 		}
 	}
 }

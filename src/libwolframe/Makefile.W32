@@ -7,7 +7,7 @@ SUBDIRS =
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
-# textwolf support for module types_string
+# textwolf support for module types/string
 !IFDEF WITH_TEXTWOLF
 INCLUDE_CXXFLAGS = \
 	$(INCLUDE_CXXFLAGS) /DWITH_TEXTWOLF
@@ -18,7 +18,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)"
 
-# textwolf support for module types_string
+# textwolf support for module types/string
 !IFDEF WITH_TEXTWOLF
 INCLUDE_DIRS = \
 	$(INCLUDE_DIRS) /I$(TOPDIR)\3rdParty\textwolf\include
@@ -31,71 +31,57 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS =
 
 LIBRARIES = \
-	wolframe.lib \
-	logger\wolframemsg.dll
-
-LOGGER_OBJS = \
-	logger\logLevel.obj \
-	logger\logSyslogFacility.obj \
-	logger\logError.obj \
-	logger\logObject.obj \
-	logger\logBackendConsole.obj \
-	logger\logBackendFile.obj \
-	logger\logBackendSyslog.obj \
-	logger\syslog_win32.obj \
-	logger\logBackendEventlog.obj \
-	logger\logBackendWinDebug.obj \
-	logger\logBackendImpl.obj \
-	logger\loggerConfig.obj
-
-PROVIDER_OBJS = \
-	provider\Authentication.obj \
-	provider\Authorization.obj \
-	provider\Audit.obj \
-	provider\AAAAproviderImpl.obj \
-	provider\AAAAproviderConfig.obj \
-	provider\DBproviderImpl.obj \
-	provider\DBproviderConfig.obj \
-	provider\procProvider.obj \
-	provider\procProviderImpl.obj \
+	wolframe.lib
 
 TYPE_OBJS = \
-	types_string.obj \
-	types_bignumber.obj \
-	types_datetime.obj \
-	types_doctype.obj \
-	types_customDataType.obj \
-	types_variant.obj \
-	types_variantStructDescription.obj \
-	types_variantStruct.obj
+	types\docmetadata.obj \
+	types\conversions.obj \
+	types\numberBaseConversion.obj \
+	types\propertyTree.obj \
+	types\string.obj \
+	types\bignumber.obj \
+	types\datetime.obj \
+	types\customDataType.obj \
+	types\addressRestriction.obj \
+	types\variant.obj \
+	types\variantStructDescription.obj \
+	types\variantStruct.obj \
+	types\form.obj
+
+UTIL_OBJS = \
+	utils\asciiCharParser.obj \
+	utils\fileLineInfo.obj \
+	utils\sourceLineInfo.obj \
+	utils\typeSignature.obj \
+	utils\allocators.obj \
+	utils\malloc.obj \
+	utils\stringUtils.obj \
+	utils\fileUtils.obj \
+	utils\parseUtils.obj \
+	utils\printFormats.obj
 
 CPP_OBJS = \
-	$(LOGGER_OBJS) \
-	$(PROVIDER_OBJS) \
 	$(TYPE_OBJS) \
-	malloc.obj \
+	$(UTIL_OBJS) \
+	logError.obj \
 	version.obj \
-	appInfo.obj \
+	platform.obj \
+	execContext.obj \
 	getPassword.obj \
 	user.obj \
-	moduleDirectory.obj \
-	utils_printFormats.obj \
-	utils_conversions.obj \
-	stringUtils.obj \
-	fileUtils.obj \
-	parseUtils.obj \
-	types_allocators.obj \
-	typeSignature.obj \
-	password.obj \
-	globalRndGen.obj \
+	base64.obj \
 	HMAC.obj \
 	PBKDF2.obj \
-	CRAM.obj
+	passwordHash.obj \
+	usernameHash.obj \
+	CRAM.obj \
+	pwdChangeMessage.obj
 
 OBJS = \
 	b64encode.obj \
 	b64decode.obj \
 	byte2hex.obj \
+	AES256.obj \
 	sha1.obj \
 	sha2.obj \
 	hmac_sha1.obj \
@@ -107,22 +93,14 @@ all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-logger\wolframemsg.dll: logger\wolframemsg.res
-	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
-logger\wolframemsg.res: logger\wolframemsg.rc
-logger\wolframemsg.rc: logger\wolframemsg.mc
-logger\logBackendEventlog.obj: logger\wolframemsg.rc
-
 wolframe.lib: $(OBJS) $(CPP_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all:
 
 local_clean:
-	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
-	@-erase MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
-	@-erase logger\*.obj 2>NUL
-	@-erase provider\*.obj 2>NUL
+	@-erase types\*.obj 2>NUL
+	@-erase utils\*.obj 2>NUL
 
 local_distclean:
 

@@ -29,130 +29,123 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/inputfilter.hpp
-///\brief Interface for input filter
+/// \file filter/inputfilter.hpp
+/// \brief Interface for input filter
 
 #ifndef _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
-#include "types/countedReference.hpp"
+#include "types/sharedReference.hpp"
+#include "types/docmetadata.hpp"
 #include "filter/filterbase.hpp"
-#include "filter/contentfilterAttributes.hpp"
 #include <string>
 #include <stdexcept>
+#include <cstring>
+#include <cstdlib>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class InputFilter
-///\brief Input filter
+/// \class InputFilter
+/// \brief Input filter
 class InputFilter
-	:public FilterBase, public ContentFilterAttributes
+	:public ContentFilterBase
 {
 public:
-	///\enum State
-	///\brief State of the input filter
+	/// \enum State
+	/// \brief State of the input filter
 	enum State
 	{
-		Open,		//< serving data - normal input processing
-		EndOfMessage,	//< have to yield processing because end of message reached
-		Error		//< have to stop processing with an error
+		Start,		///< state after first initialization
+		Open,		///< serving data - normal input processing
+		EndOfMessage,	///< have to yield processing because end of message reached
+		Error		///< have to stop processing with an error
 	};
 
-	///\brief Default constructor
-	InputFilter()
-		:types::TypeSignature("langbind::InputFilter", __LINE__)
-		,m_state(Open){}
+	/// \brief Constructor
+	explicit InputFilter( const char* name_)
+		:ContentFilterBase(name_)
+		,m_state(Start)
+		,m_metadata( new types::DocMetaData()){}
 
-	///\brief Copy constructor
-	///\param[in] o input filter to copy
+	/// \brief Constructor
+	InputFilter( const char* name_, const types::DocMetaData& metadata)
+		:ContentFilterBase(name_)
+		,m_state(Start)
+		,m_metadata( new types::DocMetaData( metadata)){}
+
+	/// \brief Copy constructor
+	/// \param[in] o input filter to copy
 	InputFilter( const InputFilter& o)
-		:types::TypeSignature(o)
-		,FilterBase(o)
-		,m_state(o.m_state){}
+		:ContentFilterBase(o)
+		,m_state(o.m_state)
+		,m_metadata( new types::DocMetaData( *o.m_metadata)){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~InputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual InputFilter* copy() const=0;
 
-	///\brief Declare the next input chunk to the filter
-	///\param [in] ptr the start of the input chunk
-	///\param [in] size the size of the input chunk in bytes
-	///\param [in] end true, if end of input (the last chunk) has been reached.
+	/// \brief Declare the next input chunk to the filter
+	/// \param [in] ptr the start of the input chunk
+	/// \param [in] size the size of the input chunk in bytes
+	/// \param [in] end true, if end of input (the last chunk) has been reached.
 	virtual void putInput( const void* ptr, std::size_t size, bool end)=0;
 
-	///\brief Get the rest of the input chunk left unparsed yet (defaults to nothing left)
-	///\param [out] ptr the start of the input chunk left to parse
-	///\param [out] size the size of the input chunk left to parse in bytes
-	///\param [out] end true, if end of input (the last chunk) has been reached.
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	{
-		ptr = 0;
-		size = 0;
-		end = false;
-	}
-
-	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
-	virtual bool getValue( const char* name, std::string& val)
-	{
-		if (std::strcmp( name, "encoding") == 0)
-		{
-			const char* ee = getEncoding();
-			if (ee)
-			{
-				val = ee;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		return FilterBase::getValue( name, val);
-	}
-
-	///\brief Get next element
-	///\param [out] type element type parsed
-	///\param [out] element pointer to element returned
-	///\param [out] elementsize size of the element returned
-	///\return true, if success, false, if not.
-	///\remark Check the filter state when false is returned
+	/// \brief Get next element
+	/// \param [out] type element type parsed
+	/// \param [out] element pointer to element returned
+	/// \param [out] elementsize size of the element returned
+	/// \return true, if success, false, if not.
+	/// \remark Check the filter state when false is returned
 	virtual bool getNext( ElementType& type, const void*& element, std::size_t& elementsize)=0;
 
-	///\brief Get type of the document
-	///\param [out] doctype the document type string returned
-	///\return true, if success, false, if not.
-	///\remark Check the filter state when false is returned
-	virtual bool getDocType( std::string& doctype)
+	/// \brief Get the current state
+	/// \return the current state
+	State state() const						{return m_state;}
+
+	/// \brief Set input filter state with error message
+	/// \param [in] s new state
+	/// \param [in] msg (optional) error to set
+	void setState( State s, const char* msg=0)			{m_state=s; setError(msg);}
+
+	/// \brief Get the document meta data if available
+	/// \return the metadata reference if already available, null, if not (if we have to feed more input or there was an error).
+	/// \remark Check the filter state for error when null is returned
+	virtual const types::DocMetaData* getMetaData()=0;
+
+	/// \brief Get a shared reference to the document meta data to link output filter to input filer meta data
+	virtual const types::DocMetaDataR& getMetaDataRef() const	{return m_metadata;}
+
+	/// \brief Set a document meta data attribute
+	void setAttribute( const std::string& name_, const std::string& value_)
 	{
-		doctype = "";
-		return true;
+		m_metadata->setAttribute( name_, value_);
 	}
 
-	///\brief Evaluate if the document metadata are avalable and set state for fetching them if needed
-	virtual bool getMetadata()
+	/// \brief Set a document type
+	void setDoctype( const std::string& doctype_)
+	{
+		m_metadata->setDoctype( doctype_);
+	}
+
+	/// \brief Validate the meta data passed to be correct for this filter
+	/// \return true, if the meta data defined in the argument structure are correct for this filter
+	virtual bool checkMetaData( const types::DocMetaData&)
 	{
 		return true;
 	}
-
-	///\brief Get the current state
-	///\return the current state
-	State state() const				{return m_state;}
-
-	///\brief Set input filter state with error message
-	///\param [in] s new state
-	///\param [in] msg (optional) error to set
-	void setState( State s, const char* msg=0)	{m_state=s; setError(msg);}
 
 private:
-	State m_state;				//< state
+	State m_state;				///< state
+	types::DocMetaDataR m_metadata;		///< meta data reference
 };
 
-///\typedef InputFilterR
-///\brief Shared input filter reference
-typedef types::CountedReference<InputFilter> InputFilterR;
+/// \typedef InputFilterR
+/// \brief Shared input filter (langbind::InputFilter) reference 
+typedef types::SharedReference<InputFilter> InputFilterR;
 
 
 }}//namespace

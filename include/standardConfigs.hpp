@@ -30,17 +30,16 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// standard configuration structures
-//
+/// \file standardConfigs.hpp
+/// \brief standard configuration structures
 
 #ifndef _STANDARD_CONFIGS_HPP_INCLUDED
 #define _STANDARD_CONFIGS_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
+#include "config/configurationTree.hpp"
 #include "system/serverEndpoint.hpp"
 #include "logger/logLevel.hpp"
-
 #include "logger/logSyslogFacility.hpp"
 
 #include <string>
@@ -66,7 +65,7 @@ public:
 	Configuration();
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -107,7 +106,7 @@ public:
 	LoggerConfiguration();
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -133,7 +132,6 @@ public:
 	std::string		user;
 	std::string		group;
 	std::string		pidFile;
-	std::string		serviceName;
 #endif
 #if defined( _WIN32 )
 	// Windows service configuration
@@ -146,7 +144,7 @@ public:
 	ServiceConfiguration();
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -171,6 +169,7 @@ public:
 		VERSION_MAJOR,
 		VERSION_MINOR,
 		VERSION_REVISION,
+		VERSION_BUILD,
 		PRODUCT_OS,
 		NONE,
 		UNDEFINED
@@ -182,7 +181,7 @@ public:
 	/// methods
 	std::string toString() const;
 
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;

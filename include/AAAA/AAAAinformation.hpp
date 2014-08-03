@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///
-/// \file AAAAinformation.hpp
-/// Header file for the objects used for AAAA information.
+/// \file AAAA/AAAAinformation.hpp
+/// \brief Header file for the objects used for AAAA information.
 ///
 
 #include "system/connectionEndpoint.hpp"
@@ -67,6 +67,8 @@ struct ConnectInfo : public Information
 		: local( lcl ), remote( rmt )	{}
 
 	Information::Type type() const		{ return CONNECTION; }
+private:
+	void operator=( const ConnectInfo&){}
 };
 
 }} // namespace _Wolframe::AAAA

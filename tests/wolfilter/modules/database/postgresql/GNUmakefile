@@ -16,22 +16,25 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR) \
 	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwolframe_database \
 	-lboost_filesystem \
+	$(TOPDIR)/src/modules/database/postgresql/mod_db_postgresql_lib.a \
+	-lwolframe_database \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
 	$(PGSQL_LIBS)
 
 DYNAMIC_MODULE = \
 	mod_db_postgresqltest.so
 
 CPP_OBJS = \
-	PostgreSQLModuleFiles.o \
-	PostgreSQLTest.o \
-	mod_db_postgresqltest.o
+	PostgreSQLTest.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

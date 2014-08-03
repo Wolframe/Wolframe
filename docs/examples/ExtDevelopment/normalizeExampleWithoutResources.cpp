@@ -6,45 +6,37 @@ class NormalizeInt
     :public types::NormalizeFunction
 {
 public:
-    NormalizeInt(){}
+    NormalizeInt( const std::vector<types::Variant>&){}
     virtual ~NormalizeInt(){}
     virtual const char* name() const
             {return "int";}
     virtual types::Variant execute( const types::Variant& i) const
             {return types::Variant( i.toint());}
-
-    static types::NormalizeFunction* create(
-            types::NormalizeResourceHandle*, const std::string&)
-    {
-        return new NormalizeInt();
-    }
+    virtual types::NormalizeFunction* copy() const
+            {return new NormalizeInt(*this);}
 };
 
 class NormalizeFloat
     :public types::NormalizeFunction
 {
 public:
-    NormalizeFloat(){}
+    NormalizeFloat( const std::vector<types::Variant>&){}
     virtual ~NormalizeFloat(){}
     virtual const char* name() const
             {return "float";}
     virtual types::Variant execute( const types::Variant& i) const
             {return types::Variant( i.todouble());}
-
-    static types::NormalizeFunction* create(
-            types::NormalizeResourceHandle*, const std::string&)
-    {
-        return new NormalizeFloat();
-    }
+    virtual types::NormalizeFunction* copy() const
+            {return new NormalizeFloat(*this);}
 };
 
-NORMALIZER_MODULE(
+WF_MODULE_BEGIN(
     "example1",
     "normalizer module without resources")
 
-NORMALIZER_FUNCTION( "int", NormalizeInt::create)
-NORMALIZER_FUNCTION( "float", NormalizeFloat::create)
+    WF_NORMALIZER( "int", NormalizeInt)
+    WF_NORMALIZER( "float", NormalizeFloat)
 
-NORMALIZER_MODULE_END
+WF_MODULE_END
 
 

@@ -30,6 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
+/// \file database/DBprovider.hpp
+/// \brief Database provider interface
 
 #ifndef _DATABASE_PROVIDER_HPP_INCLUDED
 #define _DATABASE_PROVIDER_HPP_INCLUDED
@@ -40,9 +42,9 @@
 
 namespace _Wolframe {
 
-/// Opaque definitions for ModulesDirectory
-namespace module { class ModulesDirectory; }
-
+namespace module {
+	class ModulesDirectory;
+}
 namespace db {
 
 /// database configuration
@@ -55,7 +57,7 @@ public:
 	~DBproviderConfig();
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;

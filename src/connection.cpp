@@ -49,7 +49,8 @@
 namespace _Wolframe {
 namespace net {
 
-static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
+static const char* REFUSE_MSG = "ERR Server is busy. Please try again later.\n";
+static const char* DENY_MSG = "BAD Server denied connection.\n";
 
 void GlobalConnectionList::addList( SocketConnectionList< connection_ptr >* lst )
 {
@@ -89,29 +90,6 @@ void GlobalConnectionList::removeList( SocketConnectionList< SSLconnection_ptr >
 }
 #endif // WITH_SSL
 
-bool GlobalConnectionList::isFull()
-{
-	if ( m_maxConn > 0 )	{
-		std::size_t conns = 0;
-		boost::mutex::scoped_lock lock( m_mutex );
-
-		for ( std::list< SocketConnectionList< connection_ptr >* >::iterator it = m_connList.begin();
-										it != m_connList.end(); it++ )
-			conns += (*it)->size();
-#ifdef WITH_SSL
-		for ( std::list< SocketConnectionList< SSLconnection_ptr >* >::iterator it = m_SSLconnList.begin();
-										it != m_SSLconnList.end(); it++ )
-			conns += (*it)->size();
-#endif // WITH_SSL
-		LOG_DATA << "Global number of connections: " << conns << " of maximum " << m_maxConn;
-		return( conns >= m_maxConn );
-	}
-	else	{
-		LOG_DATA << "Global number of connections unlimited, not checked";
-		return( false );
-	}
-}
-
 
 connection::connection( boost::asio::io_service& IOservice,
 			SocketConnectionList< connection_ptr >* connList,
@@ -131,6 +109,13 @@ connection::~connection()
 		LOG_TRACE << "Connection to " << m_ID <<" destroyed";
 }
 
+void connection::deny_connection()
+{
+	LOG_DEBUG << "Refusing connection from " << identifier() << ". Not allowed.";
+	boost::system::error_code ignored_ec;
+	socket().write_some( boost::asio::buffer( DENY_MSG, strlen( DENY_MSG ) ));
+	socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+}
 
 void connection::start()
 {
@@ -140,8 +125,11 @@ void connection::start()
 	LOG_TRACE << "Starting connection to " << identifier();
 
 	if ( m_connList->push( boost::static_pointer_cast< connection >( shared_from_this() )) )	{
-		m_connHandler->setPeer( RemoteTCPendpoint( socket().remote_endpoint().address().to_string(),
-							   socket().remote_endpoint().port()));
+		RemoteEndpointR remote(
+			new RemoteTCPendpoint( socket().remote_endpoint().address().to_string(),
+						socket().remote_endpoint().port()));
+		
+		m_connHandler->setPeer( remote);
 		nextOperation();
 	}
 	else	{
@@ -179,7 +167,8 @@ SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      ConnectionHandler *handler ) :
 	ConnectionBase< ssl_socket >( IOservice, handler ),
 	m_SSLsocket( IOservice, SSLcontext ),
-	m_connList( connList )
+	m_connList( connList ),
+	m_connection_denied( false )
 {
 	LOG_TRACE << "New SSL connection created";
 }
@@ -206,6 +195,10 @@ void SSLconnection::start()
 								 boost::asio::placeholders::error )));
 }
 
+void SSLconnection::deny_connection()
+{
+	m_connection_denied = true;
+}
 
 void SSLconnection::handleHandshake( const boost::system::error_code& e )
 {
@@ -221,11 +214,19 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		if ( peerCert )	{
 			certInfo = new SSLcertificateInfo( peerCert );
 		}
-
-		if ( m_connList->push( boost::static_pointer_cast< SSLconnection >( shared_from_this() )) )	{
-			m_connHandler->setPeer( RemoteSSLendpoint( m_SSLsocket.lowest_layer().remote_endpoint().address().to_string(),
-								   m_SSLsocket.lowest_layer().remote_endpoint().port(),
-								   certInfo ));
+		if (m_connection_denied)
+		{
+			LOG_DEBUG << "Refusing connection from " << identifier() << ". Not allowed.";
+			boost::system::error_code ignored_ec;
+			socket().write_some( boost::asio::buffer( DENY_MSG, strlen( DENY_MSG ) ));
+			socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+		}
+		else if ( m_connList->push( boost::static_pointer_cast< SSLconnection >( shared_from_this() )) )	{
+			RemoteEndpointR remote(
+				new RemoteSSLendpoint( m_SSLsocket.lowest_layer().remote_endpoint().address().to_string(),
+							m_SSLsocket.lowest_layer().remote_endpoint().port(),
+							certInfo ));
+			m_connHandler->setPeer( remote);
 			nextOperation();
 		}
 		else	{

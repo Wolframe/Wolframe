@@ -1,0 +1,22 @@
+TOPDIR = ..\..
+
+SUBDIRS = textfile
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+# Later:
+# SASL
+#!IFDEF WITH_SASL
+#SUBDIRS = \
+#	$(SUBDIRS) sasl
+#!ENDIF
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:

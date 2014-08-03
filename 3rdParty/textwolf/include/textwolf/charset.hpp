@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -32,8 +32,9 @@
 
 --------------------------------------------------------------------
 */
-///\file textwolf/charset.hpp
-///\brief Character set encodings already implemented in textwolf
+/// \file textwolf/charset.hpp
+/// \brief Character set encodings already implemented in textwolf
+/// \note The interface that the classes defined in the files included must fulfill is defined in "charset_interface.hpp"
 
 #ifndef __TEXTWOLF_XML_CHARSET_HPP__
 #define __TEXTWOLF_XML_CHARSET_HPP__

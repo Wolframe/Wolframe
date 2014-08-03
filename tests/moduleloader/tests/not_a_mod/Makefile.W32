@@ -1,0 +1,30 @@
+TOPDIR = ..\..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS =
+
+INCLUDE_LDFLAGS =
+
+INCLUDE_LIBS =
+
+DYNAMIC_MODULE = \
+	not_a_mod.dll
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+$(DYNAMIC_MODULE): $(CPP_OBJS) not_a_mod.obj
+	$(LINK) /dll /def:not_a_mod.def /out:$@ $(LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test: $(DYNAMIC_MODULE)

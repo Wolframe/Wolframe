@@ -27,6 +27,12 @@ ifeq ($(WITH_SSL),1)
 INCLUDE_CXXFLAGS += \
 	-DWITH_SSL
 
+INCLUDE_DIRS += \
+	$(OPENSSL_INCLUDE_DIRS)
+	
+INCLUDE_LDFLAGS += \
+	$(OPENSSL_LIB_DIRS)
+
 INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
 endif
@@ -54,12 +60,13 @@ local_uninstall:
 	-rm -f $(DESTDIR)$(bindir)/wolframec$(EXE)
 	-rmdir $(DESTDIR)$(bindir)
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/clients/lib"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwfsingleton/:$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/clients/lib"
 
 local_test:
+ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
-# currently disabled, must be adapted
-#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testWolframec
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testWolframec
+endif
 endif
 
 run:
@@ -70,3 +77,6 @@ runssl:
 		--client-cert-file=../../tests/SSL/client.crt \
 		--client-cert-key=../../tests/SSL/client.key \
 		127.0.0.1 7961
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

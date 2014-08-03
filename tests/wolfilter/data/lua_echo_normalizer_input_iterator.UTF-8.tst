@@ -6,7 +6,7 @@
 	<item>Im Französischen gibt es Buchstaben wie "ç" "è" "à" "ë" (e tréma)</item>
 	<item>Im Deutschen sind es die Umlate wie "Ü" "Ä" "Ö"</item>
 </doc>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 **requires:TEXTWOLF
 **file:wolframe.conf
 LoadModules
@@ -22,6 +22,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter textwolf
 		}
 	}
 }
@@ -30,7 +31,7 @@ function run()
 	for v,t in input:get()
 	do
 		if not t and v then
-			output:print( normalizer("name")(v),t)
+			output:print( provider.type("name")(v),t)
 		else
 			output:print( v,t)
 		end

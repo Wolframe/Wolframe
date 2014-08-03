@@ -74,7 +74,7 @@ public:
 		,m_input_bufsize(o.m_input_bufsize)
 		,m_output_bufsize(o.m_output_bufsize){}
 
-	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
+	bool parse( const config::ConfigurationNode& pt, const std::string& node, const module::ModulesDirectory* modules );
 
 	///\brief interface implementation of ConfigurationBase::test() const
 	virtual bool test() const;

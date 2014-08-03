@@ -9,6 +9,7 @@
 %define rhel 0
 %define rhel5 0
 %define rhel6 0
+%define rhel7 0
 %if 0%{?rhel_version} >= 500 && 0%{?rhel_version} <= 599
 %define dist rhel5
 %define rhel 1
@@ -18,6 +19,11 @@
 %define dist rhel6
 %define rhel 1
 %define rhel6 1
+%endif
+%if 0%{?rhel_version} >= 700 && 0%{?rhel_version} <= 799
+%define dist rhel7
+%define rhel 1
+%define rhel7 1
 %endif
 
 %define centos 0
@@ -35,6 +41,13 @@
 %define centos6 1
 %endif
 
+%define centos7 0
+%if 0%{?centos_version} >= 700 && 0%{?centos_version} <= 799
+%define dist centos7
+%define centos 1
+%define centos7 1
+%endif
+
 %define scilin 0
 %define scilin5 0
 %if 0%{?scilin_version} >= 500 && 0%{?scilin_version} <= 599
@@ -48,6 +61,13 @@
 %define dist scilin6
 %define scilin 1
 %define scilin6 1
+%endif
+
+%define scilin7 0
+%if 0%{?scilin_version} >= 700 && 0%{?scilin_version} <= 799
+%define dist scilin7
+%define scilin 1
+%define scilin7 1
 %endif
 
 %define fedora 0
@@ -68,17 +88,17 @@
 %define osu122 0
 %define osu123 0
 %define osu131 0
-%if 0%{?suse_version} >= 1220
+%if 0%{?suse_version} == 1220
 %define dist osu122
 %define osu122 1
 %define suse 1
 %endif
-%if 0%{?suse_version} >= 1230
+%if 0%{?suse_version} == 1230
 %define dist osu123
 %define osu123 1
 %define suse 1
 %endif
-%if 0%{?suse_version} >= 1310
+%if 0%{?suse_version} == 1310
 %define dist osu131
 %define osu131 1
 %define suse 1
@@ -125,9 +145,11 @@
 
 %define build_boost 0
 %if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel5} || %{centos5} || %{scilin5} || %{rhel6} || %{centos6} || %{scilin6} || %{sles}
 %define build_boost 1
 %define boost_version 1.48.0
 %define boost_underscore_version 1_48_0
+%endif
 %endif
 
 # icu for boost-locale is available natively only on a few platforms,
@@ -149,8 +171,8 @@
 %if %{build_boost}
 %define with_icu	1
 %if %{rhel}
-%if %{rhel6}
-# No icu-devel on RHEL6 on OSC due to license issues from Redhat!
+%if %{rhel6} || %{rhel7}
+# No icu-devel on RHEL6/7 on OSC due to license issues from Redhat!
 %define with_icu	0
 %endif
 %endif
@@ -161,14 +183,8 @@
 
 %if %{with_libxml2}
 %define build_libxml2 0
-%if %{rhel}
-%if %{rhel5}
-%define build_libxml2 1
-%define libxml2_version 2.9.1
-%endif
-%endif
-%if %{centos} || %{scilin}
-%if %{centos5} || %{scilin5}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel5} || %{centos5} || %{scilin5}
 %define build_libxml2 1
 %define libxml2_version 2.9.1
 %endif
@@ -180,14 +196,8 @@
 
 %if %{with_libxslt}
 %define build_libxslt 0
-%if %{rhel}
-%if %{rhel5}
-%define build_libxslt 1
-%define libxslt_version 1.1.28
-%endif
-%endif
-%if %{centos} || %{scilin}
-%if %{centos5} || %{scilin5}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel5} || %{centos5} || %{scilin5}
 %define build_libxslt 1
 %define libxslt_version 1.1.28
 %endif
@@ -198,25 +208,7 @@
 
 %if %{with_python}
 %define build_python 0
-%if %{rhel}
-%if %{rhel5} || %{rhel6}
-%define build_python 1
-%define python_version 3.3.2
-%endif
-%endif
-%if %{centos}
-%if %{centos5} || %{centos6}
-%define build_python 1
-%define python_version 3.3.2
-%endif
-%endif
-%if %{scilin}
-%if %{scilin5} || %{scilin6}
-%define build_python 1
-%define python_version 3.3.2
-%endif
-%endif
-%if %{sles}
+%if %{rhel} || %{centos} || %{scilin} || %{sles}
 %define build_python 1
 %define python_version 3.3.2
 %endif
@@ -224,14 +216,12 @@
 
 # init script to start the daemon
 
-%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel} || %{centos} || %{scilin}
 %define initscript	wolframed.initd.RHEL
 %endif
 %if %{sles}
 %define initscript	wolframed.initd.SuSE
 %endif
-
-%define configuration	wolframe.conf
 
 %define systemctl_configuration wolframed.service
 
@@ -242,8 +232,8 @@
 
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: wolframe
-Version: 0.0.1
-Release: 0.2
+Version: 0.0.2
+Release: 1
 License: Wolframe License
 Group: Application/Business
 Source: %{name}_%{version}.tar.gz
@@ -305,11 +295,11 @@ BuildRequires: systemd
 
 %if %{build_boost}
 %if %{with_icu}
-%if %{centos} || %{scilin} || %{fedora} 
+%if %{centos} || %{scilin}
 BuildRequires: libicu-devel >= 3.6
 %endif
 %if %{rhel}
-%if !%{rhel6}
+%if !%{rhel6} && !%{rhel7}
 # see http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779
 BuildRequires: libicu-devel >= 3.6
 %endif
@@ -320,7 +310,7 @@ BuildRequires: libicu-devel >= 4.0
 %endif
 %else
 BuildRequires: boost-devel
-%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel} || %{centos} || %{scilin}
 Requires: boost >= 1.48
 Requires: boost-thread >= 1.48
 Requires: boost-date-time >= 1.48
@@ -331,13 +321,21 @@ Requires: boost-locale >= 1.48
 Requires: boost-regex >= 1.48
 %endif
 %if %{suse}
-%if %{osu122} || %{osu123} || %{osu131}
+%if %{osu122} || %{osu123}
 Requires: libboost_thread1_49_0 >= 1.49.0
 Requires: libboost_date_time1_49_0 >= 1.49.0
 Requires: libboost_filesystem1_49_0 >= 1.49.0
 Requires: libboost_program_options1_49_0 >= 1.49.0
 Requires: libboost_system1_49_0 >= 1.49.0
 Requires: libboost_regex1_49_0 >= 1.49.0
+%endif
+%if %{osu131}
+Requires: libboost_thread1_53_0 >= 1.53.0
+Requires: libboost_date_time1_53_0 >= 1.53.0
+Requires: libboost_filesystem1_53_0 >= 1.53.0
+Requires: libboost_program_options1_53_0 >= 1.53.0
+Requires: libboost_system1_53_0 >= 1.53.0
+Requires: libboost_regex1_53_0 >= 1.53.0
 %endif
 %endif
 %endif
@@ -431,27 +429,12 @@ BuildRequires: postgresql-devel >= 8.3
 %if !%{build_sqlite}
 %if %{with_sqlite}
 %if %{rhel} || %{scilin} || %{centos} || %{fedora}
-%if %{rhel}
-%if %{rhel5} || %{rhel6}
 BuildRequires: sqlite-devel >= 3.0
-# for testing only
 BuildRequires: sqlite >= 3.0
-%endif
-%else
-BuildRequires: sqlite-devel >= 3.0
-# for testing only
-BuildRequires: sqlite >= 3.0
-%endif
 %endif
 %if %{suse} || %{sles}
 BuildRequires: sqlite3-devel >= 3.0
-# for testing only
 BuildRequires: sqlite3 >= 3.0
-%endif
-%endif
-%if %{scilin}
-%if %{scilin6}
-BuildRequires: sqlite >= 3.0
 %endif
 %endif
 %endif
@@ -542,23 +525,11 @@ The Wolframe database module for Sqlite3.
 
 Requires: %{name} >= %{version}-%{release}
 %if %{rhel} || %{centos} || %{fedora}
-%if %{rhel}
-%if %{rhel5} || %{rhel6}
 Requires: sqlite >= 3.0
-%endif
-%else
-Requires: sqlite >= 3.0
-%endif
 %endif
 %if %{suse} || %{sles}
 Requires: sqlite3 >= 3.0
 %endif
-%if %{scilin}
-%if %{scilin6}
-Requires: sqlite >= 3.0
-%endif
-%endif
-
 %endif
 
 %if %{with_oracle}
@@ -734,12 +705,20 @@ Requires: boost-program-options >= 1.48
 Requires: boost-system >= 1.48
 %endif
 %if %{suse}
-%if %{osu122} || %{osu123} || %{osu131}
+%if %{osu122} || %{osu123}
 Requires: libboost_thread1_49_0 >= 1.49.0
 Requires: libboost_date_time1_49_0 >= 1.49.0
 Requires: libboost_filesystem1_49_0 >= 1.49.0
 Requires: libboost_program_options1_49_0 >= 1.49.0
 Requires: libboost_system1_49_0 >= 1.49.0
+%if %{osu131}
+Requires: libboost_thread1_53_0 >= 1.53.0
+Requires: libboost_date_time1_53_0 >= 1.53.0
+Requires: libboost_filesystem1_53_0 >= 1.53.0
+Requires: libboost_program_options1_53_0 >= 1.53.0
+Requires: libboost_system1_53_0 >= 1.53.0
+Requires: libboost_regex1_53_0 >= 1.53.0
+%endif
 %endif
 %endif
 %endif
@@ -786,8 +765,6 @@ cd ../%{name}-%{version}
 %else
 %if %{build_python}
 %setup -T -D -b 0 -b 4
-cd ../boost_%{boost_underscore_version}
-%patch -P 0 -p1
 cd ../%{name}-%{version}
 %else
 %setup
@@ -809,7 +786,7 @@ cd %{_builddir}/boost_%{boost_underscore_version}
 cd %{_builddir}/Python-%{python_version}
 ./configure --prefix=/tmp/Python-%{python_version} \
 	--enable-shared 
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make %{?_smp_mflags}
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make %{?_smp_mflags}
 make install
 %endif
 
@@ -833,7 +810,7 @@ cd %{_builddir}/%{name}-%{version}
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make help \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make help \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -886,7 +863,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make help \
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make config \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make config \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -942,7 +919,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make config \
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make depend \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make depend \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -995,7 +972,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make depend \
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make all \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make all \
 	%{?_smp_mflags} \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
@@ -1054,7 +1031,7 @@ echo ======================= TESTING ==============================
 LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib \
 MAKE="LD_LIBRARY_PATH=/tmp/Python-%{python_version}/lib/ make" \
 %endif
-LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe" make test \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe,--enable-new-dtags" make test \
 	%{?_smp_mflags} \
 	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
@@ -1189,12 +1166,20 @@ ln -s libxslt.so.%{libxslt_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxslt.s
 cp -P /tmp/Python-%{python_version}/lib/libpython* $RPM_BUILD_ROOT%{_libdir}/wolframe
 %endif
 
-%if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%else
 install -D -m775 packaging/redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
+%endif
 %endif
 
 %if %{fedora}
 install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%endif
+
+%if %{sles}
+install -D -m775 packaging/redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
 %endif
 
 %if %{suse}
@@ -1203,9 +1188,14 @@ install -D -m644 packaging/redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_u
 %endif
 %endif
 
-install -D -m644 packaging/redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
-
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
+install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/run/wolframe
+
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+install -D -m644 packaging/redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
+%endif
+%endif
 
 %if %{fedora}
 install -D -m644 packaging/redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
@@ -1223,15 +1213,23 @@ getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP}
 %if %{suse} || %{sles}
 getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP} %{WOLFRAME_USR} -c "Wolframe user"
 %endif
-
-if test ! -d /var/run/wolframe; then
-  mkdir /var/run/wolframe
-  chown %{WOLFRAME_USR}:%{WOLFRAME_GRP} /var/run/wolframe
-  chmod 0755 /var/run/wolframe
-fi
  
 # Don't enable Wolframe server at install time, just inform root how this is done
-%if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+echo
+echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
+echo
+echo "Use 'firewall-cmd --reload' then 'firewall-cmd --add-service=wolframe' to set the firewall rules"
+echo
+%else
+echo
+echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/chkconfig wolframed on' to enable the"
+echo Wolframe server at startup
+echo
+%endif
+%endif
+%if %{sles}
 echo
 echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/chkconfig wolframed on' to enable the"
 echo Wolframe server at startup
@@ -1241,7 +1239,7 @@ echo
 echo
 echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
 echo
-echo "Use 'firewall-cmd --add-service=wolframe' to set the firewall rules"
+echo "Use 'firewall-cmd --reload' then 'firewall-cmd --add-service=wolframe' to set the firewall rules"
 echo
 %endif
 %if %{suse}
@@ -1263,23 +1261,32 @@ echo
 
 %preun
 if [ "$1" = 0 ]; then
-%if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+    systemctl stop wolframed.service   
+    systemctl disable wolframed.service
+%else
+    /etc/init.d/wolframed stop > /dev/null 2>&1
+    /sbin/chkconfig --del wolframed
+%endif
+%endif
+%if %{sles}
     /etc/init.d/wolframed stop > /dev/null 2>&1
     /sbin/chkconfig --del wolframed
 %endif
 %if %{fedora}
-systemctl stop wolframed.service   
-systemctl disable wolframed.service
+    systemctl stop wolframed.service   
+    systemctl disable wolframed.service
 %endif
 %if %{suse}
 %if %{osu122} || %{osu123} || %{osu131}
-systemctl stop wolframed.service
-systemctl disable wolframed.service
+    systemctl stop wolframed.service
+    systemctl disable wolframed.service
 %endif
 %endif
-  if test -d /var/run/wolframe; then
-    rmdir /var/run/wolframe
-  fi
+    if test -d /var/log/wolframe; then
+       rm -rf /var/log/wolframe/*
+    fi
 fi
 
 %postun
@@ -1289,15 +1296,19 @@ fi
 
 %files
 %defattr( -, root, root )
-%if %{rhel} || %{centos} || %{scilin} || %{sles}
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+%{_unitdir}/wolframed.service
+%else
 %attr( 554, root, root) %{_initrddir}/%{name}d
 %endif
-%if %{suse}
 %endif
-
 %if %{fedora}
 %dir %attr(0755, root, root) %{_unitdir}
 %{_unitdir}/wolframed.service
+%endif
+%if %{sles}
+%attr( 554, root, root) %{_initrddir}/%{name}d
 %endif
 %if %{suse}
 %if %{osu122} || %{osu123} || %{osu131}
@@ -1309,11 +1320,19 @@ fi
 %{_bindir}/wolfpasswd
 %{_bindir}/wolfwizard
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
-%config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
+%dir %attr(0755, root, root) %{_sysconfdir}/wolframe/modules.d
+%dir %attr(0755, root, root) %{_sysconfdir}/wolframe/conf.d
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+%{_prefix}/lib/firewalld/services/wolframe.xml
+%endif
+%endif
 %if %{fedora}
 %{_prefix}/lib/firewalld/services/wolframe.xml
 %endif
 %attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/log/wolframe
+%attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/run/wolframe
 %if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
 %endif
@@ -1338,6 +1357,8 @@ fi
 %endif
 
 %dir %{_libdir}/wolframe
+%{_libdir}/wolframe/libwfsingleton.so.0.0.0
+%{_libdir}/wolframe/libwfsingleton.so.0
 %{_libdir}/wolframe/libwolframe.so.0.0.0
 %{_libdir}/wolframe/libwolframe.so.0
 %{_libdir}/wolframe/libwolframe_serialize.so.0.0.0
@@ -1348,6 +1369,8 @@ fi
 %{_libdir}/wolframe/libwolframe_langbind.so.0
 
 %dir %{_libdir}/wolframe/modules
+
+%{_libdir}/wolframe/modules/mod_protocol_wolframe.so
 
 %{_libdir}/wolframe/modules/mod_audit_textfile.so
 %{_libdir}/wolframe/modules/mod_audit_database.so
@@ -1370,9 +1393,16 @@ fi
 %{_libdir}/wolframe/modules/mod_datatype_datetime.so
 %{_libdir}/wolframe/modules/mod_datatype_bcdnumber.so
 
+%{_libdir}/wolframe/modules/mod_doctype_xml.so
+%{_libdir}/wolframe/modules/mod_doctype_json.so
+
 %if %{with_icu}
 %{_libdir}/wolframe/modules/mod_normalize_locale.so
 %endif
+
+%{_libdir}/wolframe/modules/mod_command_aamap.so
+
+%{_libdir}/wolframe/modules/mod_command_tdl.so
 
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
@@ -1388,6 +1418,8 @@ fi
 %dir %{_libdir}/wolframe
 %{_libdir}/wolframe/libwolframe.so
 %{_libdir}/wolframe/libwolframe.a
+%{_libdir}/wolframe/libwfsingleton.so
+%{_libdir}/wolframe/libwfsingleton.a
 %{_libdir}/wolframe/libwolframe_serialize.so
 %{_libdir}/wolframe/libwolframe_serialize.a
 %{_libdir}/wolframe/libwolframe_database.so
@@ -1410,12 +1442,12 @@ fi
 %{_includedir}/wolframe/*.hpp
 %dir %{_includedir}/wolframe/langbind/
 %{_includedir}/wolframe/langbind/*.hpp
-%dir %{_includedir}/wolframe/protocol/
-%{_includedir}/wolframe/protocol/*.hpp
 %dir %{_includedir}/wolframe/cmdbind/
 %{_includedir}/wolframe/cmdbind/*.hpp
 %dir %{_includedir}/wolframe/database/
 %{_includedir}/wolframe/database/*.hpp
+%dir %{_includedir}/wolframe/database/vm/
+%{_includedir}/wolframe/database/vm/*.hpp
 %dir %{_includedir}/wolframe/config/
 %{_includedir}/wolframe/config/*.hpp
 %dir %{_includedir}/wolframe/logger/
@@ -1444,6 +1476,12 @@ fi
 %{_includedir}/wolframe/module/*.hpp
 %dir %{_includedir}/wolframe/prgbind/
 %{_includedir}/wolframe/prgbind/*.hpp
+%dir %{_includedir}/wolframe/system/
+%{_includedir}/wolframe/system/*.hpp
+%dir %{_includedir}/wolframe/appdevel/
+%{_includedir}/wolframe/appdevel/*.hpp
+%dir %{_includedir}/wolframe/appdevel/module/
+%{_includedir}/wolframe/appdevel/module/*.hpp
 
 %if %{with_pgsql}
 %files postgresql
@@ -1451,6 +1489,12 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_db_postgresql.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_db_postgresql.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_db_postgresql.conf
+%if !%{sles}
+%dir %attr(0755, root, root) %{_mandir}/man5
+%endif
+%{_mandir}/man5/wolframe-mod_db_postgresql.5.gz
 %endif
 
 %if %{with_sqlite}
@@ -1459,6 +1503,12 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_db_sqlite3.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_db_sqlite3.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_db_sqlite3.conf
+%if !%{sles}
+%dir %attr(0755, root, root) %{_mandir}/man5
+%endif
+%{_mandir}/man5/wolframe-mod_db_sqlite3.5.gz
 %endif
 
 %if %{with_oracle}
@@ -1467,6 +1517,12 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_db_oracle.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_db_oracle.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_db_oracle.conf
+%if !%{sles}
+%dir %attr(0755, root, root) %{_mandir}/man5
+%endif
+%{_mandir}/man5/wolframe-mod_db_oracle.5.gz
 %endif
 
 %if %{with_pam}
@@ -1475,6 +1531,8 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_auth_pam.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_auth_pam.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_auth_pam.conf
 %endif
 
 %if %{with_sasl}
@@ -1483,6 +1541,8 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_auth_sasl.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/conf.d/mod_auth_sasl.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_auth_sasl.conf
 %endif
 
 %if %{with_textwolf}
@@ -1495,6 +1555,7 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_line.so
 %{_libdir}/wolframe/modules/mod_filter_token.so
 %{_libdir}/wolframe/modules/mod_normalize_string.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_filter_textwolf.conf
 %endif
 
 %if %{with_libxml2}
@@ -1503,6 +1564,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_filter_libxml2.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_filter_libxml2.conf
 %if %{build_libxml2}
 %{_libdir}/wolframe/libxml2.so.%{libxml2_version}
 %{_libdir}/wolframe/libxml2.so.2
@@ -1520,6 +1582,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_command_lua.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_command_lua.conf
 %{_libdir}/wolframe/liblua.so.5.2.0
 %{_libdir}/wolframe/liblua.so.5
 
@@ -1540,6 +1603,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_command_python.so
+%config(noreplace) %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_command_python.conf
 %if %{build_python}
 %{_libdir}/wolframe/libpython*
 %endif
@@ -1551,6 +1615,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_print_harupdf.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_print_harupdf.conf
 %if %{build_libhpdf}
 %{_libdir}/wolframe/libhpdf.so.2.2.1
 %{_libdir}/wolframe/libhpdf.so.2
@@ -1562,6 +1627,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_graphix.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_graphix.conf
 %if %{build_freeimage}
 %{_libdir}/wolframe/libfreeimage.so.3.15.4
 %{_libdir}/wolframe/libfreeimage.so.3
@@ -1576,6 +1642,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_filter_cjson.so
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/modules.d/mod_filter_cjson.conf
 
 %files cjson-devel
 %defattr( -, root, root )
@@ -1616,6 +1683,9 @@ fi
 %{_bindir}/wolframec
 
 %changelog
+* Fri Jun 20 2014 Andreas Baumann <abaumann@yahoo.com> 0.0.2-1
+- intermediary release
+
 * Mon Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.2
 - more splitting into sub-packages for modules
 - builds on OpenSuse Build Service (osc)

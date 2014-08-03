@@ -32,27 +32,15 @@
 ************************************************************************/
 ///\file mod_command_directmap.cpp
 ///\brief Module for command handler executing direct mappings to transactions or functions
-#include "directmapCommandHandlerBuilder.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/commandHandlerModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "directmapCommandHandlerConfig.hpp"
+#include "directmapCommandHandler.hpp"
+#include "directmapCommandHandlerUnit.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+using namespace _Wolframe::cmdbind;
 
-namespace {
-static ConfiguredBuilder* createDirectmapCommandHandlerModule()
-{
-	static DirectmapCommandHandlerBuilder
-		mod( "DirectmapCommandHandler", "command handler for direct mappings", "cmdhandler", "directmap", "DirectmapCommandHandler");
-	return &mod;
-}
-}//anonymous namespace
-
-enum {NofContainers=1};
-static ConfiguredBuilder* (*containers[ NofContainers])() =
-{
-	createDirectmapCommandHandlerModule
-};
-
-ModuleEntryPoint entryPoint( 0, "command handler for direct mappings",
-				NofContainers, containers, 0, 0);
+WF_MODULE_BEGIN( "DirectmapCommandHandler", "standard command handler module")
+ WF_COMMAND_HANDLER( "directmap", "cmdhandler", "directmap", DirectmapCommandHandlerUnit, DirectmapCommandHandlerConfig)
+WF_MODULE_END
 

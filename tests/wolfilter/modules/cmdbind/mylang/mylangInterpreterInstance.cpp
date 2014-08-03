@@ -65,7 +65,7 @@ static void mapStructure( mylang::StructureBuilder& dest, const mylang::Structur
 	}
 }
 
-mylang::StructureR mylang::InterpreterInstance::call( const proc::ProcessorProvider*, const mylang::StructureR& arg)
+mylang::StructureR mylang::InterpreterInstance::call( proc::ExecContext*, const mylang::StructureR& arg)
 {
 	mylang::StructureBuilder rt;
 	mapStructure( rt, arg.get());

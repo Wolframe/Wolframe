@@ -48,9 +48,15 @@ public:
 		:m_sizeG(sizeG_)
 		,m_sizeF(sizeF_)
 		,m_max(max_){}
+	FloatNormalizeFunction( const std::vector<types::Variant>& arg);
+	FloatNormalizeFunction( const FloatNormalizeFunction& o)
+		:m_sizeG(o.m_sizeG)
+		,m_sizeF(o.m_sizeF)
+		,m_max(o.m_max){}
 
 	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "float";}
+	virtual types::NormalizeFunction* copy() const {return new FloatNormalizeFunction(*this);}
 
 private:
 	std::size_t m_sizeG;

@@ -3,11 +3,14 @@
 //
 
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 #include <boost/locale/generator.hpp>
 #include <boost/locale.hpp>
 
+#include <vector>
 #include <string>
+#include <algorithm>
 
 // The fixture for testing class _Wolframe::module
 class BoostLocaleFixture : public ::testing::Test
@@ -28,6 +31,18 @@ class BoostLocaleFixture : public ::testing::Test
 			boost::locale::localization_backend_manager::global(my);
 		}
 };
+
+TEST_F( BoostLocaleFixture, AvailableBackends )
+{
+	boost::locale::localization_backend_manager my = boost::locale::localization_backend_manager::global();
+	std::vector<std::string> backends = my.get_all_backends( );
+	std::vector<std::string>::const_iterator begin = backends.begin( ), end = backends.end( );
+	if( std::find( begin, end, "icu" ) != end ) {
+		SUCCEED( ) ;
+	} else {
+		FAIL( ) << "Missing icu boost-locale backend!";
+	}
+}
 
 TEST_F( BoostLocaleFixture, SimpleTestLowerCase )
 {
@@ -50,6 +65,7 @@ TEST_F( BoostLocaleFixture, SimpleTestUpperCase )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS( );
 }

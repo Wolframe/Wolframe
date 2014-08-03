@@ -215,8 +215,6 @@ private:
 	Connection( const Connection&){}	//non copyable
 
 	Impl* m_impl;
-	Callback m_notifier;
-	void* m_clientobject;
 };
 
 ///@} end group connection

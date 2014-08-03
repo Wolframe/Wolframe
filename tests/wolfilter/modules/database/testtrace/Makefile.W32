@@ -19,25 +19,26 @@ INCLUDE_LDFLAGS = \
 # getting link errors otherwise..
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
+
 
 DYNAMIC_MODULE = \
 	mod_db_testtrace.dll
 
 CPP_OBJS = \
 	testtraceDatabase.obj \
-	testtraceTransaction.obj \
-	mod_db_testtrace.obj
+	testtraceTransaction.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:TesttraceDatabaseModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_testtrace.obj
+	$(LINK) /dll /def:mod_db_testtrace.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/singlefilter.hpp
-///\brief Interface of input filter that returns one content element only
+/// \file filter/singlefilter.hpp
+/// \brief Interface of input filter that returns one content element only
 #ifndef _Wolframe_SINGLE_FILTER_HPP_INCLUDED
 #define _Wolframe_SINGLE_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
@@ -38,36 +38,35 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-///\class SingleElementInputFilter
-///\brief Input filter returning one content element only
+/// \class SingleElementInputFilter
+/// \brief Input filter returning one content element only
 class SingleElementInputFilter :public TypedInputFilter
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	explicit SingleElementInputFilter( const types::VariantConst& e)
-		:types::TypeSignature("langbind::SingleElementInputFilter", __LINE__)
+		:TypedInputFilter("single")
 		,m_element(e)
 		,m_consumed(false){}
 
-	///\brief Copy constructor
-	///\param[in] o input filter to copy
+	/// \brief Copy constructor
+	/// \param[in] o input filter to copy
 	SingleElementInputFilter( const SingleElementInputFilter& o)
-		:types::TypeSignature(o)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_element(o.m_element)
 		,m_consumed(o.m_consumed){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~SingleElementInputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual SingleElementInputFilter* copy() const
 	{
 		return new SingleElementInputFilter(*this);
 	}
 
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
+	/// \brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
 	virtual bool getNext( ElementType& type, types::VariantConst& element)
 	{
 		if (m_consumed)

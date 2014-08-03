@@ -35,30 +35,37 @@
 //
 
 #include "appProperties.hpp"
+#include "wolframe.hpp"
 #include "version.hpp"
 
+//\brief Macros to stringify compile options
+#define DO_STRINGIFY2(x) #x
+#define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
+
 namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
-	static const unsigned short APP_BUILD = 0;
 
 	const char*	applicationName()			{ return "Wolframe"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION,
-										  APP_MINOR_VERSION
-										  ,APP_REVISION
-//										  ,APP_BUILD
+	const Version	applicationVersion()			{ return Version( WOLFRAME_MAJOR_VERSION,
+										  WOLFRAME_MINOR_VERSION,
+										  WOLFRAME_REVISION,
+										  WOLFRAME_BUILD
 										  ); }
 
-	const char*	config::defaultMainConfig()		{ return "/etc/wolframe.conf"; }
+	const char*	config::defaultMainConfig()		{
+#ifdef DEFAULT_MAIN_CONFIGURATION_FILE
+		return DO_STRINGIFY( DEFAULT_MAIN_CONFIGURATION_FILE );
+#else
+		return "/etc/wolframe/wolframe.conf";
+#endif
+	}
 	const char*	config::defaultUserConfig()		{ return "~/wolframe.conf"; }
 	const char*	config::defaultLocalConfig()		{ return "./wolframe.conf"; }
 
-	unsigned short	net::defaultTCPport()			{ return 7660; }
-	unsigned short	net::defaultSSLport()			{ return 7960; }
+	unsigned short	net::defaultTCPport()			{ return 7661; }
+	unsigned short	net::defaultSSLport()			{ return 7961; }
 
-	const char*	config::defaultServiceName()		{ return "wolframe"; }
 #if defined( _WIN32 )
+	const char*	config::defaultServiceName()		{ return "wolframe"; }
 	const char*	config::defaultServiceDisplayName()	{ return "Wolframe Daemon"; }
 	const char*	config::defaultServiceDescription()	{ return "a daemon for wolframeing"; }
 #endif // defined( _WIN32 )

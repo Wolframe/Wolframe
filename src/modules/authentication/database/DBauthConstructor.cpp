@@ -40,11 +40,11 @@
 namespace _Wolframe {
 namespace AAAA {
 
-DBauthenticator* DBauthConstructor::object( const config::NamedConfiguration& conf )
+DBauthUnit* DBauthConstructor::object( const config::NamedConfiguration& conf )
 {
 	const DBAuthConfig& cfg = dynamic_cast< const DBAuthConfig& >( conf );
 
-	DBauthenticator* m_auth = new DBauthenticator( cfg.m_identifier, cfg.m_dbLabel );
+	DBauthUnit* m_auth = new DBauthUnit( cfg.m_identifier, cfg.m_dbLabel );
 	LOG_DEBUG << "Database authenticator container created for '"
 		  << cfg.m_identifier << "'";
 	return m_auth;

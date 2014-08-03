@@ -13,11 +13,13 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
+	/LIBPATH:$(TOPDIR)\src\libwfsingleton \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	kernel32.lib advapi32.lib Ws2_32.lib
+	kernel32.lib advapi32.lib Ws2_32.lib \
+	wfsingleton.lib
 
 DYNAMIC_MODULE = \
 	mod_audit_textfile.dll
@@ -25,15 +27,14 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	TextFileAuditConfig.obj \
 	TextFileAuditConstructor.obj \
-	TextFileAudit.obj \
-	TextFileAuditModule.obj
+	TextFileAudit.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:TextFileAuditModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_audit_textfile.obj
+	$(LINK) /dll /def:mod_audit_textfile.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

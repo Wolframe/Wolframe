@@ -57,7 +57,10 @@ server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandl
 						&m_IOservice,
 						it->host(), it->port(), it->maxConnections(),
 						&m_globalConnectionCounter,
-						&serverHandler );
+						it->config(),
+						it->addressRestriction(),
+						m_globalList,
+						serverHandler );
 		m_acceptors.push_back( acptr );
 		i++;
 	}
@@ -66,13 +69,16 @@ server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandl
 	i = 0;
 	for ( std::list<ServerSSLendpoint>::const_iterator it = conf->SSLaddress.begin();
 	      it != conf->SSLaddress.end(); it++ )	{
-		AcceptorSSL* acptr = new AcceptorSSL( &m_IOservice,
-							it->certificate(), it->key(),
-							it->verifyClientCert(),
-							it->CAchain(), it->CAdirectory(),
-							it->host(), it->port(), it->maxConnections(),
-							&m_globalConnectionCounter,
-							&serverHandler );
+		SSLacceptor* acptr = new SSLacceptor( m_IOservice,
+						      it->certificate(), it->key(),
+						      it->verifyClientCert(),
+						      it->CAchain(), it->CAdirectory(),
+						      it->host(), it->port(),
+						      it->maxConnections(), it->config(),
+						      &m_globalConnectionCounter,
+						      it->addressRestriction(),
+						      m_globalList,
+						      serverHandler );
 		m_SSLacceptors.push_back( acptr );
 		i++;
 	}

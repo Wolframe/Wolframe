@@ -51,13 +51,14 @@
 #endif
 
 #include "AAAA/CRAM.hpp"
-#include "AAAA/password.hpp"
+#include "AAAA/passwordHash.hpp"
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
 #include "crypto/sha2.h"
-#include "system/globalRngGen.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe;
@@ -68,8 +69,11 @@ static const size_t CRAM_CHALLENGE_BASE64_SIZE = (( CRAM_CHALLENGE_SIZE - 1 ) / 
 static const size_t CRAM_RESPONSE_BCD_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 static const size_t CRAM_RESPONSE_BASE64_SIZE = (( CRAM_RESPONSE_SIZE - 1 ) / 3 ) * 4 + 5;
 
+static const size_t CRAM_SALT_BCD_SIZE = 2 * CRAM_SALT_SIZE + 1;
+static const size_t CRAM_SALT_BASE64_SIZE = (( CRAM_SALT_SIZE - 1 ) / 3 ) * 4 + 5;
 
-CRAMchallenge::CRAMchallenge()
+
+CRAMchallenge::CRAMchallenge( const crypto::RandomGenerator& rndGen )
 {
 	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
 
@@ -89,8 +93,13 @@ CRAMchallenge::CRAMchallenge()
 	sha256((const unsigned char *)&ft, sizeof( ft ), m_challenge );
 #endif
 
-	RandomGenerator& rnd = RandomGenerator::instance();
-	rnd.generate( m_challenge + SHA256_DIGEST_SIZE, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
+	rndGen.generate( m_challenge + SHA256_DIGEST_SIZE,
+			 CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
+}
+
+CRAMchallenge::~CRAMchallenge()
+{
+	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
 }
 
 std::string CRAMchallenge::toBCD() const
@@ -119,77 +128,97 @@ std::string CRAMchallenge::toString() const
 }
 
 
+std::string CRAMchallenge::toString( const PasswordHash::Salt& salt ) const
+{
+	return "$" + salt.toString() + "$" + this->toString();
+}
+
+//***** CRAM response computation *******************************************
 static void computeResponse ( const unsigned char* challenge, const unsigned char* hash,
 			      std::size_t hashSize, unsigned char* response )
 {
 	unsigned char buffer[ CRAM_CHALLENGE_SIZE ];
 
-	memset( buffer, 0x3c, CRAM_CHALLENGE_SIZE );
 	if ( hashSize > CRAM_CHALLENGE_SIZE )	{
 		assert( CRAM_CHALLENGE_SIZE == SHA512_DIGEST_SIZE );
 		sha512( hash, hashSize, buffer );
 	}
-	else
+	else	{
+		memset( buffer + hashSize, 0x3c, CRAM_CHALLENGE_SIZE - hashSize );
 		memcpy( buffer, hash, hashSize );
+	}
 
 	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
 		buffer[ i ] ^= challenge[ i ];
 
 	assert( CRAM_RESPONSE_SIZE == SHA256_DIGEST_SIZE );
 	sha256( buffer, CRAM_CHALLENGE_SIZE, response );
-}
 
-CRAMresponse::CRAMresponse( const CRAMchallenge& challenge,
-			    const unsigned char* hash, std::size_t hashSize )
+	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
+		buffer[ i ] = 0;
+}
+//***** End of CRAM response computation ************************************
+
+
+CRAMresponse::CRAMresponse( const CRAMchallenge& challenge, const PasswordHash& pwdHash )
 {
-	computeResponse( challenge.challenge(), hash, hashSize, m_response );
+	computeResponse( challenge.challenge(), pwdHash.hash().hash(), pwdHash.hash().size(), m_response );
 }
 
-CRAMresponse::CRAMresponse( const std::string& challenge,
-			    const unsigned char* hash, std::size_t hashSize )
-{
-	unsigned char chlng[ CRAM_CHALLENGE_SIZE ];
-
-	memset( chlng, 0, CRAM_CHALLENGE_SIZE );
-
-	if ( hex2byte( challenge.data(), chlng, CRAM_CHALLENGE_SIZE ) != (int)CRAM_CHALLENGE_SIZE )
-		throw std::runtime_error( "CRAM response: challenge is invalid" );
-
-	computeResponse( chlng, hash, hashSize, m_response );
-}
-
-CRAMresponse::CRAMresponse( const CRAMchallenge& challenge, const std::string& pwdHash )
-{
-	unsigned char hash[ PASSWORD_HASH_SIZE ];
-
-	memset( hash, 0, PASSWORD_HASH_SIZE );
-
-	int pwdLen;
-	if (( pwdLen = hex2byte( pwdHash.data(), hash, CRAM_CHALLENGE_SIZE )) < 0 )
-		throw std::runtime_error( "CRAM response: password hash is invalid" );
-
-	computeResponse( challenge.challenge(), hash, pwdLen, m_response );
-}
-
-
-CRAMresponse::CRAMresponse( const std::string& challenge, const std::string& pwdHash )
+// The challenge string is base64 encoded, including the password salt,
+// with or without end padding.
+// The password string is in plain text.
+CRAMresponse::CRAMresponse( const std::string& challenge, const std::string& password )
 {
 	unsigned char chlng[ CRAM_CHALLENGE_SIZE ];
-	unsigned char hash[ PASSWORD_HASH_SIZE ];
+	memset( chlng, 0, CRAM_CHALLENGE_SIZE );
+	int chlngSize;
+	unsigned char salt[ PASSWORD_SALT_SIZE ];
+	memset( salt, 0, PASSWORD_SALT_SIZE );
+	int saltSize;
+
+	std::string s = boost::algorithm::trim_copy( challenge );
+	if ( s[ 0 ] == '$' )	{
+		size_t chlngStart = s.find( "$", 1 );
+		if ( chlngStart == s.npos )	{
+			std::string errMsg = "'" + s + "' is not a valid challenge string";
+			throw std::runtime_error( errMsg );
+		}
+		if (( saltSize = base64::decode( s.substr( 1, chlngStart - 1 ),
+						 salt, PASSWORD_SALT_SIZE )) < 0 )	{
+			std::string errMsg = "'" + s + "' is not a valid challenge string (salt error)";
+			throw std::runtime_error( errMsg );
+		}
+		if (( chlngSize = base64::decode( s.substr( chlngStart + 1 ),
+						 chlng, CRAM_CHALLENGE_SIZE )) < 0 )	{
+			std::string errMsg = "'" + s + "' is not a valid challenge string (random data error)";
+			throw std::runtime_error( errMsg );
+		}
+		if ( (size_t)chlngSize != CRAM_CHALLENGE_SIZE )	{
+			std::string errMsg = "'" + s + "' is not a valid challenge string (expected "
+					     + boost::lexical_cast<std::string>( CRAM_CHALLENGE_SIZE )
+					     + " random bytes, got "
+					     + boost::lexical_cast<std::string>( chlngSize ) + ")";
+			throw std::runtime_error( errMsg );
+		}
+	}
+	else	{
+		std::string errMsg = "'" + s + "' is not a valid challenge string";
+		throw std::runtime_error( errMsg );
+	}
+
+	PasswordHash pwd( salt, saltSize, password );
+
+	computeResponse( chlng, pwd.hash().hash(), pwd.hash().size(), m_response );
 
 	memset( chlng, 0, CRAM_CHALLENGE_SIZE );
-	memset( hash, 0, PASSWORD_HASH_SIZE );
-
-	int pwdLen;
-
-	if ( hex2byte( challenge.data(), chlng, CRAM_CHALLENGE_SIZE ) != (int)CRAM_CHALLENGE_SIZE )
-		throw std::runtime_error( "CRAM response: challenge is invalid" );
-	if (( pwdLen = hex2byte( pwdHash.data(), hash, CRAM_CHALLENGE_SIZE )) < 0 )
-		throw std::runtime_error( "CRAM response: password hash is invalid" );
-
-	computeResponse( chlng, hash, pwdLen, m_response );
+	memset( salt, 0, PASSWORD_SALT_SIZE );
 }
 
+CRAMresponse::~CRAMresponse()
+{
+	memset( m_response, 0, CRAM_RESPONSE_SIZE );
+}
 
 
 std::string CRAMresponse::toBCD() const
@@ -230,5 +259,59 @@ bool CRAMresponse::operator == ( const std::string& rhs )
 			    buffer, CRAM_RESPONSE_SIZE ) != (int)CRAM_RESPONSE_SIZE )
 		return false;
 	return !memcmp( this->m_response, buffer, CRAM_RESPONSE_SIZE );
+}
+
+
+/******************************************************************************/
+CRAMsalt::CRAMsalt( const std::string& challenge )
+{
+	memset( m_salt, 0, CRAM_SALT_SIZE );
+
+	std::string s = boost::algorithm::trim_copy( challenge );
+	if ( s[ 0 ] == '$' )	{
+		size_t chlngStart = s.find( "$", 1 );
+		if ( chlngStart == s.npos )	{
+			std::string errMsg = "'" + s + "' is not a valid challenge string";
+			throw std::runtime_error( errMsg );
+		}
+		if ( base64::decode( s.substr( 1, chlngStart - 1 ),
+				     m_salt, CRAM_SALT_SIZE ) < 0 )	{
+			std::string errMsg = "'" + s + "' is not a valid challenge string (salt error)";
+			throw std::runtime_error( errMsg );
+		}
+	}
+	else	{
+		std::string errMsg = "'" + s + "' is not a valid challenge string";
+		throw std::runtime_error( errMsg );
+	}
+}
+
+std::string CRAMsalt::toBCD() const
+{
+	char	buffer[ CRAM_SALT_BCD_SIZE ];
+
+	int len = byte2hex( m_salt, CRAM_SALT_SIZE,
+			    buffer, CRAM_SALT_BCD_SIZE );
+	assert( len == CRAM_SALT_SIZE * 2 );
+
+	return std::string( buffer );
+}
+
+std::string CRAMsalt::toString() const
+{
+	char	buffer[ CRAM_SALT_BASE64_SIZE ];
+
+	int len = base64_encode( m_salt, CRAM_SALT_SIZE,
+				 buffer, CRAM_SALT_BASE64_SIZE, 0 );
+	assert( len >= 0 && len < (int)CRAM_SALT_BASE64_SIZE );
+	while ( len > 0 && buffer[ len - 1 ] == '=' )
+		len--;
+	buffer[ len ] = 0;
+	return std::string( buffer );
+}
+
+CRAMsalt::~CRAMsalt()
+{
+	memset( m_salt, 0, CRAM_SALT_SIZE );
 }
 

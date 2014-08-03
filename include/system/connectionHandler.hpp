@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// connectionHandler.hpp
-//
+/// \brief Base class for the connection handler and related objects
+/// \file connectionHandler.hpp
 
 #ifndef _CONNECTION_HANDLER_HPP_INCLUDED
 #define _CONNECTION_HANDLER_HPP_INCLUDED
@@ -48,8 +47,8 @@
 namespace _Wolframe {
 namespace net {
 
-/// Base class for a network operation. It should never be accessed directly by
-/// the user code
+/// \class NetworkOperation
+/// \brief Base class for a network operation. It should never be accessed directly by the user code
 class NetworkOperation
 {
 	template< typename T > friend class ConnectionBase;
@@ -79,7 +78,7 @@ private:
 	std::size_t	size_;
 };
 
-/// Network operation: asynchronously read a block of data
+/// \brief Network operation: asynchronously read a block of data
 class ReadData : public NetworkOperation
 {
 public:
@@ -87,7 +86,7 @@ public:
 		: NetworkOperation( READ, d, s, to )	{}
 };
 
-/// Network operation: asynchronously send a block of data
+/// \brief Network operation: asynchronously send a block of data
 class SendData : public NetworkOperation
 {
 public:
@@ -95,7 +94,7 @@ public:
 		: NetworkOperation( WRITE, const_cast<void*>( d ), s, to )	{}
 };
 
-/// Network operation: asynchronously send a string (message)
+/// \brief Network operation: asynchronously send a string (message)
 /// This is just some syntactic sugar, simplifying SendData
 class SendString : public NetworkOperation
 {
@@ -106,21 +105,21 @@ public:
 		: NetworkOperation( WRITE, const_cast<char*>( s ), strlen( s ), to )	{}
 };
 
-/// Network operation: close the current network connection
+/// \brief Network operation: close the current network connection
 class CloseConnection : public NetworkOperation
 {
 public:
 	CloseConnection() : NetworkOperation( CLOSE )	{}
 };
 
-/// Network operation: no operation
+/// \brief Network operation: no operation
 class NoOp : public NetworkOperation
 {
 public:
 	NoOp() : NetworkOperation( NOOP )	{}
 };
 
-/// The common handler for the connection status.
+/// \brief The common handler for the connection status.
 class ConnectionHandler
 {
 	template< typename socketType > friend class ConnectionBase;
@@ -155,17 +154,17 @@ public:
 	virtual void signalOccured( NetworkSignal )	{}
 
 	/// Set the remote peer. The connection is up now.
-	virtual void setPeer( const RemoteEndpoint& remote ) = 0;
+	virtual void setPeer( const RemoteEndpointR& remote ) = 0;
 };
 
 } // namespace net
 
-/// The server main handler
-/// All it should do is to provide connection handlers
 
 struct	HandlerConfiguration;
 namespace module { class ModulesDirectory; }
 
+/// \brief The server main handler
+/// All it should do is to provide connection handlers
 class ServerHandler : private boost::noncopyable
 {
 public:
@@ -174,7 +173,7 @@ public:
 	~ServerHandler();
 
 	/// Create a new connection handler and return a pointer to it
-	net::ConnectionHandler* newConnection( const net::LocalEndpoint& local );
+	net::ConnectionHandler* newConnection( const net::LocalEndpointR& local );
 
 private:
 	class ServerHandlerImpl;

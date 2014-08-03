@@ -36,6 +36,17 @@
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
+BigintDataInitializer::BigintDataInitializer( const std::vector<types::Variant>& arg)
+	:m_max_digits(std::numeric_limits<unsigned int>::max())
+{
+	if (arg.size() > 1) throw std::runtime_error("too many arguments for big bcd number initializer");
+	if (arg.size() == 0) return;
+
+	types::Variant::Data::Int a1 = arg.at(0).touint();
+	if (a1 >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("max digits argument out of range for big bcd number initializer");
+	m_max_digits = (unsigned int)a1;
+}
+
 types::Variant BigintDataType::add( const CustomDataValue& operand_, const Variant& arg)
 {
 	const BigintDataValue* op = reinterpret_cast<const BigintDataValue*>(&operand_);
@@ -126,4 +137,76 @@ types::Variant BigintDataType::toDouble( const CustomDataValue& operand)
 	return types::Variant( op->todouble());
 }
 
+int BigintDataValue::compare( const CustomDataValue& o) const
+{
+	if (o.type() != type())
+	{
+		return ((uintptr_t)type() > (uintptr_t)o.type())?1:-1;
+	}
+	else
+	{
+		const BigintDataValue* odt = reinterpret_cast<const BigintDataValue*>(&o);
+		return types::BigBCD::compare(*odt);
+	}
+}
+
+bool BigintDataValue::getBaseTypeValue( Variant& dest) const
+{
+	try
+	{
+		dest = types::BigNumber( types::BigBCD::tostring());
+		return true;
+	}
+	catch (const std::runtime_error&)
+	{
+		return false;
+	}
+}
+
+void BigintDataValue::assign( const Variant& o)
+{
+	switch (o.type())
+	{
+		case Variant::Null:
+		case Variant::Timestamp:
+		case Variant::Bool:
+			throw std::runtime_error( std::string("cannot convert '") + o.typeName() + "' to big bcd integer");
+
+		case Variant::Custom:
+		{
+			const CustomDataValue* ref = o.customref();
+			if (ref->type() != type())
+			{
+				throw std::runtime_error( std::string("cannot convert '") + o.typeName() + "' to big bcd integer");
+			}
+			else
+			{
+				const BigintDataValue* val = reinterpret_cast<const BigintDataValue*>(ref);
+				types::BigBCD::init( *val);
+			}
+			break;
+		}
+		case Variant::BigNumber:
+			types::BigBCD::init( *o.bignumref());
+			break;
+
+		case Variant::Double:
+		case Variant::Int:
+			types::BigBCD::init( o.toint());
+			break;
+
+		case Variant::UInt:
+			types::BigBCD::init( o.touint());
+			break;
+
+		case Variant::String:
+			types::BigBCD::init( o.charptr(), o.charsize());
+			break;
+	}
+	unsigned int nn = (unsigned int)types::BigBCD::nof_digits();
+	if (nn > m_max_digits)
+	{
+		throw std::runtime_error( "to many digits in big bcd integer number");
+	}
+}
 

@@ -17,25 +17,25 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
-	
+
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
+	$(TOPDIR)\src\modules\prnt\harupdfprint\static_print_harupdf.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_print_testpdf.dll
 
 CPP_OBJS = \
-	pdfPrinterFiles.obj \
-	pdfPrinterDocumentImpl.obj \
-	mod_print_testpdf.obj
+	pdfPrinterDocumentImpl.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModPrintTestPdf.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_print_testpdf.obj
+	$(LINK) /dll /def:mod_print_testpdf.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

@@ -1,0 +1,170 @@
+<!-- Calling Wolframe over HTTP/HTTPS via PHP Client -->
+
+<chapter>
+	<title>Clients with PHP</title>
+	<para>This chapter describes how you can call Wolframe from a web service.
+	It will show how a Wolframe command can be issued as HTTP call and how it is mapped
+	in the Webserver by a scripting language. We use PHP as example language.
+	The example is so simple that you can easily map it to other languages than PHP.
+	We took PHP because its use for web services is so widespread nowadays.
+	</para>
+
+	<sect1>
+	<title>Requirements</title>
+	<para>
+		The minimum PHP version required for the client is 5.3.
+		The following additional PHP modules have to be installed:
+		<table frame="all" width="100%">
+			<title>PHP modules required</title>
+			<tgroup cols="2">
+			<colspec colnum="1" colname="col1" colwidth="1*"/>
+			<colspec colnum="2" colname="col2" colwidth="3*"/>
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>php5-mcrypt</entry>
+					<entry><para>Encryption functions needed 
+					for the password change protocol of
+					WOLFRAME-CRAM.</para></entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+	</para>
+	</sect1>
+	<sect1>
+	<title>PHP client modules</title>
+		<para>In the subdirectory clients/php of the Wolframe installation
+		you'll find the following source files you need.
+		The main module you need to call to establish a session and
+		to issue requests is session.php. The other files are helper classes for 
+		the client:
+		</para>
+		<table frame="all" width="100%">
+			<title>PHP client modules</title>
+			<tgroup cols="2">
+			<colspec colnum="1" colname="col1" colwidth="1*"/>
+			<colspec colnum="2" colname="col2" colwidth="3*"/>
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>session.php</entry>
+					<entry><para>implements the Wolframe client/server protocol
+					behind the scenes with a simple interface to send requests 
+					to the server and receive the answers.</para></entry>
+				</row>
+				<row>
+					<entry>connection.php</entry>
+					<entry><para>defines the base class of the connection to a Wolframe
+					server with methods to read and write messages</para></entry>
+				</row>
+				<row>
+					<entry>wolframe_cram.php</entry>
+					<entry><para>implements helper functions needed to implement
+					the authentication with the Wolframe-CRAM mech and its
+					password change protocol.</para></entry>
+				</row>
+				<row>
+					<entry>pbkdf2.php</entry>
+					<entry><para>implements the function hash_pbkdf2 available
+					in PHP 5.5. for PHP 5.3. (patch published on php.net)</para></entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+
+		<sect2>
+		<title>Example script implementing a request</title>
+		<para>The script examples/clients/php/webclient_form_xml.php shows the 
+		mechanisms of using the PHP client modules to create a client calling 
+		Wolframe from a web service. It takes a HTTP request, builds an XML 
+		document and a Wolframe server request with this document, passes 
+		the request to the server and returns the answer XML to the web client.
+		In case of error an XML with the error message is returned.
+		</para>
+		</sect2>
+
+		<sect2>
+		<title>Example script for a password change</title>
+		<para>The script examples/clients/php/webclient_change_password.php 
+		shows the changing of password when authenticated with "WOLFRAME-CRAM".
+		It takes a HTTP request, authenticates an initiates a password 
+		change. In case of error an XML with the error message is returned.
+		</para>
+		</sect2>
+
+		<sect2>
+		<title>The session interface</title>
+		<para>
+		In the following we shortly introduce the Wolframe session interface 
+		implemented in clients/php/session.php. 
+		</para>
+		<programlisting language='PHP'>
+namespace Wolframe
+{
+require 'connection.php';
+use Wolframe\Connection as Connection;
+
+class Session extends Connection
+{
+    /* Constructor
+    * @param[in] address Wolframe server IP address to connect
+    * @param[in] port Wolframe server port to connect
+    * @param[in] sslopt array of PHP options for SSL. The options
+    *            are not interpreted, but directly passed to to the SSL
+    *            stream context with stream_context_set_option(..)'
+    * @param[in] authopt authorization options defining the mechanism
+    *            and depending on the mechanism, the credentials needed.
+    */
+    function __construct( $address, $port, $sslopt, $authmethod);
+
+    /* Change the users password
+    * @param[in] the old password
+    * @param[in] the new password
+    * @remark The function throws in case of an error.
+    * @remark The function is blocking on read/write on its connection
+    */
+    public function changePassword( $oldpassword, $newpassword)
+
+    /* Send a request to the server
+    * @param[in] command (optional) identifier prefix of the command
+    *            to execute.
+    * @param[in] content content of the request (document to process)
+    * @return FALSE, if the server reports an error in processing
+    *            the request. The error details can be inspected with
+    *            lasterror(). In case of success the function returns
+    *            the request answer string.
+    * @remark The function throws in case of a system or protocol error.
+    * @remark The function is blocking on read/write on its connection
+    */
+    public function request( $command, $content);
+
+    /* Get the last error returned by the Wolframe server (protocol).
+    * @return the last error 
+    */
+    public function lasterror();
+} // class Session
+} // namespace Wolframe
+		</programlisting>
+		</sect2>
+	</sect1>
+
+	<sect1>
+	<title>Installation</title>
+		<para>For making it work you just have to configure your web service to run the
+		PHP scripts and to install the PHP scripts and the SSL credentials at the right place.
+		See the tutorial for details.
+		</para>
+	</sect1>
+</chapter>
+

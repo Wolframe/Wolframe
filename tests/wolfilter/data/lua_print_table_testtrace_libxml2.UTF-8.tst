@@ -3,7 +3,8 @@
 **requires:LIBXML2
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE invoice SYSTEM "Invoice.simpleform">
+<!DOCTYPE doc SYSTEM "Invoice.simpleform">
+<doc>
 <invoice>
 <order>
 <number>INS03-62</number>
@@ -104,9 +105,11 @@
 <city>Z&#252;rich</city>
 <country>Switzerland</country>
 </address>
-</invoice>**config
---input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 -c wolframe.conf run
+</invoice>
+</doc>**config
+--input-filter libxml2 --output-filter libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2 --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 
+**requires:LIBHPDF
 **file:wolframe.conf
 LoadModules
 {
@@ -115,6 +118,7 @@ LoadModules
 	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 	module ../../src/modules/filter/blob/mod_filter_blob
 	module ../wolfilter/modules/prnt/fakepdfprint/mod_print_testpdf
 }
@@ -128,109 +132,109 @@ Processor
 		lua
 		{
 			program script.lua
+			filter libxml2
 		}
 	}
 }
 **file:form.sfrm
 FORM Invoice
+	-root invoice
 {
-	invoice
+	order
 	{
-		order
+		number string
+		reference string
+		representative string
+		terms uint
+		issuedate string
+		duedate string
+		description string
+	}
+	item []
+	{
+		name string
+		description string
+		quantity uint
+		discount currency
+		price
 		{
-			number string
-			reference string
-			representative string
-			terms uint
-			issuedate string
-			duedate string
-			description string
-		}
-		item []
-		{
-			name string
-			description string
-			quantity uint
-			discount currency
-			price
+			unit currency
+			total currency
+			tax
 			{
-				unit currency
-				total currency
-				tax
-				{
-					description @string
-					_ percent_1
-				}
-				gross currency
+				description @string
+				_ percent_1
 			}
+			gross currency
 		}
-		bill
+	}
+	bill
+	{
+		price
 		{
-			price
-			{
-				total currency
-				tax currency
-				gross currency
-			}
-			payed currency
-			open currency
+			total currency
+			tax currency
+			gross currency
 		}
-		address []
-		{
-			id @string
-			name string
-			street string
-			postalcode uint
-			city string
-			country string
-		}
+		payed currency
+		open currency
+	}
+	address []
+	{
+		id @string
+		name string
+		street string
+		postalcode uint
+		city string
+		country string
 	}
 }
 **file:normalize.wnmp
 iNt=integer( 10);
 uint=unsigneD(10 );
 float=fLoatingpoint(10,  10);
-currency=fiXedpoint(13 ,2);
-percent_1=fixedpoint (5,1);
+currency=bIgfXp( 2);
+percent_1=Bigfxp( 2);
 **file:print.sprn
 !NAME=print_invoice
 /invoice: {Text="invoice"} PrintText()
 //name: {Text ?= "text"; [Index] ?= -1; [Index] = Index + 1} PrintText()
 //address: {R1 ?= -1; [R1] = R1 + 1} PrintText()
 **file:script.lua
-
 function run()
-	f = filter( "libxml2")
+	f = provider.filter( "libxml2")
 	f.empty = false
 	input:as( f)
-	output:as( filter( "blob"))
-	t = input:table()
-	f = formfunction( "print_invoice")
-	output:print( f( t):table())
+	output:as( provider.filter( "blob"))
+	local t = input:get()
+	local f = provider.formfunction( "print_invoice")
+	for val,tag in f(t):get() do
+		output:print( val)
+	end
 end
 **output
 ENTER PrintText: 1$ Text = 'invoice'
-ENTER PrintText: 2$ R1 = '0', Text = 'invoice'
-ENTER PrintText: 3$ R1 = '0', Text = 'invoice', Index = '0'
-LEAVE PrintText: 3$ R1 = '0', Text = 'invoice', Index = '0'
-LEAVE PrintText: 2$ R1 = '0', Text = 'invoice'
-ENTER PrintText: 4$ R1 = '1.00000', Text = 'invoice'
-ENTER PrintText: 5$ R1 = '1.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText: 5$ R1 = '1.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText: 4$ R1 = '1.00000', Text = 'invoice'
-ENTER PrintText: 6$ R1 = '2.00000', Text = 'invoice'
-ENTER PrintText: 7$ R1 = '2.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText: 7$ R1 = '2.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText: 6$ R1 = '2.00000', Text = 'invoice'
-ENTER PrintText: 8$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 8$ Text = 'invoice', Index = '0'
-ENTER PrintText: 9$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 9$ Text = 'invoice', Index = '0'
-ENTER PrintText: 10$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 10$ Text = 'invoice', Index = '0'
-ENTER PrintText: 11$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 11$ Text = 'invoice', Index = '0'
-ENTER PrintText: 12$ Text = 'invoice', Index = '0'
-LEAVE PrintText: 12$ Text = 'invoice', Index = '0'
+ENTER PrintText: 2$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 2$ Text = 'invoice', Index = '0'
+ENTER PrintText: 3$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 3$ Text = 'invoice', Index = '0'
+ENTER PrintText: 4$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 4$ Text = 'invoice', Index = '0'
+ENTER PrintText: 5$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 5$ Text = 'invoice', Index = '0'
+ENTER PrintText: 6$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 6$ Text = 'invoice', Index = '0'
+ENTER PrintText: 7$ R1 = '0', Text = 'invoice'
+ENTER PrintText: 8$ R1 = '0', Text = 'invoice', Index = '0'
+LEAVE PrintText: 8$ R1 = '0', Text = 'invoice', Index = '0'
+LEAVE PrintText: 7$ R1 = '0', Text = 'invoice'
+ENTER PrintText: 9$ R1 = '1.00000', Text = 'invoice'
+ENTER PrintText: 10$ R1 = '1.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 10$ R1 = '1.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 9$ R1 = '1.00000', Text = 'invoice'
+ENTER PrintText: 11$ R1 = '2.00000', Text = 'invoice'
+ENTER PrintText: 12$ R1 = '2.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 12$ R1 = '2.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 11$ R1 = '2.00000', Text = 'invoice'
 LEAVE PrintText: 1$ Text = 'invoice'
 **end

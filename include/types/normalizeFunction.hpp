@@ -29,12 +29,13 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/normalizeFunction.hpp
-///\brief Normalize function definition
+/// \file types/normalizeFunction.hpp
+/// \brief Normalize function definition
 
 #ifndef _Wolframe_TYPES_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _Wolframe_TYPES_NORMALIZE_FUNCTION_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include <cstring>
 #include <stdexcept>
 #include <boost/shared_ptr.hpp>
@@ -42,24 +43,26 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
-//\class Variant
-//\brief Forward declaration
+/// \class Variant
+/// \brief Forward declaration
 class Variant;
 
-//\class NormalizeFunction
-//\brief Basic normalization function for atomic values (variant type)
+/// \class NormalizeFunction
+/// \brief Basic normalization function for atomic values (variant type)
 class NormalizeFunction
 {
 public:
 	virtual ~NormalizeFunction(){}
 	virtual const char* name() const=0;
 	virtual Variant execute( const Variant& i) const=0;
+	virtual NormalizeFunction* copy() const=0;
 };
 
-//\brief Shared ownership reference to normalization function for atomic values (variant type)
+/// \brief Shared ownership reference to normalization function for atomic values (variant type)
 typedef boost::shared_ptr<NormalizeFunction> NormalizeFunctionR;
 
-
+/// \class NormalizeResourceHandle
+/// \brief Base class for resources for normalization functions
 class NormalizeResourceHandle
 {
 public:
@@ -70,11 +73,11 @@ public:
 typedef boost::shared_ptr<NormalizeResourceHandle> NormalizeResourceHandleR;
 
 
-typedef NormalizeResourceHandle* (*CreateNormalizeResourceHandle)();
-typedef NormalizeFunction* (*CreateNormalizeFunction)( NormalizeResourceHandle* reshnd, const std::string& arg);
+typedef const NormalizeResourceHandleR& (*GetNormalizeResourceHandle)();
+typedef NormalizeFunction* (*CreateNormalizeFunction)( NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
 
-//\class NormalizeFunctionType
-//\brief Class of basic normalization functions instantiated by arguments
+/// \class NormalizeFunctionType
+/// \brief Class of basic normalization functions instantiated by arguments
 class NormalizeFunctionType
 {
 public:
@@ -86,7 +89,7 @@ public:
 		:m_createFunction(o.m_createFunction),m_resources(o.m_resources){}
 	~NormalizeFunctionType(){}
 
-	NormalizeFunction* createFunction( const std::string& arg) const
+	NormalizeFunction* createFunction( const std::vector<types::Variant>& arg) const
 	{
 		if (m_createFunction)
 		{
@@ -106,15 +109,15 @@ private:
 
 
 
-//\class NormalizeFunctionMap
-//\brief Map of basic normalization functions for atomic values (variant type)
+/// \class NormalizeFunctionMap
+/// \brief Map of basic normalization functions for atomic values (variant type)
 struct NormalizeFunctionMap
 {
 	virtual ~NormalizeFunctionMap(){}
 	virtual const NormalizeFunction* get( const std::string& name) const=0;
 };
 
-//\brief Shared ownership reference to map of basic normalization functions for atomic values (variant type)
+/// \brief Shared ownership reference to map of basic normalization functions for atomic values (variant type)
 typedef boost::shared_ptr<NormalizeFunctionMap> NormalizeFunctionMapR;
 
 }}//namespace

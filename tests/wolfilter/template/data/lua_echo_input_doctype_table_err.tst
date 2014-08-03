@@ -1,7 +1,7 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//'`.lua
-expecterror="try to read input twice"
+expecterror="try to use iterator for input/document twice"
 docin=employee_assignment_doctype_2			# input document name
 testcmd="-c wolframe.conf run"				# command to execute by the test
 testdata="
@@ -12,6 +12,7 @@ LoadModules
 	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 }
 Processor
 {
@@ -22,6 +23,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter #FILTER#
 		}
 	}
 }

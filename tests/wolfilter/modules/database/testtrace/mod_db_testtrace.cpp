@@ -41,20 +41,20 @@ namespace module {
 
 typedef ConfiguredBuilder* (*CreateBuilderFunc)();
 
-static ConfiguredBuilder* createTesttraceDatabaseModule()
+static BuilderBase* createTesttraceDatabaseModule()
 {
 	static module::ConfiguredBuilderDescription< db::TesttraceDatabaseConstructor,
 		db::TesttraceDatabaseConfig > mod( "testtrace database", "database", "test", TESTTRACE_DATABASE_CLASSNAME);
 	return &mod;
 }
 
-enum {NofObjects=1};
-static CreateBuilderFunc containers[ NofObjects] =
+static createBuilderFunc containers[] =
 {
-	createTesttraceDatabaseModule
+	createTesttraceDatabaseModule,
+	NULL
 };
 
-ModuleEntryPoint entryPoint( 0, "Testtrace database", NofObjects, containers, 0, 0);
+ModuleEntryPoint entryPoint( 0, "Testtrace database", containers );
 
 }} // namespace _Wolframe::module
 

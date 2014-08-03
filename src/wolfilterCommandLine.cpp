@@ -33,16 +33,16 @@
 ///\file wolfilterCommandLine.cpp
 ///\brief Implementation of the options of a wolfilter call
 #include "wolfilterCommandLine.hpp"
-#include "langbind/appObjects.hpp"
 #include "database/DBprovider.hpp"
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "module/moduleInterface.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
+#include "types/propertyTree.hpp"
 #include "serialize/structOptionParser.hpp"
+#include "serialize/configSerialize.hpp"
 #include "utils/fileUtils.hpp"
-#include "types/doctype.hpp"
-#include "config/structSerialize.hpp"
+#include "filter/redirectFilterClosure.hpp"
 #include "logger-v1.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -55,12 +55,14 @@
 using namespace _Wolframe;
 using namespace _Wolframe::config;
 
-//\brief Macros to stringify compile options
-#define DO_STRINGIFY2(x) #x
-#define DO_STRINGIFY(x)  DO_STRINGIFY2(x)
-
-//TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a src/libwolframe.a -> Issue #95)
-static const char* defaultMainConfig()		{ return "/etc/wolframe.conf"; }
+//TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a src/libwolframed.a -> Issue #95)
+static const char* defaultMainConfig()		{
+#ifdef DEFAULT_MAIN_CONFIGURATION_FILE
+		return DO_STRINGIFY( DEFAULT_MAIN_CONFIGURATION_FILE );
+#else
+		return "/etc/wolframe/wolframe.conf";
+#endif
+	}
 static const char* defaultUserConfig()		{ return "~/wolframe.conf"; }
 static const char* defaultLocalConfig()		{ return "./wolframe.conf"; }
 static const char* getDefaultConfigFile()
@@ -71,48 +73,48 @@ static const char* getDefaultConfigFile()
 	return 0;
 }
 
-static std::string configurationTree_tostring( const boost::property_tree::ptree& pt)
+static std::string configurationTree_tostring( const types::PropertyTree::Node& pt)
 {
 	langbind::TypedInputFilterR inp( new langbind::PropertyTreeInputFilter( pt));
 	langbind::ToStringFilter* res;
 	langbind::TypedOutputFilterR out( res = new langbind::ToStringFilter( "\t"));
-	langbind::RedirectFilterClosure redirect( inp, out);
+	langbind::RedirectFilterClosure redirect( inp, out, false);
 	if (!redirect.call()) throw std::runtime_error( "can't map configuration tree to string");
 	return res->content();
 }
 
-static boost::property_tree::ptree getTreeNode( const boost::property_tree::ptree& tree, const std::string& name)
+config::ConfigurationNode WolfilterCommandLine::getConfigNode( const std::string& name) const
 {
-	bool found = false;
-	boost::property_tree::ptree rt;
-	boost::property_tree::ptree::const_iterator gi = tree.begin(), ge = tree.end();
-	for (; gi != ge; ++gi)
-	{
-		if (boost::algorithm::iequals( gi->first, name))
-		{
-			if (found) throw std::runtime_error( std::string("duplicate '") + name + "' node in configuration");
-			rt = gi->second;
-			found = true;
-		}
-	}
-	return rt;
+	return m_config.root().getChildrenJoined( name);
 }
 
-boost::property_tree::ptree WolfilterCommandLine::getConfigNode( const std::string& name) const
-{
-	return getTreeNode( m_config, name);
-}
-
-std::vector<std::string> WolfilterCommandLine::configModules( const std::string& refpath) const
+std::vector<std::string> WolfilterCommandLine::configModules( bool useDefaultModuleDir) const
 {
 	std::vector<std::string> rt;
-	boost::property_tree::ptree module_section = getConfigNode( "LoadModules");
-	boost::property_tree::ptree::const_iterator mi = module_section.begin(), me = module_section.end();
+	config::ConfigurationNode module_section = getConfigNode( "LoadModules");
+	std::string directory;
+
+	types::PropertyTree::Node::const_iterator mi = module_section.begin(), me = module_section.end();
+	for (; mi != me; ++mi)
+	{
+		if (boost::algorithm::iequals( mi->first, "directory"))
+		{
+			if (!directory.empty()) throw std::runtime_error( "duplicate definition of 'directory' in section LoadModules");
+			directory = mi->second.data();
+			if (directory.empty()) throw std::runtime_error( "empty definition of 'directory' in section LoadModules");
+		}
+	}
+	mi = module_section.begin();
 	for (; mi != me; ++mi)
 	{
 		if (boost::algorithm::iequals( mi->first, "module"))
 		{
-			rt.push_back( utils::getCanonicalPath( mi->second.get_value<std::string>(), refpath));
+			std::string absmodpath = m_modulesDirectory->getAbsoluteModulePath( mi->second.data(), directory, useDefaultModuleDir);
+			if (absmodpath.empty())
+			{
+				throw std::runtime_error( std::string("could not resolve configured module path '") + mi->second.data() + "'");
+			}
+			rt.push_back( absmodpath);
 		}
 	}
 	return rt;
@@ -142,6 +144,7 @@ struct WolfilterOptionStruct
 			( "filter,e", po::value<std::string>(), "specify input/output filter by name (if not specified separately)" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "config,c", po::value<std::string>(), "specify configuration file to load" )
+			( "protocol,p", po::value<std::string>(), "specify protocol to use (default no protocol)" )
 			( "cmd", po::value<std::string>(), "name of the command to execute")
 			;
 
@@ -149,15 +152,12 @@ struct WolfilterOptionStruct
 	}
 };
 
-#if defined( DEFAULT_MODULE_LOAD_DIR)
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir)
-#else
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& currentPath, bool )
-#endif
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined)
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_loglevel(_Wolframe::log::LogLevel::LOGLEVEL_WARNING)
-	,m_referencePath(referencePath_)
+	,m_modulesDirectory(0)
+	,m_configurationPath(referencePath)
 {
 	static const WolfilterOptionStruct ost;
 	po::variables_map vmap;
@@ -203,9 +203,9 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "config"))
 	{
 		configfile = vmap["config"].as<std::string>();
-		if (currentPath.size() != 0)
+		if (m_configurationPath.size() != 0)
 		{
-			configfile = utils::getCanonicalPath( configfile, currentPath);
+			configfile = utils::getCanonicalPath( configfile, m_configurationPath);
 		}
 		hasConfig = true;
 	}
@@ -213,46 +213,41 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 #if !defined(_WIN32)
 		const char* defaultConfigFile = getDefaultConfigFile();
-		if (defaultConfigFile)
+		if (defaultConfigFile && useDefaultConfigIfNotDefined)
 		{
 			LOG_DEBUG << "No configuration file specified on command line. Using default configuration file '" << defaultConfigFile << "'";
 			configfile = defaultConfigFile;
 			hasConfig = true;
 		}
-#endif
-		if (!hasConfig)
+#else
+		if (useDefaultConfigIfNotDefined)
 		{
-			LOG_DEBUG << "Running without configuration";
+			LOG_TRACE << "No configuration file specified on command line";
 		}
+#endif
 	}
 	if (hasConfig)
 	{
-		m_referencePath = boost::filesystem::path( configfile ).branch_path().string();
-		LOG_DEBUG << "Loading configuration file '" << configfile << "' and setting reference path to '" << m_referencePath << "'";
-
+		m_configurationPath = boost::filesystem::path( configfile ).branch_path().string();
 		m_config = utils::readPropertyTreeFile( configfile);
-		hasConfig = true;
 	}
+	else
+	{
+		LOG_DEBUG << "Running without configuration";
+	}
+	m_modulesDirectory = new module::ModulesDirectory( m_configurationPath);
+
 	if (vmap.count( "input"))
 	{
 		m_inputfile = vmap["input"].as<std::string>();
 	}
-	std::string modulePath;
-#if defined( DEFAULT_MODULE_LOAD_DIR)
-	if (useDefaultModuleDir)
+	if (vmap.count( "protocol"))
 	{
-		modulePath = DO_STRINGIFY( DEFAULT_MODULE_LOAD_DIR);
+		m_protocol = vmap["protocol"].as<std::string>();
 	}
-	else
-	{
-		modulePath = m_referencePath;
-	}
-#else
-	modulePath = m_referencePath;
-#endif
 	if (hasConfig)
 	{
-		std::vector<std::string> cfgmod = configModules( modulePath);
+		std::vector<std::string> cfgmod = configModules( useDefaultModuleDir);
 		std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
 	}
 	if (vmap.count( "module"))
@@ -261,24 +256,19 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::iterator mi=mods.begin(), me=mods.end();
 		for (; mi != me; ++mi)
 		{
-			if (mi->size() == 0 || (*mi).at(0) != '.')
+			std::string absmodpath = m_modulesDirectory->getAbsoluteModulePath( *mi, m_configurationPath, useDefaultModuleDir);
+			if (absmodpath.empty())
 			{
-				m_modules.push_back( utils::getCanonicalPath( *mi, modulePath));
+				throw std::runtime_error( std::string("could not resolve command line module path '") + *mi + "'");
 			}
-			else if (!currentPath.empty())
-			{
-				m_modules.push_back( utils::getCanonicalPath( *mi, currentPath));
-			}
-			else
-			{
-				m_modules.push_back( *mi);
-			}
-			LOG_DEBUG << "Defined additional module to load '" << m_modules.back() << "'";
+			m_modules.push_back( absmodpath);
+			LOG_DEBUG << "Defined additional module to load '" << absmodpath << "'";
 		}
 	}
 	std::list<std::string> modfiles;
 	std::copy( m_modules.begin(), m_modules.end(), std::back_inserter( modfiles));
-	if (!LoadModules( m_modulesDirectory, modfiles))
+
+	if (!m_modulesDirectory->loadModules( modfiles))
 	{
 		throw std::runtime_error( "Modules could not be loaded");
 	}
@@ -303,30 +293,46 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	LOG_DEBUG << "Database provider configuration:";
 	LOG_DEBUG << configurationTree_tostring( m_dbconfig);
 
-	if (!m_dbProviderConfig->parse( m_dbconfig, "", &m_modulesDirectory))
+	if (!m_dbProviderConfig->parse( m_dbconfig, "", m_modulesDirectory))
 	{
-		throw std::runtime_error( "Database provider configuration could not be created from command line");
+		throw std::runtime_error( "database provider configuration could not be parsed");
 	}
-	m_dbProviderConfig->setCanonicalPathes( m_referencePath);
+	m_dbProviderConfig->setCanonicalPathes( m_configurationPath);
 	if (!m_dbProviderConfig->check())
 	{
-		throw std::runtime_error( "error in command line. failed to setup a valid database provider configuration");
+		throw std::runtime_error( "error in database provider configuration");
 	}
 
 	m_procProviderConfig.reset( new proc::ProcProviderConfig());
-	boost::property_tree::ptree ppcfg;
+	types::PropertyTree::Node ppcfg;
 	if (hasConfig)
 	{
 		ppcfg = getConfigNode( "Processor");
 	}
-	if (!m_procProviderConfig->parse( ppcfg, "", &m_modulesDirectory))
+	if (!m_procProviderConfig->parse( ppcfg, "", m_modulesDirectory))
 	{
-		throw std::runtime_error( "Error in processor provider configuration");
+		throw std::runtime_error( "processor provider configuration could not be parsed");
 	}
-	m_procProviderConfig->setCanonicalPathes( m_referencePath);
+	m_procProviderConfig->setCanonicalPathes( m_configurationPath);
 	if (!m_procProviderConfig->check())
 	{
-		throw std::runtime_error( "Invalid processor provider configuration");
+		throw std::runtime_error( "error in processor provider configuration");
+	}
+
+	m_aaaaProviderConfig.reset( new AAAA::AAAAconfiguration());
+	types::PropertyTree::Node aacfg;
+	if (hasConfig)
+	{
+		aacfg = getConfigNode( "AAAA");
+	}
+	if (!m_aaaaProviderConfig->parse( aacfg, "", m_modulesDirectory))
+	{
+		throw std::runtime_error( "AAAA provider configuration could not be parsed");
+	}
+	m_aaaaProviderConfig->setCanonicalPathes( m_configurationPath);
+	if (!m_aaaaProviderConfig->check())
+	{
+		throw std::runtime_error( "error in AAAA provider configuration");
 	}
 }
 

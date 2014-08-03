@@ -19,21 +19,21 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_filter_textwolf.dll
 
 CPP_OBJS = \
-	textwolf_filter.obj \
-	mod_filter_textwolf.obj
+	textwolf_filter.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:TextwolfFilter.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_filter_textwolf.obj
+	$(LINK) /dll /def:mod_filter_textwolf.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

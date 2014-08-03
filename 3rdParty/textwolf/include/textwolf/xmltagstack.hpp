@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -32,33 +32,36 @@
 
 --------------------------------------------------------------------
 */
-///\file textwolf/xmltagstack.hpp
-///\brief textwolf XML printer tag stack
+/// \file textwolf/xmltagstack.hpp
+/// \brief textwolf XML printer tag stack
 
 #ifndef __TEXTWOLF_XML_TAG_STACK_HPP__
 #define __TEXTWOLF_XML_TAG_STACK_HPP__
 #include <cstring>
 #include <cstdlib>
 
-///\namespace textwolf
-///\brief Toplevel namespace of the library
+/// \namespace textwolf
+/// \brief Toplevel namespace of the library
 namespace textwolf {
 
-///\class TagStack
-///\brief stack of tag names
+/// \class TagStack
+/// \brief stack of tag names
 class TagStack
 {
 public:
+	/// \brief Destructor
 	~TagStack()
 	{
 		if (m_ptr) std::free( m_ptr);
 	}
 
+	/// \brief Default constructor
 	TagStack()
 		:m_ptr(0),m_pos(0),m_size(InitSize)
 	{
 		if ((m_ptr=(char*)std::malloc( m_size)) == 0) throw std::bad_alloc();
 	}
+	/// \brief Copy constructor
 	TagStack( const TagStack& o)
 		:m_ptr(0),m_pos(o.m_pos),m_size(o.m_size)
 	{
@@ -66,6 +69,9 @@ public:
 		std::memcpy( m_ptr, o.m_ptr, m_pos);
 	}
 
+	/// \brief Push a tag on top
+	/// \param[out] pp pointer to tag value to push
+	/// \param[out] nn size of tag value to push in bytes
 	void push( const char* pp, std::size_t nn)
 	{
 		std::size_t align = getAlign( nn);
@@ -85,6 +91,10 @@ public:
 		*(std::size_t*)(tt) = nn;
 	}
 
+	/// \brief Get the topmost tag
+	/// \param[out] element pointer to topmost tag value
+	/// \param[out] elementsize size of topmost tag value in bytes
+	/// \return true on success, false if the stack is empty
 	bool top( const void*& element, std::size_t& elementsize)
 	{
 		std::size_t ofs = topofs(elementsize);
@@ -93,6 +103,7 @@ public:
 		return true;
 	}
 
+	/// \brief Pop (remove) the topmost tag
 	void pop()
 	{
 		std::size_t elementsize=0;
@@ -101,6 +112,8 @@ public:
 		m_pos -= ofs;
 	}
 
+	/// \brief Find out if the stack is empty
+	/// \return true if yes
 	bool empty() const
 	{
 		return (m_pos == 0);
@@ -120,8 +133,8 @@ private:
 private:
 	enum {InitSize=256};
 	char* m_ptr;
-	std::size_t m_pos;	//< current position in the tag hierarchy stack buffer
-	std::size_t m_size;	//< current position in the tag hierarchy stack buffer
+	std::size_t m_pos;	///< current position in the tag hierarchy stack buffer
+	std::size_t m_size;	///< current position in the tag hierarchy stack buffer
 
 	static std::size_t getAlign( std::size_t n)
 	{

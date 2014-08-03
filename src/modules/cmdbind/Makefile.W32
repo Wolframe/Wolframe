@@ -5,7 +5,7 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 SUBDIRS = \
-	$(SUBDIRS) directmap
+	$(SUBDIRS) directmap tdl aamap
 
 !IFDEF WITH_LUA
 SUBDIRS = \

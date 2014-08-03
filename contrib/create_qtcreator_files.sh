@@ -5,6 +5,7 @@ find . -name '*.[ch]' -type f -print >/tmp/$$
 find . -name '*.[ch]pp' -type f -print >>/tmp/$$
 find . -name 'GNUmakefile' -type f -print >>/tmp/$$
 find . -name 'Makefile.W32' -type f -print >>/tmp/$$
+find . -name '*.php' -type f -print >>/tmp/$$
 find src/modules -name '*.def' -type f -print >>/tmp/$$
 find . -name '*.conf' -type f -print >>/tmp/$$
 find . -name '*.exp' -type f -print >>/tmp/$$
@@ -24,6 +25,7 @@ find . -name 'header.txt' -type f -print >>/tmp/$$
 find . -iname 'AUTHORS*' -type f -print >>/tmp/$$
 find . -iname 'Credits*' -type f -print >>/tmp/$$
 find . -iname 'README*' -type f -print >>/tmp/$$
+find . -iname 'PAMPHLET*' -type f -print >>/tmp/$$
 find . -iname 'INSTALL*' -type f -print >>/tmp/$$
 find . -iname 'TODO*' -type f -print >>/tmp/$$
 find . -iname 'BUGS*' -type f -print >>/tmp/$$

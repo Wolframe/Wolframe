@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file moduleInterface.hpp
-///
+/// \brief Basic interface classes that to build objects and the Wolframe module interface
+/// \file module/moduleInterface.hpp
 
 #ifndef _MODULE_INTERFACE_HPP_INCLUDED
 #define _MODULE_INTERFACE_HPP_INCLUDED
@@ -47,8 +46,22 @@
 namespace _Wolframe {
 namespace module {
 
-///
+/// \class BuilderBase
+/// Base class of all builders
+class BuilderBase
+{
+public:
+	virtual ~BuilderBase()				{}
+
+	virtual const char* objectClassName() const = 0;
+	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
+	virtual ObjectConstructorBase* constructor() = 0;
+};
+
+/// \class SimpleBuilder
+/// \brief Base class for builders of objects without configuration
 class SimpleBuilder
+	:public BuilderBase
 {
 	friend class ModulesDirectory;
 public:
@@ -57,7 +70,7 @@ public:
 
 	virtual ~SimpleBuilder()			{}
 
-	const char* objectClassName() const		{ return m_className; }
+	virtual const char* objectClassName() const	{ return m_className; }
 
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
 	virtual ObjectConstructorBase* constructor() = 0;
@@ -65,17 +78,19 @@ protected:
 	const char* m_className;
 };
 
-///
+/// \class ConfiguredBuilder
+/// \brief Builder for objects with configuration
 class ConfiguredBuilder
+	:public BuilderBase
 {
 	friend class ModulesDirectory;
 public:
-	/// ConfiguredBuilder (builder for objects with configuration) constructor
-	///\param title		string used for printing purposes, usually logging.
-	///\param section	configuration section (parent node)
-	///\param keyword	keyword in the configuration section. The object configuration
+	/// \brief Constructor
+	/// \param title	string used for printing purposes, usually logging.
+	/// \param section	configuration section (parent node)
+	/// \param keyword	keyword in the configuration section. The object configuration
 	///			is bind to the section, keyword pair
-	///\param className	the name of the class that the built constructor will build
+	/// \param className	the name of the class that the built constructor will build
 	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
 			   const char* className )
 		: m_title( title ), m_section( section ), m_keyword( keyword ),
@@ -83,30 +98,33 @@ public:
 
 	virtual ~ConfiguredBuilder()			{}
 
-	const char* objectClassName() const		{ return m_className; }
+	virtual const char* objectClassName() const	{ return m_className; }
 
-	/// The type of the object: filter, audit, command handler etc.
+	/// \brief Get the type of the object: filter, audit, command handler etc.
 	/// This is not the same as the objectName
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
 
-	/// the configuration for the object
-	///\param logPrefix	string to print before the log messages generated inside this object.
+	/// \brief Get the configuration for the object
+	/// \param logPrefix	string to print before the log messages generated inside this object.
 	///			Same as for any confiuration object.
 	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
 
-	/// the virtual constructor for the object
+	/// \brief get the virtual constructor for the object
 	virtual ObjectConstructorBase* constructor() = 0;
 
 protected:
 	const char* m_title;		///< used for printing (logging etc.)
 	const char* m_section;		///< configuration section to which the
 					/// configuration parser reacts
-	const char* m_keyword;		///< configuration keyword (element)
-	const char* m_className;	///< class name of the object
+	const char* m_keyword;		//< configuration keyword (element)
+	const char* m_className;	//< class name of the object
 };
 
 
-/// Template for constructing a configured builder.
+/// \class ConfiguredBuilderDescription
+/// \tparam Tconstructor
+/// \tparam Tconf
+/// \brief Template for constructing a configured builder.
 template < class Tconstructor, class Tconf >
 class ConfiguredBuilderDescription : public ConfiguredBuilder
 {
@@ -133,41 +151,29 @@ private:
 
 //*********** Module interface *********
 
-/// Function that constructs a configured builder.
-/// This function is specific for each of the configured builders in the module.
-typedef ConfiguredBuilder* (*createCfgdBuilderFunc)();
-
-/// Function that constructs a simple (non-configured) builder.
-/// This function is specific for each of the simple builders in the module.
-typedef SimpleBuilder* (*createBuilderFunc)();
+/// \brief Function that constructs a builder.
+///	This function is specific for each of the configured builders in the module.
+typedef BuilderBase* (*createBuilderFunc)();
 
 
-/// The module entry point structure. Only one entry point per module.
+/// \class ModuleEntryPoint
+/// \brief The module entry point structure. Only one entry point per module.
 struct ModuleEntryPoint
 {
 	enum	SignSize	{
 		MODULE_SIGN_SIZE = 16
 	};
 
-	char signature[MODULE_SIGN_SIZE];		///< module entry point signature
+	char signature[ MODULE_SIGN_SIZE];		///< module entry point signature
 	unsigned short ifaceVersion;			///< version of the module loader interface
 	const char* name;				///< name of the module
-	unsigned short		cfgdContainers;		///< number of configured builders
-	createCfgdBuilderFunc	*createCfgdBuilder;	///< the array of functions that create the configured builders
-	unsigned short		containers;		///< number of simple (unconfigured) builders
-	createBuilderFunc	*createBuilder;		///< the array of functions that create the simple builders
+	createBuilderFunc* createBuilder;		///< NULL terminated array of functions that create the builders
 public:
-	ModuleEntryPoint( unsigned short iVer, const char* modName,
-			  unsigned short nrContainers, createCfgdBuilderFunc* containerFunc,
-			  unsigned short nrObjects, createBuilderFunc* objectFunc
-			  )
-		: ifaceVersion( iVer ), name( modName ),
-		  cfgdContainers( nrContainers ), createCfgdBuilder( containerFunc ),
-		  containers( nrObjects ), createBuilder( objectFunc )
+	ModuleEntryPoint( unsigned short iVer, const char* modName, createBuilderFunc* createBuilder_)
+		: ifaceVersion( iVer ), name( modName ), createBuilder( createBuilder_ )
 	{
-		std::memcpy ( signature, "Wolframe Module", MODULE_SIGN_SIZE );
-		if ( createCfgdBuilder == NULL ) cfgdContainers = 0;
-		if ( createBuilder == NULL ) containers = 0;
+		std::memset ( signature, 0, MODULE_SIGN_SIZE);
+		std::memcpy ( signature, "Wolframe Module", std::strlen("Wolframe Module"));
 	}
 };
 

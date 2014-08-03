@@ -22,7 +22,7 @@ INCLUDE_LDFLAGS = \
 # is needed to make the module link..
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\3rdParty\libcjson\cjson.lib
 
@@ -32,15 +32,14 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	inputfilterImpl.obj \
 	outputfilterImpl.obj \
-	cjson_filter.obj \
-	mod_filter_cjson.obj
+	cjson_filter.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:CJsonFilterModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_filter_cjson.obj
+	$(LINK) /dll /def:mod_filter_cjson.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

@@ -1,0 +1,3 @@
+LIBRARY mod_protocol_wolframe
+EXPORTS
+entryPoint	@1

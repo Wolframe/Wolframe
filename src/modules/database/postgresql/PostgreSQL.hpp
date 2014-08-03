@@ -37,16 +37,19 @@
 #ifndef _POSTGRESQL_HPP_INCLUDED
 #define _POSTGRESQL_HPP_INCLUDED
 
+#include "PostgreSQLTransactionExecStatemachine.hpp"
+#include "PostgreSQLConfig.hpp"
 #include "logger-v1.hpp"
 #include <libpq-fe.h>
 #include <list>
+#include <vector>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
-#include "database/transactionExecStatemachine.hpp"
-#include "PostgreSQLprogram.hpp"
-#include "config/configurationBase.hpp"
+#include "PostgreSQLServerSettings.hpp"
 #include "module/constructor.hpp"
 #include "system/objectPool.hpp"
+#include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
 
 #ifdef _WIN32
 #pragma warning(disable:4250)
@@ -55,59 +58,14 @@
 namespace _Wolframe {
 namespace db {
 
-static const char* POSTGRESQL_DB_CLASS_NAME = "PostgreSQL";
-
-static const unsigned int POSTGRESQL_MIN_DB_VERSION = 80400;
-static const unsigned short POSTGRESQL_MIN_PROTOCOL_VERSION = 3;
-
-/// PostgreSQL server connection configuration
-class PostgreSQLconfig : public config::NamedConfiguration
-{
-	friend class PostgreSQLconstructor;
-public:
-	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
-
-	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
-	~PostgreSQLconfig()			{}
-
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	virtual bool check() const;
-	virtual void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	const std::string& host() const		{return m_host;}
-	unsigned short port() const		{return m_port;}
-	const std::string& dbName() const	{return m_dbName;}
-	const std::string& user() const		{return m_user;}
-	const std::string& password() const	{return m_password;}
-	const std::list<std::string>& programFiles() const	{return m_programFiles;}
-
-private:
-	std::string	m_ID;			///< database identifier
-	std::string	m_host;			///< server host
-	unsigned short	m_port;			///< server port
-	std::string	m_dbName;		///< database name on server
-	std::string	m_user;			///< database user
-	std::string	m_password;		///< and password
-	std::string	sslMode;		///< SSL connection mode
-	std::string	sslCert;		///< client SSL certificate file
-	std::string	sslKey;			///< client SSL key file
-	std::string	sslRootCert;		///< root SSL certificate file
-	std::string	sslCRL;			///< SSL certificate revocation list
-	unsigned short	connectTimeout;		///< connection timeout
-	unsigned short	connections;		///< number of database connection (pool size)
-	unsigned short	acquireTimeout;		///< timeout when acquiring a connection from the pool
-	unsigned	statementTimeout;	///< default timeout when executin a statement
-	std::list< std::string > m_programFiles;///< list of program files
+enum {
+	POSTGRESQL_MIN_DB_VERSION = 80400,
+	POSTGRESQL_MIN_PROTOCOL_VERSION = 3
 };
 
-
-class PostgreSQLdbUnit;
-
-struct PostgreSQLLanguageDescription : public LanguageDescription
+struct PostgreSQLLanguageDescription : public LanguageDescriptionSQL
 {
-	virtual std::string stm_argument_reference( int index)
+	virtual std::string stm_argument_reference( int index) const
 	{
 		std::ostringstream rt;
 		rt << "$" << index;
@@ -115,25 +73,29 @@ struct PostgreSQLLanguageDescription : public LanguageDescription
 	}
 };
 
-class PostgreSQLdatabase : public Database
+class PostgreSQLDatabase : public Database
 {
 public:
-	PostgreSQLdatabase() : m_unit( NULL )	{}
-	~PostgreSQLdatabase()			{}
+	PostgreSQLDatabase( const std::string& id,
+			  const std::string& host, unsigned short port, const std::string& dbName,
+			  const std::string& user, const std::string& password,
+			  const std::string& sslMode, const std::string& sslCert,
+			  const std::string& sslKey, const std::string& sslRootCert,
+			  const std::string& sslCRL,
+			  unsigned short connectTimeout,
+			  unsigned short connections, unsigned short acquireTimeout,
+			  unsigned statementTimeout);
+	PostgreSQLDatabase( const PostgreSQLConfig& config);
+	 ~PostgreSQLDatabase();
 
-	void setUnit( PostgreSQLdbUnit* unit )	{ m_unit = unit; }
-	bool hasUnit() const			{ return m_unit != NULL; }
-	PostgreSQLdbUnit& dbUnit() const	{ return *m_unit; }
-
-	const std::string& ID() const;
+	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 
-	virtual void loadProgram( const std::string& filename );
-	virtual void loadAllPrograms();
-	virtual void addProgram( const std::string& program );
-
-	Transaction* transaction( const std::string& name );
-	void closeTransaction( Transaction* t );
+	Transaction* transaction( const std::string& name_)
+	{
+		TransactionExecStatemachineR stm( new TransactionExecStatemachine_postgres( this));
+		return new Transaction( name_, stm);
+	}
 
 	virtual const LanguageDescription* getLanguageDescription( ) const
 	{
@@ -141,74 +103,29 @@ public:
 		return &langdescr;
 	}
 
+	boost::shared_ptr<PGconn> newConnection()
+	{
+		return boost::shared_ptr<PGconn>( m_connPool.get(), boost::bind( ObjectPool<PGconn*>::static_add, &m_connPool, _1));
+	}
+
+	PostgreSQLServerSettings serverSettings() const
+						{ return m_serverSettings; }
+
 private:
-	PostgreSQLdbUnit*	m_unit;		///< parent database unit
-};
+	void init( const PostgreSQLConfig& config);
 
-
-class PostgreSQLdbUnit : public DatabaseUnit
-{
-public:
-	PostgreSQLdbUnit( const std::string& id,
-			  const std::string& host, unsigned short port, const std::string& dbName,
-			  const std::string& user, const std::string& password,
-			  std::string sslMode, std::string sslCert, std::string sslKey,
-			  std::string sslRootCert, std::string sslCRL,
-			  unsigned short connectTimeout,
-			  size_t connections, unsigned short acquireTimeout,
-			  unsigned statementTimeout,
-			  const std::list<std::string>& programFiles_);
-	~PostgreSQLdbUnit();
-
-	const std::string& ID() const		{ return m_ID; }
-	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
-	Database* database();
 	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
 
-	virtual void loadProgram( const std::string& filename );
-	/// MBa: I have to think a bit how to handle this
-	virtual void loadAllPrograms();
-
-	virtual void addProgram( const std::string& program )
-						{ m_program.load( program ); }
-
+public:
 	static void noticeProcessor( void* this_void, const char * message);
 
-	PoolObject<PGconn*>* newConnection()	{return new PoolObject<PGconn*>( m_connPool);}
-
 private:
-	const std::string	m_ID;			///< database ID
-	std::string		m_connStr;		///< connection string
-	size_t			m_noConnections;	///< number of connections
-	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
-	unsigned		m_statementTimeout;	///< default statement execution timeout
-	PostgreSQLdatabase	m_db;			///< real database object
-	PostgreSQLprogram	m_program;
-	std::list<std::string>	m_programFiles;
+	const std::string	m_ID;			//< database ID
+	std::string		m_connStr;		//< connection string
+	unsigned short		m_connections;		//< number of connections
+	PostgreSQLServerSettings m_serverSettings;	//< data like protocol settings, OIDs, etc. loaded at initialization from server
+	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
 };
-
-
-//***  PostgreSQL database constructor  ***************************************
-class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
-{
-public:
-	ObjectConstructorBase::ObjectType objectType() const
-						{ return DATABASE_OBJECT; }
-	const char* objectClassName() const	{ return POSTGRESQL_DB_CLASS_NAME; }
-	PostgreSQLdbUnit* object( const config::NamedConfiguration& conf );
-};
-
-
-//\class PostgreSQLtransaction
-class PostgreSQLtransaction
-	:public StatemachineBasedTransaction
-{
-public:
-	PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_);
-	virtual ~PostgreSQLtransaction(){}
-};
-
-
 
 }} // _Wolframe::db
 

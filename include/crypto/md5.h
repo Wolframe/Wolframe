@@ -54,7 +54,7 @@
  *
  * See md5.c for more information.
  *
- * Modified for Wolframe by the Wolframe Team (c) 2012
+ * Modified for Wolframe by the Wolframe Team (c) 2012 - 2014
  */
 
 #ifndef _MD5_H_INCLUDED

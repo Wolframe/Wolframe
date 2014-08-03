@@ -46,7 +46,7 @@ std::string comauto::variantToString( const comauto::TypeLib* typelib_, const IT
 	types::VariantConst element;
 	std::vector<std::string> stk;
 
-	VariantInputFilter itr( typelib_, typeinfo_, data_, serialize::Context::None);
+	VariantInputFilter itr( typelib_, typeinfo_, data_, serialize::Flags::None);
 	while (itr.getNext( type, element))
 	{
 		switch (type)

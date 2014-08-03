@@ -32,10 +32,44 @@
 ************************************************************************/
 ///\file integerNormalizeFunction.cpp
 #include "integerNormalizeFunction.hpp"
+#include "normalizeFunctionUtils.hpp"
 #include <limits>
 
 using namespace _Wolframe;
 using namespace langbind;
+
+static void getIntegerDimArgument( const std::vector<types::Variant>& arg, std::size_t& dim, types::Variant::Data::UInt& maxval)
+{
+	if (arg.size() > 1) throw std::runtime_error("too many arguments for integer normalize function");
+	dim = std::numeric_limits<std::size_t>::max();
+	if (arg.size())
+	{
+		types::Variant::Data::UInt vdim = arg.at(0).touint();
+		if (vdim >= std::numeric_limits<std::size_t>::max())
+		{
+			throw std::runtime_error( "parameter out of range for integer normalize function");
+		}
+		dim = (std::size_t)vdim;
+		maxval = getMax( dim)-1;
+	}
+	else
+	{
+		dim = std::numeric_limits<std::size_t>::max();
+		maxval = std::numeric_limits<types::Variant::Data::UInt>::max();
+	}
+}
+
+IntegerNormalizeFunction::IntegerNormalizeFunction( const std::vector<types::Variant>& arg)
+{
+	m_sign = true;
+	getIntegerDimArgument( arg, m_size, m_max);
+}
+
+UnsignedNormalizeFunction::UnsignedNormalizeFunction( const std::vector<types::Variant>& arg)
+	:IntegerNormalizeFunction( arg)
+{
+	m_sign = true;
+}
 
 types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) const
 {
@@ -44,6 +78,17 @@ types::Variant IntegerNormalizeFunction::execute( const types::Variant& inp) con
 	bool do_convert = true;
 	bool isSigned = false;
 
+	if (!inp.defined())
+	{
+		if (m_sign)
+		{
+			return types::Variant( (Int)0);
+		}
+		else
+		{
+			return types::Variant( (UInt)0);
+		}
+	}
 	if (inp.type() == types::Variant::Int)
 	{
 		Int val = inp.toint();

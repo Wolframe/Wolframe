@@ -17,25 +17,25 @@
 			<itemizedlist>
 				<listitem>
 				<para>
-					wolframe_0.0.1-1_amd64.deb: the Wolframe core server
+					wolframe_&WolframeVersion;-1_amd64.deb: the Wolframe core server
 				</para>
 				</listitem>
 
 				<listitem>
 				<para>
-					wolframe-sqlite3_0.0.1-1_amd64.deb: the Sqlite3 database driver module				
+					wolframe-sqlite3_&WolframeVersion;-1_amd64.deb: the Sqlite3 database driver module				
 				</para>
 				</listitem>
 
 				<listitem>
 				<para>
-					wolframe-libxml2_0.0.1-1_amd64.deb: the XML filter based on libxml2
+					wolframe-libxml2_&WolframeVersion;-1_amd64.deb: the XML filter based on libxml2
 				</para>
 				</listitem>
 
 				<listitem>
 				<para>
-					wolfclient_0.0.3-1_amd64.deb: the Wolframe graphical user interface client 
+					wolfclient_&WolfclientVersion;-1_amd64.deb: the Wolframe graphical user interface client 
 				</para>
 				</listitem>
 			</itemizedlist>
@@ -100,9 +100,9 @@
 			Instead we create two directories, one for server data and one for
 			client data:
 		        <programlisting language='shell'>
-	mkdir ~/tutorial
-	mkdir ~/tutorial/server
-	mkdir ~/tutorial/client
+mkdir ~/tutorial
+mkdir ~/tutorial/server
+mkdir ~/tutorial/client
 			</programlisting>
 		</para>
 		

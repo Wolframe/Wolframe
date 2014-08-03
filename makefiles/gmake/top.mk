@@ -25,12 +25,12 @@
 .PHONY: all
 all:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d all || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d all || exit 1); done)
 
 .PHONY: clean
 clean:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d clean || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d clean || exit 1); done)
 	@-test ! -f $(TOPDIR)/makefiles/gmake/platform.mk.vars || rm $(TOPDIR)/makefiles/gmake/platform.mk.vars
 	@-test ! -f $(TOPDIR)/makefiles/gmake/platform.vars || rm $(TOPDIR)/makefiles/gmake/platform.vars
 	@-test ! -f $(TOPDIR)/makefiles/gmake/python.mk.vars || rm $(TOPDIR)/makefiles/gmake/python.mk.vars
@@ -39,7 +39,7 @@ clean:
 .PHONY: distclean
 distclean:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d distclean || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d distclean || exit 1); done)
 	@-test ! -f $(TOPDIR)/makefiles/gmake/platform.mk.vars || rm $(TOPDIR)/makefiles/gmake/platform.mk.vars
 	@-test ! -f $(TOPDIR)/makefiles/gmake/platform.vars || rm $(TOPDIR)/makefiles/gmake/platform.vars
 	@-test ! -f $(TOPDIR)/makefiles/gmake/python.mk.vars || rm $(TOPDIR)/makefiles/gmake/python.mk.vars
@@ -48,27 +48,34 @@ distclean:
 .PHONY: install
 install:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d install || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d install || exit 1); done)
 
 .PHONY: uninstall
 uninstall:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d uninstall || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d uninstall || exit 1); done)
 
 .PHONY: depend
 depend:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d depend || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d depend || exit 1); done)
 
 .PHONY: test
 test: all
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d test || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d test || exit 1); done)
+
+.PHONY: testreport
+testreport:
+	WOLFRAME_TESTREPORT_DIR=$(CURDIR)/tests/reports/ \
+	GTEST_OUTPUT=xml:$(CURDIR)/tests/reports/ \
+		$(MAKE) -r test
+	@tests/reports/generateTestReport.sh
 
 .PHONY: longtest
 longtest: test
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d longtest || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d longtest || exit 1); done)
 
 .PHONY: help
 help:
@@ -81,7 +88,6 @@ config:
 	@echo
 	@echo "Operating system: $(PLATFORM), $(OS_MAJOR_VERSION).$(OS_MINOR_VERSION)"
 	@echo "Architecture: $(ARCH)"
-	@echo "System library directory: $(SYSTEM_LIBDIR)"
 ifeq "$(PLATFORM)" "LINUX"
 	@echo "Linux distribution: $(LINUX_DIST) $(LINUX_REV)"
 endif
@@ -94,6 +100,13 @@ endif
 	@echo "Optimization flags: $(OPTFLAGS)"
 	@echo "Full C compilation flags: $(ALL_CFLAGS)"
 	@echo "Full C++ compilation flags: $(ALL_CXXFLAGS)"
+	@echo "Global linker flags: $(ALL_LDFLAGS)"
+	@echo "Global libraries: $(LIBS)"
+	@echo "Libraries for module loading via dlopen: $(LIBS_DL)"
+	@echo "Libraries for networking: $(LIBS_NET)"
+	@echo "Compilation flags for i18n support: $(INCLUDE_FLAGS_LT)"
+	@echo "Linking flags for i18n support: $(LDFLAGS_LT)"
+	@echo "Libraries for i18n support: $(LIBS_LT)"
 	@echo
 	@echo "Required Dependencies:"
 	@echo
@@ -106,6 +119,8 @@ endif
 ifeq ($(WITH_SSL),1)
 	@echo
 	@echo "OPENSSL_DIR: $(OPENSSL_DIR)"
+	@echo "OPENSSL_INCLUDE_DIR: $(OPENSSL_INCLUDE_DIR)"
+	@echo "OPENSSL_LIB_DIR: $(OPENSSL_LIB_DIR)"
 	@echo "OPENSSL_LIBS: $(OPENSSL_LIBS)"
 endif
 ifeq ($(WITH_LUA),1)
@@ -269,16 +284,16 @@ endif
 .PHONY: init-po
 init-po:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d init-po || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d init-po || exit 1); done)
 
 .PHONY: merge-po
 merge-po:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d merge-po || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d merge-po || exit 1); done)
 
 .PHONY: check-po
 check-po:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d check-po || exit 1); done)
+	  (set -e; $(MAKE) -r -C $$d check-po || exit 1); done)
 
 -include $(TOPDIR)/makefiles/gmake/dist.mk

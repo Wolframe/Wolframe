@@ -25,15 +25,14 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	dateArithmetic.obj \
-	datatypeDate.obj \
-	mod_datatype_datetime.obj
+	datatypeDate.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModDateTime.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_datatype_datetime.obj
+	$(LINK) /dll /def:mod_datatype_datetime.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

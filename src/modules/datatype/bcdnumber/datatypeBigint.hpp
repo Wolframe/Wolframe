@@ -41,66 +41,69 @@
 namespace _Wolframe {
 namespace types {
 
+class BigintDataInitializer
+	:public CustomDataInitializer
+{
+public:
+	explicit BigintDataInitializer( const std::vector<types::Variant>& arg);
+	virtual ~BigintDataInitializer(){}
+
+	unsigned int max_digits() const			{return m_max_digits;}
+
+	static CustomDataInitializer* create( const std::vector<types::Variant>& arg)
+	{
+		if (arg.size() == 0) return 0;
+		return new BigintDataInitializer( arg);
+	}
+
+private:
+	unsigned int m_max_digits;
+};
+
 class BigintDataValue
 	:public CustomDataValue
 	,public types::BigBCD
 {
 public:
 	///\brief Constructor
-	BigintDataValue( _WOLFRAME_INTEGER val)
+	explicit BigintDataValue( _WOLFRAME_INTEGER val)
 		:types::BigBCD(val){}
 	///\brief Constructor
-	BigintDataValue( const std::string& val)
+	explicit BigintDataValue( const std::string& val)
 		:types::BigBCD(val){}
 
 	///\brief Copy constructor
 	BigintDataValue( const BigintDataValue& o)
-		:CustomDataValue(o),types::BigBCD(o){}
+		:CustomDataValue(o),types::BigBCD(o)
+		,m_max_digits(o.m_max_digits){}
 
-	BigintDataValue()
-		{}
+	explicit BigintDataValue( const BigintDataInitializer* ini=0)
+		:m_max_digits(ini?ini->max_digits():std::numeric_limits<unsigned int>::max()){}
 
 	virtual ~BigintDataValue(){};
 
-	virtual int compare( const CustomDataValue& o) const
-	{
-		if (o.type() != type())
-		{
-			return ((uintptr_t)type() > (uintptr_t)o.type())?1:-1;
-		}
-		else
-		{
-			const BigintDataValue* odt = reinterpret_cast<const BigintDataValue*>(&o);
-			return types::BigBCD::compare(*odt);
-		}
-	}
+	virtual int compare( const CustomDataValue& o) const;
 
 	virtual std::string tostring() const
 	{
 		return types::BigBCD::tostring();
 	}
 
-	virtual void assign( const Variant& o)
-	{
-		if (o.type() == Variant::String)
-		{
-			types::BigBCD::init( o.tostring());
-		}
-		else
-		{
-			types::BigBCD::init( o.toint());
-		}
-	}
+	virtual void assign( const Variant& o);
+	virtual bool getBaseTypeValue( Variant& dest) const;
 
 	virtual CustomDataValue* copy() const
 	{
 		return new BigintDataValue(*this);
 	}
 
-	static CustomDataValue* create( const CustomDataInitializer*)
+	static CustomDataValue* create( const CustomDataInitializer* ini_)
 	{
-		return new BigintDataValue();
+		const BigintDataInitializer* ini = reinterpret_cast<const BigintDataInitializer*>(ini_);
+		return new BigintDataValue( ini);
 	}
+private:
+	unsigned int m_max_digits;
 };
 
 
@@ -110,7 +113,7 @@ class BigintDataType
 {
 public:
 	BigintDataType( const std::string& name_)
-		:CustomDataType(name_,&BigintDataValue::create)
+		:CustomDataType(name_,&BigintDataValue::create,&BigintDataInitializer::create)
 	{
 		define( Add, &add);
 		define( Subtract, &subtract);

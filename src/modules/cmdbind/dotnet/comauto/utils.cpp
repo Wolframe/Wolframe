@@ -30,6 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 #include "comauto/utils.hpp"
+#include "types/numberBaseConversion.hpp"
 #include <iostream>
 #include <sstream>
 #pragma warning(disable:4996)
@@ -580,6 +581,62 @@ VARIANT comauto::createVariantType( const char* val, std::size_t valsize, VARTYP
 	return rt;
 }
 
+VARIANT comauto::createVariantType( const types::DateTime& dt)
+{
+	VARIANT rt;
+	rt.vt = VT_DATE;
+	rt.date = dt.toMSDNtimestamp();
+	return rt;
+}
+
+VARIANT comauto::createVariantType( const types::BigNumber& dt)
+{
+	VARIANT rt;
+	if (dt.scale() < 0 || dt.scale() > 28 || dt.size() > 28)
+	{
+		throw std::runtime_error("cannot convert bignumber value to MSDN decimal variant value (scale out of range)");
+	}
+	struct
+	{
+		ULONG numhi;
+		ULONGLONG numlo;
+	} value;
+	
+	types::convertBCDtoBigEndianUint( dt.digits(), dt.size(), value);
+	types::Endian::reorder( value.numhi);
+	types::Endian::reorder( value.numlo);
+
+	rt.vt = VT_DECIMAL;
+	rt.decVal.scale = (BYTE)dt.scale();
+	rt.decVal.sign = dt.sign()?DECIMAL_NEG:0;
+	rt.decVal.Hi32 = value.numhi;
+	rt.decVal.Lo64 = value.numlo;
+	return rt;
+}
+
+static types::BigNumber getBigNumber( const VARIANT& val)
+{
+	if (val.vt != VT_DECIMAL) std::logic_error("assertion failed: getBigNumber called with non DECIMAL variant type");
+
+	enum {MaxNofDigits=40/*more than 28*/};
+	unsigned char digits[ MaxNofDigits];
+	struct
+	{
+		ULONG numhi;
+		ULONGLONG numlo;
+	} value;
+	value.numhi = val.decVal.Hi32;
+	value.numlo = val.decVal.Lo64;
+	types::Endian::reorder( value.numhi);
+	types::Endian::reorder( value.numlo);
+
+	unsigned short nofdigits = (unsigned short)types::convertBigEndianUintToBCD( value, digits, MaxNofDigits);
+
+	bool sign = (val.decVal.sign == DECIMAL_NEG);
+	signed short scale = val.decVal.scale;
+	return types::BigNumber( sign, nofdigits, scale, digits);
+}
+
 VARIANT comauto::createVariantType( const std::string& val, VARTYPE stringtype)
 {
 	return comauto::createVariantType( val.c_str(), val.size(), stringtype);
@@ -598,6 +655,8 @@ VARIANT comauto::createVariantType( const types::Variant& val)
 		case types::Variant::UInt:	rt = comauto::createVariantType( val.data().value.UInt); break;
 		case types::Variant::String:	rt = comauto::createVariantType( val.charptr(), val.charsize()); break;
 		case types::Variant::Custom:	rt = comauto::createVariantType( val.tostring()); break;
+		case types::Variant::Timestamp:	rt = comauto::createVariantType( types::DateTime( val.totimestamp())); break;
+		case types::Variant::BigNumber:	rt = comauto::createVariantType( *val.bignumref()); break;
 	}
 	return rt;
 }
@@ -613,8 +672,10 @@ VARIANT comauto::createVariantType( const types::Variant& val, VARTYPE dsttype)
 		case types::Variant::Double:	rt = comauto::createVariantType( val.data().value.Double); break;
 		case types::Variant::Int:	rt = comauto::createVariantType( val.data().value.Int); break;
 		case types::Variant::UInt:	rt = comauto::createVariantType( val.data().value.UInt); break;
-		case types::Variant::String:	rt = comauto::createVariantType( val.charptr(), val.charsize(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR);
-		case types::Variant::Custom:	rt = comauto::createVariantType( val.tostring(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR);
+		case types::Variant::String:	rt = comauto::createVariantType( val.charptr(), val.charsize(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR); break;
+		case types::Variant::Custom:	rt = comauto::createVariantType( val.tostring(), (dsttype == VT_LPWSTR || dsttype == VT_LPSTR)?dsttype:VT_BSTR); break;
+		case types::Variant::Timestamp:	rt = comauto::createVariantType( types::DateTime( val.totimestamp())); break;
+		case types::Variant::BigNumber:	rt = comauto::createVariantType( *val.bignumref()); break;
 	}
 	if (rt.vt != dsttype)
 	{
@@ -787,21 +848,21 @@ HRESULT comauto::wrapVariantChangeType( VARIANT* pvargDest, const VARIANT* pvarg
 			{
 				case VT_LPSTR:		conversion = C_COPY; break;
 				case VT_LPWSTR:		conversion = C_LPSTR_LPWSTR; break;
-				default:			conversion = C_LPSTR_BSTR; break;
+				default:		conversion = C_LPSTR_BSTR; break;
 			}
 		case VT_LPWSTR:
 			switch (pvargSrc->vt)
 			{
 				case VT_LPSTR:		conversion = C_LPWSTR_LPSTR; break;
 				case VT_LPWSTR:		conversion = C_COPY; break;
-				default:			conversion = C_LPWSTR_BSTR; break;
+				default:		conversion = C_LPWSTR_BSTR; break;
 			}
 		default:
 			switch (pvargSrc->vt)
 			{
 				case VT_LPSTR:		conversion = C_BSTR_LPSTR; break;
 				case VT_LPWSTR:		conversion = C_BSTR_LPWSTR; break;
-				default:			conversion = C_OTHER; break;
+				default:		conversion = C_OTHER; break;
 			}
 	}
 	switch (conversion)
@@ -985,11 +1046,13 @@ bool comauto::isStringType( int vt)
 
 void* comauto::arithmeticTypeAddress( VARIANT* val)
 {
+	if (val->vt == VT_DECIMAL) return (void*)val;
 	return (void*)((char*)val + 4*sizeof(short));
 }
 
 const void* comauto::arithmeticTypeAddress( const VARIANT* val)
 {
+	if (val->vt == VT_DECIMAL) return (const void*)val;
 	return (const void*)((const char*)val + 4*sizeof(short));
 }
 
@@ -1023,26 +1086,27 @@ std::string comauto::variabletype( const ITypeInfo* typeinfo, VARDESC* vardesc)
 	return rt;
 }
 
-types::VariantConst comauto::getAtomicElement( VARTYPE vt, const void* ref, std::string& elembuf)
+types::Variant comauto::getAtomicElement( VARTYPE vt, const void* ref)
 {
 	switch (vt)
 	{
-	case VT_I1:  return types::VariantConst( (types::Variant::Data::Int)(*(const SHORT*)ref)); 
-		case VT_I2:  return types::VariantConst( (types::Variant::Data::Int)(*(const SHORT*)ref));
-		case VT_I4:  return types::VariantConst( (types::Variant::Data::Int)(*(const LONG*)ref));
-		case VT_I8:  return types::VariantConst( (types::Variant::Data::Int)(*(const LONGLONG*)ref));
-		case VT_INT: return types::VariantConst( (types::Variant::Data::Int)(*(const INT*)ref));
-		case VT_UI1:  return types::VariantConst( (types::Variant::Data::UInt)(*(const USHORT*)ref));
-		case VT_UI2:  return types::VariantConst( (types::Variant::Data::UInt)(*(const USHORT*)ref));
-		case VT_UI4:  return types::VariantConst( (types::Variant::Data::UInt)(*(const ULONG*)ref));
-		case VT_UI8:  return types::VariantConst( (types::Variant::Data::UInt)(*(const ULONGLONG*)ref));
-		case VT_UINT: return types::VariantConst( (types::Variant::Data::UInt)(*(const UINT*)ref));
-		case VT_R4:  return types::VariantConst( (double)(*(const FLOAT*)ref));
-		case VT_R8:  return types::VariantConst( (double)(*(const DOUBLE*)ref));
-		case VT_BOOL: return types::VariantConst( (bool)(*(const VARIANT_BOOL*)ref != VARIANT_FALSE));
-		case VT_BSTR: return types::VariantConst( elembuf = comauto::utf8string( *(const BSTR*)ref));
-		case VT_LPSTR: return types::VariantConst( elembuf = comauto::utf8string( *(LPCSTR*)ref));
-		case VT_LPWSTR: return types::VariantConst( elembuf = comauto::utf8string( *(LPCWSTR*)ref));
+		case VT_I1:  return types::Variant( (types::Variant::Data::Int)(*(const SHORT*)ref)); 
+		case VT_I2:  return types::Variant( (types::Variant::Data::Int)(*(const SHORT*)ref));
+		case VT_I4:  return types::Variant( (types::Variant::Data::Int)(*(const LONG*)ref));
+		case VT_I8:  return types::Variant( (types::Variant::Data::Int)(*(const LONGLONG*)ref));
+		case VT_INT: return types::Variant( (types::Variant::Data::Int)(*(const INT*)ref));
+		case VT_UI1:  return types::Variant( (types::Variant::Data::UInt)(*(const USHORT*)ref));
+		case VT_UI2:  return types::Variant( (types::Variant::Data::UInt)(*(const USHORT*)ref));
+		case VT_UI4:  return types::Variant( (types::Variant::Data::UInt)(*(const ULONG*)ref));
+		case VT_UI8:  return types::Variant( (types::Variant::Data::UInt)(*(const ULONGLONG*)ref));
+		case VT_UINT: return types::Variant( (types::Variant::Data::UInt)(*(const UINT*)ref));
+		case VT_R4:  return types::Variant( (double)(*(const FLOAT*)ref));
+		case VT_R8:  return types::Variant( (double)(*(const DOUBLE*)ref));
+		case VT_BOOL: return types::Variant( (bool)(*(const VARIANT_BOOL*)ref != VARIANT_FALSE));
+		case VT_BSTR: return types::Variant( comauto::utf8string( *(const BSTR*)ref));
+		case VT_LPSTR: return types::Variant( comauto::utf8string( *(LPCSTR*)ref));
+		case VT_LPWSTR: return types::Variant( comauto::utf8string( *(LPCWSTR*)ref));
+		case VT_DATE: return types::Variant( types::DateTime::fromMSDNtimestamp( *(DATE*)ref).timestamp());
 		default:
 		{
 			VARIANT elemorig;
@@ -1053,7 +1117,7 @@ types::VariantConst comauto::getAtomicElement( VARTYPE vt, const void* ref, std:
 				elemorig.vt = vt | VT_BYREF;
 				WRAP( comauto::wrapVariantCopyInd( &elemcopy, &elemorig))
 				WRAP( comauto::wrapVariantChangeType( &elemcopy, &elemcopy, 0, VT_BSTR))
-				return types::VariantConst( elembuf = comauto::utf8string( elemcopy.bstrVal));
+				return types::Variant( comauto::utf8string( elemcopy.bstrVal));
 			}
 			catch (const std::runtime_error& e)
 			{
@@ -1065,8 +1129,15 @@ types::VariantConst comauto::getAtomicElement( VARTYPE vt, const void* ref, std:
 	}
 }
 
-types::VariantConst comauto::getAtomicElement( const VARIANT& val, std::string& elembuf)
+types::Variant comauto::getAtomicElement( const VARIANT& val)
 {
-	return getAtomicElement( val.vt, comauto::arithmeticTypeAddress( &val), elembuf);
+	if (val.vt == VT_DECIMAL)
+	{
+		return types::Variant( getBigNumber( val));
+	}
+	else
+	{
+		return getAtomicElement( val.vt, comauto::arithmeticTypeAddress( &val));
+	}
 }
 

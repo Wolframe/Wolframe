@@ -1,0 +1,15 @@
+FORM UserData
+	-root doc
+{
+	data string
+	command string
+}
+
+FORM UserDataWithLogin
+	-root doc
+{
+	_ UserData
+	uname string
+	host string
+}
+

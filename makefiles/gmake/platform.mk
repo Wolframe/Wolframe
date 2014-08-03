@@ -10,14 +10,11 @@
 # - OS_MAJOR_VERSION and OS_MINOR_VERSION
 # - GCC_MAJOR_VERSION and GCC_MINOR_VERSION
 # - PLATFORM_COMPILE_FLAGS
-# - EXE
-# - SO
 # - INSTALL
 # - BOOST_LIBRARY_TAG
 #
 # author: Andreas Baumann, abaumann at yahoo dot com
 
--include $(HOME)/config.mk
 -include $(TOPDIR)/makefiles/gmake/platform.mk.vars
 
 # set up defaults for the build switches
@@ -88,10 +85,6 @@ ifeq "$(PLATFORM)" "SUNOS"
 LIBDIR=lib
 endif
 
-
-# default location of system libraries per architecture
-SYSTEM_LIBDIR=/usr/$(LIBDIR)
-
 # platform specific flags
 #########################
 
@@ -126,13 +119,7 @@ PLATFORM_COMPILE_FLAGS += \
 			-DLINUX_REV=$(LINUX_REV)
 endif
 
-
-# extensions for shared libraries
-# (TOOD: HP/Unix has .shlib, Mac/X has .lib, but we can't test it currently)
-SO = .so
-
 # name if the installation program
-# (TODO: use the MIT or openradio install-sh script instead?)
 ifndef INSTALL
 ifeq "$(PLATFORM)" "SUNOS"
 INSTALL = /usr/ucb/install
@@ -145,25 +132,29 @@ endif
 ################
 
 # the linker library for dynamically loadable modules
-# (TODO: check for all platforms, as soon we add loadable modules here from
-# old TextWolf)
 ifeq "$(PLATFORM)" "LINUX"
+LIBS_DL = -ldl
+else
+ifeq "$(PLATFORM)" "SUNOS"
 LIBS_DL = -ldl
 else
 LIBS_DL =
 endif
+endif
 
 # Note for dlopen to work (at least on FreeBSD) with rtti information we have to export all symbols
 # in the binary and in the modules (see http://stackoverflow.com/questions/2351786/dynamic-cast-fails-when-used-with-dlopen-dlsym)
-LDFLAGS_DL =
 ifeq "$(PLATFORM)" "LINUX"
-LDFLAGS_DL = -Wl,-E
+LDFLAGS_EXPORT_ALL_SYMBOLS = -Wl,-E
 endif
 ifeq "$(PLATFORM)" "FREEBSD"
-LDFLAGS_DL = -Wl,-E
+LDFLAGS_EXPORT_ALL_SYMBOLS = -Wl,-E
 endif
 ifeq "$(PLATFORM)" "NETBSD"
-LDFLAGS_DL = -Wl,-E
+LDFLAGS_EXPORT_ALL_SYMBOLS = -Wl,-E
+endif
+ifeq "$(PLATFORM)" "SUNOS"
+LDFLAGS_EXPORT_ALL_SYMBOLS =
 endif
 
 # i18n, gettext/libintl
@@ -171,7 +162,7 @@ endif
 
 ifeq "$(ENABLE_NLS)" "1"
 
-# we relly only on the GNU version, other versions (e.g. Solaris) are not
+# we rely only on the GNU version, other versions (e.g. Solaris) are not
 # so nice..
 
 MSGFMT=msgfmt
@@ -186,7 +177,7 @@ LIBS_LT =
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
-LIBLT_DIR ?= /usr/local
+LIBLT_DIR ?= /opt/csw
 INCLUDE_FLAGS_LT = -I$(LIBLT_DIR)/include
 LDFLAGS_LT = -L$(LIBLT_DIR)/lib
 LIBS_LT = -lintl
@@ -206,8 +197,6 @@ LDFLAGS_LT = -L$(LIBLT_DIR)/lib
 LIBS_LT = -lintl
 endif
 
-PLATFORM_COMPILE_FLAGS +=  $(INCLUDE_FLAGS_LT)
-
 endif
 
 PLATFORM_COMPILE_FLAGS += \
@@ -217,30 +206,20 @@ PLATFORM_COMPILE_FLAGS += \
 #############
 
 ifeq "$(PLATFORM)" "LINUX"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
 LIBS_NET =
 endif
 
-ifeq "$(PLATFORM)" "SUNOS"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
-LIBS_NET = -lsocket -lnsl
-endif
-
 ifeq "$(PLATFORM)" "FREEBSD"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
 LIBS_NET =
 endif
 
 ifeq "$(PLATFORM)" "NETBSD"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
 LIBS_NET =
 endif
 
-PLATFORM_COMPILE_FLAGS +=  $(INCLUDE_FLAGS_NET)
+ifeq "$(PLATFORM)" "SUNOS"
+LIBS_NET = -lsocket -lnsl
+endif
 
 # XSLT processor
 ################
@@ -268,14 +247,6 @@ XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook
 endif
 
 ifeq "$(LINUX_REV)" "13.10"
-XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
-endif
-
-ifeq "$(LINUX_REV)" "13.04"
-XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 endif
 
@@ -320,6 +291,11 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
 endif
 
@@ -358,9 +334,7 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 else
-BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough boost package on Slackware before version 14.0, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 endif
@@ -384,31 +358,14 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-BOOST_DIR ?= /usr
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_LIBRARY_TAG ?=
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-BOOST_DIR ?= /usr
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_LIBRARY_TAG ?=
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
 BOOST_DIR ?= /usr
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
-
 ifndef BOOST_DIR
-BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough boost package on Ubuntu 12.04, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -416,11 +373,10 @@ ifeq "$(LINUX_REV)" "10.04"
 ifdef BOOST_DIR
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_LIBRARY_TAG ?=
 endif
 ifndef BOOST_DIR
-BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough boost package on Ubuntu 10.04, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -428,84 +384,39 @@ endif
 
 ifeq "$(LINUX_DIST)" "debian"
 
-ifeq "$(LINUX_REV)" "5"
-ifdef BOOST_DIR
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-endif
-ifndef BOOST_DIR
-BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-endif
-
 ifeq "$(LINUX_REV)" "6"
 ifdef BOOST_DIR
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
-BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough boost package on Debian 6, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
 ifeq "$(LINUX_REV)" "7"
-ifdef BOOST_DIR
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-endif
-ifndef BOOST_DIR
-BOOST_DIR = /usr
+BOOST_DIR ?= /usr
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
-endif
 endif
 
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
 
-ifeq "$(LINUX_REV)" "12.2"
-ifdef BOOST_DIR
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-endif
-ifndef BOOST_DIR
-BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?=
-endif
-endif
-
 ifeq "$(LINUX_REV)" "12.3"
-ifdef BOOST_DIR
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-endif
-ifndef BOOST_DIR
 BOOST_DIR ?= /usr
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
-endif
 endif
 
 ifeq "$(LINUX_REV)" "13.1"
-ifdef BOOST_DIR
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-endif
-ifndef BOOST_DIR
 BOOST_DIR ?= /usr
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
-endif
 endif
 
 endif
@@ -519,9 +430,7 @@ BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
-BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_LIBRARY_TAG ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough boost package on SLES, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -550,6 +459,20 @@ endif
 # RHEL5
 ifeq "$(LINUX_DIST)" "redhat"
 ifeq "$(LINUX_REV)" "5"
+ifdef BOOST_DIR
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+ifndef BOOST_DIR
+$(warning no recent enough boost package on RHEL 5, compile your own version and set BOOST_DIR accordingly)
+endif
+endif
+endif
+
+# RHEL6
+ifeq "$(LINUX_DIST)" "redhat"
+ifeq "$(LINUX_REV)" "6"
 BOOST_DIR ?= /usr
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
@@ -557,9 +480,9 @@ BOOST_LIBRARY_TAG ?=
 endif
 endif
 
-# RHEL6
+# RHEL7
 ifeq "$(LINUX_DIST)" "redhat"
-ifeq "$(LINUX_REV)" "6"
+ifeq "$(LINUX_REV)" "7"
 BOOST_DIR ?= /usr
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
@@ -577,6 +500,12 @@ BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+BOOST_DIR ?= /usr/local
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
 BOOST_DIR ?= /usr/local
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
@@ -598,19 +527,13 @@ endif
 # SunOS
 
 ifeq "$(PLATFORM)" "SUNOS"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-ifeq "$(OS_MINOR_VERSION)" "10"
-BOOST_DIR ?= NOT SUPPLIED ON THIS PLATFORM
+ifdef BOOST_DIR
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 endif
-ifeq "$(OS_MINOR_VERSION)" "11"
-BOOST_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?=
-endif
+ifndef BOOST_DIR
+$(warning no recent enough boost package on Solaris, compile your own version and set BOOST_DIR accordingly)
 endif
 endif
 
@@ -622,10 +545,20 @@ ifeq ($(WITH_SSL),1)
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto -lz
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -634,26 +567,38 @@ endif
 ifeq "$(LINUX_DIST)" "ubuntu"
 
 ifeq "$(LINUX_REV)" "14.04"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "13.10"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-
-ifeq "$(LINUX_REV)" "13.04"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "12.04"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "10.04"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -664,10 +609,20 @@ endif
 ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "6"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_REV)" "7"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -677,31 +632,71 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 # Fedora 20
 ifeq "$(LINUX_REV)" "20"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -711,9 +706,27 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
@@ -722,6 +735,11 @@ endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 ifeq "$(OS_MAJOR_VERSION)" "6"
+OPENSSL_DIR ?=
+OPENSSL_INCLUDE_DIR ?=
+OPENSSL_INCLUDE_DIRS ?=
+OPENSSL_LIB_DIR ?=
+OPENSSL_LIB_DIRS ?=
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
@@ -731,11 +749,19 @@ endif
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
-OPENSSL_DIR ?= /usr/local/ssl
+OPENSSL_DIR ?= /opt/csw
+OPENSSL_INCLUDE_DIR ?= $(OPENSSL_DIR)/include
+OPENSSL_INCLUDE_DIRS ?= -I$(OPENSSL_INCLUDE_DIR)
+OPENSSL_LIB_DIR ?= $(OPENSSL_DIR)/lib
+OPENSSL_LIB_DIRS ?= -L$(OPENSSL_LIB_DIR)
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 ifeq "$(OS_MINOR_VERSION)" "11"
-OPENSSL_DIR =
+OPENSSL_DIR ?= /opt/csw
+OPENSSL_INCLUDE_DIR ?= $(OPENSSL_DIR)/include
+OPENSSL_INCLUDE_DIRS ?= -I$(OPENSSL_INCLUDE_DIR)
+OPENSSL_LIB_DIR ?= $(OPENSSL_DIR)/lib
+OPENSSL_LIB_DIRS ?= -L$(OPENSSL_LIB_DIR)
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
@@ -751,24 +777,25 @@ ifeq ($(WITH_LUA),1)
 ifeq "$(PLATFORM)" "LINUX"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
 LUA_PLATFORM_LDFLAGS =
-LUA_PLATFORM_LIBS = -ldl -lm
+LUA_PLATFORM_LIBS = $(LIBS_DL) -lm
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
-LUA_PLATFORM_LDFLAGS = -ldl -lm
+LUA_PLATFORM_LDFLAGS =
+LUA_PLATFORM_LIBS = $(LIBS_DL) -lm
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
 LUA_PLATFORM_LDFLAGS =
-LUA_PLATFORM_LIBS = -lm
+LUA_PLATFORM_LIBS = $(LIBS_DL) -lm
 endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
-LUA_PLATFORM_LDFLAGS =
-LUA_PLATFORM_LIBS = -lm
+LUA_PLATFORM_LDFLAGS = 
+LUA_PLATFORM_LIBS = $(LIBS_DL) -lm
 endif
 
 endif
@@ -788,10 +815,7 @@ PAM_LIBS ?= -lpam
 endif
 
 ifeq "$(LINUX_DIST)" "slackware"
-PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(error There is currently no PAM support on Slackware)
 endif
 
 # Ubuntu
@@ -806,20 +830,6 @@ PAM_LIBS ?= -lpam
 endif
 
 ifeq "$(LINUX_REV)" "13.10"
-PAM_DIR ?= /usr
-PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
-PAM_LIB_DIR ?= /lib
-PAM_LIBS ?= -lpam
-endif
-
-ifeq "$(LINUX_REV)" "13.04"
-PAM_DIR ?= /usr
-PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
-PAM_LIB_DIR ?= /lib
-PAM_LIBS ?= -lpam
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
 PAM_DIR ?= /usr
 PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
 PAM_LIB_DIR ?= /lib
@@ -896,6 +906,14 @@ PAM_LIB_DIR ?= /lib
 PAM_LIBS ?= -lpam
 endif
 
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+PAM_DIR ?= /usr
+PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
+PAM_LIB_DIR ?= /lib
+PAM_LIBS ?= -lpam
+endif
+
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
@@ -932,18 +950,7 @@ endif
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-ifeq "$(OS_MAJOR_VERSION)" "8"
-PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-ifeq "$(OS_MAJOR_VERSION)" "9"
-PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
+$(error There is currently no PAM support on FreeBSD)
 endif
 
 ifeq "$(PLATFORM)" "NETBSD"
@@ -994,20 +1001,6 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-SASL_DIR ?= /usr
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-SASL_DIR ?= /usr
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
@@ -1056,6 +1049,14 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+SASL_DIR ?= /usr
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
@@ -1121,6 +1122,12 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+SASL_DIR ?= /usr/local
+SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
+SASL_LIB_DIR ?= $(SASL_DIR)/lib
+SASL_LIBS ?= -lsasl2
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
 SASL_DIR ?= /usr/local
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
@@ -1189,20 +1196,6 @@ SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-SQLITE3_DIR ?= /usr
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-SQLITE3_DIR ?= /usr
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
@@ -1243,14 +1236,26 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
+ifdef SQLITE3_DIR
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
+ifndef SQLITE3_DIR
+$(warning no recent enough sqlite3 package on RHEL 5, compile your own version and set SQLITE3_DIR accordingly)
+endif
+endif
+
+# RHEL6
+ifeq "$(LINUX_REV)" "6"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 
-# RHEL6
-ifeq "$(LINUX_REV)" "6"
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
@@ -1325,6 +1330,12 @@ SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
+SQLITE3_DIR ?= /usr/local
+SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
+SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
+SQLITE3_LIBS ?= -lsqlite3
+endif
 endif
 
 # NetBSD
@@ -1378,6 +1389,21 @@ endif
 
 ifeq "$(LINUX_DIST)" "ubuntu"
 
+ifeq "$(LINUX_REV)" "14.04"
+ORACLE_VERSION ?= 12.1
+ifeq "$(ARCH)" "x86_64"
+ORACLE_CLIENT_ARCH=client64
+else
+ORACLE_CLIENT_ARCH=client
+endif
+ORACLE_DIR ?= /usr/lib/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIR ?= /usr/include/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
+ORACLE_LIB_DIR ?= $(ORACLE_DIR)/lib
+ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
+ORACLE_LIBS ?= -lclntsh
+endif
+
 ifeq "$(LINUX_REV)" "13.10"
 ORACLE_VERSION ?= 12.1
 ifeq "$(ARCH)" "x86_64"
@@ -1391,36 +1417,6 @@ ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
 ORACLE_LIB_DIR ?= $(ORACLE_DIR)/lib
 ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
 ORACLE_LIBS ?= -lclntsh
-endif
-
-ifeq "$(LINUX_REV)" "13.04"
-ORACLE_VERSION ?= 12.1
-ifeq "$(ARCH)" "x86_64"
-ORACLE_CLIENT_ARCH=client64
-else
-ORACLE_CLIENT_ARCH=client
-endif
-ORACLE_DIR ?= /usr/lib/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
-ORACLE_INCLUDE_DIR ?= /usr/include/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
-ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
-ORACLE_LIB_DIR ?= $(ORACLE_DIR)/lib
-ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
-ORACLE_LIBS ?= -lclntsh
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-ORACLE_VERSION ?= 12.1
-ifeq "$(ARCH)" "x86_64"
-ORACLE_CLIENT_ARCH=client64
-else
-ORACLE_CLIENT_ARCH=client
-endif
-ORACLE_DIR ?= /usr/lib/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
-ORACLE_INCLUDE_DIR ?= /usr/include/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
-ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
-ORACLE_LIB_DIR ?= $(ORACLE_DIR)/lib
-ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
-ORACLE_LIBS ?= -lclntsh -lnnz12 -lons -lclntshcore
 endif
 
 ifeq "$(LINUX_REV)" "12.04"
@@ -1497,6 +1493,22 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+ORACLE_VERSION ?= 12.1
+ifeq "$(ARCH)" "x86_64"
+ORACLE_CLIENT_ARCH=client64
+else
+ORACLE_CLIENT_ARCH=client
+endif
+ORACLE_DIR ?= /usr/lib/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIR ?= /usr/include/oracle/$(ORACLE_VERSION)/$(ORACLE_CLIENT_ARCH)
+ORACLE_INCLUDE_DIRS = -I$(ORACLE_INCLUDE_DIR)
+ORACLE_LIB_DIR ?= $(ORACLE_DIR)/lib
+ORACLE_LIB_DIRS = -L$(ORACLE_LIB_DIR)
+ORACLE_LIBS ?= -lclntsh
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 ORACLE_VERSION ?= 12.1
 ifeq "$(ARCH)" "x86_64"
 ORACLE_CLIENT_ARCH=client64
@@ -1613,24 +1625,6 @@ PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
 PGSQL_LIBS ?= -lpq
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-PGSQL_DIR ?= /usr
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
-PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
-PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
-PGSQL_LIBS ?= -lpq
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-PGSQL_DIR ?= /usr
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
-PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
-PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
-PGSQL_LIBS ?= -lpq
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
@@ -1688,6 +1682,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+PGSQL_DIR ?= /usr
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
@@ -1776,6 +1780,14 @@ PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
 PGSQL_LIBS ?= -lpq
 endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
+PGSQL_DIR ?= /usr/local
+PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
+PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
+PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
+PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
+PGSQL_LIBS ?= -lpq
+endif
 endif
 
 # NetBSD
@@ -1840,24 +1852,6 @@ LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
 LIBXML2_LIBS ?= -lxml2
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-LIBXML2_DIR ?= /usr
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-LIBXML2_DIR ?= /usr
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
@@ -1906,7 +1900,9 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-LIBXML2_DIR ?= /usr
+ifndef LIBXML2_DIR
+$(warning no recent enough libxml2 package on RHEL 5, compile your own one and set LIBXML2_DIR accordingly)
+endif
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
 LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
@@ -1916,6 +1912,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+LIBXML2_DIR ?= /usr
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
@@ -1995,12 +2001,20 @@ ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 LIBXML2_DIR ?= /usr/local
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR) -I/usr/local/include
 LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
 LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
 LIBXML2_LIBS ?= -lxml2
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+LIBXML2_DIR ?= /usr/local
+LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
+LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR) -I/usr/local/include
+LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
+LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
+LIBXML2_LIBS ?= -lxml2
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
 LIBXML2_DIR ?= /usr/local
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
@@ -2076,24 +2090,6 @@ LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
 LIBXSLT_LIBS ?= -lxslt
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-LIBXSLT_DIR ?= /usr
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-LIBXSLT_DIR ?= /usr
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
 LIBXSLT_DIR ?= /usr
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
@@ -2142,7 +2138,9 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-LIBXSLT_DIR ?= /usr
+ifndef WITH_LIBXSLT
+$(warning libxslt depends on a not recent enough version of libxml2 on RHEL 5, compile your own ones and set LIBXSLT_DIR and LIBXML2_DIR accordingly)
+endif
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
 LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
 LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
@@ -2152,6 +2150,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+LIBXSLT_DIR ?= /usr
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 LIBXSLT_DIR ?= /usr
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
 LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
@@ -2237,6 +2245,14 @@ LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
 LIBXSLT_LIBS ?= -lxslt
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+LIBXSLT_DIR ?= /usr/local
+LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
+LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
+LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
+LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
+LIBXSLT_LIBS ?= -lxslt
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
 LIBXSLT_DIR ?= /usr/local
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
 LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
@@ -2311,40 +2327,12 @@ LIBHPDF_LIB_DIRS = -L$(LIBHPDF_LIB_DIR)
 LIBHPDF_LIBS ?= -lhpdf
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough libhpdf package on Ubuntu 12.04, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "10.04"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough libhpdf package on Ubuntu 10.04, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 endif
@@ -2353,22 +2341,17 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough libhpdf package on RHEL5, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough libhpdf package on RHEL6, use WITH_LOCAL_LIBHPDF=1 instead)
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+$(warning no recent enough libhpdf package on RHEL7, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 # Fedora 19
@@ -2394,21 +2377,11 @@ endif
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough libhpdf package on SLES, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough libhpdf package on OpenSuSE, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 
 endif
@@ -2417,22 +2390,7 @@ endif
 
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
-ifeq "$(OS_MINOR_VERSION)" "10"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-ifeq "$(OS_MINOR_VERSION)" "11"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
+$(warning no recent enough libhpdf package on Solaris, use WITH_LOCAL_LIBHPDF=1 instead)
 endif
 endif
 
@@ -2440,20 +2398,18 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough libhpdf package on FreeBSD 8, use WITH_LOCAL_LIBHPDF=1 instead)endif
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough libhpdf package on FreeBSD 9, use WITH_LOCAL_LIBHPDF=1 instead)endif
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
+LIBHPDF_DIR ?= /usr/local
+LIBHPDF_INCLUDE_DIR ?= $(LIBHPDF_DIR)/include
+LIBHPDF_INCLUDE_DIRS = -I$(LIBHPDF_INCLUDE_DIR)
+LIBHPDF_LIB_DIR ?= $(LIBHPDF_DIR)/lib
+LIBHPDF_LIB_DIRS = -L$(LIBHPDF_LIB_DIR)
+LIBHPDF_LIBS ?= -lhpdf
 endif
 endif
 
@@ -2461,12 +2417,7 @@ endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 ifeq "$(OS_MAJOR_VERSION)" "6"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough libhpdf package on NetBSD 6, use WITH_LOCAL_LIBHPDF=1 instead)endif
 endif
 endif
 
@@ -2552,24 +2503,6 @@ LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
 LIBPNG_LIBS ?= -lpng
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
 LIBPNG_DIR ?= /usr
 LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
@@ -2628,6 +2561,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+LIBPNG_DIR ?= /usr
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
+LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
+LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
+LIBPNG_LIBS ?= -lpng
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 LIBPNG_DIR ?= /usr
 LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
 LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
@@ -2713,6 +2656,14 @@ LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
 LIBPNG_LIBS ?= -lpng
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+LIBPNG_DIR ?= /usr/local
+LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
+LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
+LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
+LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
+LIBPNG_LIBS ?= -lpng
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
 LIBPNG_DIR ?= /usr/local
 LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
 LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
@@ -2790,24 +2741,6 @@ LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
 LIBZ_LIBS ?= -lz
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
 LIBZ_DIR ?= /usr
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
@@ -2866,6 +2799,16 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
+LIBZ_DIR ?= /usr
+LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
+LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
+LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
+LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
+LIBZ_LIBS ?= -lz
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
 LIBZ_DIR ?= /usr
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
 LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
@@ -2951,6 +2894,14 @@ LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
 LIBZ_LIBS ?= -lz
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+LIBZ_DIR ?= /usr/local
+LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
+LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
+LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
+LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
+LIBZ_LIBS ?= -lz
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
 LIBZ_DIR ?= /usr/local
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
 LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
@@ -3028,24 +2979,6 @@ ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
 ICU_LIBS ?=
 endif
 
-ifeq "$(LINUX_REV)" "13.04"
-ICU_DIR ?= /usr
-ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
-ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
-ICU_LIB_DIR ?= $(ICU_DIR)/lib
-ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
-ICU_LIBS ?=
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-ICU_DIR ?= /usr
-ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
-ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
-ICU_LIB_DIR ?= $(ICU_DIR)/lib
-ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
-ICU_LIBS ?=
-endif
-
 ifeq "$(LINUX_REV)" "12.04"
 ICU_DIR ?= /usr
 ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
@@ -3112,6 +3045,16 @@ ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
 ICU_LIBS ?=
 endif
 
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+ICU_DIR ?= /usr
+ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
+ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
+ICU_LIB_DIR ?= $(ICU_DIR)/lib
+ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
+ICU_LIBS ?=
+endif
+
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
 ICU_DIR ?= /usr
@@ -3167,12 +3110,7 @@ ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
 ICU_LIBS ?= -licuuc -licudata -licui18n
 endif
 ifndef ICU_DIR
-ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no usable ICU package for SPARC Solaris, compile your own version and set ICU_DIR accordingly)
 endif
 endif
 ifeq "$(OS_MINOR_VERSION)" "11"
@@ -3207,6 +3145,14 @@ ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
 ICU_LIBS ?=
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
+ICU_DIR ?= /usr/local
+ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
+ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
+ICU_LIB_DIR ?= $(ICU_DIR)/lib
+ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
+ICU_LIBS ?=
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
 ICU_DIR ?= /usr/local
 ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
 ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
@@ -3251,10 +3197,10 @@ ifeq "$(PLATFORM)" "LINUX"
 ifeq "$(LINUX_DIST)" "arch"
 FREEIMAGE_DIR ?= /usr
 FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
-FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR)
+FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR) $(INCLUDE_FLAGS_LT)
 FREEIMAGE_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
-FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR)
-FREEIMAGE_LIBS ?= -lfreeimage
+FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR) $(LDFLAGS_LT)
+FREEIMAGE_LIBS ?= -lfreeimage $(LIBS_LT)
 FREEIMAGEPLUS_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
 FREEIMAGEPLUS_INCLUDE_DIRS ?= -I$(FREEIMAGEPLUS_INCLUDE_DIR)
 FREEIMAGEPLUS_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
@@ -3269,10 +3215,10 @@ ifeq "$(LINUX_DIST)" "ubuntu"
 ifeq "$(LINUX_REV)" "14.04"
 FREEIMAGE_DIR ?= /usr
 FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
-FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR)
+FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR) $(INCLUDE_FLAGS_LT)
 FREEIMAGE_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
-FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR)
-FREEIMAGE_LIBS ?= -lfreeimage
+FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR) $(LDFLAGS_LT)
+FREEIMAGE_LIBS ?= -lfreeimage $(LIBS_LT)
 FREEIMAGEPLUS_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
 FREEIMAGEPLUS_INCLUDE_DIRS ?= -I$(FREEIMAGEPLUS_INCLUDE_DIR)
 FREEIMAGEPLUS_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
@@ -3283,38 +3229,10 @@ endif
 ifeq "$(LINUX_REV)" "13.10"
 FREEIMAGE_DIR ?= /usr
 FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
-FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR)
+FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR) $(INCLUDE_FLAGS_LT)
 FREEIMAGE_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
-FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR)
-FREEIMAGE_LIBS ?= -lfreeimage
-FREEIMAGEPLUS_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
-FREEIMAGEPLUS_INCLUDE_DIRS ?= -I$(FREEIMAGEPLUS_INCLUDE_DIR)
-FREEIMAGEPLUS_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
-FREEIMAGEPLUS_LIB_DIRS = -L$(FREEIMAGEPLUS_LIB_DIR)
-FREEIMAGEPLUS_LIBS = -lfreeimageplus
-endif
-
-ifeq "$(LINUX_REV)" "13.04"
-FREEIMAGE_DIR ?= /usr
-FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
-FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR)
-FREEIMAGE_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
-FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR)
-FREEIMAGE_LIBS ?= -lfreeimage
-FREEIMAGEPLUS_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
-FREEIMAGEPLUS_INCLUDE_DIRS ?= -I$(FREEIMAGEPLUS_INCLUDE_DIR)
-FREEIMAGEPLUS_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
-FREEIMAGEPLUS_LIB_DIRS = -L$(FREEIMAGEPLUS_LIB_DIR)
-FREEIMAGEPLUS_LIBS = -lfreeimageplus
-endif
-
-ifeq "$(LINUX_REV)" "12.10"
-FREEIMAGE_DIR ?= /usr
-FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
-FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR)
-FREEIMAGE_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
-FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR)
-FREEIMAGE_LIBS ?= -lfreeimage
+FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR) $(LDFLAGS_LT)
+FREEIMAGE_LIBS ?= -lfreeimage $(LIBS_LT)
 FREEIMAGEPLUS_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
 FREEIMAGEPLUS_INCLUDE_DIRS ?= -I$(FREEIMAGEPLUS_INCLUDE_DIR)
 FREEIMAGEPLUS_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
@@ -3325,10 +3243,10 @@ endif
 ifeq "$(LINUX_REV)" "12.04"
 FREEIMAGE_DIR ?= /usr
 FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
-FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR)
+FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR) $(INCLUDE_FLAGS_LT)
 FREEIMAGE_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
-FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR)
-FREEIMAGE_LIBS ?= -lfreeimage
+FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR) $(LDFLAGS_LT)
+FREEIMAGE_LIBS ?= -lfreeimage $(LIBS_LT)
 FREEIMAGEPLUS_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
 FREEIMAGEPLUS_INCLUDE_DIRS ?= -I$(FREEIMAGEPLUS_INCLUDE_DIR)
 FREEIMAGEPLUS_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
@@ -3339,10 +3257,10 @@ endif
 ifeq "$(LINUX_REV)" "10.04"
 FREEIMAGE_DIR ?= /usr
 FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
-FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR)
+FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR) $(INCLUDE_FLAGS_LT)
 FREEIMAGE_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
-FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR)
-FREEIMAGE_LIBS ?= -lfreeimage
+FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR) $(LDFLAGS_LT)
+FREEIMAGE_LIBS ?= -lfreeimage $(LIBS_LT)
 FREEIMAGEPLUS_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
 FREEIMAGEPLUS_INCLUDE_DIRS ?= -I$(FREEIMAGEPLUS_INCLUDE_DIR)
 FREEIMAGEPLUS_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
@@ -3357,21 +3275,11 @@ endif
 ifeq "$(LINUX_DIST)" "debian"
 
 ifeq "$(LINUX_REV)" "6"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on Debian 6, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 ifeq "$(LINUX_REV)" "7"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on Debian 7, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 endif
@@ -3380,62 +3288,37 @@ ifeq "$(LINUX_DIST)" "redhat"
 
 # RHEL5
 ifeq "$(LINUX_REV)" "5"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on RHEL5, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on RHEL6, use WITH_LOCAL_FREEIMAGE=1 instead)
+endif
+
+# RHEL7
+ifeq "$(LINUX_REV)" "7"
+$(warning no recent enough FreeImage package on RHEL7, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # Fedora 19
 ifeq "$(LINUX_REV)" "19"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on Fedora 19, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 # Fedora 20
 ifeq "$(LINUX_REV)" "20"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on Fedora 20, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 endif
 
 ifeq "$(LINUX_DIST)" "sles"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on SLES, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 ifeq "$(LINUX_DIST)" "suse"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on OpenSUSE, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 
 endif
@@ -3445,20 +3328,10 @@ endif
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"
 ifeq "$(OS_MINOR_VERSION)" "10"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 ifeq "$(OS_MINOR_VERSION)" "11"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on Solaris, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 endif
 endif
@@ -3467,22 +3340,23 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGEPLUS_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGEPLUS_INCLUDE_DIRS =? NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough FreeImage package on FreeBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
+endif
+ifeq "$(OS_MAJOR_VERSION)" "10"
+FREEIMAGE_DIR ?= /usr/local
+FREEIMAGE_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
+FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR) $(INCLUDE_FLAGS_LT)
+FREEIMAGE_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
+FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR) $(LDFLAGS_LT)
+FREEIMAGE_LIBS ?= -lfreeimage $(LIBS_LT)
+FREEIMAGEPLUS_INCLUDE_DIR ?= $(FREEIMAGE_DIR)/include
+FREEIMAGEPLUS_INCLUDE_DIRS ?= -I$(FREEIMAGEPLUS_INCLUDE_DIR)
+FREEIMAGEPLUS_LIB_DIR ?= $(FREEIMAGE_DIR)/lib
+FREEIMAGEPLUS_LIB_DIRS = -L$(FREEIMAGEPLUS_LIB_DIR)
+FREEIMAGEPLUS_LIBS = -lfreeimageplus
 endif
 endif
 
@@ -3490,12 +3364,7 @@ endif
 
 ifeq "$(PLATFORM)" "NETBSD"
 ifeq "$(OS_MAJOR_VERSION)" "6"
-FREEIMAGE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-FREEIMAGE_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+$(warning no recent enough official FreeImage package on NetBSD, use WITH_LOCAL_FREEIMAGE=1 instead)
 endif
 endif
 
@@ -3505,13 +3374,13 @@ ifeq ($(WITH_LOCAL_FREEIMAGE),1)
 FREEIMAGE_DIR = $(TOPDIR)/3rdParty/freeimage
 FREEIMAGE_INCLUDE_DIR = $(FREEIMAGE_DIR)/Source
 FREEIMAGEPLUS_INCLUDE_DIR = $(FREEIMAGE_DIR)/Wrapper/FreeImagePlus
-FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR)
+FREEIMAGE_INCLUDE_DIRS = -I$(FREEIMAGE_INCLUDE_DIR) $(INCLUDE_FLAGS_LT)
 FREEIMAGEPLUS_INCLUDE_DIRS = -I$(FREEIMAGEPLUS_INCLUDE_DIR)
 FREEIMAGE_LIB_DIR = $(FREEIMAGE_DIR)
 FREEIMAGEPLUS_LIB_DIR = $(FREEIMAGE_DIR)/Wrapper/FreeImagePlus
-FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR)
+FREEIMAGE_LIB_DIRS = -L$(FREEIMAGE_LIB_DIR) $(LDFLAGS_LT)
 FREEIMAGEPLUS_LIB_DIRS = -L$(FREEIMAGEPLUS_LIB_DIR)
-FREEIMAGE_LIBS = -lfreeimage
+FREEIMAGE_LIBS = -lfreeimage $(LIBS_LT)
 FREEIMAGEPLUS_LIBS = -lfreeimageplus
 endif
 
@@ -3586,19 +3455,19 @@ endif
 ifeq ($(WITH_EXPECT),1)
 
 ifeq "$(PLATFORM)" "LINUX"
-EXPECT = /usr/bin/expect
+EXPECT ?= /usr/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-EXPECT = /usr/local/bin/expect
+EXPECT ?= /usr/local/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "NETBSD"
-EXPECT = /usr/pkg/bin/expect
+EXPECT ?= /usr/pkg/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"
-EXPECT = expect
+EXPECT ?= expect
 endif
 
 endif

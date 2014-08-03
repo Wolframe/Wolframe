@@ -34,7 +34,7 @@
 ///\brief Module for testing the printing of PDFs with a simple command interpreter logging a trace of called functions and states
 
 #include "pdfPrinterDocumentImpl.hpp"
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/module/programTypeBuilder.hpp"
 #include "pdfPrinter.hpp"
 #include "pdfPrintProgramType.hpp"
 #include "logger-v1.hpp"
@@ -49,18 +49,18 @@ struct PdfPrinter
 	{
 		return new prnt::SimplePdfPrintProgram( prnt::createTestTraceDocument);
 	}
-	static SimpleBuilder* constructor()
+	static BuilderBase* constructor()
 	{
 		return new ProgramTypeBuilder( "TestPdfPrintFunction", "simplepdf", &PdfPrinter::createProgram);
 	}
 };
 }//anonymous namespace
 
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
+static createBuilderFunc objdef[] =
 {
-	PdfPrinter::constructor
+	PdfPrinter::constructor, NULL
 };
 
-ModuleEntryPoint entryPoint( 0, "simple PDF print function for test", 0, 0, NofObjects, objdef);
-
+extern "C" {
+ModuleEntryPoint entryPoint( 0, "simple PDF print function for test", objdef );
+}

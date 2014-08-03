@@ -1,0 +1,10 @@
+This is the WOLFRAME-CRAM protocol description.
+
+All messages are bse64 encoded. Pairs are in the format $<base64 of element 1>$<base64 of element 2>$...
+1. client --> server
+	128 bit seed followed by a HMAC-SHA1 of the (seed, username)
+2. server --> client
+	(user password seed, challenge)
+3. client --> server:
+	CRAM response
+4. the server authenticates the user (or not)

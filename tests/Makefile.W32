@@ -1,12 +1,12 @@
 TOPDIR = ..
 
-SUBDIRS = modules database AAAA wolfilter
-
-# all broken on windows due to working telnet
-#!IFDEF WITH_EXPECT
-#SUBDIRS = \
-#	$(SUBDIRS) expect
-#!ENDIF
+SUBDIRS = \
+	libwolframe \
+	libwfsingleton \
+	libwolframe_serialize \
+	libwolframe_database \
+	libwolframe_langbind \
+	modules
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -16,243 +16,167 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
-	/I$(TOPDIR)\src \
-	/I"$(BOOST_INCLUDE_DIR)" \
-	/I$(TOPDIR)\3rdParty\gtest\include \
-	/I$(TOPDIR)\wtest\include
+	/I$(TOPDIR) \
+	/I"$(BOOST_INCLUDE_DIR)"
 
-# Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	Advapi32.lib Ws2_32.lib \
-	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
-	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
-	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
+	advapi32.lib \
 
-# Lua
-!IFDEF WITH_LUA
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LUA
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I$(TOPDIR)\3rdParty\lua\src
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(TOPDIR)\3rdParty\lua\src\lua_static.lib
-!ENDIF
-
-# libxml2
-!IFDEF WITH_LIBXML2
-
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml" \
-	/I"$(WIN_ICONV_DIR)"
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
-!ENDIF
-
-# libxslt
-
-!IFDEF WITH_LIBXSLT
-INCLUDE_CXXFLAGS = $(INCLUDE_CXXFLAGS) \
-	/DWITH_LIBXSLT
-
-INCLUDE_DIRS = $(INCLUDE_DIRS) \
-	/I"$(LIBXSLT_DIR)\include"
-
-INCLUDE_LIBS = $(INCLUDE_LIBS) \
-	"$(LIBXSLT_DIR)\lib\libxslt.lib"
-!ENDIF
-
-# Postgresql
-!IFDEF WITH_PGSQL
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(PGSQL_DIR)\lib\libpq.lib"
-
-!ENDIF
-
-# Oracle
-!IFDEF WITH_ORACLE
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(ORACLE_DIR)\sdk\lib\msvc\oci.lib"
-!ENDIF
-
-# libhpdf
-!IFDEF WITH_LIBHPDF
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBHPDF
+# openssl
+!IFDEF WITH_SSL
 
 INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I"$(TOPDIR)\3rdParty\libhpdf\include"
+	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
+
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_SSL
+
+INCLUDE_LDFLAGS = \
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
 
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(TOPDIR)\3rdParty\libhpdf\src\hpdf.lib" \
-	"$(TOPDIR)\3rdParty\zlib\zlib.lib" "$(TOPDIR)\3rdParty\libpng\libpng.lib"
+	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
+
 !ENDIF
 
-TEST_CPP_BINS = \
-	testNamedRetVal.exe \
-	testVirtualInheritance.exe \
-	versionTest.exe \
-	testMethodMemberPointerTemplate.exe \
-	counterTest.exe \
-	connectionListTest.exe \
-	resolvePathTest.exe \
-	testFiletypeRecognition.exe \
-	testBoostPath.exe \
-	byte2hexTest.exe \
-	base64Test.exe \
-	base64Utility.exe \
-	CRAMtest.exe \
-	HMACtest.exe \
-	PBKDF2test.exe \
-	testSHA.exe \
-	testMD5.exe \
-	poolTest.exe \
-	logTest.exe \
-	protocolArgumentParsing.exe \
-	testProtocolLFdotEscaping.exe \
-	testVariantStruct.exe \
-	testString.exe \
-	testDateTime.exe \
-	testBigNumber.exe \
-#	testStorageDataType.exe \
-	configStructParser.exe \
-	configValueParser.exe \
-	testRand.exe \
-	testTimestamp.exe \
-	testWolfilter.exe \
-	testVariantTypes.exe \
-	testIntegers.exe \
-	testArrayDoublingAllocator.exe
-#DISABLED (moved to .Attic) unitLibraryTest.exe
 
-#	stringNormalizationTest.exe \
-# DISABLED (only for memory corruption checks):	testTestAllocator.exe \
+LOCAL_STATIC_LIB = \
+	wolframe.lib
 
+PROVIDER_OBJS = \
+	provider\Authentication.obj \
+	provider\Authorization.obj \
+	provider\Audit.obj \
+	provider\AAAAproviderImpl.obj \
+	provider\AAAAproviderConfig.obj \
+	provider\DBproviderImpl.obj \
+	provider\DBproviderConfig.obj \
+	provider\procProviderConfig.obj \
+	provider\procProvider.obj
 
-OBJS = \
+PROGRAM_OBJS = \
+	prgbind\normalizeProgram.obj \
+	prgbind\ddlProgram.obj \
+	prgbind\programLibrary.obj
 
-all: $(OBJS) $(CPP_BINS)
+LOCAL_STATIC_LIB_OBJS = \
+	$(PROVIDER_OBJS) \
+	$(PROGRAM_OBJS) \
+	wolframedCommandLine.obj \
+	wolfilterCommandLine.obj \
+	wolfilterIostreamFilter.obj \
+	wolfwizardCommandLine.obj \
+	mainConnectionHandler.obj \
+	contentOnlyProtocolHandler.obj \
+	moduleDirectory.obj \
+	moduleLoader.obj \
+	serviceConfig.obj \
+	serviceBanner.obj \
+	appConfig.obj \
+	jobScheduler.obj \
+	acceptor.obj \
+	connection.obj \
+	serverConfig.obj \
+	loggerConfig.obj \
+	server.obj
+
+!IFDEF WITH_SSL
+LOCAL_STATIC_LIB_OBJS = \
+	$(LOCAL_STATIC_LIB_OBJS) serverEndpoint.obj SSLcertificateInfo.obj
+!ENDIF
+
+CPP_OBJS = \
+	appProperties.obj \
+	appConfigDefinition.obj \
+	$(LOCAL_STATIC_LIB_OBJS) \
+	wolframeHandler.obj \
+	winMain.obj
+
+CPP_BINS = \
+	wolframed.exe \
+	wolfilter.exe \
+	wolfwizard.exe
+
+all: dependencies $(CPP_OBJS) $(CPP_BINS)
+
+dependencies:
+	@cd libwolframe & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwfsingleton & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwolframe_serialize & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwolframe_database & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwolframe_langbind & $(MAKE) /nologo /f Makefile.w32 all
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-testNamedRetVal.exe: testNamedRetVal.obj
-testVirtualInheritance.exe: testVirtualInheritance.obj
-testMethodMemberPointerTemplate.exe: testMethodMemberPointerTemplate.obj
-versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
-counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
-connectionListTest.exe: connectionListTest.obj $(TOPDIR)\src\wolframe.lib
-resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
-testBoostPath.exe: testBoostPath.obj
-testFiletypeRecognition.exe : testFiletypeRecognition.obj $(TOPDIR)\src\wolframe.lib
-poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
-testSHA.exe: testSHA.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-testMD5.exe: testMD5.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-byte2hexTest.exe: byte2hexTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-base64Test.exe: base64Test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-base64Utility.exe: base64Utility.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-CRAMtest.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-HMACtest.exe: HMACtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-PBKDF2test.exe: PBKDF2test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
-logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
-protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
-testArrayDoublingAllocator.exe: testArrayDoublingAllocator.obj $(TOPDIR)\src\wolframe.lib
-testTestAllocator.exe: testTestAllocator.obj $(TOPDIR)\src\wolframe.lib
-configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
-configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
-testProtocolLFdotEscaping.exe: testProtocolLFdotEscaping.obj $(TOPDIR)\src\wolframe.lib
-testVariantStruct.exe: testVariantStruct.obj $(TOPDIR)\src\wolframe.lib
-testString.exe: testString.obj $(TOPDIR)\src\wolframe.lib
-testDateTime.exe: testDateTime.obj $(TOPDIR)\src\wolframe.lib
-testBigNumber.exe: testBigNumber.obj $(TOPDIR)\src\wolframe.lib
-#testStorageDataType.exe: testStorageDataType.obj $(TOPDIR)\src\wolframe.lib
-testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
-#stringNormalizationTest.exe: stringNormalizationTest.obj $(TOPDIR)\src\libwolframe_functions\wolframe_functions.lib
-testRand.exe: testRand.obj
-testTimestamp.exe: testTimestamp.obj
-testVariantTypes.exe: testVariantTypes.obj $(TOPDIR)\src\wolframe.lib
-testIntegers.exe: testIntegers.obj $(TOPDIR)\src\wolframe.lib
-#DISABLED (moved to .Attic) unitLibraryTest.exe: unitLibraryTest.obj
+modules: libwolframe
+wolframed.exe: wolframed.obj $(CPP_OBJS) libwfsingleton\logger\wolframemsg.res
+wolfilter.exe: wolfilter.obj $(CPP_OBJS) libwfsingleton\logger\wolframemsg.res
+wolfwizard.exe: wolfwizard.obj $(CPP_OBJS) libwfsingleton\logger\wolframemsg.res
 
-local_all:
+$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $?
+
+local_all: $(LOCAL_STATIC_LIB)
 
 local_clean:
-	@-erase test.bat logTest.log 2>NUL
-	@-erase /s /q temp >NUL 2>NUL
-	@-rmdir temp 2>NUL
+	@-erase $(LOCAL_STATIC_LIB) 2>NUL
+	@-erase $(CPP_OBJS) 2>NUL
 
 local_distclean:
 
 local_test:
-	@-echo @echo off > test.bat
-	@-echo mkdir temp >> test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-!IFDEF WITH_LIBXML2
-	@-echo copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >> test.bat
-	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
-!ENDIF
-!IFDEF WITH_LIBXSLT
-	@-echo copy "$(LIBXSLT_DIR)\lib\libxslt.dll" . >> test.bat
-!ENDIF
+
+copy_prereq:
+	@-copy libwfsingleton\wfsingleton.dll . >NUL
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >NUL
+!ENDIF
+!IFDEF WITH_LUA
+	@-copy ..\3rdParty\lua\src\lua52.dll . >NUL
 !ENDIF
 !IFDEF WITH_PGSQL
-	@-echo copy "$(PGSQL_DIR)\lib\libpq.dll" . >> test.bat
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" . >NUL
 !IFDEF PGDLL_WITH_I18N
-	@-echo copy "$(PGSQL_DIR)\bin\libintl*.dll" . >> test.bat
-	@-echo copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >> test.bat
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" . >NUL
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >NUL
 !ENDIF
 !ENDIF
 !IFDEF WITH_ORACLE
-	@-echo copy "$(ORACLE_DIR)\*.dll" . >> test.bat
+	@-copy "$(ORACLE_DIR)\*.dll" .  >NUL
 !ENDIF
-	@-echo testNamedRetVal >> test.bat
-	@-echo testVirtualInheritance >> test.bat
-	@-echo testArrayDoublingAllocator >> test.bat
-	@-echo testFiletypeRecognition >> test.bat
-# DISABLED (only for memory corruption checks):	@-echo testTestAllocator >> test.bat
-	@-echo logTest >> test.bat
-	@-echo versionTest >> test.bat
-	@-echo counterTest >> test.bat
-	@-echo connectionListTest >> test.bat
-	@-echo resolvePathTest >> test.bat
-	@-echo testBoostPath >> test.bat
-	@-echo testSHA >> test.bat
-	@-echo testMD5 >> test.bat
-	@-echo byte2hexTest >> test.bat
-	@-echo base64Test >> test.bat
-	@-echo testRand >> test.bat
-	@-echo testTimestamp >> test.bat
-	@-echo CRAMtest >> test.bat
-	@-echo HMACtest >> test.bat
-	@-echo protocolArgumentParsing >> test.bat
-	@-echo testProtocolLFdotEscaping >> test.bat
-	@-echo testVariantStruct >> test.bat
-	@-echo testString >> test.bat
-	@-echo testDateTime >> test.bat
-	@-echo testBigNumber >> test.bat
-#	@-echo testStorageDataType >> test.bat
-	@-echo testVariantTypes >> test.bat
-	@-echo testIntegers >> test.bat
-	@-echo testWolfilter >> test.bat
-#	@-echo stringNormalizationTest >> test.bat
-#DISABLED (moved to .Attic) 	@-echo unitLibraryTest >> test.bat
-	@-echo echo off >> test.bat
-	@-test.bat
+!IFDEF WITH_LIBXML2
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" . >NUL
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" . >NUL
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >NUL
+!ENDIF
+!IFDEF WITH_LIBXSLT
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" . >NUL
+!ENDIF
+!IFDEF WITH_ICU
+!IFNDEF DEBUG
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" . >NUL
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" . >NUL
+!ELSE
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" . >NUL
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" . >NUL
+!ENDIF
+!ENDIF
 
-local_longtest:
-	@-echo @echo off > test.bat
-	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo poolTest >> test.bat
-	@-echo PBKDF2test >> test.bat
-	@-test.bat
+run: copy_prereq
+	@-echo Running the Wolframe server...
+	@-wolframed.exe -c wolframe.xml
+
+check: copy_prereq
+	@-wolframed.exe -c wolframe.xml -t
+
+print: copy_prereq
+	@-wolframed.exe -c wolframe.xml -p

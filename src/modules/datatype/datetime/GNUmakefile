@@ -14,17 +14,14 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwolframe \
-	$(LIBS_DL)
-
+	-lwolframe
 
 DYNAMIC_MODULE = mod_datatype_datetime.so
 
 CPP_OBJS = \
 	dateArithmetic.o \
-	datatypeDate.o \
-	mod_datatype_datetime.o
-
+	datatypeDate.o
+	
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:

@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of input filter abstraction for the cjson library
 #include "inputfilterImpl.hpp"
 #include "utils/parseUtils.hpp"
+#include "utils/sourceLineInfo.hpp"
 #include "types/string.hpp"
 #include "logger-v1.hpp"
 #include <boost/lexical_cast.hpp>
@@ -41,49 +42,24 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-bool InputFilterImpl::getValue( const char* name, std::string& val)
+bool InputFilterImpl::getValue( const char* id, std::string& val) const
 {
-	if (std::strcmp(name,"encoding") == 0 && m_encattr_defined)
-	{
-		val = types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
-		return true;
-	}
-	return false;
+	return Parent::getValue( id, val);
 }
 
-bool InputFilterImpl::getDocType( std::string& val)
+const types::DocMetaData* InputFilterImpl::getMetaData()
 {
 	if (!m_root.get())
 	{
 		setState( EndOfMessage);
-		return false;
+		return 0;
 	}
-	val = m_doctype.tostring();
-	return true;
+	return getMetaDataRef().get();
 }
 
-bool InputFilterImpl::getMetadata()
+bool InputFilterImpl::setValue( const char* id, const std::string& value)
 {
-	if (m_root.get())
-	{
-		return true;
-	}
-	else
-	{
-		setState( EndOfMessage);
-		return false;
-	}
-}
-
-const char* InputFilterImpl::getEncoding() const
-{
-	if (!m_encattr_defined) return 0;
-	return types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
-}
-
-bool InputFilterImpl::setValue( const char* name, const std::string& value)
-{
-	return Parent::setValue( name, value);
+	return Parent::setValue( id, value);
 }
 
 static types::String::Encoding guessCharsetEncoding( const void* content, std::size_t contentsize)
@@ -111,21 +87,20 @@ static types::String::Encoding guessCharsetEncoding( const void* content, std::s
 
 boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
 {
-	if (!m_encattr_defined || m_encattr.encoding == types::String::UTF8)
+	if (m_encattr.encoding == types::String::UTF8)
 	{
 		m_content = content;
 	}
 	else
 	{
-		m_content = types::StringConst( content.c_str(), content.size(), m_encattr.encoding, m_encattr.codepage)
-				.tostring();
+		m_content = types::StringConst( content.c_str(), content.size(), m_encattr.encoding, m_encattr.codepage).tostring();
 	}
 	cJSON_Context ctx;
 	cJSON* pp = cJSON_Parse( &ctx, m_content.c_str());
 	if (!pp)
 	{
 		if (!ctx.errorptr) throw std::bad_alloc();
-		utils::LineInfo pos = utils::getLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
+		utils::SourceLineInfo pos = utils::getSourceLineInfo( m_content.begin(), m_content.begin() + (ctx.errorptr - m_content.c_str()));
 
 		std::string err( ctx.errorptr);
 		if (err.size() > 80)
@@ -133,86 +108,100 @@ boost::shared_ptr<cJSON> InputFilterImpl::parse( const std::string& content)
 			err.resize( 80);
 			err.append( "...");
 		}
-		throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line) + " column " + boost::lexical_cast<std::string>(pos.column) + " at '" + err + "'");
+		throw std::runtime_error( std::string( "error in JSON content at line ") + boost::lexical_cast<std::string>(pos.line()) + " column " + boost::lexical_cast<std::string>(pos.column()) + " at '" + err + "'");
 	}
 	return boost::shared_ptr<cJSON>( pp, cJSON_Delete);
 }
 
 void InputFilterImpl::putInput( const void* content, std::size_t contentsize, bool end)
 {
-	m_content.append( (const char*)content, contentsize);
-	if (end)
+	try
 	{
-		std::string origcontent( m_content);
-		if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
-		m_encattr.encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
-		m_encattr.codepage = 0;
-		m_encattr_defined = true;
-		m_root = parse( origcontent);
+		setState( Open);
+		m_content.append( (const char*)content, contentsize);
+		if (end)
+		{
+			std::string origcontent( m_content);
+			if (m_root.get()) throw std::logic_error( "bad operation on JSON input filter: put input after end");
+			m_encattr.encoding = guessCharsetEncoding( m_content.c_str(), m_content.size());
+			m_encattr.codepage = 0;
+			if (m_encattr.encoding != types::String::UTF8)
+			{
+				setAttribute( "encoding", m_encattr.encodingName());
+			}
+			m_root = parse( origcontent);
+			m_firstnode = m_root.get();
+			int nof_docattributes = 0;
+			bool encodingParsed = false;
+			bool doctypeParsed = false;
+	
+			if (!m_firstnode->string && !m_firstnode->valuestring && !m_firstnode->next && m_firstnode->type == cJSON_Object)
+			{
+				//CJSON creates a toplevel object for multiple root nodes:
+				m_firstnode = m_firstnode->child;
+			}
 
-		const cJSON* first = m_root.get();
-		int nof_docattributes = 0;
-		bool encodingParsed = false;
+			while (m_firstnode)
+			{
+				if (m_firstnode->string && m_firstnode->valuestring)
+				{
+					if (boost::iequals("-doctype",m_firstnode->string))
+					{
+						++nof_docattributes;
+						if (doctypeParsed) throw std::runtime_error("duplicate 'doctype' definition");
+						setDoctype( m_firstnode->valuestring);
+						setAttribute( "doctype", m_firstnode->valuestring);
+						m_firstnode = m_firstnode->next;
+						continue;
+					}
+					else if (boost::iequals("-encoding", m_firstnode->string))
+					{
+						++nof_docattributes;
+						types::String::EncodingAttrib ea = types::String::getEncodingFromName( m_firstnode->valuestring);
+						setAttribute( "encoding", m_firstnode->valuestring);
 
-		if (!first->string && !first->valuestring && !first->next && first->type == cJSON_Object)
-		{
-			//CJSON creates a toplevel object for multiple root nodes:
-			first = first->child;
-		}
-		const char* rootid = 0;
-		const char* systemid = 0;
-		
-		for (;;)
-		{
-			if (first->string && first->valuestring)
-			{
-				if (boost::iequals("doctype",first->string))
-				{
-					++nof_docattributes;
-					if (systemid) throw std::runtime_error("duplicate 'doctype' definition");
-					systemid = first->valuestring;
-					first = first->next;
-					continue;
-				}
-				else if (boost::iequals("encoding", first->string))
-				{
-					++nof_docattributes;
-					types::String::EncodingAttrib ea = types::String::getEncodingFromName( first->valuestring);
-					if (m_encattr.encoding != ea.encoding || ea.codepage != 0)
-					{
-						// ... encoding different than guessed. Parse again
-						if (encodingParsed) throw std::runtime_error( "duplicate 'encoding' definition");
-						encodingParsed = true;
-						m_encattr = ea;
-						m_root = parse( origcontent);
-						first = m_root.get();
-						while (first && nof_docattributes--) first = first->next;
+						if (m_encattr.encoding != ea.encoding || ea.codepage != 0)
+						{
+							// ... encoding different than guessed. Parse again
+							if (encodingParsed) throw std::runtime_error( "duplicate 'encoding' definition");
+							encodingParsed = true;
+							m_encattr = ea;
+							m_root = parse( origcontent);
+							m_firstnode = m_root.get();
+							while (m_firstnode && nof_docattributes--) m_firstnode = m_firstnode->next;
+						}
+						else
+						{
+							m_firstnode = m_firstnode->next;
+						}
+						continue;
 					}
-					else
-					{
-						first = first->next;
-					}
-					continue;
 				}
+				break;
 			}
-			break;
-		}
-		if (first->string && !first->next)
-		{
-			rootid = first->string;
-		}
-		if (systemid)
-		{
-			if (rootid)
+			if (m_firstnode)
 			{
-				m_doctype = types::DocType( rootid, systemid);
+				m_stk.push_back( StackElement( m_firstnode));
 			}
-			else
-			{
-				throw std::runtime_error( "document type defined, but no singular root element");
-			}
+			LOG_DEBUG << "[cjson input] document meta data: {" << getMetaDataRef()->tostring() << "}";
+			setState( Open);
 		}
-		m_stk.push_back( StackElement( first));
+	}
+	catch (const std::runtime_error& err)
+	{
+		setState( InputFilter::Error, err.what());
+		return;
+	}
+	catch (const std::bad_alloc& err)
+	{
+		setState( InputFilter::Error, "out of memory");
+		return;
+	}
+	catch (const std::logic_error& err)
+	{
+		LOG_FATAL << "logic error in JSON filer: " << err.what();
+		setState( InputFilter::Error, "logic error in libxml2 filer. See logs");
+		return;
 	}
 }
 
@@ -256,13 +245,17 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 {
 	if (!m_root.get())
 	{
-		setState( EndOfMessage);
+		if (state() != Error)
+		{
+			setState( EndOfMessage);
+		}
 		return false;
 	}
+	setState( Open);
 	while (!m_stk.empty())
 	{
 		const cJSON* nd = m_stk.back().m_node;
-		if (!nd && m_stk.back().m_state != StackElement::StateCheckEnd)
+		if (!nd && m_stk.back().m_state != StackElement::StateCloseNode && m_stk.back().m_state != StackElement::StateCheckEnd)
 		{
 			setState( Error, "internal: invalid node in JSON structure");
 			return false;
@@ -310,6 +303,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 							elementsize = std::strlen( nd->string);
 							m_stk.back().m_state = StackElement::StateChild;
 						}
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else
@@ -326,6 +320,15 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						{
 							m_stk.push_back( StackElement( nd->child, nd->string));
 							nd = m_stk.back().m_node;
+
+							if (flag( FilterBase::SerializeWithIndices))
+							{
+								type = InputFilter::OpenTag;
+								element = "";
+								elementsize = 0;
+								LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
+								return true;
+							}
 						}
 						else
 						{
@@ -346,6 +349,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						m_stk.back().m_node = nd->next;
 						m_stk.back().m_state = StackElement::StateCheckEnd;
 						type = InputFilter::Value;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else if (state() == InputFilter::Open)
@@ -363,6 +367,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 					{
 						m_stk.back().m_state = StackElement::StateNext;
 						type = InputFilter::Value;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else if (state() == InputFilter::Open)
@@ -384,6 +389,7 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 						elementsize = 0;
 						m_stk.back().m_node = nd->next;
 						m_stk.back().m_state = StackElement::StateCheckEnd;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 						return true;
 					}
 					else
@@ -402,47 +408,82 @@ bool InputFilterImpl::getNext( InputFilter::ElementType& type, const void*& elem
 							element = 0;
 							elementsize = 0;
 							m_stk.back().m_state = StackElement::StateReopen;
+							LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 							return true;
 						}
 						else
 						{
 							m_stk.back().m_state = StackElement::StateOpen;
 						}
+						continue;
 					}
 					else
 					{
-						m_stk.pop_back();
-						if (m_stk.empty())
+						if (m_stk.back().m_tag && flag( FilterBase::SerializeWithIndices))
 						{
-							// final close:
 							type = InputFilter::CloseTag;
 							element = 0;
 							elementsize = 0;
+							m_stk.back().m_state = StackElement::StateCloseNode;
+							LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 							return true;
 						}
-						nd = m_stk.back().m_node;
+						m_stk.back().m_state = StackElement::StateCloseNode;
+						continue;
 					}
+
+				case StackElement::StateCloseNode:
+					m_stk.pop_back();
+					if (m_stk.empty())
+					{
+						// final close:
+						type = InputFilter::CloseTag;
+						element = 0;
+						elementsize = 0;
+						LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
+						return true;
+					}
+					nd = m_stk.back().m_node;
 					continue;
 
 				case StackElement::StateReopen:
-					type = InputFilter::OpenTag;
-					element = m_stk.back().m_tag;
-					elementsize = std::strlen( m_stk.back().m_tag);
+					if (flag( FilterBase::SerializeWithIndices))
+					{
+						type = InputFilter::OpenTag;
+						element = 0;
+						elementsize = 0;
+					}
+					else
+					{
+						type = InputFilter::OpenTag;
+						element = m_stk.back().m_tag;
+						elementsize = std::strlen( m_stk.back().m_tag);
+					}
 					m_stk.back().m_state = StackElement::StateOpen;
+					LOG_DATA << "[json input filter] get next " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
 					return true;
 			}
 		}
 	}
+	if (!m_done)
+	{
+		//... emit final close
+		type = InputFilter::CloseTag;
+		element = 0;
+		elementsize = 0;
+		m_done = true;
+		return true;
+	}
 	return false;
+}
+
+bool InputFilterImpl::checkSetFlags( Flags) const
+{
+	return true;
 }
 
 bool InputFilterImpl::setFlags( Flags f)
 {
-	if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices))
-	{
-		return false;
-	}
-	return InputFilter::setFlags( f);
+	return FilterBase::setFlags( f);
 }
-
 

@@ -1,0 +1,4 @@
+LIBRARY mod_auth_test
+
+EXPORTS
+entryPoint	@1

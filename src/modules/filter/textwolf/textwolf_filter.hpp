@@ -40,8 +40,15 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-FilterType* createTextwolfXmlFilterType();
+class TextwolfXmlFilterType :public FilterType
+{
+public:
+	TextwolfXmlFilterType()
+		:FilterType("textwolf"){}
+	virtual ~TextwolfXmlFilterType(){}
 
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const;
+};
 
 }}//namespace
 #endif

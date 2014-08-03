@@ -1,4 +1,4 @@
 {
-  "doctype" : "CategoryHierarchyRequest",
-  "category": { "-id": "1" }
+	"-doctype" : "CategoryHierarchyRequest",
+	"-id": "1"
 }

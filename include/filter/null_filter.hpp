@@ -35,13 +35,31 @@ Project Wolframe.
 #ifndef _Wolframe_FILTER_NULL_HPP_INCLUDED
 #define _Wolframe_FILTER_NULL_HPP_INCLUDED
 #include "filter/filter.hpp"
+#include <string>
+#include <vector>
 
 namespace _Wolframe {
 namespace langbind {
 
-Filter createNullFilter( const std::string& name, const std::string& arg);
-Filter* createNullFilterPtr( const std::string& name, const std::string& arg);
+/// \brief Create a new null filter
+Filter createNullFilter();
+/// \brief Create a new null filter (with new, to be destroyed with delete)
+Filter* createNullFilterPtr( const std::string& name, const std::vector<FilterArgument>& arg);
 
+/// \brief Null filter, a filter representing an empty structure
+/// \class NullFilterType
+class NullFilterType :public FilterType
+{
+public:
+	NullFilterType()
+		:FilterType("null"){}
+	virtual ~NullFilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const
+	{
+		return createNullFilterPtr( "null", arg);
+	}
+};
 
 }}//namespace
 #endif

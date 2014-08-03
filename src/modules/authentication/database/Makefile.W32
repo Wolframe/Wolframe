@@ -13,11 +13,14 @@ INCLUDE_DIRS = \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
+	/LIBPATH:$(TOPDIR)\src\libwfsingleton \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	kernel32.lib advapi32.lib Ws2_32.lib
+	$(TOPDIR)\src\wolframe.lib \
+	kernel32.lib advapi32.lib Ws2_32.lib \
+	wfsingleton.lib
 
 DYNAMIC_MODULE = \
 	mod_auth_database.dll
@@ -25,15 +28,14 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	DBauthConfig.obj \
 	DBauthConstructor.obj \
-	DBauth.obj \
-	DBauthModule.obj
+	DBauth.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:DBauthModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_auth_database.obj
+	$(LINK) /dll /def:mod_auth_database.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

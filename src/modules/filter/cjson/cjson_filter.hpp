@@ -39,7 +39,17 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-FilterType* createCJsonFilterType();
+/// \brief Filter for JSON based on the CJSON library
+class CJsonFilterType
+	:public FilterType
+{
+public:
+	CJsonFilterType()
+		:FilterType("cjson"){}
+	virtual ~CJsonFilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const;
+};
 
 }}//namespace
 #endif

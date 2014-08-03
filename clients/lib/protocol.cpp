@@ -75,6 +75,7 @@ struct Buffer
 		m_size = 0;
 		m_allocsize = 0;
 	}
+/* Intel CC says unused:
 	void reset( const char* ptr_, std::size_t size_)
 	{
 		reset();
@@ -83,7 +84,7 @@ struct Buffer
 		m_allocsize = m_size = size_;
 		std::memcpy( m_ptr, ptr_, size_);
 	}
-
+*/
 	~Buffer()
 	{
 		if (m_ptr) std::free( m_ptr);
@@ -112,10 +113,12 @@ struct Buffer
 		append( data, std::strlen( data));
 	}
 
+/* Intel CC says unused:
 	void append( const std::string& data)
 	{
 		append( data.c_str(), data.size());
 	}
+*/
 
 	bool consume( size_t pos)
 	{
@@ -142,7 +145,8 @@ struct Buffer
 
 	char* ptr()			{return m_ptr;}
 	std::size_t size()		{return m_size;}
-	std::size_t allocsize()		{return m_allocsize;}
+// Intel CC says unused:
+//	std::size_t allocsize()		{return m_allocsize;}
 
 private:
 	Buffer( const Buffer&){}
@@ -324,6 +328,7 @@ struct ProtocolState
 		SESSION_ANSWER_RESULT,
 		CLOSED
 	};
+/* Intel CC says unused:
 	static const char* name( Id id)
 	{
 		static const char* ar[] =
@@ -343,6 +348,7 @@ struct ProtocolState
 		};
 		return ar[(int)id];
 	}
+*/
 };
 
 }//anonymous namespace
@@ -508,6 +514,19 @@ public:
 				{
 					return OP_READ();
 				}
+				// Check if an error occurred before the banner has been sent:
+				getLineSplit_space( arg, line, 2);
+				if (!arg.size) continue;
+				if (isequal( arg.ptr[0], "ERR")
+				||	isequal( arg.ptr[0], "BAD")
+				||	isequal( arg.ptr[0], "BYE"))
+				{
+					msg = (arg.size == 1)?"rejected connection":arg.ptr[1];
+					notifyError( msg);
+					state( ProtocolState::CLOSED);
+					return OP_CLOSE();
+				}
+				// Read the banner:
 				getLineSplit_space( arg, line, 1);
 				if (!arg.size) continue;
 				notifyAttribute( "banner", arg.ptr[0]);

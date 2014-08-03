@@ -16,21 +16,32 @@ doc-htmlhelp:
 	@-erase /S /Q output\htmlhelp\* >NUL 2>NUL
 	@-rmdir output\htmlhelp >NUL 2>NUL
 	@-rmdir output >NUL 2>NUL
-	@mkdir output
-	@mkdir output\htmlhelp
-	@-copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
+	@-mkdir output
+	@-mkdir output\htmlhelp
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" .
 	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" .
-	@-copy "$(LIBXSLT_DIR)\lib\libxslt.dll" .
-	@-copy "$(LIBXSLT_DIR)\lib\libexslt.dll" .
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" .
+	@-copy "$(LIBXSLT_DIR)\bin\libexslt.dll" .
 	@"$(XSLTPROC)" --xinclude --stringparam draft.mode yes -o output\htmlhelp\WolfBook.html "$(XSLT_HTMLHELP_STYLESHEET)" WolfBook.xml
+	@-mkdir output\htmlhelp\images
+	@-copy images\*.png output\htmlhelp\images
+	@-copy images\*.svg output\htmlhelp\images
+	@-mkdir output\htmlhelp\images\clients
+	@-copy images\clients\*.png output\htmlhelp\images\clients
 	@-"$(HHC_LOCATION)" output\htmlhelp\htmlhelp.hhp
 
 doxygen\html\index.chm: doxygen\html\index.hhp
 	@-"$(HHC_LOCATION)" $@
 
 local_clean:
+	@-erase *.dll >NUL 2>NUL
 	@-erase /S /Q doxygen\* >NUL 2>NUL
+	@-rmdir doxygen >NUL 2>NUL
+	@-erase /S /Q output\htmlhelp\images\client\* >NUL 2>NUL
+	@-erase /S /Q output\htmlhelp\images\* >NUL 2>NUL
 	@-erase /S /Q output\htmlhelp\* >NUL 2>NUL
+	@-rmdir output\htmlhelp\images\clients >NUL 2>NUL
+	@-rmdir output\htmlhelp\images >NUL 2>NUL
 	@-rmdir output\htmlhelp >NUL 2>NUL
 	@-rmdir output >NUL 2>NUL
 

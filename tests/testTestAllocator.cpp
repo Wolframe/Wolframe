@@ -31,10 +31,10 @@
 
 ************************************************************************/
 ///\file testTestAllocator.cpp
-///\brief test program for Array Doubling Allocator (types/allocators.hpp)
+///\brief test program for malloc wrapper
 
 #include "gtest/gtest.h"
-#include "types/malloc.hpp"
+#include "utils/malloc.hpp"
 
 using namespace _Wolframe;
 

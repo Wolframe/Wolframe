@@ -1,0 +1,4 @@
+TRANSACTION main
+BEGIN
+	FOREACH /doc/element DO SELECT id FROM tab WHERE name = $(name);
+END

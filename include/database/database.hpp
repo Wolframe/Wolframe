@@ -30,99 +30,60 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// database.hpp - Wolframe base database class
-//
+/// \file database.hpp
+/// \brief Wolframe base database class
 
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
 #include "database/transaction.hpp"
 #include "database/databaseLanguage.hpp"
-#include "processor/userInterface.hpp"
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace db {
 
-///\class Database
-///\brief Base class for database interface. All databases should provide this interface
+/// \class Database
+/// \brief Base class for database interface. All databases should provide this interface
 class Database
 {
 public:
 	virtual ~Database()			{}
 
-	///\brief Database identification.
-	// All databases must have an identifier as they are referenced using this identifier.
-	// The identifier must be unique (of course).
+	/// \brief Database identification.
+	/// All databases must have an identifier as they are referenced using this identifier.
+	/// The identifier must be unique (of course).
 	virtual const std::string& ID() const = 0;
 
-	///\brief Database type identification.
+	/// \brief Database type identification.
 	virtual const char* className() const = 0;
 
-	///\brief Get a database transaction object
+	/// \brief Get a database transaction object
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
-	///\brief Get a user interface library
-	virtual const UI::UserInterfaceLibrary* UIlibrary() const
-						{ return NULL; }
-
-	///\brief Load the database transaction programs for this database from file
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadProgram( const std::string& filename ) = 0;
-
-	///\brief Load the transaction programs for this database from all
-	//        the program files configured for it
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadAllPrograms() = 0;
-
-	///\brief Add a database program to the list of transaction programs
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void addProgram( const std::string& program) = 0;
-
-	virtual const LanguageDescription* getLanguageDescription() const
-	{
-		static LanguageDescription langdescr;
-		return &langdescr;
-	}
-
-	/// Close the database connetion
-	/// This exists for no good reason (mostly to make the code look uniform)
-	virtual void close()			{}
+	virtual const LanguageDescription* getLanguageDescription() const=0;
 };
 
 
-///\class DatabaseUnit
-///\brief This is the base class for database unit implementations
+/// \class DatabaseUnit
+/// \brief This is the base class for virtual constructors of databases
 class DatabaseUnit
 {
 public:
 	virtual ~DatabaseUnit()			{}
 
-	///\brief Database type identification
-	///\remark All database implementations need a class name.
-	///\remark Class names must be unique.
+	/// \brief Database type identification
+	/// \remark All database implementations need a class name.
+	/// \remark Class names must be unique.
 	virtual const char* className() const = 0;
 
-	///\brief The database identifier. This is the configured name.
+	/// \brief The database identifier. This is the configured name.
 	virtual const std::string& ID() const = 0;
 
-	///\brief The actual database object.
+	/// \brief The actual database object.
 	virtual Database* database() = 0;
-
-	///\brief Load the database transaction programs for this database from file
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadProgram( const std::string& filename ) = 0;
-
-	///\brief Load the transaction programs for this database from all
-	//        the program files configured for it
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadAllPrograms() = 0;
-
-	///\brief add a database program to the list of transaction programs
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void addProgram( const std::string& program ) = 0;
 };
 
 }} // namespace _Wolframe::db

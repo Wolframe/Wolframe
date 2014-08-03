@@ -32,38 +32,15 @@
 ************************************************************************/
 ///\file mod_normalize_string.cpp
 ///\brief Module for string normalization and validating functions without using ICU
-#include "module/normalizeFunctionBuilder.hpp"
-#include "logger-v1.hpp"
-#include "stringNormalize.hpp"
+#include "appdevel/normalizeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "asciiNormalizeFunction.hpp"
+#include "trimNormalizeFunction.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-
-static NormalizeFunctionDef normalizeFunctions[] =
-{
-	{"trim", &langbind::createTrimNormalizeFunction},
-	{"ucname", &langbind::createUcnameNormalizeFunction},
-	{"lcname", &langbind::createLcnameNormalizeFunction},
-	{"convdia", &langbind::createConvdiaNormalizeFunction},
-	{0,0}
-};
-
-namespace {
-struct NormalizeProcessor
-{
-
-	static SimpleBuilder* constructor()
-	{
-		return new NormalizeFunctionBuilder( "StringNormalizer", normalizeFunctions);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	NormalizeProcessor::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "normalizers and validators numbers", 0, 0, NofObjects, objdef);
+WF_MODULE_BEGIN( "StringNormalizer", "basic string normalizers not using ICU or another library")
+ WF_NORMALIZER( "trim",  _Wolframe::langbind::TrimNormalizeFunction)
+ WF_NORMALIZER( "ucname", _Wolframe::langbind::UppercaseNameNormalizeFunction)
+ WF_NORMALIZER( "lcname", _Wolframe::langbind::LowercaseNameNormalizeFunction)
+ WF_NORMALIZER( "convdia", _Wolframe::langbind::ConvDiaNormalizeFunction)
+WF_MODULE_END
 

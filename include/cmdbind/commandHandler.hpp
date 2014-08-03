@@ -30,120 +30,142 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/commandHandler.hpp
-///\brief Interface to a generic command handler
+/// \file cmdbind/commandHandler.hpp
+/// \brief Interface to a generic command handler
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "types/doctypeinfo.hpp"
+#include "processor/procProviderInterface.hpp"
 
-///\brief Forward declaration
 namespace _Wolframe {
+
 namespace proc {
-class ProcessorProvider;
-}}
+/// \brief Forward declaration
+class ExecContext;
+}//namespace proc
 
-namespace _Wolframe {
 namespace cmdbind {
 
-///\class CommandHandler
-///\brief Command handler interface
+/// \class CommandHandler
+/// \brief Command handler interface
 class CommandHandler
 {
 public:
-	///\brief This is a temporary declared instance for FSMoperation::Operation
+	/// \brief Operation type
 	enum Operation	{
-		READ,
-		WRITE,
-		CLOSE
+		READ,			/// <request to read data
+		WRITE,			/// <request to write data
+		CLOSE			/// <request to terminate processing
 	};
 
-	///\brief Defaul constructor
+	/// \brief Defaul constructor
 	CommandHandler()
-		:m_provider(0){}
+		:m_execContext(0){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~CommandHandler(){}
 
-	///\brief Define the input buffer for processing the command
-	///\param [in] buf buffer for the data to process
-	///\param [in] allocsize allocation size of the buffer for the data to process in bytes
-	virtual void setInputBuffer( void* buf, std::size_t allocsize)=0;
-
-	///\brief Define the input buffer for processing the command
-	///\param [in] buf buffer for the data to process
-	///\param [in] size size of the buffer for the data to process in bytes
-	///\param [in] pos cursor position in the buffer defining byte position of the start of the the data to process
-	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos)=0;
-
-	///\brief Get the next operation to do for the connection handler
-	///\return the next operation for the connection handler
+	/// \brief Get the next operation to do for the connection handler
+	/// \return the next operation for the connection handler
 	virtual Operation nextOperation()=0;
 
-	///\brief Passes the network input to the command handler (READ operation)
-	///\param [in] begin start of the network input block.
-	///\param [in] bytesTransferred number of bytes passed in the input block
-	virtual void putInput( const void* begin, std::size_t bytesTransferred)=0;
+	/// \brief Passes the network input to the command handler (READ operation)
+	/// \param [in] begin start of the network input block.
+	/// \param [in] bytesTransferred number of bytes passed in the input block
+	/// \param [in] eod (end of data) true, if the passed chunk is the last one
+	virtual void putInput( const void* begin, std::size_t bytesTransferred, bool eod)=0;
 
-	///\brief Get the input block request (READ operation)
-	///\param [out] begin start of the network input buffer
-	///\param [out] maxBlockSize maximum size of data in bytes to pass with the subsequent putInput(const void*,std::size_t) call
-	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize)=0;
-
-	///\brief Get the next output chunk from the command handler (WRITE operation)
-	///\param [out] begin start of the output chunk
-	///\param [out] bytesToTransfer size of the output chunk to send in bytes
+	/// \brief Get the next output chunk from the command handler (WRITE operation)
+	/// \param [out] begin start of the output chunk
+	/// \param [out] bytesToTransfer size of the output chunk to send in bytes
 	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer)=0;
 
-	///\brief Get the data left unprocessed after close. The data belongs to the caller to process.
-	///\param [out] begin returned start of the data chunk
-	///\param [out] nofBytes size of the returned data chunk in bytes
-	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes)=0;
 
-	///\brief Get the error code of command execution to be returned to the client
+	/// \brief Get the last error message of command execution to be returned to the client
 	const char* lastError() const
 	{
 		return m_lastError.empty()?0:m_lastError.c_str();
 	}
 
-	///\brief Pass the reference to the processor provider to the command handler
-	///\param[in] p the reference to the processor provider
-	void setProcProvider( const proc::ProcessorProvider* p)
+	/// \brief Set the last error message of command execution to be returned to the client
+	void setLastError( const std::string& msg)
 	{
-		m_provider = p;
+		m_lastError = msg;
 	}
 
-	///\brief Get the reference to the processor provider
-	///\return the reference to the processor provider
-	const proc::ProcessorProvider* procProvider()
+	/// \brief Pass the reference to the execution context to the command handler
+	/// \param[in] c the reference to the execution context owned by the caller (connection)
+	virtual void setExecContext( proc::ExecContext* c)
 	{
-		return m_provider;
+		m_execContext = c;
 	}
 
-	///\brief Pass the parameters for the next command handler call
-	void passParameters( const std::string& nam, int argc, const char** argv)
+	/// \brief Get the reference to the processor provider
+	/// \return the reference to the processor provider
+	proc::ExecContext* execContext()
 	{
-		m_name = nam;
-		for (int ii=0; ii<argc; ii++)
-		{
-			m_argBuffer.push_back( argv[ ii]);
-		}
+		return m_execContext;
 	}
 
-	///\brief get the termination marker to send for an abort of a running data session
-	virtual const char* interruptDataSessionMarker() const	{return "";}
+	/// \brief Get info about processed document type
+	const types::DoctypeInfo* doctypeInfo() const
+	{
+		return m_doctypeinfo.get();
+	}
 
-protected:
-	std::string m_lastError;			//< error operation for the client
-	std::string m_name;				//< name of the command to execute
-	std::vector< std::string > m_argBuffer;		//< the command arguments
-	const proc::ProcessorProvider* m_provider;	//< the reference to the global processor provider
+	/// \brief Set info about processed document type
+	virtual void setDoctypeInfo( const types::DoctypeInfoR& doctypeinfo_)
+	{
+		m_doctypeinfo = doctypeinfo_;
+	}
+
+	/// \brief Get a hint for the size of output chunks in bytes
+	std::size_t outputChunkSize() const
+	{
+		return m_outputChunkSize;
+	}
+
+	/// \brief Set a hint for the size of output chunks in bytes
+	virtual void setOutputChunkSize( std::size_t outputChunkSize_)
+	{
+		m_outputChunkSize = outputChunkSize_;
+	}
+
+private:
+	std::string m_lastError;		///< Error operation for the client
+	proc::ExecContext* m_execContext;	///< The reference to the execution context of the connection
+	types::DoctypeInfoR m_doctypeinfo;	///< Document type information
+	std::size_t m_outputChunkSize;		///< Hint for the size of output chunks
 };
 
 typedef boost::shared_ptr<CommandHandler> CommandHandlerR;
 
-}}
 
+/// \class CommandHandlerUnit
+/// \brief Class that defines a command handler class and is able to create instances of it
+class CommandHandlerUnit
+{
+public:
+	/// \brief Destructor
+	virtual ~CommandHandlerUnit(){}
+
+	/// \brief Load all configured programs
+	virtual bool loadPrograms( const proc::ProcessorProviderInterface* provider)=0;
+
+	/// \brief Get the list of all commands inplemented by this command handler
+	virtual std::vector<std::string> commands() const=0;
+
+	/// \brief Create an instance of this command handler
+	virtual CommandHandler* createCommandHandler( const std::string& cmdname, const std::string& docformat)=0;
+};
+
+/// \brief Command handler unit reference
+typedef boost::shared_ptr<CommandHandlerUnit> CommandHandlerUnitR;
+
+
+}}//namespace
 #endif
 

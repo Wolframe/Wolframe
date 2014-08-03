@@ -138,7 +138,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 	
 	sword status;
 
-	status = OCIEnvCreate( &envhp, OCI_DEFAULT, (dvoid *)0,
+	status = OCIEnvCreate( &envhp, OCI_THREADED, (dvoid *)0,
 		0, 0, 0, 0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
 	
@@ -212,7 +212,10 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 			status = OCIStmtFetch( stmthp, errhp, 1, 0, 0 );
 		}
   
-		if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+		if( stmthp ) {
+			(void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+			stmthp = 0;
+		}
 		
 		// Drop the tables
 		for ( std::vector< std::string >::const_iterator it = tables.begin();
@@ -234,7 +237,10 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 				NULL, NULL, OCI_DEFAULT );
 			if( status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO ) goto cleanup;
 
-			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+			if( stmthp ) {
+				(void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+				stmthp = 0;
+			}
 		}
 	}
 
@@ -288,7 +294,10 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 				NULL, NULL, OCI_DEFAULT );
 			if( status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO ) goto cleanup;
 
-			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+			if( stmthp ) {
+				(void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+				stmthp = 0;
+			}
 		}
 	}
 
@@ -360,7 +369,10 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 				NULL, NULL, OCI_DEFAULT );
 			if( status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO ) goto cleanup;
 
-			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+			if( stmthp ) {
+				(void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+				stmthp = 0;
+			}
 			
 			dbcmd.clear( );
 		}
@@ -380,8 +392,8 @@ cleanup:
 	if( authp ) (void)OCIHandleFree( authp, OCI_HTYPE_SESSION );
 	if( svchp ) (void)OCIHandleFree( svchp, OCI_HTYPE_SVCCTX );
 	if( srvhp ) (void)OCIHandleFree( srvhp, OCI_HTYPE_SERVER );
-	if( envhp ) (void)OCIHandleFree( envhp, OCI_HTYPE_ENV );
 	if( errhp ) (void)OCIHandleFree( errhp, OCI_HTYPE_ERROR );
+	if( envhp ) (void)OCIHandleFree( envhp, OCI_HTYPE_ENV );
 
 	if( status != OCI_SUCCESS ) {
 		throw std::runtime_error( errmsg );
@@ -411,7 +423,7 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 	
 	sword status;
 
-	status = OCIEnvCreate( &envhp, OCI_DEFAULT, (dvoid *)0,
+	status = OCIEnvCreate( &envhp, OCI_THREADED, (dvoid *)0,
 		0, 0, 0, 0, (dvoid **)0 );
 	if( status != OCI_SUCCESS ) goto cleanup;
 	
@@ -600,7 +612,10 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 			(void)free( data );
 			(void)free( errcode );
 
-			if( stmthp ) (void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+			if( stmthp ) {
+				(void)OCIHandleFree( stmthp, OCI_HTYPE_STMT );
+				stmthp = 0;
+			}
 
 		} // foreach table
 	} // end of scope
@@ -619,23 +634,18 @@ cleanup:
 	if( authp ) (void)OCIHandleFree( authp, OCI_HTYPE_SESSION );
 	if( svchp ) (void)OCIHandleFree( svchp, OCI_HTYPE_SVCCTX );
 	if( srvhp ) (void)OCIHandleFree( srvhp, OCI_HTYPE_SERVER );
-	if( envhp ) (void)OCIHandleFree( envhp, OCI_HTYPE_ENV );
 	if( errhp ) (void)OCIHandleFree( errhp, OCI_HTYPE_ERROR );
+	if( envhp ) (void)OCIHandleFree( envhp, OCI_HTYPE_ENV );
 
 	if( status != OCI_SUCCESS && status != OCI_NO_DATA ) {
 		throw std::runtime_error( errmsg );
 	}
 }
 
-void OracleTestConstructor::createTestDatabase( const OracleTestConfig& cfg )
+config::ConfigurationNode OracleTestConfig::extractMyNodes( const config::ConfigurationNode& pt )
 {
-	createTestDatabase_( cfg.host(), cfg.port(), cfg.user(), cfg.password(), cfg.dbName(), cfg.input_filename());
-}
-
-config::ConfigurationTree OracleTestConfig::extractMyNodes( const config::ConfigurationTree& pt )
-{
-	boost::property_tree::ptree rt;
-	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
+	config::ConfigurationNode rt;
+	config::ConfigurationNode::const_iterator pi = pt.begin(), pe = pt.end();
 
 	for ( ; pi != pe; ++pi )	{
 		if ( boost::algorithm::iequals( pi->first, "inputfile" ))
@@ -656,9 +666,15 @@ void OracleTestConfig::setMyCanonicalPathes( const std::string& referencePath )
 		m_dump_filename = utils::getCanonicalPath( m_dump_filename, referencePath );
 }
 
-void OracleTestConfig::dump_database()
+
+void OracleTestDatabaseInitializer::initDatabase()
 {
-	dumpDatabase_( host(), port(), user(), password(), dbName(), m_dump_filename);
+	createTestDatabase_( m_host, m_port, m_user, m_password, m_dbname, m_input_filename);
+}
+
+void OracleTestDatabaseInitializer::dumpDatabase()
+{
+	dumpDatabase_( m_host, m_port, m_user, m_password, m_dbname, m_dump_filename);
 }
 
 

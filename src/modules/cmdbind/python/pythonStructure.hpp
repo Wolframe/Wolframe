@@ -41,7 +41,6 @@ Project Wolframe.
 #include <string>
 #include <ostream>
 #include <boost/shared_ptr.hpp>
-#include <Python.h>
 
 namespace _Wolframe {
 namespace langbind {

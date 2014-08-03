@@ -9,19 +9,21 @@ testdata="
 LoadModules
 {
 	module `cmd/MODULE mod_db_sqlite3test`
+	module `cmd/MODULE mod_command_tdl`
 	module `cmd/MODULE mod_normalize_number`
 	module `cmd/MODULE mod_normalize_string`
 	module `cmd/MODULE mod_command_directmap`
 	module `cmd/MODULE mod_ddlcompiler_simpleform`
+	module `cmd/MODULE mod_datatype_bcdnumber`
 }
 Database
 {
 	SQliteTest
 	{
-		identifier testdb
-		file test.db
-		dumpfile DBDUMP
-		inputfile DBDATA
+		Identifier testdb
+		File test.db
+		DumpFile DBDUMP
+		inputFile DBDATA
 	}
 }
 Processor
@@ -41,7 +43,7 @@ Processor
 	}
 }
 **file: test.dmap
-COMMAND schema_select_task_by_id CALL test_transaction RETURN STANDALONE doc;
+COMMAND schema_select_task_by_id CALL test_transaction RETURN SKIP doc {standalone='yes',root='doc'};
 **file: DBDATA
 `cat program/schema_select_task_by_id.sql`
 **file:DBPRG.tdl

@@ -30,67 +30,58 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file appdevel/normalizeModuleMacros.hpp
-///\brief Macros for defining normalization and validaton function module
-#include "module/normalizeFunctionBuilder.hpp"
-#include "logger-v1.hpp"
+/// \file appdevel/normalizeModuleMacros.hpp
+/// \brief Macros for defining normalization and validaton function module
+#include "appdevel/module/normalizeFunctionBuilder.hpp"
+#include "types/normalizeFunction.hpp"
+#include "types/variant.hpp"
+#include <boost/shared_ptr.hpp>
 
-//\brief Marks the start of the Wolframe C++ form function module after the includes section.
-#define NORMALIZER_MODULE(NAME,DESCRIPTION)\
-	static const char* _Wolframe__moduleName()\
+#define WF_NORMALIZER_RESOURCE(RESOURCECLASS)\
+struct macro__WF_NORMALIZER_RESOURCE__ ## RESOURCECLASS\
+{\
+	static const boost::shared_ptr<RESOURCECLASS>& get()\
 	{\
-		return NAME;\
-	}\
-	static const char* _Wolframe__moduleDescription()\
-	{\
-		return DESCRIPTION;\
-	}\
-	static _Wolframe::types::NormalizeResourceHandle* _Wolframe__createResourceHandle()\
-	{\
-		return 0;\
-	}\
-	static _Wolframe::module::NormalizeFunctionDef _Wolframe__normalizeFunctions[] =\
-	{
-
-//\brief Same as NORMALIZER_MODULE but including a singleton resource class (RESOURCECLASS)
-#define NORMALIZER_MODULE_WITH_RESOURCE(NAME,DESCRIPTION,RESOURCECLASS)\
-	static const char* _Wolframe__moduleName()\
-	{\
-		return NAME;\
-	}\
-	static const char* _Wolframe__moduleDescription()\
-	{\
-		return DESCRIPTION;\
-	}\
-	static _Wolframe::types::NormalizeResourceHandle* _Wolframe__createResourceHandle()\
-	{\
-		return new RESOURCECLASS();\
-	}\
-	static _Wolframe::module::NormalizeFunctionDef _Wolframe__normalizeFunctions[] =\
-	{
-
-
-//\brief Defines normalization function in the NORMALIZER_MODULE section
-#define NORMALIZER_FUNCTION(NAME,CONSTRUCTOR)\
-		{NAME,&CONSTRUCTOR},\
-
-//\brief Defines the end of the NORMALIZER_MODULE section
-#define NORMALIZER_MODULE_END\
-		{0,0}\
-	};\
-	namespace {\
-	struct ModuleImpl\
-	{\
-		static _Wolframe::module::SimpleBuilder* constructor()\
+		static boost::shared_ptr<RESOURCECLASS> rt;\
+		if (!rt.get())\
 		{\
-			return new _Wolframe::module::NormalizeFunctionBuilder( _Wolframe__moduleName(), _Wolframe__normalizeFunctions, &_Wolframe__createResourceHandle);\
+			rt.reset( new RESOURCECLASS());\
+		}\
+		return rt;\
+	}\
+};\
+
+/// \brief Defines normalization function
+#define WF_NORMALIZER(NAME,NORMALIZERCLASS)\
+{\
+	struct Constructor\
+	{\
+		static _Wolframe::types::NormalizeFunction* create( _Wolframe::types::NormalizeResourceHandle*, const std::vector<_Wolframe::types::Variant>& arg)\
+		{\
+			return new NORMALIZERCLASS( arg);\
+		}\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			return new _Wolframe::module::NormalizeFunctionBuilder( "NormalizeFunction_" #NAME, NAME, create);\
 		}\
 	};\
-	}\
-	enum {NofObjects=1};\
-	static _Wolframe::module::createBuilderFunc _Wolframe__objdef[ NofObjects] =\
+	(*this)(&Constructor ::impl);\
+}
+
+/// \brief Defines normalization function
+#define WF_NORMALIZER_WITH_RESOURCE(NAME,NORMALIZERCLASS,RESOURCECLASS)\
+{\
+	struct Constructor\
 	{\
-		ModuleImpl::constructor\
+		static _Wolframe::types::NormalizeFunction* create( _Wolframe::types::NormalizeResourceHandle* reshnd, const std::vector<_Wolframe::types::Variant>& arg)\
+		{\
+			return new NORMALIZERCLASS( reshnd, arg);\
+		}\
+		static _Wolframe::module::BuilderBase* impl()\
+		{\
+			return new _Wolframe::module::NormalizeFunctionBuilder( "NormalizeFunction_" #NAME, NAME, create, macro__WF_NORMALIZER_RESOURCE__ ## RESOURCECLASS::get());\
+		}\
 	};\
-	_Wolframe::module::ModuleEntryPoint entryPoint( 0, _Wolframe__moduleDescription(), 0, 0, NofObjects, _Wolframe__objdef);
+	(*this)(&Constructor ::impl);\
+}
 

@@ -1,5 +1,5 @@
 	<sect2>
-		<title>EBNF of the Transaction Definition Language</title>
+		<title>EBNF of the transaction definition language (TDL)</title>
 
 		<productionset>
 		<title>Tokens</title>

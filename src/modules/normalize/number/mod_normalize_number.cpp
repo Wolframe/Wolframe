@@ -32,18 +32,14 @@
 ************************************************************************/
 ///\file mod_normalize_number.hpp
 ///\brief Module for number normalization and validation functions
-#include "appDevel.hpp"
-#include "numberNormalize.hpp"
+#include "appdevel/normalizeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "integerNormalizeFunction.hpp"
+#include "floatNormalizeFunction.hpp"
 
-using namespace _Wolframe::langbind;
-
-NORMALIZER_MODULE("NumberNormalizer", "normalizers and validators for numbers")
-
-NORMALIZER_FUNCTION(	"integer",	createIntegerNormalizeFunction)
-NORMALIZER_FUNCTION(	"unsigned",	createUnsignedNormalizeFunction)
-NORMALIZER_FUNCTION(	"floatingpoint",createFloatNormalizeFunction)
-NORMALIZER_FUNCTION(	"fixedpoint",	createFixedpointNormalizeFunction)
-
-NORMALIZER_MODULE_END
-
+WF_MODULE_BEGIN( "NumberNormalizer", "normalizers and validators for numbers")
+ WF_NORMALIZER( "integer", _Wolframe::langbind::IntegerNormalizeFunction)
+ WF_NORMALIZER( "unsigned", _Wolframe::langbind::UnsignedNormalizeFunction)
+ WF_NORMALIZER( "floatingpoint", _Wolframe::langbind::FloatNormalizeFunction)
+WF_MODULE_END
 

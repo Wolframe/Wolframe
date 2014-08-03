@@ -56,14 +56,14 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf typed_invoice
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf typed_invoice
 **requires:TEXTWOLF
 **file:wolframe.conf
 LoadModules
 {
 	module ./../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
 	module ./../../src/modules/normalize/number/mod_normalize_number
-	module NOTFOUND:normalize_locale
+	module ./../../src/modules/normalize/locale/mod_normalize_locale
 	module ./../../src/modules/normalize/string/mod_normalize_string
 }
 Processor

@@ -31,31 +31,23 @@
 
 ************************************************************************/
 ///\brief Program mapping wolframe elements to output (code generation)
+#include "prgbind/programLibrary.hpp"
+#include "wolframe.hpp"
+#include "wolfwizardCommandLine.hpp"
+#include "module/moduleInterface.hpp"
+#include "module/moduleDirectory.hpp"
+#include "processor/procProvider.hpp"
+#include "types/variantStruct.hpp"
+#include "types/variantStructDescription.hpp"
 #include <fstream>
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>
-#include "prgbind/programLibrary.hpp"
-#include "wolfwizardCommandLine.hpp"
-#include "module/moduleInterface.hpp"
-#include "processor/procProvider.hpp"
-#include "types/variantStruct.hpp"
-#include "types/variantStructDescription.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace _Wolframe;
-
-///\TODO Not to be defined here
-static const unsigned short APP_MAJOR_VERSION = 0;
-static const unsigned short APP_MINOR_VERSION = 0;
-static const unsigned short APP_REVISION = 5;
-static const unsigned short APP_BUILD = 0;
-
-#define DO_STRINGIFY(x)	#x
-#define STRINGIFY(x)	DO_STRINGIFY(x)
-
 
 struct StackElement
 {
@@ -288,8 +280,14 @@ static void printStructXML( std::ostream& out, const types::VariantStructDescrip
 static void printFormXML( std::ostream& out, const types::Form& form)
 {
 	out << "<form name='" << form.description()->name() << "' " << "ddl='" << form.description()->ddlname() << "'";
-	if (form.description()->xmlRoot()) out << " xmlroot='" << form.description()->xmlRoot() << "'";
 	out << ">" << std::endl;
+	out << "<metadata>" << std::endl;
+	std::vector<types::DocMetaData::Attribute>::const_iterator ai = form.description()->metadata().attributes().begin(), ae = form.description()->metadata().attributes().end();
+	for (; ai != ae; ++ai)
+	{
+		out << "<attribute name='" << ai->name << "'>" << ai->value << "</attribute>" << std::endl;
+	}
+	out << "</metadata>" << std::endl;
 	printStructXML( out, form.description()->begin(), form.description()->end());
 	out << "</form>" << std::endl;
 }
@@ -317,18 +315,13 @@ int main( int argc, char **argv )
 	try
 	{
 		static boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
-		module::ModulesDirectory modDir;
 
-#if defined( DEFAULT_MODULE_LOAD_DIR)
-		config::WolfwizardCommandLine cmdline( argc, argv, execdir.string(), STRINGIFY( DEFAULT_MODULE_LOAD_DIR));
-#else
-		config::WolfwizardCommandLine cmdline( argc, argv, execdir.string(), execdir.string());
-#endif
+		config::WolfwizardCommandLine cmdline( argc, argv, execdir.string());
 		doPrintHelpOnError = false;
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfwizard version ";
-			std::cerr << APP_MAJOR_VERSION << "." << APP_MINOR_VERSION << "." << APP_REVISION << "." << APP_BUILD << std::endl;
+			std::cerr << WOLFRAME_MAJOR_VERSION << "." << WOLFRAME_MINOR_VERSION << "." << WOLFRAME_REVISION << "." << WOLFRAME_BUILD << std::endl;
 			doExit = true;
 		}
 		if (cmdline.printhelp() || cmdline.configfile().empty())
@@ -338,23 +331,19 @@ int main( int argc, char **argv )
 		}
 		if (doExit) return 0;
 
-		if (!LoadModules( modDir, cmdline.modules()))
-		{
-			throw std::runtime_error( "Modules could not be loaded");
-		}
 		proc::ProcProviderConfig providerconf;
-		if (!providerconf.parse( (const config::ConfigurationTree&)cmdline.providerconfig(), "", &modDir))
+		if (!providerconf.parse( cmdline.providerconfig(), "", &cmdline.modulesDirectory()))
 		{
 			throw std::runtime_error( "Processor provider configuration could not be created from command line");
 		}
-		providerconf.setCanonicalPathes( cmdline.referencePath());
+		providerconf.setCanonicalPathes( cmdline.configurationPath());
 		if (!providerconf.check())
 		{
 			throw std::runtime_error( "error in command line. failed to setup a valid processor provider configuration");
 		}
 
 		prgbind::ProgramLibrary* programLibrary = new prgbind::ProgramLibrary();
-		proc::ProcessorProvider* processorProvider = new proc::ProcessorProvider( &providerconf, &modDir, programLibrary);
+		proc::ProcessorProvider* processorProvider = new proc::ProcessorProvider( &providerconf, &cmdline.modulesDirectory(), programLibrary);
 
 		if (!processorProvider->loadPrograms())
 		{

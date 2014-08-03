@@ -35,8 +35,7 @@ Project Wolframe.
 #include "xsltMapper.hpp"
 #include "inputfilterImpl.hpp"
 #include "outputfilterImpl.hpp"
-#include "processor/procProvider.hpp"
-#include "module/filterBuilder.hpp"
+#include "prgbind/programLibrary.hpp"
 #include "utils/fileUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/shared_ptr.hpp>
@@ -62,8 +61,8 @@ struct XsltFilter :public Filter
 	{
 		XsltMapper xsltmapper( stylesheet_, arg);
 		InputFilterImpl impl( xsltmapper);
-		m_inputfilter.reset( new BufferingInputFilter( &impl));
-		m_outputfilter.reset( new OutputFilterImpl( xsltmapper));
+		m_inputfilter.reset( new InputFilterImpl( xsltmapper));
+		m_outputfilter.reset( new OutputFilterImpl( xsltmapper, m_inputfilter->getMetaDataRef()));
 	}
 };
 
@@ -73,7 +72,7 @@ class XsltFilterType
 {
 public:
 	XsltFilterType( const std::string& sourcefile_)
-		:m_ptr(0)
+		:langbind::FilterType("xslt"),m_ptr(0)
 	{
 		m_ptr = xsltParseStylesheetFile( (const xmlChar *)sourcefile_.c_str());
 		if (!m_ptr)
@@ -94,49 +93,45 @@ public:
 	}
 
 private:
-	XsltFilterType( const XsltFilterType&)
+	XsltFilterType( const XsltFilterType& o)
+		:FilterType(o)
 	{
 		throw std::logic_error( "non copyable XsltFilterConstructor");
 	}
 	xsltStylesheetPtr m_ptr;
 };
-
-
-class XsltProgramType
-	:public prgbind::Program
-{
-public:
-	XsltProgramType()
-		:prgbind::Program( prgbind::Program::Function){}
-
-	virtual ~XsltProgramType()
-	{
-		xsltCleanupGlobals();
-	}
-
-	virtual bool is_mine( const std::string& filename) const
-	{
-		boost::filesystem::path p( filename);
-		return p.extension().string() == ".xslt";
-	}
-
-	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
-	{
-		langbind::FilterTypeR fc( new XsltFilterType( filename));
-		std::string filternme( utils::getFileStem(filename));
-		library.defineFilterType( filternme, fc);
-	}
-};
 }//anonymous namespace
 
-prgbind::Program* langbind::createXsltProgramType()
+XsltProgramType::~XsltProgramType()
 {
-	return new XsltProgramType;
+	xsltCleanupGlobals();
+}
+
+bool XsltProgramType::is_mine( const std::string& filename) const
+{
+	boost::filesystem::path p( filename);
+	return p.extension().string() == ".xslt";
+}
+
+void XsltProgramType::loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
+{
+	langbind::FilterTypeR fc( new XsltFilterType( filename));
+	std::string filternme( utils::getFileStem(filename));
+	library.defineFilterType( filternme, fc);
 }
 
 #else
-prgbind::Program* langbind::createXsltProgramType()
+
+XsltProgramType::~XsltProgramType(){}
+
+bool XsltProgramType::is_mine( const std::string& filename) const
 {
-	return 0;
+	return false;
 }
+
+void XsltProgramType::loadProgram( prgbind::ProgramLibrary&, db::Database*, const std::string&)
+{
+	throw std::runtime_error("XSLT support is not built-in (WITH_XSLT)");
+}
+
 #endif

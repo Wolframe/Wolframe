@@ -43,17 +43,21 @@ namespace langbind {
 class Base64DecodeFunction :public types::NormalizeFunction
 {
 public:
-	Base64DecodeFunction(){}
+	Base64DecodeFunction( const std::vector<types::Variant>& arg);
+	Base64DecodeFunction( const Base64DecodeFunction&){}
 	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "decode";}
+	virtual types::NormalizeFunction* copy() const {return new Base64DecodeFunction(*this);}
 };
 
 class Base64EncodeFunction :public types::NormalizeFunction
 {
 public:
-	Base64EncodeFunction(){}
+	Base64EncodeFunction( const std::vector<types::Variant>& arg);
+	Base64EncodeFunction( const Base64DecodeFunction&){}
 	virtual types::Variant execute( const types::Variant& inp) const;
 	virtual const char* name() const {return "encode";}
+	virtual types::NormalizeFunction* copy() const {return new Base64EncodeFunction(*this);}
 };
 
 }}

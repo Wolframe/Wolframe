@@ -9,8 +9,9 @@ PACKAGE_NAME = wolframe
 INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe
+
 
 INCLUDE_DIRS = \
 	-I. \
@@ -18,8 +19,7 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
-	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
-	-lboost_filesystem
+	-lwfsingleton -lwolframe
 
 STATIC_LIB = libwolframe_database.a
 
@@ -29,22 +29,12 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
+	vm/programImage.o \
+	vm/programInstance.o \
 	transaction.o \
-	transactionInput.o \
-	transactionOutput.o \
-	transactionFunction.o \
-	transactionFunctionDescription.o \
-	transactionfunction/TagTable.o \
-	transactionfunction/Path.o \
-	transactionfunction/PreProcessCommand.o \
-	transactionfunction/DatabaseCommand.o \
-	transactionfunction/InputStructure.o \
-	transactionfunction/ResultStructure.o \
-	transactionfunction/ResultIterator.o \
-	transactionfunction/ResultFilter.o \
-	loadTransactionProgram.o \
+	vmTransactionInput.o \
+	vmTransactionOutput.o \
 	databaseLanguage.o \
-	transactionExecStatemachine.o \
 	baseStatement.o \
 	substitutingStatement.o
 

@@ -1,0 +1,101 @@
+<sect2>
+<title>Sqlite3</title>
+<para>This section explains how to configure a Sqlite database.
+</para>
+
+<sect3>
+<title>Requirements</title>
+<para>In order to use an Sqlite3 database in Wolframe you have to configure the 
+loading of the module mod_db_sqlite3 in the LoadModules section 
+of your configuration. The database file configured must have been created
+before.</para>
+</sect3>
+<sect3>
+<title>Configuration settings</title>
+<para>The following table shows the configuration settings for a Sqlite3 database
+in Wolframe.
+</para>
+<table frame="all" width="100%">
+	<title>Sqlite3 database configuration settings</title>
+	<tgroup cols="3">
+	<colspec colnum="1" colname="col1" colwidth="1*"/>
+	<colspec colnum="2" colname="col2" colwidth="1*"/>
+	<colspec colnum="3" colname="col3" colwidth="3*"/>
+	<thead>
+		<row>
+			<entry>Name</entry>
+			<entry>Parameter</entry>
+			<entry>Description</entry>
+		</row>
+	</thead>
+	<tbody>
+		<row>
+			<entry>Identifier</entry>
+			<entry>identifier</entry>
+			<entry>Database identifier used to reference this database.</entry>
+		</row>
+		<row>
+			<entry>File</entry>
+			<entry>filepath</entry>
+			<entry>Store the SQLite database into the file specified as argument.
+			This parameter is required and the file must have been created before.</entry>
+		</row>
+		<row>
+			<entry>Connections</entry>
+			<entry>number</entry>
+			<entry>Number of simultaneous connections to the database.
+			Specifies the size of the pool of connections used
+			for database transactions. The default number of connections
+			is 4 if not configured.</entry>
+		</row>
+		<row>
+			<entry>ForeignKeys</entry>
+			<entry><code>yes</code> or <code>no</code></entry>
+			<entry>Setting <code>foreignKeys</code> to <code>yes</code>
+			enables referential integrity in the database. This is 
+			actually the same as executing 'PRAGMA foreign_keys=true'.
+			The default is <code>yes</code>.</entry>
+		</row>
+		<row>
+			<entry>Profiling</entry>
+			<entry><code>yes</code> or <code>no</code></entry>
+			<entry>Shows the SQL commands being executed and their 
+			execution time in milliseconds. Default is <code>no</code>.</entry>
+		</row>
+		<row>
+			<entry>Extension</entry>
+			<entry>filename</entry>
+			<entry>Loads the SQLite3 extension module specified
+			as argument. This is useful to load native code into 
+			SQLite3 imlementing for instance new database functions.
+			Have a look at the SQLite3 'Run-Time Loadable Extensions'
+			section at
+			<ulink url="http://www.sqlite.org/loadext.html"/>.
+			</entry>
+		</row>
+	</tbody>
+	</tgroup>
+</table>
+</sect3>
+<sect3>
+<title>Example configuration</title>
+<para>Here follows an example Sqlite3 database configuration:
+</para>
+
+<programlisting language='text'>
+Database
+{
+    SQLite
+    {
+        Identifier    sqlitedb
+        File          sqlite.db
+        ForeignKeys   yes
+        Profiling     no
+        Connections   3
+        Extension     sqlite_module.so
+    }
+}
+</programlisting>
+</sect3>
+</sect2>
+

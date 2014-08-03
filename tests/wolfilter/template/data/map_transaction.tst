@@ -12,6 +12,7 @@ testdata="
 LoadModules
 {
 	module ../wolfilter/modules/database/testtrace/mod_db_testtrace
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 }
 Database
 {
@@ -29,8 +30,7 @@ Processor
 }
 **file:DBIN.tdl
 TRANSACTION test_transaction
-RESULT INTO doc
 BEGIN
-	INTO task FOREACH //task DO run( title);
+	INTO task FOREACH //task DO SELECT run( title);
 END"
 . ./output_tst_all.sh

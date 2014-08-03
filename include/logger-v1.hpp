@@ -30,10 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-/// \file logger.hpp
-/// \brief Top-level include file for logging
-///
+/// \file logger-v1.hpp
+/// \brief Top-level include file for logging (version 1)
 
 #ifndef _LOGGER_HPP_INCLUDED
 #define _LOGGER_HPP_INCLUDED
@@ -42,54 +40,56 @@
 #include "logger/logSyslogFacility.hpp"
 #include "logger/logError.hpp"
 #include "logger/logBackend.hpp"
-#include "logger/logObject.hpp"
 
 #include <sstream>
 
 namespace _Wolframe {
 namespace log {
 
+/// Logger abstraction configurable to print to multiple backends
 class Logger {
 public:
 	/// create a logger and connect it to a backend, typically
 	/// not called directly
-	Logger( LogBackend& backend ) : logBk_( backend )	{}
-	Logger( LogBackend* backend ) :	logBk_( *backend )	{}
+	Logger( LogBackend& backend ) : m_logBk( backend )	{}
+	Logger( LogBackend* backend ) :	m_logBk( *backend )	{}
 
 	~Logger( )	{
-		logBk_.log( msgLevel_, os_.str( ) );
+		m_logBk.log( m_msgLevel, m_os.str( ) );
 	}
 
 	inline Logger& Get( LogLevel::Level level )	{
-		msgLevel_ = level;
+		m_msgLevel = level;
 		return *this;
 	}
 
-	template<typename T> friend Logger& operator<<( Logger& logger, T thing );
-	friend Logger& operator<<( Logger& logger, LogError e );
+	template<typename T> friend Logger& operator<< ( Logger& logger, T thing );
+	friend Logger& operator<< ( Logger& logger, LogError e );
 
 protected:
-	std::ostringstream os_;
+	std::ostringstream m_os;
 
 private:
-	LogBackend&	logBk_;
-	LogLevel::Level	msgLevel_;
+	LogBackend&	m_logBk;
+	LogLevel::Level	m_msgLevel;
 
 	Logger( );
 	Logger( const Logger& );
 	Logger& operator= ( const Logger& );
 };
 
-/// template functions for logging, default is we search for the << operator
+
+/// \brief template functions for logging, default is we search for the << operator
 /// and log with this one..
 template <typename T>
-Logger& operator<<( Logger& logger, T t )
+Logger& operator<< ( Logger& logger, T t )
 {
-	logger.os_ << t;
+	logger.m_os << t;
 	return logger;
 }
 
 }} // namespace _Wolframe::log
+
 
 // shortcut macros
 #define LOG_DATA2	if ( _Wolframe::log::LogBackend::instance().minLogLevel() > _Wolframe::log::LogLevel::LOGLEVEL_DATA2 ) ; \

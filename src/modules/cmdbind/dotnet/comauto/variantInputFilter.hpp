@@ -29,12 +29,12 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file comauto/variantInputFilter.hpp
-//\brief InputFilter implementation for MSDN variant type
+///\file comauto/variantInputFilter.hpp
+///\brief InputFilter implementation for MSDN variant type
 #ifndef _Wolframe_COM_AUTOMATION_VARIANT_INPUT_FILTER_HPP_INCLUDED
 #define _Wolframe_COM_AUTOMATION_VARIANT_INPUT_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "serialize/mapContext.hpp"
+#include "serialize/flags.hpp"
 #include <vector>
 #include <objbase.h>
 
@@ -46,14 +46,14 @@ struct tagTYPEATTR;
 namespace _Wolframe {
 namespace comauto {
 
-//\brief Forward declarations
+///\brief Forward declarations
 class TypeLib;
 
 class VariantInputFilter
 	:public langbind::TypedInputFilter
 {
 public:
-	VariantInputFilter( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Context::Flags flags_);
+	VariantInputFilter( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Flags::Enum flags_);
 	VariantInputFilter( const VariantInputFilter& o);
 
 	virtual ~VariantInputFilter();
@@ -81,9 +81,9 @@ private:
 		~StackElem();
 	};
 	std::vector<StackElem> m_stk;
-	std::string m_elembuf;
+	types::Variant m_elembuf;
 	const comauto::TypeLib* m_typelib;
-	serialize::Context::Flags m_flags;
+	serialize::Flags::Enum m_flags;
 	bool m_done;
 };
 

@@ -76,25 +76,29 @@ public:
 	void addList( SocketConnectionList< SSLconnection_ptr >* lst );
 	void removeList( SocketConnectionList< SSLconnection_ptr >* lst );
 #endif // WITH_SSL
-	bool isFull();
 	bool incConnCount()
 	{
 		boost::mutex::scoped_lock lock( m_mutex );
-		assert( m_connCount >= 0 );
-		if ( m_connCount < m_maxConn )	{
-			m_connCount++;
-			return true;
+		if ( m_maxConn > 0 )	{
+			if ( m_connCount < m_maxConn )	{
+				m_connCount++;
+				return true;
+			}
+			else	{
+				LOG_TRACE << "Maximum global number of connections (" << m_maxConn << ") exceeded. Requested " << m_connCount << "connection(s)";
+				return false;
+			}
 		}
 		else	{
-			LOG_TRACE << "Maximum global number of connections (" << m_maxConn << ") exceeded. Requested " << m_connCount << "connection(s)";
-			return false;
+			m_connCount++;
+			return true;
 		}
 	}
 
 	void decConnCount()
 	{
 		boost::mutex::scoped_lock lock( m_mutex );
-		assert( m_connCount >= 0 );
+		assert( m_connCount > 0 );
 			m_connCount--;
 	}
 
@@ -103,8 +107,8 @@ private:
 #ifdef WITH_SSL
 	std::list< SocketConnectionList< SSLconnection_ptr >* >	m_SSLconnList;
 #endif // WITH_SSL
-	unsigned						m_maxConn;
-	long int						m_connCount;
+	std::size_t						m_maxConn;
+	std::size_t						m_connCount;
 	boost::mutex						m_mutex;
 };
 
@@ -133,7 +137,6 @@ public:
 		long int	noConn;
 		{
 			boost::mutex::scoped_lock lock( m_mutex );
-			assert( m_connCount >= 0 );
 			if ( m_maxConn > 0 )	{
 				if ( m_connCount < m_maxConn )	{
 					if ( m_globalList.incConnCount())	{
@@ -201,8 +204,8 @@ public:
 
 private:
 	std::list< T >		m_connList;
-	long int		m_connCount;
-	unsigned int		m_maxConn;
+	std::size_t		m_connCount;
+	std::size_t		m_maxConn;
 	GlobalConnectionList&	m_globalList;
 	boost::mutex		m_mutex;
 };
@@ -224,6 +227,9 @@ public:
 
 	/// Start the first asynchronous operation for the connection.
 	void start();
+
+	/// Send a denial message and shut the connection down
+	void deny_connection();
 
 	/// Unregister the connection from the list of active connections
 	void unregister()	{
@@ -271,6 +277,9 @@ public:
 	/// Start the first asynchronous operation for the connection.
 	void start();
 
+	/// Send a denial message and shut the connection down
+	void deny_connection();
+
 	/// Unregister the connection from the list of active connections
 	void unregister()	{
 		if ( m_connList )	{
@@ -295,6 +304,7 @@ private:
 
 	/// List of connections to which it belongs
 	SocketConnectionList< SSLconnection_ptr >* m_connList;
+	bool m_connection_denied;
 };
 
 #endif // WITH_SSL

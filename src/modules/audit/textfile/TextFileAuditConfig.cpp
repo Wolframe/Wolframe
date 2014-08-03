@@ -35,7 +35,7 @@
 //
 
 #include "TextFileAudit.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "utils/fileUtils.hpp"
 
@@ -45,15 +45,16 @@
 namespace _Wolframe {
 namespace AAAA {
 
-bool TextFileAuditConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+bool TextFileAuditConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 			     const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace config;
 
 	bool retVal = true;
 	bool reqDefined = false;
+	m_config_pos = pt.position();
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "required" ))	{
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_required, Parser::BoolDomain(), &reqDefined ))
 				retVal = false;
@@ -65,7 +66,7 @@ bool TextFileAuditConfig::parse( const config::ConfigurationTree& pt, const std:
 		}
 		else	{
 			LOG_WARNING << logPrefix() << "unknown configuration option: '"
-					<< L1it->first << "'";
+					<< L1it->first << "' " << L1it->second.position().logtext();
 		}
 	}
 	return retVal;

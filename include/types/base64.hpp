@@ -49,12 +49,15 @@ inline size_t encodedSize( size_t dataSize, unsigned short lineLength )
 }
 
 inline int encode( const void* data, size_t dataSize,
-		   char* encoded, size_t encodedMaxSize, unsigned short lineLength )
+		   char* encoded, size_t encodedMaxSize, unsigned short lineLength = 72 )
 {
-	return base64_encode(  data, dataSize, encoded, encodedMaxSize, lineLength );
+	return base64_encode( data, dataSize, encoded, encodedMaxSize, lineLength );
 }
 
+std::string encode( const void* data, size_t dataSize, unsigned short lineLength );
 
+/// \class Encoder
+/// \brief Base64 encoder class for chunkwise encoding
 class Encoder
 {
 	static const size_t BUFFERSIZE = 512;
@@ -82,34 +85,17 @@ public:
 		return base64_encodeEndChunk( &m_state, encoded, encodedMaxSize );
 	}
 
-	void encode( std::istream& input, std::ostream& output )
-	{
-		unsigned char* plain = new unsigned char[ m_bufferSize ];
-		char* encoded = new char[ 2 * m_bufferSize ];
-		int dataSize;
-		int codedSize;
-
-		do	{
-			input.read( (char *)plain, m_bufferSize );
-			dataSize = input.gcount();
-			//
-			codedSize = encodeChunk( plain, dataSize, encoded, 2 * m_bufferSize );
-			output.write( encoded, codedSize );
-		} while ( input.good() && dataSize > 0 );
-
-		codedSize = encodeEndChunk( encoded, 2 * m_bufferSize );
-		output.write( encoded, codedSize );
-		//
-		base64_resetEncodeState( &m_state );
-
-		delete [] encoded;
-		delete [] plain;
-	}
+	void encode( std::istream& input, std::ostream& output );
 
 private:
-
 	base64_EncodeState	m_state;
 	const size_t		m_bufferSize;
+
+#ifdef _WIN32
+// prevents C4512 on Windows (the m_bufferSize is const in the class)
+private:
+	Encoder& operator=( const Encoder &o );
+#endif
 };
 
 
@@ -118,6 +104,14 @@ inline int decode( const char* encoded, size_t encodedSize, void* data, size_t d
 	return base64_decode( encoded, encodedSize, data, dataMaxSize );
 }
 
+inline int decode( const std::string encoded, void* data, size_t dataMaxSize )
+{
+	return base64_decode( encoded.data(), encoded.length(), data, dataMaxSize );
+}
+
+
+/// \class Decoder
+/// \brief Base64 decoder class for chunkwise decoding
 class Decoder
 {
 	static const size_t BUFFERSIZE = 512;
@@ -138,29 +132,17 @@ public:
 		return base64_decodeChunk( &m_state, encoded, encodedSize, data, dataMaxSize );
 	}
 
-	void decode( std::istream& input, std::ostream& output )
-	{
-		char* encoded = new char[ m_bufferSize ];
-		unsigned char* data = new unsigned char[ m_bufferSize ];
-		int encodedSize;
-		int dataSize;
+	void decode( std::istream& input, std::ostream& output );
 
-		do
-		{
-			input.read( encoded, m_bufferSize );
-			encodedSize = input.gcount();
-			dataSize = decode( encoded, encodedSize, data, m_bufferSize );
-			output.write( (const char*)data, dataSize );
-		} while ( input.good() && encodedSize > 0 );
-
-		base64_initDecodeState( &m_state );
-
-		delete [] encoded;
-		delete [] data;
-	}
 private:
 	base64_DecodeState	m_state;
 	const size_t		m_bufferSize;
+
+#ifdef _WIN32
+// prevents C4512 on Windows (the m_bufferSize is const in the class)
+private:
+	Decoder& operator=( const Decoder &o );
+#endif
 };
 
 }} // namespace _Wolframe::base64

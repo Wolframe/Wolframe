@@ -27,16 +27,14 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	trimNormalizeFunction.obj \
-	asciiNormalizeFunction.obj \
-	stringNormalize.obj \
-	mod_normalize_string.obj
+	asciiNormalizeFunction.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:StringNormalize.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_normalize_string.obj
+	$(LINK) /dll /def:mod_normalize_string.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

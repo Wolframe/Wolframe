@@ -1,0 +1,58 @@
+TOPDIR = ..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I$(TOPDIR)\src \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\3rdParty\gtest\include \
+	/I$(TOPDIR)\src\modules\authentication\textfile
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Advapi32.lib Ws2_32.lib \
+	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib
+
+CPP_OBJS = \
+	$(TOPDIR)\src\modules\authentication\textfile\TextFileAuth.obj \
+	$(TOPDIR)\src\modules\authentication\textfile\passwdFile.obj
+
+TEST_CPP_BINS = \
+	passwdHashTest.exe \
+	passwdFileTest.exe \
+	textFileTest.exe \
+	textFileThrow.exe \
+	textFilePwdChange.exe
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+textFileThrow.exe: textFileThrow.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
+textFileTest.exe: textFileTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
+textFilePwdChange.exe: textFilePwdChange.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
+passwdHashTest.exe: passwdHashTest.obj $(CPP_OBJS)
+passwdFileTest.exe: passwdFileTest.obj $(CPP_OBJS)
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:
+	@-passwdHashTest
+	@-passwdFileTest
+	@-textFileTest
+	@-textFileThrow
+	@-textFilePwdChange

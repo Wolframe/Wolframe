@@ -16,9 +16,12 @@ INCLUDE_CXXFLAGS += \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lwfsingleton \
+	-lwolframe \
 	$(CJSON_LIBS)
 
 DYNAMIC_MODULE = mod_filter_cjson.so
@@ -26,8 +29,7 @@ DYNAMIC_MODULE = mod_filter_cjson.so
 CPP_OBJS = \
 	inputfilterImpl.o \
 	outputfilterImpl.o \
-	cjson_filter.o \
-	mod_filter_cjson.o
+	cjson_filter.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

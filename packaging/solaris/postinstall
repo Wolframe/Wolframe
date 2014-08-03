@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if test ! -d /var/run/wolframe; then
+	mkdir /var/run/wolframe
+	chown wolframe:wolframe /var/run/wolframe
+	chmod 0755 /var/run/wolframe
+fi
+
+if test ! -d /var/log/wolframe; then
+	mkdir /var/log/wolframe
+	chown wolframe:wolframe /var/log/wolframe
+	chmod 0755 /var/log/wolframe
+fi
+
+exit 0

@@ -35,6 +35,7 @@
 
 #ifndef _PROCESSOR_PROVIDER_HPP_INCLUDED
 #define _PROCESSOR_PROVIDER_HPP_INCLUDED
+#include "processor/procProviderInterface.hpp"
 #include "langbind/formFunction.hpp"
 #include "filter/typedfilter.hpp"
 #include "filter/filter.hpp"
@@ -48,41 +49,78 @@ namespace proc {
 
 /// Processor provider
 class ProcessorProvider
+	:public ProcessorProviderInterface
 {
 public:
 	ProcessorProvider(){}
-	~ProcessorProvider(){}
+	virtual ~ProcessorProvider(){}
 
-	const types::NormalizeFunction* normalizeFunction( const std::string&) const
+	virtual cmdbind::CommandHandler* cmdhandler( const std::string& /*command*/, const std::string& /*docformat*/) const
+	{
+		throw std::logic_error( "Assertion failed: Called undefined function");
+	}
+
+	virtual bool existcmd( const std::string& /*command*/) const
+	{
+		throw std::logic_error( "Assertion failed: Called undefined function");
+	}
+
+	virtual db::Database* transactionDatabase() const
+	{
+		throw std::logic_error( "Assertion failed: Called undefined function");
+	}
+
+	virtual db::Transaction* transaction( const std::string& /*name*/) const
+	{
+		throw std::logic_error( "Assertion failed: Called undefined function");
+	}
+
+	virtual const types::NormalizeFunction* normalizeFunction( const std::string& /*name*/) const
 	{
 		return 0;
 	}
 
-	const langbind::FormFunction* formFunction( const std::string& name) const
+	virtual const types::NormalizeFunctionType* normalizeFunctionType( const std::string& ) const
+	{
+		throw std::logic_error( "Assertion failed: Called undefined function");
+	}
+
+	virtual const types::CustomDataType* customDataType( const std::string& ) const
+	{
+		throw std::logic_error( "Assertion failed: Called undefined function");
+	}
+
+	virtual const langbind::FormFunction* formFunction( const std::string& name) const
 	{
 		std::map<std::string,langbind::FormFunctionR>::const_iterator fi = m_functionmap.find( name);
 		if (fi == m_functionmap.end()) return 0;
 		return fi->second.get();
 	}
 
-	void defineFormFunction( const std::string& name_, const langbind::FormFunctionR& func_)
+	virtual void defineFormFunction( const std::string& name_, const langbind::FormFunctionR& func_)
 	{
 		m_functionmap[ name_] = func_;
 	}
 
-	const types::FormDescription* formDescription( const std::string&) const
+	virtual const types::FormDescription* formDescription( const std::string&) const
 	{
 		return 0;
 	}
 
-	langbind::Filter* filter( const std::string& , const std::vector<langbind::FilterArgument>&) const
+	virtual const langbind::FilterType* filterType( const std::string& /*name*/) const
 	{
 		return 0;
 	}
 
-	langbind::Filter* filter( const std::string&) const
+	virtual cmdbind::DoctypeDetector* doctypeDetector() const
 	{
 		return 0;
+	}
+
+	virtual const std::string& referencePath() const
+	{
+		static const std::string nopath;
+		return nopath;
 	}
 
 private:

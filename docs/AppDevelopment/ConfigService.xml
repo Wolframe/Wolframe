@@ -1,0 +1,111 @@
+<sect1>
+	<title>Service or daemon configuration</title>
+	<para>
+	The service configuration is depending on the platform you run 
+	the Wolframe server. We show the configuration for Windows and 
+	Unix in different sections:
+	</para>
+	<sect2>
+	<title>Windows</title>
+	<para>
+	The service configuration for Windows is defined in the section
+	<code>Service</code>. The following table describes the settings
+	in the service configuration for Windows. The service configuration
+	for Windows is only read at installation time. Changing them later
+	in the configuration file has no effect.
+	<table frame="all" width="100%">
+		<title>Windows service configuration settings</title>
+		<tgroup cols="3">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="1*"/>
+		<colspec colnum="3" colname="col3" colwidth="2*"/>
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Arguments</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+
+		<tbody>
+			<row>
+				<entry>ServiceName</entry>
+				<entry>string</entry>
+				<entry>Parameter for service registration. Defines the name of the service</entry>
+			</row>
+			<row>
+				<entry>DisplayName</entry>
+				<entry>string</entry>
+				<entry>Parameter for service registration. Defines the display name of the service</entry>
+			</row>
+			<row>
+				<entry>Description</entry>
+				<entry>string</entry>
+				<entry>Parameter for service registration. Defines the description of the service</entry>
+			</row>
+		</tbody>
+		</tgroup>
+	</table>
+	Example configuration:
+	<programlisting language='text'>
+Service {
+    ServiceName wolframe
+    DisplayName "Wolframe Daemon"
+    Description "Wolframe Daemon"
+}
+	</programlisting>
+	</para>
+	</sect2>
+
+	<sect2>
+	<title>Unix</title>
+	<para>
+	The daemon configuration for Unix systems is defined in the section
+	<code>Daemon</code>. The following table describes the settings
+	in a daemon configuration:
+	<table frame="all" width="100%">
+		<title>Unix daemon configuration settings</title>
+		<tgroup cols="3">
+		<colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="1*"/>
+		<colspec colnum="3" colname="col3" colwidth="2*"/>
+		<thead>
+			<row>
+				<entry>Name</entry>
+				<entry>Arguments</entry>
+				<entry>Description</entry>
+			</row>
+		</thead>
+
+		<tbody>
+			<row>
+				<entry>User</entry>
+				<entry>identifier</entry>
+				<entry>Defines the name of the user the Wolframe server should run as.</entry>
+			</row>
+			<row>
+				<entry>Group</entry>
+				<entry>identifier</entry>
+				<entry>Defines the name of the group of the user the Wolframe server should run as.</entry>
+			</row>
+			<row>
+				<entry>PidFile</entry>
+				<entry>filepath</entry>
+				<entry>Defines the path to the file used as pid file</entry>
+			</row>
+			
+		</tbody>
+		</tgroup>
+	</table>
+	Example configuration:
+	<programlisting language='text'>
+Daemon {
+    User    wolframe
+    Group   wolframe
+    PidFile /var/run/wolframed.pid
+}
+	</programlisting>
+	</para>
+	</sect2>
+</sect1>
+

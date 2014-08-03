@@ -1,3 +1,35 @@
+/************************************************************************
+Copyright (C) 2011 - 2014 Project Wolframe.
+All rights reserved.
+
+This file is part of Project Wolframe.
+
+Commercial Usage
+Licensees holding valid Project Wolframe Commercial licenses may
+use this file in accordance with the Project Wolframe
+Commercial License Agreement provided with the Software or,
+alternatively, in accordance with the terms contained
+in a written agreement between the licensee and Project Wolframe.
+
+GNU General Public License Usage
+Alternatively, you can redistribute this file and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Wolframe is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Wolframe. If not, see <http://www.gnu.org/licenses/>.
+
+If you have questions regarding the use of this file, please contact
+Project Wolframe.
+
+************************************************************************/
+///\file SQLiteStatement.cpp
 #include "SQLiteStatement.hpp"
 #include "types/variant.hpp"
 #include "types/datetime.hpp"
@@ -73,7 +105,11 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 {
 	// does boundary checking
 	BaseStatement::bind( idx, value );
+	bindVariant( idx, value );
+}
 
+void SQLiteStatement::bindVariant( const unsigned int idx, const types::Variant &value )
+{
 	switch (value.type())
 	{
 		case types::Variant::Null:
@@ -113,25 +149,25 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 			
 		case types::Variant::Timestamp:
 		{
-			/*[PF:TODO] Implementation*/
-			m_data.push_back( value.tostring());
+			m_data.push_back( types::DateTime( value.totimestamp()).tostring( types::DateTime::StringFormat::ExtendedISOdateTime));
 			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
+			break;
 		}
 		case types::Variant::BigNumber:
 		{
-			/*[PF:TODO] Implementation*/
 			m_data.push_back( value.tostring());
 			m_rc = wrap_sqlite3_bind_text( m_stm, (int)idx, m_data.back().c_str(), m_data.back().size(), SQLITE_STATIC);
+			break;
 		}
 		case types::Variant::Custom:
 		{
 			types::Variant baseval;
 			try
 			{
-				value.customref()->getBaseTypeValue( baseval);
-				if (baseval.type() != types::Variant::Custom)
+				if (value.customref()->getBaseTypeValue( baseval)
+				&&  baseval.type() != types::Variant::Custom)
 				{
-					bind( idx, baseval);
+					bindVariant( idx, baseval);
 					break;
 				}
 			}
@@ -139,7 +175,8 @@ void SQLiteStatement::bind( const unsigned int idx, const types::Variant &value 
 			{
 				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
 			}
-			throw std::runtime_error( "cannot convert value to base type for binding");
+			bindVariant( idx, value.tostring());
+			break;
 		}
 		default:
 			throw std::logic_error( "Binding unknown type '" + std::string( value.typeName( ) ) + "'" );

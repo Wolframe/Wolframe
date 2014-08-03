@@ -37,15 +37,13 @@
 #ifndef _SQLITE_HPP_INCLUDED
 #define _SQLITE_HPP_INCLUDED
 
+#include "SQLiteTransactionExecStatemachine.hpp"
+#include "SQLiteConfig.hpp"
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "database/transactionExecStatemachine.hpp"
-#include "processor/userInterface.hpp"
-#include "config/configurationBase.hpp"
-#include "types/keymap.hpp"
-#include "module/constructor.hpp"
-#include "SQLiteProgram.hpp"
 #include <list>
+#include <vector>
 #include "system/objectPool.hpp"
 #include "sqlite3.h"
 
@@ -56,47 +54,10 @@
 namespace _Wolframe {
 namespace db {
 
-static const char* SQLite_DB_CLASS_NAME = "SQLite";
-
-/// SQLite database configuration
-class SQLiteConfig : public config::NamedConfiguration
-{
-public:
-	const char* className() const				{ return SQLite_DB_CLASS_NAME; }
-
-	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	~SQLiteConfig(){}
-
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
-		    const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, size_t indent ) const;
-	void setCanonicalPathes( const std::string& referencePath );
-
-	const std::string& ID() const				{ return m_ID; }
-	const std::string& filename() const			{ return m_filename; }
-	bool foreignKeys() const				{ return m_foreignKeys; }
-	bool profiling() const					{ return m_profiling; }
-	unsigned short connections() const			{ return m_connections; }
-	const std::list< std::string > programFiles() const	{ return m_programFiles; }
-	const std::list< std::string > extensionFiles() const	{ return m_extensionFiles; }
-
-private:
-	std::string	m_ID;
-	std::string	m_filename;
-	bool		m_foreignKeys;
-	bool		m_profiling;
-	unsigned short	m_connections;
-	std::list< std::string > m_programFiles;		//< list of program files
-	std::list< std::string > m_extensionFiles;		//< list of Sqlite extension modules to load
-};
-
-
-
-struct SQLiteLanguageDescription :public LanguageDescription
+struct SQLiteLanguageDescription :public LanguageDescriptionSQL
 {
 	///\brief String used for declaring a reference to an argument by index (starting with 1).
-	virtual std::string stm_argument_reference( int index)
+	virtual std::string stm_argument_reference( int index) const
 	{
 		std::ostringstream rt;
 		rt << "$" << index;
@@ -104,27 +65,24 @@ struct SQLiteLanguageDescription :public LanguageDescription
 	}
 };
 
-class SQLiteDBunit;
-
 class SQLiteDatabase : public Database
 {
 public:
-	SQLiteDatabase() : m_unit( NULL )	{}
-	 ~SQLiteDatabase()			{}
+	SQLiteDatabase( const std::string& id_, const std::string& filename_,
+			bool foreignKeys_, bool profiling_,
+			unsigned short connections_,
+			const std::vector<std::string>& extensionFiles_ );
+	SQLiteDatabase( const SQLiteConfig& config);
+	 ~SQLiteDatabase();
 
-	void setUnit( SQLiteDBunit* unit )	{ m_unit = unit; }
-	bool hasUnit() const			{ return m_unit != NULL; }
-	SQLiteDBunit& dbUnit() const		{ return *m_unit; }
+	const std::string& ID() const		{ return m_ID; }
+	const char* className() const		{ return "SQLite"; }
 
-	const std::string& ID() const;
-	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
-
-	virtual void loadProgram( const std::string& filename );
-	virtual void loadAllPrograms();
-	virtual void addProgram( const std::string& program );
-
-	Transaction* transaction( const std::string& name );
-	void closeTransaction( Transaction* t );
+	Transaction* transaction( const std::string& name_)
+	{
+		TransactionExecStatemachineR stm( new TransactionExecStatemachine_sqlite3( this));
+		return new Transaction( name_, stm);
+	}
 
 	virtual const LanguageDescription* getLanguageDescription() const
 	{
@@ -132,100 +90,21 @@ public:
 		return &langdescr;
 	}
 
-	///\brief Get a user interface library
-	virtual const UI::UserInterfaceLibrary* UIlibrary() const;
+	boost::shared_ptr<sqlite3> newConnection()
+	{
+		return boost::shared_ptr<sqlite3>( m_connPool.get(), boost::bind( ObjectPool<sqlite3*>::static_add, &m_connPool, _1));
+	}
+
 private:
-	SQLiteDBunit*	m_unit;			///< parent database unit
-};
-
-
-class SQLiteDBunit : public DatabaseUnit
-{
-	friend class SQLiteTransaction;
-	friend class SQLiteUIlibrary;
-public:
-	SQLiteDBunit( const std::string& id, const std::string& filename,
-		      bool foreignKeys, bool profiling,
-		      unsigned short connections,
-		      const std::list<std::string>& programFiles_,
-		      const std::list<std::string>& extensionFiles_ );
-	~SQLiteDBunit();
-
-	const std::string& ID() const		{ return m_ID; }
-	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
-	Database* database();
-
-	virtual void loadProgram( const std::string& filename );
-	/// MBa: to be defined after some more cleaning...
-	virtual void loadAllPrograms();
-
-	virtual void addProgram( const std::string& program )
-						{ m_program.load( program ); }
-
-	PoolObject<sqlite3*>* newConnection()	{return new PoolObject<sqlite3*>( m_connPool);}
+	void init( const SQLiteConfig& config);
 
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
-
-	SQLiteProgram		m_program;		///< database programs
-	SQLiteDatabase		m_db;
-	std::list<std::string>	m_programFiles;
-	std::list<std::string>	m_extensionFiles;
+	std::vector<std::string>m_extensionFiles;	///< Sqlite extensions
 };
-
-class SQLiteUIlibrary : public UI::UserInterfaceLibrary
-{
-public:
-	SQLiteUIlibrary( const SQLiteDatabase& database );
-	~SQLiteUIlibrary()			{}
-
-	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
-									const std::list< std::string >& roles,
-									const std::string& culture,
-									const std::string& tag = "" ) const;
-
-	virtual const std::list< UI::InterfaceObject::Info > userInterface( const std::string& platform,
-									const std::string& roles,
-									const std::string& culture,
-									const std::string& tag = "" ) const;
-
-	virtual const UI::InterfaceObject object( const UI::InterfaceObject::Info& info ) const;
-
-	virtual void addObject( const UI::InterfaceObject& newObject ) const;
-
-	virtual bool deleteObject( const UI::InterfaceObject::Info& info ) const;
-
-	virtual void close()			{ delete this; }
-private:
-	SQLiteDBunit&		m_unit;		///< parent database unit
-};
-
-
-//\class SQLiteConstructor
-//\brief SQLite database constructor
-class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
-{
-public:
-	ObjectConstructorBase::ObjectType objectType() const
-						{ return DATABASE_OBJECT; }
-	const char* objectClassName() const	{ return SQLite_DB_CLASS_NAME; }
-	SQLiteDBunit* object( const config::NamedConfiguration& conf );
-};
-
-
-//\class SQLiteTransaction
-class SQLiteTransaction
-	:public StatemachineBasedTransaction
-{
-public:
-	SQLiteTransaction( SQLiteDatabase& database, const std::string& name_);
-	virtual ~SQLiteTransaction(){}
-};
-
-
 
 }} // _Wolframe::db
 

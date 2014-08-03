@@ -1,9 +1,9 @@
-///
-/// \brief configuration lexem parser unit tests using google test framework (gTest)
-///
+///\file configValueParser.cpp
+///\brief configuration lexem parser unit tests using google test framework (gTest)
 
 #include "config/valueParser.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <boost/property_tree/xml_parser.hpp>
 #include <iostream>
 
@@ -59,14 +59,14 @@ static const PtNode getPropertyTreeDef( const std::string& name, const std::stri
 	return PtNode( name, it->second);
 }
 
-class ProtocolArgumentParsingFixture : public ::testing::Test
+class ConfigValueParserFixture : public ::testing::Test
 {
 public:
 		std::vector<std::string> output;
 		std::vector<std::string> expected;
 
 protected:
-		ProtocolArgumentParsingFixture() {}
+		ConfigValueParserFixture() {}
 
 		virtual void SetUp()
 		{
@@ -143,7 +143,7 @@ protected:
 
 
 // Tests the Version constructors and members
-TEST_F( ProtocolArgumentParsingFixture, Members )
+TEST_F( ConfigValueParserFixture, Members )
 {
 	for (unsigned int tt=0; testDescription[tt].in; tt++)
 	{
@@ -153,6 +153,7 @@ TEST_F( ProtocolArgumentParsingFixture, Members )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for loading programs written in a DDL to describe forms
-///\file prgbind/ddlProgram.hpp
+/// \brief Interface for loading programs written in a DDL to describe forms
+/// \file prgbind/ddlProgram.hpp
 
 #ifndef _PRGBIND_DDL_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_DDL_PROGRAM_HPP_INCLUDED
@@ -42,19 +42,23 @@
 namespace _Wolframe {
 namespace prgbind {
 
-//\class DDLProgram
-//\brief Program type for a data definition language (DDL) for forms.
+/// \class DDLProgram
+/// \brief Program type for a data definition language (DDL) for forms.
 class DDLProgram
 	:public Program
 {
 public:
+	/// \brief Constructor
 	DDLProgram( const langbind::DDLCompilerR& constructor_)
 		:Program( Form)
 		,m_constructor(constructor_){}
 
+	/// \brief Destructor
 	virtual ~DDLProgram(){}
 
+	/// \brief Implementation of Program::is_mine( const std::string&) const;
 	virtual bool is_mine( const std::string& filename) const;
+	/// \brief Implementation of Program::loadProgram( ProgramLibrary&, db::Database*, const std::string&);
 	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
 
 private:

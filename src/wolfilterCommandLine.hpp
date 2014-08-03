@@ -40,7 +40,8 @@
 #include "logger-v1.hpp"
 #include "module/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
-#include <boost/property_tree/ptree.hpp>
+#include "AAAA/AAAAprovider.hpp"
+#include "types/propertyTree.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
@@ -49,8 +50,11 @@ namespace config {
 class WolfilterCommandLine
 {
 public:
-	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& currentPath, bool useDefaultModuleDir);
-	~WolfilterCommandLine(){}
+	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined);
+	~WolfilterCommandLine()
+	{
+		delete m_modulesDirectory;
+	}
 
 	bool printhelp() const						{return m_printhelp;}
 	bool printversion() const					{return m_printversion;}
@@ -59,18 +63,20 @@ public:
 	const std::string& cmd() const					{return m_cmd;}
 	const std::string& inputfilter() const				{return m_inputfilter;}
 	const std::string& outputfilter() const				{return m_outputfilter;}
+	const std::string& protocol() const				{return m_protocol;}
+	const AAAA::AAAAconfiguration& aaaaProviderConfig() const	{return *m_aaaaProviderConfig;}
 	const db::DBproviderConfig& dbProviderConfig() const		{return *m_dbProviderConfig;}
 	const proc::ProcProviderConfig& procProviderConfig() const	{return *m_procProviderConfig;}
-	const module::ModulesDirectory& modulesDirectory() const	{return m_modulesDirectory;}
-	const std::string& referencePath() const			{return m_referencePath;}
+	const module::ModulesDirectory& modulesDirectory() const	{return *m_modulesDirectory;}
+	const std::string& configurationPath() const			{return m_configurationPath;}
 
 	static void print( std::ostream &);
 
 private:
 	config::ConfigurationTree getProcProviderConfigTree() const;
 	config::ConfigurationTree getDBProviderConfigTree( const std::string& dbopt) const;
-	std::vector<std::string> configModules( const std::string& refpath) const;
-	boost::property_tree::ptree getConfigNode( const std::string& name) const;
+	std::vector<std::string> configModules( bool useDefaultModuleDir) const;
+	config::ConfigurationNode getConfigNode( const std::string& name) const;
 
 private:
 	bool m_printhelp;
@@ -79,15 +85,17 @@ private:
 	std::string m_logfile;
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
-	boost::property_tree::ptree m_dbconfig;
-	boost::property_tree::ptree m_config;
+	types::PropertyTree::Node m_dbconfig;
+	types::PropertyTree m_config;
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;
+	std::string m_protocol;
+	boost::shared_ptr<AAAA::AAAAconfiguration> m_aaaaProviderConfig;
 	boost::shared_ptr<proc::ProcProviderConfig> m_procProviderConfig;
 	boost::shared_ptr<db::DBproviderConfig> m_dbProviderConfig;
-	module::ModulesDirectory m_modulesDirectory;
-	std::string m_referencePath;
+	module::ModulesDirectory* m_modulesDirectory;
+	std::string m_configurationPath;
 };
 
 }}//namespace

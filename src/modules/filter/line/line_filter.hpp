@@ -39,7 +39,17 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-FilterType* createLineFilterType();
+/// \class class LineFilterType
+/// \brief Line (CR/CRLF terminated line) filter type
+class LineFilterType :public FilterType
+{
+public:
+	LineFilterType()
+		:FilterType("line"){}
+	virtual ~LineFilterType(){}
+
+	virtual Filter* create( const std::vector<FilterArgument>& arg) const;
+};
 
 }}//namespace
 #endif

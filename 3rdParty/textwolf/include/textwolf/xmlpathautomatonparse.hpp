@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/xmlpathautomatonparse.hpp
+/// \brief Parser to create a path expression selector automaton from a source (list of path expression in abbreviated syntax of xpath)
+
 #ifndef __TEXTWOLF_XML_PATH_AUTOMATON_PARSE_HPP__
 #define __TEXTWOLF_XML_PATH_AUTOMATON_PARSE_HPP__
 #include "textwolf/xmlpathautomaton.hpp"

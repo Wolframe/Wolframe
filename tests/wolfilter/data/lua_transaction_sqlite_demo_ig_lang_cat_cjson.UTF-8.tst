@@ -519,15 +519,17 @@
     ]
   }
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json -c wolframe.conf run
 
 **file:wolframe.conf
 LoadModules
 {
 	module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../../src/modules/cmdbind/lua/mod_command_lua
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 }
 Database
 {
@@ -549,6 +551,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter cjson
 		}
 	}
 }
@@ -556,8 +559,8 @@ Processor
 int=integer;
 uint=unsigned;
 float=floatingpoint;
-currency=fixedpoint(13,2);
-percent_1=fixedpoint(5,1);
+currency=bigfxp(2);
+percent_1=bigfxp(2);
 **file:script.lua
 idcnt = 0
 
@@ -567,38 +570,38 @@ function insert_tree( parentid, itr)
 		if (t == "name") then
 			local name = v
 			if idcnt == 0 then
-				formfunction( "treeAddRoot")( {name=name} )
+				provider.formfunction( "treeAddRoot")( {name=name} )
 			else
-				formfunction( "treeAddNode")( {name=name, parentid=parentid} )
+				provider.formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 			end
 			idcnt = idcnt + 1
 		end
 		if (t == "class") then
-			insert_tree( id, scope( itr))
+			insert_tree( id, iterator.scope( itr))
 		end
 	end
 end
 
 function insert_node( parentname, name)
-	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
-	formfunction( "treeAddNode")( {name=name, parentid=parentid} )
+	local parentid = provider.formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
+	provider.formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 end
 
 function copy_node( name, parentname)
-	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
-	local nodeid = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	formfunction( "treeCopyNode")( {nodeid=nodeid, newparentid=parentid} )
+	local parentid = provider.formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
+	local nodeid = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	provider.formfunction( "treeCopyNode")( {nodeid=nodeid, newparentid=parentid} )
 end
 
 
 function delete_subtree( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	formfunction( "treeDeleteSubtree")( {id=id} )
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	provider.formfunction( "treeDeleteSubtree")( {id=id} )
 end
 
 function select_subtree( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectNodeAndChildren")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectNodeAndChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "subtree")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -611,7 +614,7 @@ function select_subtree( name)
 end
 
 function select_subtree2( name)
-	local nodear = formfunction( "treeSelectNodeAndChildrenByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectNodeAndChildrenByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "subtree")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -624,8 +627,8 @@ function select_subtree2( name)
 end
 
 function select_children( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectChildren")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "children")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -638,7 +641,7 @@ function select_children( name)
 end
 
 function select_children2( name)
-	local nodear = formfunction( "treeSelectChildrenByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectChildrenByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "children")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -651,8 +654,8 @@ function select_children2( name)
 end
 
 function select_cover( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectNodeAndParents")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectNodeAndParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "cover")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -665,7 +668,7 @@ function select_cover( name)
 end
 
 function select_cover2( name)
-	local nodear = formfunction( "treeSelectNodeAndParentsByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectNodeAndParentsByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "cover")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -678,8 +681,8 @@ function select_cover2( name)
 end
 
 function select_parents( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectParents")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "parents")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -692,7 +695,7 @@ function select_parents( name)
 end
 
 function select_parents2( name)
-	local nodear = formfunction( "treeSelectParentsByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectParentsByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "parents")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -705,14 +708,15 @@ function select_parents2( name)
 end
 
 function get_tree( parentid)
-	local t = formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
+	local t = provider.formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
+		local elem = { name=v.name, parent=tonumber(v.parent), children = {} }
+		a[ v.ID] = elem
 	end
 	for i,v in pairs( a) do
 		if v.parent and v.parent ~= 0 then
-			table.insert( a[ v.parent ].children, i )
+			table.insert( a[ v.parent ].children, tonumber( i ))
 		end
 	end
 	return a
@@ -730,11 +734,11 @@ function print_tree( tree, nodeid)
 end
 
 function run()
-	filter().empty = false
+	provider.filter().empty = false
 	local itr = input:get()
 	for v,t in itr do
 		if t == "class" then
-			insert_tree( idcnt, scope( itr))
+			insert_tree( idcnt, iterator.scope( itr))
 		end
 	end
 	output:opentag( "result")

@@ -36,19 +36,19 @@
 
 #include "DBauth.hpp"
 #include "config/valueParser.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
-bool DBAuthConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
+bool DBAuthConfig::parse( const config::ConfigurationNode& pt, const std::string& /*node*/,
 				const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace config;
 
 	bool retVal = true;
 
-	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
+	for ( config::ConfigurationNode::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( boost::algorithm::iequals( L1it->first, "identifier" ))	{
 			bool isDefined = ( !m_identifier.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_identifier, &isDefined ))

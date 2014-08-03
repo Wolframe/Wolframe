@@ -53,6 +53,7 @@
 namespace _Wolframe {
 namespace log {
 
+/// Logger backend implementing the logger sink
 class WOLFRAME_EXPORT LogBackend
 {
 public:

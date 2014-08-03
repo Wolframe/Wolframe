@@ -29,23 +29,33 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types/customDataNormalizer.hpp
-///\brief Custom data normalization function
+/// \file types/customDataNormalizer.hpp
+/// \brief Custom data normalization function
 #ifndef _Wolframe_TYPES_CUSTOM_DATA_NORMALIZER_HPP_INCLUDED
 #define _Wolframe_TYPES_CUSTOM_DATA_NORMALIZER_HPP_INCLUDED
 #include "types/customDataType.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/variant.hpp"
 #include <string>
+#include <vector>
 
 namespace _Wolframe {
 namespace types {
 
+/// \class CustomDataNormalizer
+/// \brief Normalizer function created from a custom data type initializer
 class CustomDataNormalizer
 	:public types::NormalizeFunction
 {
 public:
-	CustomDataNormalizer( const std::string& name_, const std::string& arg, const types::CustomDataType* type_)
+	/// \brief Copy constructor
+	CustomDataNormalizer( const CustomDataNormalizer& o)
+		:m_name(o.m_name)
+		,m_type(o.m_type)
+		,m_initializer(o.m_initializer)
+	{}
+	/// \brief Constructor
+	CustomDataNormalizer( const std::string& name_, const std::vector<types::Variant>& arg, const types::CustomDataType* type_)
 		:m_name(name_)
 		,m_type(type_)
 		,m_initializer(type_->hasInitializer()?type_->createInitializer(arg):0)
@@ -56,10 +66,65 @@ public:
 		}
 	}
 
+	/// \brief Destructor
 	virtual ~CustomDataNormalizer()
 	{
 		if (m_initializer) delete m_initializer;
 	}
+
+	/// \brief Implementation of types::NormalizeFunction::name()const
+	virtual const char* name() const
+	{
+		return m_name.c_str();
+	}
+
+	/// \brief Get the custom data type
+	const types::CustomDataType* type() const
+	{
+		return m_type;
+	}
+
+	/// \brief Implementation of types::NormalizeFunction::execute(const types::Variant&)const
+	types::Variant execute( const types::Variant& i) const
+	{
+		types::Variant rt( m_type, m_initializer);
+		if (i.defined())
+		{
+			rt.data().value.Custom->assign( i);
+		}
+		return rt;
+	}
+
+	/// \brief Implementation of types::NormalizeFunction::copy()const
+	virtual types::NormalizeFunction* copy() const
+	{
+		return new CustomDataNormalizer(*this);
+	}
+
+private:
+	std::string m_name;
+	const types::CustomDataType* m_type;
+	types::CustomDataInitializer* m_initializer;
+};
+
+
+/// \class CustomDataMethodCallNormalizer
+/// \brief Normalizer function created from a custom data method call
+class CustomDataMethodCallNormalizer
+	:public types::NormalizeFunction
+{
+public:
+	CustomDataMethodCallNormalizer( const CustomDataMethodCallNormalizer& o)
+		:m_name(o.m_name)
+		,m_arg(o.m_arg)
+	{}
+	CustomDataMethodCallNormalizer( const std::string& name_, const std::vector<types::Variant>& arg_)
+		:m_name(name_)
+		,m_arg(arg_)
+	{}
+
+	virtual ~CustomDataMethodCallNormalizer()
+	{}
 
 	virtual const char* name() const
 	{
@@ -68,15 +133,21 @@ public:
 
 	types::Variant execute( const types::Variant& i) const
 	{
-		types::Variant rt( m_type, m_initializer);
-		rt.data().value.Custom->assign( i);
-		return rt;
+		const CustomDataValue* cv = i.customref();
+		const CustomDataType* dt = cv->type();
+		CustomDataType::CustomDataValueMethod method = dt->getMethod( m_name);
+		if (!method) throw std::logic_error( "internal: calling undefined method");
+		return method( *cv, m_arg);
+	}
+
+	virtual types::NormalizeFunction* copy() const
+	{
+		return new CustomDataMethodCallNormalizer(*this);
 	}
 
 private:
 	std::string m_name;
-	const types::CustomDataType* m_type;
-	types::CustomDataInitializer* m_initializer;
+	std::vector<types::Variant> m_arg;
 };
 
 }}//namespace

@@ -39,7 +39,7 @@
 #include <iostream>
 #include "module/moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
-#include <boost/property_tree/ptree.hpp>
+#include "types/propertyTree.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -47,7 +47,7 @@ namespace config {
 class WolfwizardCommandLine
 {
 public:
-	WolfwizardCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& modulePath);
+	WolfwizardCommandLine( int argc, char **argv, const std::string& referencePath_);
 	~WolfwizardCommandLine(){}
 
 	bool printhelp() const						{return m_printhelp;}
@@ -55,17 +55,22 @@ public:
 	const std::string& configfile() const				{return m_configfile;}
 
 	static void print( std::ostream& out);
-	const boost::property_tree::ptree& providerconfig() const	{return m_providerconfig;}
-	const std::list<std::string>& modules() const			{return m_modules;}
-	const std::string& referencePath() const			{return m_referencePath;}
+	const config::ConfigurationNode& providerconfig() const		{return m_providerconfig;}
+	const std::string& configurationPath() const			{return m_configurationPath;}
+	const module::ModulesDirectory& modulesDirectory() const	{return *m_modulesDirectory;}
+
+private:
+	std::list<std::string> configModules() const;
+	config::ConfigurationNode getConfigNode( const std::string& name) const;
 
 private:
 	bool m_printhelp;
 	bool m_printversion;
 	std::string m_configfile;
-	boost::property_tree::ptree m_providerconfig;
-	std::string m_referencePath;
-	std::string m_modulePath;
+	config::ConfigurationTree m_config;
+	config::ConfigurationNode m_providerconfig;
+	module::ModulesDirectory* m_modulesDirectory;
+	std::string m_configurationPath;
 	std::list<std::string> m_modules;
 };
 

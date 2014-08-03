@@ -37,6 +37,7 @@
 #include "types/normalizeFunction.hpp"
 #include <vector>
 #include <boost/locale/generator.hpp>
+#include <boost/locale.hpp>
 
 namespace _Wolframe {
 namespace langbind {
@@ -59,17 +60,101 @@ private:
 	boost::locale::generator m_gen;
 };
 
-types::NormalizeFunction* create_tolower_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_toupper_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_totitle_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_foldcase_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_nfd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_nfc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_nfkd_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_nfkc_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_latinword_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_ascii_de_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
-types::NormalizeFunction* create_ascii_eu_NormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::string& arg);
+class LocaleConvNormalizeFunction
+	:public types::NormalizeFunction
+{
+public:
+	typedef std::string (*LocaleConv)( std::string const&, std::locale const&);
+
+	LocaleConvNormalizeFunction( const LocaleConvNormalizeFunction& o);
+	LocaleConvNormalizeFunction( LocaleResourceHandle* reshnd, const std::vector<types::Variant>& arg, const LocaleConv& func, const char* name_);
+
+	virtual ~LocaleConvNormalizeFunction(){}
+
+	virtual types::Variant execute( const types::Variant& inp) const;
+
+	virtual const char* name() const
+	{
+		return m_name;
+	}
+
+	virtual types::NormalizeFunction* copy() const;
+
+private:
+	static std::string getLcFromArg( const std::vector<types::Variant>& arg);
+	
+private:
+	LocaleResourceHandle* m_reshnd;
+	LocaleConv m_func;
+	std::string m_lc;
+	const char* m_name;
+};
+
+
+class ToLowerNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	ToLowerNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+class ToUpperNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	ToUpperNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+
+class ToTitleNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	ToTitleNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+
+class ToFoldcaseNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	ToFoldcaseNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+
+class NFDNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	NFDNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+
+class NFCNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	NFCNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+
+class NFKDNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	NFKDNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+
+class NFKCNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	NFKCNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+
+class LatinwordNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	LatinwordNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+
+class AsciiDeNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	AsciiDeNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
+
+class AsciiEuNormalizeFunction
+	:public LocaleConvNormalizeFunction
+{
+public:	AsciiEuNormalizeFunction( types::NormalizeResourceHandle* reshnd, const std::vector<types::Variant>& arg);
+};
 
 }}//namespace
 #endif

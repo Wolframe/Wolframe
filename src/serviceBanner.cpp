@@ -38,16 +38,11 @@
 #include "config/valueParser.hpp"
 #include "logger-v1.hpp"
 #include "appInfo.hpp"
+#include "platform.hpp"
 
 #include <string>
 #include <stdexcept>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
-
-//////// Just for temporary testing purposes ////////
-#include "config/configurationBase.hpp"
-#include "config/ConfigurationTree.hpp"
-//////// Just for temporary testing purposes ////////
 
 namespace _Wolframe {
 namespace config {
@@ -63,6 +58,8 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 		return ServiceBanner::VERSION_MINOR;
 	else if ( boost::algorithm::iequals( str, "Revision" ))
 		return ServiceBanner::VERSION_REVISION;
+	else if ( boost::algorithm::iequals( str, "Build" ))
+		return ServiceBanner::VERSION_BUILD;
 	else if ( boost::algorithm::iequals( str, "OS" ))
 		return ServiceBanner::PRODUCT_OS;
 	else if ( boost::algorithm::iequals( str, "None" ))
@@ -72,13 +69,13 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 
 
 /// Service signature parser
-bool ServiceBanner::parse( const ConfigurationTree& pt, const std::string& node,
+bool ServiceBanner::parse( const config::ConfigurationNode& pt, const std::string& node,
 			   const module::ModulesDirectory* /*modules*/ )
 {
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
 		bool tokensDefined = ( m_tokens != ServiceBanner::UNDEFINED );
 		std::string	val;
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.data(),
 					val, &tokensDefined ))
 			return false;
 		m_tokens = strToToken( val );
@@ -89,7 +86,7 @@ bool ServiceBanner::parse( const ConfigurationTree& pt, const std::string& node,
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
 		bool isDefined = ( !m_serverSignature.empty());
-		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
+		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.data(),
 					m_serverSignature, &isDefined ))
 			return false;
 	}
@@ -110,6 +107,7 @@ bool ServiceBanner::check() const
 	case VERSION_MAJOR:
 	case VERSION_MINOR:
 	case VERSION_REVISION:
+	case VERSION_BUILD:
 	case PRODUCT_OS:
 	case NONE:
 	case UNDEFINED:
@@ -131,6 +129,7 @@ void ServiceBanner::print( std::ostream& os, size_t /* indent */ ) const
 	case VERSION_MAJOR:	os << "product name and major version"; break;
 	case VERSION_MINOR:	os << "product name and minor version"; break;
 	case VERSION_REVISION:	os << "product name and revision"; break;
+	case VERSION_BUILD:	os << "product name and build"; break;
 	case PRODUCT_OS:	os << "product name, revision and OS"; break;
 	case NONE:		os << "none"; break;
 	case UNDEFINED:
@@ -162,8 +161,13 @@ std::string ServiceBanner::toString() const
 		case VERSION_REVISION:
 			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m.%r" );
 			break;
-		case PRODUCT_OS:
-			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m.%r" ) + " OS";
+		case VERSION_BUILD:
+			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m.%r.%b" );
+			break;
+		case PRODUCT_OS: {
+			Platform p = Platform::makePlatform( );
+			banner = "Wolframe " + _Wolframe::ApplicationInfo::instance().version().toString( "version %M.%m.%r.%b" ) + " " + p.toString( );
+			}
 			break;
 		case NONE:
 			break;

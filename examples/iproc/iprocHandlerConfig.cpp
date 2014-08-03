@@ -32,13 +32,11 @@
 ************************************************************************/
 ///\file iprocHandlerConfig.cpp
 ///\brief Implementation of the commands of the iproc connection handler
-#include "types/countedReference.hpp"
 #include "iprocHandlerConfig.hpp"
-#include "cmdbind/ioFilterCommandHandler.hpp"
+#include "iprocProtocolFiles.hpp"
 #include "logger-v1.hpp"
-#include "langbind/appObjects.hpp"
-#include "config/structSerialize.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/configSerialize.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 
@@ -68,12 +66,12 @@ const serialize::StructDescriptionBase* ConfigurationStruct::getStructDescriptio
 	return &rt;
 }
 
-bool Configuration::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
+bool Configuration::parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory*)
 {
 	try
 	{
 		ConfigurationStruct data;
-		config::parseConfigStructure( data, (const boost::property_tree::ptree&)pt);
+		serialize::parseConfigStructure( data, pt);
 
 		std::vector<std::string>::const_iterator itr=data.cmd.begin();
 		while (itr != data.cmd.end())

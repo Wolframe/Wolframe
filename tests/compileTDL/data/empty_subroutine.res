@@ -1,0 +1,14 @@
+TRANSACTION main
+BEGIN
+Code:
+[0] GOTO @2
+[1] RETURN
+[2] RESULT_SET_INIT
+[3] SUB_FRAME_OPEN SIGNATURE 0
+[4] SUB_FRAME_CLOSE
+[5] GOTO @1
+[6] RETURN
+Subroutine Signatures:
+SUB 0 (  )
+END
+

@@ -34,6 +34,7 @@
 // base64 tests
 //
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include "types/base64.hpp"
 
 #ifdef _WIN32
@@ -115,30 +116,37 @@ TEST( Base64, encoding )
 	codeLength = strEncode( emptyData, encoded, bufSize );
 	EXPECT_EQ( 0, codeLength );
 	EXPECT_STREQ( "", encoded );
+	EXPECT_STREQ( "", _Wolframe::base64::encode( emptyData, 0, 0 ).c_str() );
 
 	codeLength = strEncode( vector1, encoded, bufSize );
 	EXPECT_EQ( 4, codeLength );
 	EXPECT_STREQ( result1, encoded );
+	EXPECT_STREQ( result1, _Wolframe::base64::encode( vector1, strlen( vector1 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector2, encoded, bufSize );
 	EXPECT_EQ( 4, codeLength );
 	EXPECT_STREQ( result2, encoded );
+	EXPECT_STREQ( result2, _Wolframe::base64::encode( vector2, strlen( vector2 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector3, encoded, bufSize );
 	EXPECT_EQ( 4, codeLength );
 	EXPECT_STREQ( result3, encoded );
+	EXPECT_STREQ( result3, _Wolframe::base64::encode( vector3, strlen( vector3 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector4, encoded, bufSize );
 	EXPECT_EQ( 8, codeLength );
 	EXPECT_STREQ( result4, encoded );
+	EXPECT_STREQ( result4, _Wolframe::base64::encode( vector4, strlen( vector4 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector5, encoded, bufSize );
 	EXPECT_EQ( 8, codeLength );
 	EXPECT_STREQ( result5, encoded );
+	EXPECT_STREQ( result5, _Wolframe::base64::encode( vector5, strlen( vector5 ), 0 ).c_str() );
 
 	codeLength = strEncode( vector6, encoded, bufSize );
 	EXPECT_EQ( 8, codeLength );
 	EXPECT_STREQ( result6, encoded );
+	EXPECT_STREQ( result6, _Wolframe::base64::encode( vector6, strlen( vector6 ), 0 ).c_str() );
 }
 
 TEST( Base64, decoding )
@@ -329,14 +337,14 @@ TEST( Base64, RandomData )
 						       encoded1 + encodeResult, encodedSize - encodeResult );
 			EXPECT_GE( partialResult, 0 );
 			encodeResult += partialResult;
-			EXPECT_LE( encodeResult, encodedSize );
+			EXPECT_LE( encodeResult, (long int)encodedSize );
 			dataUsed += chunkSize;
 		}
 		partialResult = E.encodeChunk( data + dataUsed, dataSize - dataUsed,
 					       encoded1 + encodeResult, encodedSize - encodeResult + 1 );
 		EXPECT_GE( partialResult, 0 );
 		encodeResult += partialResult;
-		EXPECT_LE( encodeResult, encodedSize );
+		EXPECT_LE( encodeResult, (long int)encodedSize );
 		int encodeEndResult = E.encodeEndChunk( encoded1 + encodeResult, encodedSize - encodeResult + 1 );
 #ifdef _BASE64_PRINT_TEST_PARAMETRS
 		std::cout << ", encoded size: " << encodeResult << " + " << encodeEndResult << std::endl;
@@ -348,7 +356,7 @@ TEST( Base64, RandomData )
 		edata1.write(( const char *)encoded1, encodeResult );
 		edata1.close();
 #endif
-		EXPECT_EQ( encodeResult, encodedSize );
+		EXPECT_EQ( encodeResult, (long int)encodedSize );
 
 		encodeResult = base64::encode( data, dataSize, encoded2, encodedSize + 1, lineLength );
 #ifdef _BASE64_WRITE_OUTPUT
@@ -357,7 +365,7 @@ TEST( Base64, RandomData )
 		edata2.write(( const char *)encoded2, encodeResult );
 		edata2.close();
 #endif
-		EXPECT_EQ( encodeResult, encodedSize );
+		EXPECT_EQ( encodeResult, (long int)encodedSize );
 		EXPECT_EQ( 0, memcmp( encoded1, encoded2, encodedSize ));
 
 		decoded[ dataSize ] = 0x5a;
@@ -365,12 +373,12 @@ TEST( Base64, RandomData )
 		int decodeResult = 0;
 		dataUsed = 0;
 		partialResult = 0;
-		while ( dataUsed <= encodeResult - chunkSize )	{
+		while ( dataUsed <= (size_t)( encodeResult - chunkSize ))	{
 			partialResult = D.decode( encoded1 + dataUsed, chunkSize,
 						  decoded + decodeResult, dataSize - decodeResult + 1 );
 			EXPECT_GE( partialResult, 0 );
 			decodeResult += partialResult;
-			EXPECT_LE( decodeResult, dataSize );
+			EXPECT_LE( decodeResult, (long int)dataSize );
 			dataUsed += chunkSize;
 		}
 		partialResult = D.decode( encoded1 + dataUsed, encodeResult - dataUsed,
@@ -395,7 +403,7 @@ TEST( Base64, RandomData )
 		ddata2.write(( const char *)decoded, decodeResult );
 		ddata2.close();
 #endif
-		EXPECT_EQ( dataSize, decodeResult );
+		EXPECT_EQ( (long int)dataSize, decodeResult );
 		EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
 		EXPECT_EQ( decoded[ dataSize ], 0xa5 );
 
@@ -410,6 +418,7 @@ TEST( Base64, RandomData )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

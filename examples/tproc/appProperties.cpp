@@ -35,12 +35,11 @@
 //
 
 #include "appProperties.hpp"
+#include "wolframe.hpp"
 
 namespace _Wolframe	{
-	enum {APP_MAJOR_VERSION = 0, APP_MINOR_VERSION = 0, APP_REVISION = 5};
-
 	const char*	applicationName()			{ return "tproc"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION, APP_MINOR_VERSION ,APP_REVISION); }
+	const Version	applicationVersion()			{ return Version( WOLFRAME_MAJOR_VERSION, WOLFRAME_MINOR_VERSION ,WOLFRAME_REVISION); }
 
 	const char*	config::defaultMainConfig()		{ return "/etc/tproc.conf"; }
 	const char*	config::defaultUserConfig()		{ return "~/tproc.conf"; }

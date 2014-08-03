@@ -29,16 +29,16 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file pythonFunctionProgramType.cpp
-///\brief Implementation of the function to create a form function program type object for python scripts
+/// \file pythonFunctionProgramType.cpp
+/// \brief Implementation of the function to create a form function program type object for python scripts
+#include "pythonInterpreter.hpp"
 #include "pythonFunctionProgramType.hpp"
 #include "pythonStructureBuilder.hpp"
-#include "pythonInterpreter.hpp"
 #include "pythonObject.hpp"
 #include "langbind/formFunction.hpp"
-#include "processor/procProvider.hpp"
+#include "prgbind/programLibrary.hpp"
+#include "processor/procProviderInterface.hpp"
 #include "logger-v1.hpp"
-#include "types/countedReference.hpp"
 #include "types/variant.hpp"
 #include <vector>
 #include <string>
@@ -50,14 +50,14 @@ using namespace _Wolframe::langbind;
 
 namespace {
 
-///\class PythonResult
-///\brief Structure representing the result of a function call
+/// \class PythonResult
+/// \brief Structure representing the result of a function call
 class PythonResult
 	:public TypedInputFilter
 {
 public:
 	PythonResult( const python::StructureR& data_)
-		:types::TypeSignature("langbind::PythonResult", __LINE__)
+		:TypedInputFilter("pythonresult")
 		,m_data(data_)
 		,m_bufidx(0)
 	{
@@ -72,8 +72,7 @@ public:
 	}
 
 	PythonResult( const PythonResult& o)
-		:types::TypeSignature("langbind::PythonResult", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_data(o.m_data)
 		,m_buf(o.m_buf)
 		,m_bufidx(o.m_bufidx)
@@ -237,7 +236,7 @@ class PythonFormFunctionClosure
 {
 public:
 	PythonFormFunctionClosure( const std::string& name_, const python::InterpreterInstanceR& instance_)
-		:m_name(name_),m_initialized(false),m_instance(instance_),m_provider(0){}
+		:m_name(name_),m_initialized(false),m_instance(instance_),m_context(0){}
 
 	virtual ~PythonFormFunctionClosure(){}
 
@@ -323,7 +322,7 @@ public:
 		}
 		try
 		{
-			m_output = m_instance->call( m_provider, m_input);
+			m_output = m_instance->call( m_context, m_input);
 			LOG_TRACE << "Calling function '" << m_name << "' with argument: " << m_input->tostring() << "returns " << m_output->tostring();
 			m_result.reset( new PythonResult( m_output));
 		}
@@ -334,9 +333,9 @@ public:
 		return true;
 	}
 
-	virtual void init( const proc::ProcessorProvider* provider, const TypedInputFilterR& arg, serialize::Context::Flags /*f*/)
+	virtual void init( proc::ExecContext* ctx, const TypedInputFilterR& arg, serialize::Flags::Enum /*f*/)
 	{
-		m_provider = provider;
+		m_context = ctx;
 		m_arg = arg;
 		if (!m_arg->setFlags( TypedInputFilter::SerializeWithIndices))
 		{
@@ -353,16 +352,16 @@ public:
 	}
 
 private:
-	TypedInputFilterR m_result;			//< result of the function call
-	std::string m_name;				//< name of the function called for error messages
-	TypedInputFilterR m_arg;			//< call argument as input filter
-	bool m_initialized;				//< true, if the input has been initialized
-	std::string m_tagbuf;				//< buffer for attribute name to handle Attribute+Value pair
-	python::StructureBuilder m_inputbuilder;	//< structure input builder object
-	python::StructureR m_input;			//< pointer to input structure
-	python::StructureR m_output;			//< pointer to output structure
-	python::InterpreterInstanceR m_instance;	//< interpreter instance
-	const proc::ProcessorProvider* m_provider;	//< pointer to processor provider
+	TypedInputFilterR m_result;				//< result of the function call
+	std::string m_name;					//< name of the function called for error messages
+	TypedInputFilterR m_arg;				//< call argument as input filter
+	bool m_initialized;					//< true, if the input has been initialized
+	std::string m_tagbuf;					//< buffer for attribute name to handle Attribute+Value pair
+	python::StructureBuilder m_inputbuilder;		//< structure input builder object
+	python::StructureR m_input;				//< pointer to input structure
+	python::StructureR m_output;				//< pointer to output structure
+	python::InterpreterInstanceR m_instance;		//< interpreter instance
+	proc::ExecContext* m_context;				//< pointer to execution context
 };
 
 
@@ -388,43 +387,24 @@ private:
 	const python::Interpreter* m_interpreter;
 	std::string m_name;
 };
-
-///\class PythonProgramType
-///\brief Program type of python programs
-class PythonProgramType
-	:public prgbind::Program
-{
-public:
-	PythonProgramType()
-		:prgbind::Program( prgbind::Program::Function){}
-
-	virtual ~PythonProgramType(){}
-
-	virtual bool is_mine( const std::string& filename) const
-	{
-		boost::filesystem::path p( filename);
-		return p.extension().string() == ".mlg";
-	}
-
-	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
-	{
-		std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
-		std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
-		for (; fi != fe; ++fi)
-		{
-			langbind::FormFunctionR ff( new PythonFormFunction( &m_interpreter, *fi));
-			library.defineFormFunction( *fi, ff);
-		}
-	}
-
-private:
-	python::Interpreter m_interpreter;
-};
 }//anonymous namespace
 
-prgbind::Program* langbind::createPythonProgramType()
+
+bool PythonProgramType::is_mine( const std::string& filename) const
 {
-	return new PythonProgramType();
+	boost::filesystem::path p( filename);
+	return p.extension().string() == ".mlg";
+}
+
+void PythonProgramType::loadProgram( prgbind::ProgramLibrary& library, db::Database* /*transactionDB*/, const std::string& filename)
+{
+	std::vector<std::string> funcs = m_interpreter.loadProgram( filename);
+	std::vector<std::string>::const_iterator fi = funcs.begin(), fe = funcs.end();
+	for (; fi != fe; ++fi)
+	{
+		langbind::FormFunctionR ff( new PythonFormFunction( &m_interpreter, *fi));
+		library.defineFormFunction( *fi, ff);
+	}
 }
 
 

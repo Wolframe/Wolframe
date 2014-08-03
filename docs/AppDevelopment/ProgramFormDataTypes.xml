@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>Datatypes in DDLs</title>
-	<sect2>
+	<sect3>
 	<title>Introduction</title>
 	<para>The basic elements to build atomic data types in <application>Wolframe</application>
 		are normalization functions. Basic normalization functions are written in C++
@@ -17,13 +17,16 @@
 	<para>
 		A <code>.wnmp</code> file contains assignments of a type name to sequences 
 		of basic normalization function calls where the first takes the initial input.
+		A normalization function call can either be a normalizer function 
+		or a custom data type defined in a module or a method of the predecessing
+		custom data type in the sequence of the normalization function calls.
 		The output of a function in the sequence gets the input of the next one and 
 		the final output for the last one.
 		Each normalization step validates the input as atomic type (arithmetic,string,etc.)
 		and transforms it to another atomic type.
 	</para>
-	</sect2>
-	<sect2>
+	</sect3>
+	<sect3>
 	<title>Example</title>
 	<para>
 		The example defines 3 numeric types including trimming of the input string for mode tolerant
@@ -34,27 +37,42 @@
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/example_1.normalize" parse="text" />
 		</programlisting>
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
-	<title>Language Description</title>
-		<sect3>
-		<title>Type Assignments</title>	
+	<sect3>
+	<title>Language description</title>
+		<sect4>
+		<title>Type assignments</title>	
 		<para>
 			Each type declaration in a <code>.wnmp</code> file starts with an identifier followed by an assignment 
 			operator '='. The left side identifier specifies the name of the type. 
 			This type name can be used in a DDL as name instead of the built-in
 			type <code>string</code>. 
 			A token of this type is validated and normalized with the 
-			comma separated sequence of function references on the right side of
-			the assignment. A function reference consists of an identifier plus an 
+			comma separated sequence of normalizer references on the right side of
+			the assignment. A normalizer reference consists of an identifier plus an 
 			optional comma separated list of constant arguments in brackets ('(' and ')').
-			The interpretation of the arguments depend on the function type. An integer type for example could have 
-			the maximum number of digits of the integer type.
+			The interpretation of the arguments depend on the function type. 
+			An integer type for example could have the maximum number of digits 
+			of the integer type.
 		</para>
-		</sect3>
-	</sect2>
-	<sect2>
+		</sect4>
+		<sect4>
+		<title>Standard modules for normalizers</title>	
+		<para>
+			There are some standard modules you can use when you define your own type system.
+			They are delivered with <application>Wolframe</application>:
+		</para>
+			<itemizedlist>
+			<listitem><para>mod_normalize_locale: Unicode string composite normalization</para></listitem>
+			<listitem><para>mod_normalize_string: Basic string normalization (like trim, etc.)</para></listitem>
+			<listitem><para>mod_normalize_base64: Base64 encoding/decoding</para></listitem>
+			<listitem><para>mod_datatype_datetime: Custom data type for date and time arithmetics and normalization</para></listitem>
+			<listitem><para>mod_datatype_bcdnumber: Custom data type for bid number arithmetics and normalization</para></listitem>
+			</itemizedlist>
+		</sect4>
+	</sect3>
+	<sect3>
 	<title>Configuration</title>
 	<para>For declaring and using a .wnmp file in our example above, we have to load 
 	the module 'mod_normalize_string' and the module 'mod_normalize_number'.
@@ -69,7 +87,7 @@
 	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/cfg_program_wnmp.conf" parse="text" />
 	</programlisting>
 	</para>
-	</sect2>
-</sect1>
+	</sect3>
+</sect2>
 
 

@@ -25,16 +25,16 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	bcdArithmetic.obj \
+	fxpArithmetic.obj \
 	datatypeBigint.obj \
-	datatypeBigfxp.obj \
-	mod_datatype_bcdnumber.obj
-
+	datatypeBigfxp.obj
+	
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModBcdNumber.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_datatype_bcdnumber.obj
+	$(LINK) /dll /def:mod_datatype_bcdnumber.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

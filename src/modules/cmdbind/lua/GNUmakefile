@@ -17,14 +17,14 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_langbind
 
 INCLUDE_LIBS = \
 	-lwolframe \
+	-lwolframe_serialize \
 	-lwolframe_langbind \
-	$(TOPDIR)/3rdParty/lua/src/liblua.a \
-	$(LIBS_DL)
-
+	$(TOPDIR)/3rdParty/lua/src/liblua.a
 
 DYNAMIC_MODULE = mod_command_lua.so
 
@@ -40,8 +40,8 @@ LUA_CPP_OBJS = \
 CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
 	luaCommandHandler.o \
-	luaCommandHandlerBuilder.o \
-	mod_command_lua.o
+	luaCommandHandlerUnit.o \
+	luaCommandHandlerConfig.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -50,23 +50,21 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEnvirenment *env_, const std::string& name_, OracleDbUnit *dbUnit_)
-	: TransactionExecStatemachine(name_)
-	,m_state(Init)
+TransactionExecStatemachine_oracle::TransactionExecStatemachine_oracle( OracleEnvirenment *env_, OracleDatabase *database_)
+	:m_state(Init)
 	,m_env(env_)
 	,m_lastresult(0)
 	,m_nof_cols(0)
 	,m_statement( new OracleStatement( m_env ) )
 	,m_hasResult(false)
 	,m_hasRow(false)
-	,m_dbUnit(dbUnit_)
-	,m_conn(0)
+	,m_database(database_)
 	{}
 
 TransactionExecStatemachine_oracle::~TransactionExecStatemachine_oracle()
 {
-	if (m_conn) delete m_conn;
 	clear();
+	delete m_statement;
 }
 
 void TransactionExecStatemachine_oracle::clear()
@@ -136,17 +134,13 @@ void TransactionExecStatemachine_oracle::setDatabaseErrorMessage( sword status_ 
 			break;
 			
 		case OCI_ERROR:
-			(void)OCIErrorGet( (dvoid *)(*m_conn)->errhp, (ub4)1, (text *)NULL,
+			(void)OCIErrorGet( (dvoid *)m_conn->errhp, (ub4)1, (text *)NULL,
 				&errcode, (text *)errmsg, (ub4)sizeof( errmsg ), OCI_HTYPE_ERROR );
 			break;
 	}
 	
 	const char *errtype = getErrorType( errcode );
-	
-	// TODO: map OCI codes to severity levels, so far everything is ERROR
-	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
-	
-	m_lasterror.reset( new DatabaseError( severity, errcode, m_dbname.c_str(), m_statement->originalSQL().c_str(), errtype, errmsg, errmsg));
+	m_lasterror.reset( new DatabaseError( errtype, errcode, errmsg));
 }
 
 bool TransactionExecStatemachine_oracle::status( sword status_, State newstate )
@@ -172,11 +166,10 @@ bool TransactionExecStatemachine_oracle::begin()
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (m_conn) delete m_conn;
-	m_conn = m_dbUnit->newConnection();
-	static_cast<OracleStatement *>( m_statement )->setConnection( m_conn->object( ) );
+	m_conn = m_database->newConnection();
+	static_cast<OracleStatement *>( m_statement )->setConnection( m_conn.get());
 
-	return status( OCITransStart( (*m_conn)->svchp, (*m_conn)->errhp, (uword)0, (ub4)OCI_TRANS_NEW ), Transaction );
+	return status( OCITransStart( m_conn->svchp, m_conn->errhp, (uword)0, (ub4)OCI_TRANS_NEW ), Transaction );
 }
 
 bool TransactionExecStatemachine_oracle::commit()
@@ -190,11 +183,10 @@ bool TransactionExecStatemachine_oracle::commit()
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
-	bool rt = status( OCITransCommit( (*m_conn)->svchp, (*m_conn)->errhp, OCI_DEFAULT ), Init );
+	bool rt = status( OCITransCommit( m_conn->svchp, m_conn->errhp, OCI_DEFAULT ), Init );
 	if (rt)
 	{
-		delete m_conn;
-		m_conn = 0;
+		m_conn.reset();
 	}
 	return rt;
 }
@@ -202,16 +194,24 @@ bool TransactionExecStatemachine_oracle::commit()
 bool TransactionExecStatemachine_oracle::rollback()
 {
 	LOG_TRACE << "[oracle statement] CALL rollback()";
-	if (m_conn)
+	if (m_state == Transaction)
 	{
-		bool rt = status( OCITransRollback( (*m_conn)->svchp, (*m_conn)->errhp, OCI_DEFAULT ), Init );
+	}
+	else if (m_state != Executed && m_state != CommandReady)
+	{
+		return errorStatus( std::string( "call of rollback not allowed in state '") + stateName(m_state) + "'");
+	}
+	if (m_conn.get())
+	{
+		bool rt = status( OCITransRollback( m_conn->svchp, m_conn->errhp, OCI_DEFAULT ), Init );
+		clear();
 		if (rt)
 		{
-			delete m_conn;
-			m_conn = 0;
+			m_conn.reset();
 		}
 		return rt;
 	}
+	m_state = Init;
 	return true;
 }
 
@@ -219,7 +219,7 @@ bool TransactionExecStatemachine_oracle::errorStatus( const std::string& message
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_statement->originalSQL().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
+		m_lasterror.reset( new DatabaseError( "INTERNAL", 0, message));
 		m_state = Error;
 	}
 	return false;
@@ -255,7 +255,7 @@ bool TransactionExecStatemachine_oracle::start( const std::string& statement)
 	// native SQL placeholders but the current index!
 	m_statement->substitute( false );
 	std::string stmstr = m_statement->nativeSQL();
-	status_ = OCIStmtPrepare( m_lastresult, (*m_conn)->errhp, 
+	status_ = OCIStmtPrepare( m_lastresult, m_conn->errhp, 
 		(text *)const_cast<char *>( stmstr.c_str( ) ),
 		(ub4)stmstr.length( ), (ub4)OCI_NTV_SYNTAX, (ub4)OCI_DEFAULT );
 	rt = status( status_, CommandReady );
@@ -309,13 +309,13 @@ bool TransactionExecStatemachine_oracle::execute()
 	ub2 stmtTypehp;
 	sword status_ = OCIAttrGet( m_lastresult, OCI_HTYPE_STMT,
 		(dvoid *)&stmtTypehp, (ub4 *)0, (ub4)OCI_ATTR_STMT_TYPE,
-		(*m_conn)->errhp );
+		m_conn->errhp );
 	bool rt = status( status_, Executed );
 	if( !rt ) return rt;
 
 	m_hasResult = ( stmtTypehp == OCI_STMT_SELECT );
 
-	status_ = OCIStmtExecute( (*m_conn)->svchp, m_lastresult, (*m_conn)->errhp, 
+	status_ = OCIStmtExecute( m_conn->svchp, m_lastresult, m_conn->errhp, 
 		(ub4)(m_hasResult) ? 0 : 1, (ub4)0,
 		NULL, NULL, OCI_DEFAULT );
 
@@ -324,7 +324,7 @@ bool TransactionExecStatemachine_oracle::execute()
 		ub4 counter = 1;
 		OCIParam *paraDesc = 0;
 		status_ = OCIParamGet( (dvoid *)m_lastresult, OCI_HTYPE_STMT,
-			(*m_conn)->errhp, (dvoid **)&paraDesc, (ub4)counter );
+			m_conn->errhp, (dvoid **)&paraDesc, (ub4)counter );
 		rt = status( status_, Executed );
 		if( !rt ) return rt;
 		
@@ -338,7 +338,7 @@ bool TransactionExecStatemachine_oracle::execute()
 			 */
 			status_ = OCIAttrGet( (dvoid *)paraDesc, (ub4)OCI_DTYPE_PARAM,
 				(dvoid *)&descrRef->dataType, (ub4 *)0, (ub4)OCI_ATTR_DATA_TYPE,
-				(*m_conn)->errhp );
+				m_conn->errhp );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
 
@@ -347,7 +347,7 @@ bool TransactionExecStatemachine_oracle::execute()
 			char *colName;
 			status_ = OCIAttrGet( (dvoid *)paraDesc, (ub4)OCI_DTYPE_PARAM,
 				(dvoid *)&colName, (ub4 *)&colNameLen, (ub4)OCI_ATTR_NAME,
-				(*m_conn)->errhp );
+				m_conn->errhp );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
 			descrRef->name = std::string( colName, colNameLen );
@@ -357,7 +357,7 @@ bool TransactionExecStatemachine_oracle::execute()
 			int sizeInChars = 0;
 			status_ = OCIAttrGet( (dvoid *)paraDesc, (ub4)OCI_DTYPE_PARAM,
 				(dvoid *)&sizeInChars, (ub4 *)0, (ub4)OCI_ATTR_CHAR_USED,
-				(*m_conn)->errhp );
+				m_conn->errhp );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
 			
@@ -365,11 +365,11 @@ bool TransactionExecStatemachine_oracle::execute()
 			if( sizeInChars ) {
 				status_ = OCIAttrGet( (dvoid *)paraDesc, (ub4)OCI_DTYPE_PARAM,
 					(dvoid *)&col_width, (ub4 *)0, (ub4)OCI_ATTR_CHAR_SIZE,
-					(*m_conn)->errhp );
+					m_conn->errhp );
 			} else {
 				status_ = OCIAttrGet( (dvoid *)paraDesc, (ub4)OCI_DTYPE_PARAM,
 					(dvoid *)&col_width, (ub4 *)0, (ub4)OCI_ATTR_DATA_SIZE,
-					(*m_conn)->errhp );
+					m_conn->errhp );
 			}
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
@@ -378,14 +378,14 @@ bool TransactionExecStatemachine_oracle::execute()
 			ub2 precision = (ub2)0;
 			status_ = OCIAttrGet( (dvoid *)paraDesc, (ub4)OCI_DTYPE_PARAM,
 				(dvoid *)&precision, (ub4 *)0, (ub4)OCI_ATTR_PRECISION,
-				(*m_conn)->errhp );
+				m_conn->errhp );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
 
 			sb1 scale = (sb1)0;
 			status_ = OCIAttrGet( (dvoid *)paraDesc, (ub4)OCI_DTYPE_PARAM,
 				(dvoid *)&scale, (ub4 *)0, (ub4)OCI_ATTR_SCALE,
-				(*m_conn)->errhp );
+				m_conn->errhp );
 			rt = status( status_, Executed );
 			if( !rt ) return rt;
 			
@@ -418,12 +418,12 @@ bool TransactionExecStatemachine_oracle::execute()
 			}
 			
 			// allocate buffer for column and register it at the column position
-			descrRef->buf = (char *)calloc( descrRef->bufsize, sizeof( char ) );
+			descrRef->buf.cbuf = (char *)calloc( descrRef->bufsize, sizeof( char ) );
 			descrRef->ind = 0;
 			descrRef->len = 0;
 			descrRef->errcode = 0;
 			status_ = OCIDefineByPos( m_lastresult, &descrRef->defhp,
-				(*m_conn)->errhp, counter, (dvoid *)descrRef->buf,
+				m_conn->errhp, counter, (dvoid *)descrRef->buf.cbuf,
 				(sb4)descrRef->bufsize, descrRef->fetchType,
 				&descrRef->ind, &descrRef->len, &descrRef->errcode, OCI_DEFAULT );
 			rt = status( status_, Executed );
@@ -437,7 +437,7 @@ bool TransactionExecStatemachine_oracle::execute()
 					ub1 cform = SQLCS_NCHAR;
 					status_ = OCIAttrSet( (dvoid *)descrRef->defhp, (ub4)OCI_HTYPE_DEFINE,
 						(void *)&cform, (ub4)0, (ub4)OCI_ATTR_CHARSET_FORM,
-						(*m_conn)->errhp );
+						m_conn->errhp );
 					rt = status( status_, Executed );
 					if( !rt ) return rt;
 					
@@ -445,7 +445,7 @@ bool TransactionExecStatemachine_oracle::execute()
 					ub2 csid = 871; // UTF8
 					status_ = OCIAttrSet( (dvoid *)descrRef->defhp, (ub4)OCI_HTYPE_DEFINE,
 						(void *)&csid, (ub4)0, (ub4)OCI_ATTR_CHARSET_ID,
-						(*m_conn)->errhp );
+						m_conn->errhp );
 					rt = status( status_, Executed );
 					if( !rt ) return rt;
 
@@ -457,7 +457,7 @@ bool TransactionExecStatemachine_oracle::execute()
 				<< ", type: " << descrRef->dataType
 				<< ", sizeInChars: " << sizeInChars
 				<< ", precision: " << precision
-				<< ", scale: " << scale
+				<< ", scale: " << static_cast<int>( scale )
 				<< ", size: " << descrRef->bufsize
 				<< ", len: " << descrRef->len;
 
@@ -466,13 +466,13 @@ bool TransactionExecStatemachine_oracle::execute()
 			// get next column descriptor (if there is any)
 			counter++;
 			status_ = OCIParamGet( (dvoid *)m_lastresult, OCI_HTYPE_STMT,
-				(*m_conn)->errhp, (dvoid **)&paraDesc, (ub4)counter );
+				m_conn->errhp, (dvoid **)&paraDesc, (ub4)counter );
 		}
 
 		m_nof_cols = counter - 1;
 
 		// fetch first row
-		status_ = OCIStmtFetch( m_lastresult, (*m_conn)->errhp, (ub4)1,
+		status_ = OCIStmtFetch( m_lastresult, m_conn->errhp, (ub4)1,
 			(ub2)OCI_FETCH_NEXT, (ub4)OCI_DEFAULT );
 		rt = status( status_, Executed );
 		if( !rt ) return rt;
@@ -585,28 +585,28 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 	
 	switch( descrRef->dataType ) {
 		case SQLT_CHR: {
-			//~ LOG_DATA << "[Oracle get SQLT_CHR]: " << descrRef->buf;
+			//~ LOG_DATA << "[Oracle get SQLT_CHR]: " << descrRef->buf.cbuf;
 			//~ for (int i = 0; i < descrRef->bufsize ; i++){
-				//~ printf(" %2x", descrRef->buf[i]);
+				//~ printf(" %2x", descrRef->buf.cbuf[i]);
 			//~ }
 			//~ putchar( '\n' );
 			// TODO: enforce Oracle returning UTF8 or UTF16 and then
 			// convert it, the variant takes UTF8 (also on Windows?)
-			rt = descrRef->buf;
+			rt = descrRef->buf.cbuf;
 			break;
 		}
 		
 		case SQLT_NUM: {
 			sword status_;
 			sword isInt = 0;		
-			status_ = OCINumberIsInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf, &isInt );
+			status_ = OCINumberIsInt( m_conn->errhp, (OCINumber *)descrRef->buf.cbuf, &isInt );
 			if( !status( status_, Executed ) ) {
 				errorStatus( std::string( "error in OCINumberIsInt for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
 				return types::VariantConst( );
 			}
 			if( !isInt ) {
 				double doubleval = 0;
-				status_ = OCINumberToReal( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+				status_ = OCINumberToReal( m_conn->errhp, (OCINumber *)descrRef->buf.cbuf,
 					(ub4)sizeof( doubleval ), (void *)&doubleval );
 				if( status( status_, Executed ) ) {
 					rt = doubleval;
@@ -615,7 +615,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 				}
 			} else {
 				sword sign = 0;
-				status_ = OCINumberSign( (*m_conn)->errhp, (OCINumber *)descrRef->buf, &sign );
+				status_ = OCINumberSign( m_conn->errhp, (OCINumber *)descrRef->buf.cbuf, &sign );
 				if( !status( status_, Executed ) ) {
 					errorStatus( std::string( "error in OCINumberSign for SQLT_NUM, error " ) + boost::lexical_cast<std::string>( descrRef->errcode ) + " in column (" + boost::lexical_cast<std::string>(idx) + ")" );
 					return types::VariantConst( );
@@ -623,7 +623,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 
 				if( sign < 0 ) {
 					_WOLFRAME_INTEGER intval = 0;
-					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+					status_ = OCINumberToInt( m_conn->errhp, (OCINumber *)descrRef->buf.cbuf,
 						(ub4)sizeof( _WOLFRAME_INTEGER ), (ub4)OCI_NUMBER_SIGNED, (void *)&intval );
 					if( status( status_, Executed ) ) {
 						//~ LOG_DATA << "[Oracle get SQLT_NUM(signed)]: " << intval;
@@ -634,7 +634,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 					}
 				} else {
 					_WOLFRAME_UINTEGER uintval = 0;
-					status_ = OCINumberToInt( (*m_conn)->errhp, (OCINumber *)descrRef->buf,
+					status_ = OCINumberToInt( m_conn->errhp, (OCINumber *)descrRef->buf.cbuf,
 						(ub4)sizeof( _WOLFRAME_UINTEGER ), (ub4)OCI_NUMBER_UNSIGNED, (void *)&uintval );
 					if( status( status_, Executed ) ) {
 						//~ LOG_DATA << "[Oracle get SQLT_NUM(unsigned)]: " << uintval;
@@ -653,7 +653,7 @@ types::VariantConst TransactionExecStatemachine_oracle::get( std::size_t idx)
 		}
 		
 		case SQLT_IBDOUBLE: {
-			rt = types::VariantConst( *((double *)descrRef->buf) );
+			rt = types::VariantConst( *((double *)descrRef->buf.dbuf) );
 			break;
 		}
 					
@@ -677,7 +677,7 @@ bool TransactionExecStatemachine_oracle::next()
 	
 	if( !m_hasRow ) return false;
 
-	sword status_ = OCIStmtFetch( m_lastresult, (*m_conn)->errhp, (ub4)1,
+	sword status_ = OCIStmtFetch( m_lastresult, m_conn->errhp, (ub4)1,
 		(ub2)OCI_FETCH_NEXT, (ub4)OCI_DEFAULT );
 	bool rt = status( status_, Executed );
 	if( !rt ) return rt;
@@ -689,5 +689,5 @@ bool TransactionExecStatemachine_oracle::next()
 
 const std::string& TransactionExecStatemachine_oracle::databaseID() const
 {
-	return m_dbUnit->ID();
+	return m_database->ID();
 }

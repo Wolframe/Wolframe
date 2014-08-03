@@ -1,6 +1,6 @@
 
 function run()
-	f = filter( "textwolf")
+	f = provider.filter( "textwolf")
 	-- filter out tokens containing only spaces:
 	f.empty = false
 	input:as( f)
@@ -8,13 +8,11 @@ function run()
 	t = input:value()
 
 	-- print the document from the table
-	output:opentag( 'doc')
 	output:opentag( 'name')
-	output:print( t['doc']['name'])
+	output:print( t['name'])
 	output:closetag()
 	output:opentag( 'country')
-	output:print( t['doc']['country'])
-	output:closetag()
+	output:print( t['country'])
 	output:closetag()
 end
 

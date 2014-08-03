@@ -34,7 +34,7 @@
 ///\brief Interface wolfilter test plugin data
 #ifndef _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
 #define _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
-#include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/structDescriptionBase.hpp"
 #include <string>
 #include <vector>
 
@@ -72,13 +72,6 @@ struct Assignment
 struct AssignmentList
 {
 	std::vector<Assignment> assignment;
-
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
-struct AssignmentListDoc
-{
-	AssignmentList assignmentlist;
 
 	static const serialize::StructDescriptionBase* getStructDescription();
 };

@@ -22,19 +22,18 @@ LIBRARIES = \
 	wolframe_langbind.lib
 
 CPP_OBJS = \
-	protocol_ioblocks.obj \
-	appObjects.obj \
+	filterdef.obj \
+	input.obj \
+	output.obj \
 	tostringfilter.obj \
 	ptreefilter.obj \
 	typingfilter.obj \
 	typedfilterScope.obj \
 	inputfilterScope.obj \
+	joinfilter.obj \
 	null_filter.obj \
-	cmdbind_lineCommandHandler.obj \
-	cmdbind_execCommandHandler.obj \
-	cmdbind_doctypeFilterCommandHandler.obj \
-	cmdbind_contentBufferCommandHandlerEscDLF.obj \
-	cmdbind_IOFilterCommandHandlerEscDLF.obj
+	execContextInputFilter.obj \
+	ioFilterCommandHandler.obj \
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

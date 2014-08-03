@@ -34,6 +34,7 @@ Project Wolframe.
 #include "pythonStructureBuilder.hpp"
 #include "logger-v1.hpp"
 #include "pythonException.hpp"
+#include <Python.h>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;

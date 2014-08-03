@@ -46,7 +46,7 @@
 namespace _Wolframe {
 namespace db {
 
-class SQLiteDBunit;
+class SQLiteDatabase;
 
 ///\class TransactionExecStatemachine_sqlite3
 ///\brief Implementation of the standard database transaction execution statemechine for sqlite (Sqlite3)
@@ -55,12 +55,12 @@ struct TransactionExecStatemachine_sqlite3
 	:public TransactionExecStatemachine
 {
 	///\brief Constructor
-	TransactionExecStatemachine_sqlite3( const std::string& name_, SQLiteDBunit* dbunit_);
+	explicit TransactionExecStatemachine_sqlite3( SQLiteDatabase* database_);
 
 	///\brief Destructor
 	virtual ~TransactionExecStatemachine_sqlite3();
 
-	//\brief Get the database identifier
+	///\brief Get the database identifier
 	virtual const std::string& databaseID() const;
 
 	///\brief Begin transaction
@@ -78,7 +78,8 @@ struct TransactionExecStatemachine_sqlite3
 	virtual bool execute();
 	///\brief Return true is the last command has at least one result row returned
 	virtual bool hasResult();
-	///\brief Get the number of columns of the last result
+	///\brief Get the number of columns of the last result.
+	///\remark This function should be used to check if the last command had a result (that can also be empty)
 	virtual std::size_t nofColumns();
 	///\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx);
@@ -115,15 +116,15 @@ private:
 	bool executeInstruction( const char* stmstr, State newstate);
 
 private:
-	State m_state;
-	std::string m_dbname;
-	std::string m_curstm;
-	bool m_hasResult;
-	bool m_hasRow;
+	State m_state;						//< command execution state
+	std::string m_dbname;					//< name of database
+	std::string m_curstm;					//< current statement executed
+	bool m_hasResult;					//< last command executed is a command that returns a result set (the result might be empty, check 'm_hasRow' for  non empty result)
+	bool m_hasRow;						//< last command executed result set has at least one result row
 	boost::shared_ptr<db::DatabaseError> m_lasterror;	//< last error occurred
 	sqlite3_stmt* m_stm;					//< current statement
-	SQLiteDBunit* m_dbunit;					//< database unit
-	PoolObject<sqlite3*>* m_conn;				//< database connection
+	SQLiteDatabase* m_database;				//< database
+	boost::shared_ptr<sqlite3> m_conn;			//< database connection
 	Statement *m_statement;					//< the statement parser
 };
 

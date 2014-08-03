@@ -1,0 +1,95 @@
+#!/bin/sh
+
+VERSION=0.0.2
+PKGBUILD=$HOME/bsdbuild
+ORIG_ARCH=`uname -m`
+OS_VERSION=`uname -r`
+ORIG_OS_VER=`uname -r | cut -f 1 -d -`
+
+if test "x$ORIG_ARCH" = "xamd64"; then
+	ARCH="x86_64"
+else if test "x$ORIG_ARCH" = "xi386"; then
+	ARCH="i686"
+else
+	echo "ERROR: Unknown FreeBSD architecture '$ORIG_ARCH'"
+	exit 1
+fi
+fi
+
+# sort out various FreeImage mess
+if test "x$ORIG_OS_VER" = "x10.0"; then
+	# freeimage is ok on FreeBSD 10
+else
+if test "x$ORIG_ARCH" = "xamd64"; then
+	FREEIMAGE="WITH_LOCAL_FREEIMAGE=1"
+else
+if test "x$ORIG_ARCH" = "xi386"; then
+	# Freeimage is broken on 32-bit FreeBSD (because of gcc)
+	FREEIMAGE=""
+fi
+fi
+fi
+
+case $OS_VERSION in
+	8.*)
+		FREEIMAGE=""
+		;;
+esac
+
+check_for_errors( )
+{
+	RET=$?
+	if test $RET -gt 0; then
+		echo "Packaging failed."
+		exit 1
+	fi
+}
+
+rm -rf $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
+mkdir $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d
+cp packaging/freebsd/wolframed $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/.
+chmod 0775 $PKGBUILD/PKG/wolframe-$VERSION/usr/local/etc/rc.d/wolframed
+
+if test "x$ORIG_OS_VER" = "x10.0"; then
+	cp packaging/freebsd/+MANIFEST $PKGBUILD/PKG/.
+	cd $PKGBUILD
+	pkg create -o $PKGBUILD/PKGS/$ARCH -m PKG -r PKG/wolframe-$VERSION
+	mv $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION.txz $PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$ARCH.txz
+else
+	cp packaging/freebsd/comment $PKGBUILD/PKG/wolframe-$VERSION/.
+	cp packaging/freebsd/description $PKGBUILD/PKG/wolframe-$VERSION/.
+	cp packaging/freebsd/packlist $PKGBUILD/PKG/wolframe-$VERSION/.
+	if test "x$FREEIMAGE" = "xWITH_LOCAL_FREEIMAGE=1"; then
+		cat packaging/freebsd/packlist.freeimage >> $PKGBUILD/PKG/wolframe-$VERSION/packlist
+	fi
+	cat packaging/freebsd/packlist.tail >> $PKGBUILD/PKG/wolframe-$VERSION/packlist
+	cp packaging/freebsd/iscript $PKGBUILD/PKG/wolframe-$VERSION/.
+	cp packaging/freebsd/dscript $PKGBUILD/PKG/wolframe-$VERSION/.
+
+	cd $PKGBUILD
+
+	pkg_create -S $PKGBUILD -z -v \
+		-c PKG/wolframe-$VERSION/comment \
+		-d PKG/wolframe-$VERSION/description \
+		-f PKG/wolframe-$VERSION/packlist \
+		-i PKG/wolframe-$VERSION/iscript \
+		-k PKG/wolframe-$VERSION/dscript \
+		$PKGBUILD/PKGS/$ARCH/wolframe-$VERSION-$ARCH.tgz
+	check_for_errors
+fi
+
+echo "Packaging succeeded."
+
+if test "x$ORIG_OS_VER" = "x10.0"; then
+	pkg info -l -F PKGS/$ARCH/wolframe-$VERSION-$ARCH.txz | tr -d '\t' | grep -v "wolframe-$VERSION:" | sort > in
+else
+	pkg_info -L PKGS/$ARCH/wolframe-$VERSION-$ARCH.tgz | sort > in
+fi
+cd $PKGBUILD/PKG/wolframe-$VERSION
+find . -type f | sort | sed 's|^\.||g' > ../../now
+
+echo "Differences in package and in installation root:"
+cd $PKGBUILD
+diff now in
+
+exit 0

@@ -51,55 +51,32 @@ std::string OutputFilterImpl::elementpath() const
 	return rt;
 }
 
-bool OutputFilterImpl::flushBuffer()
-{
-	bool rt = true;
-	// if we have the whole document, then we start to print it and return an error, as long as we still have data:
-	if (m_elemitr < m_elembuf.size())
-	{
-		m_elemitr += write( m_elembuf.c_str() + m_elemitr, m_elembuf.size() - m_elemitr);
-		if (m_elemitr == m_elembuf.size())
-		{
-			setState( OutputFilter::Open);
-			rt = true;
-		}
-		else
-		{
-			setState( OutputFilter::EndOfBuffer);
-			rt = false;
-		}
-	}
-	else
-	{
-		setState( OutputFilter::Open);
-	}
-	return rt;
-}
-
 void OutputFilterImpl::printStructToBuffer()
 {
-	if (m_stk.size() != 1) throw std::logic_error( "internal: illegal call of 'printStructToBuffer()'");
-
-	char* content = cJSON_Print( m_stk.back().m_node);
-	if (!content) throw std::bad_alloc();
-
-	boost::shared_ptr<char> contentref( content, std::free);
-
-	setEncoding();
-	if (m_encattr.encoding == types::String::UTF8)
+	if (!m_stk.back().m_node)
 	{
-		m_elembuf.append( content);
 		m_elembuf.push_back( '\n');
 	}
 	else
 	{
-		std::string res( content);
-		res.push_back( '\n');
-		types::String convres = types::StringConst( res).translateEncoding( m_encattr.encoding, m_encattr.codepage);
-		m_elembuf.append( (const char*)convres.ptr(), convres.size() * convres.elementSize());
+		char* content = cJSON_Print( m_stk.back().m_node);
+		if (!content) throw std::bad_alloc();
+	
+		boost::shared_ptr<char> contentref( content, std::free);
+	
+		if (m_encattr.encoding == types::String::UTF8)
+		{
+			m_elembuf.append( content);
+			m_elembuf.push_back( '\n');
+		}
+		else
+		{
+			std::string res( content);
+			res.push_back( '\n');
+			types::String convres = types::StringConst( res).translateEncoding( m_encattr.encoding, m_encattr.codepage);
+			m_elembuf.append( (const char*)convres.ptr(), convres.size() * convres.elementSize());
+		}
 	}
-	m_stk.clear();
-	m_stk.push_back( StackElement(""));
 }
 
 static bool deleteNameString( cJSON*& st)
@@ -117,9 +94,9 @@ static bool deleteNameString( cJSON*& st)
 	return true;
 }
 
-void OutputFilterImpl::addStructItem( const std::string name, cJSON* val)
+void OutputFilterImpl::addStructItem( const std::string id, cJSON* val)
 {
-	cJSON* item = cJSON_GetObjectItem( m_stk.back().m_node, name.c_str());
+	cJSON* item = cJSON_GetObjectItem( m_stk.back().m_node, id.c_str());
 	if (item)
 	{
 		// ... object with this name already exists
@@ -131,7 +108,7 @@ void OutputFilterImpl::addStructItem( const std::string name, cJSON* val)
 		else
 		{
 			// ... it is an object -> make an array with the 2 duplicates as elements
-			item = cJSON_DetachItemFromObject( m_stk.back().m_node, name.c_str());
+			item = cJSON_DetachItemFromObject( m_stk.back().m_node, id.c_str());
 			if (!deleteNameString( item))
 			{
 				cJSON_Delete( val);
@@ -148,7 +125,7 @@ void OutputFilterImpl::addStructItem( const std::string name, cJSON* val)
 			cJSON_AddItemToArray( ar, item);
 			cJSON_AddItemToArray( ar, val);
 
-			if (!cJSON_AddItemToObject( m_stk.back().m_node, name.c_str(), ar))
+			if (!cJSON_AddItemToObject( m_stk.back().m_node, id.c_str(), ar))
 			{
 				cJSON_Delete( ar);
 				throw std::bad_alloc();
@@ -157,7 +134,7 @@ void OutputFilterImpl::addStructItem( const std::string name, cJSON* val)
 	}
 	else
 	{
-		if (!cJSON_AddItemToObject( m_stk.back().m_node, name.c_str(), val))
+		if (!cJSON_AddItemToObject( m_stk.back().m_node, id.c_str(), val))
 		{
 			cJSON_Delete( val);
 			throw std::bad_alloc();
@@ -169,11 +146,13 @@ void OutputFilterImpl::closeElement()
 {
 	if (m_stk.size() <= 1)
 	{
-		if (!m_stk.empty()) m_stk.pop_back();
+		if (m_stk.empty()) throw std::runtime_error("tags not balanced, got a close too much");
+		printStructToBuffer();
+		m_stk.pop_back();
 	}
 	else
 	{
-		std::string name = m_stk.back().m_name;
+		std::string id = m_stk.back().m_name;
 		cJSON* val = m_stk.back().m_node;
 		m_stk.back().m_node = 0;
 		m_stk.pop_back();
@@ -182,7 +161,7 @@ void OutputFilterImpl::closeElement()
 		{
 			if (!m_stk.back().m_node)
 			{
-				if (name.empty())
+				if (id.empty())
 				{
 					m_stk.back().m_node = cJSON_CreateArray();
 				}
@@ -202,7 +181,7 @@ void OutputFilterImpl::closeElement()
 			}
 			else if (m_stk.back().m_node->type == cJSON_Object)
 			{
-				addStructItem( name, val);
+				addStructItem( id, val);
 			}
 			else
 			{
@@ -216,7 +195,7 @@ void OutputFilterImpl::closeElement()
 				}
 				if (val)
 				{
-					if (!cJSON_AddItemToObject(m_stk.back().m_node,name.c_str(),val))
+					if (!cJSON_AddItemToObject( m_stk.back().m_node, id.c_str(),val))
 					{
 						cJSON_Delete( val);
 						cJSON_Delete( contentval);
@@ -230,15 +209,10 @@ void OutputFilterImpl::closeElement()
 				}
 			}
 		}
-		if (m_stk.size() == 1)
-		{
-			// close of a root element -> we print the document content to output
-			printStructToBuffer();
-		}
 	}
 }
 
-void OutputFilterImpl::addStructValue( const std::string name, const std::string& value)
+void OutputFilterImpl::addStructValue( const std::string id, const std::string& value)
 {
 	if (!m_stk.back().m_node)
 	{
@@ -254,7 +228,7 @@ void OutputFilterImpl::addStructValue( const std::string name, const std::string
 		cJSON* val = cJSON_CreateString( value.c_str());
 		if (!val) throw std::bad_alloc();
 
-		addStructItem( name, val);
+		addStructItem( id, val);
 	}
 	else
 	{
@@ -298,115 +272,150 @@ void OutputFilterImpl::setContentValue( const std::string& value)
 		cJSON_AddItemToArray( ar, val);
 		m_stk.back().m_node = ar;
 	}
-	if (m_stk.size() == 1)
+}
+
+void OutputFilterImpl::printHeader()
+{
+	types::DocMetaData md = getMetaData();
+	LOG_DEBUG << "[cjson output] document meta data: {" << md.tostring() << "}";
+
+	const char* encname = md.getAttribute( "encoding");
+	if (encname)
 	{
-		// set of a root element -> we print the document content to output
-		printStructToBuffer();
+		m_encattr = types::String::getEncodingFromName( encname);
 	}
+
+	const char* standalone = md.getAttribute( "standalone");
+	if (standalone && 0==std::strcmp( standalone, "yes"))
+	{
+		//... explicit standalone -> no meta data except encoding
+	}
+	else
+	{
+		std::string doctype = md.doctype();
+		if (doctype.empty())
+		{
+			const char* doctypeattr = md.getAttribute( "doctype");
+			if (doctypeattr)
+			{
+				addStructValue( "-doctype", doctypeattr);
+			}
+		}
+		else
+		{
+			addStructValue( "-doctype", doctype);
+		}
+	}
+	if (m_encattr.codepage) addStructValue( "-encoding", encname);
+
+	m_headerprinted = true;
+	setState( Open);
+}
+
+bool OutputFilterImpl::close()
+{
+	if (!m_headerprinted)
+	{
+		printHeader();
+	}
+	if (!m_stk.empty())
+	{
+		return print( FilterBase::CloseTag, 0, 0);
+	}
+	return true;
 }
 
 bool OutputFilterImpl::print( ElementType type, const void* element, std::size_t elementsize)
 {
-	if (!flushBuffer()) return false;
-	if (m_stk.empty())
+	try
 	{
-		setState( Error, "cjson filter illegal operation: printing after final close");
-	}
-	switch (type)
-	{
-		case OutputFilter::OpenTag:
-			if (!m_headerPrinted)
+		if (m_elembuf.size() > outputChunkSize() && outputChunkSize())
+		{
+			if (m_elemitr == m_elembuf.size())
 			{
-				if (!m_doctypeid.empty()) addStructValue( "doctype", m_doctypeid);
-				m_headerPrinted = true;
-			}
-			m_stk.push_back( StackElement( std::string( (const char*)element, elementsize)));
-			break;
-
-		case OutputFilter::Attribute:
-			if (!m_attribname.empty())
-			{
-				setState( Error, "cjson filter illegal operation: printing subsequent attributes");
-				return false;
-			}
-			m_attribname.append( (const char*)element, elementsize);
-			break;
-
-		case OutputFilter::Value:
-			if (m_attribname.empty())
-			{
-				setContentValue( std::string( (const char*)element, elementsize));
+				m_elembuf.clear();
+				m_elemitr = 0;
 			}
 			else
 			{
-				addStructValue( m_attribname, std::string( (const char*)element, elementsize));
-				m_attribname.clear();
+				setState( EndOfBuffer);
+				return false;
 			}
-			break;
-
-		case OutputFilter::CloseTag:
-			closeElement();
-			break;
-
-		default:
-			setState( Error, "cjson filter: illegal state");
-			return false;
-	}
-	return flushBuffer();
-}
-
-void OutputFilterImpl::setDocType( const std::string& value)
-{
-	if (m_headerPrinted)
-	{
-		throw std::runtime_error( "cannot set doctype anymore after elements printed");
-	}
-	types::DocType doctype( value);
-	m_doctypeid = doctype.systemid;
-}
-
-void OutputFilterImpl::setEncoding()
-{
-	if (!m_encattr_defined)
-	{
-		if (attributes())
-		{
-			const char* encstr = attributes()->getEncoding();
-			if (encstr)
-			{
-				m_encattr = types::String::getEncodingFromName( encstr);
-			}
-			m_encattr_defined = true;
 		}
-	}
-}
-
-bool OutputFilterImpl::getValue( const char* name, std::string& val)
-{
-	if (std::strcmp( name, "encoding") == 0)
-	{
-		if (m_encattr_defined)
+		if (m_stk.empty())
 		{
-			val = types::String::encodingName( m_encattr.encoding, m_encattr.codepage);
-			return true;
+			setState( Error, "cjson filter illegal operation: printing after final close");
 		}
-		return false;
-	}
-	return Parent::getValue( name, val);
-}
-
-bool OutputFilterImpl::setValue( const char* name, const std::string& value)
-{
-	if (std::strcmp( name, "encoding") == 0)
-	{
-		if (m_headerPrinted)
+		if (!m_headerprinted)
 		{
-			setState( Error, "setting of the encoding not allowed after first print operation");
-			return false;
+			printHeader();
 		}
-		m_encattr = types::String::getEncodingFromName( value);
+		LOG_DATA << "[json output filter] print " << FilterBase::elementTypeName( type) << " '" << std::string( (const char*)element, elementsize) << "'";
+	
+		switch (type)
+		{
+			case OutputFilter::OpenTag:
+				m_stk.push_back( StackElement( std::string( (const char*)element, elementsize)));
+				break;
+	
+			case OutputFilter::Attribute:
+				if (!m_attribname.empty())
+				{
+					setState( Error, "cjson filter illegal operation: printing subsequent attributes");
+					return false;
+				}
+				m_attribname.append( (const char*)element, elementsize);
+				break;
+	
+			case OutputFilter::Value:
+				if (m_attribname.empty())
+				{
+					setContentValue( std::string( (const char*)element, elementsize));
+				}
+				else
+				{
+					addStructValue( m_attribname, std::string( (const char*)element, elementsize));
+					m_attribname.clear();
+				}
+				break;
+	
+			case OutputFilter::CloseTag:
+				closeElement();
+				break;
+	
+			default:
+				setState( Error, "cjson filter: illegal state");
+				return false;
+		}
+		m_lastelemtype = type;
 		return true;
 	}
-	return Parent::setValue( name, value);
+	catch (const std::bad_alloc& e)
+	{
+		setState( Error, e.what());
+		return false;
+	}
+	catch (const std::runtime_error& e)
+	{
+		setState( Error, e.what());
+		return false;
+	}
+}
+
+void OutputFilterImpl::getOutput( const void*& buf, std::size_t& bufsize)
+{
+	buf = (const void*)(m_elembuf.c_str() + m_elemitr);
+	bufsize = m_elembuf.size() - m_elemitr;
+	m_elemitr = m_elembuf.size();
+}
+
+bool OutputFilterImpl::getValue( const char* id, std::string& val) const
+{
+	return Parent::getValue( id, val);
+}
+
+bool OutputFilterImpl::setValue( const char* id, const std::string& value)
+{
+	return Parent::setValue( id, value);
 }
 

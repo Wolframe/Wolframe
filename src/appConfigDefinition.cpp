@@ -64,7 +64,7 @@ ApplicationConfiguration::ApplicationConfiguration()
 	addConfig( "ServerTokens", handlerCfg->bannerCfg );
 	addConfig( "ServerSignature", handlerCfg->bannerCfg );
 
-	addConfig( "listen", serverCfg );
+	addConfig( "Server", serverCfg );
 //	addConfig( "JobScheduler", jobSchedulerCfg );
 	addConfig( "logging", loggerCfg );
 	addConfig( "database", handlerCfg->databaseCfg );

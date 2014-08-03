@@ -39,22 +39,16 @@
 
 #include <string>
 #include <vector>
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "module/constructor.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/CRAM.hpp"
 #include "passwdFile.hpp"
 
-#ifndef _WIN32
-static const bool	USERNAME_DEFAULT_CASE_SENSIVE = true;
-#else
-static const bool	USERNAME_DEFAULT_CASE_SENSIVE = false;
-#endif
-
 namespace _Wolframe {
 namespace AAAA {
 
-static const char* TEXT_FILE_AUTHENTICATION_CLASS_NAME = "TextFileAuth";
+static const char* TEXT_FILE_AUTH_CLASS_NAME = "TextFileAuth";
 
 class TextFileAuthConfig :  public config::NamedConfiguration
 {
@@ -63,10 +57,10 @@ public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* className() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
+	virtual const char* className() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -74,63 +68,167 @@ public:
 private:
 	std::string			m_identifier;
 	std::string			m_file;
+	bool				m_caseSensitive;
+	bool				m_canChangePassword;
 };
 
 
-class TextFileAuthenticator : public AuthenticationUnit
+class TextFileAuthUnit : public AuthenticationUnit
 {
 public:
-	TextFileAuthenticator( const std::string& Identifier, const std::string& filename );
-	~TextFileAuthenticator();
-	virtual const char* className() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
+	TextFileAuthUnit( const std::string& Identifier, const std::string& filename );
 
-	AuthenticatorInstance* instance();
+	~TextFileAuthUnit();
 
-	/// \brief
-	User* authenticatePlain( const std::string& username, const std::string& password,
-				 bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+	virtual const char* className() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
 
-	/// \brief
-	PwdFileUser getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
-			     bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+	const char** mechs() const;
+
+	AuthenticatorSlice* slice( const std::string& mech, const net::RemoteEndpoint& client );
+	PasswordChanger* passwordChanger( const User& user, const net::RemoteEndpoint& client );
+
+	/// \brief	Authenticate a user with its plain username and password
+	/// \note	This function is supposed to be used only for tests.
+	///		DO NOT USE THIS FUNCTION IN REAL AUTHENTICATION MECHANISMS
+	///
+	/// \param [in]	username
+	/// \param [in]	password	guess what this are :D
+	/// \param [in]	caseSensitveUser should the username be treated as case-sensitive or not
+	User* authenticatePlain( const std::string& username, const std::string& password ) const;
+
+	/// \brief	Get the user data
+	/// \param [in]	hash		username hash (base64 of the HMAC-SHA256)
+	/// \param [in]	key		the key used for computing the username hash (base64)
+	/// \param [out] user		reference to the user structure that will be filled
+	///				by the function in case of success
+	/// \param [in]	caseSensitveUser should the username be treated as case-sensitive or not
+	/// \returns	true if the user was found, false otherwise
+	bool getUser( const std::string& hash, const std::string& key, PwdFileUser& user ) const;
+	bool getUser( const std::string& userHash, PwdFileUser& user ) const;
+
+	bool getUserPlain( const std::string& username, PwdFileUser& user ) const;
+
 private:
-	const PasswordFile	m_pwdFile;
+	static const std::string	m_mechs[];
+	const PasswordFile		m_pwdFile;
 };
 
 
-/// Flow:
-/// Initialize --> send HMAC key --> receive username HMAC +-> user found --> send salt + challenge --> (*)
-///                                                        +-> user not found --> finish
-///
-/// (*) --> receive response --> send result
-///
-class TextFileAuthInstance : public AuthenticatorInstance
+// Flow:
+// Initialize --> receive username key + HMAC --> + user found --> send salt + challenge --> (*)
+//                                                + user not found --> finish
+//
+// (*) --> receive response --> + got user
+//				+ invalid credentials
+//
+class TextFileAuthSlice : public AuthenticatorSlice
 {
-	enum	FSMstate	{
-		INITIALIZED,			///< It has been initialized OK.
-		HMAC_KEY_SENT,			///< Sent HMAC key
-		PARSING,
-		FINISHED
+	enum	SliceState	{
+		SLICE_INITIALIZED,		///< Has been initialized, no other data
+		SLICE_USER_FOUND,		///< User has been found, will send challenge
+		SLICE_USER_NOT_FOUND,		///< User has not been found -> fail
+		SLICE_CHALLENGE_SENT,		///< Waiting for the response
+		SLICE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
+		SLICE_AUTHENTICATED,		///< Response was correct -> user available
+		SLICE_SYSTEM_FAILURE		///< Something is wrong
 	};
 
 public:
-	TextFileAuthInstance( const TextFileAuthenticator& backend );
-	~TextFileAuthInstance();
-	void close()					{ delete this; }
+	TextFileAuthSlice( const TextFileAuthUnit& backend );
 
-	const char* typeName() const			{ return m_backend.className(); }
-	AuthProtocol protocolType() const		{ return AuthenticatorInstance::PLAIN; }
+	~TextFileAuthSlice();
 
-	void receiveData( const void* data, std::size_t size );
-	const FSM::Operation nextOperation();
-	void signal( FSM::Signal event );
-	std::size_t dataLeft( const void*& begin );
+	void dispose();
 
-	User* user();
+	virtual const char* className() const		{ return m_backend.className(); }
+
+	virtual const std::string& identifier() const	{ return m_backend.identifier(); }
+
+	/// The input message
+	virtual void messageIn( const std::string& message );
+
+	/// The output message
+	virtual std::string messageOut();
+
+	/// The current status of the authenticator slice
+	virtual Status status() const;
+
+	/// Is the last input message reusable for this mech ?
+	virtual bool inputReusable() const		{ return m_inputReusable; }
+
+	/// Tell the slice that it is the last one
+	virtual void lastSlice()			{ m_lastSlice = true; }
+
+	/// The authenticated user or NULL if not authenticated
+	virtual User* user();
+
 private:
-	const TextFileAuthenticator&	m_backend;
-	struct PwdFileUser		m_usr;
-	User*				m_user;
+	const TextFileAuthUnit&	m_backend;
+	struct PwdFileUser	m_usr;
+	SliceState		m_state;
+	CRAMchallenge*		m_challenge;
+	bool			m_inputReusable;
+	bool			m_lastSlice;
+	bool			m_fakeUser;
+};
+
+
+// Flow:
+// Initialize --> send salt + challenge -->
+//  --> client encrypts the new password + password crc with the response -->
+//  --> server decrypts with the response --> crc matches --> + - yes --> change pwd
+//                                                            + - no  --> abort
+//
+class TextFilePwdChanger : public PasswordChanger
+{
+	enum	ChangerState	{
+		CHANGER_INITIALIZED,		///< Has been initialized, no other data
+		CHANGER_CHALLENGE_SENT,		///< Waiting for the answer
+		CHANGER_INVALID_MESSAGE,	///< Answer CRC was wrong -> fail
+		CHANGER_PASSWORD_EXCHANGED,	///< Answer CRC was correct -> password changed
+		CHANGER_SYSTEM_FAILURE		///< Something is wrong
+	};
+
+	static const char* statusName( ChangerState i )
+	{
+		static const char* ar[] = {	"CHANGER_INITIALIZED",
+						"CHANGER_CHALLENGE_SENT",
+						"CHANGER_INVALID_MESSAGE",
+						"CHANGER_PASSWORD_EXCHANGED",
+						"CHANGER_SYSTEM_FAILURE"
+					  };
+		return ar[ i ];
+	}
+
+public:
+	TextFilePwdChanger( const TextFileAuthUnit& backend, const std::string& username );
+
+	~TextFilePwdChanger();
+
+	void dispose();
+
+	virtual const char* className() const		{ return m_backend.className(); }
+
+	virtual const std::string& identifier() const	{ return m_backend.identifier(); }
+
+	/// The input message
+	virtual void messageIn( const std::string& message );
+
+	/// The output message
+	virtual std::string messageOut();
+
+	/// The current status of the authenticator slice
+	virtual Status status() const;
+
+	/// The new password
+	virtual std::string password();
+
+private:
+	const TextFileAuthUnit&	m_backend;
+	struct PwdFileUser	m_usr;
+	ChangerState		m_state;
+	CRAMchallenge*		m_challenge;
+	std::string		m_password;
 };
 
 
@@ -141,8 +239,10 @@ class TextFileAuthConstructor : public ConfiguredObjectConstructor< Authenticati
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 							{ return AUTHENTICATION_OBJECT; }
-	const char* objectClassName() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
-	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
+
+	const char* objectClassName() const		{ return TEXT_FILE_AUTH_CLASS_NAME; }
+
+	TextFileAuthUnit* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

@@ -1,0 +1,104 @@
+'\" t
+.\"     Title: wolframe
+.\"    Author:  <contact@wolframe.net>
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 07/16/2014
+.\"    Manual: Wolframe User Manual
+.\"    Source: wolframe-mod_db_sqlite3
+.\"  Language: English
+.\"
+.TH "WOLFRAME" "5" "07/16/2014" "wolframe-mod_db_sqlite3" "Wolframe User Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+wolframe-mod_db_sqlite3 \- Wolframe database module for Sqlite3
+.SH "SYNOPSIS"
+.HP \w'\fB/etc/wolframe/wolframe\&.conf,\ /etc/wolframe/conf\&.d/mod_db_sqlite3\&.conf\fR\ 'u
+\fB/etc/wolframe/wolframe\&.conf, /etc/wolframe/conf\&.d/mod_db_sqlite3\&.conf\fR
+.SH "DESCRIPTION"
+.PP
+This manual page documents briefly the configuration option available for the SQLite3 database module of the Wolframe system\&.
+.SH "OPTIONS"
+.PP
+The module adds a new directive
+\fBSQLite\fR
+to the global configuration section
+\fBdatabase\fR\&.
+.SS "SQLite"
+.PP
+The following directives are valid in this section:
+.PP
+\fBIdentifier \fR\fB\fIidentifier\fR\fR
+.RS 4
+Register the configured database connection with name
+\fIidentifier\fR\&. You can later reference it by that name when an identifier of a database connection is needed\&. This parameter is required\&.
+.RE
+.PP
+\fBFile \fR\fB\fIfilename\fR\fR
+.RS 4
+Store the SQLite database into
+\fIfilename\fR\&. This parameter is required\&.
+.RE
+.PP
+\fBConnections \fR\fB\fIconnections\fR\fR
+.RS 4
+Number of parallel connections used to connect to the database\&. This creates a pool of size
+\fIconnections\fR
+of database connections available to the business layer\&.
+.RE
+.PP
+\fBForeignKeys \fR\fB\fIyes\fR\fR\fB | \fR\fB\fIno\fR\fR\fB \fR
+.RS 4
+Setting \*(AqforeignKeys\*(Aq to \*(Aqyes\*(Aq enables referential integrity in the database\&. This is actually the same as executing \*(AqPRAGMA foreign_keys=true\*(Aq\&. The default is \*(Aqyes\*(Aq\&.
+.RE
+.PP
+\fBProfiling \fR\fB\fIyes\fR\fR\fB | \fR\fB\fIno\fR\fR\fB \fR
+.RS 4
+Shows the SQL commands being executed and their execution time in milliseconds\&. Default is \*(Aqno\*(Aq\&.
+.RE
+.PP
+\fBExtension \fR\fB\fIfilename\fR\fR
+.RS 4
+Loads an SQLite3 extension module named
+\fIfilename\fR\&. This is useful to load native code into SQLite3 imlementing for instance new database functions\&. Have a look at the SQLite3 \*(AqRun\-Time Loadable Extensions\*(Aq section at
+\m[blue]\fB\%http://www.sqlite.org/loadext.html\fR\m[]\&.
+.RE
+.SH "BUGS"
+.PP
+Find issues and bugs on
+Github
+at
+\m[blue]\fB\%https://github.com/Wolframe/Wolframe/issues\fR\m[]\&.
+.SH "SEE ALSO"
+.PP
+\fBwolframe.conf\fR(5)
+.SH "AUTHOR"
+.PP
+ <\&contact@wolframe\&.net\&>
+.RS 4
+This manual was written by the Wolframe Team\&.
+.RE
+.SH "COPYRIGHT"
+.br
+Copyright \(co 2010-2014 Wolframe Team
+.br
+.PP
+The authors grant permission to copy, distribute and/or modify this manual page under the terms of the GNU General Public License Version 3 or newer (GPLv3)\&.
+.sp

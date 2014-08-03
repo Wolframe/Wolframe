@@ -32,31 +32,20 @@
 ************************************************************************/
 ///\file mod_command_dotnet.cpp
 ///\brief Module for calling functions as methods defined in .NET assemblies via .NET interop
-#include "dotnetRuntimeEnvironmentBuilder.hpp"
-#include "logger-v1.hpp"
+#include "appdevel/runtimeEnvironmentModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
+#include "dotnetRuntimeEnvironment.hpp"
+#include "comauto/utils.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::module;
 
-namespace {
-static ConfiguredBuilder* createDotnetRuntimeEnvironmentBuilder()
+static int initDotNetCLR()
 {
-	static DotnetRuntimeEnvironmentBuilder
-		mod( "runtime environment for .NET", "runtimeenv", "dotnet", "DotnetRuntimeEnvironment");
-	return &mod;
+	WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED));
+	return 0/*OK*/;
 }
 
-}//anonymous namespace
-
-enum {NofConfiguredBuilder=1};
-enum {NofSimpleBuilder=0};
-static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
-{
-	createDotnetRuntimeEnvironmentBuilder
-};
-
-ModuleEntryPoint entryPoint( 0, "form function handler for .NET interop",
-				NofConfiguredBuilder, configuredBuilder,
-				NofSimpleBuilder, 0);
-
-
+WF_MODULE_BEGIN( "DotNetRuntimeEnvironment", "runtime environment for .NET programs")
+ WF_RUNTIME_ENVIRONMENT( "runtime environment for .NET", "runtimeenv", "dotnet", _Wolframe::module::DotnetRuntimeEnvironment, _Wolframe::module::DotnetRuntimeEnvironmentConfig, initDotNetCLR)
+WF_MODULE_END

@@ -2,14 +2,11 @@
 #include "appDevel.hpp"
 // ... PUT THE INCLUDES FOR THE "ProcessCustomer" FUNCTION DECLARATION HERE !
 
-CPP_APPLICATION_FORM_FUNCTION_MODULE("process customer function")
+#include "customersFunction.hpp"
 
 using namespace _Wolframe;
 
-static module::createBuilderFunc objdef[] =
-{
-    appdevel::CppFormFunction<ProcessCustomer>::constructor
-};
-
-CPP_APPLICATION_FORM_FUNCTION_MODULE_END(1,objdef)
+WF_MODULE_BEGIN( "ProcessCustomerFunction", "process customer function")
+WF_FORM_FUNCTION("process_customer",ProcessCustomer::exec,Customer,Customer)
+WF_MODULE_END
 

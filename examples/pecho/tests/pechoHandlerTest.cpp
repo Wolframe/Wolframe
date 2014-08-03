@@ -39,6 +39,7 @@
 #include "system/connectionHandler.hpp"
 #include "wtest/testHandlerTemplates.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 #include <stdlib.h>
 #include <boost/thread/thread.hpp>
 
@@ -142,7 +143,7 @@ class pechoHandlerFixture : public ::testing::Test
 public:
 	std::string input;
 	std::string expected;
-	net::LocalTCPendpoint ep;
+	net::LocalEndpointR ep;
 	pecho::Connection* connection;
 	enum
 	{
@@ -151,7 +152,9 @@ public:
 	};
 
 protected:
-	pechoHandlerFixture() :ep( "127.0.0.1", 12345),connection(0) {}
+	pechoHandlerFixture()
+		:ep( new net::LocalTCPendpoint( "127.0.0.1", 12345))
+		,connection(0) {}
 
 	virtual void SetUp()
 	{
@@ -255,6 +258,7 @@ TYPED_TEST( pechoHandlerFixture, ExpectedResult )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

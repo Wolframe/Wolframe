@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file blob_filter.cpp
-///\brief Filter implementation reading/writing of uninterpreted binary data
+/// \file blob_filter.cpp
+/// \brief Filter implementation reading/writing of uninterpreted binary data
 
 #include "blob_filter.hpp"
 #include <cstring>
@@ -49,41 +49,33 @@ struct InputFilterImpl :public InputFilter
 {
 	///\brief Constructor
 	InputFilterImpl()
-		:types::TypeSignature("langbind::InputFilterImpl (blob)", __LINE__)
+		:InputFilter("blob")
 		,m_end(false)
 		,m_done(false){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:types::TypeSignature("langbind::InputFilterImpl (blob)", __LINE__)
-		,InputFilter( o)
+		:InputFilter( o)
 		,m_elembuf( o.m_elembuf)
 		,m_end(o.m_end)
 		,m_done(o.m_done){}
 
-	///\brief self copy
-	///\return copy of this
+	///\brief Implement InputFilter::copy()
 	virtual InputFilter* copy() const
 	{
 		return new InputFilterImpl( *this);
 	}
 
-	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
+	///\brief Implement InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* ptr, std::size_t size, bool end)
 	{
 		m_elembuf.append( (const char*)ptr, size);
 		m_end = end;
+		setState( Open);
 	}
 
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	{
-		ptr = 0;
-		size = 0;
-		end = m_end;
-	}
-
-	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	///\brief implement InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
 	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (m_done)
@@ -99,14 +91,21 @@ struct InputFilterImpl :public InputFilter
 			element = m_elembuf.c_str();
 			elementsize = m_elembuf.size();
 			m_done = true;
+			setState( Open);
 			return true;
 		}
+		setState( EndOfMessage);
 		return false;
 	}
 
-	virtual const char* getEncoding() const
+	virtual const types::DocMetaData* getMetaData()
 	{
-		return 0;
+		return getMetaDataRef().get();
+	}
+
+	virtual bool checkSetFlags( Flags f) const
+	{
+		return (0==((int)f & (int)langbind::FilterBase::SerializeWithIndices));
 	}
 
 	virtual bool setFlags( Flags f)
@@ -124,73 +123,67 @@ private:
 	bool m_done;				//< true if we have finished
 };
 
-///\class OutputFilterImpl
-///\brief output filter filter for data as binary blob
+/// \class OutputFilterImpl
+/// \brief output filter filter for data as binary blob
 struct OutputFilterImpl :public OutputFilter
 {
-	///\brief Constructor
-	OutputFilterImpl()
-		:types::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
+	/// \brief Constructor
+	OutputFilterImpl( const types::DocMetaDataR& inheritedMetaData)
+		:OutputFilter("blob", inheritedMetaData)
 		,m_elemitr(0){}
 
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
+	/// \brief Copy constructor
+	/// \param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:types::TypeSignature("langbind::OutputFilterImpl (blob)", __LINE__)
-		,OutputFilter(o)
+		:OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr){}
 
-	///\brief self copy
-	///\return copy of this
+	/// \brief self copy
+	/// \return copy of this
 	virtual OutputFilter* copy() const
 	{
 		return new OutputFilterImpl( *this);
 	}
 
-	bool emptybuf()
-	{
-		std::size_t nn = m_elembuf.size() - m_elemitr;
-		m_elemitr += write( m_elembuf.c_str() + m_elemitr, nn);
-		if (m_elemitr == m_elembuf.size())
-		{
-			m_elembuf.clear();
-			m_elemitr = 0;
-			return true;
-		}
-		return false;
-	}
-
-	///\brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
-	///\param [in] type type of the element to print
-	///\param [in] element pointer to the element to print
-	///\param [in] elementsize size of the element to print in bytes
-	///\return true, if success, false else
+	/// \brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
+	/// \param [in] type type of the element to print
+	/// \param [in] element pointer to the element to print
+	/// \param [in] elementsize size of the element to print in bytes
+	/// \return true, if success, false else
 	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
-		setState( Open);
-		if (m_elemitr < m_elembuf.size())
+		if (m_elembuf.size() > outputChunkSize() && outputChunkSize())
 		{
-			// there is something to print left from last time
-			if (!emptybuf())
+			if (m_elemitr == m_elembuf.size())
+			{
+				m_elembuf.clear();
+				m_elemitr = 0;
+			}
+			else
 			{
 				setState( EndOfBuffer);
 				return false;
 			}
-			//... we've done the emptying of the buffer left
-			return true;
 		}
+		setState( Open);
 		if (type == Value)
 		{
 			m_elembuf.append( (const char*)element, elementsize);
-			if (!emptybuf())
-			{
-				setState( EndOfBuffer);
-				return false;
-			}
 		}
 		return true;
 	}
+
+	virtual void getOutput( const void*& buf, std::size_t& bufsize)
+	{
+		buf = (const void*)(m_elembuf.c_str() + m_elemitr);
+		bufsize = m_elembuf.size() - m_elemitr;
+		m_elemitr = m_elembuf.size();
+	}
+
+	/// \brief Implementation of OutputFilter::close()
+	virtual bool close(){return true;}
+
 private:
 	std::string m_elembuf;				//< buffer for the currently printed element
 	std::size_t m_elemitr;				//< iterator to pass it to output
@@ -203,26 +196,14 @@ struct BlobFilter :public Filter
 	BlobFilter()
 	{
 		m_inputfilter.reset( new InputFilterImpl());
-		m_outputfilter.reset( new OutputFilterImpl());
+		m_outputfilter.reset( new OutputFilterImpl( m_inputfilter->getMetaDataRef()));
 	}
 };
 
-class BlobFilterType :public FilterType
+Filter* BlobFilterType::create( const std::vector<FilterArgument>& arg) const
 {
-public:
-	BlobFilterType(){}
-	virtual ~BlobFilterType(){}
-
-	virtual Filter* create( const std::vector<FilterArgument>& arg) const
-	{
-		if (arg.size()) throw std::runtime_error( "unexpected arguments for blob filter");
-		return new BlobFilter();
-	}
-};
-
-FilterType* _Wolframe::langbind::createBlobFilterType()
-{
-	return new BlobFilterType();
+	if (arg.size()) throw std::runtime_error( "unexpected arguments for blob filter");
+	return new BlobFilter();
 }
 
 

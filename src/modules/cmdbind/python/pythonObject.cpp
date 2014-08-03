@@ -32,6 +32,11 @@ Project Wolframe.
 ///\file pythonObject.hpp
 #include "pythonObject.hpp"
 #include "pythonException.hpp"
+#include "types/customDataType.hpp"
+#include "types/datetime.hpp"
+#include "types/bignumber.hpp"
+#include <datetime.h>
+#include <Python.h>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -125,32 +130,62 @@ std::string Object::tostring() const
 	return Object::tostring( const_cast<PyObject*>(m_obj));
 }
 
-Object::Object( const types::Variant& val)
+void Object::constructor( const types::Variant& val)
 {
 	switch (val.type())
 	{
 		case types::Variant::Custom:
 		{
-			/*[PF:TODO] Implementation*/
-			std::string strval = val.tostring();
-			m_obj = PyUnicode_FromStringAndSize( strval.c_str(), strval.size());
-			if (!m_obj) THROW_ON_ERROR( "failed to convert to python unicode string");
-			break;
+			types::Variant baseval;
+			try
+			{
+				if (val.customref()->getBaseTypeValue( baseval)
+				&&  baseval.type() != types::Variant::Custom)
+				{
+					constructor( baseval);
+					break;
+				}
+			}
+			catch (const std::runtime_error& e)
+			{
+				throw std::runtime_error( std::string("cannot convert value to base type for binding: ") + e.what());
+			}
+			constructor( val.tostring());
 		}
 		case types::Variant::Timestamp:
 		{
-			/*[PF:TODO] Implementation*/
-			std::string strval = val.tostring();
-			m_obj = PyUnicode_FromStringAndSize( strval.c_str(), strval.size());
-			if (!m_obj) THROW_ON_ERROR( "failed to convert to python unicode string");
+			types::DateTime dt( val.totimestamp());
+			if (dt.subtype() == types::DateTime::YYYYMMDD)
+			{
+				m_obj = PyDate_FromDate( dt.year(), dt.month(), dt.day());
+				if (!m_obj) THROW_ON_ERROR( "failed to convert to python Date");
+			}
+			else
+			{
+				m_obj = PyDateTime_FromDateAndTime( dt.year(), dt.month(), dt.day(), dt.hour(), dt.minute(), dt.second(), dt.usecond());
+				if (!m_obj) THROW_ON_ERROR( "failed to convert to python DateTime");
+			}
 			break;
 		}
 		case types::Variant::BigNumber:
 		{
-			/*[PF:TODO] Implementation*/
 			std::string strval = val.tostring();
-			m_obj = PyUnicode_FromStringAndSize( strval.c_str(), strval.size());
-			if (!m_obj) THROW_ON_ERROR( "failed to convert to python unicode string");
+			if (val.bignumref()->scale() <= 0)
+			{
+				char* end = 0;
+				m_obj = PyLong_FromString( const_cast<char*>(strval.c_str()), &end, 10);
+				if (!m_obj) THROW_ON_ERROR( "failed to convert to big number (Long)");
+				else if (end != strval.c_str()+strval.size())
+				{
+					Py_DECREF( m_obj);
+					throw std::runtime_error( "superfluous characters at end of big number string");
+				}
+			}
+			else
+			{
+				m_obj = PyBytes_FromStringAndSize( strval.c_str(), strval.size());
+				if (!m_obj) THROW_ON_ERROR( "failed to convert to big number (fixed point number) as string");
+			}
 			break;
 		}
 		case types::Variant::Null:
@@ -179,6 +214,11 @@ Object::Object( const types::Variant& val)
 		default:
 			throw std::runtime_error("try to get object for non atomic value");
 	}
+}
+
+Object::Object( const types::Variant& val)
+{
+	constructor( val);
 }
 
 Object::Object( PyObject* obj_, bool isborrowed)
@@ -280,17 +320,22 @@ Object::Object( const char* s, std::size_t n, bool unicode)
 	if (!m_obj) THROW_ON_ERROR( "failed to convert to python string");
 }
 
-Object::Object( const std::string& s, bool unicode)
+void Object::constructor( const std::string& val, bool unicode)
 {
 	if (unicode)
 	{
-		m_obj = PyBytes_FromStringAndSize( s.c_str(), s.size());
+		m_obj = PyBytes_FromStringAndSize( val.c_str(), val.size());
 	}
 	else
 	{
-		m_obj = PyUnicode_FromStringAndSize( s.c_str(), s.size());
+		m_obj = PyUnicode_FromStringAndSize( val.c_str(), val.size());
 	}
 	if (!m_obj) THROW_ON_ERROR( "failed to convert to python string");
+}
+
+Object::Object( const std::string& val, bool unicode)
+{
+	constructor( val, unicode);
 }
 
 Object& Object::operator=( const Object& o)

@@ -34,9 +34,10 @@
 // appConfig.cpp
 //
 
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "appConfig.hpp"
+#include "module/moduleDirectory.hpp"
 #include "utils/fileUtils.hpp"
 #include "wolframedCommandLine.hpp"
 #include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
@@ -45,12 +46,7 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/info_parser.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
 #include <boost/algorithm/string.hpp>
-
 #include <string>
 #include <ostream>
 #include <stdexcept>
@@ -120,7 +116,6 @@ ApplicationConfiguration::ConfigFileType ApplicationConfiguration::fileType ( co
 		return CONFIG_UNDEFINED;
 	}
 
-	boost::property_tree::ptree	pt;
 	try	{
 		switch ( type )	{
 			case CONFIG_INFO:
@@ -184,29 +179,34 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 	configFile = utils::resolvePath( boost::filesystem::absolute( filename ).string() );
 	assert( boost::filesystem::exists( configFile ));
 
-	// Create an empty property tree object
-	boost::property_tree::ptree	pt;
 	try	{
-		switch ( type )	{
-			case CONFIG_INFO:
-				read_info( configFile, pt );
-				break;
-			case CONFIG_XML:
-				read_xml( configFile, pt, boost::property_tree::xml_parser::no_comments |
-					  boost::property_tree::xml_parser::trim_whitespace );
-				pt = pt.get_child( "configuration" );
-				break;
-			case CONFIG_UNDEFINED:
-				throw std::logic_error( "undefined configuration file type" );
+		types::PropertyTree pt;
+		bool isXML = false;
+
+		if (type == CONFIG_INFO)
+		{
+			pt = utils::readInfoPropertyTreeFile( configFile);
 		}
+		else if (type == CONFIG_XML)
+		{
+			isXML = true;
+			pt = utils::readXmlPropertyTreeFile( configFile);
+		}
+		else
+		{
+			isXML = (utils::getFileType( configFile).format == utils::FileType::XML);
+			pt = utils::readPropertyTreeFile( configFile);
+		}
+		types::PropertyTree::Node ptnode = pt.root();
 
 		bool retVal = true;
-		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
+		for ( types::PropertyTree::Node::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			LOG_TRACE << "Parse list of modules : parsing root element '" << it->first << "'";
-			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
+			if ( isXML && it->first == "<xmlcomment>" )
 				continue;
 			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))	{
-				for ( boost::property_tree::ptree::const_iterator L2it = it->second.begin();
+				// Parse LoadModules section:
+				for ( types::PropertyTree::Node::const_iterator L2it = it->second.begin();
 										L2it != it->second.end(); L2it++ )	{
 					if ( boost::algorithm::iequals( L2it->first, "module" ))	{
 						std::string modFile;
@@ -238,43 +238,28 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 							    << L2it->first << "'";
 					}
 				}
-				// resolv relative pathes
-				if ( ! m_modFolder.empty() )	{
-					std::string basePath = m_modFolder;
-					boost::filesystem::path bp( basePath );
-					if ( !bp.is_absolute() )	{
-#if defined( DEFAULT_MODULE_LOAD_DIR )
-						basePath = utils::getCanonicalPath( basePath, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
-						LOG_DEBUG << MODULE_SECTION_MSG << "using directory '" << basePath << "' for modules";
-#else
-						basePath = utils::getCanonicalPath( basePath, boost::filesystem::path( configFile ).branch_path().string() );
-/*MBa - maybe WARNING ? */			LOG_NOTICE << MODULE_SECTION_MSG << "using absolute directory path '" << basePath
-							   << "' for modules, instead of '" << m_modFolder << "'";
-#endif
+				// Resolve relative module pathes:
+				if (!m_modDir) throw std::runtime_error( "Module directory structure not defined");
+				std::list< std::string >::iterator pi = m_modFiles.begin(), pe = m_modFiles.end();
+				for (; pi != pe; ++pi)
+				{
+					if (pi->empty())
+					{
+						LOG_ERROR << MODULE_SECTION_MSG << "Configured empty module name";
+						continue;
 					}
-					for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
-										Pit != m_modFiles.end(); Pit++ )	{
-						*Pit = utils::getCanonicalPath( *Pit, basePath );
-						assert( ! Pit->empty() );
-						LOG_TRACE << MODULE_SECTION_MSG << "added module file '" << *Pit << "'";
+					boost::filesystem::path modfile( *pi);
+					if (modfile.is_absolute())
+					{
+						LOG_NOTICE << MODULE_SECTION_MSG << "Module configured has absolute module path '" << *pi << "'";
 					}
-				}
-				else	{
-					for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
-										Pit != m_modFiles.end(); Pit++ )	{
-						std::string oldPath = *Pit;
-#if defined( DEFAULT_MODULE_LOAD_DIR )
-						*Pit = utils::getCanonicalPath( *Pit, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
-#else
-						*Pit = utils::getCanonicalPath( *Pit, boost::filesystem::path( configFile ).branch_path().string() );
-						assert( ! Pit->empty() );
-						if ( oldPath != *Pit )	{
-							LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << *Pit
-								   << "' for modules, instead of '" << oldPath << "'";
-						}
-#endif
-						LOG_TRACE << MODULE_SECTION_MSG << "added module file '" << *Pit << "'";
+					else
+					{
+						std::string modpath = m_modDir->getAbsoluteModulePath( *pi, m_modFolder);
+						LOG_NOTICE << MODULE_SECTION_MSG << "Resolved relative module path '" << *pi << "' as '" << modpath << "'";
+						*pi = modpath;
 					}
+					LOG_TRACE << MODULE_SECTION_MSG << "Added module file '" << *pi << "'";
 				}
 			}
 		}
@@ -292,27 +277,30 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 {
 	configFile = utils::resolvePath( boost::filesystem::absolute( filename ).string() );
 	assert( boost::filesystem::exists( configFile ));
+	types::PropertyTree pt;
 
-	// Create an empty property tree object
-	boost::property_tree::ptree	pt;
 	try	{
-		switch ( type )	{
-			case CONFIG_INFO:
-				read_info( configFile, pt );
-				break;
-			case CONFIG_XML:
-				read_xml( configFile, pt, boost::property_tree::xml_parser::no_comments |
-					  boost::property_tree::xml_parser::trim_whitespace );
-				pt = pt.get_child( "configuration" );
-				break;
-			case CONFIG_UNDEFINED:
-				throw std::logic_error( "undefined configuration file type" );
+		bool isXML = false;
+		if (type == CONFIG_INFO)
+		{
+			pt = utils::readInfoPropertyTreeFile( configFile);
 		}
+		else if (type == CONFIG_XML)
+		{
+			isXML = true;
+			pt = utils::readXmlPropertyTreeFile( configFile);
+		}
+		else
+		{
+			isXML = (utils::getFileType( configFile).format == utils::FileType::XML);
+			pt = utils::readPropertyTreeFile( configFile);
+		}
+		types::PropertyTree::Node ptnode = pt.root();
 
 		bool retVal = true;
-		for ( boost::property_tree::ptree::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
+		for ( types::PropertyTree::Node::const_iterator it = pt.begin(); it != pt.end(); it++ )	{
 			LOG_TRACE << "Configuration : parsing root element '" << it->first << "'";
-			if ( it->first == "<xmlcomment>" && m_type == CONFIG_XML )
+			if ( isXML && it->first == "<xmlcomment>" )
 				continue;
 			// skip modules to load
 			if ( boost::algorithm::iequals( it->first, MODULE_SECTION ))
@@ -321,7 +309,7 @@ bool ApplicationConfiguration::parse ( const char *filename, ConfigFileType type
 			std::string nodeNameLC = it->first;
 			boost::algorithm::to_lower( nodeNameLC );
 			if (( confIt = m_section.find( nodeNameLC ) ) != m_section.end() )	{
-				if ( ! (m_conf[confIt->second])->parse( config::ConfigurationTree( it->second ),
+				if ( ! (m_conf[confIt->second])->parse( config::ConfigurationNode( it->second ),
 									confIt->first, m_modDir ))
 					retVal = false;
 			}

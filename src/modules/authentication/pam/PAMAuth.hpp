@@ -31,14 +31,14 @@
 
 ************************************************************************/
 //
-// text file authentication
+// PAM authentication
 //
 
 #ifndef _PAM_AUTHENTICATION_HPP_INCLUDED
 #define _PAM_AUTHENTICATION_HPP_INCLUDED
 
 #include <string>
-#include "AAAA/authentication.hpp"
+#include "AAAA/authUnit.hpp"
 #include "module/constructor.hpp"
 
 #include <security/pam_appl.h>
@@ -58,7 +58,7 @@ public:
 	virtual const char* className() const	{ return PAM_AUTHENTICATION_CLASS_NAME; }
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -70,6 +70,7 @@ private:
 // the structure with data we have to pass to the
 // PAM callback function (a transport wagon)
 typedef struct {
+	bool has_login;
 	std::string login;
 	bool has_pass;
 	std::string pass;
@@ -77,36 +78,25 @@ typedef struct {
 	pam_handle_t *h;
 } pam_appdata;
 
-class PAMAuthenticator : public AuthenticationUnit
+class PAMAuthUnit : public AuthenticationUnit
 {
 public:
-	PAMAuthenticator( const std::string& Identifier,
+	PAMAuthUnit( const std::string& Identifier,
 			  const std::string& service );
-	~PAMAuthenticator();
+	~PAMAuthUnit();
 	virtual const char* className() const	{ return PAM_AUTHENTICATION_CLASS_NAME; }
 
-	AuthenticatorInstance* instance()	{ return NULL; }
+	const char** mechs() const;
+
+	AuthenticatorSlice* slice( const std::string& /*mech*/,
+				   const net::RemoteEndpoint& /*client*/ );
+
+	User* authenticatePlain( const std::string& username, const std::string& password ) const;
 
 private:
-	// name of the PAM service
-	const std::string	m_service;
-
-	// PAM internal data structure
-	struct pam_conv		m_conv;
-
-	// our void * for PAM data
-	pam_appdata		m_appdata;
-
-	// states of the authenticator state machine
-	enum {
-		_Wolframe_PAM_STATE_NEED_LOGIN,
-		_Wolframe_PAM_STATE_HAS_LOGIN,
-		_Wolframe_PAM_STATE_NEED_PASS,
-		_Wolframe_PAM_STATE_HAS_PASS,
-		_Wolframe_PAM_STATE_ERROR
-	} m_state;
+	friend class PAMAuthSlice;
+	const std::string		m_service;	///< name of the PAM service
 };
-
 
 class PAMAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
 {
@@ -114,7 +104,54 @@ public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
 	const char* objectClassName() const		{ return PAM_AUTHENTICATION_CLASS_NAME; }
-	PAMAuthenticator* object( const config::NamedConfiguration& conf );
+	PAMAuthUnit* object( const config::NamedConfiguration& conf );
+};
+
+class PAMAuthSlice : public AuthenticatorSlice
+{
+	enum	SliceState	{
+		SLICE_INITIALIZED = 0,		///< Has been initialized, no other data
+		SLICE_ASK_FOR_PASSWORD,		///< Ask for password, send 'password?' to the client
+		SLICE_WAITING_FOR_PWD,		///< We have sent 'password?' and wait for an answer
+		SLICE_USER_NOT_FOUND,		///< User has not been found -> fail
+		SLICE_INVALID_CREDENTIALS,	///< Response was wrong -> fail
+		SLICE_AUTHENTICATED,		///< Response was correct -> user available
+		SLICE_SYSTEM_FAILURE		///< Something is wrong
+	};
+	
+public:
+	PAMAuthSlice( const PAMAuthUnit& backend );
+
+	~PAMAuthSlice();
+
+	void dispose();
+
+	virtual const char* className() const		{ return m_backend.className(); }
+
+	virtual const std::string& identifier() const	{ return m_backend.identifier(); }
+
+	/// The input message
+	virtual void messageIn( const std::string& message );
+
+	/// The output message
+	virtual std::string messageOut();
+
+	/// The current status of the authenticator slice
+	virtual Status status() const;
+
+	/// Is the last input message reusable for this mech ?
+	virtual bool inputReusable() const		{ return m_inputReusable; }
+
+	/// The authenticated user or NULL if not authenticated
+	virtual User* user();
+
+private:
+	const PAMAuthUnit&	m_backend;
+	SliceState		m_state;
+	struct pam_conv		m_conv;		///< PAM internal data structure
+	pam_appdata		m_appdata;	///< our void * for PAM data
+	bool			m_inputReusable;
+	std::string		m_user;
 };
 
 }} // namespace _Wolframe::AAAA

@@ -33,8 +33,9 @@ Project Wolframe.
 ///\brief Interface to python object for using python reference counting within C++ scopes (exception safe for avoiding memory leaks)
 #ifndef _Wolframe_python_OBJECT_HPP_INCLUDED
 #define _Wolframe_python_OBJECT_HPP_INCLUDED
-#include <Python.h>
 #include "types/variant.hpp"
+
+#include <Python.h>
 
 namespace _Wolframe {
 namespace langbind {
@@ -52,17 +53,17 @@ public:
 	///\brief Default constructor
 	Object()				:m_obj(0){}
 	///\brief Constructor
-	Object( Type type_);
+	explicit Object( Type type_);
 	///\brief Constructor
-	Object( PyObject* obj_, bool isborrowed=true);
+	explicit Object( PyObject* obj_, bool isborrowed=true);
 	///\brief Copy constructor
 	Object( const Object& o);
 	///\brief Constructor
 	Object( const types::Variant& v);
 	///\brief Constructor
-	Object( const char* s, bool unicode=false);
+	explicit Object( const char* s, bool unicode=false);
 	///\brief Constructor
-	Object( const char* s, std::size_t n, bool unicode=false);
+	explicit Object( const char* s, std::size_t n, bool unicode=false);
 	///\brief Constructor
 	Object( const std::string& s, bool unicode=false);
 
@@ -107,6 +108,10 @@ public:
 
 	///\brief Release the object and set it to undefined
 	void clear();
+
+private:
+	void constructor( const types::Variant& val);
+	void constructor( const std::string& val, bool unicode);
 
 private:
 	PyObject* m_obj;

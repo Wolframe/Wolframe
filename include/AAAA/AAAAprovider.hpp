@@ -30,22 +30,25 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// AAAA provider interface
-//
+/// \file AAAA/AAAAprovider.hpp
+/// \brief AAAA provider object
 
 #ifndef _AAAA_PROVIDER_HPP_INCLUDED
 #define _AAAA_PROVIDER_HPP_INCLUDED
 
-#include "authentication.hpp"
+#include "AAAAproviderInterface.hpp"
+#include "passwordChanger.hpp"
 #include "authorization.hpp"
 #include "audit.hpp"
+#include "user.hpp"
 #include "config/configurationBase.hpp"
+#include "system/connectionEndpoint.hpp"
 #include <boost/noncopyable.hpp>
 
 namespace _Wolframe {
 namespace AAAA {
 
+/// \brief Configuration for AAAA (Authentication, Authorization, Audit, Accounting)
 class AAAAconfiguration : public config::ConfigurationBase
 {
 	friend class AAAAprovider;
@@ -55,7 +58,7 @@ public:
 	~AAAAconfiguration();
 
 	/// methods
-	bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	bool parse( const config::ConfigurationNode& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
@@ -69,7 +72,9 @@ private:
 	std::list< config::NamedConfiguration* >	m_auditConfig;
 };
 
-class AAAAprovider : public boost::noncopyable
+/// \brief Global provider object to create AAAA related objects
+class AAAAprovider
+	:public AAAAproviderInterface
 {
 public:
 	AAAAprovider( const AAAAconfiguration* conf,
@@ -78,14 +83,20 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Authenticator* authenticator();
+	Authenticator* authenticator( const net::RemoteEndpoint& client ) const;
+	PasswordChanger* passwordChanger( const User& user,
+					  const net::RemoteEndpoint& client ) const;
 	Authorizer* authorizer() const;
 	Auditor* auditor() const;
+
 private:
-	class AAAAprovider_Impl;
-	AAAAprovider_Impl*	m_impl;
+	AAAAprovider( const AAAAprovider&){}				///< non copyable
+	AAAAprovider& operator=( const AAAAprovider&){return *this;}	///< non copyable
+
+	class AAAAprovider_Impl;					///< PIMPL class
+	AAAAprovider_Impl* m_impl;					///< PIMPL
 };
 
-}} // namespace _Wolframe::AAAA
+}}// namespace
 
-#endif // _AAAA_PROVIDER_HPP_INCLUDED
+#endif

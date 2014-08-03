@@ -1,6 +1,5 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
-testcmd="$opt AllDataRequest"				# command to execute by the test
 docin=tdl_preprocess.in					# input document name
 docout=tdl_preprocess_sqlite.out			# output document name
 dumpout="program/tdl_preprocess/sqlite.dbdump.txt"	# resource dump to add to expected test output
@@ -10,6 +9,7 @@ testdata="
 LoadModules
 {
 	module `cmd/MODULE mod_db_sqlite3test`
+	module `cmd/MODULE mod_command_tdl`
 	module `cmd/MODULE mod_command_lua`
 	module `cmd/MODULE mod_normalize_number`
 	module `cmd/MODULE mod_normalize_string`

@@ -1,0 +1,3 @@
+
+COMMAND insert UserData CONTEXT { uname = UserName }
+    CALL doInsertUserData;

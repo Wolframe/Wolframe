@@ -39,6 +39,11 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
+bool PropertyTreeInputFilter::checkSetFlags( Flags f) const
+{
+	return (0==((int)f & (int)langbind::FilterBase::SerializeWithIndices));
+}
+
 bool PropertyTreeInputFilter::setFlags( Flags f)
 {
 	langbind::TypedInputFilter::setFlags( f);
@@ -60,11 +65,16 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& e
 			m_state = 0;
 			type = FilterBase::CloseTag;
 			element.init();
+			m_position = types::PropertyTree::Position();
 			return true;
 		}
 		switch (m_state)
 		{
 			case 0:
+				if (m_stk.back().itr != m_stk.back().end)
+				{
+					m_position = m_stk.back().itr->second.position();
+				}
 				element.init( m_stk.back().itr->first);
 				type = FilterBase::OpenTag;
 				m_state = 1;
@@ -72,6 +82,7 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& e
 			case 1:
 				if (m_stk.back().itr->second.data().size())
 				{
+					m_position = m_stk.back().itr->second.position();
 					element.init( m_stk.back().itr->second.data());
 					type = FilterBase::Value;
 					m_state = 2;
@@ -80,6 +91,10 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& e
 			case 2:
 				st.itr = m_stk.back().itr->second.begin();
 				st.end = m_stk.back().itr->second.end();
+				if (st.itr != st.end)
+				{
+					m_position = m_stk.back().itr->second.position();
+				}
 				++m_stk.back().itr;
 				m_stk.push_back( st);
 				m_state = 0;
@@ -93,24 +108,10 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, types::VariantConst& e
 }
 
 PropertyTreeOutputFilter::PropertyTreeOutputFilter()
-	:types::TypeSignature("langbind::PropertyTreeOutputFilter", __LINE__)
+	:TypedOutputFilter("ptree")
 {
 	m_stk.push_back( State());
 }
-
-static std::string ptree_tostring( const boost::property_tree::ptree& pt)
-{
-	std::ostringstream rt;
-	rt << "[" << pt.get_value<std::string>() << "]";
-	boost::property_tree::ptree::const_iterator ii = pt.begin(), ee = pt.end();
-	for (; ii != ee; ++ii)
-	{
-		if (ii != pt.begin()) rt << ", ";
-		rt << std::string(ii->first) << " {" << ptree_tostring( ii->second) << "}";
-	}
-	return rt.str();
-}
-
 
 bool PropertyTreeOutputFilter::print( ElementType type, const types::VariantConst& element)
 {
@@ -135,9 +136,9 @@ bool PropertyTreeOutputFilter::print( ElementType type, const types::VariantCons
 			{
 				std::runtime_error( "tags not balanced in property tree output filter");
 			}
-			if (!m_stk.back().m_node.empty() || !m_stk.back().m_node.get_value<std::string>().empty())
+			if (!m_stk.back().m_node.empty() || !m_stk.back().m_node.data().empty())
 			{
-				boost::property_tree::ptree* parent = &m_stk[ m_stk.size()-2].m_node;
+				types::PropertyTree::Node* parent = &m_stk[ m_stk.size()-2].m_node;
 				parent->add_child( m_stk.back().m_name, m_stk.back().m_node);
 			}
 			m_stk.pop_back();
@@ -153,19 +154,19 @@ bool PropertyTreeOutputFilter::print( ElementType type, const types::VariantCons
 		{
 			if (!m_attribute.empty())
 			{
-				boost::property_tree::ptree node;
-				node.put_value( elem);
+				types::PropertyTree::Node node;
+				node.setValue( elem);
 				m_stk.back().m_node.add_child( m_attribute, node);
 				m_attribute.clear();
 			}
 			else
 			{
-				boost::property_tree::ptree* cur = &m_stk.back().m_node;
-				if (!cur->get_value<std::string>().empty())
+				types::PropertyTree::Node* cur = &m_stk.back().m_node;
+				if (!cur->data().empty())
 				{
 					std::runtime_error( "duplicate value for a tag in property tree output filter");
 				}
-				cur->put_value( elem);
+				cur->setValue( elem);
 			}
 		}
 		break;

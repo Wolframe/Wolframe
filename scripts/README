@@ -1,0 +1,18 @@
+Some helper scripts:
+
+wolfwizard.simpleform:
+	XML Schema definition for the output of wolfwizard
+wolfwizard.lua:
+	Some lua procedures (lua command handler interface) for transforming the output of wolfwizard
+	1) function filterRequests() :Transforms the form definitions into the format of request answer definitions of the Qt client as defined in project Wolframe/qtClient
+		Example call:
+		wolfwizard -c <wolframe config file> | wolfilter -m mod_filter_textwolf -m mod_filter_line -m mod_ddlcompiler_simpleform -m mod_command_lua -e xml -x ./wolfwizard.lua -p ./wolfwizard.simpleform filterRequests
+
+generate_bcdToBinaryConversionTable_cpp.sh:
+	Script that was used to generate the file src/libwolframe/types/bcdToBinaryConversionTable.cpp.
+	The file contains the tables for conversions of big bcd numbers (up to 40 digits) to a binary (hexadecimal) representation.
+
+generate_binaryToBcdConversionTable_cpp.sh
+	Script that was used to generate the file src/libwolframe/types/binaryToBcdConversionTable.cpp
+	The file contains the tables for conversions of integers in binary (hexadecimal) representation to big bcd numbers (up to 40 digits).
+

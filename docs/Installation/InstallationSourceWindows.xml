@@ -1,0 +1,1537 @@
+<!-- Windows -->
+	<sect1>
+		<title>Building on Windows systems (the NMAKE way)</title>
+
+		<para>
+			This is the Unix-style compilation using the Visual
+			Studio Command Line Window and NMAKE. This is the
+			preferred way currently.
+		</para>
+		
+<!-- prerequisites -->
+		<sect2>
+			<title>Prerequisites</title>
+
+		<para>
+			For building <application>Wolframe</application> on 
+			Windows you need at least the following software:
+		</para>
+		
+		<itemizedlist>
+			<listitem>
+				<para>
+					Visual Studio C++ 2008 or newer (<filename>cl.exe</filename>, <filename>rc.exe</filename>, <filename>link.exe</filename> and <filename>nmake.exe</filename>)
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Platform SDK 6.0a or newer
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<filename>mc.exe</filename> may be missing in your path (for instance in Visual Studio 2008
+					it was not bundled),
+					usually it is available as part of the Platform SDK,
+					copy it somewhere into the path
+				</para>
+			</listitem>
+			<listitem>
+				<para>Boost 1.48.0 or newer from <ulink url="http://www.boost.org">http://www.boost.org</ulink></para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			Depending on the features you want to use you also may need
+			the following software:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					The OpenSSL library 0.9.7 or newer, for encryption and authentication,
+					<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The PostgreSQL database client library, version 8.1 or newer, for storing user data
+					and authentication data in a PostgreSQL database,
+					<ulink url="http://postgresql.org">http://postgresql.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The Oracle OCI client library, version 11.2 or newer, for storing user data
+					and authentication data in an Oracle database,
+					<ulink url="http://www.oracle.com">http://www.oracle.com</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The win-iconv library, version 0.0.3 or newer, needed by libxml2,
+					<ulink url="http://code.google.com/p/win-iconv/">http://code.google.com/p/win-iconv/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The libxml2 library, version 2.7.6 or newer, for filtering XML data,
+					<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The libxslt library, version 1.1.26 or newer, for the transformation of
+					XML data,
+					<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Python 3, version 3.3.0 or newer, for writting applications in Python,
+					<ulink url="https://www.python.org">https://www.python.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The ICU library, version 3.5 or newer, for text normalization and conversion,
+					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			For testing the <application>Wolframe</application> software you need:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					Expect 5.40 or newer, for running the Expect tests,
+					<ulink url="http://expect.sourceforge.net/">http://expect.sourceforge.net/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Expect needs ActiveTcl 8.5 or newer, for running the Expect tests,
+					<ulink url="http://www.activestate.com/activetcl">http://www.activestate.com/activetcl</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A working telnet
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					A PostgreSQL or Oracle database when you want to run the database tests
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			For building Windows packages you need:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					The WIX Toolset, version 3.5 or newer,
+					<ulink url="http://wixtoolset.org/">http://wixtoolset.org/</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+		
+		<para>
+			For building the documentation and manpages you need:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					Doxygen for developer documentation,
+					<ulink url="http://www.doxygen.org">http://www.doxygen.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Docbook 4.5 or newer and the XSL toolchain,
+					<ulink url="http://www.docbook.org">http://www.docbook.org</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<filename>xsltproc.exe</filename>, from libxslt
+					<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The FOP PDF generator for documentation in PDF format,
+					<ulink url="http://xmlgraphics.apache.org/fop/">http://xmlgraphics.apache.org/fop/</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					 <filename>hhc.exe</filename>, help compiler from the 'HTML Help Workshop',
+					 <ulink url="http://msdn.microsoft.com/en-us/library/windows/desktop/ms670169%28v=vs.85%29.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/ms670169%28v=vs.85%29.aspx</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		&InstallationSourceWindowsClientPrereq;
+		
+		</sect2>
+	
+<!-- Basic build instructions -->		
+		<sect2>
+			<title>Basic build instructions</title>
+			
+		<para>
+			<application>Wolframe</application> can be build in a Visual Studio command line (or better a Platform SDK command line)
+			using the following command:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32
+			</programlisting>
+		</para>
+		
+		<para>
+			You can check the compilation mode with:
+		        <programlisting language='shell'>
+	setenv
+			</programlisting>
+		</para>
+
+		<para>
+			The makefiles understand the standard GNU targets like 'clean', 'distclean', 'test',
+			etc. The whole list of options can be seen with:
+			
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 help
+			</programlisting>
+		</para>
+
+		<para>
+			Configuration is all done in a file called <filename>config.mk</filename>.
+			Examples can be found in the <filename>makefiles/nmake</filename> directory.
+		</para>
+
+		<para>
+			Optional features are enabled by using 'WITH_XXX' variables when
+			calling nmake, e. g. to enable SSL support you call make like this:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_SSL=1
+			</programlisting>
+		</para>
+		
+		<para>
+			On Windows you would rather change the 'OPENSSL_DIR' variable in
+			the <filename>config.mk</filename>, for instance:
+		        <programlisting language='shell'>
+	OPENSSL_DIR = C:\OpenSSL\Win32
+			</programlisting>
+		</para>
+
+		<para>
+			A complete build may look like this:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 ^
+		WITH_SQLITE3=1 WITH_PGSQL=1 WITH_ORACLE=1 ^
+		WITH_LIBXML2=1 WITH_LIBXSLT=1 ^
+		WITH_LIBHPDF=1 WITH_EXAMPLES=1 WITH_ICU=1 WITH_FREEIMAGE=1 ^
+		WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 ^
+		clean all test
+			</programlisting>
+
+		</para>
+		
+		<para>
+			We currently have no dependency system for the NMAKE
+			build system, so be careful when to use 'clean' to 
+			rebuild parts of the system.
+		</para>
+		
+		<para>
+			This way of building the system is mainly useful for
+			automatized systems and for packaging.
+		</para>
+		
+		</sect2>
+
+		<sect2>
+			<title>Using ccache and distcc</title>
+			
+			<para>
+				Ccache (<ulink url="http://ccache.samba.org/">http://ccache.samba.org/</ulink>) 
+				can be used to cache the compilation of
+				<application>Wolframe</application> also on Windows.
+			</para>
+			
+			<para>
+				You need then <filename>ccache.exe</filename> binary with MSVC support from
+				<ulink url="http://cgit.freedesktop.org/libreoffice/contrib/dev-tools/tree/ccache-msvc">http://cgit.freedesktop.org/libreoffice/contrib/dev-tools/tree/ccache-msvc</ulink>.
+				You also need the Cygwin runtime from
+				<ulink url="http://cygwin.org">http://cygwin.org</ulink>.
+				Install the <filename>ccache.exe</filename> binary into
+				<filename>c:\cygwin\bin</filename>.
+			</para>
+			
+			<para>
+				Set the 'CC' and 'CXX' variables in
+				<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+				<programlisting language='shell'>
+	CC=C:\cygwin\bin\ccache.exe cl
+	CXX=C:\cygwin\bin\ccache.exe cl
+			</programlisting>
+			
+			</para>
+
+			<para>
+				Set the following variable in the shell you use to compile
+				<application>Wolframe</application>:
+				
+				<programlisting language='shell'>
+	Set CYGWIN=nodosfilewarning
+				</programlisting>
+			</para>
+
+		</sect2>
+
+<!-- Boost -->
+		<sect2>
+			<title>Boost</title>
+			
+				<para>
+					Boost (<ulink url="http://www.boost.org">http://www.boost.org</ulink>) is the only
+					library which is absolutely required in order to build
+					<application>Wolframe</application>.
+				</para>
+
+
+			<sect3>
+				<title>Use prebuild version of Boost</title>
+				
+				<para>
+					<ulink url="http://boost.teeks99.com">http://boost.teeks99.com</ulink> provides
+					pre-compiled packages of Boost. You can install the library into for instance
+					<filename>C:\boost\boost_1_55_0</filename> and set the 'BOOST_XXX' variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	BOOST_DIR = C:\Boost\boost_1_55
+	BOOST_INCLUDE_DIR = $(BOOST_DIR)
+	BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
+	BOOST_VC_VER = vc100
+	BOOST_MT = -mt
+					</programlisting>
+
+				</para>
+				
+				<para>
+					Rename the directory <filename>C:\Boost\boost_1_55_0\libs</filename> to
+					<filename>C:\Boost\boost_1_55_0\boost</filename>.
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: Those pre-built packages don't
+					have support for the ICU backend in boost-locale. If you need ICU
+					support and enable it with 'WITH_ICU=1' you will have to build your
+					own version of Boost from the sources.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Build your own version of Boost</title>
+			
+				<para>
+					The following Boost libraries are required for building
+					<application>Wolframe</application>:
+
+					<programlisting language='shell'>
+	bootstrap
+	.\b2 --prefix=C:\boost\boost_1_55 ^
+		--with-thread --with-filesystem --with-system --with-program_options ^
+		--with-date_time ^
+		architecture=x86 address-model=64 toolset=msvc ^
+		install
+					</programlisting>
+				</para>
+
+				<para>
+					Set 'architecture', 'address-mode' and 'toolset' fitting
+					your platform.
+				</para>
+			
+				<para>
+					If you want to build the ICU normalization
+					module (WITH_ICU=1) you will have to build 'boost-locale'
+					with ICU support and you have to enable the
+					'regex' and the 'locale' boost libraries too:
+				
+					<programlisting language='shell'>
+	bootstrap
+	.\b2 --prefix=C:\boost\boost_1_55 ^
+		--with-thread --with-filesystem --with-system --with-program_options ^
+		--with-date_time --with-locale --with-regex ^
+		-sICU_PATH="C:\icu4c-52_1-win32-debug" ^
+		architecture=x86 address-model=64 toolset=msvc ^
+		install
+					</programlisting>
+
+				</para>
+
+				<para>
+					Set the "BOOST_XXX" variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	BOOST_DIR = C:\Boost\boost_1_55
+	BOOST_INCLUDE_DIR = $(BOOST_DIR)
+	BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32-msvc-10.0
+	BOOST_VC_VER = vc100
+	BOOST_MT = -mt
+					</programlisting>
+					
+				</para>
+						
+			</sect3>
+			
+		</sect2>
+
+<!-- SSL -->
+		<sect2>
+			<title>Secure Socket Layer (SSL)</title>
+
+			<para>
+				The <application>Wolframe</application> protocol can
+				be secured with SSL. Currently only OpenSSL
+				(<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>)
+				is supported.
+			
+			</para>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: No matter whether you
+				use the precompiled version or if you build OpenSSL on your own
+				use the 0.9.8, 1.0.0 or 1.0.1g versions, but not  the version
+				1.0.1 through 1.0.1f (Heartbleed bug)!
+			</para>
+
+			<sect3>
+				<title>Use prebuild version of OpenSSL</title>
+			
+				<para>
+					
+					You can get a prebuilt version of OpenSSL from
+					<ulink url="http://www.slproweb.com/products/Win32OpenSSL.html">http://www.slproweb.com/products/Win32OpenSSL.html</ulink>.
+					Despite the name you get also 64-bit versions there.
+				</para>
+				
+				<para>
+					Install the developer version (for instance <filename>Win32OpenSSL-1_0_1g.exe</filename>)
+					for instance to <filename>C:\OpenSSL-Win32</filename>.
+				</para>
+				
+				<para>
+					Do not copy the OpenSSL binaries to the Windows system directory, copy
+					them to the Bin subdirectory of the OpenSSL installation directory!
+				</para>
+
+				<para>
+					Set the "BOOST_XXX" variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	OPENSSL_DIR = C:\OpenSSL-Win32
+					</programlisting>
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Build your own version of OpenSSL</title>
+				
+				<para>
+					You need the community edition of ActivePerl from
+					<ulink url="http://www.activestate.com/activeperl/">http://www.activestate.com/activeperl/</ulink>.
+					Install it for instance to <filename>C:\Perl</filename>.
+				</para>
+
+				<para>
+					You will also need NASM to assemble certain
+					parts of OpenSSL. You can get a Windows NASM from
+					<ulink url="http://www.nasm.us/">http://www.nasm.us/</ulink>.
+					Install it for instance to <filename>C:\nasm</filename>.
+				</para>
+
+				<para>
+					Make sure the Perl interpreter and the NASM assembler are part of the path in
+					the shell you want to build OpenSSL:
+					
+					<programlisting language='shell'>
+	Set PATH=%PATH%;C:\Perl\bin;C:\nasm
+					</programlisting>
+				</para>
+								
+				<para>
+					Get the source package <filename>openssl-1.0.1g.tar.gz</filename> of OpenSSL from
+					<ulink url="http://www.openssl.org">http://www.openssl.org</ulink>.
+				</para>
+				
+				<para>
+					Configure the package with:
+					
+					<programlisting language='shell'>
+	perl Configure debug-VC-WIN32 \
+		--prefix="C:\openssl-1.0.1g-win32-debug"
+					</programlisting>
+					
+					for a debug version, respectively with:
+					
+					<programlisting language='shell'>
+	perl Configure VC-WIN32 \
+		--prefix="C:\openssl-1.0.1g-win32-release"
+					</programlisting>
+					
+					for a release version.
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					Make sure there prefix you choose has no spaces in it!
+				</para>
+				
+				<para>
+					Prepare OpenSSL for NASM support with:
+					
+					<programlisting language='shell'>
+	ms\do_nasm.bat
+					</programlisting>
+				</para>
+				
+				<para>
+					Build and install OpenSSL now with:
+					<programlisting language='shell'>
+	nmake /f ms\ntdll.mak
+	nmake /f ms\ntdll.mak install
+					</programlisting>
+				</para>
+				
+				<para>
+					More build information is available
+					in <filename>INSTALL.W32</filename> and
+					<filename>INSTALL.W64</filename> of the 
+					OpenSSL package itself.
+				</para>
+				
+			</sect3>
+
+		</sect2>
+
+<!-- Sqlite3 -->		
+		<sect2>
+			<title>SQLite database support</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				an Sqlite3 database (<ulink url="http://sqlite.org">http://sqlite.org</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+
+			<para>
+				The Sqlite3 library is embedded in the subdirectory
+				<filename>3rdParty/sqlite3</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Sqlite3 database
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_SQLITE3=1
+			</programlisting>
+							
+			</para>
+	
+		</sect2>
+		
+<!-- PostgreSQL -->
+		<sect2>
+			<title>PostgreSQL database support</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				a PostgreSQL database (<ulink url="http://postgresql.org">http://postgresql.org</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+
+			<sect3>
+				<title>Use prebuild version of PostgreSQL</title>
+			
+				<para>
+					Download the Windows installer from EnterpriseDB (you
+					reach the download link via
+					<ulink url="http://postgresql.org">http://postgresql.org</ulink>).
+				</para>
+				
+				<para>
+					You will have to set some variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	PGSQL_DIR = C:\Program Files\PostgreSQL\9.3
+	PGDLL_WITH_I18N = 1
+					</programlisting>
+				</para>
+
+				<para>
+					You enable the building of a loadable PostgreSQL database
+					module with:
+
+				<programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_PGSQL=1
+				</programlisting>
+							
+				</para>
+				
+			</sect3>
+
+			<sect3>
+				<title>Build your own version of PostgreSQL</title>
+
+				<para>
+					You need the community edition of ActivePerl from
+					<ulink url="http://www.activestate.com/activeperl/">http://www.activestate.com/activeperl/</ulink>.
+					Install it for instance to <filename>C:\Perl</filename>.
+				</para>
+
+				<para>
+					Make sure the Perl interpreter is part of the path in
+					the shell you want to build PostgreSQL:
+					
+					<programlisting language='shell'>
+	Set PATH=%PATH%;C:\Perl\bin
+					</programlisting>
+				</para>
+
+				<para>
+					Get the source package <filename>postgresql-9.3.4.tar.gz</filename> of PostgreSQL from
+					<ulink url="http://www.postgresql.org">http://www.opstgresql.org</ulink>.
+				</para>
+				
+				<para>
+					Configure the package in the <filename>config.pl</filename>
+					file which you create as follows:
+					
+					<programlisting language='shell'>
+	cd src\tools\msvc
+	copy config_default.pl config.pl
+					</programlisting>
+				</para>
+				
+				<para>
+					Adapt <filename>config.pl</filename> to your needs. We actually don't
+					want to build the full server just the client PostgreSQL library, so
+					specifying the location of OpenSSL is enough:
+					
+					<programlisting language='shell'>
+	openssl=>"C:\\openssl-1.0.1g-win32-debug"
+					</programlisting>
+					
+					<emphasis role="bold">Note</emphasis>: Those must be two backslashes!
+				</para>
+
+				<para>
+					If you built your own version of OpenSSL before you will be missing
+					some linking libraries in the right places. So copy them with:
+
+					<programlisting language='shell'>
+	mkdir C:\openssl-1.0.1g-win32-debug\lib\VC
+	copy C:\openssl-1.0.1g-win32-debug\lib\libeay32.lib ^
+		C:\openssl-1.0.1g-win32-debug\lib\VC\libeay32MDd.lib
+	copy C:\openssl-1.0.1g-win32-debug\lib\ssleay32.lib ^
+		C:\openssl-1.0.1g-win32-debug\lib\VC\ssleay32MDd.lib
+					</programlisting>
+					
+					respectively if you built the release version:
+
+					<programlisting language='shell'>
+	mkdir C:\openssl-1.0.1g-win32-release\lib\VC
+	copy C:\openssl-1.0.1g-win32-release\lib\libeay32.lib ^
+		C:\openssl-1.0.1g-win32-release\lib\VC\libeay32MD.lib
+	copy C:\openssl-1.0.1g-win32-release\lib\ssleay32.lib ^
+		C:\openssl-1.0.1g-win32-release\lib\VC\ssleay32MD.lib
+					</programlisting>
+					
+				</para>
+					
+				<para>
+					Build the <filename>libpq</filename> library now with:
+					
+					<programlisting language='shell'>
+	build DEBUG libpq
+					</programlisting>
+					
+					respectively if you prefer a release version:
+					
+					<programlisting language='shell'>
+	build RELEASE libpq
+					</programlisting>
+					
+				</para>
+
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					You may have to touch <filename>preproc.c</filename> and
+					<filename>preproc.h</filename> if 'build' wants
+					to start 'bison' and you don't have 'bison' installed.
+				</para>
+				
+				<para>
+					Install the PostgreSQL client library for instance
+					to <filename>C:\PostgreSQL-9.3.4-win32-debug</filename> with:
+					
+					<programlisting language='shell'>
+	install C:\PostgreSQL-9.3.4-win32-debug
+					</programlisting>
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: Unless you
+					were able to build the whole PostgreSQL the 'install'
+					script will fail. In this case copy the essential files
+					to for instance <filename>C:\PostgreSQL-9.3.4-win32-debug</filename> with:
+					
+					<programlisting language='shell'>
+	mkdir C:\PostgreSQL-9.3.4\include
+	mkdir C:\PostgreSQL-9.3.4\lib
+	copy Debug\libpq\libpq.dll C:\PostgreSQL-9.3.4\lib
+	copy Debug\libpq\libpq.lib C:\PostgreSQL-9.3.4\lib
+	copy src\interfaces\libpq\libpq-fe.h C:\PostgreSQL-9.3.4\include
+	copy src\include\postgres_ext.h C:\PostgreSQL-9.3.4\include
+	copy src\include\pg_config_ext.h C:\PostgreSQL-9.3.4\include
+					</programlisting>
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					If you disable OpenSSL (for instance for debugging), you have
+					to touch <filename>sslinfo.sql</filename> in <filename>contrib/sslinfo</filename>.
+					The same applies for 
+					<filename>uuid-ossp.sql</filename> and <filename>pgxml.sql.in</filename>.
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>:
+					If you want to build PostgrSQL with gettext/libint or zlib support
+					you have to build those libraries first, or get
+					them from <ulink url="http://gnuwin32.sourceforge.net/packages.html">http://gnuwin32.sourceforge.net/packages.html</ulink>.
+				</para>
+					
+			</sect3>
+
+		</sect2>
+
+<!-- Oracle -->
+		<sect2>
+			<title>Oracle database support</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				a Oracle database (<ulink url="http://www.oracle.com">http://www.oracle.com</ulink>)
+				as backend for data storage and for authentication and
+				autorization.
+			</para>
+			
+			<para>
+				<emphasis role="bold">Import note</emphasis>: Make sure you
+				have all the licenses to develop with Oracle and to install an
+				Oracle database! The <application>Wolframe</application> team
+				doesn't take any responsability if licenses are violated!
+			</para>
+
+			<para>
+				You have to download the two packages
+				<filename>instantclient-basic-nt-12.1.0.1.0.zip</filename> and
+				<filename>instantclient-sdk-nt-12.1.0.1.0.zip</filename> and
+				install them to for instance
+				<filename>C:\Oracle\instantclient_12_1</filename>.
+			</para>	
+				
+			<para>
+				You will have to set the 'ORACLE_DIR' variable in
+				<filename>makefiles\nmake\config.mk</filename> as follows:
+				
+				<programlisting language='shell'>
+	ORACLE_DIR = C:\Oracle\instantclient_12_1
+				</programlisting>
+			</para>
+			
+			<para>
+				You enable the building of a loadable Oracle database
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_ORACLE=1
+			</programlisting>
+							
+			</para>
+			
+		</sect2>
+
+<!-- libxml2/libxslt -->
+		<sect2>
+			<title>XML filtering support with libxml2 and libxslt</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				libxml2 and libxslt (<ulink url="http://xmlsoft.org/">http://xmlsoft.org/</ulink>)
+				for filtering and the conversion of XML data.
+			</para>
+			
+			<para>
+				You can build only filtering with libxml2. But if you enable libxslt
+				filtering you also have to enable libxml2 filtering.
+			</para>
+
+			<sect3>
+				<title>Use prebuild versions of libxml2 and libxslt</title>
+			
+				<para>
+					Download the Windows ZIP files <filename>libxml2-2.7.8.win32.zip</filename>,
+					<filename>iconv-1.9.2.win32.zip</filename> and
+					<filename>libxslt-1.1.26.win32.zip</filename>
+					from
+					<ulink url="http://ftp.zlatkovic.com/libxml/">http://ftp.zlatkovic.com/libxml/</ulink>).
+					Unpack them for instance to:
+					<filename>C:\libxml2-2.7.8.win32</filename>,
+					<filename>C:\iconv-1.9.2.win32</filename> and
+					<filename>C:\libxslt-1.1.26.win32</filename>.
+				</para>
+				
+				<para>
+					You will have to set the following variables in
+					<filename>makefiles\nmake\config.mk</filename>:
+					
+					<programlisting language='shell'>
+	ZLIB_DIR = C:\zlib-1.2.5.win32
+	ICONV_DIR = C:\iconv-1.9.2.win32
+	LIBXML2_DIR = C:\libxml2-2.7.8.win32
+	LIBXSLT_DIR = C:\libxslt-1.1.26.win32
+					</programlisting>
+				</para>
+
+				<para>
+					You enable the building of a loadable libxml2/libxslt filtering
+					module with:
+
+				<programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_LIBXML2=1 WITH_LIBXSLT=1
+				</programlisting>
+							
+				</para>
+
+			</sect3>
+
+			<sect3>
+				<title>Build your own version of LibXML2</title>
+				
+				<para>
+					For libxml2 to support character sets you need a working
+					iconv library. We currently use 
+					<filename>win-iconv-0.0.6.zip</filename> from
+					<ulink url="http://code.google.com/p/win-iconv/">http://code.google.com/p/win-iconv/</ulink>.
+				</para>
+				
+				<para>
+					Build <filename>iconv.dll</filename> with
+					the supplied makefile from 
+					<filename>packaging\patches\Windows\win-iconv\Makefile.msvc</filename>
+					and install the results to for instance
+					<filename>C:\win-iconv-0.0.6-win32-debug</filename> with:
+
+					<programlisting language='shell'>
+	nmake /nologo /f Makefile.msvc DEBUG=1
+	mkdir C:\win-iconv-0.0.6-win32-debug
+	mkdir C:\win-iconv-0.0.6-win32-debug\include
+	mkdir C:\win-iconv-0.0.6-win32-debug\lib
+	mkdir C:\win-iconv-0.0.6-win32-debug\bin
+	copy iconv.h C:\win-iconv-0.0.6-win32-release\include
+	copy iconv.lib C:\win-iconv-0.0.6-win32-debug\lib
+	copy iconv.dll C:\win-iconv-0.0.6-win32-debug\bin
+					</programlisting>
+					
+					respectively if you want to build a release version:
+
+					<programlisting language='shell'>
+	nmake /nologo /f Makefile.msvc
+	mkdir C:\win-iconv-0.0.6-win32-release
+	mkdir C:\win-iconv-0.0.6-win32-release\include
+	mkdir C:\win-iconv-0.0.6-win32-release\lib
+	mkdir C:\win-iconv-0.0.6-win32-release\bin
+	copy iconv.h C:\win-iconv-0.0.6-win32-release\include
+	copy iconv.lib C:\win-iconv-0.0.6-win32-release\lib
+	copy iconv.dll C:\win-iconv-0.0.6-win32-release\bin
+					</programlisting>
+					
+				</para>
+
+				<para>
+					Adapt the 'ICONV_DIR' variable in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+						
+					<programlisting language='shell'>
+	ICONV_DIR = C:\win-iconv-0.0.6-win32-debug
+					</programlisting>
+				</para>
+					
+				<para>
+					Get the source package <filename>libxml2-2.9.1.tar.gz</filename> from
+					<ulink url="ftp://xmlsoft.org/libxml2/">ftp://xmlsoft.org/libxml2/</ulink>.
+				</para>
+					
+				<para>
+					Configure libxml2, make it use the 'win-iconv' library:
+
+					<programlisting language='shell'>
+	cd win32
+	cscript configure.js compiler=msvc
+		prefix="C:\libxml2-2.9.1-win32-release"
+		lib="C:\win-iconv-0.0.6-win32-release\lib"
+		include="C:\win-iconv-0.0.6-win32-release\include"
+		zlib=no iconv=yes vcmanifest=yes
+					</programlisting>
+					
+					For a debug version you have to change 'debug'
+					to 'release' in the paths and to add 'debug=yes'
+					and 'cruntime=/MDd':
+					<programlisting language='shell'>
+	cd win32
+	cscript configure.js compiler=msvc
+		prefix="C:\libxml2-2.9.1-win32-debug"
+		lib="C:\win-iconv-0.0.6-win32-debug\lib"
+		include="C:\win-iconv-0.0.6-win32-debug\include"
+		zlib=no iconv=yes vcmanifest=yes
+		debug=yes cruntime=/MDd
+					</programlisting>
+	
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: Try to avoid spaces
+					in the installation prefix, if you really need some spaces then you will
+					have to fix them after running the <filename>configure.js</filename>
+					script by hand in the <filename>config.msvc</filename> file:
+
+					<programlisting language='shell'>
+	PREFIX="C:\libxml2-2.9.1 win32 debug"
+					</programlisting>
+				</para>
+				
+				<para>
+					Finally build and install libxml2 with:
+					<programlisting language='shell'>
+	nmake /nologo /f Makefile.msvc all
+	nmake /nologo /f Makefile.msvc install
+					</programlisting>
+				</para>
+
+				<para>
+					Adapt the 'LIBXML2_DIR' variable in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+						
+					<programlisting language='shell'>
+	LIBXML2_DIR = C:\libxml2-2.9.1-win32-debug
+					</programlisting>
+				</para>				
+			</sect3>
+
+<!-- libXSLT self-compiled -->
+			<sect3>
+				<title>Build your own version of LibXSLT</title>
+
+				<para>
+					Get the source package <filename>libxslt-1.1.28.tar.gz</filename> from
+					<ulink url="ftp://xmlsoft.org/libxslt/">ftp://xmlsoft.org/libxslt/</ulink>.
+				</para>
+
+				<para>
+					Configure libxslt, make it use the 'win-iconv' and the 'libxml2' library
+					compiled above:
+
+					<programlisting language='shell'>
+	cd win32
+	cscript configure.js compiler=msvc
+		prefix="C:\libxslt-1.1.28-win32-release"
+		lib="C:\libxml2-2.9.1-win32-release\lib;C:\win-iconv-0.0.6-win32-release\lib"
+		include="C:\libxml2-2.9.1-win32-release\include\libxml2;C:\win-iconv-0.0.6-win32-release\include"
+		zlib=no iconv=yes vcmanifest=yes
+					</programlisting>
+					
+					For a debug version you have to change 'debug'
+					to 'release' in the paths and to add 'debug=yes'
+					and 'cruntime=/MDd':
+					<programlisting language='shell'>
+	cd win32
+	cscript configure.js compiler=msvc
+		prefix="C:\libxslt-1.1.28-win32-debug"
+		lib="C:\libxml2-2.9.1-win32-debug\lib;C:\win-iconv-0.0.6-win32-debug\lib"
+		include="C:\libxml2-2.9.1-win32-debug\include;C:\win-iconv-0.0.6-win32-debug\include"
+		zlib=no iconv=yes vcmanifest=yes
+		debug=yes cruntime=/MDd
+					</programlisting>
+	
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: Try to avoid spaces
+					in the installation prefix, if you really need some spaces then you will
+					have to fix them after running the <filename>configure.js</filename>
+					script by hand in the <filename>config.msvc</filename> file:
+
+					<programlisting language='shell'>
+	PREFIX="C:\libxslt-1.1.28 win32 debug"
+					</programlisting>
+				</para>
+				
+				<para>
+					Finally build and install libxslt with:
+					<programlisting language='shell'>
+	nmake /nologo /f Makefile.msvc all
+	nmake /nologo /f Makefile.msvc install
+					</programlisting>
+				</para>
+
+				<para>
+					Adapt the 'LIBXSLT_DIR' variable in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+						
+					<programlisting language='shell'>
+	LIBXSLT_DIR = C:\libxslt-1.1.28-win32-debug
+					</programlisting>
+				</para>		
+				
+				<para>
+					The DLLs end up in the wrong directory, move them from 
+					'lib' to 'bin':
+					<programlisting language='shell'>
+	cd C:\libxslt-1.1.28-win32-debug
+	move lib\*.dll bin\.
+					</programlisting>
+				</para>		
+							
+			</sect3>
+			
+		</sect2>
+		
+<!-- Textwolf -->
+		<sect2>
+			<title>XML filtering support with Textwolf</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				Textwolf (<ulink url="http://textwolf.net">http://textwolf.net</ulink>)
+				for filtering and the conversion of XML data.
+			</para>
+			
+			<para>
+				The textwolf library is embedded in the subdirectory
+				<filename>3rdParty/textwolf</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Textwolf filtering
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_TEXTWOLF=1
+			</programlisting>
+							
+			</para>
+			
+			<para>
+				<emphasis role="bold">Note</emphasis>: If you plan to
+				run tests when building the <application>Wolframe</application>
+				you should enable Textwolf as many tests rely on it's presence.
+			</para>						
+		</sect2>
+		
+<!-- cJSON -->
+		<sect2>
+			<title>JSON filtering support with cJSON</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				cJSON (<ulink url="http://sourceforge.net/projects/cjson/">http://sourceforge.net/projects/cjson/</ulink>)
+				for filtering and the conversion of JSON data.
+			</para>
+			
+			<para>
+				The cjson library is embedded in the subdirectory
+				<filename>3rdParty/libcjson</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable cJSON filtering
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_CJSON=1
+			</programlisting>
+							
+			</para>
+									
+		</sect2>
+
+<!-- Lua -->
+		<sect2>
+			<title>Scripting support with Lua</title>
+
+			<para>
+				<application>Wolframe</application> can be scripted
+				with Lua (<ulink url="http://www.lua.org">http://www.lua.org</ulink>).
+			</para>
+
+			<para>
+				The Lua interpreter is embedded in the subdirectory
+				<filename>3rdParty/lua</filename>.
+			</para>
+			
+			<para>
+				You enable the building of a loadable Lua scripting
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_LUA=1
+			</programlisting>
+							
+			</para>
+
+		</sect2>
+
+<!-- Python -->
+		<sect2>
+			<title>Scripting support with Python</title>
+			
+			<para>
+				<application>Wolframe</application> can be scripted
+				with Python (<ulink url="https://www.python.org">https://www.python.org</ulink>).
+			</para>
+						
+			<para>
+				The module supports only version 3 of the Python interpreter,
+				version 2 is not supported.
+			</para>
+
+			<sect3>
+				<title>Use prebuild version of Python</title>
+			
+				<para>
+					Download the official Python 3 Installer for Windows from
+					<ulink url="http://python.org">http://python.org</ulink>).
+				</para>
+				
+				<para>
+					You will have to set the 'PYTHON_XXX' variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	PYTHON_DIR = C:\Python34
+	PYTHON_VERSION = 34
+	PYTHON_MAJOR_VERSION = 3
+	PYTHON_LIB_DIR = $(PYTHON_DIR)\libs
+	PYTHON_DLL_DIR = $(PYTHON_DIR)\DLLs
+					</programlisting>
+				</para>
+
+				<para>
+					You enable the building of a loadable Python scripting
+					module with:
+
+				<programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_PYTHON=1
+				</programlisting>
+				
+				</para>
+				
+				<para>
+					<emphasis role="bold">Note</emphasis>: The binary installation packages from
+					<ulink url="http://python.org/">http://python.org</ulink>) do not
+					contain debug versions of the library. If you want to build a debugging version of 
+					<application>Wolframe</application> you have to build your own version of Python.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Build you own version of Python</title>
+
+				<para>
+					You have to get the sources of Python3 called
+					<filename>Python-3.4.0.tar</filename> from
+					<ulink url="http://python.org/">http://python.org</ulink>.
+					Unpack it for instance to <filename>C:\Python-3.4.0</filename>.
+				</para>
+
+				<para>
+					Open the solution file <filename>PCBuild\pcbuild.sln</filename>.
+					Build the desired version. Read also <filename>PCBuild\readme.txt</filename>.
+				</para>
+				
+				<para>
+					Copy the resulting <filename>python34_d.lib</filename> on top of the downloaded
+					binary vesion in for instance <filename>C:\Python34\libs</filename> and
+					<filename>python34_d.dll</filename> to <filename>C:\Python34\DLLs</filename>.
+				</para>
+
+				<para>
+					You will have to set the 'PYTHON_XXX' variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	PYTHON_DIR = C:\Python34
+	PYTHON_VERSION = 34
+	PYTHON_MAJOR_VERSION = 3
+	PYTHON_LIB_DIR = $(PYTHON_DIR)\libs
+	PYTHON_DLL_DIR = $(PYTHON_DIR)\DLLs
+					</programlisting>
+				</para>
+
+			</sect3>
+							
+		</sect2>
+		
+<!-- libhpdf -->
+		<sect2>
+			<title>Printing support with libhpdf</title>
+			
+			<para>
+				<application>Wolframe</application> can print
+				with libhpdf (<ulink url="http://libharu.org/">http://libharu.org/</ulink>,
+				also called libharu).
+			</para>
+
+			<para>
+				The libhpdf library is embedded in the subdirectory
+				<filename>3rdParty/libhpdf</filename>.
+			</para>
+									
+			<para>
+				You enable the building of a loadable libhpdf printing
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_LIBHPDF=1
+			</programlisting>
+							
+			</para>
+												
+		</sect2>
+
+<!-- FreeImage -->
+		<sect2>
+			<title>Image processing with FreeImage</title>
+			
+			<para>
+				<application>Wolframe</application> can manipulate
+				various image formats with the help of
+				the FreeImage project (<ulink url="http://freeimage.sourceforge.net">http://freeimage.sourceforge.net</ulink>).
+			</para>
+
+			<para>
+				The FreeImage package is embedded in the subdirectory
+				<filename>3rdParty/freeimage</filename>.
+			</para>
+									
+			<para>
+				You enable the building of a loadable FreeImage processing
+				module with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_SYSTEM_FREEIMAGE=1
+			</programlisting>
+							
+			</para>
+			
+		</sect2>
+		
+<!-- zlib and libpng -->
+		<sect2>
+			<title>zlib and libpng</title>
+			
+			<para>
+				Libhpdf needs the zlib and libpng libraries.
+			</para>
+
+			<para>
+				The libpng and zlib libraries are embedded in the subdirectory
+				<filename>3rdParty/zlib</filename> and <filename>3rdParty/libpng</filename>.
+			</para>
+		
+		</sect2>
+
+<!-- ICU -->
+		<sect2>
+			<title>Support for ICU</title>
+			
+			<para>
+				<application>Wolframe</application> can use
+				the International Components for Unicode
+				(ICU, <ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>)
+				library for text normalization and conversion.
+			</para>
+			
+			<sect3>
+				<title>Use prebuild version of ICU</title>
+				
+				<para>
+					You can take the pre-build ZIP-files from
+					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>,
+					called somthing like <filename>icu4c-52_1-Win32-msvc10.zip</filename> and
+					unpack them in for instance <filename>C:\icu4c-52_1_1-Win32-msvc10</filename>.
+				</para>
+				
+				<para>
+					You will have to set the 'ICU_XXX' variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	ICU_LIB_VERSION = 52
+	ICU_DIR = C:\icu4c-52_1-Win32-msvc10\icu
+					</programlisting>
+				</para>
+
+				<para>
+					You also have to build your own version of Boost, meaning the 'boost-locale'
+					library has to be built with ICU support enabled and you have to enable the
+					'regex' and the 'locale' boost libraries too:
+				
+					<programlisting language='shell'>
+	bootstrap
+	.\b2 --prefix=C:\boost\boost_1_55 ^
+		--with-thread --with-filesystem --with-system --with-program_options ^
+		--with-date_time --with-locale --with-regex ^
+		-sICU_PATH="C:\icu4c-52_1-win32-debug" ^
+		architecture=x86 address-model=64 toolset=msvc ^
+		install
+					</programlisting>
+
+				</para>
+
+				<para>
+					<emphasis role="bold">Note</emphasis>: The binary installation packages from
+					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>) do not
+					contain debug versions of the library. If you want to build a debugging version of 
+					<application>Wolframe</application> you have to build your own version of ICU.
+				</para>
+								
+			</sect3>
+			
+			<sect3>
+				<title>Build you own version of ICU</title>
+
+				<para>
+					You have to get the ZIP file with the Windows sources called
+					<filename>icu4c-51_1-src.zip</filename> from
+					<ulink url="http://site.icu-project.org/">http://site.icu-project.org</ulink>.
+					Unpack it for instance to <filename>C:\icu4c-52_1-src</filename>.
+				</para>
+				
+				<para>
+					Open the solution file <filename>icu\source\allinone\allinone.sln</filename>.
+					Build the desired version (Release or Debug, 32-bit or 64-bit).
+				</para>
+				
+				<para>
+					Best is to copy the resulting artifacts into a directory
+					like <filename>C:\icu4c-52_1-win32-debug</filename>. Copy in
+					there the <filename>include</filename>, <filename>bin</filename>
+					and <filename>lib</filename> directories.					
+				</para>
+				
+				<para>
+					Adapt the 'ICU_XXX' variables in
+					<filename>makefiles\nmake\config.mk</filename> as follows:
+					
+					<programlisting language='shell'>
+	ICU_LIB_VERSION = 52
+	ICU_DIR = C:\icu4c-52_1-win32-debug
+					</programlisting>
+				</para>
+				
+				<para>
+					You build boost with boost-locale and ICU backend exactly the
+					same way as with the pre-compiled version of ICU:
+
+					<programlisting language='shell'>
+	bootstrap
+	.\b2 --prefix=C:\boost\boost_1_55 ^
+		--with-thread --with-filesystem --with-system --with-program_options ^
+		--with-date_time --with-locale --with-regex ^
+		-sICU_PATH="C:\icu4c-52_1-win32-debug" ^
+		architecture=x86 address-model=64 toolset=msvc ^
+		install
+					</programlisting>
+				</para>
+				
+			</sect3>
+				
+		</sect2>
+
+<!-- testing -->
+		<sect2>
+			<title>Testing Wolframe</title>
+			
+			<para>
+				<application>Wolframe</application> has tests
+				written in Google gtest
+				(<ulink url="https://code.google.com/p/googletest/">https://code.google.com/p/googletest/</ulink>).
+			</para>
+			
+			<para>
+				Tests are run with:
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 test
+			</programlisting>
+			</para>
+			
+			<para>
+				Some tests run for a long time (regression and stress
+				tests). They are not run per default when calling
+				'make test', but you have to call:
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 longtest
+			</programlisting>
+			</para>
+			
+		</sect2>
+
+<!-- Expect -->
+		<sect2>
+			<title>Testing with Expect</title>
+						
+			<para>
+				Some more complex tests are written with Expect
+				(<ulink url="http://expect.sourceforge.net/">http://expect.sourceforge.net/</ulink>).
+			</para>
+						
+			<para>
+				You enable testing with Expect with:
+
+		        <programlisting language='shell'>
+	nmake /nologo /f Makefile.W32 WITH_EXPECT=1
+			</programlisting>
+
+			</para>
+			
+			<para>
+				You can get a Windows version of TCL from
+				<ulink url="http://www.activestate.com/activetcl/">http://www.activestate.com/activetcl/</ulink>.
+				Take the 32-bit community version, the the 64-bit version had no Expect available
+				(at least at the time of writting).
+			</para>
+			
+			<para>
+				Install ActiveTcl 8.6.1 to for instance
+				<filename>C:\Tcl86</filename>.
+			</para>
+			
+			<para>
+				Install Expect with:
+
+				<programlisting language='shell'>
+	cd C:\Tcl86
+	teacup install Expect
+				</programlisting>
+			</para>
+
+			<para>
+				Adapt the following variable in
+				<filename>makefiles\nmake\config.mk</filename>:
+				
+				<programlisting language='shell'>
+	TCL_DIR = C:\Tcl86
+				</programlisting>
+			</para>
+			
+			<para>
+				Some tests also need 'telnet'. If telnet is not
+				enabled as Windows feature, enable it in
+				"Control Panel", "Windows Features" under "Telnet Client".
+			</para>
+
+		</sect2>
+
+<!-- Documentation -->
+		<sect2>
+			<title>Building the documentation</title>
+						
+			<para>
+				The documentation including the man pages is written using
+				DocBook 
+				(<ulink url="http://www.docbook.org">http://www.docbook.org</ulink>).
+			</para>
+						
+			<para>
+				You need the Docbook XSLT files from
+				<ulink url="http://sourceforge.net/projects/docbook/files/docbook-xsl-ns/">http://sourceforge.net/projects/docbook/files/docbook-xsl-ns/</ulink>.
+				Install them and set the 'XSLT_HTMLHELP_STYLESHEET' variable
+				in <filename>makefiles\nmake\config.mk</filename>:
+				
+				<programlisting language='shell'>
+	XSLT_HTMLHELP_STYLESHEET = C:\docbook-xsl-1.76.1\htmlhelp\htmlhelp.xsl
+				</programlisting>
+				
+				You will also need a working <filename>xsltproc.exe</filename>.
+			</para>
+
+			<para>
+				For generating CHM help files you have to install
+				the "HTML Help Workshop and Documentation" from Microsoft.
+				Install it and set the 'HHC_LOCATION' variable
+				in <filename>makefiles\nmake\config.mk</filename>:
+
+				<programlisting language='shell'>
+	HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe	
+				</programlisting>
+			</para>
+							
+			<para>
+				Developer documentation is generated with Doxygen
+				(<ulink url="http://www.doxygen.org">http://www.doxygen.org</ulink>).		
+			</para>
+			
+			<para>
+				Get Doxygen from <ulink url="http://www.stack.nl/~dimitri/doxygen/">http://www.stack.nl/~dimitri/doxygen/</ulink>,
+				install it to for instance <filename>C:\Doxygen</filename> and
+				set the 'DOXYGEN' variable in
+				<filename>makefiles\nmake\config.mk</filename>:
+				
+				<programlisting language='shell'>
+	DOXYGEN = C:\Doxygen\bin\doxygen.exe
+				</programlisting>
+			</para>
+		</sect2>			
+
+<!-- Wolfclient -->
+		<sect2>
+			&InstallationSourceWindowsClient;
+		</sect2>
+
+	</sect1>
+
+<!-- TODO:
+		
+	<sect1>
+		<title>Building on Windows systems (the IDE way)</title>
+		
+		<para>
+			TODO
+		</para>
+	</sect1>
+	
+-->

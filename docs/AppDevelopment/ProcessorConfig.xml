@@ -1,0 +1,15 @@
+<sect1>
+	<title>Processor Configuration</title>
+	<para>The processing of application server requests is configured in the
+	section <code>Processor</code> of the server configuration.
+	The following example shows an empty <code>Processor</code> configuration
+	section:
+	<programlisting language='text'>
+Processor
+{
+    ;... processing configuration
+}
+	</programlisting>
+	</para>
+</sect1>
+

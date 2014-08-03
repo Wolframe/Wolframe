@@ -31,8 +31,8 @@
 
 ************************************************************************/
 //
-/// \file CRAM.hpp
-/// Challenge Response Authentication Mechanism classes
+/// \file AAAA/CRAM.hpp
+/// \brief Challenge Response Authentication Mechanism classes
 ///
 /// \note This implementation of a CRAM mechanism is specific to the Wolframe Project.
 /// It is not supposed to be compatible to other implementations.
@@ -43,6 +43,8 @@
 #define _CRAM_HPP_INCLUDED
 
 #include <string>
+#include <system/randomGenerator.hpp>
+#include <AAAA/passwordHash.hpp>
 
 namespace _Wolframe {
 namespace AAAA {
@@ -51,33 +53,46 @@ static const size_t CRAM_BLOCK_SIZE = 512 / 8;
 static const size_t CRAM_DIGEST_SIZE = 256 / 8;
 static const size_t CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
 static const size_t CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
+static const size_t CRAM_SALT_SIZE = PASSWORD_SALT_SIZE;
 
+/// Challenge for the authentication mech "Wolframe-CRAM"
 class CRAMchallenge
 {
 public:
-	CRAMchallenge();
+	CRAMchallenge( const crypto::RandomGenerator& rndGen );
+
+	~CRAMchallenge();
 
 	const unsigned char* challenge() const		{ return m_challenge; }
 	std::size_t size() const			{ return CRAM_CHALLENGE_SIZE; }
 
 	std::string toBCD() const;
 	std::string toString() const;
+
+	/// Return a string in the format $<salt>$<challenge>
+	std::string toString( const PasswordHash::Salt& salt ) const;
+
+	std::string toString( const PasswordHash& password ) const	{
+		return toString( password.salt() );
+	}
 private:
 	unsigned char	m_challenge[ CRAM_CHALLENGE_SIZE ];
 };
 
 
+/// Response for the authentication mech "Wolframe-CRAM"
 class CRAMresponse
 {
 public:
-	/// Constructor
-	/// \note The strings are base64 encoded, with or without end padding.
-	CRAMresponse( const CRAMchallenge& challenge,
-		      const unsigned char *hash, std::size_t hashSize );
-	CRAMresponse( const std::string& challenge,
-		      const unsigned char *hash, std::size_t hashSize  );
-	CRAMresponse( const CRAMchallenge& challenge, const std::string& pwdHash );
-	CRAMresponse( const std::string& challenge, const std::string& pwdHash );
+	/// Constructors
+	CRAMresponse( const CRAMchallenge& challenge, const PasswordHash& pwdHash );
+
+	/// \note The challenge string is base64 encoded, including the password salt,
+	///	  with or without end padding.
+	///	  The password string is in plain text.
+	CRAMresponse( const std::string& challenge, const std::string& password );
+
+	~CRAMresponse();
 
 	const unsigned char* response() const		{ return m_response; }
 	std::size_t size() const			{ return CRAM_RESPONSE_SIZE; }
@@ -96,6 +111,26 @@ public:
 	bool operator != ( const std::string& rhs )	{ return !( *this == rhs ); }
 private:
 	unsigned char	m_response[ CRAM_RESPONSE_SIZE ];
+};
+
+/// Extract the password seed from the challenge message
+class CRAMsalt
+{
+public:
+	/// \note The challenge string is base64 encoded, including the password salt,
+	///	  with or without end padding.
+	CRAMsalt( const std::string& challenge );
+
+	~CRAMsalt();
+
+	const unsigned char* salt() const		{ return m_salt; }
+	std::size_t size() const			{ return CRAM_SALT_SIZE; }
+
+	std::string toBCD() const;
+	std::string toString() const;
+
+private:
+	unsigned char	m_salt[ CRAM_SALT_SIZE ];
 };
 
 }} // namespace _Wolframe::AAAA

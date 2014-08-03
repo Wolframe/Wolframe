@@ -19,24 +19,26 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	$(TOPDIR)\3rdParty\sqlite3\sqlite3.lib \
+	$(TOPDIR)\src\modules\database\sqlite3\static_db_sqlite3.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_db_sqlite3test.dll
 
 CPP_OBJS = \
-	SQLiteModuleFiles.obj \
-	SQLiteTest.obj \
-	mod_db_sqlite3test.obj
+	SQLiteTest.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:SQLiteTestModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_db_sqlite3test.obj
+	$(LINK) /dll /def:mod_db_sqlite3test.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

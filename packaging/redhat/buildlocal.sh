@@ -10,7 +10,7 @@
 # the Centos version is set below as 'centos_version 630' (OSB service
 # linguo for Centos 6.3)
 
-VERSION=0.0.1
+VERSION=0.0.2
 RPMBUILD=$HOME/rpmbuild
 #OSB_PLATFORM=
 
@@ -27,11 +27,14 @@ rm -rf /var/tmp/wolframe-root/
 rm -f wolframe-$VERSION.tar.gz
 rm -f $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
 
+GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
+sed -i "s/^#define WOLFRAME_BUILD.*/#define WOLFRAME_BUILD $GIT_COMMIT_COUNT/g" include/wolframe.hpp
 make \
 	WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
 	WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
 	WITH_ICU=1 WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 WITH_TEXTWOLF=1 \
 	dist-gz >/dev/null 2>&1
+git checkout include/wolframe.hpp
 
 cp wolframe-$VERSION.tar.gz $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
 cp packaging/redhat/wolframe.spec $RPMBUILD/SPECS/wolframe.spec
@@ -42,7 +45,7 @@ if test ! -f $RPMBUILD/SOURCES/boost_1_48_0.tar.gz; then
 fi
 
 if test ! -f $RPMBUILD/SOURCES/Python-3.3.2.tar.bz2; then
-	wget -O $RPMBUILD/SOURCES/Python-3.3.2.tgz \
+	wget --no-check-certificate -O $RPMBUILD/SOURCES/Python-3.3.2.tgz \
 		http://www.python.org/ftp/python/3.3.2/Python-3.3.2.tgz
 	gunzip $RPMBUILD/SOURCES/Python-3.3.2.tgz
 	bzip2 $RPMBUILD/SOURCES/Python-3.3.2.tar
@@ -62,8 +65,29 @@ cp packaging/obs/boost1.48/boost_1_48_0-gcc-compile.patch $RPMBUILD/SOURCES/.
 
 cd $RPMBUILD/SPECS
 
-export CC='ccache gcc'
-export CXX='ccache g++'
+# add Intel compiler to the path if we have one (Centos VMs with Intel CC only)
+if test -f /opt/intel/bin/iccvars.sh; then
+	MACHINE_ARCH=`uname -m`
+	if test "$MACHINE_ARCH" = "x86_64"; then
+		ICC_ARCH="intel64"
+	else
+		if test "$MACHINE_ARCH" = "i686"; then
+			ICC_ARCH="ia32"
+		else
+			print "ERROR: Unknown Intel architecture $MACHIN_ARCH!"
+			global_unlock
+			exit 1
+		fi
+	fi
+	. /opt/intel/bin/iccvars.sh $ICC_ARCH
+	export CCACHE_CPP2=1
+	export CC='ccache icc'
+	export CXX='ccache icpc'	
+else
+	export CC='ccache gcc'
+	export CXX='ccache g++'
+fi
+sed -i "s/make test/make testreport/g" wolframe.spec
 rpmbuild -ba --define "$OSB_PLATFORM" wolframe.spec
 
 RET=$?

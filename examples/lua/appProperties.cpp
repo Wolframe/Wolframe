@@ -35,16 +35,13 @@
 //
 
 #include "appProperties.hpp"
+#include "wolframe.hpp"
 
 namespace _Wolframe	{
-	static const unsigned short APP_MAJOR_VERSION = 0;
-	static const unsigned short APP_MINOR_VERSION = 0;
-	static const unsigned short APP_REVISION = 5;
-
 	const char*	applicationName()			{ return "Wolframe-lua"; }
-	const Version	applicationVersion()			{ return Version( APP_MAJOR_VERSION,
-										  APP_MINOR_VERSION
-										  ,APP_REVISION
+	const Version	applicationVersion()			{ return Version( WOLFRAME_MAJOR_VERSION,
+										  WOLFRAME_MINOR_VERSION
+										  ,WOLFRAME_REVISION
 									  ); }
 
 	const char*	config::defaultMainConfig()		{ return "/etc/lua.conf"; }

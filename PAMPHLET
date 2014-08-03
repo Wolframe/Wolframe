@@ -1,0 +1,150 @@
+== Main
+	Wolframe is a modular 3-tier application server written in C++ 
+	with an event-driven, cooperative, single-threaded processing model.
+	Its architecture supports the separation of tasks
+	by roles, developer skills and authorization into aspects
+	to support projects in complex environments.
+
+
+== Data processing
+=== Data formats processed
+	In Wolframe the data formats processed are defined by 
+	loadable modules. Currently there are standard modules 
+	provided to process XML and JSON. Modules for other 
+	widespread data formats are planned, questions for 
+	not so widespread data formats can be asked for.
+
+=== Your data definition as aspect on its own
+	Unlike most application servers do, Wolframe does not 
+	delegate the parsing of content to the functions doing 
+	the processing of the request. The marshalling and 
+	demarshalling (serialization/deserialization) of data 
+	is handled as an aspect on its own. Data formats, data 
+	validation and normalization are defind for all language 
+	bindings used. Therefore it does not rely on the capability
+	of a programming language to implement the definition of 
+	your data. It is lowering the hurdles to use another 
+	specific programming language to implement a component.
+
+== Application Integration 
+=== Integration capabilities of web services
+	To get an idea of the capabilities to integrate in existing
+	software, we have to have a look at web services.
+	Web services had a big success also because they allow to 
+	integrate existing software, even legacy systems. Wolframe 
+	lets you integrate from bottom up, accessing your components
+	directly without translation layers inbetween. Your 
+	software will also be understod without digging to deep. 
+	There is no code generation involved with the risk of 
+	obfuscating your code base.
+
+=== Isolate problems to solve
+	One other reason of the success of web services is their 
+	non intrusive interface. You call a function. This interface 
+	lets you solve problems isolated and finish your projects 
+	in time. It minimizes the risk of finished projects being
+	affected by development in other projects. Wolframe extends
+	this concept and encourages you to design also some of your
+	internally used components as functions (eventually as
+	functions with an execution context) without the overhead
+	of a remote procedure call. 
+
+=== Interconnectivity of components
+	Any language binding is able to call any other function 
+	written in any other language where a language binding 
+	exists for Wolframe. But on contrary to other systems, 
+	Wolframe does not need a global interface description (like
+	for example an IDL) for that. Each function has internally 
+	the same interface defined as an iterator on the input
+	and an iterator on the output plus a contract to level 
+	out language differences. This loosely coupled mechanism 
+	of communication enables for example a .NET method 
+	to call a Lua function or a Python function to call a 
+	function written in C++ and so on. The internal 
+	interface with an iterator and input and output is not 
+	visible to the outside. You specify your functions in 
+	the native way of the programming language used.
+	The mapping of the internal interface to the native data 
+	structures of the programming language used happens behind 
+	the scenes. Nevertheless the mapping is transparent and can 
+	be traced to find out problems. In contrary to other systems 
+	offering this level of interconnectivity there is no code 
+	generation involved here at all.
+
+== Separation of aspects
+=== Separate tasks by roles, developer skills and authorization
+	Wolframe enforces the separation of the implementation
+	into different aspects. Separation of different aspects 
+	is important for a succesful project management, because
+	otherwise much more has to be done on the process control 
+	level to prevent developers to care about what they must not
+	or should not care about.
+	The wished thing here is to have natural borders to separate
+	tasks according knowledge, competence, user roles and rights.
+	Wolframe separates the following aspects:
+		- authentication (where you can define your own 
+			module with its own configuration)
+		- authorization (to call functions or database transactions)
+		- auditing methods for groups of functions identified by name
+		- handling of document formats and types, defined by modules
+		- structure of documents processed (including validation)
+		- definition of atomic data types and their normalization
+		- database schema and transaction definitions
+		- scripting (for implementing functions)
+
+
+== Characteristics of components
+=== Use native data structures in bindings
+	If you write a component in a programming language for Wolframe,
+	the chance is high, that you can write it without referencing
+	a Wolframe specific API. You define the API of your component in
+	a way native for the programming language used. If you for example
+	write a function in .NET, you write a .NET object with the method
+	to call and you create an assembly out of it. If you write a 
+	function in Lua, you write a function processing a Lua table and
+	returning a Lua table. If you write a function in native C++, you
+	write a function with a struct as input and a struct as output 
+	(with the method providing introspection information that is 
+	not implicitely available in native C++).
+	The situation changes only slightly, if you want to call
+	globally defined functions written in another language 
+	binding in Wolframe. In this situation you ask the global
+	context for a function and pass a structure native to your
+	programming language to it and you get a native structure back.
+
+=== Domain specific languages
+	Wolframe encourages you to implement one of the aspects mentioned
+	above with a domain specific language. It introduces itself domain
+	specific languages like for example TDL (Transaction Definition
+	Language). The TDL has not the capabilities of a general purpose
+	programming language. On one hand this looks like a disadvantage,
+	because it is less flexible. On the other hand this is a big 
+	advantage, because of the same reason. Flexibility increases the
+	costs of process control: Developers can do much more and you have
+	to control them not to do so. If the domain specific language does 
+	its job you are better off with.
+	Other advantages of domain specific languages are depending on
+	their implementation. TDL for example is modelled very close to
+	SQL and therefore a tool that is familiar for the database engineer.
+	TDL cannot count or calculate variables and change states based
+	on these calculated values. Therefore its behaviour is predictable by
+	proof in contrary to a general purpose programming language.
+
+=== No code generation
+	The effort to write a new language binding or filter in Wolframe 
+	as a new module is quite small (implementing the filter interface
+	- the iterator for input and output - needs about 1000 lines or 
+	less). This encourages and empowers you to implement domain specific
+	languages without code generation involved. Code generation 
+	includes big risks, if applied in a wrong way.
+	One risk is, that if you do not define the domain of the language 
+	completely and the requirements start to shift during use of it
+	in a project, you start to develop on two sides: On the generator
+	and on its target code.
+	Another risk is that code generation is often not seen as part of 
+	the product, just as speed up to get to the final result, and 
+	is therefore not documented as it should. It may entrap you to 
+	hide costs.
+
+
+

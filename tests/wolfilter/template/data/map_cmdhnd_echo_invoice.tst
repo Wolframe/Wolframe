@@ -12,6 +12,7 @@ LoadModules
 	module `cmd/MODULE ddlcompiler_simpleform`
 	module `cmd/MODULE normalize_number`
 	module `cmd/MODULE normalize_string`
+	module `cmd/MODULE datatype_bcdnumber`
 }
 Processor
 {
@@ -28,6 +29,6 @@ Processor
 	}
 }
 **file: test.dmap
-COMMAND(echo Invoice) CALL(echo_invoice_table) RETURN Invoice;"
+COMMAND (echo Invoice) CALL echo_invoice_table RETURN Invoice;"
 . ./output_tst_all.sh
 

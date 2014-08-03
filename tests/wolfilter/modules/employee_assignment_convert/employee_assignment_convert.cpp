@@ -33,7 +33,7 @@
 ///\file employee_assignment_convert.cpp
 ///\brief Implementation wolfilter test plugin data
 
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include "employee_assignment_convert.hpp"
 #include <string>
 #include <vector>
@@ -83,17 +83,7 @@ struct AssignmentListDescription :public serialize::StructDescription<Assignment
 		("assignment", &AssignmentList::assignment);
 	}
 };
-
-struct AssignmentListDocDescription :public serialize::StructDescription<AssignmentListDoc>
-{
-	AssignmentListDocDescription()
-	{
-		(*this)
-		("assignmentlist", &AssignmentListDoc::assignmentlist);
-	}
-};
 }
-
 
 const serialize::StructDescriptionBase* Task::getStructDescription()
 {
@@ -119,9 +109,4 @@ const serialize::StructDescriptionBase* AssignmentList::getStructDescription()
 	return &rt;
 }
 
-const serialize::StructDescriptionBase* AssignmentListDoc::getStructDescription()
-{
-	static AssignmentListDocDescription rt;
-	return &rt;
-}
 

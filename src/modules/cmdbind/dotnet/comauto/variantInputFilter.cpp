@@ -39,8 +39,8 @@
 using namespace _Wolframe;
 using namespace _Wolframe::comauto;
 
-VariantInputFilter::VariantInputFilter( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Context::Flags flags_)
-	:types::TypeSignature( "comauto::VariantInputFilter", __LINE__)
+VariantInputFilter::VariantInputFilter( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Flags::Enum flags_)
+	:TypedInputFilter("dotNetVariantInputFilter")
 	,m_typelib(typelib_)
 	,m_flags(flags_)
 	,m_done(false)
@@ -49,7 +49,7 @@ VariantInputFilter::VariantInputFilter( const comauto::TypeLib* typelib_, const 
 }
 
 VariantInputFilter::VariantInputFilter( const VariantInputFilter& o)
-	:types::TypeSignature( "comauto::VariantInputFilter", __LINE__)
+	:TypedInputFilter(o)
 	,m_stk(o.m_stk)
 	,m_elembuf(o.m_elembuf)
 	,m_typelib(o.m_typelib)
@@ -156,7 +156,7 @@ AGAIN:
 						goto AGAIN;
 					}
 					cur.state = VarClose;
-					if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0 || cur.name.empty())
+					if (((int)m_flags & serialize::Flags::SerializeWithIndices) != 0 || cur.name.empty())
 					{
 						element = types::VariantConst( cur.idx+1);
 					}
@@ -224,7 +224,7 @@ AGAIN:
 				}
 				else if (comauto::isAtomicType( cur.data.vt) || comauto::isStringType( cur.data.vt))
 				{
-					element = comauto::getAtomicElement( cur.data, m_elembuf);
+					element = m_elembuf = comauto::getAtomicElement( cur.data);
 					type = Value;
 					m_stk.pop_back();
 					return true;
@@ -249,7 +249,7 @@ AGAIN:
 					{
 						bool rt = false;
 						std::string elemname;
-						if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0)
+						if (((int)m_flags & serialize::Flags::SerializeWithIndices) != 0)
 						{
 							type = OpenTag;
 							element = types::VariantConst( m_elembuf = comauto::utf8string( varname));

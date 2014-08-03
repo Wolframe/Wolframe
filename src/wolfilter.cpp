@@ -33,9 +33,11 @@
 //\brief Program using wolframe functions to map stdin to stdout
 #include "wolfilterCommandLine.hpp"
 #include "wolfilterIostreamFilter.hpp"
+#include "wolframe.hpp"
 #include "prgbind/programLibrary.hpp"
 #include "module/moduleInterface.hpp"
 #include "processor/procProvider.hpp"
+#include "AAAA/AAAAprovider.hpp"
 #include <fstream>
 #include <iostream>
 #include <cstring>
@@ -46,11 +48,6 @@
 
 using namespace _Wolframe;
 
-///\TODO Not to be defined here
-static const unsigned short APP_MAJOR_VERSION = 0;
-static const unsigned short APP_MINOR_VERSION = 0;
-static const unsigned short APP_REVISION = 5;
-static const unsigned short APP_BUILD = 0;
 enum {IOBUFFERSIZE=8192};
 
 int main( int argc, char **argv )
@@ -58,18 +55,18 @@ int main( int argc, char **argv )
 	bool doExit = false;
 	try
 	{
-		static boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
 		if (argc == 1)
 		{
 			std::cerr << "no arguments specified" << std::endl;
 			config::WolfilterCommandLine::print( std::cerr);
 			return 0;
 		}
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), "", true);
+		boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), true, true);
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";
-			std::cerr << APP_MAJOR_VERSION << "." << APP_MINOR_VERSION << "." << APP_REVISION << "." << APP_BUILD << std::endl;
+			std::cerr << WOLFRAME_MAJOR_VERSION << "." << WOLFRAME_MINOR_VERSION << "." << WOLFRAME_REVISION << "." << WOLFRAME_BUILD << std::endl;
 			doExit = true;
 		}
 		if (cmdline.printhelp())
@@ -83,7 +80,9 @@ int main( int argc, char **argv )
 		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
 		prgbind::ProgramLibrary programLibrary;
 
+		AAAA::AAAAprovider aaaaProvider( &cmdline.aaaaProviderConfig(), &cmdline.modulesDirectory());
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &programLibrary);
+		proc::ExecContext execContext( &processorProvider, &aaaaProvider);
 
 		if (!processorProvider.resolveDB( databaseProvider))
 		{
@@ -100,11 +99,11 @@ int main( int argc, char **argv )
 			std::ifstream fh;
 			fh.open( cmdline.inputfile().c_str());
 
-			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, fh, std::cout);
+			langbind::iostreamfilter( &execContext, cmdline.protocol(), cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, fh, std::cout);
 		}
 		else
 		{
-			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, std::cin, std::cout);
+			langbind::iostreamfilter( &execContext, cmdline.protocol(), cmdline.cmd(), cmdline.inputfilter(), IOBUFFERSIZE, cmdline.outputfilter(), IOBUFFERSIZE, std::cin, std::cout);
 		}
 	}
 	catch (const std::bad_alloc& e)

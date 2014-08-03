@@ -6,17 +6,17 @@ SUBDIRS =
 
 # Postgresql
 ifeq ($(WITH_PGSQL),1)
-SUBDIRS += PostgreSQL
+SUBDIRS += postgresql
 endif
 
 # Oracle
 ifeq ($(WITH_ORACLE),1)
-SUBDIRS += Oracle
+SUBDIRS += oracle
 endif
 
 # sqlite3
 ifeq ($(WITH_SQLITE3),1)
-SUBDIRS += SQLite3
+SUBDIRS += sqlite3
 endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

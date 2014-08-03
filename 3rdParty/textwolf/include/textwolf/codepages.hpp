@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/codepages.hpp
+/// \brief Definition of IsoLatin code pages
+
 #ifndef __TEXTWOLF_CODE_PAGES_HPP__
 #define __TEXTWOLF_CODE_PAGES_HPP__
 #include "textwolf/char.hpp"
@@ -40,6 +43,8 @@
 namespace textwolf {
 namespace charset {
 
+/// \class IsoLatinCodePage
+/// \brief IsoLatin code page
 class IsoLatinCodePage
 {
 private:
@@ -79,7 +84,7 @@ private:
 			}
 		}
 
-		const std::map<unsigned short, unsigned char>* get( unsigned int idx) const
+		inline const std::map<unsigned short, unsigned char>* get( unsigned int idx) const
 		{
 			return &m_map[ idx];
 		}
@@ -88,11 +93,14 @@ private:
 	};
 
 public:
+	/// \brief Copy constructor
 	IsoLatinCodePage( const IsoLatinCodePage& o)
 		:m_cd(o.m_cd)
 		,m_invcd(o.m_invcd)
 		,m_invovlcd(o.m_invovlcd){}
 
+	/// \brief Constructor
+	/// \param[in] idx IsoLatin code page index, 1 for "IsoLatin-1"
 	IsoLatinCodePage( unsigned int idx)
 	{
 		enum {NofCodePages=9};
@@ -130,24 +138,37 @@ public:
 		m_invovlcd = invOvlCodeMap.get( idx-1);
 	}
 
-	UChar ucharcode( char ch) const
+	/// \brief Get the unicode character representation of the character ch in this codepage
+	/// \param[in] ch character in this codepage
+	/// \return the unicode representation of the passed character
+	inline UChar ucharcode( char ch) const
 	{
 		if ((signed char)ch >= 0) return ch;
 		return m_cd[ (unsigned int)(unsigned char)ch - 128];
 	}
 
-	char invcode( UChar ch) const
+	/// \brief Get the character representation of a unicode character in this codepage
+	/// \param[in] ch unicode character
+	/// \return the representation of the passed unicode character in this codepage
+	inline char invcode( UChar ch) const
 	{
 		char rt = 0;
-		if (ch <= 128) return ch;
-		if (ch <= 255) rt = m_invcd[ ch - 128];
+		if (ch <= 128) return (char)ch;
+		if (ch <= 255) rt = (unsigned char)m_invcd[ ch - 128];
 		if (rt == 0)
 		{
-			std::map<unsigned short, unsigned char>::const_iterator fi = m_invovlcd->find( ch);
+			if (ch >= (1<<sizeof(unsigned short))) return 0;
+			std::map<unsigned short, unsigned char>::const_iterator fi = m_invovlcd->find( (unsigned short)ch);
 			if (fi == m_invovlcd->end()) return 0;
 			rt = fi->second;
 		}
 		return rt;
+	}
+
+	/// \brief Evaluate if two code pages are equal
+	static inline bool is_equal( const IsoLatinCodePage& a, const IsoLatinCodePage& b)
+	{
+		return a.m_cd == b.m_cd;
 	}
 
 private:

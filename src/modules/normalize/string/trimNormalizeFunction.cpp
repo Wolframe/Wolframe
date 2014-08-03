@@ -37,6 +37,11 @@
 using namespace _Wolframe;
 using namespace langbind;
 
+TrimNormalizeFunction::TrimNormalizeFunction( const std::vector<types::Variant>& arg)
+{
+	if (!arg.empty()) std::runtime_error( "no arguments expected for string normalizer 'trim'");
+}
+
 types::Variant TrimNormalizeFunction::execute( const types::Variant& inp) const
 {
 	if (inp.type() == types::Variant::String)

@@ -30,15 +30,20 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilterIostreamFilter.hpp
+///\file wolfilterIostreamFilter.cpp
 ///\brief Implementation of a kind of pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 #include "wolfilterIostreamFilter.hpp"
-#include "langbind/appObjects.hpp"
-#include "langbind/formFunction.hpp"
-#include "serialize/ddl/filtermapDDLParse.hpp"
-#include "serialize/ddl/filtermapDDLSerialize.hpp"
+#include "contentOnlyProtocolHandler.hpp"
+#include "serialize/ddlFormSerializer.hpp"
+#include "serialize/ddlFormParser.hpp"
+#include "serialize/ddl/ddlStructParser.hpp"
+#include "serialize/ddl/ddlStructSerializer.hpp"
+#include "processor/execContext.hpp"
+#include "cmdbind/protocolHandler.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/null_filter.hpp"
+#include "filter/redirectFilterClosure.hpp"
+#include "langbind/formFunction.hpp"
 #include "utils/stringUtils.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
@@ -102,67 +107,56 @@ std::pair<std::string, std::vector<langbind::FilterArgument> > filterIdentifier(
 	return rt;
 }
 
-static std::string filterargAsString( const std::vector<langbind::FilterArgument>& arg)
-{
-	std::ostringstream out;
-	std::vector<langbind::FilterArgument>::const_iterator ai = arg.begin(), ae = arg.end();
-	for (; ai != ae; ++ai)
-	{
-		if (ai != arg.begin()) out << ", ";
-		out << ai->first << "='" << ai->second << "'";
-	}
-	return out.str();
-}
-
-static Filter getFilter( proc::ProcessorProvider* provider, const std::string& ifl_, const std::string& ofl_)
+static Filter getFilter( const proc::ProcessorProviderInterface* provider, const std::string& ifl_, const std::string& ofl_)
 {
 	Filter rt;
 	if (ifl_.empty() && ofl_.empty())
 	{
-		return langbind::createNullFilter( "", "");
+		return langbind::createNullFilter();
 	}
 	std::pair<std::string,std::vector<langbind::FilterArgument> > ifl = filterIdentifier( ifl_);
 	std::pair<std::string,std::vector<langbind::FilterArgument> > ofl = filterIdentifier( ofl_);
 	if (boost::iequals( ofl_, ifl_))
 	{
-		Filter* fp = provider->filter( ifl.first, ifl.second);
-		if (!fp)
+		const FilterType* ft = provider->filterType( ifl.first);
+		if (!ft)
 		{
 			std::ostringstream msg;
-			msg << "unknown filter: name = '" << ifl.first << "' ,arguments = '" << filterargAsString(ofl.second) << "'";
+			msg << "unknown filter '" << ifl.first << "'";
 			throw std::runtime_error( msg.str());
 		}
 		else
 		{
+			FilterR fp( ft->create( ifl.second));
 			rt = *fp;
-			delete fp;
 		}
 	}
 	else
 	{
-		Filter* in = provider->filter( ifl.first, ifl.second);
-		Filter* out = provider->filter( ofl.first, ofl.second);
-		if (!in)
+		const FilterType* inft = provider->filterType( ifl.first);
+		const FilterType* outft = provider->filterType( ofl.first);
+		if (!inft)
 		{
 			std::ostringstream msg;
-			msg << "unknown input filter: name = '" << ifl.first << "' arguments = '" << filterargAsString( ifl.second) << "'";
+			msg << "unknown input filter '" << ifl.first << "'";
 			throw std::runtime_error( msg.str());
 		}
-		if (!out)
+		if (!outft)
 		{
-			delete in;
 			std::ostringstream msg;
-			msg << "unknown output filter: name = '" << ofl.first << "' arguments = '" << filterargAsString( ofl.second) << "'";
+			msg << "unknown output filter '" << ofl.first << "'";
 			throw std::runtime_error( msg.str());
 		}
+		FilterR in( inft->create( ifl.second));
+		FilterR out( outft->create( ofl.second));
+		
+		out->outputfilter()->inheritMetaData( in->inputfilter()->getMetaDataRef());
 		rt = Filter( in->inputfilter(), out->outputfilter());
-		delete in;
-		delete out;
 	}
 	return rt;
 }
 
-static void readInput( char* buf, unsigned int bufsize, std::istream& is, InputFilter& iflt)
+static void readFilterInput( char* buf, unsigned int bufsize, std::istream& is, InputFilter& iflt)
 {
 	std::size_t pp = 0;
 	while (pp < bufsize && !is.eof())
@@ -171,43 +165,76 @@ static void readInput( char* buf, unsigned int bufsize, std::istream& is, InputF
 		if (!is.eof()) ++pp;
 	}
 	iflt.putInput( buf, pp, is.eof());
-	iflt.setState( InputFilter::Open);
+	if (iflt.state() == InputFilter::Error)
+	{
+		std::ostringstream msg;
+		msg << "error processing input: '" << iflt.getError() << "'";
+		throw std::runtime_error( msg.str());
+	}
 }
 
-static void checkUnconsumedInput( std::istream& is, InputFilter& iflt)
+static bool readProtocolInput( char* buf, unsigned int bufsize, std::istream& is, cmdbind::ProtocolHandler* cmdh)
 {
-	union
+	if (is.eof())
 	{
-		const void* ptr_;
-		const char* ptr;
-	} data;
-	std::size_t ii,size;
-	bool end;
-	iflt.getRest( data.ptr_, size, end);
-	for (ii=0; ii<size; ++ii)
-	{
-		if ((unsigned char)data.ptr[ii] > 32)
-		{
-			throw std::runtime_error( "unconsumed input left");
-		}
+		cmdh->putEOF();
+		return false;
 	}
+	std::size_t pp = 0;
+	while (pp < bufsize && !is.eof())
+	{
+		is.read( buf+pp, sizeof(char));
+		if (!is.eof()) ++pp;
+	}
+	if (pp == 0 && is.eof())
+	{
+		cmdh->putEOF();
+		return false;
+	}
+	else
+	{
+		cmdh->putInput( buf, pp);
+		return true;
+	}
+}
+
+
+
+static void checkUnconsumedInput( std::istream& is)
+{
+	bool end = 0;
 	while (!end)
 	{
 		char ch = 0;
 		is.read( &ch, sizeof(char));
 		if ((unsigned char)ch > 32)
 		{
-			throw std::runtime_error( "unconsumed input left");
+			std::string str;
+			str.push_back( (unsigned char)ch < 32?'.':ch);
+
+			std::size_t pp = 0;
+			while (pp < 20 && !is.eof())
+			{
+				is.read( &ch, sizeof(char));
+				if (!is.eof())
+				{
+					str.push_back( (unsigned char)ch < 32?'.':ch);
+					++pp;
+				}
+			}
+			throw std::runtime_error( std::string("unconsumed input left [") + str + "...]");
 		}
 		end = is.eof();
 	}
 }
 
-static void writeOutput( char* buf, unsigned int size, std::ostream& os, OutputFilter& oflt)
+static void writeOutput( std::ostream& os, OutputFilter& oflt)
 {
-	os.write( buf, oflt.getPosition());
-	oflt.setOutputBuffer( buf, size);
-	oflt.setState( OutputFilter::Open);
+	const void* buf;
+	std::size_t bufsize;
+
+	oflt.getOutput( buf, bufsize);
+	os.write( (const char*)buf, bufsize);
 }
 
 struct BufferStruct
@@ -234,12 +261,13 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 	}
 	switch (iflt->state())
 	{
+		case InputFilter::Start:
 		case InputFilter::Open:
 			break;
 
 		case InputFilter::EndOfMessage:
-			if (is.eof()) throw std::runtime_error( "unexpected end of input");
-			readInput( buf.inbuf, buf.insize, is, *iflt);
+			if (is.eof()) throw std::runtime_error( "unexpected end of input (EOF)");
+			readFilterInput( buf.inbuf, buf.insize, is, *iflt);
 			return;
 
 		case InputFilter::Error:
@@ -251,11 +279,12 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 	}
 	switch (oflt->state())
 	{
+		case OutputFilter::Start:
 		case OutputFilter::Open:
 			throw std::runtime_error( "unknown error");
 
 		case OutputFilter::EndOfBuffer:
-			writeOutput( buf.outbuf, buf.outsize, os, *oflt);
+			writeOutput( os, *oflt);
 			return;
 
 		case OutputFilter::Error:
@@ -267,29 +296,72 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 	}
 }
 
-
-void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
+static bool processProtocolHandler( BufferStruct& buf, cmdbind::ProtocolHandler* cmdh, std::istream& is, std::ostream& os, std::string& lasterr)
 {
-	Filter flt = getFilter( provider, ifl, ofl);
-	if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
-	if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
+	bool eod = false;
+	cmdh->setInputBuffer( buf.inbuf, buf.insize);
 
+	for (;;) switch (cmdh->nextOperation())
+	{
+		case cmdbind::ProtocolHandler::READ:
+			if (eod) throw std::runtime_error( "protocol handler trying to read after end of data");
+			eod = !readProtocolInput( buf.inbuf, buf.insize, is, cmdh);
+			continue;
+
+		case cmdbind::ProtocolHandler::WRITE:
+		{
+			const void* cmdh_output;
+			std::size_t cmdh_outputsize;
+			cmdh->getOutput( cmdh_output, cmdh_outputsize);
+			os << std::string( (const char*)cmdh_output, cmdh_outputsize);
+			continue;
+		}
+		case cmdbind::ProtocolHandler::CLOSE:
+		{
+			const char* error = cmdh->lastError();
+			if (error)
+			{ 
+				std::ostringstream msg;
+				msg << "error process command handler: " << error;
+				lasterr = msg.str();
+				return false;
+			}
+			return true;
+		}
+	}
+}
+
+
+void langbind::iostreamfilter( proc::ExecContext* execContext, const std::string& protocol, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
+{
 	BufferStruct buf( ib, ob);
-	flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
-
+	const proc::ProcessorProviderInterface* provider = execContext->provider();
+		
 	if (proc.size() == 0 || proc == "-")
 	{
+		LOG_TRACE << "Start executing filter";
+		Filter flt = getFilter( provider, ifl, ofl);
+		if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
+		if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
+		flt.outputfilter()->setOutputChunkSize( buf.outsize);
+
+		// ... no command specified -> we simply map the input through the
+		//	input/output filters specified:
 		if (ifl.empty() && ofl.empty()) throw std::runtime_error( "argument for command, form or function not defined and no filter for processing specified");
 
 		const void* elem;
 		int taglevel = 0;
 		std::size_t elemsize;
-		InputFilter::ElementType etype;
+		FilterBase::ElementType etype;
 
 		while (taglevel >= 0)
 		{
 			if (!flt.inputfilter().get()->getNext( etype, elem, elemsize))
 			{
+				if (flt.inputfilter()->state() == InputFilter::Open || flt.inputfilter()->state() == InputFilter::Start)
+				{
+					throw std::runtime_error( "filter not delivering final close tag");
+				}
 				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 				continue;
 			}
@@ -301,63 +373,54 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 			{
 				taglevel--;
 			}
-			if (taglevel >= 0)
+			while (!flt.outputfilter().get()->print( etype, elem, elemsize))
 			{
-				while (!flt.outputfilter().get()->print( etype, elem, elemsize))
-				{
-					processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
-				}
-				LOG_DATA << "[iostream filter] print " << std::string( (const char*)elem, elemsize);
+				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 			}
+			LOG_DATA << "[iostream filter] print " << FilterBase::elementTypeName(etype) << " '" << std::string( (const char*)elem, elemsize) << "'"; 
 		}
-		checkUnconsumedInput( is, *flt.inputfilter());
-		writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+		while (!flt.outputfilter().get()->close())
+		{
+			processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+		}
+		checkUnconsumedInput( is);
+		writeOutput( os, *flt.outputfilter());
 		if (taglevel != -1) throw std::runtime_error( "tags not balanced");
 		return;
 	}
 	{
-		cmdbind::IOFilterCommandHandler* hnd = provider->iofilterhandler( proc);
-		if (hnd)
+		if (proc[ proc.size()-1] == '~' || provider->hasCommand( proc))
 		{
-			cmdbind::CommandHandlerR cmdhnd( hnd);
-			hnd->passParameters( proc, 0, 0);
-			// Take the input filter defined in the command handler if not passed as parameter:
-			if (ifl.empty() && hnd->inputfilter().get())
-			{
-				flt.inputfilter() = hnd->inputfilter();
-			}
-			else
-			{
-				hnd->setFilter( flt.inputfilter());
-			}
-			// Take the output filter defined in the command handler if not passed as parameter:
-			if (ofl.empty() && hnd->outputfilter().get())
-			{
-				flt.outputfilter() = hnd->outputfilter();
-				hnd->outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
-			}
-			else
-			{
-				hnd->setFilter( flt.outputfilter());
-			}
-			// Processing:
-			const char* errmsg;
-			cmdbind::IOFilterCommandHandler::CallResult res;
+			LOG_TRACE << "Start executing command '" << proc << "'";
 
-			while ((res = hnd->call( errmsg)) == cmdbind::IOFilterCommandHandler::Yield)
+			cmdbind::ProtocolHandlerR protocolhnd;
+			if (protocol.empty())
 			{
-				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
-			}
-			if (res == cmdbind::IOFilterCommandHandler::Error)
-			{
-				std::string emsg( errmsg?errmsg:"unknown");
-				throw std::runtime_error( emsg);
+				protocolhnd.reset( new cmdbind::ContentOnlyProtocolHandler());
 			}
 			else
 			{
-				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+				protocolhnd.reset( provider->protocolHandler( protocol));
+				if (!protocolhnd.get()) throw std::runtime_error( std::string("protocol '") + protocol + "' is not defined");
 			}
-			checkUnconsumedInput( is, *flt.inputfilter());
+			protocolhnd->setExecContext( execContext);
+			if (proc[ proc.size()-1] == '~')
+			{
+				protocolhnd->setArgumentString( std::string( proc.c_str(), proc.size()-1));
+			}
+			else
+			{
+				protocolhnd->setArgumentString( proc + "!");
+			}
+			protocolhnd->setOutputBuffer( buf.outbuf, buf.outsize, 0);
+
+			std::string lasterr;
+			if (!processProtocolHandler( buf, protocolhnd.get(), is, os, lasterr))
+			{
+				throw std::runtime_error( lasterr);
+			}
+			// Check if there is unconsumed input left (must not happen):
+			checkUnconsumedInput( is);
 			return;
 		}
 	}
@@ -365,19 +428,29 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		const FormFunction* func = provider->formFunction( proc);
 		if (func)
 		{
+			LOG_TRACE << "Start executing form function '" << proc << "'";
+
+			// ... command is the name of a form function we call directly
+			//	with the filter specified:
+			Filter flt = getFilter( provider, ifl, ofl);
+			if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
+			if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
+			flt.outputfilter()->setOutputChunkSize( buf.outsize);
+
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
 			FormFunctionClosureR closure( func->createClosure());
-			closure->init( provider, inp, serialize::Context::ValidateAttributes);
+			closure->init( execContext, inp, serialize::Flags::ValidateAttributes);
 
 			while (!closure->call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			RedirectFilterClosure res( closure->result(), outp);
+			RedirectFilterClosure res( closure->result(), outp, true);
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+			while (!flt.outputfilter()->close()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-			checkUnconsumedInput( is, *flt.inputfilter());
+			writeOutput( os, *flt.outputfilter());
+			checkUnconsumedInput( is);
 			return;
 		}
 	}
@@ -385,22 +458,33 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		const types::FormDescription* st = provider->formDescription( proc);
 		if (st)
 		{
+			LOG_TRACE << "Start mapping through form '" << proc << "'";
+
+			// ... command is the name a form description -> we simply map
+			//	the input with the input/output filters specified 
+			//	through the form:
+			Filter flt = getFilter( provider, ifl, ofl);
+			if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
+			if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
+			flt.outputfilter()->setOutputChunkSize( buf.outsize);
+
 			types::Form df( st);
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
 			serialize::DDLStructParser closure( &df);
-			closure.init( inp, serialize::Context::ValidateAttributes);
+			closure.init( inp, serialize::Flags::ValidateAttributes);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			serialize::DDLStructSerializer res( &df);
-			res.init( outp, serialize::Context::None);
+			res.init( outp, serialize::Flags::None);
 
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+			while (!flt.outputfilter()->close()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-			checkUnconsumedInput( is, *flt.inputfilter());
+			writeOutput( os, *flt.outputfilter());
+			checkUnconsumedInput( is);
 			return;
 		}
 	}

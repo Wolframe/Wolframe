@@ -32,31 +32,34 @@
 ************************************************************************/
 ///\file datatypeBigfxp.cpp
 #include "datatypeBigfxp.hpp"
+#include <limits>
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
-
-BigfxpDataInitializer::BigfxpDataInitializer( const std::string& description)
-	:m_show_precision(0),m_calc_precision(0)
+BigfxpDataInitializer::BigfxpDataInitializer( const std::vector<types::Variant>& arg)
+	:m_max_integer_digits(std::numeric_limits<unsigned int>::max())
+	,m_max_fractional_digits(std::numeric_limits<unsigned int>::max())
 {
-	std::string::const_iterator di = description.begin(), de = description.end();
-	for (; di != de && *di >= '0' && *di <= '9'; ++di)
+	if (arg.size() > 2) throw std::runtime_error("too many arguments for big fixed point number initializer");
+	if (arg.size() == 0) return;
+	if (arg.size() == 1)
 	{
-		m_show_precision = (m_show_precision * 10) + *di - '0';
+		types::Variant::Data::Int a1 = arg.at(0).touint();
+		if (a1 >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("max fractional digits argument out of range for big fixed point number initializer");
+		m_max_fractional_digits = (unsigned int)a1;
 	}
-	if (di == de) return;
-	if (*di != '+')
+	else
 	{
-		throw std::runtime_error("illegal syntax of initializer description (<show-precision>+<calc-precision>)");
-	}
-	m_calc_precision = m_show_precision;
-	for (; di != de && *di >= '0' && *di <= '9'; ++di)
-	{
-		m_calc_precision = (m_calc_precision * 10) + *di - '0';
+		types::Variant::Data::Int a1 = arg.at(0).touint();
+		if (a1 >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("max integer digits argument out of range for big fixed point number initializer");
+		m_max_integer_digits = (unsigned int)a1;
+
+		types::Variant::Data::Int a2 = arg.at(1).touint();
+		if (a2 >= std::numeric_limits<unsigned int>::max()) throw std::runtime_error("max fractional digits argument out of range for big fixed point number initializer");
+		m_max_fractional_digits = (unsigned int)a2;
 	}
 }
-
 
 types::Variant BigfxpDataType::add( const CustomDataValue& operand, const Variant& arg)
 {
@@ -66,11 +69,12 @@ types::Variant BigfxpDataType::add( const CustomDataValue& operand, const Varian
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
 		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigFxpBCD::init( op->operator+( *bcdarg));
+		res->BigFxpBCD::operator=( op->operator+( *bcdarg));
 	}
 	else
 	{
-		res->BigFxpBCD::init( op->types::BigFxpBCD::operator+( arg.toint()));
+		BigFxpBCD argnum( arg.tostring());
+		res->BigFxpBCD::operator=( op->BigFxpBCD::operator+( argnum));
 	}
 	return rt;
 }
@@ -83,11 +87,12 @@ types::Variant BigfxpDataType::subtract( const CustomDataValue& operand, const V
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
 		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigFxpBCD::init( op->operator-( *bcdarg));
+		res->BigFxpBCD::operator=( op->operator-( *bcdarg));
 	}
 	else
 	{
-		res->BigFxpBCD::init( op->operator-( arg.toint()));
+		BigFxpBCD argnum( arg.tostring());
+		res->BigFxpBCD::operator=( op->types::BigFxpBCD::operator-( argnum));
 	}
 	return rt;
 }
@@ -100,39 +105,22 @@ types::Variant BigfxpDataType::multiply( const CustomDataValue& operand, const V
 	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
 	{
 		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigFxpBCD::init( op->operator*( *bcdarg));
+		res->BigFxpBCD::operator=( op->operator*( *bcdarg));
 	}
 	else
 	{
-		res->BigFxpBCD::init( op->operator*( arg.toint()));
+		BigFxpBCD argnum( arg.tostring());
+		res->BigFxpBCD::operator=( op->types::BigFxpBCD::operator*( argnum));
 	}
 	return rt;
 }
-
-types::Variant BigfxpDataType::divide( const CustomDataValue& operand, const Variant& arg)
-{
-	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
-	types::Variant rt( op->type(), op->initializer());
-	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
-	if (arg.type() == types::Variant::Custom && arg.data().value.Custom->type() == op->type())
-	{
-		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg.data().value.Custom);
-		res->BigFxpBCD::init( op->operator/( *bcdarg));
-	}
-	else
-	{
-		res->BigFxpBCD::init( op->operator/( arg.toint()));
-	}
-	return rt;
-}
-
 
 types::Variant BigfxpDataType::negation( const CustomDataValue& operand)
 {
 	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
 	types::Variant rt( op->type(), op->initializer());
 	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
-	res->BigBCD::operator=( op->operator-());
+	res->BigFxpBCD::operator=( op->operator-());
 	return rt;
 }
 
@@ -141,5 +129,147 @@ types::Variant BigfxpDataType::toDouble( const CustomDataValue& operand)
 	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
 	return types::Variant( op->todouble());
 }
+
+types::Variant BigfxpDataType::divide( const CustomDataValue& operand, const std::vector<types::Variant>& arg)
+{
+	if (arg.size() < 2) throw std::runtime_error( "two arguments expected for divide (operand, additional scale)");
+	if (arg.size() > 2) throw std::runtime_error( "too many arguments for format (two arguments: operand, additional scale)");
+
+	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
+	types::Variant rt( op->type(), op->initializer());
+	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
+	if (arg[0].type() == types::Variant::Custom && arg[0].data().value.Custom->type() == op->type())
+	{
+		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg[0].data().value.Custom);
+		res->BigFxpBCD::operator=( op->divide( *bcdarg, arg[1].touint()));
+	}
+	else
+	{
+		BigFxpBCD argnum( arg[0].tostring());
+		res->BigFxpBCD::operator=( op->types::BigFxpBCD::divide( argnum, arg[1].touint()));
+	}
+	return rt;
+}
+
+types::Variant BigfxpDataType::format( const CustomDataValue& operand, const std::vector<types::Variant>& arg)
+{
+	if (arg.size() < 1) throw std::runtime_error( "argument expected for format (precision)");
+	if (arg.size() > 1) throw std::runtime_error( "too many arguments for format (one argument: precision)");
+	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
+	types::Variant rt( op->type(), op->initializer());
+	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
+	res->BigFxpBCD::format( arg[0].touint());
+	return rt;
+}
+
+types::Variant BigfxpDataType::round( const CustomDataValue& operand, const std::vector<types::Variant>& arg)
+{
+	if (arg.size() < 1) throw std::runtime_error( "argument expected for round (bcd fixed point number)");
+	if (arg.size() > 1) throw std::runtime_error( "too many arguments for round (one argument: bcd fixed point number)");
+	const BigfxpDataValue* op = reinterpret_cast<const BigfxpDataValue*>(&operand);
+	types::Variant rt( op->type(), op->initializer());
+	BigfxpDataValue* res = reinterpret_cast<BigfxpDataValue*>( rt.data().value.Custom);
+
+	if (arg[0].type() == types::Variant::Custom && arg[0].data().value.Custom->type() == op->type())
+	{
+		const BigfxpDataValue* bcdarg = reinterpret_cast<const BigfxpDataValue*>(arg[0].data().value.Custom);
+		res->BigFxpBCD::round( *bcdarg);
+	}
+	else
+	{
+		BigFxpBCD argnum( arg[0].tostring());
+		res->BigFxpBCD::round( argnum);
+	}
+	return rt;
+}
+
+int BigfxpDataValue::compare( const CustomDataValue& o) const
+{
+	if (o.type() != type())
+	{
+		return ((uintptr_t)type() > (uintptr_t)o.type())?1:-1;
+	}
+	else
+	{
+		const BigfxpDataValue* odt = reinterpret_cast<const BigfxpDataValue*>(&o);
+		return types::BigFxpBCD::compare(*odt);
+	}
+}
+
+void BigfxpDataValue::assign( const Variant& o)
+{
+	switch (o.type())
+	{
+		case Variant::Null:
+		case Variant::Timestamp:
+		case Variant::Bool:
+			throw std::runtime_error( std::string("cannot convert '") + o.typeName() + "' to big bcd fixed point number");
+
+		case Variant::Custom:
+		{
+			const CustomDataValue* ref = o.customref();
+			if (ref->type() != type())
+			{
+				BigFxpBCD argnum( o.tostring());
+				types::BigFxpBCD::operator=( argnum);
+			}
+			else
+			{
+				const BigfxpDataValue* val = reinterpret_cast<const BigfxpDataValue*>(ref);
+				types::BigFxpBCD::operator=( *val);
+			}
+			break;
+		}
+		case Variant::BigNumber:
+			types::BigFxpBCD::operator = ( *o.bignumref());
+			break;
+
+		case Variant::Double:
+			types::BigFxpBCD::operator=( o.todouble());
+			break;
+
+		case Variant::Int:
+			types::BigFxpBCD::operator=( o.toint());
+			break;
+
+		case Variant::UInt:
+			types::BigFxpBCD::operator=( o.touint());
+			break;
+
+		case Variant::String:
+			types::BigFxpBCD::operator=( o.tostring());
+			break;
+	}
+	unsigned int prec = (unsigned int)types::BigFxpBCD::nof_digits();
+	unsigned int scal = (unsigned int)types::BigFxpBCD::scale();
+	if (prec - scal > m_max_integer_digits)
+	{
+		throw std::runtime_error( "to many integer digits in bcd fixed point number");
+	}
+	if (scal > m_max_fractional_digits)
+	{
+		throw std::runtime_error( "to many fractional digits in bcd fixed point number");
+	}
+	if (m_max_fractional_digits != std::numeric_limits<unsigned int>::max())
+	{
+		BigFxpBCD::setScale( m_max_fractional_digits);
+	}
+}
+
+bool BigfxpDataValue::getBaseTypeValue( Variant& dest) const
+{
+	try
+	{
+		dest = types::BigNumber( types::BigFxpBCD::tostring());
+		return true;
+	}
+	catch (const std::runtime_error&)
+	{
+		return false;
+	}
+}
+
+
+
 
 

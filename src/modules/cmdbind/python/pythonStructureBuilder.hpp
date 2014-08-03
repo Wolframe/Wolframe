@@ -35,7 +35,6 @@ Project Wolframe.
 #define _Wolframe_python_STRUCTURE_BUILDER_HPP_INCLUDED
 #include "pythonStructure.hpp"
 #include "types/variant.hpp"
-#include "types/countedReference.hpp"
 #include "utils/printFormats.hpp"
 #include <utility>
 #include <vector>

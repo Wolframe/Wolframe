@@ -41,27 +41,97 @@ using namespace langbind;
 bool TypingInputFilter::getNext( ElementType& type, types::VariantConst& element)
 {
 	if (!m_inputfilter.get()) return false;
-	const void* charptr;
-	std::size_t charsize;
+	const void* charptr = 0;
+	std::size_t charsize = 0;
 	bool rt = m_inputfilter->getNext( type, charptr, charsize);
 	if (!rt)
 	{
 		setState( m_inputfilter->state(), m_inputfilter->getError());
+		return false;
 	}
 	else
 	{
-		element.init( (const char*)charptr, charsize);
+		setState( m_inputfilter->state());
+		if (flag(FilterBase::SerializeWithIndices))
+		{
+			if (type == FilterBase::OpenTag)
+			{
+				if (charsize == 0)
+				{
+					if (m_stack.size())
+					{
+						m_stack.back().isArrayElem = true;
+						element = ++m_stack.back().cnt;
+						return true;
+					}
+					else
+					{
+						throw std::runtime_error("illegal index element in filter (SerializeWithIndices)");
+					}
+				}
+				else
+				{
+					element.init( (const char*)charptr, charsize);
+					m_stack.push_back( StackElement());
+					return true;
+				}
+			}
+			else if (type == FilterBase::CloseTag)
+			{
+				if (m_stack.size())
+				{
+					if (m_stack.back().isArrayElem)
+					{
+						m_stack.back().isArrayElem = false;
+					}
+					else
+					{
+						m_stack.pop_back();
+					}
+				}
+				else
+				{
+					element.init();
+					return true;
+				}
+				element.init();
+				return true;
+			}
+			else
+			{
+				element.init( (const char*)charptr, charsize);
+				return true;
+			}
+		}
+		else
+		{
+			element.init( (const char*)charptr, charsize);
+			return true;
+		}
 	}
-	return rt;
 }
 
 bool TypingInputFilter::setFlags( Flags f)
 {
 	if (m_inputfilter.get()->setFlags( f))
 	{
+		if (0!=((int)f & (int)langbind::FilterBase::SerializeWithIndices) && m_stack.empty())
+		{
+			m_stack.push_back( StackElement());
+		}
 		return langbind::TypedInputFilter::setFlags( f);
 	}
 	return false;
+}
+
+bool TypingInputFilter::checkSetFlags( Flags f) const
+{
+	return (m_inputfilter.get()->checkSetFlags( f));
+}
+
+const char* TypingInputFilter::getError() const
+{
+	return m_inputfilter->getError();
 }
 
 bool TypingOutputFilter::print( ElementType type, const types::VariantConst& element)
@@ -127,21 +197,18 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 
 			case types::Variant::Custom:
 			{
-				/*[PF:TODO] Implementation*/
 				std::string strval = element.tostring();
 				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
 				break;
 			}
 			case types::Variant::Timestamp:
 			{
-				/*[PF:TODO] Implementation*/
 				std::string strval = element.tostring();
 				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
 				break;
 			}
 			case types::Variant::BigNumber:
 			{
-				/*[PF:TODO] Implementation*/
 				std::string strval = element.tostring();
 				rt = m_outputfilter->print( type, strval.c_str(), strval.size());
 				break;
@@ -156,6 +223,5 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 	}
 	return rt;
 }
-
 
 

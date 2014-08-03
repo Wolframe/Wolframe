@@ -3,14 +3,13 @@
 **requires:TEXTWOLF
 **input
 {
-  "doctype" : "CategoryHierarchyRequest",
-  "category": { "-id": "1" }
+	"-doctype" : "CategoryHierarchyRequest",
+	"-id": "1"
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson - 
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json - 
 **output
 {
-	"category":	{
-		"id":	"1"
-	}
+	"-doctype":	"CategoryHierarchyRequest",
+	"id":	"1"
 }
 **end

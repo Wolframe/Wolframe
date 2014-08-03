@@ -170,7 +170,7 @@ RUN
 QUIT
 --file:echo.lua
 function run( )
-	f = filter( "libxml2")
+	f = provider.filter( "libxml2")
 	f.empty = false
 
 	input:as( f)
@@ -188,6 +188,7 @@ provider
 		lua
 		{
 			program echo.lua
+			filter char
 		}
 	}
 }

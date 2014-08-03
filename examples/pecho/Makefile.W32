@@ -11,6 +11,7 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\src\modules\protocol\wolframe \
 	/I$(TOPDIR)\3rdParty\gtest\include \
 	/I$(TOPDIR)\wtest\include
 
@@ -22,6 +23,7 @@ INCLUDE_LIBS = \
 	Advapi32.lib \
 	$(TOPDIR)\3rdParty\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
@@ -50,6 +52,7 @@ OBJS = \
 	appConfigDefinition.obj \
 	pechoConfig.obj \
 	pechoHandler.obj \
+	pechoProtocolFiles.obj \
 	$(TOPDIR)\src\winMain.obj
 
 CPP_BINS = \
@@ -74,25 +77,24 @@ local_clean:
 	@-erase tests\*.exe.manifest 2>NUL
 	@-erase tests\*.ilk 2>NUL
 	@-erase tests\*.pdb 2>NUL
+	@-erase tests\*.exp 2>NUL
+	@-erase tests\*.lib 2>NUL
 
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
-	@-echo @echo off > test.bat
+	@-copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" tests
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests
 !ENDIF
-	@-echo tests\pechoHandlerTest.exe >> test.bat
-	@echo
-	@-test.bat
+	@-tests\pechoHandlerTest.exe
 
 run: $(CPP_BINS)
-	@-echo @echo off > test.bat
+	@-copy "$(TOPDIR)\src\libwfsingleton\wfsingleton.dll" .
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
 !ENDIF
-	@-echo echo Running the Wolframe server... >> test.bat
-	@-echo pechod.exe -c pecho.conf -d DATA >> test.bat
-	@-test.bat
+	@-echo Running the Wolframe server...
+	@-pechod.exe -c pecho.conf -d DATA

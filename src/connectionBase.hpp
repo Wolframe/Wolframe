@@ -186,46 +186,61 @@ protected:
 		ConnectionHandler::NetworkSignal	ns;
 		std::string				name;
 
-		switch( e.value() )	{
-		case boost::asio::error::eof :
-			ns = ConnectionHandler::END_OF_FILE;
-			name = "EOF";
-			break;
+		int errorcode = e.value();
 
-		case boost::asio::error::operation_aborted :
-			ns = ConnectionHandler::OPERATION_CANCELLED;
-			name = "OPERATION CANCELLED";
-			break;
-
-		case boost::asio::error::broken_pipe :
-			ns = ConnectionHandler::BROKEN_PIPE;
-			name = "BROKEN PIPE";
-			break;
-
-		case boost::asio::error::connection_reset :
-			ns = ConnectionHandler::CONNECTION_RESET;
-			name = "CONNECTION RESET";
-			break;
-
-		default:	{
-			std::string err = e.message();
+#if defined(_WIN32)
 #ifdef WITH_SSL
-			if ( e.category() == boost::asio::error::get_ssl_category() )	{
-				err = std::string( "(" )
-						+ boost::lexical_cast< std::string >( ERR_GET_LIB( e.value() ) ) + ", "
-						+ boost::lexical_cast< std::string >( ERR_GET_FUNC( e.value() ) )+ ", "
-						+ boost::lexical_cast< std::string >( ERR_GET_REASON( e.value() ) ) + ")";
-				//ERR_PACK /* crypto/err/err.h */
-				char buf[ 128 ];
-				::ERR_error_string_n( e.value(), buf, sizeof( buf ) );
-				err += buf;
-			}
+		// Rewrite error code got for a missing SSL_shutdown to a connection reset
+		// because on Windows SSL_shutdown may not be called:
+		if (e.category() == boost::asio::error::get_ssl_category()
+		&&  e.value() == ERR_PACK(ERR_LIB_SSL, 0, SSL_R_SHORT_READ))
+		{
+			LOG_DEBUG << "Connection terminated abruptly by client, got no SSL_shutdown(); "
+					<< "error: " << e.value() << ", category: " << e.category().name()
+					<< ", message: " << e.message();
+			errorcode = boost::asio::error::connection_reset;
+		}
+#endif
+#endif
+		switch( errorcode )	{
+			case boost::asio::error::eof :
+				ns = ConnectionHandler::END_OF_FILE;
+				name = "EOF";
+				break;
+	
+			case boost::asio::error::operation_aborted :
+				ns = ConnectionHandler::OPERATION_CANCELLED;
+				name = "OPERATION CANCELLED";
+				break;
+	
+			case boost::asio::error::broken_pipe :
+				ns = ConnectionHandler::BROKEN_PIPE;
+				name = "BROKEN PIPE";
+				break;
+	
+			case boost::asio::error::connection_reset :
+				ns = ConnectionHandler::CONNECTION_RESET;
+				name = "CONNECTION RESET";
+				break;
+			default:	{
+				std::string err = e.message();
+#ifdef WITH_SSL
+				if ( e.category() == boost::asio::error::get_ssl_category() )	{
+					err = std::string( "(" )
+							+ boost::lexical_cast< std::string >( ERR_GET_LIB( e.value() ) ) + ", "
+							+ boost::lexical_cast< std::string >( ERR_GET_FUNC( e.value() ) )+ ", "
+							+ boost::lexical_cast< std::string >( ERR_GET_REASON( e.value() ) ) + ")";
+					//ERR_PACK /* crypto/err/err.h */
+					char buf[ 128 ];
+					::ERR_error_string_n( e.value(), buf, sizeof( buf ) );
+					err += buf;
+				}
 #endif // WITH_SSL
-			LOG_DEBUG << "Unknown error: " << e.value() << ", category: " << e.category().name()
-				  << ", message: " << err;
-			ns = ConnectionHandler::UNKNOWN_ERROR;
-			name = "UNKNOWN ERROR";
-			break;
+				LOG_DEBUG << "Unknown error: " << e.value() << ", category: " << e.category().name()
+					  << ", message: " << err;
+				ns = ConnectionHandler::UNKNOWN_ERROR;
+				name = "UNKNOWN ERROR";
+				break;
 			}
 		}
 		m_connHandler->signalOccured( ns );

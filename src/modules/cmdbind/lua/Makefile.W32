@@ -20,6 +20,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
@@ -40,15 +41,15 @@ LUA_CPP_OBJS = \
 CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
 	luaCommandHandler.obj \
-	luaCommandHandlerBuilder.obj \
-	mod_command_lua.obj
+	luaCommandHandlerUnit.obj \
+	luaCommandHandlerConfig.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModLuaCommandHandler.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_command_lua.obj
+	$(LINK) /dll /def:mod_command_lua.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

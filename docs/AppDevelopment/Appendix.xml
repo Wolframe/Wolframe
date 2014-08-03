@@ -1,12 +1,1 @@
 <!-- Appendix -->
-<appendix>
-	<title>Language Grammars</title>
-
-	<sect1>
-		<title>Grammars</title>
-		<para>
-		&App_EBNF_TDL;
-		&App_EBNF_Normalizer;
-		</para>
-	</sect1>
-</appendix>

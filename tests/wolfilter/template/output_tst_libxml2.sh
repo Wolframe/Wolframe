@@ -14,7 +14,6 @@
 # VARIABLES
 # - testname		name of the test
 # - testcmd		command to execute by the test
-# - testscripts		list of scripts of the test
 # - docin		input document name
 # - docout		output document name
 # - dumpout		(optional) file to dump to expected output too
@@ -31,7 +30,7 @@ topdir=`dirname $PWD/$0`"/../../../../"
 filter="libxml2"
 if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
 	modpath="../../src/modules"
-	testcmd="--module $modpath/filter/libxml2/mod_filter_libxml2 $testcmd"
+	testcmd="--module $modpath/filter/libxml2/mod_filter_libxml2 --module $modpath/doctype/xml/mod_doctype_xml $testcmd"
 fi
 
 testname="$TESTNAME""_libxml2"

@@ -10,12 +10,20 @@ INCLUDE_DIRS = \
 	$(PGSQL_INCLUDE_DIRS)
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwfsingleton \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_database \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR) \
 	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lwfsingleton \
 	-lwolframe \
+	-lwolframe_serialize \
+	-lwolframe_database \
+	-lwolframe_langbind \
 	$(PGSQL_LIBS)
 
 NOINST_STATIC_LIB = mod_db_postgresql_lib.a
@@ -23,14 +31,13 @@ NOINST_STATIC_LIB = mod_db_postgresql_lib.a
 DYNAMIC_MODULE = mod_db_postgresql.so
 
 CPP_OBJS = \
-	PostgreSQLconfig.o \
-	PostgreSQLconstructor.o \
+	PostgreSQLDatatypes.o \
+	PostgreSQLServerSettings.o \
+	PostgreSQLConfig.o \
 	PostgreSQL.o \
-	PostgreSQLtransactionExecStatemachine.o \
-	PostgreSQLstatement.o \
-	PostgreSQLsubstitutingStatement.o \
-	PostgreSQLprogram.o \
-	PostgreSQLmodule.o
+	PostgreSQLTransactionExecStatemachine.o \
+	PostgreSQLStatement.o \
+	PostgreSQLSubstitutingStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -49,4 +56,3 @@ local_uninstall:
 	-rmdir $(DESTDIR)$(libdir)/wolframe/modules
 
 local_test:
-

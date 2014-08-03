@@ -5,529 +5,531 @@
 **requires:PGSQL
 **input
 {
-  "class": {
-    "-name": "indogermanic",
-    "class": [
-      {
-        "-name": "celtic",
-        "-status": "living",
-        "class": [
-          {
-            "-name": "gaulisch",
-            "-status": "dead"
-          },
-          {
-            "-name": "goidelic",
-            "-status": "dead",
-            "class": [
-              {
-                "-name": "old irish",
-                "-status": "dead"
-              },
-              {
-                "-name": "middle irish",
-                "-status": "dead"
-              },
-              {
-                "-name": "manx",
-                "-status": "dead"
-              },
-              {
-                "-name": "irish",
-                "-status": "living"
-              },
-              {
-                "-name": "scotts gaelic",
-                "-status": "living"
-              }
-            ]
-          },
-          {
-            "-name": "brythonic",
-            "-status": "dead",
-            "class": [
-              {
-                "-name": "comish",
-                "-status": "dead"
-              },
-              {
-                "-name": "welsh",
-                "-status": "living"
-              },
-              {
-                "-name": "breton",
-                "-status": "living"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "-name": "germanic",
-        "-status": "living",
-        "class": [
-          {
-            "-name": "west germanic",
-            "-status": "living",
-            "class": [
-              {
-                "-name": "anglo-frisian",
-                "-status": "living",
-                "class": [
-                  {
-                    "-name": "old english",
-                    "-status": "dead",
-                    "class": {
-                      "-name": "middle english",
-                      "-status": "dead",
-                      "class": {
-                        "-name": "english",
-                        "-status": "living"
-                      }
-                    }
-                  },
-                  {
-                    "-name": "old frisian",
-                    "-status": "dead",
-                    "class": {
-                      "-name": "frisian",
-                      "-status": "living"
-                    }
-                  }
-                ]
-              },
-              {
-                "-name": "german",
-                "-status": "living",
-                "class": [
-                  {
-                    "-name": "low german",
-                    "-status": "living",
-                    "class": [
-                      {
-                        "-name": "old saxon",
-                        "-status": "dead",
-                        "class": {
-                          "-name": "plattdeutsch",
-                          "-status": "dead"
-                        }
-                      },
-                      {
-                        "-name": "old low franconian",
-                        "-status": "dead",
-                        "class": [
-                          {
-                            "-name": "dutch",
-                            "-status": "living"
-                          },
-                          {
-                            "-name": "flemish",
-                            "-status": "living"
-                          },
-                          {
-                            "-name": "afrikaans",
-                            "-status": "living"
-                          },
-                          {
-                            "-name": "south african dutch",
-                            "-status": "dead"
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "-name": "high german",
-                    "-status": "living",
-                    "class": [
-                      {
-                        "-name": "alemannic",
-                        "-status": "living"
-                      },
-                      {
-                        "-name": "alsatian",
-                        "-status": "living"
-                      },
-                      {
-                        "-name": "bavarian",
-                        "-status": "living"
-                      },
-                      {
-                        "-name": "franconian",
-                        "-status": "living"
-                      },
-                      {
-                        "-name": "german",
-                        "-status": "living"
-                      },
-                      {
-                        "-name": "pensilvania german",
-                        "-status": "living"
-                      },
-                      {
-                        "-name": "swiss",
-                        "-status": "living"
-                      },
-                      {
-                        "-name": "yiddish",
-                        "-status": "living"
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "-name": "east germanic",
-            "-status": "living"
-          },
-          {
-            "-name": "north germanic",
-            "-status": "living",
-            "class": [
-              {
-                "-name": "old west norse",
-                "-status": "living",
-                "class": [
-                  {
-                    "-name": "islandic",
-                    "-status": "living"
-                  },
-                  {
-                    "-name": "faroese",
-                    "-status": "living"
-                  }
-                ]
-              },
-              {
-                "-name": "old east norse",
-                "-status": "living",
-                "class": [
-                  {
-                    "-name": "norwegian",
-                    "-status": "living"
-                  },
-                  {
-                    "-name": "danish",
-                    "-status": "living"
-                  },
-                  {
-                    "-name": "swedish",
-                    "-status": "living"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "-name": "italic",
-        "-status": "living",
-        "class": [
-          {
-            "-name": "oscan",
-            "-status": "dead"
-          },
-          {
-            "-name": "umbrian",
-            "-status": "dead"
-          },
-          {
-            "-name": "old latin",
-            "-status": "living",
-            "class": [
-              {
-                "-name": "catalan",
-                "-status": "living"
-              },
-              {
-                "-name": "french",
-                "-status": "living"
-              },
-              {
-                "-name": "galician",
-                "-status": "living"
-              },
-              {
-                "-name": "portuguese",
-                "-status": "living"
-              },
-              {
-                "-name": "italian",
-                "-status": "living"
-              },
-              {
-                "-name": "provencal",
-                "-status": "living"
-              },
-              {
-                "-name": "romansch",
-                "-status": "living"
-              },
-              {
-                "-name": "romanian",
-                "-status": "living"
-              },
-              {
-                "-name": "spanish",
-                "-status": "living"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "-name": "slavonic",
-        "-status": "living",
-        "class": [
-          {
-            "-name": "west slavic",
-            "-status": "living",
-            "class": [
-              {
-                "-name": "chech",
-                "-status": "living"
-              },
-              {
-                "-name": "polish",
-                "-status": "living"
-              },
-              {
-                "-name": "slovak",
-                "-status": "living"
-              },
-              {
-                "-name": "sorbian",
-                "-status": "living"
-              }
-            ]
-          },
-          {
-            "-name": "east slavic",
-            "-status": "living",
-            "class": [
-              {
-                "-name": "belarussian",
-                "-status": "living"
-              },
-              {
-                "-name": "russian",
-                "-status": "living"
-              },
-              {
-                "-name": "ukrainian",
-                "-status": "living"
-              }
-            ]
-          },
-          {
-            "-name": "south slavic",
-            "-status": "living",
-            "class": [
-              {
-                "-name": "bosnian",
-                "-status": "living"
-              },
-              {
-                "-name": "bulgarian",
-                "-status": "living"
-              },
-              {
-                "-name": "macedonian",
-                "-status": "living"
-              },
-              {
-                "-name": "serbo-croatian",
-                "-status": "living"
-              },
-              {
-                "-name": "slovene",
-                "-status": "living"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "-name": "albanian",
-        "-status": "living"
-      },
-      {
-        "-name": "armenian",
-        "-status": "living"
-      },
-      {
-        "-name": "hellenic",
-        "-status": "living",
-        "class": {
-          "-name": "greek",
-          "-status": "living"
-        }
-      },
-      {
-        "-name": "baltic",
-        "-status": "living",
-        "class": [
-          {
-            "-name": "lettish",
-            "-status": "living"
-          },
-          {
-            "-name": "latvian",
-            "-status": "living"
-          },
-          {
-            "-name": "lithuanian",
-            "-status": "living"
-          }
-        ]
-      },
-      {
-        "-name": "hittie",
-        "-status": "dead"
-      },
-      {
-        "-name": "indo iranian",
-        "-status": "living",
-        "class": [
-          {
-            "-name": "iranian",
-            "-status": "living",
-            "class": [
-              {
-                "-name": "avestan",
-                "-status": "dead",
-                "class": {
-                  "-name": "pashto",
-                  "-status": "living"
-                }
-              },
-              {
-                "-name": "old persian",
-                "-status": "dead",
-                "class": [
-                  {
-                    "-name": "balushti",
-                    "-status": "living"
-                  },
-                  {
-                    "-name": "kurdish",
-                    "-status": "living"
-                  },
-                  {
-                    "-name": "ossetic",
-                    "-status": "living"
-                  },
-                  {
-                    "-name": "pashto",
-                    "-status": "living"
-                  },
-                  {
-                    "-name": "persian",
-                    "-status": "living"
-                  }
-                ]
-              },
-              {
-                "-name": "scythian",
-                "-status": "dead"
-              }
-            ]
-          },
-          {
-            "-name": "indic",
-            "-status": "living",
-            "class": [
-              {
-                "-name": "sanskrit",
-                "-status": "dead"
-              },
-              {
-                "-name": "prakrit",
-                "-status": "dead"
-              },
-              {
-                "-name": "pali",
-                "-status": "dead"
-              },
-              {
-                "-name": "bengali",
-                "-status": "living"
-              },
-              {
-                "-name": "bihari",
-                "-status": "living"
-              },
-              {
-                "-name": "bhili",
-                "-status": "living"
-              },
-              {
-                "-name": "gujarati",
-                "-status": "living"
-              },
-              {
-                "-name": "hindi",
-                "-status": "living"
-              },
-              {
-                "-name": "hindustani",
-                "-status": "living"
-              },
-              {
-                "-name": "marati",
-                "-status": "living"
-              },
-              {
-                "-name": "nepali",
-                "-status": "living"
-              },
-              {
-                "-name": "bahari",
-                "-status": "living"
-              },
-              {
-                "-name": "punjabi",
-                "-status": "living"
-              },
-              {
-                "-name": "rajasthani",
-                "-status": "living"
-              },
-              {
-                "-name": "sindhi",
-                "-status": "living"
-              },
-              {
-                "-name": "singhalese",
-                "-status": "living"
-              },
-              {
-                "-name": "urdu",
-                "-status": "living"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "-name": "tocharian",
-        "-status": "dead"
-      }
-    ]
-  }
+	"class": {
+		"-name": "indogermanic",
+		"class": [
+			{
+				"-name": "celtic",
+				"-status": "living",
+				"class": [
+					{
+						"-name": "gaulisch",
+						"-status": "dead"
+					},
+					{
+						"-name": "goidelic",
+						"-status": "dead",
+						"class": [
+							{
+								"-name": "old irish",
+								"-status": "dead"
+							},
+							{
+								"-name": "middle irish",
+								"-status": "dead"
+							},
+							{
+								"-name": "manx",
+								"-status": "dead"
+							},
+							{
+								"-name": "irish",
+								"-status": "living"
+							},
+							{
+								"-name": "scotts gaelic",
+								"-status": "living"
+							}
+						]
+					},
+					{
+						"-name": "brythonic",
+						"-status": "dead",
+						"class": [
+							{
+								"-name": "comish",
+								"-status": "dead"
+							},
+							{
+								"-name": "welsh",
+								"-status": "living"
+							},
+							{
+								"-name": "breton",
+								"-status": "living"
+							}
+						]
+					}
+				]
+			},
+			{
+				"-name": "germanic",
+				"-status": "living",
+				"class": [
+					{
+						"-name": "west germanic",
+						"-status": "living",
+						"class": [
+							{
+								"-name": "anglo-frisian",
+								"-status": "living",
+								"class": [
+									{
+										"-name": "old english",
+										"-status": "dead",
+										"class": {
+											"-name": "middle english",
+											"-status": "dead",
+											"class": {
+												"-name": "english",
+												"-status": "living"
+											}
+										}
+									},
+									{
+										"-name": "old frisian",
+										"-status": "dead",
+										"class": {
+											"-name": "frisian",
+											"-status": "living"
+										}
+									}
+								]
+							},
+							{
+								"-name": "german",
+								"-status": "living",
+								"class": [
+									{
+										"-name": "low german",
+										"-status": "living",
+										"class": [
+											{
+												"-name": "old saxon",
+												"-status": "dead",
+												"class": {
+													"-name": "plattdeutsch",
+													"-status": "dead"
+												}
+											},
+											{
+												"-name": "old low franconian",
+												"-status": "dead",
+												"class": [
+													{
+														"-name": "dutch",
+														"-status": "living"
+													},
+													{
+														"-name": "flemish",
+														"-status": "living"
+													},
+													{
+														"-name": "afrikaans",
+														"-status": "living"
+													},
+													{
+														"-name": "south african dutch",
+														"-status": "dead"
+													}
+												]
+											}
+										]
+									},
+									{
+										"-name": "high german",
+										"-status": "living",
+										"class": [
+											{
+												"-name": "alemannic",
+												"-status": "living"
+											},
+											{
+												"-name": "alsatian",
+												"-status": "living"
+											},
+											{
+												"-name": "bavarian",
+												"-status": "living"
+											},
+											{
+												"-name": "franconian",
+												"-status": "living"
+											},
+											{
+												"-name": "german",
+												"-status": "living"
+											},
+											{
+												"-name": "pensilvania german",
+												"-status": "living"
+											},
+											{
+												"-name": "swiss",
+												"-status": "living"
+											},
+											{
+												"-name": "yiddish",
+												"-status": "living"
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					{
+						"-name": "east germanic",
+						"-status": "living"
+					},
+					{
+						"-name": "north germanic",
+						"-status": "living",
+						"class": [
+							{
+								"-name": "old west norse",
+								"-status": "living",
+								"class": [
+									{
+										"-name": "islandic",
+										"-status": "living"
+									},
+									{
+										"-name": "faroese",
+										"-status": "living"
+									}
+								]
+							},
+							{
+								"-name": "old east norse",
+								"-status": "living",
+								"class": [
+									{
+										"-name": "norwegian",
+										"-status": "living"
+									},
+									{
+										"-name": "danish",
+										"-status": "living"
+									},
+									{
+										"-name": "swedish",
+										"-status": "living"
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			{
+				"-name": "italic",
+				"-status": "living",
+				"class": [
+					{
+						"-name": "oscan",
+						"-status": "dead"
+					},
+					{
+						"-name": "umbrian",
+						"-status": "dead"
+					},
+					{
+						"-name": "old latin",
+						"-status": "living",
+						"class": [
+							{
+								"-name": "catalan",
+								"-status": "living"
+							},
+							{
+								"-name": "french",
+								"-status": "living"
+							},
+							{
+								"-name": "galician",
+								"-status": "living"
+							},
+							{
+								"-name": "portuguese",
+								"-status": "living"
+							},
+							{
+								"-name": "italian",
+								"-status": "living"
+							},
+							{
+								"-name": "provencal",
+								"-status": "living"
+							},
+							{
+								"-name": "romansch",
+								"-status": "living"
+							},
+							{
+								"-name": "romanian",
+								"-status": "living"
+							},
+							{
+								"-name": "spanish",
+								"-status": "living"
+							}
+						]
+					}
+				]
+			},
+			{
+				"-name": "slavonic",
+				"-status": "living",
+				"class": [
+					{
+						"-name": "west slavic",
+						"-status": "living",
+						"class": [
+							{
+								"-name": "chech",
+								"-status": "living"
+							},
+							{
+								"-name": "polish",
+								"-status": "living"
+							},
+							{
+								"-name": "slovak",
+								"-status": "living"
+							},
+							{
+								"-name": "sorbian",
+								"-status": "living"
+							}
+						]
+					},
+					{
+						"-name": "east slavic",
+						"-status": "living",
+						"class": [
+							{
+								"-name": "belarussian",
+								"-status": "living"
+							},
+							{
+								"-name": "russian",
+								"-status": "living"
+							},
+							{
+								"-name": "ukrainian",
+								"-status": "living"
+							}
+						]
+					},
+					{
+						"-name": "south slavic",
+						"-status": "living",
+						"class": [
+							{
+								"-name": "bosnian",
+								"-status": "living"
+							},
+							{
+								"-name": "bulgarian",
+								"-status": "living"
+							},
+							{
+								"-name": "macedonian",
+								"-status": "living"
+							},
+							{
+								"-name": "serbo-croatian",
+								"-status": "living"
+							},
+							{
+								"-name": "slovene",
+								"-status": "living"
+							}
+						]
+					}
+				]
+			},
+			{
+				"-name": "albanian",
+				"-status": "living"
+			},
+			{
+				"-name": "armenian",
+				"-status": "living"
+			},
+			{
+				"-name": "hellenic",
+				"-status": "living",
+				"class": {
+					"-name": "greek",
+					"-status": "living"
+				}
+			},
+			{
+				"-name": "baltic",
+				"-status": "living",
+				"class": [
+					{
+						"-name": "lettish",
+						"-status": "living"
+					},
+					{
+						"-name": "latvian",
+						"-status": "living"
+					},
+					{
+						"-name": "lithuanian",
+						"-status": "living"
+					}
+				]
+			},
+			{
+				"-name": "hittie",
+				"-status": "dead"
+			},
+			{
+				"-name": "indo iranian",
+				"-status": "living",
+				"class": [
+					{
+						"-name": "iranian",
+						"-status": "living",
+						"class": [
+							{
+								"-name": "avestan",
+								"-status": "dead",
+								"class": {
+									"-name": "pashto",
+									"-status": "living"
+								}
+							},
+							{
+								"-name": "old persian",
+								"-status": "dead",
+								"class": [
+									{
+										"-name": "balushti",
+										"-status": "living"
+									},
+									{
+										"-name": "kurdish",
+										"-status": "living"
+									},
+									{
+										"-name": "ossetic",
+										"-status": "living"
+									},
+									{
+										"-name": "pashto",
+										"-status": "living"
+									},
+									{
+										"-name": "persian",
+										"-status": "living"
+									}
+								]
+							},
+							{
+								"-name": "scythian",
+								"-status": "dead"
+							}
+						]
+					},
+					{
+						"-name": "indic",
+						"-status": "living",
+						"class": [
+							{
+								"-name": "sanskrit",
+								"-status": "dead"
+							},
+							{
+								"-name": "prakrit",
+								"-status": "dead"
+							},
+							{
+								"-name": "pali",
+								"-status": "dead"
+							},
+							{
+								"-name": "bengali",
+								"-status": "living"
+							},
+							{
+								"-name": "bihari",
+								"-status": "living"
+							},
+							{
+								"-name": "bhili",
+								"-status": "living"
+							},
+							{
+								"-name": "gujarati",
+								"-status": "living"
+							},
+							{
+								"-name": "hindi",
+								"-status": "living"
+							},
+							{
+								"-name": "hindustani",
+								"-status": "living"
+							},
+							{
+								"-name": "marati",
+								"-status": "living"
+							},
+							{
+								"-name": "nepali",
+								"-status": "living"
+							},
+							{
+								"-name": "bahari",
+								"-status": "living"
+							},
+							{
+								"-name": "punjabi",
+								"-status": "living"
+							},
+							{
+								"-name": "rajasthani",
+								"-status": "living"
+							},
+							{
+								"-name": "sindhi",
+								"-status": "living"
+							},
+							{
+								"-name": "singhalese",
+								"-status": "living"
+							},
+							{
+								"-name": "urdu",
+								"-status": "living"
+							}
+						]
+					}
+				]
+			},
+			{
+				"-name": "tocharian",
+				"-status": "dead"
+			}
+		]
+	}
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json -c wolframe.conf run
 
 **file:wolframe.conf
 LoadModules
 {
 	module ../wolfilter/modules/database/postgresql/mod_db_postgresqltest
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../../src/modules/cmdbind/lua/mod_command_lua
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 }
 Database
 {
@@ -553,6 +555,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter cjson
 		}
 	}
 }
@@ -560,8 +563,8 @@ Processor
 int=integer;
 uint=unsigned;
 float=floatingpoint;
-currency=fixedpoint(13,2);
-percent_1=fixedpoint(5,1);
+currency=bigfxp(2);
+percent_1=bigfxp(2);
 **file:script.lua
 idcnt = 0
 
@@ -571,38 +574,38 @@ function insert_tree( parentid, itr)
 		if (t == "name") then
 			local name = v
 			if idcnt == 0 then
-				formfunction( "treeAddRoot")( {name=name} )
+				provider.formfunction( "treeAddRoot")( {name=name} )
 			else
-				formfunction( "treeAddNode")( {name=name, parentid=parentid} )
+				provider.formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 			end
 			idcnt = idcnt + 1
 		end
 		if (t == "class") then
-			insert_tree( id, scope( itr))
+			insert_tree( id, iterator.scope( itr))
 		end
 	end
 end
 
 function insert_node( parentname, name)
-	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
-	formfunction( "treeAddNode")( {name=name, parentid=parentid} )
+	local parentid = provider.formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
+	provider.formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 end
 
 function copy_node( name, parentname)
-	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
-	local nodeid = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	formfunction( "treeCopyNode")( {nodeid=nodeid, newparentid=parentid} )
+	local parentid = provider.formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
+	local nodeid = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	provider.formfunction( "treeCopyNode")( {nodeid=nodeid, newparentid=parentid} )
 end
 
 
 function delete_subtree( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	formfunction( "treeDeleteSubtree")( {id=id} )
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	provider.formfunction( "treeDeleteSubtree")( {id=id} )
 end
 
 function select_subtree( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectNodeAndChildren")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectNodeAndChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "subtree")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -615,7 +618,7 @@ function select_subtree( name)
 end
 
 function select_subtree2( name)
-	local nodear = formfunction( "treeSelectNodeAndChildrenByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectNodeAndChildrenByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "subtree")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -628,8 +631,8 @@ function select_subtree2( name)
 end
 
 function select_children( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectChildren")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "children")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -642,7 +645,7 @@ function select_children( name)
 end
 
 function select_children2( name)
-	local nodear = formfunction( "treeSelectChildrenByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectChildrenByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "children")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -655,8 +658,8 @@ function select_children2( name)
 end
 
 function select_cover( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectNodeAndParents")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectNodeAndParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "cover")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -669,7 +672,7 @@ function select_cover( name)
 end
 
 function select_cover2( name)
-	local nodear = formfunction( "treeSelectNodeAndParentsByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectNodeAndParentsByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "cover")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -682,8 +685,8 @@ function select_cover2( name)
 end
 
 function select_parents( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectParents")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "parents")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -696,7 +699,7 @@ function select_parents( name)
 end
 
 function select_parents2( name)
-	local nodear = formfunction( "treeSelectParentsByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectParentsByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "parents")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -709,14 +712,15 @@ function select_parents2( name)
 end
 
 function get_tree( parentid)
-	local t = formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
+	local t = provider.formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
+		local elem = { name=v.name, parent=tonumber(v.parent), children = {} }
+		a[ v.ID] = elem
 	end
 	for i,v in pairs( a) do
 		if v.parent and v.parent ~= 0 then
-			table.insert( a[ v.parent ].children, i )
+			table.insert( a[ v.parent ].children, tonumber( i ))
 		end
 	end
 	return a
@@ -734,11 +738,11 @@ function print_tree( tree, nodeid)
 end
 
 function run()
-	filter().empty = false
+	provider.filter().empty = false
 	local itr = input:get()
 	for v,t in itr do
 		if t == "class" then
-			insert_tree( idcnt, scope( itr))
+			insert_tree( idcnt, iterator.scope( itr))
 		end
 	end
 	output:opentag( "result")

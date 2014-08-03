@@ -1,0 +1,11 @@
+--- boost_1_55_0-orig/boost/locale/conversion.hpp	2011-07-12 15:57:36.000000000 +0200
++++ boost_1_55_0/boost/locale/conversion.hpp	2014-04-26 20:37:32.395003000 +0200
+@@ -143,7 +143,7 @@
+             norm_nfc,   ///< Canonical decomposition followed by canonical composition
+             norm_nfkd,  ///< Compatibility decomposition
+             norm_nfkc,  ///< Compatibility decomposition followed by canonical composition.
+-            norm_default = norm_nfc, ///< Default normalization - canonical decomposition followed by canonical composition
++            norm_default = norm_nfc ///< Default normalization - canonical decomposition followed by canonical composition
+         } norm_type;
+        
+         ///

@@ -6,7 +6,7 @@ function print_tree( itr)
 end
 
 function run_employee( itr)
-	local employee = form("Employee"):fill( itr)
+	local employee = provider.form("Employee"):fill( itr)
 	output:print( employee:get())
 end
 
@@ -15,21 +15,21 @@ function run_task( itr)
 		if t == "title" then
 			if not v then
 				output:opentag( t)
-				print_tree( scope(itr))
+				print_tree( iterator.scope(itr))
 			else
 				output:print( v,t)
 			end
 		elseif t == "key" then
 			if not v then
 				output:opentag( t)
-				print_tree( scope(itr))
+				print_tree( iterator.scope(itr))
 			else
 				output:print( v,t)
 			end
 		elseif t == "customernumber" then
 			if not v then
 				output:opentag( t)
-				print_tree( scope(itr))
+				print_tree( iterator.scope(itr))
 			else
 				output:print( v,t)
 			end
@@ -43,30 +43,18 @@ function run_assignment( itr)
 	for v,t in itr do
 		if t == "task" then
 			output:opentag( t)
-			run_task( scope( itr))
+			run_task( iterator.scope( itr))
 			output:closetag()
 		elseif t == "issuedate" then
 			if not v then
 				output:opentag( t)
-				print_tree( scope(itr))
+				print_tree( iterator.scope(itr))
 			else
 				output:print( v,t)
 			end
 		elseif t == "employee" then
 			output:opentag( t)
-			run_employee( scope( itr))
-			output:closetag()
-		else
-			error( "unknown element " .. tostring(t) .. " " .. tostring(v))
-		end
-	end
-end
-
-function run_assignmentlist( itr)
-	for v,t in itr do
-		if t == "assignment" then
-			output:opentag( t)
-			run_assignment( scope( itr))
+			run_employee( iterator.scope( itr))
 			output:closetag()
 		else
 			error( "unknown element " .. tostring(t) .. " " .. tostring(v))
@@ -75,13 +63,13 @@ function run_assignmentlist( itr)
 end
 
 function run()
-	r = form("employee_assignment_print")
+	r = provider.form("employee_assignment_print")
 	r:fill( input:table())
 	itr = r:get()
 	for v,t in itr do
-		if t == "assignmentlist" then
-			output:opentag( "assignmentlist")
-			run_assignmentlist( scope( itr))
+		if t == "assignment" then
+			output:opentag( t)
+			run_assignment( iterator.scope( itr))
 			output:closetag()
 		else
 			error( "unknown element " .. tostring(t) .. " " .. tostring(v))

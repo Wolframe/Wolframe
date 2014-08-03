@@ -30,25 +30,27 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file filter/ptreefilter.hpp
-///\brief Filter for serialization/deserialization of a property tree
+/// \file filter/ptreefilter.hpp
+/// \brief Filter for serialization/deserialization of a property tree
 
 #ifndef _Wolframe_FILTER_PTREE_FILTER_HPP_INCLUDED
 #define _Wolframe_FILTER_PTREE_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "types/propertyTree.hpp"
 #include <vector>
 #include <string>
-#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace langbind {
 
+/// \class PropertyTreeInputFilter
+/// \brief Filter for property tree structures
 class PropertyTreeInputFilter :public TypedInputFilter
 {
 public:
-	///\brief Constructor
-	PropertyTreeInputFilter( const boost::property_tree::ptree& pt)
-		:types::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
+	/// \brief Constructor
+	PropertyTreeInputFilter( const types::PropertyTree::Node& pt)
+		:TypedInputFilter("ptree")
 		,m_state(0)
 	{
 		State st;
@@ -57,59 +59,73 @@ public:
 		m_stk.push_back(st);
 	}
 
-	///\brief Copy constructor
-	///\param[in] o input filter to copy
+	/// \brief Copy constructor
+	/// \param[in] o input filter to copy
 	PropertyTreeInputFilter( const PropertyTreeInputFilter& o)
-		:types::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
-		,TypedInputFilter(o)
+		:TypedInputFilter(o)
 		,m_stk(o.m_stk)
 		,m_state(o.m_state){}
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~PropertyTreeInputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual TypedInputFilter* copy() const		{return new PropertyTreeInputFilter(*this);}
 
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
+	/// \brief Implementation of TypedInputFilter::getNext(ElementType&,types::VariantConst&)
 	virtual bool getNext( ElementType& type, types::VariantConst& element);
+
+	/// \brief Implements FilterBase::setFlags()
 	virtual bool setFlags( Flags f);
 
+	/// \brief Implements FilterBase::checkSetFlags()const
+	virtual bool checkSetFlags( Flags f) const;
+
+	std::string posLogText() const
+	{
+		return m_position.logtext();
+	}
+
 private:
+	/// \class State
+	/// \brief State of property tree input filter
 	struct State
 	{
-		boost::property_tree::ptree::const_iterator itr;
-		boost::property_tree::ptree::const_iterator end;
+		types::PropertyTree::Node::const_iterator itr;
+		types::PropertyTree::Node::const_iterator end;
 	};
 
 private:
-	std::vector<State> m_stk;	//< stack of iterator states
-	int m_state;			//< fetching state of current element
+	std::vector<State> m_stk;			//< stack of iterator states
+	int m_state;					//< fetching state of current element
+	types::PropertyTree::Position m_position;	//< position of current element
 };
 
-///\class PropertyTreeOutputFilter
-///\brief Output filter for serializing a structure as property tree
+/// \class PropertyTreeOutputFilter
+/// \brief Output filter for serializing a structure as property tree
 class PropertyTreeOutputFilter :public TypedOutputFilter
 {
 public:
-	///\brief Constructor
+	/// \brief Constructor
 	PropertyTreeOutputFilter();
 
-	///\brief Destructor
+	/// \brief Destructor
 	virtual ~PropertyTreeOutputFilter(){}
 
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
+	/// \brief Get a self copy
+	/// \return allocated pointer to copy of this
 	virtual TypedOutputFilter* copy() const			{return new PropertyTreeOutputFilter(*this);}
 
-	///\brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
+	/// \brief Implementation of TypedOutputFilter::print(ElementType,const types::VariantConst&)
 	virtual bool print( ElementType type, const types::VariantConst& element);
 
-	///\brief Get the content
-	const boost::property_tree::ptree& content() const	{return m_stk.back().m_node;}
+	/// \brief Get the content
+	const types::PropertyTree::Node& content() const	{return m_stk.back().m_node;}
 
 private:
+	/// \class State
+	/// \brief State of property tree output filter
 	struct State
 	{
 		State(){}
@@ -119,7 +135,7 @@ private:
 			:m_name(o.m_name), m_node(o.m_node){}
 
 		std::string m_name;
-		boost::property_tree::ptree m_node;
+		types::PropertyTree::Node m_node;
 	};
 	std::vector<State> m_stk;		//< build property tree stack
 	std::string m_attribute;		//< parsed attribute name

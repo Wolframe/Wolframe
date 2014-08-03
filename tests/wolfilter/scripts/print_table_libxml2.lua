@@ -1,11 +1,12 @@
-
 function run()
-	f = filter( "libxml2")
+	f = provider.filter( "libxml2")
 	f.empty = false
 	input:as( f)
-	output:as( filter( "blob"))
-	t = input:table()
-	f = formfunction( "print_invoice")
-	output:print( f( t):table())
+	output:as( provider.filter( "blob"))
+	local t = input:get()
+	local f = provider.formfunction( "print_invoice")
+	for val,tag in f(t):get() do
+		output:print( val)
+	end
 end
 

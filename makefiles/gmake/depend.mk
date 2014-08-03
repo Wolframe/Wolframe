@@ -12,6 +12,18 @@
 #
 # author: Andreas Baumann, abaumann at yahoo dot com
 
+ifdef MAKEDEPEND
+
+%.d : %.c
+	@echo Generating dependencies for $<
+	@$(MAKEDEPEND) $(@:.d=.o) $(ALL_CFLAGS) $< > $@
+
+%.d : %.cpp
+	@echo Generating dependencies for $<
+	@$(MAKEDEPEND) $(@:.d=.o) $(ALL_CFLAGS) $< > $@
+
+else
+
 ifeq "$(COMPILER)" "gcc"
 
 %.d : %.c
@@ -66,6 +78,8 @@ ifeq "$(COMPILER)" "icc"
 	  
 endif
 
+endif
+
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)
 -include $(OBJS:.o=.d)
@@ -74,6 +88,10 @@ ifneq ($(MAKECMDGOALS),distclean)
 -include $(CPP_BIN_OBJS:.o=.d)
 -include $(TEST_BIN_OBJS:.o=.d)
 -include $(TEST_CPP_BIN_OBJS:.o=.d)
+ifneq "$(DYNAMIC_MODULE)" ""
+DYNAMIC_MODULE_OBJ=$(DYNAMIC_MODULE:.so=.o)
+-include $(DYNAMIC_MODULE_OBJ:.o=.d)
+endif
 
 .PHONY: depend_recursive
 depend_recursive:
@@ -81,7 +99,7 @@ depend_recursive:
 	  (set -e; $(MAKE) -C $$d depend || exit 1); done)
 
 .PHONY: depend
-depend: depend_recursive $(OBJS:.o=.d) $(CPP_OBJS:.o=.d) $(BIN_OBJS:.o=.d) $(CPP_BIN_OBJS:.o=.d) $(TEST_BIN_OBJS:.o=.d) $(TEST_CPP_BIN_OBJS:.o=.d)
+depend: depend_recursive $(OBJS:.o=.d) $(CPP_OBJS:.o=.d) $(BIN_OBJS:.o=.d) $(CPP_BIN_OBJS:.o=.d) $(TEST_BIN_OBJS:.o=.d) $(TEST_CPP_BIN_OBJS:.o=.d) $(DYNAMIC_MODULE_OBJ:.o=.d)
 
 endif
 endif

@@ -2,14 +2,14 @@ TOPDIR = .
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-SUBDIRS = 3rdParty src wtest tests clients include docs
+SUBDIRS = 3rdParty src wtest tests clients include config docs
 
 ifeq ($(WITH_EXAMPLES),1)
 SUBDIRS += examples
 endif
 
 PACKAGE_NAME = wolframe
-PACKAGE_VERSION = 0.0.1
+PACKAGE_VERSION = 0.0.2
 
 -include $(TOPDIR)/makefiles/gmake/top.mk
 

@@ -17,10 +17,11 @@ CMD3A 4
 QUIT
 --file:echo.lua
 function run( )
-	input:as( filter( "char"))
+	input:as( provider.filter( "char"))
 	for ch,t in input:get() do
+		logger.printc( "OUTPUT [", ch, "]")
 		output:print( ch,t)
-		output:print( 'X')
+		output:print( '_')
 	end
 end
 --output
@@ -37,7 +38,7 @@ BYE
 --requires:TEXTWOLF
 --config
 !TEST
-./output_provider_cfg.sh echo.lua >> $output
+./output_provider_cfg.sh echo.lua char >> $output
 recode lat1..ibmpc >> $output <<!TEST
 --end
 !TEST

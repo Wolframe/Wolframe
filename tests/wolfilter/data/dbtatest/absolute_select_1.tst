@@ -2,13 +2,17 @@
 **requires:TEXTWOLF
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<aa>1</aa>
+<doc><aa>1</aa></doc>
 **config
 --config wolframe.conf --filter textwolf testcall
 **file:wolframe.conf
 LoadModules
 {
 	module ../../src/modules/filter/textwolf/mod_filter_textwolf
+<<<<<<< HEAD
+=======
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
+>>>>>>> 974f42f509317b90fc22b74f21479acc18fabb3e
 	module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 }
 Database
@@ -27,13 +31,19 @@ Processor
 **file:DBIN.tdl
 TRANSACTION testcall
 BEGIN
-	DO run( /aa);
+	DO SELECT run( $(/aa));
 END
 **outputfile:DBOUT
 **output
-run #1
-
-start( 'run' );
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<doc/>
+Code:
+[0] RESULT_SET_INIT
+[1] DBSTM_START STM (SELECT run( $1))
+[2] DBSTM_BIND_CONST CONST '1'
+[3] DBSTM_EXEC
+[4] RETURN
+start( 'SELECT run( $1)' );
 bind( 1, '1' );
 execute();
 nofColumns(); returns 0

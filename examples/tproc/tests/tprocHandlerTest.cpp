@@ -38,17 +38,17 @@
 #include "system/connectionHandler.hpp"
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
+#include "wtest/testReport.hpp"
 #include "wtest/testDescription.hpp"
 #include "module/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "config/ConfigurationTree.hpp"
-#include "langbind/appObjects.hpp"
+#include "config/configurationTree.hpp"
 #include "processor/procProvider.hpp"
 #include "wtest/testHandlerTemplates.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
 #include "wtest/testModules.hpp"
 #include <boost/filesystem.hpp>
-#include <boost/property_tree/info_parser.hpp>
 #include <boost/algorithm/string.hpp>
 #include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
@@ -74,6 +74,7 @@ static boost::filesystem::path g_referencePath;
 static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const proc::ProcProviderConfig* cfg, prgbind::ProgramLibrary* prglib)
 {
 	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg, g_modulesDirectory, prglib));
+	rt->loadPrograms();
 	return rt;
 }
 
@@ -112,7 +113,7 @@ private:
 	proc::ProcProviderConfig m_procConfig;
 };
 
-class TProcHandlerTest : public ::testing::Test
+class TProcHandlerTest : public ::testing::TestWithParam<std::string>
 {
 protected:
 	TProcHandlerTest() {}
@@ -125,7 +126,7 @@ class TProcHandlerTestInstance
 {
 public:
 	TProcHandlerTestInstance( const wtest::TestDescription& descr, TestConfiguration* config, std::size_t ib, std::size_t ob)
-		:ep( "127.0.0.1", 12345)
+		:ep( new net::LocalTCPendpoint( "127.0.0.1", 12345))
 		,m_connection(0)
 		,m_config( config)
 		,m_input( descr.input)
@@ -134,7 +135,8 @@ public:
 		m_config->setBuffers( ib + EoDBufferSize, ob + MinOutBufferSize);
 		m_connection = new tproc::Connection( ep, m_config);
 		m_provider = getProcProvider( m_config->providerConfig(), &m_prglib);
-		m_connection->setProcessorProvider( m_provider.get());
+		m_execContext.reset( new proc::ExecContext( m_provider.get(), 0));
+		m_connection->setExecContext( m_execContext.get());
 	}
 
 	~TProcHandlerTestInstance()
@@ -153,7 +155,7 @@ public:
 	}
 
 private:
-	net::LocalTCPendpoint ep;
+	net::LocalEndpointR ep;
 	tproc::Connection* m_connection;
 	boost::shared_ptr<proc::ProcessorProvider> m_provider;
 	prgbind::ProgramLibrary m_prglib;
@@ -161,6 +163,7 @@ private:
 	std::string m_input;
 	std::string m_output;
 	std::string m_expected;
+	boost::shared_ptr<proc::ExecContext> m_execContext;
 
 	enum
 	{
@@ -171,6 +174,12 @@ private:
 
 static std::string selectedTestName;
 
+static std::vector<std::string> tests;
+
+INSTANTIATE_TEST_CASE_P(AllTProcHandlerTests,
+                        TProcHandlerTest,
+                        ::testing::ValuesIn(tests));
+
 static unsigned int testSeed()
 {
 
@@ -179,13 +188,156 @@ static unsigned int testSeed()
 	return (int)(ltm->tm_mday + 100 * ltm->tm_mon);
 }
 
-TEST_F( TProcHandlerTest, tests)
+TEST_P( TProcHandlerTest, tests)
 {
+	std::string filename = GetParam();
+	
 	enum {NOF_IB=11,NOF_OB=7,TEST_MOD=13,NOF_TESTS=5};
 	std::size_t ib[] = {16000,127,1,2,3,5,7,8,11,13,17};
 	std::size_t ob[] = {16000,127,1,2,5,7,8};
-	std::vector<std::string> tests;
 
+	std::string testname = boost::filesystem::basename(filename);
+	// Read test description:
+	wtest::TestDescription td( filename, g_gtest_ARGV[0]);
+	if (td.requires.size())
+	{
+		// Skip tests when disabled:
+		std::cerr << "skipping test '" << testname << "' ( is " << td.requires << ")" << std::endl;
+		return;
+	}
+	// Run test:
+	std::cerr << "processing test '" << testname << "'" << std::endl;
+	TestConfiguration testConfiguration;
+
+	unsigned int rr = testSeed();
+	for (int tt=0; tt<NOF_TESTS; tt++,rr+=TEST_MOD)
+	{
+		unsigned int ii = rr % NOF_IB;
+		unsigned int oo = rr % NOF_OB;
+
+		TProcHandlerTestInstance test( td, &testConfiguration, ib[ii], ob[oo]);
+		int trt = test.run();
+		if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
+		EXPECT_EQ( 0, trt);
+
+		std::string expected = boost::erase_all_copy( test.expected(), "\r");
+		std::string output = boost::erase_all_copy( test.output(), "\r");
+		if (expected != output)
+		{
+			boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
+			std::fstream outputf( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
+			outputf.write( output.c_str(), output.size());
+			if (outputf.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
+			outputf.close();
+
+			boost::filesystem::path EXPECT( g_testdir / "temp" / "EXPECT");
+			std::fstream expectedf( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
+			expectedf.write( expected.c_str(), expected.size());
+			if (expectedf.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
+			expectedf.close();
+
+			boost::filesystem::path INPUT( g_testdir / "temp" / "INPUT");
+			std::fstream inputf( INPUT.string().c_str(), std::ios::out | std::ios::binary);
+			inputf.write( test.input().c_str(), test.input().size());
+			if (inputf.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;
+			inputf.close();
+
+			std::cerr << "test output [" << ib[ii] << "/" << ob[oo] << "] does not match for '" << filename << "'" << std::endl;
+			std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
+			std::cerr << "OUTPUT written to file '" << OUTPUT.string() << "'" << std::endl;
+			std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
+			boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
+		}
+		EXPECT_EQ( expected, output);
+	}
+}
+
+static void printUsage( const char *prgname)
+{
+	std::cout << "Usage " << prgname << " [OPTION] [<test name substring>]" << std::endl;
+	std::cout << "Description:" << std::endl;
+	std::cout << "\tRun tproc hander tests" << std::endl;
+	std::cout << "\t-h:" << " Print usage" << std::endl;
+	std::cout << "\t-t:" << " Raise verbosity level (-t,-tt,-ttt,..)" << std::endl;
+}
+
+int main( int argc, char **argv )
+{
+	g_gtest_ARGC = 1;
+	g_gtest_ARGV[0] = argv[0];
+	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+	std::string topdir = g_testdir.parent_path().parent_path().parent_path().string();
+	g_modulesDirectory = new module::ModulesDirectory( g_testdir.string());
+	int argstart = 1;
+	int tracelevel = 0;
+
+	while (argc >= argstart+1 && argv[argstart][0] == '-')
+	{
+		char optionname = argv[argstart][1];
+		if (optionname == 't')
+		{
+			tracelevel = 1;
+			while (argv[argstart][tracelevel+1] == 't') ++tracelevel;
+			if (argv[argstart][tracelevel+1])
+			{
+				std::cerr << "unknown option " << argv[argstart][tracelevel+1] << std::endl;
+				printUsage( argv[0]);
+				return 1;
+			}
+			argstart += 1;
+		}
+		else if (optionname == 'h')
+		{
+			printUsage( argv[0]);
+			return 0;
+		}
+		else if (optionname == '-')
+		{
+			if (0==std::strcmp( argv[argstart], "--help"))
+			{
+				printUsage( argv[0]);
+				return 0;
+			}
+			else
+			{
+				std::cerr << "unknown option -" << argv[argstart] << std::endl;
+				printUsage( argv[0]);
+				return 5;
+			}
+		}
+		else
+		{
+			std::cerr << "unknown option -" << optionname << std::endl;
+			printUsage( argv[0]);
+			return 6;
+		}
+	}
+	if (!g_modulesDirectory->loadModules( wtest::getTestModuleList( topdir)))
+	{
+		std::cerr << "failed to load modules" << std::endl;
+		return 2;
+	}
+	if (argc > argstart)
+	{
+		if (argc - argstart > 1)
+		{
+			std::cerr << "too many arguments passed to " << argv[0] << std::endl;
+			return 1;
+		}
+		selectedTestName = argv[argstart];
+	}
+	if (tracelevel != 0)
+	{
+		_Wolframe::log::LogLevel::Level loglevel;
+		if (tracelevel == 1) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_INFO;
+		if (tracelevel == 2) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG;
+		if (tracelevel == 3) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_TRACE;
+		if (tracelevel == 4) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA;
+		if (tracelevel >= 5) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA2;
+
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( loglevel);
+	}
+	// [1] Selecting tests to execute:
 	boost::filesystem::recursive_directory_iterator ditr( g_testdir / "data"), dend;
 	if (selectedTestName.size())
 	{
@@ -216,88 +368,11 @@ TEST_F( TProcHandlerTest, tests)
 	}
 	std::sort( tests.begin(), tests.end());
 
-	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
-	for (; itr != end; ++itr)
-	{
-		std::string testname = boost::filesystem::basename(*itr);
-		// Read test description:
-		wtest::TestDescription td( *itr, g_gtest_ARGV[0]);
-		if (td.requires.size())
-		{
-			// Skip tests when disabled:
-			std::cerr << "skipping test '" << testname << "' ( is " << td.requires << ")" << std::endl;
-			continue;
-		}
-		// Run test:
-		std::cerr << "processing test '" << testname << "'" << std::endl;
-		TestConfiguration testConfiguration;
+	// [2] Instantiate test cases with INSTANTIATE_TEST_CASE_P (see above)
 
-		unsigned int rr = testSeed();
-		for (int tt=0; tt<NOF_TESTS; tt++,rr+=TEST_MOD)
-		{
-			unsigned int ii = rr % NOF_IB;
-			unsigned int oo = rr % NOF_OB;
-
-			TProcHandlerTestInstance test( td, &testConfiguration, ib[ii], ob[oo]);
-			int trt = test.run();
-			if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
-			EXPECT_EQ( 0, trt);
-
-			if (test.expected() != test.output())
-			{
-				boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
-				std::fstream outputf( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
-				outputf.write( test.output().c_str(), test.output().size());
-				if (outputf.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
-				outputf.close();
-
-				boost::filesystem::path EXPECT( g_testdir / "temp" / "EXPECT");
-				std::fstream expectedf( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
-				expectedf.write( test.expected().c_str(), test.expected().size());
-				if (expectedf.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
-				expectedf.close();
-
-				boost::filesystem::path INPUT( g_testdir / "temp" / "INPUT");
-				std::fstream inputf( INPUT.string().c_str(), std::ios::out | std::ios::binary);
-				inputf.write( test.input().c_str(), test.input().size());
-				if (inputf.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;
-				inputf.close();
-
-				std::cerr << "test output [" << ib[ii] << "/" << ob[oo] << "] does not match for '" << *itr << "'" << std::endl;
-				std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
-				std::cerr << "OUTPUT written to file '" << OUTPUT.string() << "'" << std::endl;
-				std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
-				boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
-			}
-			EXPECT_EQ( test.expected(), test.output());
-		}
-	}
-}
-
-int main( int argc, char **argv )
-{
-	g_gtest_ARGC = 1;
-	g_gtest_ARGV[0] = argv[0];
-	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
-	std::string topdir = g_testdir.parent_path().parent_path().parent_path().string();
-	g_modulesDirectory = new module::ModulesDirectory();
-
-	if (!LoadModules( *g_modulesDirectory, wtest::getTestModuleList( topdir)))
-	{
-		std::cerr << "failed to load modules" << std::endl;
-		return 2;
-	}
-	if (argc > 2)
-	{
-		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
-		return 1;
-	}
-	else if (argc == 2)
-	{
-		selectedTestName = argv[1];
-	}
-	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
-	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
+	// [3] Execute tests:
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
+	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV);
 	return RUN_ALL_TESTS();
 	delete g_modulesDirectory;
 }

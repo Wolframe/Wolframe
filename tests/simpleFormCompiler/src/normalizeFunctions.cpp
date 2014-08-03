@@ -31,6 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///\file normalizeFunctions.cpp
 ///\brief Reference code that is used as module and not in a library
+#include "modules/normalize/number/normalizeFunctionUtils.cpp"
 #include "modules/normalize/number/integerNormalizeFunction.cpp"
 #include "modules/normalize/number/floatNormalizeFunction.cpp"
 

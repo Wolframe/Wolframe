@@ -30,12 +30,14 @@ Project Wolframe.
 
 ************************************************************************/
 #include "directmapCommandHandler.hpp"
-#include "serialize/struct/filtermapBase.hpp"
+#include "serialize/struct/structParser.hpp"
+#include "serialize/struct/structSerializer.hpp"
 #include "serialize/tostringUtils.hpp"
-#include "types/doctype.hpp"
+#include "types/docmetadata.hpp"
 #include "types/variant.hpp"
-#include "langbind/appObjects.hpp"
 #include "filter/typingfilter.hpp"
+#include "filter/execContextInputFilter.hpp"
+#include "filter/joinfilter.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
@@ -45,180 +47,49 @@ using namespace _Wolframe;
 using namespace cmdbind;
 using namespace langbind;
 
-void DirectmapContext::loadPrograms( const std::vector<std::string>& prgfiles_)
+DirectmapCommandHandler::DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const langbind::InputFilterR& inputfilter_, const langbind::OutputFilterR& outputfilter_)
+	:m_cmd(cmddescr)
+	,m_state(0)
+	,m_outputprinter(true)
 {
-	std::vector<std::string>::const_iterator ci = prgfiles_.begin(), ce = prgfiles_.end();
-	for (; ci != ce; ++ci) m_program.loadProgram( *ci);
+	setInputFilter( inputfilter_);
+	setOutputFilter( outputfilter_);
 }
 
-const std::string& DirectmapContext::filter( const std::string& docformat) const
+void DirectmapCommandHandler::initcall()
 {
-	types::keymap<std::string>::const_iterator ki = m_filtermap.find( docformat);
-	if (ki == m_filtermap.end())
-	{
-		ki = m_filtermap.find( std::string());
-		if (ki == m_filtermap.end())
-		{
-			throw std::runtime_error( std::string("filter for document format '") + docformat + "' not defined");
-		}
-	}
-	return ki->second;
-}
+	if (!execContext()) throw std::logic_error( "execution context is not defined");
 
-void DirectmapCommandHandler::initcall( const std::string& docformat)
-{
-	m_cmd = m_ctx->command( m_name);
-	if (!m_cmd)
+	// Check if we are allowed to execute the command:
+	if (!m_cmd->authfunction.empty())
 	{
-		throw std::runtime_error( std::string( "command is not defined '") + m_name + "'");
-	}
-	if (!m_cmd->inputform.empty())
-	{
-		const types::FormDescription* df = m_provider->formDescription( m_cmd->inputform);
-		if (!df)
+		std::string errmsg;
+		if (!execContext()->checkAuthorization( m_cmd->authfunction, m_cmd->authresource, errmsg))
 		{
-			throw std::runtime_error( std::string( "input form is not defined '") + m_cmd->inputform + "'");
-		}
-		m_inputform.reset( new types::Form( df));
-	}
-	if (!m_cmd->outputform.empty())
-	{
-		const types::FormDescription* df = m_provider->formDescription( m_cmd->outputform);
-		if (!df)
-		{
-			if (m_cmd->outputrootelem.empty())
-			{
-				throw std::runtime_error( std::string( "output form is not defined '") + m_cmd->outputform + "'");
-			}
-		}
-		else
-		{
-			if (m_cmd->outputrootelem.empty())
-			{
-				if (df->xmlRoot())
-				{
-					m_outputform.reset( new types::Form( df));
-				}
-			}
-			else
-			{
-				if (df->xmlRoot())
-				{
-					if (m_cmd->outputrootelem != df->xmlRoot())
-					{
-						throw std::runtime_error( std::string( "root element of output form does not match '") + m_cmd->outputform + "'");
-					}
-				}
-			}
+			throw std::runtime_error( std::string( "not authorized to execute command '") + m_cmd->cmdname + "': " + errmsg);
 		}
 	}
-	std::string input_filtername;
-	std::vector<langbind::FilterArgument> input_filterarg;
-	if (m_cmd->inputfilter.empty())
+	// Initialize input form for validation if defined:
+	if (m_cmd->inputform)
 	{
-		input_filtername = m_ctx->filter( docformat);
+		m_inputform.reset( new types::Form( m_cmd->inputform));
 	}
-	else
+	// Initialize output form for validation if defined:
+	if (m_cmd->outputform)
 	{
-		input_filtername = m_cmd->inputfilter;
-		input_filterarg = m_cmd->inputfilterarg;
-	}
-	std::string output_filtername;
-	std::vector<langbind::FilterArgument> output_filterarg;
-	if (m_cmd->outputfilter.empty())
-	{
-		output_filtername = m_ctx->filter( docformat);
-	}
-	else
-	{
-		output_filtername = m_cmd->outputfilter;
-		output_filterarg = m_cmd->outputfilterarg;
-	}
-	m_function = m_provider->formFunction( m_cmd->call);
-	if (!m_function)
-	{
-		throw std::runtime_error( std::string( "function not defined '") + m_cmd->call + "'");
-	}
-	langbind::InputFilterR l_inputfilter;
-	langbind::OutputFilterR l_outputfilter;
-
-	if (input_filtername == output_filtername)
-	{
-		types::CountedReference<langbind::Filter> filter( m_provider->filter( input_filtername, input_filterarg));
-		if (!filter.get())
-		{
-			throw std::runtime_error( std::string( "filter not defined '") + input_filtername + "'");
-		}
-		l_inputfilter = filter->inputfilter();
-		l_outputfilter = filter->outputfilter();
-	}
-	else
-	{
-		types::CountedReference<langbind::Filter> filter_i( m_provider->filter( input_filtername, input_filterarg));
-		if (!filter_i.get())
-		{
-			throw std::runtime_error( std::string( "filter not defined '") + input_filtername + "'");
-		}
-		types::CountedReference<langbind::Filter> filter_o( m_provider->filter( output_filtername, output_filterarg));
-		if (!filter_o.get())
-		{
-			throw std::runtime_error( std::string( "filter not defined '") + output_filtername + "'");
-		}
-		l_inputfilter = filter_i->inputfilter();
-		l_outputfilter = filter_o->outputfilter();
-	}
-	if (!l_inputfilter.get())
-	{
-		throw std::runtime_error( std::string( "input filter not defined '") + input_filtername + "'");
-	}
-	if (m_inputfilter.get())
-	{
-		//... filter already defined: we change it but take its data
-		setFilterAs( l_inputfilter);
-		m_inputfilter->setValue( "empty", "false");
-	}
-	else
-	{
-		m_inputfilter = l_inputfilter;
-	}
-	if (!l_outputfilter.get())
-	{
-		throw std::runtime_error( std::string( "output filter not defined '") + output_filtername + "'");
-	}
-	if (m_outputfilter.get())
-	{
-		//... filter already defined: we change it but take its data
-		setFilterAs( l_outputfilter);
-	}
-	else
-	{
-		m_outputfilter = l_outputfilter;
+		m_outputform.reset( new types::Form( m_cmd->outputform));
 	}
 
-	if (m_outputform.get())
+	// Initialize filters:
+	if (inputfilter().get())
 	{
-		const char* xmlroot = m_outputform->description()->xmlRoot();
-		if (xmlroot)
-		{
-			std::string xmlDoctype = m_provider->xmlDoctypeString( m_outputform->description()->name(), m_outputform->description()->ddlname(), xmlroot);
-			m_outputfilter->setDocType( xmlDoctype);
-			m_output_rootelement = xmlroot;
-		}
+		inputfilter()->setValue( "empty", "false");
 	}
-	else if (!m_cmd->outputrootelem.empty())
-	{
-		if (!m_cmd->output_doctype_standalone)
-		{
-			std::string xmlDoctype = m_provider->xmlDoctypeString( m_cmd->outputform, "", m_cmd->outputrootelem);
-			m_outputfilter->setDocType( xmlDoctype);
-		}
-		m_output_rootelement = m_cmd->outputrootelem;
-	}
-	// synchronize attributes:
-	m_outputfilter->setAttributes( m_inputfilter.get());
+	outputfilter()->inheritMetaData( inputfilter()->getMetaDataRef());
+	outputfilter()->setMetaData( m_cmd->outputmetadata);
 
-	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));
-	m_output.reset( new langbind::TypingOutputFilter( m_outputfilter));
+	m_inputfilter.reset( new langbind::TypingInputFilter( inputfilter()));
+	m_outputfilter.reset( new langbind::TypingOutputFilter( outputfilter()));
 }
 
 IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& err)
@@ -229,98 +100,60 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 		{
 			case 0:
 				m_state = 1;
-				initcall( m_argBuffer.size()?m_argBuffer.at(0):"");
+				initcall();
 				/* no break here ! */
 			case 1:
 				if (m_inputform.get())
 				{
 					m_inputform_parser.reset( new serialize::DDLStructParser( m_inputform.get()));
-					serialize::Context::Flags flags = (serialize::Context::Flags)((int)serialize::Context::ValidateAttributes|(int)serialize::Context::ValidateInitialization);
-					m_inputform_parser->init( m_input, flags);
+					serialize::Flags::Enum flags = (serialize::Flags::Enum)((int)serialize::Flags::ValidateAttributes|(int)serialize::Flags::ValidateInitialization);
+					m_inputform_parser->init( m_inputfilter, flags);
 					m_state = 2;
+					/* no break here ! */;
+				}
+				else
+				{
+					m_state = 3;
 					continue;
 				}
-				else
-				{
-					std::string doctype;
-					if (m_inputfilter->getDocType( doctype) && !doctype.empty())
-					{
-						// if no input form is defined we check for the input document type and set the form on our own:
-						std::string doctypeid( types::getIdFromDoctype( doctype));
-						const types::FormDescription* df = m_provider->formDescription( doctypeid);
-						if (df)
-						{
-							m_inputform.reset( new types::Form( df));
-							m_inputform_parser.reset( new serialize::DDLStructParser( m_inputform.get()));
-							serialize::Context::Flags flg = serialize::Context::Flags((int)serialize::Context::ValidateInitialization | (int)serialize::Context::ValidateAttributes);
-							m_inputform_parser->init( m_input, flg);
-							m_state = 2;
-						}
-						else
-						{
-							LOG_WARNING << "input form '" << doctypeid << "' is not defined (document type '" << doctypeid << "'). treating document as standalone (document processed with root element ignored)";
-							m_state = 11;
-						}
-						continue;
-					}
-					else
-					{
-						switch (m_inputfilter->state())
-						{
-							case InputFilter::Open:
-							{
-								m_state = 11;
-								LOG_WARNING << "input form: standalone document type and no input form defined. document processed with root element ignored";
-								break;
-							}
-							case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
-							case InputFilter::Error: throw std::runtime_error( std::string( "error in input: ") + m_inputfilter->getError());
-						}
-					}
-				}
-			case 11:
-			{
-				// ... treat document as standalone: swallow root element
-				langbind::InputFilter::ElementType typ;
-				types::VariantConst element;
-				if (!m_input->getNext( typ, element))
-				{
-					switch (m_inputfilter->state())
-					{
-						case InputFilter::Open: throw std::runtime_error( "unexpected end of standalone document. no root element defined");
-						case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
-						case InputFilter::Error: throw std::runtime_error( std::string( "error in input: ") + m_inputfilter->getError());
-					}
-				}
-				m_state = 3;
-				break;
-			}
 			case 2:
 			{
+				// Fill the form with the serialized input to validate it:
 				if (!m_inputform_parser->call()) return IOFilterCommandHandler::Yield;
-				const char* xmlroot = m_inputform->description()->xmlRoot();
-				if (xmlroot)
+				m_inputfilter.reset( new serialize::DDLStructSerializer( m_inputform.get()));
+
+				// Validate the input meta data depending on what is required in th filter:
+				if (!inputfilter()->checkMetaData( m_cmd->inputform->metadata()))
 				{
-					m_input.reset( new serialize::DDLStructSerializer( m_inputform->select( xmlroot)));
-				}
-				else
-				{
-					m_input.reset( new serialize::DDLStructSerializer( m_inputform.get()));
+					LOG_ERROR << "error validating input form metadata: " << m_inputfilter->getError();
+					throw std::runtime_error( "input validation failed");
 				}
 				m_state = 3;
 				/* no break here ! */
 			}
 			case 3:
-				m_functionclosure.reset( m_function->createClosure());
-				m_functionclosure->init( m_provider, m_input);
+				// Join input with additional attributes (CONTEXT)
+				if (m_cmd->execContextElements.size())
+				{
+					//... if we have execution context arguments, we have to join them with the input as new input structure:
+					TypedInputFilterR ecinput( new langbind::ExecContextInputFilter( m_cmd->execContextElements, *execContext(), ""));
+					TypedInputFilterR joinedinput( new langbind::JoinInputFilter( "dmapinput", ecinput, m_inputfilter));
+					m_inputfilter = joinedinput;
+				}
+				// Initialize the function execution context:
+				m_functionclosure.reset( m_cmd->function->createClosure());
+				m_functionclosure->init( execContext(), m_inputfilter);
 				m_state = 4;
 				/* no break here ! */
 			case 4:
 			{
+				// Call the function:
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
 				langbind::TypedInputFilterR res = m_functionclosure->result();
-				if (!m_cmd->command_has_result)
+
+				if (!m_cmd->has_result)
 				{
+					// Validate that there is no result if the function did not declare it:
 					langbind::InputFilter::ElementType typ;
 					types::VariantConst element;
 
@@ -332,38 +165,27 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						}
 					}
 					m_state = 6;
-					return IOFilterCommandHandler::Ok;
+					continue;
 				}
-				if (m_outputform.get() && !m_cmd->skipvalidation_output)
+				else if (m_outputform.get())
 				{
-					types::VariantStruct* substructure = (m_output_rootelement.size())?m_outputform->select(m_output_rootelement.c_str()):m_outputform.get();
-					substructure->setInitialized();
-					serialize::DDLStructParser formparser( substructure);
-					formparser.init( m_functionclosure->result(), serialize::Context::ValidateInitialization);
+					// Validate the output with form -> Fill the output form:
+					serialize::DDLStructParser formparser( m_outputform.get());
+					formparser.init( res, serialize::Flags::ValidateInitialization);
 					if (!formparser.call())
 					{
-						throw std::runtime_error( "internal: output form serialization not complete");
+						throw std::runtime_error( "internal: output form serialization is not complete");
 					}
-					m_outputform_serialize.reset( new serialize::DDLStructSerializer( m_outputform.get()));
-					m_outputprinter.init( m_outputform_serialize, m_output);
+					// Pass serializer of the data in the output form ro printer:
+					langbind::TypedInputFilterR outputform_serialize( new serialize::DDLStructSerializer( m_outputform.get()));
+					m_outputprinter.init( outputform_serialize, m_outputfilter);
 					m_state = 5;
 				}
 				else 
 				{
-					m_outputprinter.init( m_functionclosure->result(), m_output);
-					if (!m_output_rootelement.empty())
-					{
-						m_state = 51;
-						break;
-					}
-					else
-					{
-						if (!m_cmd->output_doctype_standalone)
-						{
-							throw std::runtime_error("RETURN with no valid output form (RETURN doctype, RETURN SKIP doctype [root]) defined and document is not standalone (RETURN STANDALONE root)");
-						}
-						m_state = 5;
-					}
+					// SKIP output -> Pass function result iterator directly to printer:
+					m_outputprinter.init( res, m_outputfilter);
+					m_state = 5;
 				}
 				/* no break here ! */
 			}
@@ -371,54 +193,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 			{
 				if (!m_outputprinter.call()) return IOFilterCommandHandler::Yield;
 				m_state = 6;
-				return IOFilterCommandHandler::Ok;
-			}
-			case 51:
-			{
-				// Print open tag for root element
-				if (!m_output->print( FilterBase::OpenTag, m_cmd->outputrootelem))
-				{
-					switch (m_outputfilter->state())
-					{
-						case OutputFilter::Open:
-							throw std::runtime_error( "unknown error in output filter");
-	
-						case OutputFilter::EndOfBuffer:
-							return IOFilterCommandHandler::Yield;
-	
-						case OutputFilter::Error:
-							throw std::runtime_error( m_outputfilter->getError());
-					}
-				}
-				m_state = 52;
-				/* no break here ! */
-			}
-			case 52:
-			{
-				// same as state 5 in print with root element context
-				if (!m_outputprinter.call()) return IOFilterCommandHandler::Yield;
-				m_state = 53;
-				/* no break here ! */
-			}
-			case 53:
-			{
-				// Print close tag for root element
-				if (!m_output->print( FilterBase::CloseTag, types::Variant()))
-				{
-					switch (m_outputfilter->state())
-					{
-						case OutputFilter::Open:
-							throw std::runtime_error( "unknown error in output filter");
-	
-						case OutputFilter::EndOfBuffer:
-							return IOFilterCommandHandler::Yield;
-	
-						case OutputFilter::Error:
-							throw std::runtime_error( m_outputfilter->getError());
-					}
-				}
-				m_state = 6;
-				return IOFilterCommandHandler::Ok;
+				continue;
 			}
 			default:
 				return IOFilterCommandHandler::Ok;

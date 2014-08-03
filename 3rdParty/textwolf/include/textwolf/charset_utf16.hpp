@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010,2011,2012 Patrick Frey
+    Copyright (C) 2010,2011,2012,2013,2014 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,9 @@
 
 --------------------------------------------------------------------
 */
+/// \file textwolf/charset_utf16.hpp
+/// \brief Definition of UTF-16 encodings
+
 #ifndef __TEXTWOLF_CHARSET_UTF16_HPP__
 #define __TEXTWOLF_CHARSET_UTF16_HPP__
 #include "textwolf/char.hpp"
@@ -42,16 +45,16 @@
 namespace textwolf {
 namespace charset {
 
-///\class UTF16
-///\brief Character set UTF16 (little/big endian)
-///\tparam encoding ByteOrder::LE or ByteOrder::BE
-///\remark BOM character sequences are not interpreted as such and byte swapping is not done implicitely
-//	It is left to the caller to detect BOM or its inverse and to switch the iterator.
-///\remark See http://en.wikipedia.org/wiki/UTF-16/UCS-2: ... If the endian architecture of the decoder
-//	matches that of the encoder, the decoder detects the 0xFEFF value, but an opposite-endian decoder
-//	interprets the BOM as the non-character value U+FFFE reserved for this purpose. This incorrect
-//	result provides a hint to perform byte-swapping for the remaining values. If the BOM is missing,
-//	the standard says that big-endian encoding should be assumed....
+/// \class UTF16
+/// \brief Character set UTF16 (little/big endian)
+/// \tparam encoding ByteOrder::LE or ByteOrder::BE
+/// \remark BOM character sequences are not interpreted as such and byte swapping is not done implicitely
+///	It is left to the caller to detect BOM or its inverse and to switch the iterator.
+/// \remark See http://en.wikipedia.org/wiki/UTF-16/UCS-2: ... If the endian architecture of the decoder
+///	matches that of the encoder, the decoder detects the 0xFEFF value, but an opposite-endian decoder
+///	interprets the BOM as the non-character value U+FFFE reserved for this purpose. This incorrect
+///	result provides a hint to perform byte-swapping for the remaining values. If the BOM is missing,
+///	the standard says that big-endian encoding should be assumed....
 template <int encoding=ByteOrder::BE>
 class UTF16
 {
@@ -63,18 +66,17 @@ private:
 		Print1shift=(encoding==ByteOrder::BE)?8:0,	//< value to shift with to get the 1st character to print
 		Print2shift=(encoding==ByteOrder::LE)?8:0	//< value to shift with to get the 2nd character to print
 	};
+
 public:
 	enum
 	{
-		MaxChar=0x10FFFF				//< maximum character in alphabet
+		MaxChar=0x10FFFFU				//< maximum character in alphabet
 	};
+
 public:
-	///\brief Get the size of the current character in bytes (variable length encoding)
-	///\param [in] buf buffer for the character data
-	///\param [in,out] bufpos position in 'buf'
-	///\param [in,out] itr iterator to skip
+	/// \brief See template<class Iterator>Interface::fetchbytes(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline void fetchbytes( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		if (bufpos<2)
 		{
@@ -88,6 +90,17 @@ public:
 			++itr;
 			++bufpos;
 		}
+	}
+
+	/// \brief Get the size of the current character in bytes (variable length encoding)
+	/// \param [in] buf buffer for the character data
+	/// \param [in,out] bufpos position in 'buf'
+	/// \param [in,out] itr iterator
+	template <class Iterator>
+	static inline unsigned int size( char* buf, unsigned int& bufpos, Iterator& itr)
+	{
+		fetchbytes( buf, bufpos, itr);
+
 		UChar rt = (unsigned char)buf[ MSB];
 		if ((rt - 0xD8) > 0x03)
 		{
@@ -99,9 +112,9 @@ public:
 		}
 	}
 
-	///\brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static void skip( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline void skip( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		unsigned int bufsize = size( buf, bufpos, itr);
 		for (;bufpos < bufsize; ++bufpos)
@@ -110,19 +123,20 @@ public:
 		}
 	}
 
-	///\brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::asciichar(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
+	static inline signed char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		UChar ch = value_impl( buf, bufpos, itr);
 		return (ch > 127)?-1:(char)ch;
 	}
 
-	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
+	/// \brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
 	static UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		unsigned int bufsize = size( buf, bufpos, itr);
+
 		UChar rt = (unsigned char)buf[ MSB];
 		rt = (rt << 8) + (unsigned char)buf[ LSB];
 
@@ -146,12 +160,12 @@ public:
 	}
 
 	template <class Iterator>
-	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
+	inline UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
 		return value_impl( buf, bufpos, itr);
 	}
 
-	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
+	/// \brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
 	void print( UChar ch, Buffer_& buf) const
 	{
@@ -171,8 +185,8 @@ public:
 		else if (ch <= 0x10FFFF)
 		{
 			ch -= 0x10000;
-			unsigned short hi = (ch / 0x400) + 0xD800;
-			unsigned short lo = (ch % 0x400) + 0xDC00;
+			unsigned short hi = (unsigned short )((ch / 0x400) + 0xD800);
+			unsigned short lo = (unsigned short )((ch % 0x400) + 0xDC00);
 			buf.push_back( (char)(unsigned char)((hi >> Print1shift) & 0xFF));
 			buf.push_back( (char)(unsigned char)((hi >> Print2shift) & 0xFF));
 			buf.push_back( (char)(unsigned char)((lo >> Print1shift) & 0xFF));
@@ -189,13 +203,19 @@ public:
 			++cc;
 		}
 	}
+
+	/// \brief See template<class Buffer>Interface::is_equal( const Interface&, const Interface&)
+	static inline bool is_equal( const UTF16&, const UTF16&)
+	{
+		return true;
+	}
 };
 
-///\class UTF16LE
-///\brief UTF-16 little endian character set encoding
+/// \class UTF16LE
+/// \brief UTF-16 little endian character set encoding
 struct UTF16LE :public UTF16<ByteOrder::LE> {};
-///\class UTF16BE
-///\brief UTF-16 big endian character set encoding
+/// \class UTF16BE
+/// \brief UTF-16 big endian character set encoding
 struct UTF16BE :public UTF16<ByteOrder::BE> {};
 
 }//namespace

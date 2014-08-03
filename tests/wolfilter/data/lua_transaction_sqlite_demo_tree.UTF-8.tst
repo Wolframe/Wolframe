@@ -11,15 +11,17 @@
 <treeAddNode><parentid>3</parentid><name>Eddie</name></treeAddNode>
 <treeAddNode><parentid>3</parentid><name>Fred</name></treeAddNode>
 </transactions>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 **requires:TEXTWOLF
 **file:wolframe.conf
 LoadModules
 {
 	module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../../src/modules/cmdbind/lua/mod_command_lua
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 }
 Database
 {
@@ -41,6 +43,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter textwolf
 		}
 	}
 }
@@ -48,16 +51,16 @@ Processor
 int=integer;
 uint=unsigned;
 float=floatingpoint;
-currency=fixedpoint(13,2);
-percent_1=fixedpoint(5,1);
+currency=bigfxp(2);
+percent_1=bigfxp(2);
 **file:script.lua
 function run()
-	filter().empty = false
+	provider.filter().empty = false
 	output:opentag( "result")			-- top level result tag
 	local itr = input:get()
 	for v,t in itr do
 		if t and t ~= "transactions" then	-- top level tag names are the transaction names
-			f = formfunction( t )		-- call the transaction
+			f = provider.formfunction( t )	-- call the transaction
 			output:print( f( itr))		-- print the result
 		end
 	end
@@ -261,7 +264,7 @@ END
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result>
+<transactions><result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result></transactions>
 tree:
 '1', NULL, 'Albert', '1', '12'
 '2', '1', 'Bert', '2', '3'

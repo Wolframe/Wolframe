@@ -42,8 +42,10 @@ bool TypedInputFilterScope::getNext( TypedInputFilter::ElementType& type, types:
 	setState( InputFilter::Open);
 
 	TypedInputFilter* ref = m_inputfilter.get();
-	if (m_taglevel == 0 || !ref)
+	if (m_taglevel <= 0 || !ref)
 	{
+		if (m_taglevel < 0) return false;
+		--m_taglevel;
 		type = TypedInputFilter::CloseTag;
 		element.init();
 	}

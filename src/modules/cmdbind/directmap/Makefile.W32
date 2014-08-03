@@ -18,6 +18,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
@@ -27,17 +28,18 @@ DYNAMIC_MODULE = \
 	mod_command_directmap.dll
 
 CPP_OBJS = \
+	directmapCommandDescription.obj \
 	directmapProgram.obj \
 	directmapCommandHandler.obj \
-	directmapCommandHandlerBuilder.obj \
-	mod_command_directmap.obj
+	directmapCommandHandlerUnit.obj \
+	directmapCommandHandlerConfig.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModDirectmapCommandHandler.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_command_directmap.obj
+	$(LINK) /dll /def:mod_command_directmap.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

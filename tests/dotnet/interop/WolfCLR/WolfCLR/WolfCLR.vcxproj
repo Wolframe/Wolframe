@@ -56,7 +56,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\interop\src;..\..\..\interop\src;..\..\..\..\..\src\modules\cmdbind\dotnet;..\..\..\..\..\include;C:\Boost\boost_1_55_0\boost_1_55_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\interop\src;..\..\..\interop\src;..\..\..\..\..\src\modules\cmdbind\dotnet;..\..\..\..\..\include;..\..\..\..\..\src\libwolframe;C:\Boost\boost_1_55_0\boost_1_55_0</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -84,7 +84,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAsManaged>false</CompileAsManaged>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <AdditionalIncludeDirectories>..\..\interop\src;..\..\..\interop\src;..\..\..\..\..\src\modules\cmdbind\dotnet;..\..\..\..\include;C:\boost\boost_1_51</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\interop\src;..\..\..\interop\src;..\..\..\..\..\src\modules\cmdbind\dotnet;..\..\..\..\include;..\..\..\..\..\src\libwolframe;C:\boost\boost_1_51</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -99,7 +99,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\include\langbind\formFunction.hpp" />
+    <ClInclude Include="..\..\..\..\..\include\processor\procProviderInterface.hpp" />
+    <ClInclude Include="..\..\..\..\..\include\types\bignumber.hpp" />
     <ClInclude Include="..\..\..\..\..\include\types\customDataType.hpp" />
+    <ClInclude Include="..\..\..\..\..\include\types\datetime.hpp" />
+    <ClInclude Include="..\..\..\..\..\include\types\numberBaseConversion.hpp" />
+    <ClInclude Include="..\..\..\..\..\include\types\string.hpp" />
+    <ClInclude Include="..\..\..\..\..\include\types\variant.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\function.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\procProviderDispatch.hpp" />
@@ -109,17 +115,22 @@
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantInputFilter.hpp" />
     <ClInclude Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\variantToString.hpp" />
     <ClInclude Include="..\..\src\ddl_form.hpp" />
+    <ClInclude Include="..\..\src\processor\execContext.hpp" />
     <ClInclude Include="..\..\src\processor\procProvider.hpp" />
     <ClInclude Include="..\..\src\testFormFunction.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\src\libwolframe\malloc.cpp" />
-    <ClCompile Include="..\..\..\..\..\src\libwolframe\typeSignature.cpp" />
-    <ClCompile Include="..\..\..\..\..\src\libwolframe\types_customDataType.cpp" />
-    <ClCompile Include="..\..\..\..\..\src\libwolframe\types_variant.cpp" />
-    <ClCompile Include="..\..\..\..\..\src\libwolframe\utils_conversions.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\types\bignumber.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\types\conversions.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\types\customDataType.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\types\datetime.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\types\numberBaseConversion.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\types\string.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\types\variant.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\utils\malloc.cpp" />
+    <ClCompile Include="..\..\..\..\..\src\libwolframe\utils\typeSignature.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\clr.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\function.cpp" />
     <ClCompile Include="..\..\..\..\..\src\modules\cmdbind\dotnet\comauto\procProviderDispatch.cpp" />

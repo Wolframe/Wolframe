@@ -40,6 +40,7 @@
 
 #include "system/objectPool.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testReport.hpp"
 
 class testObject	{
 public:
@@ -121,7 +122,7 @@ public:
 	{
 		for ( std::size_t i = 0; i < count; )	{
 			try	{
-				_Wolframe::PoolObject< testObject* > tstObj( *pool );
+				boost::shared_ptr<testObject> tstObj( pool->get(), boost::bind( _Wolframe::ObjectPool<testObject*>::static_add, pool, _1) );
 				tstObj->doSomething();
 				i++;
 			}
@@ -135,7 +136,7 @@ public:
 	{
 		for ( std::size_t i = 0; i < count; )	{
 			try	{
-				_Wolframe::PoolObject< testObject* > tstObj( *pool );
+				boost::shared_ptr<testObject> tstObj( pool->get(), boost::bind( _Wolframe::ObjectPool<testObject*>::static_add, pool, _1) );
 				tstObj->sleepSomething();
 				i++;
 			}
@@ -151,7 +152,7 @@ public:
 // Tests the ObjectPool get & release
 TEST_F( ObjectPoolFixture, noTimeout )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
-		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->used(), 0u );
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
@@ -178,7 +179,7 @@ TEST_F( ObjectPoolFixture, noTimeout )	{
 
 TEST_F( ObjectPoolFixture, noTimeoutSleep )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
-		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->used(), 0u );
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
@@ -206,7 +207,7 @@ TEST_F( ObjectPoolFixture, noTimeoutSleep )	{
 TEST_F( ObjectPoolFixture, Timeout )	{
 	objPool.timeout( 1 );
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
-		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->used(), 0u );
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
@@ -234,7 +235,7 @@ TEST_F( ObjectPoolFixture, Timeout )	{
 TEST_F( ObjectPoolFixture, TimeoutSleep )	{
 	objPool.timeout( 1 );
 	for ( unsigned long i = 0; i < poolSize; i++ )	{
-		ASSERT_EQ( tstObjs[i]->used(), 0 );
+		ASSERT_EQ( tstObjs[i]->used(), 0u );
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	}
 
@@ -270,6 +271,7 @@ TEST_F( ObjectPoolFixture, TestTimeout )	{
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

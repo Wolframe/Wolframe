@@ -1,0 +1,2 @@
+COMMAND CustomerListRequest SKIP CALL SelectCustomerList RETURN SKIP {standalone='yes', root='list'};
+COMMAND (Insert Customer) CALL insertCustomer RETURN CustomerInserted;

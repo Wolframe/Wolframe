@@ -38,7 +38,17 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-prgbind::Program* createXsltProgramType();
+class XsltProgramType
+	:public prgbind::Program
+{
+public:
+	XsltProgramType()
+		:prgbind::Program( prgbind::Program::Function){}
+
+	virtual ~XsltProgramType();
+	virtual bool is_mine( const std::string& filename) const;
+	virtual void loadProgram( prgbind::ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
+};
 
 }} //namespace
 #endif

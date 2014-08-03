@@ -34,7 +34,7 @@
 ///\brief Fake implementation of graphix functions for testing
 
 #include "graphix.hpp"
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/structDescription.hpp"
 #include <string>
 #include <vector>
 #include <sstream>
@@ -73,6 +73,18 @@ struct ImageThumbDescription : public serialize::StructDescription<ImageThumb>
 	}
 };
 
+struct ImageRescaleDescription : public serialize::StructDescription<ImageRescale>
+{
+	ImageRescaleDescription( )
+	{
+		( *this )
+		( "image", &ImageRescale::image )
+		( "height", &ImageRescale::height )
+		( "width", &ImageRescale::width )
+		;
+	}
+};
+
 struct ImageImplDescription : public serialize::StructDescription<ImageImpl>
 {
 	ImageImplDescription( )
@@ -100,32 +112,36 @@ const serialize::StructDescriptionBase *ImageThumb::getStructDescription( )
 	return &rt;
 }
 
+const serialize::StructDescriptionBase *ImageRescale::getStructDescription( )
+{
+	static ImageRescaleDescription rt;
+	return &rt;
+}
+
 const serialize::StructDescriptionBase *ImageImpl::getStructDescription( )
 {
 	static ImageImplDescription rt;
 	return &rt;
 }
 
-int ImageImpl::info( ImageInfo &res, const Image &param )
+int ImageImpl::info( proc::ExecContext*, ImageInfo &res, const Image &param )
 {
 	res.width = param.data.size();
 	res.height = 1000 / param.data.size();
 	return 0;
 }
 
-int ImageImpl::thumb( Image &res, const ImageThumb &param )
+int ImageImpl::thumb( proc::ExecContext*, Image &res, const ImageThumb &param )
 {
 	std::size_t nn = (param.image.data.size() < (std::size_t)param.size)?param.image.data.size():param.size;
 	res.data = std::string( param.image.data.c_str(), nn);
 	return 0;
 }
 
-int _Wolframe::graphix::imageInfo( const proc::ProcessorProvider*, void *res, const void *param )
+int ImageImpl::rescale( proc::ExecContext*, Image &res, const ImageRescale &param )
 {
-	return ImageImpl::info( *(ImageInfo *)res, *(const Image *)param );
-}
-
-int _Wolframe::graphix::imageThumb( const proc::ProcessorProvider*, void *res, const void *param )
-{
-	return ImageImpl::thumb( *(Image *)res, *(const ImageThumb *)param );
+	std::size_t hh = (param.image.data.size() < (std::size_t)param.height)?param.image.data.size():param.height;
+	std::size_t ww = (param.image.data.size() < (std::size_t)param.width)?param.image.data.size():param.width;
+	res.data = std::string( param.image.data.c_str(), hh*ww);
+	return 0;
 }

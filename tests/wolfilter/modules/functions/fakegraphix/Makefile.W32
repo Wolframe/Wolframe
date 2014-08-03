@@ -14,9 +14,10 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
-	
+
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	Ws2_32.lib advapi32.lib
 
@@ -24,15 +25,14 @@ DYNAMIC_MODULE = \
 	mod_graphix.dll
 
 CPP_OBJS = \
-	mod_graphix.obj \
 	graphix.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModGraphix.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_graphix.obj
+	$(LINK) /dll /def:mod_graphix.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

@@ -30,11 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-//\file langbind/runtimeEnvironment.hpp
-//\brief Definition of language runtime environment
+/// \file langbind/runtimeEnvironment.hpp
+/// \brief Definition of language runtime environment
 #ifndef _Wolframe_LANGBIND_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #define _Wolframe_LANGBIND_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #include "langbind/formFunction.hpp"
+#include "processor/procProviderInterface.hpp"
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -42,42 +43,42 @@
 namespace _Wolframe {
 namespace langbind {
 
-//\class RuntimeEnvironment
-//\brief Runtime environment for functions that need it. (for example as structure hosting the CLR for .NET function calls)
+/// \class RuntimeEnvironment
+/// \brief Runtime environment for functions that need it. (for example as structure hosting the CLR for .NET function calls)
 class RuntimeEnvironment
 {
 public:
-	//\brief Destructor
+	/// \brief Destructor
 	virtual ~RuntimeEnvironment(){}
-	//\brief createClosure create a closure to execute function with name 'funcname'
-	//\param [in] funcname function name
+	/// \brief createClosure create a closure to execute function with name 'funcname'
+	/// \param [in] funcname function name
 	virtual FormFunctionClosure* createClosure( const std::string& funcname) const=0;
 
-	//\brief Get the names of the functions implemented
-	//\return the function names
+	/// \brief Get the names of the functions implemented
+	/// \return the function names
 	virtual std::vector<std::string> functions() const=0;
 
 	virtual const char* name() const=0;
 };
 
-//\brief Shared ownership reference to a runtime environment
+/// \brief Shared ownership reference to a runtime environment
 typedef boost::shared_ptr<RuntimeEnvironment> RuntimeEnvironmentR;
 
 
-//\class RuntimeEnvironmentFormFunction
-//\brief Form function that needs an execution environment
+/// \class RuntimeEnvironmentFormFunction
+/// \brief Form function that needs an execution environment
 class RuntimeEnvironmentFormFunction
 	:public FormFunction
 {
 public:
-	//\brief Constructor
-	//\param[in] funcname_ name of the function
-	//\param[in] env_ runtime environment of the function
+	/// \brief Constructor
+	/// \param[in] funcname_ name of the function
+	/// \param[in] env_ runtime environment of the function
 	RuntimeEnvironmentFormFunction( const std::string& funcname_, const RuntimeEnvironment* env_)
 		:m_env(env_),m_funcname(funcname_){}
 
-	//\brief Create a function closure for execution with help of the runtime environment
-	//\return created closure
+	/// \brief Create a function closure for execution with help of the runtime environment
+	/// \return created closure
 	virtual langbind::FormFunctionClosure* createClosure() const
 	{
 		FormFunctionClosure* rt = m_env->createClosure( m_funcname);
@@ -85,8 +86,8 @@ public:
 	}
 
 private:
-	const RuntimeEnvironment* m_env;	//< runtime environment reference
-	std::string m_funcname;			//< name of the function
+	const RuntimeEnvironment* m_env;	///< runtime environment reference
+	std::string m_funcname;			///< name of the function
 };
 
 }}//namespace

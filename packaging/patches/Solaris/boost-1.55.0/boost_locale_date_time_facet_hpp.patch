@@ -1,0 +1,20 @@
+--- boost_1_55_0-orig/boost/locale/date_time_facet.hpp	2012-12-29 15:18:45.000000000 +0100
++++ boost_1_55_0/boost/locale/date_time_facet.hpp	2014-04-26 20:49:10.027406000 +0200
+@@ -51,7 +51,7 @@
+                     second,                     ///< second [0..59]
+                     week_of_year,               ///< The week number in the year
+                     week_of_month,              ///< The week number within current month
+-                    first_day_of_week,          ///< First day of week, constant, for example Sunday in US = 1, Monday in France = 2
++                    first_day_of_week           ///< First day of week, constant, for example Sunday in US = 1, Monday in France = 2
+                 };
+ 
+             } // marks
+@@ -133,7 +133,7 @@
+                 least_maximum,      ///< The last maximal value for this period, For example for Gregorian calendar
+                                     ///< day it is 28
+                 actual_maximum,     ///< Actual maximum, for it can be 28, 29, 30, 31 for day according to current month
+-                absolute_maximum,   ///< Maximal value, for Gregorian day it would be 31.
++                absolute_maximum    ///< Maximal value, for Gregorian day it would be 31.
+             } value_type;
+ 
+             ///

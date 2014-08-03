@@ -30,101 +30,67 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mainConnectionHandler.hpp
+/// \file mainConnectionHandler.hpp
 ///
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
+#include "cmdbind/protocolHandler.hpp"
 #include "system/connectionHandler.hpp"
-#include "cmdbind/commandHandler.hpp"
-#include "cmdbind/lineCommandHandler.hpp"
-#include "cmdbind/doctypeFilterCommandHandler.hpp"
-#include "mainConnectionHandler_auth.hpp"
-#include "protocol/ioblocks.hpp"
+#include "processor/execContext.hpp"
 #include "types/keymap.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace proc {
 
-class CommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
+/// \brief The wolframed connection handler
+class MainConnectionHandler
+	:public net::ConnectionHandler
 {
 public:
-	typedef cmdbind::LineCommandHandlerTemplate<CommandHandler> Parent;
-	CommandHandler();
-	virtual ~CommandHandler(){}
+	/// \brief Defines the chunk size for messages no the net
+	/// \todo Find a better place for the constant NeworkBufferSize than MainConnectionHandler::NeworkBufferSize
+	enum {NeworkBufferSize=4000};
 
-public:
-	int doAuth( int argc, const char** argv, std::ostream& out);
+	/// \brief Constructor
+	MainConnectionHandler( const net::LocalEndpointR& local);
 
-	int doMech( int argc, const char** argv, std::ostream& out);
-	int endMech( cmdbind::CommandHandler* ch, std::ostream& out);
+	/// \brief Destructor
+	virtual ~MainConnectionHandler();
 
-	int doRequest( int argc, const char** argv, std::ostream& out);
-	int endRequest( cmdbind::CommandHandler* ch, std::ostream& out);
+	/// \brief Set the remote peer and indicate that the connection is up now.
+	/// \param [in] remote remote peer
+	virtual void setPeer( const net::RemoteEndpointR& remote);
 
-	int doInterface( int argc, const char** argv, std::ostream& out);
-	int endInterface( cmdbind::CommandHandler* ch, std::ostream& out);
-
-	int doCapabilities( int argc, const char** argv, std::ostream& out);
-	int doQuit( int argc, const char** argv, std::ostream& out);
-
-	int endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out);
-	int endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out);
-
-private:
-	bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out);
-	std::list<std::string> roles() const
-	{
-		std::list<std::string> rt;
-		rt.push_back( "std");		//TODO: To be extracted from m_authtickets
-		return rt;
-	}
-
-private:
-	AuthMechanisms m_authMechanisms;
-	std::string m_command;
-	std::string m_commandtag;
-	std::vector<std::string> m_authtickets;
-};
-
-
-/// The connection handler
-class Connection : public net::ConnectionHandler
-{
-public:
-	///\brief Constructor
-	Connection( const net::LocalEndpoint& local);
-
-	///\brief Destructor
-	virtual ~Connection();
-
-	///\brief Set the remote peer and indicate that the connection is up now.
-	///\param [in] remote remote peer
-	virtual void setPeer( const net::RemoteEndpoint& remote);
-
-	///\brief Handle a request and produce a reply (statemachine of the processor)
+	/// \brief Handle a request and produce a reply (statemachine of the processor)
 	virtual const net::NetworkOperation nextOperation();
 
-	///\brief Passes the network input to the processor
-	///\param [in] begin start of the network input block.
-	///\param [in] bytesTransferred number of bytes passed in the input block
-	///\remark Begin is ignored because it points always to the same block as given by the read network message
+	/// \brief Passes the network input to the processor
+	/// \param [in] begin start of the network input block.
+	/// \param [in] bytesTransferred number of bytes passed in the input block
+	/// \remark Begin is ignored because it points always to the same block as given by the read network message
 	virtual void networkInput( const void *begin, std::size_t bytesTransferred);
 
-	///\brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
+	/// \brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
 	virtual void signalOccured( NetworkSignal);
 
-	///\brief Set the reference to the prcessor provider
-	void setProcessorProvider( proc::ProcessorProvider* provider_)
-	{
-		m_cmdhandler.setProcProvider( provider_);
-	}
+	/// \brief Set the reference to the execution context and initialize the protocol handler
+	void setExecContext( proc::ExecContext* context_);
 
 private:
-	CommandHandler m_cmdhandler;			//< top level instance executing commands
-	protocol::InputBlock m_input;			//< buffer for network read messages
-	protocol::OutputBlock m_output;			//< buffer for network write messages
-	bool m_terminated;				//< true, if a termination signal came from the network
+	void initSessionExceptionBYE();
+
+private:
+	net::LocalEndpointR m_localEndPoint;		///< local end point of the connection
+	net::RemoteEndpointR m_remoteEndPoint;		///< local end point of the connection
+	cmdbind::ProtocolHandlerR m_protocolHandler;	///< top level protocol handler
+	char* m_input;					///< buffer for network read messages
+	std::size_t m_inputsize;			///< allocation size of m_input in bytes
+	char* m_output;					///< buffer for network write messages
+	std::size_t m_outputsize;			///< allocation size of m_output in bytes
+	bool m_terminated;				///< true, if a termination signal came from the network
+	std::string m_exceptionByeMessage;		///< message to terminate connection on exception
+	const char* m_exceptionByeMessagePtr;		///< reference to message to terminate connection on exception
 };
 } // namespace proc
 } // namespace _Wolframe

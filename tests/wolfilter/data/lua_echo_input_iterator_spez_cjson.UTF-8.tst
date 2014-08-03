@@ -4,22 +4,20 @@
 **requires:TEXTWOLF
 **input
 {
-  "doc": {
-    "image": [
-      { "-id": "1" },
-      {
-        "-id": "1",
-        "-name": "troll"
-      },
-      { "-id": "2" },
-      {
-        "-id": "3",
-        "#text": "X"
-      }
-    ]
-  }
+	"image": [
+		{ "-id": "1" },
+		{
+			"-id": "1",
+			"-name": "troll"
+		},
+		{ "-id": "2" },
+		{
+			"-id": "3",
+			"#text": "X"
+		}
+	]
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json -c wolframe.conf run
 
 **file:wolframe.conf
 LoadModules
@@ -33,6 +31,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter cjson
 		}
 	}
 }
@@ -49,7 +48,7 @@ function run()
 	for v,t in itr do
 		if t == "image" then
 			output:opentag( t)
-			process_image( scope( itr))
+			process_image( iterator.scope( itr))
 			output:closetag()
 		else
 			output:print( v, t)
@@ -58,18 +57,16 @@ function run()
 end
 **output
 {
-	"doc":	{
-		"image":	[{
-				"id":	"1"
-			}, {
-				"id":	"1",
-				"name":	"troll"
-			}, {
-				"id":	"2"
-			}, {
-				"id":	"3",
-				"#text":	"X"
-			}]
-	}
+	"image":	[{
+			"id":	"1"
+		}, {
+			"id":	"1",
+			"name":	"troll"
+		}, {
+			"id":	"2"
+		}, {
+			"id":	"3",
+			"#text":	"X"
+		}]
 }
 **end

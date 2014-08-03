@@ -50,20 +50,36 @@ extern "C" void profiling_callback(  void * /*a*/, const char *b, sqlite3_uint64
 	LOG_DATA << b << " (time: " << c / 1000 << " ms)";
 }
 
-SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
-			    bool foreignKeys, bool profiling,
-			    unsigned short connections,
-			    const std::list<std::string>& programFiles_,
-			    const std::list<std::string>& extensionFiles_)
-	: m_ID( id ), m_filename( filename ), m_programFiles(programFiles_),
-	m_extensionFiles(extensionFiles_)
+SQLiteDatabase::SQLiteDatabase( const SQLiteConfig& config)
+	:m_ID(config.ID())
+	,m_filename(config.filename())
+	,m_extensionFiles(config.extensionFiles())
+{
+	init( config);
+}
+
+SQLiteDatabase::SQLiteDatabase(
+		const std::string& id_, const std::string& filename_,
+		bool foreignKeys_, bool profiling_,
+		unsigned short connections_,
+		const std::vector<std::string>& extensionFiles_ )
+	:m_ID(id_)
+	,m_filename(filename_)
+	,m_extensionFiles(extensionFiles_)
+{
+	SQLiteConfig config( id_, filename_, foreignKeys_, profiling_, connections_, extensionFiles_);
+	init( config);
+}
+
+void SQLiteDatabase::init( const SQLiteConfig& config)
 {
 	bool	checked = false;
 	int	dbFlags = SQLITE_OPEN_READWRITE;
+	int	connections = config.connections();
 
 	if ( ! sqlite3_threadsafe() )	{
 		if ( connections != 1 )	{
-			LOG_WARNING << "SQLite database '" << id
+			LOG_WARNING << "SQLite database '" << m_ID
 				    << "' has not been compiled without the SQLITE_THREADSAFE parameter."
 				    << " Using only 1 connection instead of " << connections << ".";
 			connections = 1;
@@ -73,10 +89,9 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 				throw std::runtime_error( "Unable to set SQLite in multithreaded mode" );
 			}
 			dbFlags |= SQLITE_OPEN_NOMUTEX;
-//			dbFlags |= SQLITE_OPEN_FULLMUTEX;
 		}
 	}
-
+	
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
 		char* err;
@@ -87,7 +102,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 					   NULL );
 #endif
 		if( res != SQLITE_OK )	{
-			LOG_ALERT << "Unable to open SQLite database '" << filename
+			LOG_ALERT << "Unable to open SQLite database '" << m_filename
 				      << "': " << sqlite3_errmsg( handle );
 				sqlite3_close( handle );	// really ?!?
 			throw std::runtime_error( "Unable to open SQLite database" );
@@ -96,7 +111,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			if ( !checked )	{
 				res = sqlite3_exec( handle, "PRAGMA integrity_check", NULL, NULL, &err );
 				if( res != SQLITE_OK )	{
-					LOG_ALERT << "Corrupt SQLite database '" << filename
+					LOG_ALERT << "Corrupt SQLite database '" << m_filename
 						      << "': " << err;
 					sqlite3_close( handle );
 				}
@@ -108,10 +123,10 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			}
 
 			// enable foreign keys
-			if ( foreignKeys )	{
+			if ( config.foreignKeys() )	{
 				res = sqlite3_exec( handle, "PRAGMA foreign_keys=true", NULL, NULL, &err );
 				if( res != SQLITE_OK ) {
-					LOG_ALERT << "Unable to enforce integrity checks in '" << filename
+					LOG_ALERT << "Unable to enforce integrity checks in '" << m_filename
 						      << "': " << err;
 				}
 				if( err ) {
@@ -119,11 +134,11 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 				}
 			}
 			// enable tracing and profiling of commands
-			if ( profiling )
+			if ( config.profiling() )
 				sqlite3_profile( handle, profiling_callback, NULL );
 
 			// enable extensions in every connection
-			std::list<std::string>::const_iterator it = m_extensionFiles.begin( ), end = m_extensionFiles.end( );
+			std::vector<std::string>::const_iterator it = m_extensionFiles.begin( ), end = m_extensionFiles.end( );
 			for( ; it != end; it++ ) {
 				LOG_DEBUG << "Loading extension '" << *it << "' for SQLite database unit '" << m_ID << "'";
 				// No extension file, do nothing
@@ -148,230 +163,23 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 					continue;
 				}
 			}
-			LOG_DEBUG << "Extensions for SQLite database unit '" << m_ID << "' loaded";
+			LOG_DEBUG << "Extensions for SQLite database '" << m_ID << "' loaded";
 
 			m_connections.push_back( handle );
 			m_connPool.add( handle );
 		}
 	}
-	m_db.setUnit( this );
-
-	LOG_DEBUG << "SQLite database unit '" << m_ID << "' created with "
+	LOG_DEBUG << "SQLite database '" << m_ID << "' created with "
 		      << connections << " connections to file '" << m_filename << "'";
 }
 
-SQLiteDBunit::~SQLiteDBunit( )
+SQLiteDatabase::~SQLiteDatabase()
 {
-	m_db.setUnit( NULL );
-
 	while( m_connPool.available( ) > 0 ) {
 		sqlite3 *handle = m_connPool.get( );
 		sqlite3_close( handle );
 	}
-	LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
-}
-
-void SQLiteDBunit::loadProgram( const std::string& filename )
-{
-	// No program file, do nothing
-	if ( filename.empty())
-		return;
-	if ( !boost::filesystem::exists( filename ))	{
-		LOG_ALERT << "Program file '" << filename
-			      << "' does not exist (SQLite database '" << m_ID << "')";
-		return;
-	}
-	try
-	{
-		addProgram( utils::readSourceFileContent( filename));
-	}
-	catch (const std::runtime_error& e)
-	{
-		throw std::runtime_error( std::string("error in program '") + utils::getFileStem(filename) + "':" + e.what());
-	}
-}
-
-void SQLiteDBunit::loadAllPrograms()
-{
-	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
-	for (; pi != pe; ++pi)
-	{
-		LOG_DEBUG << "Loading program '" << *pi << "' for SQLite database unit '" << m_ID << "'";
-		loadProgram( *pi);
-	}
-	LOG_DEBUG << "Programs for SQLite database unit '" << m_ID << "' loaded";
-}
-
-Database* SQLiteDBunit::database()
-{
-	return m_db.hasUnit() ? &m_db : NULL;
-}
-
-
-/*****  SQLite database  **********************************************/
-const std::string& SQLiteDatabase::ID() const
-{
-	if ( m_unit )
-		return m_unit->ID();
-	else
-		throw std::runtime_error( "SQLite database unit not initialized" );
-}
-
-void SQLiteDatabase::loadProgram( const std::string& filename )
-{
-	if ( !m_unit )
-		throw std::runtime_error( "loadProgram: SQLite database unit not initialized" );
-	m_unit->loadProgram( filename );
-}
-
-void SQLiteDatabase::loadAllPrograms()
-{
-	if ( !m_unit )
-		throw std::runtime_error( "loadAllPrograms: SQLite database unit not initialized" );
-	m_unit->loadAllPrograms();
-}
-
-void SQLiteDatabase::addProgram( const std::string& program )
-{
-	if ( !m_unit )
-		throw std::runtime_error( "addProgram: SQLite database unit not initialized" );
-	m_unit->addProgram( program );
-}
-
-Transaction* SQLiteDatabase::transaction( const std::string& name)
-{
-	return new SQLiteTransaction( *this, name);
-}
-
-void SQLiteDatabase::closeTransaction( Transaction *t )
-{
-	delete t;
-}
-
-
-const UI::UserInterfaceLibrary* SQLiteDatabase::UIlibrary() const
-{
-	return new SQLiteUIlibrary( *this );
-}
-
-/*****  SQLite transaction  *******************************************/
-SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database, const std::string& name_)
-	:StatemachineBasedTransaction( name_, new TransactionExecStatemachine_sqlite3( name_, &database.dbUnit())){}
-
-
-
-/*****  SQLite user interface library  ********************************/
-SQLiteUIlibrary::SQLiteUIlibrary( const SQLiteDatabase &database )
-	: m_unit( database.dbUnit() )
-{}
-
-
-const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::userInterface( const std::string& platform,
-									 const std::string& role,
-									 const std::string& culture,
-									 const std::string& tag ) const
-{
-	std::list< std::string > roles;
-	roles.push_back( role );
-	return userInterface( platform, roles, culture, tag );
-}
-
-const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::userInterface( const std::string& platform,
-									 const std::list< std::string >& roles,
-									 const std::string& culture,
-									 const std::string& /*tag*/ ) const
-{
-	std::list< UI::InterfaceObject::Info >	objs;
-
-	bool condition = false;
-	PoolObject< sqlite3* > conn( m_unit.m_connPool );
-	sqlite3_stmt* ppStmt = NULL;
-	std::ostringstream errMsg;
-	bool success = true;
-
-	std::string query = "SELECT platform.name, locale, typeName "
-			"FROM UIobject JOIN Platform ON Platform.ID = UIobject.platformID "
-			"JOIN UIobjectType ON UIobject.typeID=UIobjectType.ID";
-
-	std::string cond = " WHERE ";
-	if ( ! platform.empty() )	{
-		cond += "upper( Platform.name ) = "
-				+ boost::algorithm::to_upper_copy( platform );
-		condition = true;
-	}
-
-	if ( ! roles.empty() )	{
-		if ( condition )
-			cond += "AND upper( Platform.name ) = "
-					+ boost::algorithm::to_upper_copy( platform );
-		else	{
-			cond += "";
-			condition = true;
-		}
-	}
-
-	if ( ! culture.empty() )	{
-		if ( condition )
-			cond += "AND upper( culture ) = "
-					+ boost::algorithm::to_upper_copy( culture );
-		else	{
-			cond += "upper( culture ) = "
-					+ boost::algorithm::to_upper_copy( culture );
-			condition = true;
-		}
-	}
-
-	if ( condition )
-		query += cond;
-	int rc = sqlite3_prepare_v2( *conn, query.c_str(), -1, &ppStmt, NULL );
-	if ( rc != SQLITE_OK )	{
-		const char* str = sqlite3_errmsg( *conn );
-		int errcode = sqlite3_errcode( *conn );
-		errMsg << "SQLite error " << errcode << ": " << str;
-		success = false;
-	}
-	else	{
-		assert ( ppStmt != NULL );
-		while ( success )	{
-			rc = sqlite3_step( ppStmt );
-			if ( rc == SQLITE_ROW )	{
-				const unsigned char* text;
-				text = sqlite3_column_text ( ppStmt, 0 );
-				std::cout << text << ", ";
-//				UI::InterfaceObject::Info info();
-//				objs.push_back( info );
-			}
-			else if ( rc == SQLITE_DONE )
-				break;
-			else	{
-				const char* str = sqlite3_errmsg( *conn );
-				int errcode = sqlite3_errcode( *conn );
-				errMsg << "SQLite error " << errcode << ": " << str;
-				success = false;
-			}
-		}
-	}
-	sqlite3_finalize( ppStmt );
-	if ( !success )
-		throw std::runtime_error( errMsg.str() );
-
-	return objs;
-}
-
-const UI::InterfaceObject SQLiteUIlibrary::object( const UI::InterfaceObject::Info& /*info*/ ) const
-{
-	UI::InterfaceObject	obj( "FORM", "Linux", "dummy test", "mo_MO", 01000000,
-				     "Dummy form for now", "" );
-	return obj;
-}
-
-void SQLiteUIlibrary::addObject( const UI::InterfaceObject& /*newObject*/ ) const
-{
-}
-
-bool SQLiteUIlibrary::deleteObject( const UI::InterfaceObject::Info& /*info*/ ) const
-{
-	return true;
+	LOG_TRACE << "SQLite database '" << m_ID << "' destroyed";
 }
 
 }} // _Wolframe::db

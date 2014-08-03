@@ -1,7 +1,6 @@
 FORM User
+	-root user
 {
-	user
-	{
-		name string
-	}
+	name string
 }
+

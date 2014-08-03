@@ -6,6 +6,30 @@
 
 <!ENTITY AppGettingStarted		SYSTEM "GettingStarted.xml">
 
+<!ENTITY AppServerConfiguration		SYSTEM "ServerConfiguration.xml">
+<!ENTITY AppConfigService		SYSTEM "ConfigService.xml">
+<!ENTITY AppConfigListener		SYSTEM "ConfigListener.xml">
+<!ENTITY AppConfigLogging		SYSTEM "ConfigLogging.xml">
+<!ENTITY AppConfigModules		SYSTEM "ConfigModules.xml">
+<!ENTITY AppConfigGlobalSettings	SYSTEM "ConfigGlobalSettings.xml">
+<!ENTITY AppConfigDatabases		SYSTEM "ConfigDatabases.xml">
+<!ENTITY AppConfigDatabasePostgreSQL	SYSTEM "ConfigDatabasePostgreSQL.xml">
+<!ENTITY AppConfigDatabaseSqlite	SYSTEM "ConfigDatabaseSqlite.xml">
+<!ENTITY AppConfigDatabaseOracle	SYSTEM "ConfigDatabaseOracle.xml">
+<!ENTITY AppConfigDatabasePostgresSslOptionTable	SYSTEM "ConfigDatabaseSslOptionTable.xml">
+<!ENTITY AppConfigDatabasePostgresSslModeTable		SYSTEM "ConfigDatabaseSslModeTable.xml">
+<!ENTITY AppConfigDatabaseOracleSslOptionTable		SYSTEM "ConfigDatabaseSslOptionTable.xml">
+<!ENTITY AppConfigDatabaseOracleSslModeTable		SYSTEM "ConfigDatabaseSslModeTable.xml">
+
+<!ENTITY AppAAAA			SYSTEM "AAAA.xml">
+<!ENTITY AppAAAAConfig			SYSTEM "AAAAConfig.xml">
+<!ENTITY AppAuthentication		SYSTEM "Authentication.xml">
+<!ENTITY AppAuthorization		SYSTEM "Authorization.xml">
+<!ENTITY AppAuditingAndAccounting	SYSTEM "AuditingAndAccounting.xml">
+
+<!ENTITY AppProcessorConfig		SYSTEM "ProcessorConfig.xml">
+<!ENTITY AppDataProcessing		SYSTEM "DataProcessing.xml">
+<!ENTITY AppApplicationServerRequests	SYSTEM "ApplicationServerRequests.xml">
 <!ENTITY AppCmdhandlers			SYSTEM "CmdHandlers.xml">
 <!ENTITY AppCmdhandlerDirectmap		SYSTEM "CmdHandlerDirectmap.xml">
 <!ENTITY AppCmdhandlerLua		SYSTEM "CmdHandlerLua.xml">

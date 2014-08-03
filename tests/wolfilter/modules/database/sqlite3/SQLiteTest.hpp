@@ -36,8 +36,7 @@
 #ifndef _SQLITE_TEST_HPP_INCLUDED
 #define _SQLITE_TEST_HPP_INCLUDED
 #include "SQLite.hpp"
-#include <boost/property_tree/ptree.hpp>
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 
 namespace _Wolframe {
 namespace db {
@@ -47,15 +46,10 @@ namespace db {
 class SQLiteTestConfig : public SQLiteConfig
 {
 public:
-	SQLiteTestConfig( const char* name, const char* logParent, const char* logName )
-		:SQLiteConfig( name, logParent, logName){}
+	SQLiteTestConfig( const char* sectionName_, const char* logName_)
+		:SQLiteConfig( sectionName_, logName_){}
 
-	virtual ~SQLiteTestConfig()
-	{
-		dump_database();
-	}
-
-	virtual bool parse( const config::ConfigurationTree& pt, const std::string& node,
+	virtual bool parse( const config::ConfigurationNode& pt, const std::string& node,
 				const module::ModulesDirectory* modules )
 	{
 		return SQLiteConfig::parse( extractMyNodes( pt), node, modules);
@@ -71,7 +65,7 @@ public:
 	const std::string& dump_filename() const	{return m_dump_filename;}
 
 private:
-	config::ConfigurationTree extractMyNodes( const config::ConfigurationTree& pt);
+	config::ConfigurationNode extractMyNodes( const config::ConfigurationNode& pt);
 	void setMyCanonicalPathes( const std::string& referencePath);
 	void dump_database();
 
@@ -79,22 +73,35 @@ private:
 	std::string m_dump_filename;
 };
 
-class SQLiteTestConstructor : public SQLiteConstructor
+
+class SQLiteTestDatabaseInitializer
 {
 public:
-	SQLiteTestConstructor(){}
-	virtual ~SQLiteTestConstructor(){}
-
-	virtual SQLiteDBunit* object( const config::NamedConfiguration& conf)
+	SQLiteTestDatabaseInitializer( const SQLiteTestConfig& config)
+		:m_db_filename(config.filename())
+		,m_input_filename(config.input_filename())
+		,m_dump_filename(config.dump_filename())
 	{
-		const SQLiteTestConfig& cfg = dynamic_cast< const SQLiteTestConfig&>( conf);
-		createTestDatabase( cfg.filename(), cfg.input_filename());
-		return SQLiteConstructor::object( conf);
+		initDatabase();
+	}
+
+	~SQLiteTestDatabaseInitializer()
+	{
+		dumpDatabase();
 	}
 
 private:
-	static void createTestDatabase( const std::string& filename_, const std::string& inputfile_);
+	/// \brief Dumps the content of the database to file
+	void dumpDatabase();
+	/// \brief Creates the tables needed for the test
+	void initDatabase();
+
+private:
+	std::string m_db_filename;
+	std::string m_input_filename;
+	std::string m_dump_filename;
 };
+
 
 }} // _Wolframe::db
 

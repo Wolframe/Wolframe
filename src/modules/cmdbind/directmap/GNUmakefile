@@ -18,17 +18,16 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_serialize \
-	-lwolframe_langbind \
-	$(LIBS_DL)
-
+	-lwolframe_langbind
 
 DYNAMIC_MODULE = mod_command_directmap.so
 
 CPP_OBJS = \
+	directmapCommandDescription.o \
 	directmapProgram.o \
 	directmapCommandHandler.o \
-	directmapCommandHandlerBuilder.o \
-	mod_command_directmap.o
+	directmapCommandHandlerUnit.o \
+	directmapCommandHandlerConfig.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

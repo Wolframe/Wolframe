@@ -9,16 +9,19 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/include \
 	-I$(TOPDIR)/src \
 	-I$(TOPDIR)/3rdParty/gtest/include \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	-I$(TOPDIR)/wtest/include
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/wtest \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/3rdParty/gtest/gtest-all.o \
-	$(TOPDIR)/src/libwolframe.a \
+	-lwolftest \
+	$(TOPDIR)/src/libwolframed.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/src/libwolframe_serialize/libwolframe_serialize.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
@@ -33,7 +36,7 @@ TEST_CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframed.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 local_all:
 

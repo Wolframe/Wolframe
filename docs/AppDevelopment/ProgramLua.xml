@@ -1,6 +1,6 @@
-<sect1>
+<sect2>
 <title>Functions in Lua</title>
-	<sect2>
+	<sect3>
 	<title>Introduction</title>
 	<para>You can write functions for the logic tier of <application>Wolframe</application> with <application>Lua</application>. <application>Lua</application> is a scripting language designed, implemented, and maintained
 		at PUC-Rio in Brazil by Roberto Ierusalimschy, Waldemar Celes and Luiz Henrique de Figueiredo
@@ -8,9 +8,9 @@
 		For an introduction into programming with <application>Lua</application> see <ulink url="http://www.lua.org">http://www.lua.org</ulink>. The official manual which is also available as book
 		is very good. <application>Wolframe</application> introduces some <application>Lua</application> interfaces to access input and output and to execute functions.
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
+	<sect3>
 	<title>Configuration</title>
 	<para>For enabling <application>Lua</application> you have to declare the loading of the module 'mod_command_lua'
 		in the main section of the server configuration file.
@@ -22,44 +22,283 @@
 		The script is recognized as <application>Lua</application> script by the file extension ".lua".
 		Files without this extension cannot be loaded as <application>Lua</application> scripts.
 		</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
-	<title>Declaring Functions</title>
+	<sect3>
+	<title>Declaring functions</title>
 	<para>For <application>Lua</application> we do not have to declare anything in addition to the 
 		<application>Lua</application> script. If you configure a <application>Lua</application>
 		script as program, all global functions declared in this script are declared as global form
 		functions. For avoiding name conflicts you should declare private functions
 		of the script as <code>local</code>.
 	</para>
-	</sect2>
-	<sect2>
-	<title>Wolframe Provider Library</title>
+	</sect3>
+
+	<sect3>
+	<title>Wolframe provider library</title>
 	<para><application>Wolframe</application> lets you access objects of the global context through
 		a library called <code>provider</code> offering the following functions:
 
-		<simplelist type="horiz" columns="3">
-		<member>Name</member><member>Parameter</member><member>Returns</member>
-		<member>form</member><member>name of the form</member><member>an instance of a form</member>
-		<member>normalizer</member><member>name of the normalize function</member><member>normalize function defined in a <application>Wolframe</application> normalizer program</member>
-		<member>formfunction</member><member>name of the function</member><member>form function defined in a <application>Wolframe</application> program or module</member>
-		</simplelist>
+		<table frame="all" width="100%">
+			<title>Method</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Parameter</entry>
+					<entry>Returns</entry>
+				</row>
+			</thead>
+	
+			<tbody>
+				<row>
+					<entry>form</entry>
+					<entry>Name of the form</entry>
+					<entry>An instance of the form</entry>
+				</row>
+				<row>
+					<entry>type</entry>
+					<entry>Type name and initializer list</entry>
+					<entry>A constructor function to create a value instance of this type</entry>
+				</row>
+				<row>
+					<entry>formfunction</entry>
+					<entry>Name of the function</entry>
+					<entry>Form function defined in a <application>Wolframe</application> program or module</entry>
+				</row>
+				<row>
+					<entry>document</entry>
+					<entry>Content string of the document to process</entry>
+					<entry>Returns an object of type "document" that allows the processing of the contents passed as argument.
+						See description of type "document"</entry>
+				</row>
+				<row>
+					<entry>authorize</entry>
+					<entry>1) authorization function 2) (optional) authorization resource</entry>
+					<entry>Calls the specified authorization function and returns true on success (authorized) and false on failure (authorization denied or error)</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
 	</para>
-	</sect2>
+	</sect3>
 
-	<sect2>
-	<title>Serialization Iterators</title>
-	<para>Some objects introduced in the following sections are accessible through
-		iterators. These are called serialization iterators and are <application>Lua</application>
-		function closures. You should not mix them with the standard <application>Lua</application>
-		iterators though the semantic is similar. Serialization iterators do not
+	<sect3>
+	<title>Using atomic data types</title>
+	<para><application>Wolframe</application> lets us extend the type system consisting 
+		of Lua basic data types with our own. We can create atomic data types 
+		defined in a module or in a DDL datatype definition program (.wnmp file).
+		For this you call the <code>type</code> method of the provider with 
+		the type name as first argument plus the type initializer argument 
+		list as additional parameters.
+		The function returns a constructor function that can be called 
+		with the initialization value as argument to get a
+		value instance of this type. The name of the type can refer to 
+		one of the following:
+
+		<table frame="all" width="100%">
+			<title>List of Atomic Data Types</title>
+			<tgroup cols="3">
+			<colspec colnum="1" colwidth="1*"/>
+			<colspec colnum="2" colwidth="2*"/>
+			<colspec colnum="3" colwidth="2*"/>
+			<thead>
+				<row>
+					<entry>Class</entry>
+					<entry>Initializer Arguments</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+					<entry>Custom data type</entry>
+					<entry>Custom Type Parameters</entry>
+					<entry>A custom data type defined in a module with arithmetic operators and methods</entry>
+				</row>
+				<row>
+					<entry>Normalization function</entry>
+					<entry>Dimension parameters</entry>
+					<entry>A type defined as normalization function in a module</entry>
+				</row>
+				<row>
+					<entry>DDL data type</entry>
+					<entry>(no arguments)</entry>
+					<entry>A normalizer defined as sequence of normalization functions in a .wnmp source file</entry>
+				</row>
+				<row>
+					<entry>Data type 'bignumber'</entry>
+					<entry>(no arguments)</entry>
+					<entry>Arbitrary precision number type</entry>
+				</row>
+				<row>
+					<entry>Data fype 'datetime'</entry>
+					<entry>(no arguments)</entry>
+					<entry>Data type representing date and time down to a granularity of microseconds</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		</para>
+
+		<sect4>
+		<title>Data type 'datetime'</title>
+		<para>
+			The data type 'datetime' is used as interface for date time values.
+			<table frame="all" width="100%">
+				<title>Methods of 'datetime'</title>
+				<tgroup cols="3">
+				<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+				</thead>
+				<tbody>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>year, month, day, hour, minute, second ,millisecond, microsecond</entry>
+					<entry>Creates a date and time value with a granularity down to microseconds</entry>
+				</row>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>year, month, day, hour, minute, second ,millisecond</entry>
+					<entry>Creates a date and time value with a granularity down to milliseconds</entry>
+				</row>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>year, month, day, hour, minute, second</entry>
+					<entry>Creates a date and time value</entry>
+				</row>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>year, month, day</entry>
+					<entry>Creates a date value</entry>
+				</row>
+				<row>
+					<entry>year</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the year</entry>
+				</row>
+				<row>
+					<entry>month</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the month (1..12)</entry>
+				</row>
+				<row>
+					<entry>day</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the day in the month (1..31)</entry>
+				</row>
+				<row>
+					<entry>hour</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the hour in the day (0..23)</entry>
+				</row>
+				<row>
+					<entry>minute</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the minute (0..59)</entry>
+				</row>
+				<row>
+					<entry>second</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the second (0..63 : 59 + leap seconds)</entry>
+				</row>
+				<row>
+					<entry>millisecond</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the millisecond (0..1023)</entry>
+				</row>
+				<row>
+					<entry>microsecond</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the value of the microsecond (0..1023)</entry>
+				</row>
+				<row>
+					<entry>__tostring</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the date as string in the format YYYYMMDD, YYYYMMDDhhmmss, YYYYMMDDhhmmssll or YYYYMMDDhhmmssllcc, depending on constructor used to create the date and time value.</entry>
+				</row>
+				</tbody>
+				</tgroup>
+			</table>
+		</para>
+		</sect4>
+
+		<sect4>
+		<title>Data Type 'bignumber'</title>
+		<para>
+			The data type 'bignumber' is used to reference fixed point BCD numbers with a precision of 32767 digits between -1E32767 and +1E32767.
+			<table frame="all" width="100%">
+				<title>Methods of 'datetime'</title>
+				<tgroup cols="3">
+				<thead>
+				<row>
+					<entry>Method name</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+				</thead>
+				<tbody>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>number value as string</entry>
+					<entry>Creates a bignumber from its string representation</entry>
+				</row>
+				<row>
+					<entry>&lt;constructor&gt;</entry>
+					<entry>number value</entry>
+					<entry>Creates a bignumber from a lua number value (double precision floating point number)</entry>
+				</row>
+				<row>
+					<entry>precision</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the number of significant digits in the number</entry>
+				</row>
+				<row>
+					<entry>scale</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the number of fractional digits (may be negative, may be bigger than precision)</entry>
+				</row>
+				<row>
+					<entry>digits</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the significant digits in the number</entry>
+				</row>
+				<row>
+					<entry>tonumber</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the number as lua number value (double precision floating point number) with possible lost of accurancy</entry>
+				</row>
+				<row>
+					<entry>__tostring</entry>
+					<entry>(no arguments)</entry>
+					<entry>Return the big number value as string (not normalized).</entry>
+				</row>
+				</tbody>
+				</tgroup>
+			</table>
+		</para>
+		</sect4>
+	</sect3>
+
+	<sect3>
+	<title>Filter interface iterators</title>
+	<para>Lua provides an interface to the iterators internally used to couple 
+		objects and functions. They are accessible as iterator function closure
+		in <application>Lua</application>. 
+		The look similar to <application>Lua</application> iterators but are not.
+		You should not mix them with the standard <application>Lua</application>
+		iterators though the semantic is similar. Filter interface iterators do not
 		return nodes of the tree as subtree objects but only the node data in the
 		order of a pre-order traversal. You can recursively iterate on the tree
 		and build the object during traversal if you want.
-		The returned elements of the serialization iterators are tuples with the following meaning:
+		The returned elements of the Filter interface iterators are tuples 
+		with the following meaning:
 	</para>
 	<table frame="all" width="100%">
-		<title>Serialization Iterator Elements</title>
+		<title>Filter interface iterator elements</title>
 		<tgroup cols="3">
 		<thead>
 			<row>
@@ -93,26 +332,61 @@
 		</tbody>
 		</tgroup>
 	</table>
-	</sect2>
+	</sect3>
 
-	<sect2>
-	<title>Wolframe Global Objects</title>
+	<sect3>
+	<title>Iterator library</title>
+	<para><application>Wolframe</application> lets you access filter interface
+		iterators through a library called <code>iterator</code> 
+		offering the following functions:
+
+		<table frame="all" width="100%">
+			<title>Method</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Name</entry>
+					<entry>Parameter</entry>
+					<entry>Returns</entry>
+				</row>
+			</thead>
+	
+			<tbody>
+				<row>
+					<entry>scope</entry>
+					<entry>serialization iterator (*)</entry>
+					<entry>An iterator restricted on the subnodes of the last visited node (**)</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+	</para>
+	<para>
+		(*) See section "serialization iterator"
+	</para>
+	<para>
+		(**) If iterator.scope is called, all elements of the returned iterator has to be visited in order to continue 
+		iteration with the origin iterator on which iterator.scope was called.
+	</para>
+	</sect3>
+
+	<sect3>
+	<title>Global objects</title>
 	<para>Besides the provider library <application>Wolframe</application> defines the following objects global in the script execution context:
 		<simplelist type="horiz" columns="2">
 		<member>Name</member><member>Description</member>
-		<member>scope</member><member>function with an serialization iterator as 
-		argument returning a serialization iterator on the currently visited node 
-		and its children taking ownership on this sub scope</member>
 		<member>logger</member><member>object with methods for logging or debugging</member>
 		</simplelist>
 	</para>
-	</sect2>
-	<sect2>
-	<title>Using Forms</title>
-	<para>The provider function <code>provider.form( )</code> with the name of the form as string as parameter returns an empty
-		instance of a form. It takes the name of the form as string argument.
-		If you for example have a form configured called "employee" and you want to create an
-		employee object from a <application>Lua</application> table, you call
+	</sect3>
+
+	<sect3>
+	<title>Using forms</title>
+	<para>The provider function <code>provider.form( )</code> with the name of the form as string as 
+		parameter returns an empty instance of a form. It takes the name of 
+		the form as string argument. If you for example have a form configured 
+		called "employee" and you want to create an employee object from 
+		a <application>Lua</application> table, you call
 			<programlisting language='lua'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/AppDevelop/lua_usage_form_1a.lua" parse="text" />
 			</programlisting>
@@ -142,20 +416,20 @@
 		</para>
 		<para>
 		To access the data in a form there are two form methods available.
-		<code>get()</code> returns a serialization iterator on the form data.
+		<code>get()</code> returns a filter interface iterator on the form data.
 		There is also a method <code>value()</code> that returns the form data as
 		<application>Lua</application> data structure
 		(a <application>Lua</application> table or atomic value).
 		</para>
-	</sect2>
-	<sect2>
-	<title>Form Functions</title>
+	</sect3>
+	<sect3>
+	<title>Form functions</title>
 	<para>
 		For calling transactions or built-in functions loaded as modules the <application>Lua</application> layer defines the
 		concept of functions. The provider function <code>provider.formfunction</code> with the name of the function
-		as argument returns a <application>Lua</application> function. This function takes a table or a serialization iterator as argument
+		as argument returns a <application>Lua</application> function. This function takes a table or a filter interface iterator as argument
 		and returns a data form structure. The data in the returned form data structure can be
-		accessed with <code>get()</code> that returns a serialization iterator on the content 
+		accessed with <code>get()</code> that returns a filter interface iterator on the content 
 		and <code>value()</code> that returns a <application>Lua</application> table or 
 		atomic value.
 		</para>
@@ -172,10 +446,10 @@
 		The second calls the transaction, the third creates a <application>Lua</application> table out of the result
 		and the fourth selects and prints the "id" element in the table.
 	</para>
-	</sect2>
-
-	<sect2>
-	<title>List of <application>Lua</application> Objects</title>
+	</sect3>
+	
+	<sect3>
+	<title>List of <application>Lua</application> objects</title>
 	<para>This is a list of all objects and functions declared by <application>Wolframe</application>:</para>
 
 		<table frame="all" width="100%">
@@ -194,8 +468,8 @@
 				<row>
 					<entry>get</entry>
 					<entry></entry>
-					<entry>serialization iterator (*)</entry>
-					<entry>Returns a serialization iterator on the form elements</entry>
+					<entry>filter interface iterator (*)</entry>
+					<entry>Returns a filter interface iterator on the form elements</entry>
 				</row>
 				<row>
 					<entry>value</entry>
@@ -219,7 +493,7 @@
 				<row>
 					<entry>fill</entry>
 					<entry><application>Lua</application> table or 
-					serialization iterator (*), optional validation mode (**)</entry>
+					filter interface iterator (*), optional validation mode (**)</entry>
 					<entry>the filled form (for concatenation)</entry>
 					<entry>Validates input and fills the input data into the form.</entry>
 				</row>
@@ -227,7 +501,7 @@
 			</tgroup>
 		</table>
 		<para>
-			(*) See section "Serialization Iterator"
+			(*) See section "filter interface iterator"
 		</para>
 		<para>
 			(**) "strict" (full validation), "complete" (only check for all non optional elements initialization) or "relaxed" (no validation except matching of input to elements)
@@ -247,8 +521,8 @@
 			<tbody>
 				<row>
 					<entry>get</entry>
-					<entry>serialization iterator (*)</entry>
-					<entry>Returns a serialization iterator on the form elements</entry>
+					<entry>filter interface iterator (*)</entry>
+					<entry>Returns a filter interface iterator on the form elements</entry>
 				</row>
 				<row>
 					<entry>value</entry>
@@ -264,7 +538,67 @@
 			</tgroup>
 		</table>
 		<para>
-			(*) See section "Serialization Iterator"
+			(*) See section "filter interface iterator"
+		</para>
+
+		<table>
+		<title>Document</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+	
+			<tbody>
+				<row>
+					<entry>docformat</entry>
+					<entry> - </entry>
+					<entry>Returns the format of the document {'XML','JSON',etc..}</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>filter and/or document type table</entry>
+					<entry>Attaches a filter to the document to be used for processing</entry>
+				</row>
+				<row>
+					<entry>doctype</entry>
+					<entry> - </entry>
+					<entry>Returns the document type of the content. For retrieving the document type you have first to define a filter.</entry>
+				</row>
+				<row>
+					<entry>metadata</entry>
+					<entry> - </entry>
+					<entry>Returns the meta data structure of the content. For retrieving the document meta data you have first to define a filter.</entry>
+				</row>
+				<row>
+					<entry>value</entry>
+					<entry> - </entry>
+					<entry>Returns the contents of the document as <application>Lua</application> table or atomic value. The method 'table' does the same but is considered to be deprecated.</entry>
+				</row>
+				<row>
+					<entry>table</entry>
+					<entry> - </entry>
+					<entry>Deprecated. Does return the same as the method 'value'</entry>
+				</row>
+				<row>
+					<entry>form</entry>
+					<entry> - </entry>
+					<entry>Returns the contents of the document as filled form instace</entry>
+				</row>
+				<row>
+					<entry>get</entry>
+					<entry> - </entry>
+					<entry>Returns a filter interface iterator (*) on the form elements</entry>
+				</row>
+			</tbody>
+			</tgroup>
+
+		</table>
+		<para>
+			(*) See section "filter interface iterator"
 		</para>
 
 		<table frame="all" width="100%">
@@ -293,6 +627,7 @@
 			</tgroup>
 		</table>
 
+
 		<table frame="all" width="100%">
 			<title>Global functions</title>
 			<tgroup cols="3">
@@ -316,25 +651,26 @@
 					<entry>Returns a lua function to execute the <application>Wolframe</application> function specified by name</entry>
 				</row>
 				<row>
-					<entry>provider.normalizer</entry>
-					<entry>type name</entry>
-					<entry>Returns a <application>Lua</application> function for normalizing values of the type specified (as used in forms)</entry>
+					<entry>provider.type</entry>
+					<entry>name of data type (string)</entry>
+					<entry>Returns a constructor function for the data type given by name. The name specifies either a custom data type or a normalization function as used in forms or one of the additional userdata types 'datetime' or 'bignumber'.</entry>
 				</row>
 				<row>
-					<entry>scope</entry>
-					<entry>serialization iterator (*)</entry>
-					<entry>Returns a serialization iterator to iterate till the end of the current tag (**). Consumes the iterated scope from the argument iterator.</entry>
+					<entry>provider.document</entry>
+					<entry>Content string of the document to process</entry>
+					<entry>Returns an object of type "document" that allows the processing of the contents passed as argument.
+						See description of type "document"</entry>
 				</row>
 			</tbody>
 			</tgroup>
 		</table>
 		<para>
-			(*) See section "Serialization Iterator"
+			(*) See section "filter interface iterator "
 		</para>
 		<para>
-			(**) The serialization iterator of a defined scope must be consumed completely before consuming anything of the parent iterator.
+			(**) The filter interface iterator  of a defined scope must be consumed completely before consuming anything of the parent iterator.
 			Otherwise it may lead to unexpected results because they share some part of the iterator state.
 		</para>
-	</sect2>
-</sect1>
+	</sect3>
+</sect2>
 

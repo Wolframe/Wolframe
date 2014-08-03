@@ -1,0 +1,66 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504 \
+	/DWFSHARED_DLL_IMPLEMENTATION
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)"
+
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	ws2_32.lib kernel32.lib advapi32.lib
+
+LIBRARIES = \
+	wfsingleton.dll \
+	logger\wolframemsg.dll
+
+LOGGER_OBJS = \
+	logger\logLevel.obj \
+	logger\logSyslogFacility.obj \
+	logger\logBackendConsole.obj \
+	logger\logBackendFile.obj \
+	logger\logBackendSyslog.obj \
+	logger\syslog_win32.obj \
+	logger\logBackendEventlog.obj \
+	logger\logBackendWinDebug.obj \
+	logger\logBackendImpl.obj
+
+CPP_OBJS = \
+	$(LOGGER_OBJS) \
+	appInfo.obj \
+	globalRndGen.obj
+
+OBJS =
+
+all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+logger\wolframemsg.dll: logger\wolframemsg.res
+	$(LINK) /dll /nologo /noentry /MACHINE:x86 /out:$@ $?
+logger\wolframemsg.res: logger\wolframemsg.rc
+logger\wolframemsg.rc: logger\wolframemsg.mc
+logger\logBackendEventlog.obj: logger\wolframemsg.rc
+
+wfsingleton.dll: $(OBJS) $(CPP_OBJS)
+	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+	@-erase logger\MSG*.bin logger\wolframemsg.rc logger\wolframemsg.h logger\wolframemsg.res logger\wolframemsg.dll 2>NUL
+	@-erase logger\*.obj 2>NUL
+
+local_distclean:
+
+local_test:

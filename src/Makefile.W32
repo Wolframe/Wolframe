@@ -2,6 +2,7 @@ TOPDIR = ..
 
 SUBDIRS = \
 	libwolframe \
+	libwfsingleton \
 	libwolframe_serialize \
 	libwolframe_database \
 	libwolframe_langbind \
@@ -26,7 +27,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
-	advapi32.lib
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
+	advapi32.lib \
 
 # openssl
 !IFDEF WITH_SSL
@@ -49,27 +51,43 @@ INCLUDE_LIBS = \
 LOCAL_STATIC_LIB = \
 	wolframe.lib
 
+PROVIDER_OBJS = \
+	provider\Authentication.obj \
+	provider\Authorization.obj \
+	provider\Audit.obj \
+	provider\AAAAproviderImpl.obj \
+	provider\AAAAproviderConfig.obj \
+	provider\DBproviderImpl.obj \
+	provider\DBproviderConfig.obj \
+	provider\procProviderConfig.obj \
+	provider\procProvider.obj
+
+PROGRAM_OBJS = \
+	prgbind\normalizeProgram.obj \
+	prgbind\ddlProgram.obj \
+	prgbind\programLibrary.obj
+
 LOCAL_STATIC_LIB_OBJS = \
+	$(PROVIDER_OBJS) \
+	$(PROGRAM_OBJS) \
 	wolframedCommandLine.obj \
 	wolfilterCommandLine.obj \
 	wolfilterIostreamFilter.obj \
 	wolfwizardCommandLine.obj \
 	mainConnectionHandler.obj \
-	interfaceCommandHandler.obj \
-	loadModules.obj \
+	contentOnlyProtocolHandler.obj \
+	moduleDirectory.obj \
+	moduleLoader.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	appConfig.obj \
-	prgbind_transactionProgram.obj \
-	prgbind_normalizeProgram.obj \
-	prgbind_ddlProgram.obj \
-	prgbind_programLibrary.obj \
 	jobScheduler.obj \
 	acceptorSocket.obj \
 	acceptorSSL.obj \
 	connectionTypeSocket.obj \
 	connectionTypeSSL.obj \
 	serverConfig.obj \
+	loggerConfig.obj \
 	server.obj
 
 !IFDEF WITH_SSL
@@ -93,6 +111,7 @@ all: dependencies $(CPP_OBJS) $(CPP_BINS)
 
 dependencies:
 	@cd libwolframe & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwfsingleton & $(MAKE) /nologo /f Makefile.w32 all
 	@cd libwolframe_serialize & $(MAKE) /nologo /f Makefile.w32 all
 	@cd libwolframe_database & $(MAKE) /nologo /f Makefile.w32 all
 	@cd libwolframe_langbind & $(MAKE) /nologo /f Makefile.w32 all
@@ -100,9 +119,9 @@ dependencies:
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 modules: libwolframe
-wolframed.exe: wolframed.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
-wolfilter.exe: wolfilter.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
-wolfwizard.exe: wolfwizard.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
+wolframed.exe: wolframed.obj $(CPP_OBJS) libwfsingleton\logger\wolframemsg.res
+wolfilter.exe: wolfilter.obj $(CPP_OBJS) libwfsingleton\logger\wolframemsg.res
+wolfwizard.exe: wolfwizard.obj $(CPP_OBJS) libwfsingleton\logger\wolframemsg.res
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $?
@@ -112,53 +131,54 @@ local_all: $(LOCAL_STATIC_LIB)
 local_clean:
 	@-erase $(LOCAL_STATIC_LIB) 2>NUL
 	@-erase $(CPP_OBJS) 2>NUL
-	@-erase test.bat 2>NUL
 
 local_distclean:
 
 local_test:
 
 copy_prereq:
+	@-copy libwfsingleton\wfsingleton.dll . >NUL
 !IFDEF WITH_SSL
-	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
-	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >NUL
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >NUL
 !ENDIF
 !IFDEF WITH_LUA
-	@-copy ..\lua\src\lua52.dll .
+	@-copy ..\3rdParty\lua\src\lua52.dll . >NUL
 !ENDIF
 !IFDEF WITH_PGSQL
-	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" . >NUL
 !IFDEF PGDLL_WITH_I18N
-	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" .
-	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" .
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" . >NUL
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" . >NUL
 !ENDIF
+!ENDIF
+!IFDEF WITH_ORACLE
+	@-copy "$(ORACLE_DIR)\*.dll" .  >NUL
 !ENDIF
 !IFDEF WITH_LIBXML2
-	@-copy "$(WIN_ICONV_DIR)\iconv.dll" .
-	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" .
+	@-copy "$(ZLIB_DIR)\bin\zlib1.dll" . >NUL
+	@-copy "$(ICONV_DIR)\bin\iconv.dll" . >NUL
+	@-copy "$(LIBXML2_DIR)\bin\libxml2.dll" . >NUL
 !ENDIF
 !IFDEF WITH_LIBXSLT
-	@-copy "$(LIBXSLT_DIR)\lib\libxslt.dll" .
+	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" . >NUL
 !ENDIF
 !IFDEF WITH_ICU
 !IFNDEF DEBUG
-	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" .
-	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" .
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" . >NUL
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" . >NUL
 !ELSE
-	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" .
-	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" .
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" . >NUL
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" . >NUL
 !ENDIF
 !ENDIF
 
 run: copy_prereq
-	@-echo echo Running the Wolframe server... > test.bat
-	@-echo wolframed.exe -c wolframe.xml >> test.bat
-	@-test.bat
+	@-echo Running the Wolframe server...
+	@-wolframed.exe -c wolframe.xml
 
 check: copy_prereq
-	@-echo wolframed.exe -c wolframe.xml -t > test.bat
-	@-test.bat
+	@-wolframed.exe -c wolframe.xml -t
 
 print: copy_prereq
-	@-echo wolframed.exe -c wolframe.xml -p > test.bat
-	@-test.bat
+	@-wolframed.exe -c wolframe.xml -p

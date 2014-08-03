@@ -29,24 +29,21 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file dotnetRuntimeEnvironmentConfig.hpp
-//\brief Interface .NET runtime environment configuration
+///\file dotnetRuntimeEnvironmentConfig.hpp
+///\brief Interface .NET runtime environment configuration
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "module/moduleInterface.hpp"
-#include <boost/property_tree/ptree.hpp>
+#include "processor/procProviderInterface.hpp"
+#include "processor/execContext.hpp"
 #include <string>
 #include <map>
 
 namespace _Wolframe {
-namespace proc {
-	//\brief Forward declaration
-	class ProcessorProvider;
-}
 namespace module {
 
-//\brief Named configuration definition
+///\brief Named configuration definition
 class DotnetRuntimeEnvironmentConfig
 	:public config::NamedConfiguration
 {
@@ -69,18 +66,18 @@ public:
 		,m_className(className_){}
 	virtual ~DotnetRuntimeEnvironmentConfig(){}
 
-	//\brief Parse the configuration
-	//\param[in] pt configuration tree
-	//\param[in] modules module directory
-	virtual bool parse( const config::ConfigurationTree& pt, const std::string&, const ModulesDirectory* modules);
+	///\brief Parse the configuration
+	///\param[in] pt configuration tree
+	///\param[in] modules module directory
+	virtual bool parse( const config::ConfigurationNode& pt, const std::string&, const ModulesDirectory* modules);
 
-	//\brief Set canonical path for files referenced as relative path in configuration
-	//\param[in] referencePath reference path
+	///\brief Set canonical path for files referenced as relative path in configuration
+	///\param[in] referencePath reference path
 	virtual void setCanonicalPathes( const std::string& referencePath);
 
 	virtual bool check() const;
 
-	virtual bool checkReferences( const proc::ProcessorProvider*) const {return true;}
+	virtual bool checkReferences( const proc::ProcessorProviderInterface*) const {return true;}
 
 	virtual void print( std::ostream& os, size_t indent ) const;
 
@@ -110,6 +107,7 @@ private:
 
 	std::vector<AssemblyDescription> m_assemblylist;
 	const char* m_className;
+	config::ConfigurationTree::Position m_config_pos;
 };
 
 }} //namespace

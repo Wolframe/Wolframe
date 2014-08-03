@@ -12,6 +12,7 @@ LoadModules
 	module ../../src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 }
 Processor
 {
@@ -22,6 +23,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter #FILTER#
 		}
 	}
 }

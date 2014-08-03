@@ -1,50 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PostgreSQL module", "src\modules\database\postgresql\postgresql.vcxproj", "{F22F83DA-6B34-46DC-BB51-2EFB6827B482}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wfsingleton", "src\libwfsingleton\wfsingleton.vcxproj", "{0B431123-760A-BA83-1B9A-5EFCA495493B}"
 	ProjectSection(ProjectDependencies) = postProject
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF} = {C98728D4-70D9-4717-85E7-28DAE67ADCAF}
+		{CA8F5570-94E0-4265-8E81-863633BC727D} = {CA8F5570-94E0-4265-8E81-863633BC727D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwolframe", "src\libwolframe\libwolframe.vcxproj", "{C98728D4-70D9-4717-85E7-28DAE67ADCAF}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLite3 module", "src\modules\database\sqlite3\sqlite3.vcxproj", "{3A01E671-DD01-47DF-84C8-ABCED3A8969B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF} = {C98728D4-70D9-4717-85E7-28DAE67ADCAF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libwolframe", "src\libwolframe\libwolframe.vcxproj", "{CA8F5570-94E0-4265-8E81-863633BC727D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
-		Debug|x64 = Debug|x64
 		Release|Win32 = Release|Win32
-		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F22F83DA-6B34-46DC-BB51-2EFB6827B482}.Debug|Win32.ActiveCfg = Debug|Win32
-		{F22F83DA-6B34-46DC-BB51-2EFB6827B482}.Debug|Win32.Build.0 = Debug|Win32
-		{F22F83DA-6B34-46DC-BB51-2EFB6827B482}.Debug|x64.ActiveCfg = Debug|x64
-		{F22F83DA-6B34-46DC-BB51-2EFB6827B482}.Debug|x64.Build.0 = Debug|x64
-		{F22F83DA-6B34-46DC-BB51-2EFB6827B482}.Release|Win32.ActiveCfg = Release|Win32
-		{F22F83DA-6B34-46DC-BB51-2EFB6827B482}.Release|Win32.Build.0 = Release|Win32
-		{F22F83DA-6B34-46DC-BB51-2EFB6827B482}.Release|x64.ActiveCfg = Release|x64
-		{F22F83DA-6B34-46DC-BB51-2EFB6827B482}.Release|x64.Build.0 = Release|x64
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF}.Debug|Win32.Build.0 = Debug|Win32
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF}.Debug|x64.ActiveCfg = Debug|x64
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF}.Debug|x64.Build.0 = Debug|x64
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF}.Release|Win32.ActiveCfg = Release|Win32
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF}.Release|Win32.Build.0 = Release|Win32
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF}.Release|x64.ActiveCfg = Release|x64
-		{C98728D4-70D9-4717-85E7-28DAE67ADCAF}.Release|x64.Build.0 = Release|x64
-		{3A01E671-DD01-47DF-84C8-ABCED3A8969B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{3A01E671-DD01-47DF-84C8-ABCED3A8969B}.Debug|Win32.Build.0 = Debug|Win32
-		{3A01E671-DD01-47DF-84C8-ABCED3A8969B}.Debug|x64.ActiveCfg = Debug|x64
-		{3A01E671-DD01-47DF-84C8-ABCED3A8969B}.Debug|x64.Build.0 = Debug|x64
-		{3A01E671-DD01-47DF-84C8-ABCED3A8969B}.Release|Win32.ActiveCfg = Release|Win32
-		{3A01E671-DD01-47DF-84C8-ABCED3A8969B}.Release|Win32.Build.0 = Release|Win32
-		{3A01E671-DD01-47DF-84C8-ABCED3A8969B}.Release|x64.ActiveCfg = Release|x64
-		{3A01E671-DD01-47DF-84C8-ABCED3A8969B}.Release|x64.Build.0 = Release|x64
+		{0B431123-760A-BA83-1B9A-5EFCA495493B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0B431123-760A-BA83-1B9A-5EFCA495493B}.Debug|Win32.Build.0 = Debug|Win32
+		{0B431123-760A-BA83-1B9A-5EFCA495493B}.Release|Win32.ActiveCfg = Release|Win32
+		{0B431123-760A-BA83-1B9A-5EFCA495493B}.Release|Win32.Build.0 = Release|Win32
+		{CA8F5570-94E0-4265-8E81-863633BC727D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CA8F5570-94E0-4265-8E81-863633BC727D}.Debug|Win32.Build.0 = Debug|Win32
+		{CA8F5570-94E0-4265-8E81-863633BC727D}.Release|Win32.ActiveCfg = Release|Win32
+		{CA8F5570-94E0-4265-8E81-863633BC727D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

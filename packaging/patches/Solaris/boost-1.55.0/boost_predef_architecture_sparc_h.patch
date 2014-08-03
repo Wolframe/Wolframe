@@ -1,0 +1,11 @@
+--- boost_1_55_0-orig/boost/predef/architecture/sparc.h	2013-08-01 05:46:04.000000000 +0200
++++ boost_1_55_0/boost/predef/architecture/sparc.h	2014-04-27 09:45:36.433197000 +0200
+@@ -37,7 +37,7 @@
+ #   if !defined(BOOST_ARCH_SPARC) &&  defined(__sparcv8)
+ #       define BOOST_ARCH_SPARC BOOST_VERSION_NUMBER(8,0,0)
+ #   endif
+-#   if !defined(BOOST_ARCH_SPARC) &&
++#   if !defined(BOOST_ARCH_SPARC)
+ #       define BOOST_ARCH_SPARC BOOST_VERSION_NUMBER_AVAILABLE
+ #   endif
+ #endif

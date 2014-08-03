@@ -5,41 +5,41 @@
 **requires:SQLITE3
 **input
 {
-  "transactions": {
-    "treeAddRoot": { "name": "Albert" },
-    "treeAddNode": [
-      {
-        "parentid": "1",
-        "name": "Bert"
-      },
-      {
-        "parentid": "1",
-        "name": "Chuck"
-      },
-      {
-        "parentid": "3",
-        "name": "Donna"
-      },
-      {
-        "parentid": "3",
-        "name": "Eddie"
-      },
-      {
-        "parentid": "3",
-        "name": "Fred"
-      }
-    ]
-  }
+	"treeAddRoot": { "name": "Albert" },
+	"treeAddNode": [
+		{
+			"parentid": "1",
+			"name": "Bert"
+		},
+		{
+			"parentid": "1",
+			"name": "Chuck"
+		},
+		{
+			"parentid": "3",
+			"name": "Donna"
+		},
+		{
+			"parentid": "3",
+			"name": "Eddie"
+		},
+		{
+			"parentid": "3",
+			"name": "Fred"
+		}
+	]
 }**config
---input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson -c wolframe.conf run
+--input-filter cjson --output-filter cjson --module ../../src/modules/filter/cjson/mod_filter_cjson --module ../../src/modules/doctype/json/mod_doctype_json -c wolframe.conf run
 
 **file:wolframe.conf
 LoadModules
 {
 	module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../../src/modules/cmdbind/lua/mod_command_lua
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 }
 Database
 {
@@ -61,6 +61,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter cjson
 		}
 	}
 }
@@ -68,16 +69,16 @@ Processor
 int=integer;
 uint=unsigned;
 float=floatingpoint;
-currency=fixedpoint(13,2);
-percent_1=fixedpoint(5,1);
+currency=bigfxp(2);
+percent_1=bigfxp(2);
 **file:script.lua
 function run()
-	filter().empty = false
+	provider.filter().empty = false
 	output:opentag( "result")			-- top level result tag
 	local itr = input:get()
 	for v,t in itr do
 		if t and t ~= "transactions" then	-- top level tag names are the transaction names
-			f = formfunction( t )		-- call the transaction
+			f = provider.formfunction( t )	-- call the transaction
 			output:print( f( itr))		-- print the result
 		end
 	end

@@ -1,0 +1,327 @@
+<title>Building the wolfclient</title>
+		
+<para>
+	The <application>wolfclient</application> is a Qt-based client
+	for the <application>Wolframe</application> server.
+</para>
+
+<para>
+	You build it with:
+	
+	<programlisting language='shell'>
+	qmake -config debug -recursive
+	make
+	make install
+	</programlisting>
+
+	respectively for a release version:
+	
+	<programlisting language='shell'>
+	qmake -config release -recursive
+	make
+	make install
+	</programlisting>
+</para>
+
+<para>
+	<emphasis role="bold">Note</emphasis>: <application>qmake</application>
+	is on some platforms called <application>qmake-qt4</application> or
+	<application>qmake-qt5</application> and may be installed in non-standard
+	locations.
+</para>
+
+<para>
+	<emphasis role="bold">Note</emphasis>: Use <application>gmake</application>
+	instead of <application>make</application> on FreeBSD, NetBSD and Solaris.
+</para>
+
+<para>
+	You can run the unit tests of the client with:
+	<programlisting language='shell'>
+	make test
+	</programlisting>
+</para>
+
+<para>
+	<emphasis role="bold">Note</emphasis>:For the tests to run you need an installed
+	X server and have to set the DISPLAY variable correctly.
+</para>
+
+<para>
+	You can disable the building of SSL-enabled code if you remove the
+	'WITH_SSL=1' definition in the 'DEFINES' directive in
+	<filename>libqtwolfclient/libqtwolfclient.pro</filename>.
+</para>
+
+<para>
+	You need the Qt libarary of the Unix system you are building on.
+	The following list gives Linux distribution respectively Unix
+	specific instructions and lists the required packages.
+</para>
+
+<para>
+	You can use the Qt 4 or 5 version to build the client.
+</para>
+
+<sect3>
+	<title>RedHat/Centos/Scientific Linux 5 and similar Linux distributions</title>
+	
+	<para>
+		The official Qt 4 package is too old, build your own Qt library.
+	</para>
+	
+	<para>
+		For Qt 5 compile your own version of the library.
+	</para>
+</sect3>
+
+<sect3>
+	<title>RedHat/Centos/Scientific Linux 6 and 7 or similar Linux distributions</title>
+	
+	<para>
+		For Qt 4 you need the 'qt4-devel' package.
+	</para>
+
+	<para>
+		For Qt 5 compile your own version of the library.
+	</para>
+</sect3>
+
+<sect3>
+	<title>Fedora 19 and 20 and similar distributions</title>
+	
+	<para>
+		For Qt 4 you need the 'qt4-devel' package.
+	</para>
+	
+	<para>
+		For Qt 5 you need the following packages: 'qt5-qtbase-devel',
+		'qt5-qttools-devel', 'qt5-qttools-static'.
+	</para>
+</sect3>
+
+<sect3>
+	<title>Debian 6 and 7</title>
+	
+	<para>
+		For Qt 4 you need the 'libqt4-dev' package.
+	</para>	
+
+	<para>
+		For Qt 5 compile your own version of the library.
+	</para>
+</sect3>
+
+<sect3>
+	<title>Ubuntu 10.04.1 and 12.04</title>
+	
+	<para>
+		For Qt 4 you need the 'libqt4-dev' package.
+	</para>	
+
+	<para>
+		For Qt 5 compile your own version of the library.
+	</para>
+</sect3>
+
+<sect3>
+	<title>Ubuntu 13.10 and 14.04</title>
+	
+	<para>
+		For Qt 4 you need the 'libqt4-dev' package.
+	</para>	
+
+	<para>
+		For Qt 5 you need the following packages: 'qt5-qmake',
+		'libqt5designer5', 'qtbase5-dev', 'qttools5-dev',
+		'qttools5-dev-tools'.
+	</para>
+</sect3>
+
+<sect3>
+	<title>openSUSE 12.3, SLES and similar Linux distributions</title>		
+	<para>
+		For Qt 4 you need the 'libqt4-devel' package.
+	</para>
+
+	<para>
+		For Qt 5 compile your own version of the library.
+	</para>
+</sect3>
+
+<sect3>
+	<title>openSUSE 13.1</title>		
+	<para>
+		For Qt 4 you need the 'libqt4-devel' package.
+	</para>
+
+	<para>
+		For Qt 5 you need the following packages: 'libqt5-qtbase-devel',
+		'libqt5-qttools-devel'.
+	</para>
+</sect3>
+
+<sect3>
+	<title>ArchLinux</title>
+
+	<para>
+		For Qt 4 you need the 'qt4' package.
+	</para>
+
+	<para>
+		For Qt 5 you need the 'qt5-base' and the 'qt5-tools' package.
+	</para>
+
+</sect3>
+
+<sect3>
+	<title>Slackware</title>
+	
+	<para>
+		For Qt 4 you need the 'qt' package. This package is
+		part of the 'l' package series.
+	</para>
+
+	<para>
+		For Qt 5 compile your own version of the library.
+	</para>
+</sect3>
+
+<sect3>
+	<title>FreeBSD 8 and 9</title>
+
+	<para>
+		For Qt 4 you need the following packages: 'qt4-gui',
+		'qt4-moc', 'qt4-network', 'qt4-designer', 'qt4-rcc',
+		'qt4-uic', 'qt4-qmake', 'qt4-linguist'.
+	</para>
+
+	<para>
+		For Qt 5 compile your own version of the library.
+	</para>
+</sect3>
+
+<sect3>
+	<title>FreeBSD 10</title>
+
+	<para>
+		For Qt 4 you need the following packages: 'qt4-gui',
+		'qt4-moc', 'qt4-network', 'qt4-designer', 'qt4-rcc',
+		'qt4-uic', 'qt4-qmake', 'qt4-linguist'.
+	</para>
+
+	<para>
+		For Qt 5 you need the following packages: 'qt5-gui',
+		'qt5-network', 'qt5-widgets', 'qt5-designer', 'qt5-concurrent',
+		'qt5-uitools', 'qt5-buildtools', 'qt5-qmake', 'qt5-linguisttools'.
+	</para>                   
+</sect3>
+
+<sect3>
+	<title>NetBSD</title>
+	<para>
+		For Qt 4 you need the 'qt4' package.
+	</para>
+	
+	<para>
+		Make sure <filename>/usr/pkg/qt4/bin</filename> and 
+		<filename>/usr/pkg/bin</filename> are part of the path.
+	</para>
+	
+	<para>
+		Also set 'QTDIR' to <filename>/usr/pkg/qt4</filename>.
+	</para>
+	
+	<para>
+		Build the wolfclient with:
+
+		<programlisting language='shell'>
+	qmake -config debug -recursive
+		</programlisting>
+		
+		respectively
+
+		<programlisting language='shell'>
+	qmake -config release -recursive
+		</programlisting>
+		
+	</para>
+	
+	<para>
+		Before compiling apply the following patch command to
+		the generated makefiles:
+		
+		<programlisting language='shell'>
+	find . -name Makefile -exec sh -c \
+		"sed 's/libtool --silent/libtool --silent --tag=CXX/g' {} &gt; x &amp;&amp; mv x {}" \;
+		</programlisting>
+	</para>
+	
+	<para>
+		Now build normally with:
+
+		<programlisting language='shell'>
+	gmake
+	gmake install
+		</programlisting>
+	</para>
+	
+	<para>
+		To run the <application>wolfclient</application> you have
+		currently to set 'LD_LIBRARY_PATH' to <filename>/usr/X11R7/lib</filename>.
+	</para>
+
+	<para>
+		Using Qt 5 for <application>wolfclient</application> is untested.
+	</para>
+</sect3>
+
+<sect3>
+	<title>OpenIndiana 151a8</title>
+	
+	<para>
+		For Qt 4 you need the 'CSWqt4-dev' package (at least version '4.8.5,REV=2013.11.26').
+	</para>
+
+	<para>
+		Using Qt 5 for <application>wolfclient</application> is untested.
+	</para>
+</sect3>			
+
+<sect3>
+	<title>Solaris 10</title>
+	
+	<para>
+		For Qt 4 you need the 'CSWqt4-dev' package (at least version '4.8.5,REV=2013.11.26').
+	</para>
+	
+	<para>
+		Before compiling apply the following patch command to
+		the generated makefiles:
+		
+		<programlisting language='shell'>
+	for i in `find . -name Makefile`; do \
+		sed 's|-Wl,-rpath|-Wl,-R|g' $i > /tmp/x; mv -f /tmp/x $i; \
+	done
+		</programlisting>
+		
+		This is because we should use <application>/usr/css/bin/ld</application>
+		as linker and this one unterstands only '-R' and not '-rpath'.
+	</para>
+	
+	<para>
+		Now build normally with:
+
+		<programlisting language='shell'>
+	gmake
+	gmake install
+		</programlisting>
+	</para>
+
+	<para>
+		Using Qt 5 for <application>wolfclient</application> is untested.
+	</para>
+</sect3>
+
+
+

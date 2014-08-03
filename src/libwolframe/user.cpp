@@ -30,33 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
+///
 /// \file user.cpp
-//
-//
 
-#include <string>
-#include <AAAA/user.hpp>
+#include "AAAA/user.hpp"
 
-using namespace _Wolframe::AAAA;
+namespace _Wolframe	{
+namespace AAAA	{
 
+}} // namespace _Wolframe::AAAA
 
-/// User object destructor.
-/// This function will overwrite the data in the User structure.
-User::~User()
-{
-	std::size_t i;
-	char* cptr;
-	time_t* tptr;
-
-	for ( i = 0, cptr = const_cast< char* >( m_authenticator.c_str() );
-	      i < m_authenticator.length(); i++, cptr++ )
-		*cptr = 'x';
-	tptr = const_cast< time_t* >( &m_loginTime ); *tptr = 0;
-
-	for ( i = 0, cptr = const_cast< char* >( m_uname.c_str() );
-	      i < m_uname.length(); i++, cptr++ )
-		*cptr = 'x';
-	for ( i = 0, cptr = const_cast< char* >( m_name.c_str() );
-	      i < m_name.length(); i++, cptr++ )
-		*cptr = 'x';
-}

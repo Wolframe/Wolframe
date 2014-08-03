@@ -32,42 +32,11 @@
 ************************************************************************/
 ///\file mod_command_python.cpp
 ///\brief Module for command handler executing python code
-#include "module/programTypeBuilder.hpp"
+#include "appdevel/programTypeModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "pythonFunctionProgramType.hpp"
-#include "logger-v1.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-
-/* LATER
-static ConfiguredBuilder* createPythonCommandHandler()
-{
-	static ScriptCommandHandlerBuilder<cmdbind::PythonCommandHandler>
-		mod( "PythonCommandHandler", "command handler for Python scripts", "cmdhandler", "python", "PythonCommandHandler");
-	return &mod;
-}
-*/
-
-static SimpleBuilder* pythonProgramTypeBuilder()
-{
-	return new ProgramTypeBuilder( "PythonProgramType", "pythonformfunc", langbind::createPythonProgramType);
-}
-
-enum {NofConfiguredBuilder=0};
-/* LATER
-static ConfiguredBuilder* (*configuredBuilder[ NofConfiguredBuilder])() =
-{
-	createPythonCommandHandler
-};
-*/
-enum {NofSimpleBuilder=1};
-static SimpleBuilder* (*simpleBuilder[ NofSimpleBuilder])() =
-{
-	pythonProgramTypeBuilder
-};
-
-ModuleEntryPoint entryPoint( 0, "command handler and form function handler for Python",
-				NofConfiguredBuilder, 0, /* configuredBuilder, */
-				NofSimpleBuilder, simpleBuilder);
-
+WF_MODULE_BEGIN( "Python", "python program module")
+ WF_PROGRAM_TYPE( "Python", _Wolframe::langbind::PythonProgramType)
+WF_MODULE_END
 

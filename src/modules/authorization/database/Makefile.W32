@@ -17,7 +17,10 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
+
 
 DYNAMIC_MODULE = \
 	mod_authz_database.dll
@@ -25,15 +28,14 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	DBauthzConfig.obj \
 	DBauthzConstructor.obj \
-	DBauthz.obj \
-	DBauthzModule.obj
+	DBauthz.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:DBauthzModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:mod_authz_database.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

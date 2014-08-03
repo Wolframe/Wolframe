@@ -8,7 +8,9 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR) \
 	$(SQLITE3_LIB_DIRS)
 
@@ -19,7 +21,9 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
+	-lwolframe_serialize \
 	-lwolframe_database \
+	-lwolframe_langbind \
 	-lboost_filesystem \
 	$(SQLITE3_LIBS)
 
@@ -29,11 +33,8 @@ DYNAMIC_MODULE = mod_db_sqlite3.so
 
 CPP_OBJS = \
 	SQLite.o \
-	SQLiteConstructor.o \
 	SQLiteConfig.o \
 	SQLiteTransactionExecStatemachine.o \
-	SQLiteProgram.o \
-	SQLiteModule.o \
 	SQLiteStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

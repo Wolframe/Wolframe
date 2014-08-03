@@ -1,7 +1,7 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
 # Maintainer: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe
-pkgver=0.0.1
+pkgver=0.0.2
 pkgrel=2
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
@@ -11,11 +11,11 @@ depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl'
          'sqlite' 'postgresql-libs' 'libxml2' 'libxslt' 'libpng' 'zlib'
          'python')
 makedepends=()
+checkdepends=('expect' 'inetutils' 'diffutils')
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(
   "${pkgname}_${pkgver}.tar.gz"
-  'wolframe.conf'
   'wolframed.service'
 )
 
@@ -33,12 +33,25 @@ package() {
     sysconfdir=/etc \
     install
 
-  install -D -m644 ${srcdir}/wolframe.conf \
-    ${pkgdir}/etc/wolframe/wolframe.conf
   install -D -m644 ${srcdir}/wolframed.service \
     ${pkgdir}/usr/lib/systemd/system/wolframed.service
   install -d -m775 -g nobody -o nobody \
     ${pkgdir}/var/log/wolframe
+}
+
+check() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+
+  msg "Testing..."
+  make test \
+    WITH_SSL=1 WITH_EXPECT=1 WITH_PAM=1 WITH_SASL=1 \
+    WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
+    WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
+    WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
+    WITH_TEXTWOLF=1 RELEASE=1 \
+    DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
+    RELEASE=1 \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,--enable-new-dtags
 }
 
 build() {
@@ -52,8 +65,8 @@ build() {
     WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
     WITH_TEXTWOLF=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
-    CFLAGS='-O2' CXXFLAGS='-O2' \
-    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
+    RELEASE=1 \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,--enable-new-dtags
 
   msg "Generating dependencies..."
   make depend \
@@ -63,8 +76,8 @@ build() {
     WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
     WITH_TEXTWOLF=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
-    CFLAGS='-O2' CXXFLAGS='-O2' \
-    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
+    RELEASE=1 \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,--enable-new-dtags
 
   msg "Building..."
   make \
@@ -74,6 +87,6 @@ build() {
     WITH_LOCAL_FREEIMAGE=1 WITH_PYTHON=1 WITH_CJSON=1 \
     WITH_TEXTWOLF=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
-    CFLAGS='-O2' CXXFLAGS='-O2' \
-    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
+    RELEASE=1 \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,--enable-new-dtags
 }

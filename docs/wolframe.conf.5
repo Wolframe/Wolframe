@@ -2,12 +2,12 @@
 .\"     Title: wolframe
 .\"    Author:  <contact@wolframe.net>
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 02/20/2014
+.\"      Date: 07/24/2014
 .\"    Manual: Wolframe User Manual
 .\"    Source: wolframe.conf
 .\"  Language: English
 .\"
-.TH "WOLFRAME" "5" "02/20/2014" "wolframe.conf" "Wolframe User Manual"
+.TH "WOLFRAME" "5" "07/24/2014" "wolframe.conf" "Wolframe User Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -34,7 +34,16 @@ wolframe.conf \- Wolframe server configuration file
 \fB/etc/wolframe/wolframe\&.conf\fR
 .SH "DESCRIPTION"
 .PP
-This manual page documents briefly the configuration option of the Wolframe system\&.
+This manual page documents briefly the configuration options of the Wolframe system\&.
+.SH "OPTIONS"
+.PP
+The configuration of the wolframe daemon or service is separated into sections\&. Some sections like \*(AqLoadModules\*(Aq always exist, others only exist if a module has been loaded\&.
+.PP
+We describe here only the standard settings which exist when no modules are loaded\&.
+.PP
+Check out the manpages of the wolframe modules
+\fBwolframe-mod_XXXX\fR(5)
+to see the available options in \*(Aqwolframe\&.conf\*(Aq when this module is loaded\&.
 .SS "Global configuration options"
 .PP
 \fBServerSignature\fR
@@ -73,35 +82,31 @@ Revision
 Print major, minor and revision of Wolframe\&.
 .RE
 .PP
+Build
+.RS 4
+Print major, minor, revision and build of Wolframe\&.
+.RE
+.PP
 OS
 .RS 4
 Print all information, including the operating system Wolframe is running on\&.
 .RE
 .sp
 .RE
-.SH "OPTIONS"
-.PP
-The configuration of the wolframe daemon or service is separated into sections\&. Some sections like \*(AqLoadModules\*(Aq always exist, others only exist if a module has been loaded\&.
-.PP
-We describe here only the standard settings which exist when no modules are loaded\&.
-.PP
-Check out the manpages of the wolframe modules
-\fBwolframe-module-XXXX\fR(5)
-to see the available options in \*(Aqwolframe\&.conf\*(Aq when this module is loaded\&.
 .SS "LoadModules"
 .PP
 The \*(AqLoadModules\*(Aq section contains directives to extend the system with loadable modules\&. Those can be new database modules, new scripting languages, document filters and processors, authentication/authorization/audit modules and other 3rdParty bindings, etc\&.
 .PP
 The following directives are valid in this section:
 .PP
-\fBdirectory \fR\fB\fImodule_directory\fR\fR
+\fBDirectory \fR\fB\fImodule_directory\fR\fR
 .RS 4
 Load modules from directory
 \fImodule_directory\fR
 instead of searching for modules in the standard system module directory of Wolframe\&.
 .RE
 .PP
-\fBmodule \fR\fB\fImodule_name\fR\fR
+\fBModule \fR\fB\fImodule_name\fR\fR
 .RS 4
 Load module
 \fImodule_name\fR\&. Note: You don\*(Aqt have to specify the module extension like \*(Aq\&.so\*(Aq\&.
@@ -112,15 +117,15 @@ can contain a relative path\&. The module path is always caculated relatively to
 \fImodule_directory\fR
 or to the default installation path for Wolframe modules\&.
 .RE
-.SS "logging"
+.SS "Logging"
 .PP
-In the \*(Aqlogging\*(Aq section you can configure ways of the Wolframe server to log\&.
+In the \*(AqLogging\*(Aq section you can configure ways of the Wolframe server to log\&.
 .PP
-There are logging channels named \*(Aq\fBstderr\fR\*(Aq (for foreground mode only!), \*(Aq\fBlogFile\fR\*(Aq to log to a simple text file and \*(Aq\fBsyslog\fR\*(Aq to log to the system log\&.
+There are logging channels named \*(Aq\fBStderr\fR\*(Aq (for foreground mode only!), \*(Aq\fBlogFile\fR\*(Aq to log to a simple text file and \*(Aq\fBsyslog\fR\*(Aq to log to the system log\&.
 .PP
 The following directives are valid in this section:
 .PP
-\fBlevel \fR\fB\fIlog_level\fR\fR
+\fBLevel \fR\fB\fIlog_level\fR\fR
 .RS 4
 Log only messages up to the level
 \fIlog_level\fR\&. Possible log levels are \*(AqFATAL\*(Aq, \*(AqALERT\*(Aq, \*(AqCRITICAL\*(Aq, \*(AqSEVERE\*(Aq, \*(AqERROR\*(Aq, \*(AqWARNING\*(Aq, \*(AqNOTICE\*(Aq, \*(AqINFO, \*(AqDEBUG\*(Aq, \*(AqTRACE\*(Aq, \*(AqDATA\*(Aq or \*(AqDATA2\*(Aq\&.
@@ -128,18 +133,18 @@ Log only messages up to the level
 Note: This is the only directive which must be understood by all logging channels\&.
 .RE
 .PP
-\fBfilename (logFile) \fR\fB\fIfile_name\fR\fR
+\fBFilename (logFile) \fR\fB\fIfile_name\fR\fR
 .RS 4
 Write log message to the file denoted by
 \fIfile_name\fR\&.
 .RE
 .PP
-\fBident (syslog) \fR\fB\fIident\fR\fR
+\fBIdent (syslog) \fR\fB\fIident\fR\fR
 .RS 4
 The syslog identifier to tag the log entries with\&.
 .RE
 .PP
-\fBfacility (syslog) \fR\fB\fIident\fR\fR
+\fBFacility (syslog) \fR\fB\fIident\fR\fR
 .RS 4
 The syslog facility to tag the log entries with\&. Usual facilities are \*(AqLOCAL0\*(Aq to \*(AqLOCAL7\*(Aq, \*(AqUSER\*(Aq, \*(AqDAEMON\*(Aq or similar\&.
 .sp
@@ -147,72 +152,72 @@ Consult the
 \fBopenlog\fR(3)
 man page to see what facilities are available on your system\&.
 .RE
-.SS "listen"
+.SS "Listen"
 .PP
-The \*(Aqlisten\*(Aq section deals with network settings\&.
+The \*(AqListen\*(Aq section deals with network settings\&.
 .PP
-You can choose between a plain socket with the \*(Aq\fBsocket\fR\*(Aq directive or an encrypted socket with \*(Aq\fBSSLsocket\fR\*(Aq\&.
+You can choose between a plain socket with the \*(Aq\fBSocket\fR\*(Aq directive or an encrypted socket with \*(Aq\fBSSLSocket\fR\*(Aq\&.
 .PP
-Note: \*(Aqname\*(Aq, \*(Aqaddress\*(Aq, \*(Aqport\*(Aq and \*(AqmaxConnections\*(Aq are common directives for both plain and encrypted sockets\&.
+Note: \*(AqName\*(Aq, \*(AqAddress\*(Aq, \*(AqPort\*(Aq and \*(AqMaxConnections\*(Aq are common directives for both plain and encrypted sockets\&.
 .PP
 The following directives are valid in this section:
 .PP
-\fBmaxConnections \fR\fB\fImax_connections\fR\fR
+\fBMaxConnections \fR\fB\fImax_connections\fR\fR
 .RS 4
 Maximum number of simultaneous connections\&. This limits the number of clients which can use the server in parallel\&. If \*(Aq0\*(Aq is specified for
 \fImax_connections\fR
 or if the directive is absent, an operating system default is choosen\&.
 .RE
 .PP
-\fBthreads \fR\fB\fImax_threads\fR\fR
+\fBThreads \fR\fB\fImax_threads\fR\fR
 .RS 4
 Size of the pool of threads serving client connections\&. The default for
 \fImax_threads\fR
 is 4\&.
 .RE
 .PP
-\fBaddress \fR\fB\fIip_address\fR\fR
+\fBAddress \fR\fB\fIip_address\fR\fR
 .RS 4
 IP address the server should listen to incoming connections\&.
 \fIip_address\fR
 is a valid IPv4 or IPv6 address\&. \*(Aq*\*(Aq denotes any address\&. \*(Aq0\&.0\&.0\&.0\*(Aq any IPv4 address\&. \*(Aq:::*\*(Aq any IPv6 address\&. \*(Aq127\&.0\&.0\&.1\*(Aq and \*(Aq::1\*(Aq denote the local loopback interface for IPv4 respectively IPv6\&.
 .RE
 .PP
-\fBport \fR\fB\fIport\fR\fR
+\fBPort \fR\fB\fIport\fR\fR
 .RS 4
 Defines the port where the server listens on\&. We usually set
 \fIport\fR
 to 7661 for unencrypted connections and 7961 for encrypted connections\&.
 .RE
 .PP
-\fBname "\fR\fB\fIinterface_name\fR\fR\fB"\fR
+\fBName "\fR\fB\fIinterface_name\fR\fR\fB"\fR
 .RS 4
 You can give interfaces a name, so they can be identified as group (for instance in authentication, autorization, auditing)\&. Naming interfaces is not required\&.
 .RE
 .PP
-\fBmaxConnections \fR\fB\fImax_connections\fR\fR
+\fBMaxConnections \fR\fB\fImax_connections\fR\fR
 .RS 4
 Sets the maximum number of simultaneous connections locally for this interface\&.
 .RE
 .PP
-\fBcertificate \fR\fB\fIserver\&.crt\fR\fR
+\fBCertificate \fR\fB\fIserver\&.crt\fR\fR
 .RS 4
 The server certificate to use for encrypted connections\&. The format of the certificate is excepted to be
 PEM\&.
 .RE
 .PP
-\fBcertificate \fR\fB\fIserver\&.key\fR\fR
+\fBCertificate \fR\fB\fIserver\&.key\fR\fR
 .RS 4
 The server key to use for encrypted connections\&. The format of the key is excepted to be
 PEM\&.
 .RE
 .PP
-\fBCAdirectory \fR\fB\fICA_directory\fR\fR
+\fBCADirectory \fR\fB\fICA_directory\fR\fR
 .RS 4
 A directory holding CA certificate files\&.
 .RE
 .PP
-\fBCAchainFile \fR\fB\fIchain_file\fR\fR
+\fBCAChainFile \fR\fB\fIchain_file\fR\fR
 .RS 4
 The
 \fIchain_file\fR
@@ -222,29 +227,29 @@ has to be
 PEM\&.
 .RE
 .PP
-\fBverify\fR \fION\fR | \fIOFF\fR
+\fBVerify\fR \fIOn\fR | \fIOff\fR
 .RS 4
 If switched on the server requires the client to send a valid client certificate which is checked by the server\&.
 .RE
-.SS "daemon"
+.SS "Daemon"
 .PP
-The \*(Aqdaemon\*(Aq section sets the behaviour of the Wolframe server as a Unix daemon\&.
+The \*(AqDaemon\*(Aq section sets the behaviour of the Wolframe server as a Unix daemon\&.
 .PP
 The following directives are valid in this section:
 .PP
-\fBuser \fR\fB\fIuser\fR\fR
+\fBUser \fR\fB\fIuser\fR\fR
 .RS 4
 Run the Wolframe daemon under permissions of the Unix user
 \fIuser\fR\&.
 .RE
 .PP
-\fBgroup \fR\fB\fIgroup\fR\fR
+\fBGroup \fR\fB\fIgroup\fR\fR
 .RS 4
 Run the Wolframe daemon under permissions of the Unix group
 \fIgroup\fR\&.
 .RE
 .PP
-\fBpidFile \fR\fB\fIpid_file\fR\fR
+\fBPidFile \fR\fB\fIpid_file\fR\fR
 .RS 4
 Where to store the PID daemon lock file\&. Note that
 \fIpid_file\fR
@@ -252,6 +257,24 @@ must be in a location with enough rights for the
 \fIuser\fR
 to create the PID file!
 .RE
+.SS "Database"
+.PP
+The \*(AqDatabase\*(Aq section configures databases which can be used in programs, the AAAA layer, etc\&.
+.PP
+Each database module registers itself with a new section name, for instance the \*(Aqmod_db_sqlite3\&.so\*(Aq module registers a new section named
+\fBSQLite\fR\&.
+.PP
+One parameter is supported for all database sections:
+.PP
+\fBIdentifier \fR\fB\fIidentifier\fR\fR
+.RS 4
+Register the configured database connection with name
+\fIidentifier\fR\&. You can later reference it by that name when an identifier of a database connection is needed\&. This parameter is required\&.
+.RE
+.PP
+Check out the manpages named
+\fBwolframe-mod_db_XXXX\fR(5)
+of the specific database module you want to use for a list of database specific options\&.
 .SH "BUGS"
 .PP
 Find issues and bugs on

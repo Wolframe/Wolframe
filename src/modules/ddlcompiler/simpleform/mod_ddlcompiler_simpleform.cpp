@@ -32,28 +32,11 @@
 ************************************************************************/
 ///\file modules/ddlcompiler/mod_ddlcompiler_simpleform.cpp
 ///\brief Module for testing form functions
-#include "module/ddlcompilerBuilder.hpp"
+#include "appdevel/ddlCompilerModuleMacros.hpp"
+#include "appdevel/moduleFrameMacros.hpp"
 #include "simpleFormCompiler.hpp"
-#include "logger-v1.hpp"
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-
-namespace {
-struct SimpleformDDLCompiler
-{
-	static SimpleBuilder* constructor()
-	{
-		return new DDLCompilerBuilder( "langbind::SimpleFormCompiler", "simpleform", langbind::createSimpleFormCompilerFunc);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	SimpleformDDLCompiler::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "simple form DDL compiler", 0, 0, NofObjects, objdef);
+WF_MODULE_BEGIN( "SimpleformCompiler", "compiler for the simpleform language (DDL)")
+ WF_DDLCOMPILER( "simpleform", _Wolframe::langbind::SimpleFormCompiler)
+WF_MODULE_END
 

@@ -31,13 +31,14 @@
 
 ************************************************************************/
 ///\file testArrayDoublingAllocator.cpp
-///\brief test program for Array Doubling Allocator (types/allocators.hpp)
+///\brief test program for Array Doubling Allocator (utils/allocators.hpp)
 
 #include "gtest/gtest.h"
-#include "types/allocators.hpp"
+#include "wtest/testReport.hpp"
+#include "utils/allocators.hpp"
 
 using namespace _Wolframe;
-using namespace _Wolframe::types;
+using namespace _Wolframe::utils;
 
 TEST( ArrayDoublingAllocator, tests )
 {
@@ -56,7 +57,7 @@ TEST( ArrayDoublingAllocator, tests )
 		char* ptr = (char*)mem.base() + pp[ii];
 		for (int kk=0; kk<size[ii]; ++kk)
 		{
-			ASSERT_EQ (ptr[kk], ('A' + ii));
+			ASSERT_EQ ((std::size_t)ptr[kk], ('A' + ii));
 		}
 	}
 	SUCCEED();
@@ -64,6 +65,7 @@ TEST( ArrayDoublingAllocator, tests )
 
 int main( int argc, char **argv )
 {
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS( );
 }

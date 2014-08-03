@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EmployeeList</class>
+ <widget class="QWidget" name="EmployeeList">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>655</width>
+    <height>365</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Employee List</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="1">
+    <widget class="QGroupBox" name="horizontalGroupBox">
+     <layout class="QHBoxLayout" name="navigate">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="NavAddEmployee">
+        <property name="text">
+         <string>Add</string>
+        </property>
+        <property name="form" stdset="0">
+         <string>addEmployee</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="NavDeleteEmployee">
+        <property name="text">
+         <string>Delete</string>
+        </property>
+        <property name="form" stdset="0">
+         <string>listEmployee</string>
+        </property>
+        <property name="action" stdset="0">
+         <string notr="true">DeleteEmployee employee {id={employee.selected}}</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="NavEditEmployee">
+        <property name="text">
+         <string>Edit</string>
+        </property>
+        <property name="form" stdset="0">
+         <string>editEmployee?id={employee.selected}</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="NavMainBenu">
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+        <property name="form" stdset="0">
+         <string>init</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QTreeWidget" name="employee">
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <property name="action" stdset="0">
+      <string>ListEmployee employee {}</string>
+     </property>
+     <property name="dataslot" stdset="0">
+      <string>listEmployee</string>
+     </property>
+     <property name="answer" stdset="0">
+      <string>EmployeeListResult employees {employee[] {id={row.id}; name{{row.name}}; status{{row.status}}; addr_line1{{row.addr_line1}}; addr_line2{{row.addr_line2}}; addr_postalcode{{row.addr_postalcode}}; addr_district{{row.addr_district}}; addr_country{{row.addr_country}}}}</string>
+     </property>
+     <column>
+      <property name="text">
+       <string>name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>status</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_line1</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_line2</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_postalcode</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_district</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>addr_country</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

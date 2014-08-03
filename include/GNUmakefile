@@ -8,10 +8,10 @@ local_clean:
 
 INCLUDE_SUBDIRS = \
 	. \
-	langbind protocol cmdbind database config \
+	langbind cmdbind database database/vm config \
 	logger utils serialize serialize/struct \
 	serialize/ddl processor filter types AAAA module \
-	prgbind crypto
+	prgbind crypto system appdevel appdevel/module
 
 local_install:
 	for d in $(INCLUDE_SUBDIRS); do \

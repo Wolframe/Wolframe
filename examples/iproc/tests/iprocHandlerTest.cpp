@@ -37,16 +37,17 @@
 #include "system/connectionHandler.hpp"
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
-#include "langbind/appObjects.hpp"
 #include "processor/procProvider.hpp"
 #include "module/moduleDirectory.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "config/ConfigurationTree.hpp"
+#include "config/configurationTree.hpp"
 #include "wtest/testHandlerTemplates.hpp"
 #include "testUtils.hpp"
 #include "utils/fileUtils.hpp"
+#include "logger-v1.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testModules.hpp"
+#include "wtest/testReport.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>
@@ -66,7 +67,7 @@ static boost::filesystem::path g_referencePath;
 static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const std::string& script)
 {
 	boost::shared_ptr<proc::ProcProviderConfig> rt( new proc::ProcProviderConfig());
-	boost::property_tree::ptree proccfg;
+	config::ConfigurationNode proccfg;
 	std::vector<std::pair<std::string,std::string> >
 		cmdhl = g_modulesDirectory->getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
 
@@ -96,12 +97,12 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 	{
 		throw std::runtime_error( std::string( "no command handler module loaded that matches to scripts selected (") + cmdhndname + ")");
 	}
-	boost::property_tree::ptree programcfg,cmdhlcfg;
-	programcfg.add_child( "program", boost::property_tree::ptree( script));
+	config::ConfigurationNode programcfg,cmdhlcfg;
+	programcfg.add_child( "program", types::PropertyTree::Node( script));
 	cmdhlcfg.add_child( cfgid.second, programcfg);
 	proccfg.add_child( cfgid.first, cmdhlcfg);
 
-	if (!rt->parse( (const config::ConfigurationTree&)proccfg, std::string(""), g_modulesDirectory))
+	if (!rt->parse( proccfg, std::string(""), g_modulesDirectory))
 	{
 		throw std::runtime_error( "error in test configuration");
 	}
@@ -112,6 +113,7 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const boost::shared_ptr<proc::ProcProviderConfig>& cfg, prgbind::ProgramLibrary* prglib)
 {
 	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory, prglib));
+	rt->loadPrograms();	
 	return rt;
 }
 
@@ -262,10 +264,12 @@ class IProcHandlerTest : public ::testing::Test
 public:
 	std::string m_input;
 	std::string m_expected;
-	net::LocalTCPendpoint ep;
+	net::LocalEndpointR ep;
 	boost::shared_ptr<proc::ProcessorProvider> m_provider;
 	boost::shared_ptr<iproc::Connection> m_connection;
 	IProcTestConfiguration m_config;
+	boost::shared_ptr<proc::ExecContext> m_execContext;
+
 	enum
 	{
 		EoDBufferSize=4,
@@ -273,7 +277,7 @@ public:
 	};
 protected:
 	IProcHandlerTest()
-		:ep( "127.0.0.1", 12345)
+		:ep( new net::LocalTCPendpoint( "127.0.0.1", 12345))
 		,m_config(
 			g_testdir / "scripts/test_echo_char.lua",
 			TestDescription().inputBufferSize + EoDBufferSize,
@@ -289,7 +293,8 @@ protected:
 		TestDescription test;
 		m_provider = getProcProvider( m_config.providerConfig(), m_config.prglib());
 		m_connection.reset( new iproc::Connection( ep, &m_config));
-		m_connection->setProcessorProvider( m_provider.get());
+		m_execContext.reset( new proc::ExecContext( m_provider.get(), 0));
+		m_connection->setExecContext( m_execContext.get());
 
 		m_input.clear();
 		m_expected.clear();
@@ -395,8 +400,8 @@ int main( int argc, char **argv )
 	g_referencePath = g_testdir / "temp";
 	std::string topdir = g_testdir.parent_path().parent_path().parent_path().string();
 
-	g_modulesDirectory = new module::ModulesDirectory();
-	if (!LoadModules( *g_modulesDirectory, wtest::getTestModuleList( topdir)))
+	g_modulesDirectory = new module::ModulesDirectory( g_testdir.string());
+	if (!g_modulesDirectory->loadModules( wtest::getTestModuleList( topdir)))
 	{
 		std::cerr << "failed to load modules" << std::endl;
 		return 2;
@@ -412,6 +417,7 @@ int main( int argc, char **argv )
 	boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
 
 	wtest::Data::createDataDir( "temp", g_gtest_ARGV[0]);
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
 	return RUN_ALL_TESTS();

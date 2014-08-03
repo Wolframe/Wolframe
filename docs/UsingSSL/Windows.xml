@@ -1,0 +1,65 @@
+<!-- step 9 -->
+
+<sect1>
+	<title>Step 9 - Delete a customer</title>	
+
+	<para>
+		We want to get rid of customers. For this we have to change little
+		in the <filename>custorms.ui</filename> form: a button "Delete" with
+		the following 'action' property:
+
+		<programlisting language='shell'>
+		CustomerDelete customer {id={customer.selected}}
+		</programlisting>
+		
+		We also want to reload the customer list after deletion. For now we
+		just set add a 'form' property with the value of 'customer',
+		this is the simplest way to reload the list of customers after the deletion:
+	</para>
+
+	<screenshot>
+		<screeninfo>Step 9 customers, delete button</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step9_customers_delete_button.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step9_customers_delete_button.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
+
+	<para>
+		We add another map for the 'CustomerDelete' request in <filename>tutorial.dmap</filename>:
+
+	<programlisting language='shell'>
+	COMMAND CustomerDelete CALL DeleteCustomer;
+	</programlisting>
+	
+		We also add a new form 'CustomerDelete' to the simpleform file <filename>Customer.sfrm</filename>
+		which allows us only the specify an 'id' attribute of the customer to delete:
+
+	<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerDelete.sfrm" parse="text" />
+	</programlisting>
+	
+		Finally we add the implementation of the delete transaction
+		in <filename>Customer.tdl</filename>:
+
+	<programlisting language='sql'>
+	TRANSACTION DeleteCustomer
+	BEGIN
+		DO DELETE FROM Customer WHERE id=$(id);
+	END
+	</programlisting>
+	
+		Executing the request we see in the wolfclient debug output:
+
+	<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerDelete.xml" parse="text" />
+	</programlisting>
+
+		Seems ok, customer gone. :-)
+	</para>
+
+</sect1>

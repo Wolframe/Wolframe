@@ -29,67 +29,65 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/filterbase.hpp
-///\brief Common definitions of input and output filter
+/// \file filter/filterbase.hpp
+/// \brief Common definitions of input and output filter
 
 #ifndef _Wolframe_FILTER_FILTERBASE_HPP_INCLUDED
 #define _Wolframe_FILTER_FILTERBASE_HPP_INCLUDED
 #include <string>
 #include <cstring>
-#include "types/typeSignature.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class FilterBase
-///\brief Base of input/ouput filter
+/// \class FilterBase
+/// \brief Base of input/ouput filter
 class FilterBase
-	:public virtual types::TypeSignature
 {
 public:
-	FilterBase()
-		:types::TypeSignature("langbind::FilterBase", __LINE__)
-		,m_flags(None)
+	explicit FilterBase( const char* name_)
+		:m_flags(None)
+		,m_name(name_)
 	{
 		m_errorbuf[0] = '\0';
 	}
 
 	FilterBase( const FilterBase& o)
-		:types::TypeSignature("langbind::FilterBase", __LINE__)
-		,m_flags(o.m_flags)
+		:m_flags(o.m_flags)
+		,m_name(o.m_name)
 	{
 		setError( o.m_errorbuf);
 	}
 
 	virtual ~FilterBase(){}
 
-	///\enum ElementType
-	///\brief Content element type that describes the role of the element in the structured input
+	/// \enum ElementType
+	/// \brief Content element type that describes the role of the element in the structured input
 	enum ElementType
 	{
-		OpenTag,	//< open new hierarchy level
-		Attribute,	//< attribute name
-		Value,		//< content or attribute value
-		CloseTag	//< close current hierarchy level
+		OpenTag,	///< open new hierarchy level
+		Attribute,	///< attribute name
+		Value,		///< content or attribute value
+		CloseTag	///< close current hierarchy level
 	};
-	///\brief Get the name of an ElementType as string
-	///\param[in] i an ElementType identifier
-	///\return the name of an ElementType as string
+	/// \brief Get the name of an ElementType as string
+	/// \param[in] i an ElementType identifier
+	/// \return the name of an ElementType as string
 	static const char* elementTypeName( ElementType i)
 	{
 		static const char* ar[] = {"OpenTag","Attribute","Value","CloseTag"};
 		return ar[(int)i];
 	}
 
-	///\brief Get the las error in case of error state
-	///\return the error string or 0
-	const char* getError() const
+	/// \brief Get the las error in case of error state
+	/// \return the error string or 0
+	virtual const char* getError() const
 	{
 		return m_errorbuf[0]?m_errorbuf:0;
 	}
 
-	///\brief Set input filter error message
-	///\param [in] msg (optional) error to set
+	/// \brief Set input filter error message
+	/// \param [in] msg (optional) error to set
 	void setError( const char* msg=0)
 	{
 		if (msg)
@@ -105,50 +103,66 @@ public:
 		}
 	}
 
-	///\brief Get a member value of the filter. Throws on conversion error
-	///\param [in] name case sensitive name of the variable
-	///\param [in] val buffer for the value returned
-	///\return true on success, false, if the variable does not exist or we have to yield (check state)
-	virtual bool getValue( const char* /*name*/, std::string& /*val*/)
+	enum Flags
+	{
+		None=0x00,				///< no flags set
+		SerializeWithIndices=0x01,		///< do serialization with array index elements, if implemented
+		PropagateNoCase=0x02,			///< true, if the result is propagated to be case insensitive
+		PropagateNoAttr=0x04			///< true, if the result is propagated to have no attribute support (only open/close tag and value)
+	};
+
+	/// \brief Query a flag (or a set of flags)
+	/// \return true if the flag (or all flags) are set
+	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
+
+	/// \brief Get all flags
+	/// \return the flags as bitfield
+	Flags flags() const				{return m_flags;}
+
+	/// \brief Set a flag (or a set of flags)
+	/// \return true on success, false if the (or one of) flag is not supported
+	virtual bool setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff; return true;}
+	/// \brief Test if a flag can be set (allowed)
+	virtual bool checkSetFlags( Flags) const	{return true;}
+
+	/// \brief Get the name of the filter
+	const char* name() const			{return m_name;}
+
+private:
+	enum {ErrorBufSize=128};		///< maximum size of error string
+	char m_errorbuf[ ErrorBufSize];		///< error string
+	Flags m_flags;				///< flags
+	const char* m_name;			///< name of the filter
+};
+
+/// \class ContentFilterBase
+/// \brief Base of a content input/ouput filter
+class ContentFilterBase
+	:public FilterBase
+{
+public:
+	ContentFilterBase( const char* name_)
+		:FilterBase( name_){}
+	ContentFilterBase( const ContentFilterBase& o)
+		:FilterBase( o){}
+
+	/// \brief Get a member value of the filter. Throws on conversion error
+	/// \param [in] name case sensitive name of the variable
+	/// \param [in] val buffer for the value returned
+	/// \return true on success, false, if the variable does not exist or we have to yield (check state)
+	virtual bool getValue( const char* /*name*/, std::string& /*val*/) const
 	{
 		return false;
 	}
 
-	///\brief Set a member value of the filter. Throws on conversion error
-	///\param [in] name case sensitive name of the variable
-	///\param [in] val new value of the variable to set
-	///\return true on success, false, if the variable does not exist or we have to yield (check state)
+	/// \brief Set a member value of the filter. Throws on conversion error
+	/// \param [in] name case sensitive name of the variable
+	/// \param [in] val new value of the variable to set
+	/// \return true on success, false, if the variable does not exist or we have to yield (check state)
 	virtual bool setValue( const char* /*name*/, const std::string& /*val*/)
 	{
 		return false;
 	}
-
-	enum Flags
-	{
-		None=0x00,
-		SerializeWithIndices=0x01,		//< do serialization with array index elements, if implemented
-		PropagateNoCase=0x02,			//< true, if the result is propagated to be case insensitive
-		PropagateNoAttr=0x04			//< true, if the result is propagated to have no attribute support (only open/close tag and value)
-	};
-
-	///\brief Query a flag (or a set of flags)
-	///\return true if the flag (or all flags) are set
-	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
-
-	///\brief Get all flags
-	///\return the flags as bitfield
-	Flags flags() const				{return m_flags;}
-
-	///\brief Set a flag (or a set of flags)
-	///\return true on success, false if the (or one of) flag is not supported
-	virtual bool setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff; return true;}
-	///\brief Reset set all flags
-	void resetFlags()				{m_flags = None;}
-
-private:
-	enum {ErrorBufSize=128};		//< maximum size of error string
-	char m_errorbuf[ ErrorBufSize];		//< error string
-	Flags m_flags;				//< flags
 };
 
 }}//namespace

@@ -14,8 +14,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\src \
 	/I"$(LIBXML2_DIR)\include\libxml2" \
 	/I"$(LIBXML2_DIR)\include" \
-	/I"$(WIN_ICONV_DIR)" \
-	/I"$(WIN_ICONV_DIR)\include" \
+	/I"$(ICONV_DIR)\include" \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
@@ -23,6 +22,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwfsingleton\wfsingleton.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	"$(LIBXML2_DIR)\lib\libxml2.lib"
 
@@ -49,15 +49,14 @@ CPP_OBJS = \
 	outputfilterImpl.obj \
 	xsltMapper.obj \
 	xsltProgramType.obj \
-	libxml2_filter.obj \
-	mod_filter_libxml2.obj
+	libxml2_filter.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:LibXml2FilterModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_filter_libxml2.obj
+	$(LINK) /dll /def:mod_filter_libxml2.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

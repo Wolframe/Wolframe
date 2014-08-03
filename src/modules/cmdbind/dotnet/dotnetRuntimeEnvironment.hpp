@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-//\file dotnetRuntimeEnvironment.hpp
-//\brief Interface .NET runtime environment
+///\file dotnetRuntimeEnvironment.hpp
+///\brief Interface .NET runtime environment
 #ifndef _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #define _Wolframe_DOTNET_RUNTIME_ENVIRONMENT_HPP_INCLUDED
 #include "dotnetRuntimeEnvironmentConfig.hpp"
@@ -45,7 +45,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-//\class DotnetRuntimeEnvironment
+///\class DotnetRuntimeEnvironment
 class DotnetRuntimeEnvironment
 	:public langbind::RuntimeEnvironment
 {

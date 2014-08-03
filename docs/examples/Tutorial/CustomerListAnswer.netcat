@@ -1,11 +1,11 @@
-	Wolframe
-	OK
-	MECHS NONE
-	OK authorization
-	ANSWER
-	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-	<list/>
+Wolframe
+OK
+MECHS NONE
+OK authorization
+ANSWER
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<list/>
 	
-	.
-	OK REQUEST CustomerListRequest
-	BYE
+.
+OK REQUEST CustomerListRequest
+BYE

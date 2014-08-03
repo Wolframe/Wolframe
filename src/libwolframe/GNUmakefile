@@ -8,7 +8,7 @@ PACKAGE_NAME = wolframe
 
 INCLUDE_CXXFLAGS =
 
-# textwolf support for module types_string
+# textwolf support for module types/string
 ifeq ($(WITH_TEXTWOLF),1)
 INCLUDE_CXXFLAGS += \
 	-DWITH_TEXTWOLF
@@ -22,7 +22,7 @@ INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR)
 
-# textwolf support for module types_string
+# textwolf support for module types/string
 ifeq ($(WITH_TEXTWOLF),1)
 INCLUDE_DIRS += \
 	-I$(TOPDIR)/3rdParty/textwolf/include
@@ -30,7 +30,7 @@ endif
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
-	-lboost_filesystem
+	-lboost_filesystem \
 
 STATIC_LIB = libwolframe.a
 
@@ -39,65 +39,55 @@ DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
-LOGGER_OBJS = \
-	logger/logLevel.o \
-	logger/logSyslogFacility.o \
-	logger/logError.o \
-	logger/logObject.o \
-	logger/logBackendConsole.o \
-	logger/logBackendFile.o \
-	logger/logBackendSyslog.o \
-	logger/logBackendImpl.o \
-	logger/loggerConfig.o
-
-PROVIDER_OBJS = \
-	provider/Authentication.o \
-	provider/Authorization.o \
-	provider/Audit.o \
-	provider/AAAAproviderImpl.o \
-	provider/AAAAproviderConfig.o \
-	provider/DBproviderImpl.o \
-	provider/DBproviderConfig.o \
-	provider/procProvider.o \
-	provider/procProviderImpl.o
-
 TYP_OBJS = \
-	types_string.o \
-	types_bignumber.o \
-	types_datetime.o \
-	types_doctype.o \
-	types_customDataType.o \
-	types_variant.o \
-	types_variantStructDescription.o \
-	types_variantStruct.o
+	types/docmetadata.o \
+	types/conversions.o \
+	types/numberBaseConversion.o \
+	types/propertyTree.o \
+	types/string.o \
+	types/bignumber.o \
+	types/datetime.o \
+	types/customDataType.o \
+	types/addressRestriction.o \
+	types/variant.o \
+	types/variantStructDescription.o \
+	types/variantStruct.o \
+	types/form.o
+
+UTIL_OBJS = \
+	utils/asciiCharParser.o \
+	utils/fileLineInfo.o \
+	utils/sourceLineInfo.o \
+	utils/typeSignature.o \
+	utils/allocators.o \
+	utils/malloc.o \
+	utils/stringUtils.o \
+	utils/fileUtils.o \
+	utils/parseUtils.o \
+	utils/printFormats.o
 
 CPP_OBJS = \
-	$(LOGGER_OBJS) \
-	$(PROVIDER_OBJS) \
 	$(TYP_OBJS) \
-	malloc.o \
+	$(UTIL_OBJS) \
+	logError.o \
 	version.o \
-	appInfo.o \
+	platform.o \
+	execContext.o \
 	getPassword.o \
 	user.o \
-	moduleDirectory.o \
-	utils_printFormats.o \
-	utils_conversions.o \
-	stringUtils.o \
-	parseUtils.o \
-	fileUtils.o \
-	types_allocators.o \
-	typeSignature.o \
-	password.o \
-	globalRndGen.o \
+	base64.o \
 	HMAC.o \
 	PBKDF2.o \
-	CRAM.o
+	passwordHash.o \
+	usernameHash.o \
+	CRAM.o \
+	pwdChangeMessage.o
 
 OBJS = \
 	b64encode.o \
 	b64decode.o \
 	byte2hex.o \
+	AES256.o \
 	sha1.o \
 	sha2.o \
 	hmac_sha1.o \

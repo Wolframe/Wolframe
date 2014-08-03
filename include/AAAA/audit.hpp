@@ -44,13 +44,13 @@
 namespace _Wolframe {
 namespace AAAA {
 
-// virtual base (interface) for auditor classes
+/// Virtual base (interface) for auditor classes
 class Auditor {
 public:
-	virtual ~Auditor()				{}
+	virtual ~Auditor(){}
 
-	// close the auditor
-	virtual void close()				{}
+	/// \brief Close the auditor
+	virtual void close(){}
 
 	virtual bool audit( const Information& auditObject ) = 0;
 };
@@ -70,11 +70,6 @@ public:
 	virtual bool required() = 0;
 
 	virtual bool audit( const Information& auditObject ) = 0;
-
-//	virtual bool log( AuditMsg_Connect & msg ) = 0;
-//	virtual bool log( AuditMsg_Login& msg ) = 0;
-//	virtual bool log( AuditMsg_Logout& msg ) = 0;
-//	virtual bool log( AuditMsg_Transaction& msg ) = 0;
 };
 
 }} // namespace _Wolframe::AAAA

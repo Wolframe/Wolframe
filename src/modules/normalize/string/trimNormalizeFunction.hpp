@@ -43,9 +43,11 @@ namespace langbind {
 class TrimNormalizeFunction :public types::NormalizeFunction
 {
 public:
-	TrimNormalizeFunction(){}
+	TrimNormalizeFunction( const std::vector<types::Variant>& arg);
+	TrimNormalizeFunction( const TrimNormalizeFunction&){}
 	virtual const char* name() const {return "trim";}
 	virtual types::Variant execute( const types::Variant& inp) const;
+	virtual types::NormalizeFunction* copy() const {return new TrimNormalizeFunction(*this);}
 };
 
 }}

@@ -1,0 +1,20 @@
+This example shows how to use wolframe as webservice.
+As example we show here a localhost configuration with a we page that shows a form to define some 
+attributes of a customer. The request result shows the attributes of the inserted customer.
+
+To prepare http://127.0.0.1/wolframe/InsertCustomer.html the example to work you have to do the following
+
+Linux/Apache:
+	# install the page and the PHP scripts:
+	sudo mkdir /var/www/wolframe
+	sudo cp examples/demo/tutorial/step4a/client/InsertCustomer.html /var/www/wolframe/
+	sudo cp clients/php/webclient_form_xml.php /var/www/wolframe/
+	sudo cp clients/php/connection.php /var/www/wolframe/
+	sudo cp clients/php/session.php /var/www/wolframe/
+	# start/restart the web service:
+	sudo service apache2 restart
+	# start the wolframe server in foreground for testing:
+	sudo wolframed -f -c examples/demo/tutorial/step4a/server/tutorial.conf
+
+
+

@@ -3,6 +3,7 @@
 **requires:PGSQL
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tree>
 <class name="indogermanic">
 	<class name="celtic" status="living">
 		<class name="gaulisch" status="dead"/>
@@ -151,16 +152,19 @@
 	</class>
 	<class name="tocharian" status="dead">
 	</class>
-</class>**config
---input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf -c wolframe.conf run
+</class>
+</tree>**config
+--input-filter textwolf --output-filter textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf --module ../../src/modules/doctype/xml/mod_doctype_xml -c wolframe.conf run
 **requires:TEXTWOLF
 **file:wolframe.conf
 LoadModules
 {
 	module ../wolfilter/modules/database/postgresql/mod_db_postgresqltest
+	module ../../src/modules/cmdbind/tdl/mod_command_tdl
 	module ../../src/modules/cmdbind/lua/mod_command_lua
 	module ../../src/modules/normalize/number/mod_normalize_number
 	module ../../src/modules/normalize/string/mod_normalize_string
+	module ../../src/modules/datatype/bcdnumber/mod_datatype_bcdnumber
 }
 Database
 {
@@ -186,6 +190,7 @@ Processor
 		lua
 		{
 			program script.lua
+			filter textwolf
 		}
 	}
 }
@@ -193,8 +198,8 @@ Processor
 int=integer;
 uint=unsigned;
 float=floatingpoint;
-currency=fixedpoint(13,2);
-percent_1=fixedpoint(5,1);
+currency=bigfxp(2);
+percent_1=bigfxp(2);
 **file:script.lua
 idcnt = 0
 
@@ -204,38 +209,38 @@ function insert_tree( parentid, itr)
 		if (t == "name") then
 			local name = v
 			if idcnt == 0 then
-				formfunction( "treeAddRoot")( {name=name} )
+				provider.formfunction( "treeAddRoot")( {name=name} )
 			else
-				formfunction( "treeAddNode")( {name=name, parentid=parentid} )
+				provider.formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 			end
 			idcnt = idcnt + 1
 		end
 		if (t == "class") then
-			insert_tree( id, scope( itr))
+			insert_tree( id, iterator.scope( itr))
 		end
 	end
 end
 
 function insert_node( parentname, name)
-	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
-	formfunction( "treeAddNode")( {name=name, parentid=parentid} )
+	local parentid = provider.formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
+	provider.formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 end
 
 function copy_node( name, parentname)
-	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
-	local nodeid = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	formfunction( "treeCopyNode")( {nodeid=nodeid, newparentid=parentid} )
+	local parentid = provider.formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
+	local nodeid = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	provider.formfunction( "treeCopyNode")( {nodeid=nodeid, newparentid=parentid} )
 end
 
 
 function delete_subtree( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	formfunction( "treeDeleteSubtree")( {id=id} )
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	provider.formfunction( "treeDeleteSubtree")( {id=id} )
 end
 
 function select_subtree( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectNodeAndChildren")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectNodeAndChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "subtree")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -248,7 +253,7 @@ function select_subtree( name)
 end
 
 function select_subtree2( name)
-	local nodear = formfunction( "treeSelectNodeAndChildrenByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectNodeAndChildrenByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "subtree")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -261,8 +266,8 @@ function select_subtree2( name)
 end
 
 function select_children( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectChildren")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "children")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -275,7 +280,7 @@ function select_children( name)
 end
 
 function select_children2( name)
-	local nodear = formfunction( "treeSelectChildrenByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectChildrenByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "children")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -288,8 +293,8 @@ function select_children2( name)
 end
 
 function select_cover( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectNodeAndParents")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectNodeAndParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "cover")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -302,7 +307,7 @@ function select_cover( name)
 end
 
 function select_cover2( name)
-	local nodear = formfunction( "treeSelectNodeAndParentsByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectNodeAndParentsByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "cover")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -315,8 +320,8 @@ function select_cover2( name)
 end
 
 function select_parents( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	local nodear = formfunction( "treeSelectParents")( { node={ id=id } } ):table()["node"] or {}
+	local id = provider.formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	local nodear = provider.formfunction( "treeSelectParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "parents")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -329,7 +334,7 @@ function select_parents( name)
 end
 
 function select_parents2( name)
-	local nodear = formfunction( "treeSelectParentsByName")( { node={ name=name } } ):table()["node"] or {}
+	local nodear = provider.formfunction( "treeSelectParentsByName")( { node={ name=name } } ):table()["node"] or {}
 	output:opentag( "parents")
 	output:print( name, "name")
 	for i,v in pairs( nodear) do
@@ -342,14 +347,15 @@ function select_parents2( name)
 end
 
 function get_tree( parentid)
-	local t = formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
+	local t = provider.formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
+		local elem = { name=v.name, parent=tonumber(v.parent), children = {} }
+		a[ v.ID] = elem
 	end
 	for i,v in pairs( a) do
 		if v.parent and v.parent ~= 0 then
-			table.insert( a[ v.parent ].children, i )
+			table.insert( a[ v.parent ].children, tonumber( i ))
 		end
 	end
 	return a
@@ -367,11 +373,11 @@ function print_tree( tree, nodeid)
 end
 
 function run()
-	filter().empty = false
+	provider.filter().empty = false
 	local itr = input:get()
 	for v,t in itr do
 		if t == "class" then
-			insert_tree( idcnt, scope( itr))
+			insert_tree( idcnt, iterator.scope( itr))
 		end
 	end
 	output:opentag( "result")
@@ -604,7 +610,7 @@ END
 **outputfile:DBDUMP
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result><class name="indogermanic"><class name="celtic"><class name="gaulisch"/><class name="goidelic"><class name="old irish"/><class name="middle irish"/><class name="manx"/><class name="irish"/><class name="scotts gaelic"/></class><class name="brythonic"><class name="comish"/><class name="welsh"/><class name="breton"/></class></class><class name="germanic"><class name="west germanic"><class name="anglo-frisian"><class name="old english"><class name="middle english"><class name="english"/></class></class><class name="old frisian"><class name="frisian"/></class></class><class name="german"><class name="low german"><class name="old saxon"><class name="plattdeutsch"/></class><class name="old low franconian"><class name="dutch"/><class name="flemish"/><class name="afrikaans"/><class name="south african dutch"/></class></class><class name="high german"><class name="alemannic"/><class name="alsatian"/><class name="bavarian"/><class name="franconian"/><class name="german"/><class name="pensilvania german"/><class name="swiss"/><class name="yiddish"/></class></class></class><class name="east germanic"/><class name="north germanic"><class name="old west norse"><class name="islandic"/><class name="faroese"/></class><class name="old east norse"><class name="norwegian"/><class name="danish"/><class name="swedish"/></class></class></class><class name="italic"><class name="oscan"/><class name="umbrian"/><class name="old latin"><class name="catalan"/><class name="french"/><class name="galician"/><class name="portuguese"/><class name="italian"/><class name="provencal"/><class name="romansch"/><class name="romanian"/><class name="spanish"/></class></class><class name="slavonic"><class name="west slavic"><class name="chech"/><class name="polish"/><class name="slovak"/><class name="sorbian"/></class><class name="east slavic"><class name="belarussian"/><class name="russian"/><class name="ukrainian"/></class><class name="south slavic"><class name="bosnian"/><class name="bulgarian"/><class name="macedonian"/><class name="serbo-croatian"/><class name="slovene"/></class></class><class name="albanian"/><class name="armenian"/><class name="hellenic"><class name="greek"/></class><class name="baltic"><class name="lettish"/><class name="latvian"/><class name="lithuanian"/></class><class name="hittie"/><class name="indo iranian"><class name="iranian"><class name="avestan"><class name="pashto"/></class><class name="old persian"><class name="balushti"/><class name="kurdish"/><class name="ossetic"/><class name="pashto"/><class name="persian"/></class><class name="scythian"/></class><class name="indic"><class name="sanskrit"/><class name="prakrit"/><class name="pali"/><class name="bengali"/><class name="bihari"/><class name="bhili"/><class name="gujarati"/><class name="hindi"/><class name="hindustani"/><class name="marati"/><class name="nepali"/><class name="bahari"/><class name="punjabi"/><class name="rajasthani"/><class name="sindhi"/><class name="singhalese"/><class name="urdu"/></class></class><class name="tocharian"/></class><subtree name="italic"><node id="49" name="italic"/><node id="50" name="oscan"/><node id="51" name="umbrian"/><node id="52" name="old latin"/><node id="53" name="catalan"/><node id="54" name="french"/><node id="55" name="galician"/><node id="56" name="portuguese"/><node id="57" name="italian"/><node id="58" name="provencal"/><node id="59" name="romansch"/><node id="60" name="romanian"/><node id="61" name="spanish"/></subtree><subtree name="brythonic"><node id="10" name="brythonic"/><node id="11" name="comish"/><node id="12" name="welsh"/><node id="13" name="breton"/></subtree><subtree name="germanic"><node id="14" name="germanic"/><node id="15" name="west germanic"/><node id="16" name="anglo-frisian"/><node id="17" name="old english"/><node id="18" name="middle english"/><node id="19" name="english"/><node id="20" name="old frisian"/><node id="21" name="frisian"/><node id="22" name="german"/><node id="23" name="low german"/><node id="24" name="old saxon"/><node id="25" name="plattdeutsch"/><node id="26" name="old low franconian"/><node id="27" name="dutch"/><node id="28" name="flemish"/><node id="29" name="afrikaans"/><node id="30" name="south african dutch"/><node id="31" name="high german"/><node id="32" name="alemannic"/><node id="33" name="alsatian"/><node id="34" name="bavarian"/><node id="35" name="franconian"/><node id="36" name="german"/><node id="37" name="pensilvania german"/><node id="38" name="swiss"/><node id="39" name="yiddish"/><node id="40" name="east germanic"/><node id="41" name="north germanic"/><node id="42" name="old west norse"/><node id="43" name="islandic"/><node id="44" name="faroese"/><node id="45" name="old east norse"/><node id="46" name="norwegian"/><node id="47" name="danish"/><node id="48" name="swedish"/></subtree><subtree name="anglo-frisian"><node id="16" name="anglo-frisian"/><node id="17" name="old english"/><node id="18" name="middle english"/><node id="19" name="english"/><node id="20" name="old frisian"/><node id="21" name="frisian"/></subtree><children name="gaulisch"/><children name="slavonic"><node id="63" name="west slavic"/><node id="64" name="chech"/><node id="65" name="polish"/><node id="66" name="slovak"/><node id="67" name="sorbian"/><node id="68" name="east slavic"/><node id="69" name="belarussian"/><node id="70" name="russian"/><node id="71" name="ukrainian"/><node id="72" name="south slavic"/><node id="73" name="bosnian"/><node id="74" name="bulgarian"/><node id="75" name="macedonian"/><node id="76" name="serbo-croatian"/><node id="77" name="slovene"/></children><children name="east germanic"/><children name="indic"><node id="99" name="sanskrit"/><node id="100" name="prakrit"/><node id="101" name="pali"/><node id="102" name="bengali"/><node id="103" name="bihari"/><node id="104" name="bhili"/><node id="105" name="gujarati"/><node id="106" name="hindi"/><node id="107" name="hindustani"/><node id="108" name="marati"/><node id="109" name="nepali"/><node id="110" name="bahari"/><node id="111" name="punjabi"/><node id="112" name="rajasthani"/><node id="113" name="sindhi"/><node id="114" name="singhalese"/><node id="115" name="urdu"/></children><cover name="italic"><node id="1" name="indogermanic"/><node id="49" name="italic"/></cover><cover name="brythonic"><node id="1" name="indogermanic"/><node id="2" name="celtic"/><node id="10" name="brythonic"/></cover><cover name="germanic"><node id="1" name="indogermanic"/><node id="14" name="germanic"/></cover><cover name="anglo-frisian"><node id="1" name="indogermanic"/><node id="14" name="germanic"/><node id="15" name="west germanic"/><node id="16" name="anglo-frisian"/></cover><parents name="gaulisch"><node id="1" name="indogermanic"/><node id="2" name="celtic"/></parents><parents name="slavonic"><node id="1" name="indogermanic"/></parents><parents name="east germanic"><node id="1" name="indogermanic"/><node id="14" name="germanic"/></parents><parents name="indic"><node id="1" name="indogermanic"/><node id="87" name="indo iranian"/></parents><sparsetree><class name="indogermanic"><class name="germanic"><class name="west germanic"><class name="anglo-frisian"><class name="old english"><class name="middle english"><class name="english"/></class></class><class name="old frisian"><class name="frisian"/></class></class><class name="german"><class name="low german"><class name="old saxon"><class name="plattdeutsch"/></class><class name="old low franconian"><class name="dutch"/><class name="flemish"/><class name="afrikaans"/><class name="south african dutch"/></class></class><class name="high german"><class name="alemannic"/><class name="alsatian"/><class name="bavarian"/><class name="franconian"/><class name="german"/><class name="pensilvania german"/><class name="swiss"><class name="bern german"/><class name="eastern swiss german"/><class name="grison german"/></class><class name="yiddish"/></class></class></class><class name="east germanic"/><class name="north germanic"><class name="old west norse"><class name="islandic"/><class name="faroese"/></class><class name="old east norse"><class name="norwegian"/><class name="danish"/><class name="swedish"/></class></class></class><class name="italic"><class name="oscan"/><class name="umbrian"/><class name="old latin"><class name="catalan"/><class name="french"/><class name="galician"/><class name="portuguese"/><class name="italian"/><class name="provencal"/><class name="romansch"/><class name="romanian"/><class name="spanish"/></class></class><class name="slavonic"><class name="west slavic"><class name="chech"/><class name="polish"/><class name="slovak"/><class name="sorbian"/></class><class name="east slavic"><class name="belarussian"/><class name="russian"/><class name="ukrainian"/></class><class name="south slavic"><class name="bosnian"/><class name="bulgarian"/><class name="macedonian"/><class name="serbo-croatian"/><class name="slovene"/></class></class><class name="albanian"/><class name="armenian"/><class name="baltic"><class name="lettish"/><class name="latvian"/><class name="lithuanian"/></class><class name="tocharian"/><class name="hittie"/></class></sparsetree></result>
+<tree><result><class name="indogermanic"><class name="celtic"><class name="gaulisch"/><class name="goidelic"><class name="old irish"/><class name="middle irish"/><class name="manx"/><class name="irish"/><class name="scotts gaelic"/></class><class name="brythonic"><class name="comish"/><class name="welsh"/><class name="breton"/></class></class><class name="germanic"><class name="west germanic"><class name="anglo-frisian"><class name="old english"><class name="middle english"><class name="english"/></class></class><class name="old frisian"><class name="frisian"/></class></class><class name="german"><class name="low german"><class name="old saxon"><class name="plattdeutsch"/></class><class name="old low franconian"><class name="dutch"/><class name="flemish"/><class name="afrikaans"/><class name="south african dutch"/></class></class><class name="high german"><class name="alemannic"/><class name="alsatian"/><class name="bavarian"/><class name="franconian"/><class name="german"/><class name="pensilvania german"/><class name="swiss"/><class name="yiddish"/></class></class></class><class name="east germanic"/><class name="north germanic"><class name="old west norse"><class name="islandic"/><class name="faroese"/></class><class name="old east norse"><class name="norwegian"/><class name="danish"/><class name="swedish"/></class></class></class><class name="italic"><class name="oscan"/><class name="umbrian"/><class name="old latin"><class name="catalan"/><class name="french"/><class name="galician"/><class name="portuguese"/><class name="italian"/><class name="provencal"/><class name="romansch"/><class name="romanian"/><class name="spanish"/></class></class><class name="slavonic"><class name="west slavic"><class name="chech"/><class name="polish"/><class name="slovak"/><class name="sorbian"/></class><class name="east slavic"><class name="belarussian"/><class name="russian"/><class name="ukrainian"/></class><class name="south slavic"><class name="bosnian"/><class name="bulgarian"/><class name="macedonian"/><class name="serbo-croatian"/><class name="slovene"/></class></class><class name="albanian"/><class name="armenian"/><class name="hellenic"><class name="greek"/></class><class name="baltic"><class name="lettish"/><class name="latvian"/><class name="lithuanian"/></class><class name="hittie"/><class name="indo iranian"><class name="iranian"><class name="avestan"><class name="pashto"/></class><class name="old persian"><class name="balushti"/><class name="kurdish"/><class name="ossetic"/><class name="pashto"/><class name="persian"/></class><class name="scythian"/></class><class name="indic"><class name="sanskrit"/><class name="prakrit"/><class name="pali"/><class name="bengali"/><class name="bihari"/><class name="bhili"/><class name="gujarati"/><class name="hindi"/><class name="hindustani"/><class name="marati"/><class name="nepali"/><class name="bahari"/><class name="punjabi"/><class name="rajasthani"/><class name="sindhi"/><class name="singhalese"/><class name="urdu"/></class></class><class name="tocharian"/></class><subtree name="italic"><node id="49" name="italic"/><node id="50" name="oscan"/><node id="51" name="umbrian"/><node id="52" name="old latin"/><node id="53" name="catalan"/><node id="54" name="french"/><node id="55" name="galician"/><node id="56" name="portuguese"/><node id="57" name="italian"/><node id="58" name="provencal"/><node id="59" name="romansch"/><node id="60" name="romanian"/><node id="61" name="spanish"/></subtree><subtree name="brythonic"><node id="10" name="brythonic"/><node id="11" name="comish"/><node id="12" name="welsh"/><node id="13" name="breton"/></subtree><subtree name="germanic"><node id="14" name="germanic"/><node id="15" name="west germanic"/><node id="16" name="anglo-frisian"/><node id="17" name="old english"/><node id="18" name="middle english"/><node id="19" name="english"/><node id="20" name="old frisian"/><node id="21" name="frisian"/><node id="22" name="german"/><node id="23" name="low german"/><node id="24" name="old saxon"/><node id="25" name="plattdeutsch"/><node id="26" name="old low franconian"/><node id="27" name="dutch"/><node id="28" name="flemish"/><node id="29" name="afrikaans"/><node id="30" name="south african dutch"/><node id="31" name="high german"/><node id="32" name="alemannic"/><node id="33" name="alsatian"/><node id="34" name="bavarian"/><node id="35" name="franconian"/><node id="36" name="german"/><node id="37" name="pensilvania german"/><node id="38" name="swiss"/><node id="39" name="yiddish"/><node id="40" name="east germanic"/><node id="41" name="north germanic"/><node id="42" name="old west norse"/><node id="43" name="islandic"/><node id="44" name="faroese"/><node id="45" name="old east norse"/><node id="46" name="norwegian"/><node id="47" name="danish"/><node id="48" name="swedish"/></subtree><subtree name="anglo-frisian"><node id="16" name="anglo-frisian"/><node id="17" name="old english"/><node id="18" name="middle english"/><node id="19" name="english"/><node id="20" name="old frisian"/><node id="21" name="frisian"/></subtree><children name="gaulisch"/><children name="slavonic"><node id="63" name="west slavic"/><node id="64" name="chech"/><node id="65" name="polish"/><node id="66" name="slovak"/><node id="67" name="sorbian"/><node id="68" name="east slavic"/><node id="69" name="belarussian"/><node id="70" name="russian"/><node id="71" name="ukrainian"/><node id="72" name="south slavic"/><node id="73" name="bosnian"/><node id="74" name="bulgarian"/><node id="75" name="macedonian"/><node id="76" name="serbo-croatian"/><node id="77" name="slovene"/></children><children name="east germanic"/><children name="indic"><node id="99" name="sanskrit"/><node id="100" name="prakrit"/><node id="101" name="pali"/><node id="102" name="bengali"/><node id="103" name="bihari"/><node id="104" name="bhili"/><node id="105" name="gujarati"/><node id="106" name="hindi"/><node id="107" name="hindustani"/><node id="108" name="marati"/><node id="109" name="nepali"/><node id="110" name="bahari"/><node id="111" name="punjabi"/><node id="112" name="rajasthani"/><node id="113" name="sindhi"/><node id="114" name="singhalese"/><node id="115" name="urdu"/></children><cover name="italic"><node id="1" name="indogermanic"/><node id="49" name="italic"/></cover><cover name="brythonic"><node id="1" name="indogermanic"/><node id="2" name="celtic"/><node id="10" name="brythonic"/></cover><cover name="germanic"><node id="1" name="indogermanic"/><node id="14" name="germanic"/></cover><cover name="anglo-frisian"><node id="1" name="indogermanic"/><node id="14" name="germanic"/><node id="15" name="west germanic"/><node id="16" name="anglo-frisian"/></cover><parents name="gaulisch"><node id="1" name="indogermanic"/><node id="2" name="celtic"/></parents><parents name="slavonic"><node id="1" name="indogermanic"/></parents><parents name="east germanic"><node id="1" name="indogermanic"/><node id="14" name="germanic"/></parents><parents name="indic"><node id="1" name="indogermanic"/><node id="87" name="indo iranian"/></parents><sparsetree><class name="indogermanic"><class name="germanic"><class name="west germanic"><class name="anglo-frisian"><class name="old english"><class name="middle english"><class name="english"/></class></class><class name="old frisian"><class name="frisian"/></class></class><class name="german"><class name="low german"><class name="old saxon"><class name="plattdeutsch"/></class><class name="old low franconian"><class name="dutch"/><class name="flemish"/><class name="afrikaans"/><class name="south african dutch"/></class></class><class name="high german"><class name="alemannic"/><class name="alsatian"/><class name="bavarian"/><class name="franconian"/><class name="german"/><class name="pensilvania german"/><class name="swiss"><class name="bern german"/><class name="eastern swiss german"/><class name="grison german"/></class><class name="yiddish"/></class></class></class><class name="east germanic"/><class name="north germanic"><class name="old west norse"><class name="islandic"/><class name="faroese"/></class><class name="old east norse"><class name="norwegian"/><class name="danish"/><class name="swedish"/></class></class></class><class name="italic"><class name="oscan"/><class name="umbrian"/><class name="old latin"><class name="catalan"/><class name="french"/><class name="galician"/><class name="portuguese"/><class name="italian"/><class name="provencal"/><class name="romansch"/><class name="romanian"/><class name="spanish"/></class></class><class name="slavonic"><class name="west slavic"><class name="chech"/><class name="polish"/><class name="slovak"/><class name="sorbian"/></class><class name="east slavic"><class name="belarussian"/><class name="russian"/><class name="ukrainian"/></class><class name="south slavic"><class name="bosnian"/><class name="bulgarian"/><class name="macedonian"/><class name="serbo-croatian"/><class name="slovene"/></class></class><class name="albanian"/><class name="armenian"/><class name="baltic"><class name="lettish"/><class name="latvian"/><class name="lithuanian"/></class><class name="tocharian"/><class name="hittie"/></class></sparsetree></result></tree>
 tree:
 id, parent, name, lft, rgt
 '1', NULL, 'indogermanic', '1', '152'
