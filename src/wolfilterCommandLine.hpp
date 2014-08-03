@@ -51,7 +51,10 @@ class WolfilterCommandLine
 {
 public:
 	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath, bool useDefaultModuleDir, bool useDefaultConfigIfNotDefined);
-	~WolfilterCommandLine(){}
+	~WolfilterCommandLine()
+	{
+		delete m_modulesDirectory;
+	}
 
 	bool printhelp() const						{return m_printhelp;}
 	bool printversion() const					{return m_printversion;}

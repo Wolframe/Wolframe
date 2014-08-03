@@ -53,18 +53,21 @@ public:
 	/// \brief Constructor
 	EnvelopeInputFilter( const TypedInputFilterR& i, const ContextR& c)
 		:TypedInputFilter(i->name())
-		,m_input(i)
-		,m_context(c){}
+		,m_context(c)
+		,m_input(i){}
 
 	/// \brief Copy constructor
 	/// \param[in] o typed output filter to copy
 	EnvelopeInputFilter( const EnvelopeInputFilter& o)
 		:TypedInputFilter(o)
-		,m_input(o.m_input)
-		,m_context(o.m_context){}
+		,m_context(o.m_context)
+		,m_input(o.m_input){}
 
 	/// \brief Destructor
-	virtual ~EnvelopeInputFilter(){}
+	virtual ~EnvelopeInputFilter()
+	{
+		m_input.reset();
+	}
 
 	/// \brief Get a self copy
 	/// \return allocated pointer to copy of this
@@ -113,8 +116,8 @@ public:
 	}
 
 private:
-	TypedInputFilterR m_input;
 	boost::shared_ptr<Context> m_context;
+	TypedInputFilterR m_input;
 };
 
 }}//namespace
