@@ -29,22 +29,21 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file directmapCommandHandlerUnit.hpp
-///\brief Interface to the directmap command handler unit
+/// \file directmapCommandHandlerUnit.hpp
+/// \brief Interface to the directmap command handler unit
 #ifndef _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_UNIT_HPP_INCLUDED
 #define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_UNIT_HPP_INCLUDED
+#include "directmapCommandHandlerConfig.hpp"
+#include "directmapCommandHandler.hpp"
 #include "directmapProgram.hpp"
 #include "filter/filterdef.hpp"
-#include "directmapCommandHandlerConfig.hpp"
-#include "cmdbind/commandHandler.hpp"
-#include "processor/procProviderInterface.hpp"
 #include <vector>
 #include <string>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class DirectmapCommandHandlerUnit
+/// \class DirectmapCommandHandlerUnit
 class DirectmapCommandHandlerUnit
 	:public CommandHandlerUnit
 {

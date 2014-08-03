@@ -55,7 +55,7 @@
 		}\
 		virtual const char* objectClassName() const\
 		{\
-			return CONFIG_TITLE "CommandHandler";\
+			return CONFIG_TITLE;\
 		}\
 		virtual ObjectConstructorBase::ObjectType objectType() const\
 		{\
@@ -67,7 +67,7 @@
 	{\
 	public:\
 		CommandHandlerBuilder()\
-			:_Wolframe::module::ConfiguredBuilder( TITLE, CONFIG_SECTION, CONFIG_TITLE, CONFIG_TITLE "CommandHandler")\
+			:_Wolframe::module::ConfiguredBuilder( TITLE, CONFIG_SECTION, CONFIG_TITLE, CONFIG_TITLE)\
 		{}\
 		virtual ~CommandHandlerBuilder(){}\
 		virtual _Wolframe::ObjectConstructorBase::ObjectType objectType() const\
@@ -76,7 +76,7 @@
 		}\
 		virtual _Wolframe::config::NamedConfiguration* configuration( const char* logPrefix)\
 		{\
-			return new CONFIGDEF( CONFIG_TITLE "CommandHandler", m_title, logPrefix, m_keyword);\
+			return new CONFIGDEF( CONFIG_TITLE, m_title, logPrefix, m_keyword);\
 		}\
 		virtual _Wolframe::ObjectConstructorBase* constructor()\
 		{\

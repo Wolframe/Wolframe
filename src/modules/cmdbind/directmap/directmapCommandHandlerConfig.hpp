@@ -29,15 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file directmapCommandHandlerConfig.hpp
-///\brief Interface directmap command handler configuration
+/// \file directmapCommandHandlerConfig.hpp
+/// \brief Interface directmap command handler configuration
 #ifndef _Wolframe_DIRECTMAP_COMMAND_HANDLER_CONFIG_HPP_INCLUDED
 #define _Wolframe_DIRECTMAP_COMMAND_HANDLER_CONFIG_HPP_INCLUDED
-#include "directmapCommandHandler.hpp"
-#include "processor/procProviderInterface.hpp"
 #include "processor/execContext.hpp"
-#include "cmdbind/commandHandler.hpp"
-#include "cmdbind/ioFilterCommandHandler.hpp"
 #include "config/configurationTree.hpp"
 #include "module/moduleInterface.hpp"
 #include "module/constructor.hpp"
@@ -47,30 +43,31 @@ Project Wolframe.
 namespace _Wolframe {
 namespace cmdbind {
 
-///\brief Named configuration definition
+/// \class DirectmapCommandHandlerConfig
+/// \brief Standard command handler configuration definition
 class DirectmapCommandHandlerConfig
 	:public config::NamedConfiguration
 {
 public:
-	DirectmapCommandHandlerConfig( const char* classname_, const char* name, const char* logParent, const char* logName)
-		:config::NamedConfiguration( name, logParent, logName)
+	DirectmapCommandHandlerConfig( const char* classname_, const char* sectionName_, const char* logParent_, const char* logName_)
+		:config::NamedConfiguration( sectionName_, logParent_, logName_)
 		,m_classname(classname_){}
 	virtual ~DirectmapCommandHandlerConfig(){}
 
-	///\brief Parse the configuration
-	///\param[in] pt configuration tree
-	///\param[in] modules module directory
+	/// \brief Parse the configuration
+	/// \param[in] pt configuration tree
+	/// \param[in] modules module directory
 	virtual bool parse( const config::ConfigurationNode& pt, const std::string&, const module::ModulesDirectory* modules);
 
-	///\brief Set canonical path for files referenced as relative path in configuration
-	///\param[in] referencePath reference path
+	/// \brief Set canonical path for files referenced as relative path in configuration
+	/// \param[in] referencePath reference path
 	virtual void setCanonicalPathes( const std::string& referencePath);
 
 	virtual bool check() const;
 
 	virtual bool checkReferences( const proc::ProcessorProviderInterface* provider) const;
 
-	virtual void print( std::ostream& os, size_t indent ) const;
+	virtual void print( std::ostream& os, size_t indent) const;
 
 	virtual const char* className() const
 	{

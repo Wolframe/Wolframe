@@ -41,6 +41,6 @@
 using namespace _Wolframe::cmdbind;
 
 WF_MODULE_BEGIN( "DirectmapCommandHandler", "standard command handler module")
- WF_COMMAND_HANDLER( "standard command handler", "cmdhandler", "directmap", DirectmapCommandHandlerUnit, DirectmapCommandHandlerConfig)
+ WF_COMMAND_HANDLER( "directmap", "cmdhandler", "directmap", DirectmapCommandHandlerUnit, DirectmapCommandHandlerConfig)
 WF_MODULE_END
 

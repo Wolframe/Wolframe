@@ -1,6 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS = authentication
+SUBDIRS = authentication cmdbind doctype
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

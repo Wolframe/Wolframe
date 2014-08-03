@@ -54,7 +54,7 @@ class DirectmapCommandHandler
 {
 public:
 	/// \brief Constructor
-	explicit DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const langbind::InputFilterR& inputfilter_, const langbind::OutputFilterR& outputfilter_);
+	DirectmapCommandHandler( const langbind::DirectmapCommandDescription* cmddescr, const langbind::InputFilterR& inputfilter_, const langbind::OutputFilterR& outputfilter_);
 
 	/// \brief Destructor
 	virtual ~DirectmapCommandHandler(){}

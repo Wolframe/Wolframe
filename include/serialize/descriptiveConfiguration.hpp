@@ -60,7 +60,7 @@ public:
 	virtual ~DescriptiveConfiguration()
 	{}
 
-	const char* className() const
+	virtual const char* className() const
 	{
 		return m_classname.c_str();
 	}

@@ -128,9 +128,13 @@ ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& section,
 ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& objectClassName ) const
 {
 	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdBuilder.begin();
-							it != m_cfgdBuilder.end(); it++ )	{
+							it != m_cfgdBuilder.end(); it++ )
+	{
+		LOG_DATA << "Get builder of '" << objectClassName << "' test '" << (*it)->m_className << "'";
 		if ( boost::algorithm::iequals( (*it)->m_className, objectClassName ))
+		{
 			return *it;
+		}
 	}
 	return NULL;
 }

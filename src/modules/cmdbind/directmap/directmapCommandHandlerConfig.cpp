@@ -118,7 +118,7 @@ bool DirectmapCommandHandlerConfig::checkReferences( const proc::ProcessorProvid
 	return true;
 }
 
-void DirectmapCommandHandlerConfig::print( std::ostream& os, size_t indent ) const
+void DirectmapCommandHandlerConfig::print( std::ostream& os, size_t indent) const
 {
 	std::string indentstr( indent*3, ' ');
 	std::vector<std::string>::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();

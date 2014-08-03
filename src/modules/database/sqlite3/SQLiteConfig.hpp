@@ -38,7 +38,6 @@
 #define _SQLITE_CONFIG_HPP_INCLUDED
 
 #include "config/configurationBase.hpp"
-#include "serialize/configSerialize.hpp"
 #include "serialize/descriptiveConfiguration.hpp"
 #include <vector>
 
