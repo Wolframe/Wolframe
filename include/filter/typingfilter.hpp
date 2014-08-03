@@ -75,6 +75,9 @@ public:
 	/// \brief Implements FilterBase::checkSetFlags()const
 	virtual bool checkSetFlags( Flags f) const;
 
+	/// \brief Get the last error
+	virtual const char* getError() const;
+	
 private:
 	/// \brief Stack element of the input filter state stack
 	struct StackElement
@@ -90,6 +93,7 @@ private:
 	InputFilterR m_inputfilter;
 	std::vector<StackElement> m_stack;
 };
+
 
 /// \class TypingOutputFilter
 /// \brief Typed fascade for output filter

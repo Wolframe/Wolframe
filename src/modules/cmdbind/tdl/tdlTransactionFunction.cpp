@@ -36,6 +36,7 @@
 #include "tdlTransactionInput.hpp"
 #include "database/transaction.hpp"
 #include "vm/inputStructure.hpp"
+#include "filter/envelopefilter.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/auditFunction.hpp"
 #include "processor/procProviderInterface.hpp"
@@ -519,7 +520,11 @@ bool TdlTransactionFunctionClosure::call()
 				{
 					filteredResult->setFlags( langbind::TypedInputFilter::PropagateNoCase);
 				}
-				m_result = filteredResult;
+				// Because we return the result of a function we called with a different context
+				// We have to create an envelope containing both the result and its context as
+				// our own result. We use the langbind::EnvelopeInputFilter template for that:
+				typedef langbind::EnvelopeInputFilter<langbind::FormFunctionClosure> ResultWithContext;
+				m_result = langbind::TypedInputFilterR( new ResultWithContext( filteredResult, filterclosure));
 			}
 
 			// Propagate flags for output:

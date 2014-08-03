@@ -51,22 +51,6 @@ using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
 namespace {
-class ResultData
-	:public TypedFilterData
-{
-public:
-	explicit ResultData( const LuaScriptInstanceR& interp_)
-		:m_interp(interp_){}
-
-	virtual ~ResultData()
-	{
-	}
-
-private:
-	LuaScriptInstanceR m_interp;
-};
-
-
 class LuaFormFunctionClosure
 	:public FormFunctionClosure
 {
@@ -76,9 +60,7 @@ public:
 	{}
 
 	virtual ~LuaFormFunctionClosure()
-	{
-		m_interp.reset();
-	}
+	{}
 
 	virtual bool call()
 	{
@@ -100,6 +82,11 @@ public:
 			LOG_ERROR << "error calling lua form function '" << m_name.c_str() << "':" << m_interp->luaErrorMessage( m_interp->thread());
 			throw std::runtime_error( m_interp->luaUserErrorMessage( m_interp->thread()));
 		}
+		m_result = m_interp->getObject( -1);
+		if (!m_result.get())
+		{
+			throw std::runtime_error( "lua function called returned no result or nil (structure expected)");
+		}
 		return true;
 	}
 
@@ -115,20 +102,14 @@ public:
 
 	virtual TypedInputFilterR result() const
 	{
-		TypedInputFilterR res = m_interp->getObject( -1);
-		if (!res.get())
-		{
-			throw std::runtime_error( "lua function called returned no result or nil (structure expected)");
-		}
-		boost::shared_ptr<TypedFilterData> data( new ResultData( m_interp)); 
-		res->setData( data);
-		return res;
+		return m_result;
 	}
 
 private:
 	LuaScriptInstanceR m_interp;
 	std::string m_name;
 	TypedInputFilterR m_arg;
+	TypedInputFilterR m_result;
 	bool m_firstcall;
 };
 

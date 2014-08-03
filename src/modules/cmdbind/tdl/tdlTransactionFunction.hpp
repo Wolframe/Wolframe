@@ -127,7 +127,7 @@ public:
 	const vm::ProgramR& program() const				{return m_program;}
 
 	/// \brief Build the function output
-	langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const;
+	//langbind::TypedInputFilterR getOutput( const proc::ProcessorProviderInterface* provider, const VmTransactionOutput& output) const;
 
 	virtual TdlTransactionFunctionClosure* createClosure() const;
 

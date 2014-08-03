@@ -49,7 +49,7 @@ namespace langbind {
 /// \class InputFilter
 /// \brief Input filter
 class InputFilter
-	:public FilterBase
+	:public ContentFilterBase
 {
 public:
 	/// \enum State
@@ -64,20 +64,20 @@ public:
 
 	/// \brief Constructor
 	explicit InputFilter( const char* name_)
-		:FilterBase(name_)
+		:ContentFilterBase(name_)
 		,m_state(Start)
 		,m_metadata( new types::DocMetaData()){}
 
 	/// \brief Constructor
 	InputFilter( const char* name_, const types::DocMetaData& metadata)
-		:FilterBase(name_)
+		:ContentFilterBase(name_)
 		,m_state(Start)
 		,m_metadata( new types::DocMetaData( metadata)){}
 
 	/// \brief Copy constructor
 	/// \param[in] o input filter to copy
 	InputFilter( const InputFilter& o)
-		:FilterBase(o)
+		:ContentFilterBase(o)
 		,m_state(o.m_state)
 		,m_metadata( new types::DocMetaData( *o.m_metadata)){}
 
@@ -93,12 +93,6 @@ public:
 	/// \param [in] size the size of the input chunk in bytes
 	/// \param [in] end true, if end of input (the last chunk) has been reached.
 	virtual void putInput( const void* ptr, std::size_t size, bool end)=0;
-
-	/// \brief Implementation of FilterBase::getValue( const char*, std::string&)
-	virtual bool getValue( const char* id, std::string& val) const
-	{
-		return FilterBase::getValue( id, val);
-	}
 
 	/// \brief Get next element
 	/// \param [out] type element type parsed

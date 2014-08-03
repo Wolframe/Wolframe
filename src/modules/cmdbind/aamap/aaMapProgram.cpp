@@ -42,6 +42,7 @@ Project Wolframe.
 #include "utils/parseUtils.hpp"
 #include "filter/joinfilter.hpp"
 #include "filter/execContextInputFilter.hpp"
+#include "filter/envelopefilter.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -151,12 +152,13 @@ public:
 	/// \remark MUST be standalone (alive after destruction of this 'FormFunctionClosure'!)
 	virtual langbind::TypedInputFilterR result() const
 	{
-		return m_formFunctionClosure->result();
+		return m_result;
 	}
 
 private:
 	const AuditFunctionImpl* m_auditfunc;
 	langbind::FormFunctionClosureR m_formFunctionClosure;
+	langbind::TypedInputFilterR m_result;
 	proc::ExecContext* m_context;
 	DatabaseScopeR m_dbscope;
 };
@@ -230,6 +232,12 @@ bool AuditFunctionClosureImpl::call()
 	}
 	if (m_formFunctionClosure->call())
 	{
+		// Because we return the result of a function we called with a different context
+		// We have to create an envelope containing both the result and its context as
+		// our own result. We use the langbind::EnvelopeInputFilter template for that:
+		typedef langbind::EnvelopeInputFilter<langbind::FormFunctionClosure> ResultWithContext;
+		m_result = langbind::TypedInputFilterR( new ResultWithContext( m_formFunctionClosure->result(), m_formFunctionClosure));
+
 		m_dbscope.reset();
 		return true;
 	}

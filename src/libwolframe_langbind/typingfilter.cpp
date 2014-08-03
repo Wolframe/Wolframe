@@ -129,6 +129,11 @@ bool TypingInputFilter::checkSetFlags( Flags f) const
 	return (m_inputfilter.get()->checkSetFlags( f));
 }
 
+const char* TypingInputFilter::getError() const
+{
+	return m_inputfilter->getError();
+}
+
 bool TypingOutputFilter::print( ElementType type, const types::VariantConst& element)
 {
 	bool rt = true;
@@ -218,6 +223,5 @@ bool TypingOutputFilter::print( ElementType type, const types::VariantConst& ele
 	}
 	return rt;
 }
-
 
 

@@ -37,6 +37,7 @@
 #include "vm/inputStructure.hpp"
 #include "langbind/formFunction.hpp"
 #include "filter/typedfilter.hpp"
+#include "filter/envelopefilter.hpp"
 #include "types/normalizeFunction.hpp"
 #include "types/variant.hpp"
 #include "processor/procProviderInterface.hpp"
@@ -313,8 +314,13 @@ void TdlTransactionPreprocStep::call( proc::ExecContext* context, vm::InputStruc
 				{
 					// assign form function result to destination in input structure for further processing:
 					langbind::TypedOutputFilterR resfilter( structure.createOutputFilter( resultnode, sourccetagmap));
-					langbind::TypedInputFilterR result = fc->result();
 
+					// Because we cannot be sure about the order of disposal of 'fc' and 'result' 
+					// we create an envelope containing both 'result' and context (reference to 'fc').
+					// This way it is ensured that 'fc' is released after 'result':
+					typedef langbind::EnvelopeInputFilter<langbind::FormFunctionClosure> ResultWithContext;
+					langbind::TypedInputFilterR result = langbind::TypedInputFilterR( new ResultWithContext( fc->result(), fc));
+					
 					result->setFlags( langbind::TypedInputFilter::SerializeWithIndices);
 					// ... result should provide indices of arrays is possible (for further preprocessing function calls)
 

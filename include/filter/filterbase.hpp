@@ -81,7 +81,7 @@ public:
 
 	/// \brief Get the las error in case of error state
 	/// \return the error string or 0
-	const char* getError() const
+	virtual const char* getError() const
 	{
 		return m_errorbuf[0]?m_errorbuf:0;
 	}
@@ -103,24 +103,6 @@ public:
 		}
 	}
 
-	/// \brief Get a member value of the filter. Throws on conversion error
-	/// \param [in] name case sensitive name of the variable
-	/// \param [in] val buffer for the value returned
-	/// \return true on success, false, if the variable does not exist or we have to yield (check state)
-	virtual bool getValue( const char* /*name*/, std::string& /*val*/) const
-	{
-		return false;
-	}
-
-	/// \brief Set a member value of the filter. Throws on conversion error
-	/// \param [in] name case sensitive name of the variable
-	/// \param [in] val new value of the variable to set
-	/// \return true on success, false, if the variable does not exist or we have to yield (check state)
-	virtual bool setValue( const char* /*name*/, const std::string& /*val*/)
-	{
-		return false;
-	}
-
 	enum Flags
 	{
 		None=0x00,				///< no flags set
@@ -140,8 +122,6 @@ public:
 	/// \brief Set a flag (or a set of flags)
 	/// \return true on success, false if the (or one of) flag is not supported
 	virtual bool setFlags( Flags f)			{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff; return true;}
-	/// \brief Reset set all flags
-	virtual void resetFlags()			{m_flags = None;}
 	/// \brief Test if a flag can be set (allowed)
 	virtual bool checkSetFlags( Flags) const	{return true;}
 
@@ -153,6 +133,36 @@ private:
 	char m_errorbuf[ ErrorBufSize];		///< error string
 	Flags m_flags;				///< flags
 	const char* m_name;			///< name of the filter
+};
+
+/// \class ContentFilterBase
+/// \brief Base of a content input/ouput filter
+class ContentFilterBase
+	:public FilterBase
+{
+public:
+	ContentFilterBase( const char* name_)
+		:FilterBase( name_){}
+	ContentFilterBase( const ContentFilterBase& o)
+		:FilterBase( o){}
+
+	/// \brief Get a member value of the filter. Throws on conversion error
+	/// \param [in] name case sensitive name of the variable
+	/// \param [in] val buffer for the value returned
+	/// \return true on success, false, if the variable does not exist or we have to yield (check state)
+	virtual bool getValue( const char* /*name*/, std::string& /*val*/) const
+	{
+		return false;
+	}
+
+	/// \brief Set a member value of the filter. Throws on conversion error
+	/// \param [in] name case sensitive name of the variable
+	/// \param [in] val new value of the variable to set
+	/// \return true on success, false, if the variable does not exist or we have to yield (check state)
+	virtual bool setValue( const char* /*name*/, const std::string& /*val*/)
+	{
+		return false;
+	}
 };
 
 }}//namespace

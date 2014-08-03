@@ -40,18 +40,8 @@ Project Wolframe.
 #include "filter/outputfilter.hpp"
 #include <boost/shared_ptr.hpp>
 
-// temporarily for output below
-#include <iostream>
-
 namespace _Wolframe {
 namespace langbind {
-
-/// \class TypedFilterData
-/// \brief Private object bound to a filter to hold some data to be freed with the release of this filter (to solve some object life time dependency problems)
-struct TypedFilterData
-{
-	virtual ~TypedFilterData(){}
-};
 
 /// \class TypedInputFilter
 /// \brief Input filter with atomic values having a type
@@ -70,8 +60,7 @@ public:
 	/// \param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)
 		:FilterBase(o)
-		,m_state(o.m_state)
-		,m_data(o.m_data){}
+		,m_state(o.m_state){}
 
 	/// \brief Destructor
 	virtual ~TypedInputFilter(){}
@@ -100,15 +89,8 @@ public:
 	/// \brief Set the iterator to the start (if implemented)
 	virtual void resetIterator(){}
 
-	/// \brief Set data that belongs to filter scope
-	void setData( const boost::shared_ptr<TypedFilterData>& data_)
-	{
-		m_data = data_;
-	}
-
 private:
 	State m_state;					///< state
-	boost::shared_ptr<TypedFilterData> m_data;	///< data bound to the filter
 };
 
 /// \typedef TypedInputFilterR

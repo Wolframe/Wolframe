@@ -144,4 +144,22 @@ bool JoinInputFilter::checkSetFlags( Flags f) const
 	return m_inputfilter1->setFlags(f) && m_inputfilter2->setFlags(f);
 }
 
+void JoinInputFilter::resetIterator()
+{
+	m_inputfilter1->resetIterator();
+	m_inputfilter2->resetIterator();
+}
+
+const char* JoinInputFilter::getError() const
+{
+	switch (m_joinstate)
+	{
+		case Init: return 0;
+		case ProcessFilter1: return m_inputfilter1->getError();
+		case ProcessFilter2: return m_inputfilter2->getError()?m_inputfilter2->getError():m_inputfilter1->getError();
+		case FinalClose: return m_inputfilter2->getError();
+		case Done: return 0;
+	}
+	return 0;
+}
 
