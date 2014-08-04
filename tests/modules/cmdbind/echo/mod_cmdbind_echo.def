@@ -1,0 +1,4 @@
+LIBRARY mod_cmdbind_echo
+
+EXPORTS
+entryPoint	@1

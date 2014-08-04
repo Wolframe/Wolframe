@@ -1,0 +1,4 @@
+LIBRARY mod_doctype_test
+
+EXPORTS
+entryPoint	@1
