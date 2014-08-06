@@ -63,6 +63,10 @@ bool DoctypeDetectorTest::run()
 		{
 			return false;
 		}
+		else
+		{
+			m_itembuf.push_back(ch);
+		}
 	}
 	return false;
 }

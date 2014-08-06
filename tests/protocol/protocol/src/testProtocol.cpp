@@ -296,6 +296,12 @@ struct GlobalContext
 		m_databaseProvider = new db::DatabaseProvider( &m_dbProviderConfig, &m_modulesDirectory);
 		m_processorProvider = new proc::ProcessorProvider( &m_procProviderConfig, &m_modulesDirectory, &m_programLibrary);
 		m_execContext = new proc::ExecContext( m_processorProvider, m_aaaaProvider);
+
+		m_processorProvider->resolveDB( *m_databaseProvider);
+		if (!m_processorProvider->loadPrograms())
+		{
+			throw std::runtime_error( "failed to load programs for the processor provider");
+		}
 	}
 
 	~GlobalContext()

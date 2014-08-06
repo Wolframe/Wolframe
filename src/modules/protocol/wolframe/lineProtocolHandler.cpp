@@ -42,7 +42,7 @@ using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::protocol;
 
 LineProtocolHandler::LineProtocolHandler( const LineProtocolHandlerSTM* stm_, std::size_t stateidx_)
-	:m_delegateHandler(0),m_delegateHandlerEnd(0),m_stm(stm_),m_argBuffer(&m_buffer),m_cmdstateidx(Init),m_stateidx(stateidx_),m_cmdidx(-1),m_resultstate(-1),m_resultitr(0)
+	:m_delegateHandler(0),m_delegateHandlerEnd(0),m_stm(stm_),m_argBuffer(&m_buffer),m_cmdstateidx(Init),m_stateidx(stateidx_),m_cmdidx(-1),m_resultstate(-1),m_resultitr(0),m_refuseInputFlag(false)
 {
 	m_itr = m_input.begin();
 	m_end = m_input.end();
@@ -148,6 +148,7 @@ int LineProtocolHandler::runCommand( const char* cmd_, int argc_, const char** a
 
 bool LineProtocolHandler::redirectInput( void* data, std::size_t datasize, cmdbind::ProtocolHandler* toh, std::ostream& out)
 {
+	bool rt = true;
 	const void* toh_output;
 	std::size_t toh_outputsize;
 	const char* error;
@@ -165,10 +166,28 @@ bool LineProtocolHandler::redirectInput( void* data, std::size_t datasize, cmdbi
 			out << std::string( (const char*)toh_output, toh_outputsize);
 			continue;
 		case cmdbind::ProtocolHandler::CLOSE:
+		{
 			error = toh->lastError();
-			if (error) { LOG_ERROR << "error redirect input: " << error; }
-			toh->setInputBuffer( m_input.ptr(), m_input.size());
-			return false;
+			if (error)
+			{
+				LOG_ERROR << "error redirect input: " << error;
+				rt = false;
+			}
+			toh->getDataLeft( toh_output, toh_outputsize);
+			if (toh_outputsize)
+			{
+				if (toh_outputsize > m_input.size())
+				{
+					throw std::runtime_error("internal: data chunk to feed exceeds size of buffer. Can not happen");
+				}
+				std::memmove( m_input.charptr(), toh_output, toh_outputsize);
+				m_input.setPos( toh_outputsize);
+				m_end = m_input.begin() + toh_outputsize;
+				m_itr = m_input.begin();
+				m_refuseInputFlag = true;
+			}
+			return rt;
+		}
 	}
 }
 
@@ -180,9 +199,11 @@ ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 		LOG_TRACE << "STATE LineProtocolHandler " << commandStateName( m_cmdstateidx);
 		// to blurry log message. Helped in the beginning, but got now useless
 #endif
+		/*[-]*/std::cout << "STATE LineProtocolHandler " << commandStateName( m_cmdstateidx) << std::endl;
 		switch( m_cmdstateidx)
 		{
 			case Init:
+				//\todo Rethink model of protocol processing delegation. Got too many if's
 				m_argBuffer.clear();
 				if (m_output.pos()) return WRITE;
 				m_cmdstateidx = EnterCommand;
@@ -192,8 +213,14 @@ ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 				m_resultitr = 0;
 				if (m_delegateHandler)
 				{
+					const void* data = (const void*)(m_input.charptr() + (m_itr-m_input.begin()));
+					std::size_t datasize = m_end-m_itr;
+					if (datasize > m_input.size())
+					{
+						throw std::runtime_error("internal: data chunk to feed exceeds size of buffer. Can not happen");
+					}
+					std::memmove( m_input.charptr(), data, datasize);
 					m_delegateHandler->setInputBuffer( m_input.ptr(), m_input.size());
-					std::memmove( m_input.charptr(), m_input.charptr() + (m_itr-m_input.begin()), m_end-m_itr);
 					m_end = m_input.begin() + (m_end-m_itr);
 					m_itr = m_input.begin();
 					m_delegateHandler->putInput( m_itr.ptr(), m_end-m_itr);
@@ -208,6 +235,7 @@ ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 					ProtocolHandler::Operation delegateRes = m_delegateHandler->nextOperation();
 					if (delegateRes == CLOSE)
 					{
+						/*[-]*/std::cout << "GOT CLOSE" << std::endl;
 						try
 						{
 							std::ostringstream out;
@@ -220,7 +248,10 @@ ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 							m_delegateHandlerEnd = 0;
 							m_cmdstateidx = ProcessOutput;
 							m_resultstate = (*l_delegateHandlerEnd)( (void*)this, l_delegateHandler, out);
-							putInput( r_begin, r_nofBytes);
+							if (!m_refuseInputFlag)
+							{
+								putInput( r_begin, r_nofBytes);
+							}
 							m_resultstr = out.str();
 							m_resultitr = 0;
 							continue;
@@ -246,6 +277,7 @@ ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 
 			case EnterCommand:
 			{
+				m_refuseInputFlag = false;
 				const LineProtocolHandlerSTM::State& st = (*m_stm).get( m_stateidx);
 				int ci = st.m_parser.getCommand( m_itr, m_end, m_buffer);
 				if (ci == -1)
@@ -264,6 +296,7 @@ ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 				}
 				else
 				{
+					/*[-]*/std::cout << "COMMAND '" << m_buffer << "'" << std::endl;
 					m_cmdidx = ci;
 					m_cmdstateidx = ParseArgs;
 					m_argBuffer.clear();

@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = test
+SUBDIRS = textfl
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

@@ -19,7 +19,7 @@ INCLUDE_LIBS = \
 	-lwfsingleton \
 	-lwolframe
 
-DYNAMIC_MODULE = mod_doctype_test.so
+DYNAMIC_MODULE = mod_doctype_textfl.so
 
 CPP_OBJS = \
 	doctypeDetectorTest.o

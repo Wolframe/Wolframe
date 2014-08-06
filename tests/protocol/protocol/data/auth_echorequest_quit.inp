@@ -1,0 +1,13 @@
+AUTH
+MECH NONE
+REQUEST
+Test
+ . ..
+ABC
+.DEF
+..
+End Test
+...
+.
+QUIT
+

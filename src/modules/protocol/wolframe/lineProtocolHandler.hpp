@@ -206,6 +206,7 @@ private:
 	int m_resultstate;					///< result state of the last command
 	std::string m_resultstr;				///< content the command output stream after command execution
 	std::size_t m_resultitr;				///< iterator on m_result to send the output via network output
+	bool m_refuseInputFlag;					///< bad hack to save processing delegation statemachine (must be reimplemented): next input block has already been defined by redirectInput
 };
 
 

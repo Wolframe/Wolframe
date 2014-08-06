@@ -201,7 +201,7 @@ int InputBlock::getEoDpos( std::size_t offset)
 					remove_chars_from_buf( buf, bufsize, delchrs);
 					m_nextpos = bufpos - delchrs.size() + 1;
 					setPos( bufsize - delchrs.size());
-					return srcendpos;
+					return srcendpos - delchrs.size() + 1;
 				}
 				else
 				{
@@ -217,7 +217,7 @@ int InputBlock::getEoDpos( std::size_t offset)
 					remove_chars_from_buf( buf, bufsize, delchrs);
 					m_nextpos = bufpos - delchrs.size() + 1;
 					setPos( bufsize - delchrs.size());
-					return srcendpos;
+					return srcendpos - delchrs.size() + 1;
 				}
 				else if (buf[bufpos] == '\r')
 				{

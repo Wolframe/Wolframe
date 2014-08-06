@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of the echo command handler for protocol tests
 #include "echoCommandHandler.hpp"
 #include "processor/execContext.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
@@ -72,6 +73,7 @@ IOFilterCommandHandler::CallResult EchoCommandHandler::call( const char*& err)
 				if (inputfilter()->state() == langbind::InputFilter::EndOfMessage)
 				{
 					m_state = 2;
+					LOG_DEBUG << "echo input [" << m_content << "]";
 					return Yield;
 				}
 				else if (inputfilter()->state() == langbind::InputFilter::Error)

@@ -23,7 +23,7 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_doctype_test.dll
+	mod_doctype_textfl.dll
 
 CPP_OBJS = \
 	doctypeDetectorTest.obj
@@ -32,8 +32,8 @@ all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS) mod_doctype_test.obj
-	$(LINK) /dll /def:mod_doctype_test.def /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_doctype_textfl.obj
+	$(LINK) /dll /def:mod_doctype_textfl.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

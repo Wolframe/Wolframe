@@ -84,6 +84,7 @@ const char* EscDlfProtocolHandler::interruptDataSessionMarker() const
 void EscDlfProtocolHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
 	m_input.set( (char*)buf, allocsize);
+	m_nextmsg = 0;
 }
 
 void EscDlfProtocolHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
@@ -164,40 +165,54 @@ ProtocolHandler::Operation EscDlfProtocolHandler::nextOperation()
 					continue;
 				}
 				m_state = Processing;
-				switch (m_cmdhandler->nextOperation())
+				try
 				{
-					case CommandHandler::READ:
-						if (consumeInput())
-						{
-							continue;
-						}
-						return READ;
-
-					case CommandHandler::WRITE:
-						if (getCommandHandlerWriteData())
-						{
-							m_state = FlushingOutput;
-							return WRITE;
-						}
-						else
-						{
-							m_state = Terminated;
-							setLastError( "illegal state: got WRITE from command handler but no data");
-							return CLOSE;
-						}
-
-					case CommandHandler::CLOSE:
-						if (m_cmdhandler->lastError())
-						{
-							setLastError( m_cmdhandler->lastError());
-							m_state = DiscardInput;
-							continue;
-						}
-						else
-						{
-							m_state = DiscardInput;
-							continue;
-						}
+					switch (m_cmdhandler->nextOperation())
+					{
+						case CommandHandler::READ:
+							if (consumeInput())
+							{
+								continue;
+							}
+							if (m_gotEoD)
+							{
+								m_state = DiscardInput;
+								continue;
+							}
+							return READ;
+	
+						case CommandHandler::WRITE:
+							if (getCommandHandlerWriteData())
+							{
+								m_state = FlushingOutput;
+								return WRITE;
+							}
+							else
+							{
+								m_state = Terminated;
+								setLastError( "illegal state: got WRITE from command handler but no data");
+								return CLOSE;
+							}
+	
+						case CommandHandler::CLOSE:
+							if (m_cmdhandler->lastError())
+							{
+								setLastError( m_cmdhandler->lastError());
+								m_state = DiscardInput;
+								continue;
+							}
+							else
+							{
+								m_state = DiscardInput;
+								continue;
+							}
+					}
+				}
+				catch (const std::runtime_error& err)
+				{
+					setLastError( err.what());
+					m_state = DiscardInput;
+					continue;
 				}
 				break;
 			}
@@ -217,13 +232,15 @@ bool EscDlfProtocolHandler::consumeInput()
 		{
 			if (m_state != DiscardInput)
 			{
-				cmdh->putInput( m_input.charptr()+m_itrpos, m_eoD-m_input.at(m_itrpos), m_input.gotEoD());
+				const char* data = m_input.charptr()+m_itrpos;
+				std::size_t datasize = m_eoD-m_input.at(m_itrpos);
+				cmdh->putInput( data, datasize, m_input.gotEoD());
 			}
-			if (m_input.gotEoD())
-			{
-				m_gotEoD = true;
-				m_nextmsg = m_input.skipEoD();
-			}
+		}
+		if (m_input.gotEoD())
+		{
+			m_gotEoD = true;
+			m_nextmsg = m_input.skipEoD();
 		}
 		m_unconsumedInput = false;
 		return true;
@@ -233,6 +250,8 @@ bool EscDlfProtocolHandler::consumeInput()
 
 void EscDlfProtocolHandler::putInput( const void* chunk_, std::size_t chunksize_)
 {
+	/*[-]*/std::cout << "++++ EscDlfProtocolHandler::putInput [" << std::string((const char*)chunk_, chunksize_) << "]" << std::endl;
+
 	std::size_t startidx = (const char*)chunk_ - m_input.charptr();
 	if (chunksize_ + startidx > m_input.size())
 	{
