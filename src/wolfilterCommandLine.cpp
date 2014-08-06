@@ -58,6 +58,7 @@ using namespace _Wolframe::config;
 //TODO: NOT TO DEFINE HERE (it is here because appProperties.cpp is not in a src/libwolframed.a -> Issue #95)
 static const char* defaultMainConfig()		{
 #ifdef DEFAULT_MAIN_CONFIGURATION_FILE
+		#define DO_STRINGIFY(x)	#x
 		return DO_STRINGIFY( DEFAULT_MAIN_CONFIGURATION_FILE );
 #else
 		return "/etc/wolframe/wolframe.conf";
