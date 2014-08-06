@@ -11,9 +11,14 @@ cd ~/tutorial/server
 	</para>
 	
 	<para>
-		We create the central confuguration file of the server <filename>tutorial.conf</filename>:
+		We create the central configuration file of the server <filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
+; we have to load the wolframe protocol to be able to talk with the server
+LoadModules {
+    Module mod_protocol_wolframe
+}
+
 ; we install a verbose default logger to the shell
 Logging {
     Stderr {
