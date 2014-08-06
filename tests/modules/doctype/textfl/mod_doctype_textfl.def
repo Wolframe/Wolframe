@@ -1,4 +1,4 @@
-LIBRARY mod_doctype_test
+LIBRARY mod_doctype_textfl
 
 EXPORTS
 entryPoint	@1
