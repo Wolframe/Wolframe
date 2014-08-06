@@ -250,8 +250,6 @@ bool EscDlfProtocolHandler::consumeInput()
 
 void EscDlfProtocolHandler::putInput( const void* chunk_, std::size_t chunksize_)
 {
-	/*[-]*/std::cout << "++++ EscDlfProtocolHandler::putInput [" << std::string((const char*)chunk_, chunksize_) << "]" << std::endl;
-
 	std::size_t startidx = (const char*)chunk_ - m_input.charptr();
 	if (chunksize_ + startidx > m_input.size())
 	{

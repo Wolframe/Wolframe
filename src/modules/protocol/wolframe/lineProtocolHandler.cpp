@@ -199,7 +199,6 @@ ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 		LOG_TRACE << "STATE LineProtocolHandler " << commandStateName( m_cmdstateidx);
 		// to blurry log message. Helped in the beginning, but got now useless
 #endif
-		/*[-]*/std::cout << "STATE LineProtocolHandler " << commandStateName( m_cmdstateidx) << std::endl;
 		switch( m_cmdstateidx)
 		{
 			case Init:
@@ -235,7 +234,6 @@ ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 					ProtocolHandler::Operation delegateRes = m_delegateHandler->nextOperation();
 					if (delegateRes == CLOSE)
 					{
-						/*[-]*/std::cout << "GOT CLOSE" << std::endl;
 						try
 						{
 							std::ostringstream out;
@@ -296,7 +294,6 @@ ProtocolHandler::Operation LineProtocolHandler::nextOperation()
 				}
 				else
 				{
-					/*[-]*/std::cout << "COMMAND '" << m_buffer << "'" << std::endl;
 					m_cmdidx = ci;
 					m_cmdstateidx = ParseArgs;
 					m_argBuffer.clear();
