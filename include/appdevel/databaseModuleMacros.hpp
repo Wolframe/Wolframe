@@ -106,7 +106,7 @@
 	{\
 		static _Wolframe::module::BuilderBase* impl()\
 		{\
-			static BuilderDescription mod( "Database interface to " NAME, "Database", NAME, NAME "Database");\
+			static BuilderDescription mod( NAME "Database", "Database", NAME, NAME "Database");\
 			return &mod;\
 		}\
 	};\
