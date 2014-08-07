@@ -334,7 +334,6 @@ dirs:
 - /usr/local/include/wolframe/lua
 - /usr/local/include/wolframe/libclient
 - /usr/local/include/wolframe/langbind
-- /usr/local/include/wolframe/protocol
 - /usr/local/include/wolframe/cmdbind
 - /usr/local/include/wolframe/database
 - /usr/local/include/wolframe/database/vm
