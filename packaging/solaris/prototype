@@ -154,13 +154,9 @@ f none opt/csw/include/wolframe/langbind/output.hpp 0644 root staff
 f none opt/csw/include/wolframe/langbind/runtimeEnvironment.hpp 0644 root staff
 d none opt/csw/include/wolframe/cmdbind 0755 root root
 f none opt/csw/include/wolframe/cmdbind/commandHandler.hpp 0644 root staff
-f none opt/csw/include/wolframe/cmdbind/commandHandlerUnit.hpp 0644 root staff
-f none opt/csw/include/wolframe/cmdbind/commandHandlerConstructor.hpp 0644 root staff
-f none opt/csw/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/doctypeDetector.hpp 0644 root staff
 f none opt/csw/include/wolframe/cmdbind/ioFilterCommandHandler.hpp 0644 root staff
-f none opt/csw/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp 0644 root staff
-f none opt/csw/include/wolframe/cmdbind/lineCommandHandler.hpp 0644 root staff
+f none opt/csw/include/wolframe/cmdbind/protocolHandler.hpp 0644 root staff
 d none opt/csw/include/wolframe/database 0755 root root
 f none opt/csw/include/wolframe/database/DBprovider.hpp 0644 root staff
 f none opt/csw/include/wolframe/database/baseStatement.hpp 0644 root staff
@@ -238,7 +234,7 @@ f none opt/csw/include/wolframe/processor/procProvider.hpp 0644 root staff
 f none opt/csw/include/wolframe/processor/procProviderInterface.hpp 0644 root staff
 f none opt/csw/include/wolframe/processor/procProviderConfig.hpp 0644 root staff
 d none opt/csw/include/wolframe/filter 0755 root root
-f none opt/csw/include/wolframe/filter/bufferingfilter.hpp 0644 root staff
+f none opt/csw/include/wolframe/filter/envelopefilter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/execContextInputFilter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filter.hpp 0644 root staff
 f none opt/csw/include/wolframe/filter/filterbase.hpp 0644 root staff
@@ -262,7 +258,6 @@ f none opt/csw/include/wolframe/types/base64.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/bignumber.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/byte2hex.h 0644 root staff
 f none opt/csw/include/wolframe/types/conversions.hpp 0644 root staff
-f none opt/csw/include/wolframe/types/countedReference.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/docmetadata.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/doctypeinfo.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/customDataNormalizer.hpp 0644 root staff
@@ -277,6 +272,7 @@ f none opt/csw/include/wolframe/types/propertyTree.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/string.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/secureString.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/secureReference.hpp 0644 root staff
+f none opt/csw/include/wolframe/types/sharedReference.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/traits.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/variant.hpp 0644 root staff
 f none opt/csw/include/wolframe/types/variantStruct.hpp 0644 root staff
@@ -287,6 +283,7 @@ f none opt/csw/include/wolframe/AAAA/authUnit.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/authenticator.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/AAAAinformation.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/AAAAprovider.hpp 0644 root staff
+f none opt/csw/include/wolframe/AAAA/AAAAproviderInterface.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/CRAM.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/audit.hpp 0644 root staff
 f none opt/csw/include/wolframe/AAAA/authorization.hpp 0644 root staff
@@ -299,6 +296,7 @@ d none opt/csw/include/wolframe/module 0755 root root
 f none opt/csw/include/wolframe/module/constructor.hpp 0644 root staff
 f none opt/csw/include/wolframe/module/moduleDirectory.hpp 0644 root staff
 f none opt/csw/include/wolframe/module/moduleInterface.hpp 0644 root staff
+f none opt/csw/include/wolframe/module/moduleLoader.hpp 0644 root staff
 d none opt/csw/include/wolframe/prgbind 0755 root root
 f none opt/csw/include/wolframe/prgbind/ddlProgram.hpp 0644 root staff
 f none opt/csw/include/wolframe/prgbind/normalizeProgram.hpp 0644 root staff
@@ -340,6 +338,7 @@ f none opt/csw/include/wolframe/appdevel/ddlCompilerModuleMacros.hpp 0644 root s
 f none opt/csw/include/wolframe/appdevel/normalizeModuleMacros.hpp 0644 root staff
 f none opt/csw/include/wolframe/appdevel/doctypeModuleMacros.hpp 0644 root staff
 f none opt/csw/include/wolframe/appdevel/programTypeModuleMacros.hpp 0644 root staff
+f none opt/csw/include/wolframe/appdevel/protocolHandlerModuleMacros.hpp 0644 root staff
 f none opt/csw/include/wolframe/appdevel/moduleFrameMacros.hpp 0644 root staff
 f none opt/csw/include/wolframe/appdevel/cppFormFunctionModuleMacros.hpp 0644 root staff
 f none opt/csw/include/wolframe/appdevel/runtimeEnvironmentModuleMacros.hpp 0644 root staff

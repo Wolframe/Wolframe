@@ -132,13 +132,9 @@ usr/local/include/wolframe/langbind/output.hpp
 usr/local/include/wolframe/langbind/runtimeEnvironment.hpp
 @dirrm usr/local/include/wolframe/langbind
 usr/local/include/wolframe/cmdbind/commandHandler.hpp
-usr/local/include/wolframe/cmdbind/commandHandlerUnit.hpp
-usr/local/include/wolframe/cmdbind/discardInputCommandHandlerEscDLF.hpp
 usr/local/include/wolframe/cmdbind/doctypeDetector.hpp
 usr/local/include/wolframe/cmdbind/ioFilterCommandHandler.hpp
-usr/local/include/wolframe/cmdbind/ioFilterCommandHandlerEscDLF.hpp
-usr/local/include/wolframe/cmdbind/lineCommandHandler.hpp
-usr/local/include/wolframe/cmdbind/commandHandlerConstructor.hpp
+usr/local/include/wolframe/cmdbind/protocolHandler.hpp
 @dirrm usr/local/include/wolframe/cmdbind
 usr/local/include/wolframe/database/DBprovider.hpp
 usr/local/include/wolframe/database/database.hpp
@@ -216,9 +212,10 @@ usr/local/include/wolframe/processor/procProviderConfig.hpp
 usr/local/include/wolframe/processor/jobSchedule.hpp
 usr/local/include/wolframe/module/moduleDirectory.hpp
 usr/local/include/wolframe/module/moduleInterface.hpp
+usr/local/include/wolframe/module/moduleLoader.hpp
 usr/local/include/wolframe/processor/procProvider.hpp
 @dirrm usr/local/include/wolframe/processor
-usr/local/include/wolframe/filter/bufferingfilter.hpp
+usr/local/include/wolframe/filter/envelopefilter.hpp
 usr/local/include/wolframe/filter/execContextInputFilter.hpp
 usr/local/include/wolframe/filter/filter.hpp
 usr/local/include/wolframe/filter/filterbase.hpp
@@ -241,7 +238,6 @@ usr/local/include/wolframe/types/base64.h
 usr/local/include/wolframe/types/base64.hpp
 usr/local/include/wolframe/types/byte2hex.h
 usr/local/include/wolframe/types/conversions.hpp
-usr/local/include/wolframe/types/countedReference.hpp
 usr/local/include/wolframe/types/docmetadata.hpp
 usr/local/include/wolframe/types/doctypeinfo.hpp
 usr/local/include/wolframe/types/form.hpp
@@ -249,6 +245,7 @@ usr/local/include/wolframe/types/integer.hpp
 usr/local/include/wolframe/types/keymap.hpp
 usr/local/include/wolframe/types/normalizeFunction.hpp
 usr/local/include/wolframe/types/secureReference.hpp
+usr/local/include/wolframe/types/sharedReference.hpp
 usr/local/include/wolframe/types/traits.hpp
 usr/local/include/wolframe/types/variant.hpp
 usr/local/include/wolframe/types/variantStruct.hpp
@@ -267,6 +264,7 @@ usr/local/include/wolframe/AAAA/authUnit.hpp
 usr/local/include/wolframe/AAAA/authenticator.hpp
 usr/local/include/wolframe/AAAA/AAAAinformation.hpp
 usr/local/include/wolframe/AAAA/AAAAprovider.hpp
+usr/local/include/wolframe/AAAA/AAAAproviderInterface.hpp
 usr/local/include/wolframe/AAAA/CRAM.hpp
 usr/local/include/wolframe/AAAA/audit.hpp
 usr/local/include/wolframe/AAAA/authorization.hpp
@@ -318,6 +316,7 @@ usr/local/include/wolframe/appdevel/ddlCompilerModuleMacros.hpp
 usr/local/include/wolframe/appdevel/normalizeModuleMacros.hpp
 usr/local/include/wolframe/appdevel/doctypeModuleMacros.hpp
 usr/local/include/wolframe/appdevel/programTypeModuleMacros.hpp
+usr/local/include/wolframe/appdevel/protocolHandlerModuleMacros.hpp
 usr/local/include/wolframe/appdevel/moduleFrameMacros.hpp
 usr/local/include/wolframe/appdevel/cppFormFunctionModuleMacros.hpp
 usr/local/include/wolframe/appdevel/runtimeEnvironmentModuleMacros.hpp
