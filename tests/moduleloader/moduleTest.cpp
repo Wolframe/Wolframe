@@ -231,8 +231,7 @@ TEST_F( ModuleFixture, LoadingModuleResolvableSymbol )
 
 int main( int argc, char **argv )
 {
-	g_execdir = boost::filesystem::system_complete( argv[0]).parent_path().string();
-	WOLFRAME_GTEST_REPORT( argv[0], g_execdir);
+	WOLFRAME_GTEST_REPORT( argv[0], refpath.string());
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS( );
 }
