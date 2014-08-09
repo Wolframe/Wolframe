@@ -32,11 +32,13 @@
 ************************************************************************/
 ///\brief Implementation of the input data structure for transaction functions
 ///\file vm/inputStructure.cpp
-#include "vm/inputStructure.hpp"
+
+#include "inputStructure.hpp"
 #include "filter/typedfilter.hpp"
 #include "utils/printFormats.hpp"
 #include "logger-v1.hpp"
 #include <boost/algorithm/string.hpp>
+#include <iostream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
