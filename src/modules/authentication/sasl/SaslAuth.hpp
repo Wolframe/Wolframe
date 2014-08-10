@@ -114,7 +114,7 @@ class SaslAuthSlice : public AuthenticatorSlice
 		SLICE_AUTHENTICATED,		///< Response was correct -> user available
 		SLICE_SYSTEM_FAILURE		///< Something is wrong
 	};
-	
+
 public:
 	SaslAuthSlice( const SaslAuthUnit& backend );
 
@@ -143,7 +143,7 @@ public:
 
 private:
 	const SaslAuthUnit&	m_backend;
-	SliceState		m_state;
+//	SliceState		m_state;
 	bool			m_inputReusable;
 	std::string		m_user;
 };

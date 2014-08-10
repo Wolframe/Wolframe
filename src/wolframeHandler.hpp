@@ -125,7 +125,7 @@ private:
 
 	void* m_input;						///< buffer for read messages
 	std::size_t m_inputsize;				///< allocation size of m_input in bytes
-	std::size_t m_inputpos;
+//	std::size_t m_inputpos;
 	void* m_output;						///< buffer for write messages
 	std::size_t m_outputsize;				///< allocation size of m_output in bytes
 

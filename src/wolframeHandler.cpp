@@ -56,7 +56,7 @@ namespace _Wolframe	{
 wolframeConnection::wolframeConnection( const WolframeHandler& context,
 					const net::LocalEndpointR& local )
 	: m_globalCtx( context ),
-	  m_input(0), m_inputsize(16536), m_inputpos(0), m_output(0), m_outputsize( 4096 ), m_execContext( &context.proc(), &context.aaaa())
+	  m_input(0), m_inputsize(16536), /*m_inputpos(0),*/ m_output(0), m_outputsize( 4096 ), m_execContext( &context.proc(), &context.aaaa())
 {
 	m_input = std::malloc( m_inputsize);
 	m_output = std::malloc( m_outputsize);

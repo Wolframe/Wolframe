@@ -114,7 +114,7 @@ private:
 	std::size_t m_elemitr;					///< iterator on current element
 	types::String::EncodingAttrib m_encattr;		///< character set encoding attributes
 	bool m_headerprinted;					///< true if the header has already been printed
-	bool m_flushing;					///< true, if we are flushing the buffer to output
+//	bool m_flushing;					///< true, if we are flushing the buffer to output
 
 	struct StackElement
 	{
