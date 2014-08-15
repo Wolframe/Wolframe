@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-Jul 20, 2014 version 0.0.4
+Jul 30, 2014 version 0.0.2
 
 -------------------------------------------------------------------------------
 
@@ -1128,7 +1128,7 @@ of SlackBuilds.
 
 FreeBSD 10
 
-You need the 'python33' package.
+You need the 'python34' package.
 
 FreeBSD 8 and 9
 
@@ -2003,7 +2003,7 @@ The official Qt 4 package is too old, build your own Qt library.
 
 For Qt 5 compile your own version of the library.
 
-RedHat/Centos/Scientific Linux 6 and similar Linux distributions
+RedHat/Centos/Scientific Linux 6 and 7 or similar Linux distributions
 
 For Qt 4 you need the 'qt4-devel' package.
 
