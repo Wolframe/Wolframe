@@ -13,13 +13,23 @@
 VERSION=0.0.2
 RPMBUILD=$HOME/rpmbuild
 #OSB_PLATFORM=
+ARCH=`uname -m`
+if test "x$ARCH" = "xi686"; then
+	ARCH="i386"
+fi
 
-rm -rf $RPMBUILD/BUILDROOT $RPMBUILD/BUILD/wolframe-$VERSION \
-	$RPMBUILD/BUILD/boost-1.48.0 $RPMBUILD/BUILD/libxml2-2.9.1 \
-	$RPMBUILD/BUILD/libxslt-1.1.28 $RPMBUILD/BUILD/Python-3.3.2 \
-	$RPMBUILD/RPMS/*/* \
-	$RPMBUILD/SRPMS/* $RPMBUILD/SPECS/log \
-	/tmp/boost-1.48.0 /tmp/libxml2-2.9.1 /tmp/libxslt-1.1.28 /tmp/Python-3.3.2
+rm -rf $RPMBUILD/BUILD/wolframe-$VERSION \
+	$RPMBUILD/BUILDROOT/wolframe-$VERSION \
+	$RPMBUILD/RPMS/$ARCH/wolframe-*$VERSION*.rpm \
+	$RPMBUILD/SRPMS/wolframe-$VERSION*src.rpm \
+	$RPMBUILD/SPECS/wolframe.spec
+
+mkdir -p $RPMBUILD $RPMBUILD/BUILD/wolframe-$VERSION \
+	$RPMBUILD/BUILDROOT/wolframe-$VERSION \
+	$RPMBUILD/RPMS/$ARCH $RPMBUILD/SRPMS \
+	$RPMBUILD/SOURCES $RPMBUILD/SPECS
+
+rm -f $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
 
 # for rhel5
 rm -rf /var/tmp/wolframe-root/

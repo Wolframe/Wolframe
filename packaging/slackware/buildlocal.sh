@@ -24,12 +24,12 @@ check_for_errors( )
 	fi
 }
 
-rm -rf $PKGBUILD/BUILD/wolfclient-$VERSION $PKGBUILD/PKG/* \
-	$PKGBUILD/PKGS/$ARCH/wolfclient-$VERSION*.tgz
+rm -rf $PKGBUILD/BUILD/wolframe-$VERSION $PKGBUILD/PKG/* \
+	$PKGBUILD/PKGS/$ARCH/wolframe-$VERSION*.tgz
 
 mkdir -p $PKGBUILD $PKGBUILD/BUILD $PKGBUILD/PKG $PKGBUILD/PKGS/$ARCH
 
-rm -f $PKGBUILD/BUILD/wolfclient_$VERSION.tar.gz
+rm -f $PKGBUILD/BUILD/wolframe_$VERSION.tar.gz
 
 GIT_COMMIT_COUNT=`git describe --long --tags | cut -f 2 -d -`
 make distclean
