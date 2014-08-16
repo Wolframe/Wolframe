@@ -1915,7 +1915,7 @@ export PATH
 				<title>FreeBSD 10</title>
 				
 				<para>
-					You need the 'python34' package.
+					You need the 'python33' package.
 				</para>
 			</sect3>
 			
