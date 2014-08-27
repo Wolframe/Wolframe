@@ -59,7 +59,7 @@ Database {
 		When we restart the server we see:
 
 		<programlisting language='shell'>
-DEBUG: SQLite database unit 'db' created with 3 connections to file 'tutorial.db'
+DEBUG: SQLite database unit 'db' created with 4 connections to file 'tutorial.db'
 		</programlisting>
 	</para>
 	
@@ -95,10 +95,11 @@ LoadModules {
 		<programlisting language='shell'>
 ..
 Module files to load:
-  /usr/lib/wolframe/modules/mod_command_tdl
-  /usr/lib/wolframe/modules/mod_db_sqlite3
-  /usr/lib/wolframe/modules/mod_doctype_xml
-  /usr/lib/wolframe/modules/mod_filter_libxml2
+   /usr/lib/wolframe/modules/mod_protocol_wolframe.so
+   /usr/lib/wolframe/modules/mod_command_tdl.so
+   /usr/lib/wolframe/modules/mod_db_sqlite3.so
+   /usr/lib/wolframe/modules/mod_doctype_xml.so
+   /usr/lib/wolframe/modules/mod_filter_libxml2.so
 ..
 		</programlisting>
 		which looks ok.

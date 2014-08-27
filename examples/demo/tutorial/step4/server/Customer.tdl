@@ -1,4 +1,4 @@
 TRANSACTION SelectCustomerList
 BEGIN
-	INTO customer DO SELECT * from Customer;
+    INTO customer DO SELECT * from Customer;
 END

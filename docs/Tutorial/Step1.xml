@@ -14,7 +14,7 @@ cd ~/tutorial/server
 		We create the central configuration file of the server <filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
-; we have to load the wolframe protocol to be able to talk with the server
+; we have to load the wolframe protocol to be able to talk to the server
 LoadModules {
     Module mod_protocol_wolframe
 }
@@ -31,7 +31,7 @@ Server {
     MaxConnections 1
     Threads 1
     Listen {
-        Address	*
+        Address *
         Port 7661
         MaxConnections 1
     }
