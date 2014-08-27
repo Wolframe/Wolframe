@@ -154,8 +154,7 @@ static void computeResponse ( const unsigned char* challenge, const unsigned cha
 	assert( CRAM_RESPONSE_SIZE == SHA256_DIGEST_SIZE );
 	sha256( buffer, CRAM_CHALLENGE_SIZE, response );
 
-	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
-		buffer[ i ] = 0;
+	memset( buffer, 0, sizeof( buffer ));
 }
 //***** End of CRAM response computation ************************************
 
