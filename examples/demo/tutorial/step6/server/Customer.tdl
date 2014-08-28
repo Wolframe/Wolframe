@@ -1,9 +1,9 @@
 TRANSACTION SelectCustomerList
 BEGIN
-	INTO customer DO SELECT * from Customer;
+    INTO customer DO SELECT * from Customer;
 END
 
 TRANSACTION SelectCustomer
 BEGIN
-	INTO . DO SELECT * from Customer WHERE id=$(id);
+    INTO . DO SELECT * from Customer WHERE id=$(id);
 END

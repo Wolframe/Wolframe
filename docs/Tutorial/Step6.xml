@@ -49,7 +49,7 @@ customer_show?id={customer.selected}
 	</para>
 	
 	<screenshot>
-		<screeninfo>Step 5 customer button signals</screeninfo>
+		<screeninfo>Step 6 customer button signals</screeninfo>
 		<mediaobject>
 			<imageobject role="html"> 
 				<imagedata fileref="images/Tutorial/step6_customers_signals.png" format="PNG"/>

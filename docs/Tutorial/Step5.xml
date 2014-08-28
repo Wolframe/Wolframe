@@ -263,11 +263,11 @@ CustomerList list {
 	<programlisting language='shell'>
 COMMAND CustomerListRequest
     CALL SelectCustomerList
-    RETURN SKIP CustomerList {root='list'};
+    RETURN SKIP CustomerList {root="list"};
 	</programlisting>
 
 	<para>
-	The directive "RETURN SKIP CustomerList {root='list'}" states that a document
+	The directive 'RETURN SKIP CustomerList {root="list"}' states that a document
 	of type 'CustomerList' with the root element 'list' is returned
 	without validation of the output.
 	We omit a validation on purpose for now to get to the next step.

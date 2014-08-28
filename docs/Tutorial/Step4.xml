@@ -232,7 +232,7 @@ FORM CustomerListRequest
 	</para>
 	
 	<para>
-		We have to restart the wolframe daemon now and restart it with:
+		We have to restart the Wolframe daemon now and restart it with:
 		<programlisting language='shell'>
 pkill wolframed
 /usr/sbin/wolframed -f -c tutorial.conf			

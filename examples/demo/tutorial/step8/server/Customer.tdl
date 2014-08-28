@@ -1,21 +1,21 @@
 TRANSACTION SelectCustomerList
 BEGIN
-	INTO customer DO SELECT * from Customer;
+    INTO customer DO SELECT * from Customer;
 END
 
 TRANSACTION SelectCustomer
 BEGIN
-	INTO . DO SELECT * from Customer WHERE id=$(id);
+    INTO . DO SELECT * from Customer WHERE id=$(id);
 END
 
 TRANSACTION UpdateCustomer
 BEGIN
-	DO UPDATE Customer SET name=$(name), address=$(address)
-		WHERE id=$(id);
+    DO UPDATE Customer SET name=$(name), address=$(address)
+        WHERE id=$(id);
 END
 
 TRANSACTION CreateCustomer
 BEGIN
-	DO INSERT INTO Customer( name, address )
-		VALUES( $(name), $(address) );
+    DO INSERT INTO Customer( name, address )
+        VALUES( $(name), $(address) );
 END

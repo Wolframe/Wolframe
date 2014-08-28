@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE list SYSTEM "CustomerList.simpleform">
+<!DOCTYPE list SYSTEM "CustomerList">
 <list>
     <customer id="1">
         <name>Dr Who</name>

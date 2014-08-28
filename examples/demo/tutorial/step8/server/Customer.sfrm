@@ -42,4 +42,3 @@ FORM CustomerCreate
     name string
     address string
 }
-
