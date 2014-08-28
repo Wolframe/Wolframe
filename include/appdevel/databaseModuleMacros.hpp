@@ -44,21 +44,21 @@
 	{\
 	public:\
 		Unit( const CONFIGCLASS& cfg)\
-			:m_db(cfg){}\
+			:m_id(cfg.ID()),m_db(cfg){}\
 		virtual const char* className() const\
 		{\
 			return #DBCLASS "Unit";\
 		}\
 		virtual const std::string& ID() const\
 		{\
-			static const std::string s_ID(NAME);\
-			return s_ID;\
+			return m_id;\
 		}\
 		virtual DBCLASS* database()\
 		{\
 			return &m_db;\
 		}\
 	private:\
+		std::string m_id;\
 		DBCLASS m_db;\
 	};\
 	class Constructor :public _Wolframe::ConfiguredObjectConstructor< _Wolframe::db::DatabaseUnit >\

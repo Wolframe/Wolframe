@@ -10,7 +10,16 @@ class MyDatabaseConfig
 	:public _Wolframe::serialize::DescriptiveConfiguration
 {
 public:
+	const std::string& ID() const
+	{
+		// ... return the identifier of the database as declared in the configuration here
+		// ... for convenience the identifier of the database should be configured as 'identifier'
+		static const std::string rt;
+		return rt;
+	}
+
 	// ... define your configuration data elements here
+	// ... you will find an example of how to define a configuration in a descriptive way at \ref ConfigDescription
 
 	static const _Wolframe::serialize::StructDescriptionBase* getStructDescription()
 	{
