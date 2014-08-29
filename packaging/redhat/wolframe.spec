@@ -232,7 +232,7 @@
 
 Summary: Small and medium enterprise resource planning (Wolframe)
 Name: wolframe
-Version: 0.0.2
+Version: 0.0.3
 Release: 1
 License: Wolframe License
 Group: Application/Business
@@ -1683,6 +1683,9 @@ fi
 %{_bindir}/wolframec
 
 %changelog
+* Fri Aug 29 2014 Andreas Baumann <abaumann@yahoo.com> 0.0.3-1
+- intermediary release
+
 * Fri Jun 20 2014 Andreas Baumann <abaumann@yahoo.com> 0.0.2-1
 - intermediary release
 

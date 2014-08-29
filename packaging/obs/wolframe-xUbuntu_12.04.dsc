@@ -1,6 +1,6 @@
 Format: 3.0 (quilt)
 Source: wolframe
-Version: 0.0.2-xUbuntu12.04
+Version: 0.0.3-xUbuntu12.04
 Binary: wolframe
 Maintainer: contact@wolframe.net
 Architecture: any

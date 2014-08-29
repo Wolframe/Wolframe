@@ -25,7 +25,7 @@ Wolframe. If not, see http://www.gnu.org/licenses/
 If you have questions regarding the use of this file, please contact Project
 Wolframe.
 
-Jul 30, 2014 version 0.0.2
+Aug 29, 2014 version 0.0.3
 
 -------------------------------------------------------------------------------
 
@@ -1906,15 +1906,15 @@ destination of the installation.
 
 For instance:
 
-        make DESTDIR=/var/tmp prefix=/usr/local/wolframe-0.0.2
+        make DESTDIR=/var/tmp prefix=/usr/local/wolframe-0.0.3
  install
 
 
 installs the software in:
 
-        /var/tmp/usr/local/wolframe-0.0.2
+        /var/tmp/usr/local/wolframe-0.0.3
 /sbin/wolframed
-        /var/tmp/usr/local/wolframe-0.0.2
+        /var/tmp/usr/local/wolframe-0.0.3
 /etc/wolframe/wolframe.conf
         ...
 

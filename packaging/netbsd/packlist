@@ -1,6 +1,6 @@
-@name wolframe-0.0.2
+@name wolframe-0.0.3
 @cwd /
-@srcdir PKG/wolframe-0.0.2
+@srcdir PKG/wolframe-0.0.3
 usr/pkg/lib/wolframe/libhpdf.a
 usr/pkg/lib/wolframe/libhpdf.so.2.2.1
 usr/pkg/lib/wolframe/libhpdf.so.2

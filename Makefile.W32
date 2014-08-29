@@ -9,6 +9,6 @@ SUBDIRS = $(SUBDIRS) examples
 !ENDIF
 
 PACKAGE_NAME = wolframe
-PACKAGE_VERSION = 0.0.2
+PACKAGE_VERSION = 0.0.3
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\top.mk
