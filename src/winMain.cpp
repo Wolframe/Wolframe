@@ -452,6 +452,7 @@ int _Wolframe_winMain( int argc, char* argv[] )
 
 		_Wolframe::module::ModulesDirectory modDir( configurationPath);
 		_Wolframe::config::ApplicationConfiguration conf;
+		conf.addModules( &modDir );
 
 		_Wolframe::config::ApplicationConfiguration::ConfigFileType cfgType =
 				_Wolframe::config::ApplicationConfiguration::fileType( configFile, cmdLineCfg.cfgType );
@@ -461,7 +462,6 @@ int _Wolframe_winMain( int argc, char* argv[] )
 			return _Wolframe::ErrorCode::FAILURE;
 		if ( ! modDir.loadModules( conf.moduleList() ))
 			return _Wolframe::ErrorCode::FAILURE;
-		conf.addModules( &modDir );
 		if ( !conf.parse( configFile, cfgType ))
 			return _Wolframe::ErrorCode::FAILURE;
 
