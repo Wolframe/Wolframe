@@ -235,10 +235,10 @@ Project Wolframe.
 								<util:XmlFile Id="AppendDBconfigSqlite3Identifier" Action="createElement" ElementPath="/configuration/database/SQLite"
 								              Name="identifier" Value="sqlitedb"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
-								<util:XmlFile Id="AppendDBconfigSqlite3Filename" Action="createElement" ElementPath="/configuration/database/SQLite"
-								              Name="filename" Value="#inserted by installer#"
+								<util:XmlFile Id="AppendDBconfigSqlite3File" Action="createElement" ElementPath="/configuration/database/SQLite"
+								              Name="file" Value="#inserted by installer#"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="3"/>
-								<util:XmlFile Id="UpdateSqlite3DbLocation" Action="setValue" ElementPath="/configuration/database/SQLite/filename"
+								<util:XmlFile Id="UpdateSqlite3DbLocation" Action="setValue" ElementPath="/configuration/database/SQLite/file"
 								              Value="[INSTALLDIR]data\primary.db"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
 							</Component>
@@ -282,6 +282,13 @@ Project Wolframe.
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="10"/>
 							</Component>
 							<?endif?>
+
+							<Component Id="ModProtocolWolframe" Guid="{2176fc71-380e-4edb-ba8c-d164680ce5e2}">
+								<File Id="mod_protocol_wolframe.dll" Name="mod_protocol_wolframe.dll" DiskId="1" Source="$(var.topdir)\src\modules\protocol\wolframe\mod_protocol_wolframe.dll"/>
+								<util:XmlFile Id="AppendConfigModProtocolWolframe" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_protocol_wolframe.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
 							
 							<Component Id="ModAuditDatabase" Guid="{8EBEC554-6E24-435A-82E1-EE7B1DADE59D}">
 								<File Id="mod_audit_database.dll" Name="mod_audit_database.dll" DiskId="1" Source="$(var.topdir)\src\modules\audit\database\mod_audit_database.dll"/>
@@ -463,6 +470,12 @@ Project Wolframe.
 				<ComponentRef Id="ApplicationShortcut"/>
 				<ComponentRef Id="EmptyLogDir"/>
 				<ComponentRef Id="EmptyDataDir"/>
+			</Feature>
+
+			<Feature Id="ProtocolModules" Title="Protocol modules" Description="protocol modules" Level="3">
+				<Feature Id="ProtocolWolframe" Title="Standard Wolframe protocol" Description="Wolframe protocol module." Level="3" TypicalDefault="install">
+					<ComponentRef Id="ModProtocolWolframe"/>
+				</Feature>
 			</Feature>
 						
 			<Feature Id="DatabaseModules" Title="Database Modules" Description="Connectors to databases" Level="3">
