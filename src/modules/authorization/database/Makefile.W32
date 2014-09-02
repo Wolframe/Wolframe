@@ -34,7 +34,7 @@ all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
+$(DYNAMIC_MODULE): $(CPP_OBJS) mod_authz_database.obj
 	$(LINK) /dll /def:mod_authz_database.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
