@@ -105,7 +105,7 @@ Project Wolframe.
 								<firewall:FirewallException Id="SSLProtocol" Name="Wolframe Protocol (SSL)" Port="7961" Protocol="tcp" Scope="any"/>
 
 								<!-- set location of the logfile -->
-								<util:XmlFile Id="UpdateLogfileLocation" Action="setValue" ElementPath="/configuration/logging/logFile/filename"
+								<util:XmlFile Id="UpdateLogfileLocation" Action="setValue" ElementPath="/Configuration/logging/logFile/filename"
 								              Value="[INSTALLDIR]logs\wolframed.log"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								<!-- install service (TODO, couple names with config) -->
@@ -174,6 +174,7 @@ Project Wolframe.
 							
 							<?ifdef var.with_icu?>
 							<Component Id="ICUDlls" Guid="{205cf449-6a2e-4d43-969a-5740fc4f737b}">
+								<File Id="icudt$(var.icu_lib_version).dll" Name="icudt.dll" DiskId="1" Source="$(var.topdir)\src\icudt$(var.icu_lib_version).dll"/>
 								<?ifdef var.debug?>
 									<File Id="icuin$(var.icu_lib_version)d.dll" Name="icuind.dll" DiskId="1" Source="$(var.topdir)\src\icuin$(var.icu_lib_version)d.dll"/>
 									<File Id="icuuc$(var.icu_lib_version)d.dll" Name="icuucd.dll" DiskId="1" Source="$(var.topdir)\src\icuuc$(var.icu_lib_version)d.dll"/>
@@ -223,22 +224,25 @@ Project Wolframe.
 						</Directory>						
 						
 						<Directory Id="ModulesDir" Name="modules">
+
+							<!-- database modules -->        
+
 							<?ifdef with_sqlite3?>
 							<Component Id="ModDbSqlite3" Guid="{71270C73-F3B4-4956-8DBC-D80301BB3417}">
 								<File Id="mod_db_sqlite3.dll" Name="mod_db_sqlite3.dll" DiskId="1" Source="$(var.topdir)\src\modules\database\sqlite3\mod_db_sqlite3.dll"/>
-								<util:XmlFile Id="AppendConfigModDbSqlite3" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_db_sqlite3.dll"
+								<util:XmlFile Id="AppendConfigModDbSqlite3" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_db_sqlite3.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="AppendDBconfigSqlite3SQlite" Action="createElement" ElementPath="/configuration/database"
+								<util:XmlFile Id="AppendDBconfigSqlite3SQlite" Action="createElement" ElementPath="/Configuration/database"
 								              Name="SQLite"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="AppendDBconfigSqlite3Identifier" Action="createElement" ElementPath="/configuration/database/SQLite"
+								<util:XmlFile Id="AppendDBconfigSqlite3Identifier" Action="createElement" ElementPath="/Configuration/database/SQLite"
 								              Name="identifier" Value="sqlitedb"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
-								<util:XmlFile Id="AppendDBconfigSqlite3File" Action="createElement" ElementPath="/configuration/database/SQLite"
+								<util:XmlFile Id="AppendDBconfigSqlite3File" Action="createElement" ElementPath="/Configuration/database/SQLite"
 								              Name="file" Value="#inserted by installer#"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="3"/>
-								<util:XmlFile Id="UpdateSqlite3DbLocation" Action="setValue" ElementPath="/configuration/database/SQLite/file"
+								<util:XmlFile Id="UpdateSqlite3DbLocation" Action="setValue" ElementPath="/Configuration/database/SQLite/file"
 								              Value="[INSTALLDIR]data\primary.db"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
 							</Component>
@@ -247,152 +251,317 @@ Project Wolframe.
 							<?ifdef with_pgsql?>
 							<Component Id="ModDbPostgresql" Guid="{F1A6E235-2394-466A-AB1E-A1CD6C396339}">
 								<File Id="mod_db_postgresql.dll" Name="mod_db_postgresql.dll" DiskId="1" Source="$(var.topdir)\src\modules\database\postgresql\mod_db_postgresql.dll"/>
-								<util:XmlFile Id="AppendConfigModDbPostgresql" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_db_postgresql.dll"
+								<util:XmlFile Id="AppendConfigModDbPostgresql" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_db_postgresql.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlPostgresql" Action="createElement" ElementPath="/configuration/database"
+								<util:XmlFile Id="AppendDBconfigPostgresqlPostgresql" Action="createElement" ElementPath="/Configuration/database"
 								              Name="PostgreSQL"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlIdentifier" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								<util:XmlFile Id="AppendDBconfigPostgresqlIdentifier" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
 								              Name="identifier" Value="pgdb"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlHost" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								<util:XmlFile Id="AppendDBconfigPostgresqlHost" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
 								              Name="host" Value="[WOLFRAME_DATABASE_HOST]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="3"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlPort" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								<util:XmlFile Id="AppendDBconfigPostgresqlPort" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
 								              Name="port" Value="[WOLFRAME_DATABASE_PORT]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlDatabase" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								<util:XmlFile Id="AppendDBconfigPostgresqlDatabase" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
 								              Name="database" Value="[WOLFRAME_DATABASE_DATABASE]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="5"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlUser" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								<util:XmlFile Id="AppendDBconfigPostgresqlUser" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
 								              Name="user" Value="[WOLFRAME_DATABASE_USER]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="6"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlPassword" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								<util:XmlFile Id="AppendDBconfigPostgresqlPassword" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
 								              Name="password" Value="[WOLFRAME_DATABASE_PASSWORD]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="7"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlConnectionTimeout" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								<util:XmlFile Id="AppendDBconfigPostgresqlConnectionTimeout" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
 								              Name="connectionTimeout" Value="10"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="8"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqConnections" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								<util:XmlFile Id="AppendDBconfigPostgresqConnections" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
 								              Name="connections" Value="5"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="9"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlAcquireTimeout" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								<util:XmlFile Id="AppendDBconfigPostgresqlAcquireTimeout" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
 								              Name="acquireTimeout" Value="10"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="10"/>
 							</Component>
 							<?endif?>
 
+							<!-- protocol modules -->        
+
 							<Component Id="ModProtocolWolframe" Guid="{2176fc71-380e-4edb-ba8c-d164680ce5e2}">
 								<File Id="mod_protocol_wolframe.dll" Name="mod_protocol_wolframe.dll" DiskId="1" Source="$(var.topdir)\src\modules\protocol\wolframe\mod_protocol_wolframe.dll"/>
-								<util:XmlFile Id="AppendConfigModProtocolWolframe" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_protocol_wolframe.dll"
+								<util:XmlFile Id="AppendConfigModProtocolWolframe" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_protocol_wolframe.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
-							
-							<Component Id="ModAuditDatabase" Guid="{8EBEC554-6E24-435A-82E1-EE7B1DADE59D}">
-								<File Id="mod_audit_database.dll" Name="mod_audit_database.dll" DiskId="1" Source="$(var.topdir)\src\modules\audit\database\mod_audit_database.dll"/>
-								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_audit_database.dll"
+
+							<!-- authentication modules -->        
+
+							<Component Id="ModAuthTextfile" Guid="{C3062ADD-6827-4ABE-915F-F1DA1D8EAF47}">
+								<File Id="mod_auth_textfile.dll" Name="mod_auth_textfile.dll" DiskId="1" Source="$(var.topdir)\src\modules\authentication\textfile\mod_auth_textfile.dll"/>
+								<util:XmlFile Id="AppendConfigModAuthTextfile" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_auth_textfile.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateConfigModAuditDatabaseReference" Action="setValue" ElementPath="/configuration/AAAA/Audit/Database/database"
-								              Value="[WOLFRAME_DATABASE_TYPE]"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-							</Component>
-							
-							<Component Id="ModAuditTextfile" Guid="{A2A224B8-E564-4F45-B600-A3FC6142544F}">
-								<File Id="mod_audit_textfile.dll" Name="mod_audit_textfile.dll" DiskId="1" Source="$(var.topdir)\src\modules\audit\textfile\mod_audit_textfile.dll"/>
-								<util:XmlFile Id="AppendConfigModAuditTextfile" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_audit_textfile.dll"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateAuditTextfileLocation" Action="setValue" ElementPath="/configuration/AAAA/Audit/TextFile/file"
-								              Value="[INSTALLDIR]data\audit.txt"
+								<util:XmlFile Id="UpdateAuthTextfileLocation" Action="setValue" ElementPath="/Configuration/AAAA/authentication/TextFile/file"
+								              Value="[INSTALLDIR]data\auth.txt"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<Component Id="ModAuthDatabase" Guid="{5C91782A-8751-40ED-9E3C-3818405614B8}">
 								<File Id="mod_auth_database.dll" Name="mod_auth_database.dll" DiskId="1" Source="$(var.topdir)\src\modules\authentication\database\mod_auth_database.dll"/>
-								<util:XmlFile Id="AppendConfigModAuthDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_auth_database.dll"
+								<util:XmlFile Id="AppendConfigModAuthDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_auth_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateConfigModAuthDatabaseReference" Action="setValue" ElementPath="/configuration/AAAA/authentication/database/database"
+								<util:XmlFile Id="UpdateConfigModAuthDatabaseReference" Action="setValue" ElementPath="/Configuration/AAAA/authentication/database/database"
 								              Value="[WOLFRAME_DATABASE_TYPE]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
-							<Component Id="ModAuthTextfile" Guid="{C3062ADD-6827-4ABE-915F-F1DA1D8EAF47}">
-								<File Id="mod_auth_textfile.dll" Name="mod_auth_textfile.dll" DiskId="1" Source="$(var.topdir)\src\modules\authentication\textfile\mod_auth_textfile.dll"/>
-								<util:XmlFile Id="AppendConfigModAuthTextfile" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_auth_textfile.dll"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateAuthTextfileLocation" Action="setValue" ElementPath="/configuration/AAAA/authentication/TextFile/file"
-								              Value="[INSTALLDIR]data\auth.txt"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-							</Component>
+							<!-- authorization modules -->        
 
 							<Component Id="ModAuthzDatabase" Guid="{e9da7e48-2bee-43bf-a388-ce2bb02da1bd}">
 								<File Id="mod_authz_database.dll" Name="mod_authz_database.dll" DiskId="1" Source="$(var.topdir)\src\modules\authorization\database\mod_authz_database.dll"/>
-								<util:XmlFile Id="AppendConfigModAuthzDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_authz_database.dll"
+								<util:XmlFile Id="AppendConfigModAuthzDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_authz_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
-<!--
-							<Component Id="ModDdlCompilerSimpleForm" Guid="{2a5e72e8-cc29-4264-8026-c222901ea401}">
-								<File Id="mod_ddlcompiler_simpleform.dll" Name="mod_ddlcompiler_simpleform.dll" DiskId="1" Source="$(var.topdir)\src\modules\ddlcompiler\simpleform\mod_ddlcompiler_simpleform.dll"/>
-								<util:XmlFile Id="AppendConfigModDdlCompilerSimpleForm" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_ddlcompiler_simpleform.dll"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-							</Component>
--->
-
-							<Component Id="ModFilterChar" Guid="{2dc36fbb-e779-43cf-b6cf-c6dbb280fc85}">
-								<File Id="mod_filter_char.dll" Name="mod_filter_char.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\char\mod_filter_char.dll"/>
-								<util:XmlFile Id="AppendConfigModFilterChar" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_filter_char.dll"
+							<Component Id="ModCommandAamap" Guid="{36260062-2100-4580-80f5-85d1641a32a7}">
+								<File Id="mod_command_aamap.dll" Name="mod_command_aamap.dll" DiskId="1" Source="$(var.topdir)\src\modules\cmdbind\aamap\mod_command_aamap.dll"/>
+								<util:XmlFile Id="AppendConfigModCommandAamap" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_command_aamap.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
-							<?ifdef var.with_libxml2?>
-								<Component Id="ModFilterLibXml2" Guid="{ccbe6394-ce8e-4faf-acbf-79b8173c8c12}">
-									<File Id="mod_filter_libxml2.dll" Name="mod_filter_libxml2.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\libxml2\mod_filter_libxml2.dll"/>
-									<util:XmlFile Id="AppendConfigModFilterLibXml2" Action="createElement" ElementPath="/configuration/LoadModules"
-												  Name="module" Value="[INSTALLDIR]modules\mod_filter_libxml2.dll"
+							<!-- audit modules -->
+							
+							<Component Id="ModAuditTextfile" Guid="{A2A224B8-E564-4F45-B600-A3FC6142544F}">
+								<File Id="mod_audit_textfile.dll" Name="mod_audit_textfile.dll" DiskId="1" Source="$(var.topdir)\src\modules\audit\textfile\mod_audit_textfile.dll"/>
+								<util:XmlFile Id="AppendConfigModAuditTextfile" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_audit_textfile.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="UpdateAuditTextfileLocation" Action="setValue" ElementPath="/Configuration/AAAA/Audit/TextFile/file"
+								              Value="[INSTALLDIR]data\audit.txt"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<Component Id="ModAuditDatabase" Guid="{8EBEC554-6E24-435A-82E1-EE7B1DADE59D}">
+								<File Id="mod_audit_database.dll" Name="mod_audit_database.dll" DiskId="1" Source="$(var.topdir)\src\modules\audit\database\mod_audit_database.dll"/>
+								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_audit_database.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								<util:XmlFile Id="UpdateConfigModAuditDatabaseReference" Action="setValue" ElementPath="/Configuration/AAAA/Audit/Database/database"
+								              Value="[WOLFRAME_DATABASE_TYPE]"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<!-- modules for detecting document types -->
+							<Component Id="ModDocTypeXml" Guid="{0ace5957-0722-447a-8c74-bc41aaf22cdd}">
+								<File Id="mod_doctype_xml.dll" Name="mod_doctype_xml.dll" DiskId="1" Source="$(var.topdir)\src\modules\doctype\xml\mod_doctype_xml.dll"/>
+								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_doctype_xml.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<Component Id="ModDocTypeJson" Guid="{08911c37-13e4-4b19-a55e-b4ca168de8f8}">
+								<File Id="mod_doctype_json.dll" Name="mod_doctype_json.dll" DiskId="1" Source="$(var.topdir)\src\modules\doctype\json\mod_doctype_json.dll"/>
+								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_doctype_json.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+							
+							<!-- modules for XML processing -->
+
+							<!-- XML processing using textwolf -->
+							<?ifdef var.with_textwolf?>
+								<Component Id="ModFilterTextwolf" Guid="{2c0379f7-bec4-41f1-bf2b-7cf2e23d22cb}">
+									<File Id="mod_filter_textwolf.dll" Name="mod_filter_textwolf.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\textwolf\mod_filter_textwolf.dll"/>
+									<util:XmlFile Id="AppendConfigModFilterTextwolf" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_filter_textwolf.dll"
 											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								</Component>
 							<?endif?>
+							
+							<!-- XML processing using libxml2 -->
+							<?ifdef var.with_libxml2?>
+								<Component Id="ModFilterLibXml2" Guid="{ccbe6394-ce8e-4faf-acbf-79b8173c8c12}">
+									<File Id="mod_filter_libxml2.dll" Name="mod_filter_libxml2.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\libxml2\mod_filter_libxml2.dll"/>
+									<util:XmlFile Id="AppendConfigModFilterLibXml2" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_filter_libxml2.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+							
+							<!-- modules for JSON processing -->
 
-							<Component Id="ModFilterLine" Guid="{60e8af7a-488b-4b50-81ba-e1f0685e5987}">
-								<File Id="mod_filter_line.dll" Name="mod_filter_line.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\line\mod_filter_line.dll"/>
-								<util:XmlFile Id="AppendConfigModFilterLine" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_filter_line.dll"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							<!-- JSON processing using cjson -->
+							<?ifdef var.with_cjson?>
+								<Component Id="ModFilterCjson" Guid="{44a2bbe5-7caf-4990-b6f6-b9e4c38291dd}">
+									<File Id="mod_filter_cjson.dll" Name="mod_filter_cjson.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\cjson\mod_filter_cjson.dll"/>
+									<util:XmlFile Id="AppendConfigModFilterCjson" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_filter_cjson.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+							
+							<!-- data normalization modules -->
+							<Component Id="ModNormalizeBase64" Guid="{b3ad80af-774a-45cd-a1c6-a9ad34ab5c12}">
+								<File Id="mod_normalize_base64.dll" Name="mod_normalize_base64.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\base64\mod_normalize_base64.dll"/>
+								<util:XmlFile Id="AppendConfigModFilterCjson" Action="createElement" ElementPath="/Configuration/LoadModules"
+											  Name="Module" Value="[INSTALLDIR]modules\mod_normalize_base64.dll"
+										  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
-							<Component Id="ModFilterTextwolf" Guid="{2c0379f7-bec4-41f1-bf2b-7cf2e23d22cb}">
-								<File Id="mod_filter_textwolf.dll" Name="mod_filter_textwolf.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\textwolf\mod_filter_textwolf.dll"/>
-								<util:XmlFile Id="AppendConfigModFilterTextwolf" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_filter_textwolf.dll"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-							</Component>
-
-							<Component Id="ModFilterToken" Guid="{2424b75e-85cc-4bbe-b5ce-73c21680e622}">
-								<File Id="mod_filter_token.dll" Name="mod_filter_token.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\token\mod_filter_token.dll"/>
-								<util:XmlFile Id="AppendConfigModFilterToken" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_filter_token.dll"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							<Component Id="ModNormalizeNumber" Guid="{a77a21c2-5586-470b-a3fa-96968c708705}">
+								<File Id="mod_normalize_number.dll" Name="mod_normalize_number.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\number\mod_normalize_number.dll"/>
+								<util:XmlFile Id="AppendConfigModNormalizeNumber" Action="createElement" ElementPath="/Configuration/LoadModules"
+											  Name="Module" Value="[INSTALLDIR]modules\mod_normalize_number.dll"
+										  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<?ifdef var.with_icu?>
 								<Component Id="ModNormalizeLocale" Guid="{619a69fe-f857-40e3-abd1-8acc44b6f939}">
 									<File Id="mod_normalize_locale.dll" Name="mod_normalize_locale.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\locale\mod_normalize_locale.dll"/>
+									<util:XmlFile Id="AppendConfigModNormalizeLocale" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_normalize_locale.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								</Component>
 							<?endif?>
 
-							<Component Id="ModNormalizeNumber" Guid="{a77a21c2-5586-470b-a3fa-96968c708705}">
-								<File Id="mod_normalize_number.dll" Name="mod_normalize_number.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\number\mod_normalize_number.dll"/>
+							<!-- data types modules	-->
+
+							<Component Id="ModDatatypeDatetime" Guid="{1737c3f5-e463-4077-809c-71670e422078}">
+								<File Id="mod_datatype_datetime.dll" Name="mod_datatype_datetime.dll" DiskId="1" Source="$(var.topdir)\src\modules\datatype\datetime\mod_datatype_datetime.dll"/>
+								<util:XmlFile Id="AppendConfigModDatatypeDatetime" Action="createElement" ElementPath="/Configuration/LoadModules"
+											  Name="Module" Value="[INSTALLDIR]modules\mod_datatype_datetime.dll"
+										  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
+							<Component Id="ModDatatypeBcdNumber" Guid="{72b910e2-24ca-4963-ad3b-f24880fe6fe3}">
+								<File Id="mod_datatype_bcdnumber.dll" Name="mod_datatype_bcdnumber.dll" DiskId="1" Source="$(var.topdir)\src\modules\datatype\bcdnumber\mod_datatype_bcdnumber.dll"/>
+								<util:XmlFile Id="AppendConfigModDatatypeBcdNumber Action="createElement" ElementPath="/Configuration/LoadModules"
+											  Name="Module" Value="[INSTALLDIR]modules\mod_datatype_bcdnumber.dll"
+										  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<!-- business layer modules -->
+
+							<Component Id="ModCommandDirectmap" Guid="{9b6f4224-8094-4bc6-a9df-791aad4353c8}">
+								<File Id="mod_command_directmap.dll" Name="mod_command_directmap.dll" DiskId="1" Source="$(var.topdir)\src\modules\cmdbind\directmap\mod_command_directmap.dll"/>
+								<util:XmlFile Id="AppendConfigModCommandDirectmap" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_command_directmap.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+        
+							<Component Id="ModDdlCompilerSimpleForm" Guid="{2a5e72e8-cc29-4264-8026-c222901ea401}">
+								<File Id="mod_ddlcompiler_simpleform.dll" Name="mod_ddlcompiler_simpleform.dll" DiskId="1" Source="$(var.topdir)\src\modules\ddlcompiler\simpleform\mod_ddlcompiler_simpleform.dll"/>
+								<util:XmlFile Id="AppendConfigModDdlCompilerSimpleForm" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_ddlcompiler_simpleform.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<Component Id="ModCommandTdl" Guid="{0c5f303e-a1d9-4c4d-a978-0c99696bad04}">
+								<File Id="mod_command_tdl.dll" Name="mod_command_tdl.dll" DiskId="1" Source="$(var.topdir)\src\modules\cmdbind\tdl\mod_command_tdl.dll"/>
+								<util:XmlFile Id="AppendConfigModCommandTdl" Action="createElement" ElementPath="/Configuration/LoadModules"
+								              Name="Module" Value="[INSTALLDIR]modules\mod_command_tdl.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+        
+							<!-- scripting language modules -->
+
+							<?ifdef var.with_lua?>
+								<Component Id="ModCommandLua" Guid="{4d40b7ea-27e2-4a04-be05-705ccd57ed14}">
+									<File Id="mod_command_lua.dll" Name="mod_command_lua.dll" DiskId="1" Source="$(var.topdir)\src\modules\cmdbind\lua\mod_command_lua.dll"/>
+									<util:XmlFile Id="AppendConfigModCommandLua" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_command_lua.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+
+							<?ifdef var.with_python?>
+								<Component Id="ModCommandPython" Guid="{f8a6e400-214d-4a58-8958-08b9e29ded8b}">
+									<File Id="mod_command_python.dll" Name="mod_command_python.dll" DiskId="1" Source="$(var.topdir)\src\modules\cmdbind\python\mod_command_python.dll"/>
+									<util:XmlFile Id="AppendConfigModCommandPython" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_command_python.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+
+							<!-- various filtering modules -->
+							
+							<?ifdef var.with_textwolf?>
+								<Component Id="ModFilterChar" Guid="{2dc36fbb-e779-43cf-b6cf-c6dbb280fc85}">
+									<File Id="mod_filter_char.dll" Name="mod_filter_char.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\char\mod_filter_char.dll"/>
+									<util:XmlFile Id="AppendConfigModFilterChar" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_filter_char.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+
+							<?ifdef var.with_textwolf?>
+								<Component Id="ModFilterLine" Guid="{60e8af7a-488b-4b50-81ba-e1f0685e5987}">
+									<File Id="mod_filter_line.dll" Name="mod_filter_line.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\line\mod_filter_line.dll"/>
+									<util:XmlFile Id="AppendConfigModFilterLine" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_filter_line.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+
+							<?ifdef var.with_textwolf?>
+								<Component Id="ModFilterToken" Guid="{2424b75e-85cc-4bbe-b5ce-73c21680e622}">
+									<File Id="mod_filter_token.dll" Name="mod_filter_token.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\token\mod_filter_token.dll"/>
+									<util:XmlFile Id="AppendConfigModFilterToken" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_filter_token.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+
+							<?ifdef var.with_textwolf?>
+								<Component Id="ModNormalizeString" Guid="{76052d96-1c4d-4dfe-a501-cb4dcdd7834a}">
+									<File Id="mod_normalize_string.dll" Name="mod_normalize_string.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\string\mod_normalize_string.dll"/>
+									<util:XmlFile Id="AppendConfigModNormalizeString" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_normalize_string.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+
+							<Component Id="ModNormalizeBlob" Guid="{6b646bd3-8ab2-4524-844a-a95111c0bd3f}">
+								<File Id="mod_normalize_blob.dll" Name="mod_normalize_blob.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\blob\mod_normalize_blob.dll"/>
+								<util:XmlFile Id="AppendConfigModNormalizeString" Action="createElement" ElementPath="/Configuration/LoadModules"
+											  Name="Module" Value="[INSTALLDIR]modules\mod_normalize_blob.dll"
+										  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<!-- various other modules -->
+
+<!--
+							<Component Id="ModJobScheduleDb" Guid="{c2c21197-8348-47f5-891c-4d36e0cf659a}">
+								<File Id="mod_job_schedule_db.dll" Name="mod_job_schedule_db.dll" DiskId="1" Source="$(var.topdir)\src\modules\jobSchedule\database\mod_job_schedule_db.dll"/>
+								<util:XmlFile Id="AppendConfigModNormalizeString" Action="createElement" ElementPath="/Configuration/LoadModules"
+											  Name="Module" Value="[INSTALLDIR]modules\mod_job_schedule_db.dll"
+										  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+-->
+
+							<?ifdef var.with_libhpdf?>
+								<Component Id="ModPrintHarupdf" Guid="{eacfd02f-991f-4376-bfe7-fc828a4190a7}">
+									<File Id="mod_print_harupdf.dll" Name="mod_print_harupdf.dll" DiskId="1" Source="$(var.topdir)\src\modules\prnt\haupdfprint\mod_print_harupdf.dll"/>
+									<util:XmlFile Id="AppendConfigModNormalizeString" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_print_harupdf.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+
+							<?ifdef var.with_freeimage?>
+								<Component Id="ModGraphix" Guid="{136637d0-30a1-4bbc-ae5e-0d5d355b215a}">
+									<File Id="mod_graphix.dll" Name="mod_graphix.dll" DiskId="1" Source="$(var.topdir)\src\modules\functions\graphix\mod_graphix.dll"/>
+									<util:XmlFile Id="AppendConfigModNormalizeString" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_graphix.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+							
 						</Directory>
 						
 						<Directory Id="LogDir" Name="logs">
@@ -493,68 +662,142 @@ Project Wolframe.
 				</Feature>
 				<?endif?>
 			</Feature>
-			
-			<Feature Id="AuditModules" Title="Modules for Auditing" Description="Audit modules" Level="3">
-				<Feature Id="AuditDatabase" Title="Audit via database" Description="Audit via a database module." Level="3" TypicalDefault="install">
-					<ComponentRef Id="ModAuditDatabase"/>
-				</Feature>
-				<Feature Id="AuditTextfile" Title="Audit via textfile" Description="Audit via a local text file." Level="3" InstallDefault="local" TypicalDefault="install">
-					<ComponentRef Id="ModAuditTextfile"/>
-				</Feature>
-			</Feature>
-			
+
 			<Feature Id="AuthModules" Title="Authentication Modules" Description="Authentication modules" Level="3">
-				<Feature Id="AuthDatabase" Title="Authenticate via database" Description="Use a database module for authentication." Level="3" InstallDefault="local" TypicalDefault="install">
-					<ComponentRef Id="ModAuthDatabase"/>
-				</Feature>
 				<Feature Id="AuthTextfile" Title="Authenticate via textfile" Description="Use a local textfile for authentication." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModAuthTextfile"/>
+				</Feature>
+				<Feature Id="AuthDatabase" Title="Authenticate via database" Description="Use a database module for authentication." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModAuthDatabase"/>
 				</Feature>
 			</Feature>
 
 			<Feature Id="AuthzModules" Title="Authorization Modules" Description="Authorization modules" Level="3">
-				<Feature Id="AuthzDatabase" Title="Authenticate via database" Description="Use a database module for authorizaion." Level="3" InstallDefault="local" TypicalDefault="install">
+				<Feature Id="AuthzDatabase" Title="Authorize via database" Description="Use a database module for authorizaion." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModAuthzDatabase"/>
 				</Feature>
+				<Feature Id="CommandAamap" Title="Authorize via scripting" Description="Use a database module for authorizaion." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModCommandAamap"/>
+				</Feature>
+			</Feature>
+			
+			<Feature Id="AuditModules" Title="Modules for Auditing" Description="Audit modules" Level="3">
+				<Feature Id="AuditTextfile" Title="Audit via textfile" Description="Audit via a local text file." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModAuditTextfile"/>
+				</Feature>
+				<Feature Id="AuditDatabase" Title="Audit via database" Description="Audit via a database module." Level="3" TypicalDefault="install">
+					<ComponentRef Id="ModAuditDatabase"/>
+				</Feature>
+			</Feature>
+			
+			<Feature Id="DoctypeModules" Title="Modules for document type detection" Description="Document type detection modules" Level="3">
+				<Feature Id="DocTypeXml" Title="XML document type detection" Description="Deteccts documents of type XML" Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModDocTypeXml"/>
+				</Feature>
+				<Feature Id="DocTypeJson" Title="JSON document type detection" Description="Deteccts documents of type JSON" Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModDocTypeJson"/>
+				</Feature>
 			</Feature>
 
-<!--
-			<Feature Id="ProcessingModules" Title="Data Processing Modules" Description="Data Processing modules" Level="3">
-				<Feature Id="DdlCompilerSimpleForm" Title="Simple form" Description="Wolframe data definition language compiler." Level="3" InstallDefault="local" TypicalDefault="install">
-					<ComponentRef Id="ModDdlCompilerSimpleForm"/>
-				</Feature>
-			</Feature>
--->
-			
-			<Feature Id="FilterModules" Title="Filter Modules" Description="Filter modules" Level="3">
-				<Feature Id="StandardFilterModules" Title="Standard filter modules" Description="Standard filter modules." Level="3" InstallDefault="local" TypicalDefault="install">
-					<ComponentRef Id="ModFilterChar"/>
-					<ComponentRef Id="ModFilterLine"/>
-					<ComponentRef Id="ModFilterTextwolf"/>
-					<ComponentRef Id="ModFilterToken"/>
-				</Feature>
+			<Feature Id="FilterModulesXml" Title="XML Filter Modules" Description="Filter modules to process XML documents" Level="3">
+
+				<?ifdef var.with_textwolf?>
+					<Feature Id="FilterModulesTextwolf" Title="Textwolf filter modules" Description="XML document processing with textwolf." Level="3" InstallDefault="local" TypicalDefault="install">
+						<ComponentRef Id="ModFilterTextwolf"/>
+					</Feature>
+				<?endif?>
 
 				<?ifdef var.with_libxml2?>
-					<Feature Id="FilterModuleLibXml2" Title="Libxml2 filter module" Description="Libxml filter module." Level="3" InstallDefault="local" TypicalDefault="install">
+					<Feature Id="FilterModuleLibXml2" Title="Libxml2 filter module" Description="XML document processing with libxml/libxslt." Level="3" InstallDefault="local" TypicalDefault="install">
 						<ComponentRef Id="ModFilterLibXml2"/>
 						<ComponentRef Id="LibXML2"/>
 					</Feature>
 				<?endif?>
-				
-			</Feature>			
-			
+			</Feature>
+
+			<?ifdef var.with_cjson?>
+			<Feature Id="FilterModulesJson" Title="JSON Filter Modules" Description="Filter modules to process JSON documents" Level="3">
+					<Feature Id="FilterModuleCjson" Title="CJSON filter module" Description="JSON document processing with cjson." Level="3" InstallDefault="local" TypicalDefault="install">
+						<ComponentRef Id="ModFilterCjson"/>
+					</Feature>
+			</Feature>
+			<?endif?>
+
 			<Feature Id="NormalizationModules" Title="Normalization Modules" Description="Normalization modules" Level="3">
 				<Feature Id="StandardNormalizationModules" Title="Standard normalization modules" Description="Standard normalization modules." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModNormalizeBase64"/>
 					<ComponentRef Id="ModNormalizeNumber"/>
 				</Feature>
+				
+				<?ifdef var.with_textwolf?>
+					<Feature Id="NormalizationModulesTextwolf" Title="Normalization modules with textwolf" Description="Normalization modules implemented with textwolf." Level="3" InstallDefault="local" TypicalDefault="install">
+						<ComponentRef Id="ModNormalizeSring"/>
+					</Feature>
+				<?endif?>
 
 				<?ifdef var.with_icu?>
 					<Feature Id="NormalizationModuleLocale" Title="Normalization Module with ICU" Description="Normalization Module with ICU." Level="3" InstallDefault="local" TypicalDefault="install">
 						<ComponentRef Id="ModNormalizeLocale"/>
 						<ComponentRef Id="ICUDlls"/>
 					</Feature>
+				<?endif?>				
+			</Feature>
+
+			<Feature Id="DataTypeModules" Title="Datatype Modules" Description="Datatype modules" Level="3">
+				<Feature Id="StandardDataTypeModules" Title="Standard datatype modules" Description="Modules implementing standard data types." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModDatatypeDatetime"/>
+					<ComponentRef Id="ModDatatypeBcdNumber"/>
+				</Feature>
+			</Feature>
+
+			<Feature Id="BusinessLayerModules" Title="Business Layer Modules" Description="Business layer modules" Level="3">
+				<Feature Id="CommandDirectmap" Title="Direcmap handler" Description="Module implementing the default mapping of requests to business functions." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModCommandDirectmap"/>
+				</Feature>
+				<Feature Id="DdlCompilerSimpleForm" Title="Simple form validation" Description="Module implementing the default validation of data (simple form)." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModDdlCompilerSimpleForm"/>
+				</Feature>
+				<Feature Id="CommandTdl" Title="TDL database language" Description="Write database functions in TDL." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModCommandTdl"/>
+				</Feature>
+			</Feature>
+
+			<Feature Id="ScriptingModules" Title="Scripting Modules" Description="Modules implementing bindings to scripting languages" Level="3">
+				<Feature Id="ModCommandLua" Title="Lua scripting module" Description="Module implementing bindings to the Lua scripting language." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModCommandLua"/>
+				</Feature>
+				<Feature Id="ModCommandPython" Title="Python scripting module" Description="Module implementing bindings to the Python scripting language." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModCommandPython"/>
+				</Feature>
+			</Feature>
+
+			<Feature Id="VariousFilterModules" Title="Various Filtering Modules" Description="Various other filter modules" Level="3">
+				<Feature Id="VariousFilterModulesStandard" Title="various standard filtering modules" Description="Various standard filtering modules." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModFilterBlob"/>
+				</Feature>
+				<?ifdef var.with_textwolf?>
+					<Feature Id="VariousFilterModulesTextwolf" Title="various filtering modules with textwolf" Description="Various filtering modules implemented with textwolf." Level="3" InstallDefault="local" TypicalDefault="install">
+						<ComponentRef Id="ModFilterChar"/>
+						<ComponentRef Id="ModFilterLine"/>
+						<ComponentRef Id="ModFilterToken"/>
+					</Feature>
 				<?endif?>
-				
+			</Feature>			
+			
+			<Feature Id="VariousOtherModules" Title="Various Other Modules" Description="Various other modules" Level="3">
+				<Feature Id="JobSchedule" Title="job scheduler" Description="Schedule jobs in the database." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModJobScheduleDb"/>
+				</Feature>
+				<?ifdef var.with_libhpdf?>
+					<Feature Id="PrintHaru" Title="Printing with libhpdf" Description="Produce PDF output with libhpdf." Level="3" InstallDefault="local" TypicalDefault="install">
+						<ComponentRef Id="ModPrintHarupdf"/>
+					</Feature>
+				<?endif?
+				<?ifdef var.with_libhpdf?>
+					<Feature Id="Graphix" Title="Image processing with Freeimage" Description="Image manipulations with the FreeImage library." Level="3" InstallDefault="local" TypicalDefault="install">
+						<ComponentRef Id="ModGraphix"/>
+					</Feature>
+				<?endif?
 			</Feature>
 			
 			<Feature Id="Clients" Title="Clients" Description="Client programs talking to Wolframe." Level="3"  InstallDefault="local">

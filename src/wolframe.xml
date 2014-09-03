@@ -1,248 +1,305 @@
 <?xml version="1.0"?>
 
+<!-- Wolframe main configuration file
+
+     Note: this configuration is for development only, used by the 'nmake run'
+     'nmake check', 'nmake print' targets in this directory. Deployed
+     configuration files are in 'config'.
+-->
+
+<Configuration>
+
+    <!-- Modules to be loaded -->
+    <LoadModules>
+
+        <!-- Search also for modules in the following directory additionally to
+             the default load dir (with lower priority). Can be absolute or relative,
+             if relative it has this configuration file as basis to compute the path
+          -->
 <!--
-
-Copyright (C) 2011 - 2014 Project Wolframe.
-All rights reserved.
-
-This file is part of Project Wolframe.
-
-Commercial Usage
-   Licensees holding valid Project Wolframe Commercial licenses may
-   use this file in accordance with the Project Wolframe
-   Commercial License Agreement provided with the Software or,
-   alternatively, in accordance with the terms contained
-   in a written agreement between the licensee and Project Wolframe.
-
-GNU General Public License Usage
-   Alternatively, you can redistribute this file and/or modify it
-   under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   Wolframe is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
-
-If you have questions regarding the use of this file, please contact
-Project Wolframe.
-
+        <Directory>modules</Directory>
 -->
 
-<!-- Wolframe configuration file -->
-<configuration>
-
-	<!-- modules to be loaded by the server -->
-	<LoadModules>
-		<module>modules\database\postgresql\mod_db_postgresql.dll</module>
-		<module>modules\database\sqlite3\mod_db_sqlite3.dll</module>
-		<module>modules\audit\database\mod_audit_database.dll</module>
-		<module>modules\audit\textfile\mod_audit_textfile.dll</module>
-		<module>modules\authentication\database\mod_auth_database.dll</module>
-<!--		<module>modules\authentication\textfile\mod_auth_textfile.dll</module>-->
-		<module>modules\authorization\database\mod_authz_database.dll</module>
-
-<!--		<module>modules\processor\echo\mod_proc_echo.dll</module>-->
-
-	<module>modules\filter\char\mod_filter_char.dll</module>
-	<module>modules\filter\libxml2\mod_filter_libxml2.dll</module>
-	<module>modules\filter\line\mod_filter_line.dll</module>
-		<module>modules\filter\textwolf\mod_filter_textwolf.dll</module>
-		<module>modules\filter\token\mod_filter_token.dll</module>
-	</LoadModules>
-
-	<ServerTokens>OS</ServerTokens>		<!--    Print the application name and version
-							in the initial greeting.
-							Allowed values are:
-							   ProductOnly, Major, Minor, Revision, OS, None -->
-	<ServerSignature>None</ServerSignature>	<!--	Print the name of the server as first element
-							of the greeting -->
-
-	<!--	Windows service parameters (for service registration).
-		This section is not valid on non-Windows OSes -->
-	<service>
-		<serviceName>wolframe</serviceName>
-		<displayName>Wolframe Daemon</displayName>
-		<description>Wolframe Daemon</description>
-	</service>
-
-	<!--	Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
-		Let's use 7660 for unencrypted connections and 7960 for SSL connections.
-		Note that 7654 seems to be used by Winamp. -->
-	<server>
-		<maxConnections>3</maxConnections>	<!--	Maximum number of simultaneous connections (clients).
-								Default is the OS limit. This is the global (total) value.
-								Set it to 0 to disable (to use the system limit) -->
-		<threads>7</threads>			<!--	Number of threads for serving client connections.
-								Default is 4 -->
-		<listen>
-			<address>*</address>
-			<port>7661</port>
-			<maxConnections>2</maxConnections><!--	Maximum number of simultaneous connections (clients)
-								for this socket. Default is the OS limit. -->
-		</listen>
-		<listen>
-			<address>localhost</address>
-			<port>7662</port>
-			<identifier>Interface 1</identifier><!--	Interfaces can be named for AAA purposes -->
-		</listen>
-		<listenSsl>
-			<address>0.0.0.0</address>
-			<port>7961</port>
-			<identifier>Interface 1</identifier><!--	Many interfaces can have the same name and
-								they can be refered as one group in AAAA -->
-			<!--	SSL parameters: required if listenSsl is defined -->
-			<certificate>../tests/SSL/wolframed.crt</certificate><!-- Server certificate file (PEM) -->
-			<key>../tests/SSL/wolframed.key</key>		<!-- Server key file (PEM) -->
-			<CAdirectory>../tests/SSL/CAdir</CAdirectory>	<!-- Directory holding CA certificate files -->
-			<CAchainFile>../tests/SSL/CAchain.pem</CAchainFile><!-- SSL CA chain file -->
-			<verify>ON</verify>				<!--	Require and verify client certificate -->
-		</listenSsl>
-		<listenSsl>
-			<address>127.0.0.1</address>
-			<port>7962</port>
-			<identifier>Interface 2</identifier>
-			<maxConnections>2</maxConnections>
-			<!--	SSL parameters: required if listenSsl is defined -->
-			<certificate>../tests/SSL/wolframed.crt</certificate>
-			<key>../tests/SSL/wolframed.key</key>
-			<!-- <CAdirectory>../tests/SSL/CAdir</CAdirectory> -->
-								<!--	It's not necessary to define both
-									CAdirectory and CAchainFile. -->
-			<CAchainFile>../tests/SSL/CAchain.pem</CAchainFile>
-			<verify>OFF</verify>
-		</listenSsl>
-	</server>
-
-
-	<!--	Database configuration -->
-	<database>
+        <!-- protocol modules -->
+        <Module>modules\protocol\wolframe\mod_protocol_wolframe</Module>
+        
+        <!-- database modules -->        
 <!--
-		<PostgreSQL>
-			<identifier>pgdb</identifier>
-			<host>localhost</host>
-			<port>5432</port>
-			<database>wolframe</database>
-			<user>wolframe</user>
-			<password>blabla</password>
-			<connectionTimeout>10</connectionTimeout>
-			<connections>5</connections>
-			<acquireTimeout>10</acquireTimeout>
-		</PostgreSQL>
+        <Module>modules\database\postgresql\mod_db_postgresql</Module>
 -->
-		<SQLite>
-			<identifier>sqlitedb</identifier>
-			<filename>primary.db</filename>
-<!--			<filename>/var/lib/wolframe/primary.db</filename> -->
-		</SQLite>
-		
 <!--
-		<Oracle>
-			<identifier>oracledb</identifier>
-			<host>localhost</host>
-			<port>1521</port>
-			<database>orcl</database>
-			<user>wolframe</user>
-			<password>wolfpwd</password>
-		</Oracle>
+        <Module>modules\database\sqlite3\mod_db_sqlite3</Module>
 -->
-	</database>
-
-	<!--	Logging parameters -->
-	<logging>
-		<!--	log level for console (stderr) logging -->
-		<stderr>
-			<level>INFO</level>
-		</stderr>
-
-		<!--	log level for file logging -->
-		<logFile>
-			<filename>C:\TEMP\wolframed.log</filename>
-			<level>INFO</level>
-		</logFile>
-
-		<!--	syslog facility, identifier and log level -->
-		<syslog>
-			<ident>wolframed</ident>
-			<facility>LOCAL2</facility>
-			<level>INFO</level>
-		</syslog>
-
-		<!--	eventlog source and log level. Valid only on Windows -->
-		<eventlog>
-			<name>Application</name>
-			<source>Wolframe</source>
-			<level>INFO</level>
-		</eventlog>
-	</logging>
-
-	<!-- Authentication, authorization, auditing and accounting configuration -->
-	<AAAA>
-
-		<authentication>
-			<database>
-				<identifier>SQLite database authentication</identifier>
-				<database>sqlitedb</database>
-			</database>
 <!--
-			<database>
-				<identifier>PostgreSQL database authentication</identifier>
-				<database>pgdb</database>
-			</database>
+        <Module>modules\database\oracle\mod_db_oracle</Module>
 -->
-			<TextFile>
-				<identifier>Text file authentication</identifier>
-				<file>wolframe.auth</file>
-			</TextFile>
-		</authentication>
 
-		<Authorization>
-			<default>deny</default> <!-- what to do when there is no authorization information -->
+        <!-- authentication modules -->        
+        <Module>modules\authentication\textfile\mod_auth_textfile</Module>
+        <Module>modules\authentication\database\mod_auth_database</Module>
+
+        <!-- authorization modules -->        
+        <Module>modules\authorization\database\mod_authz_database</Module>
+        <Module>modules\cmdbind\aamap\mod_command_aamap</Module>
+
+        <!-- audit modules -->
+        <Module>modules\audit\textfile\mod_audit_textfile</Module>
+        <Module>modules\audit\database\mod_audit_database</Module>
+
+        <!-- modules for detecting document types -->
+        <Module>modules\doctype\xml\mod_doctype_xml</Module>
+        <Module>modules\doctype\json\mod_doctype_json</Module>
+
+        <!-- modules for XML processing -->
+
+        <!-- XML processing using textwolf -->
+        <Module>modules\filter\textwolf\mod_filter_textwolf</Module>
+
+        <!-- XML processing using libxml2 -->
+        <Module>modules\filter\libxml2\mod_filter_libxml2</Module>
+
+        <!-- modules for JSON processing -->
+
+        <!-- JSON processing using cjson -->
+        <Module>modules\filter\cjson\mod_filter_cjson</Module>
+
+        <!-- data normalization modules -->
+        <Module>modules\normalize\base64\mod_normalize_base64</Module>
+        <Module>modules\normalize\number\mod_normalize_number</Module>
+        <Module>modules\normalize\locale\mod_normalize_locale</Module>
+
+        <!-- data types modules	-->
+        <Module>modules\datatype\datetime\mod_datatype_datetime</Module>
+        <Module>modules\datatype\bcdnumber\mod_datatype_bcdnumber</Module>
+	
+        <!-- business layer modules -->
+        <Module>modules\cmdbind\directmap\mod_command_directmap</Module>
+        <Module>modules\ddlcompiler\simpleform\mod_ddlcompiler_simpleform</Module>
+        <Module>modules\cmdbind\tdl\mod_command_tdl</Module>
+
+        <!-- scripting language modules -->
+        <Module>modules\cmdbind\lua\mod_command_lua</Module>
+<!--
+        <Module>modules\cmdbind\python\mod_command_python</Module>
+-->
+
+        <!-- various filtering modules -->
+        <Module>modules\filter\char\mod_filter_char</Module>
+        <Module>modules\filter\line\mod_filter_line</Module>
+        <Module>modules\filter\token\mod_filter_token</Module>
+        <Module>modules\normalize\string\mod_normalize_string</Module>
+        <Module>modules\filter\blob\mod_filter_blob</Module>
+
+        <!-- various other modules -->
+<!--
+        <Module>modules\jobSchedule\database\mod_job_schedule_db</Module>
+-->
+<!--
+        <Module>modules\prnt\harupdfprint\mod_print_harupdf</Module>
+-->
+<!--
+        <Module>modules\functions\graphix\mod_graphix</Module>
+-->
+
+    </LoadModules>
+
+    <!-- Print the application name and version in the initial greeting
+         allowed values are: ProductOnly, Major, Minor, Revision, Build, OS, None
+         Default: None
+      -->
+    <ServerTokens>OS</ServerTokens>
+
+    <!-- Print the name of the server as first element of the greeting
+         Default: empty
+      -->
+    <ServerSignature>Wolframe</ServerSignature> 
+
+    <!-- Windows service parameters (for service registration) -->
+    <Service>
+        <ServiceName>wolframe</ServiceName>
+        <DisplayName>Wolframe Daemon</DisplayName>
+        <Description>Wolframe Daemon</Description>
+    </Service>
+    
+    
+    
+    
+    
+    
+
+    <!--    Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
+        Let's use 7660 for unencrypted connections and 7960 for SSL connections.
+        Note that 7654 seems to be used by Winamp. -->
+    <server>
+        <maxConnections>3</maxConnections>    <!--    Maximum number of simultaneous connections (clients).
+                                Default is the OS limit. This is the global (total) value.
+                                Set it to 0 to disable (to use the system limit) -->
+        <threads>7</threads>            <!--    Number of threads for serving client connections.
+                                Default is 4 -->
+        <listen>
+            <address>*</address>
+            <port>7661</port>
+            <maxConnections>2</maxConnections><!--    Maximum number of simultaneous connections (clients)
+                                for this socket. Default is the OS limit. -->
+        </listen>
+        <listen>
+            <address>localhost</address>
+            <port>7662</port>
+            <identifier>Interface 1</identifier><!--    Interfaces can be named for AAA purposes -->
+        </listen>
+        <listenSsl>
+            <address>0.0.0.0</address>
+            <port>7961</port>
+            <identifier>Interface 1</identifier><!--    Many interfaces can have the same name and
+                                they can be refered as one group in AAAA -->
+            <!--    SSL parameters: required if listenSsl is defined -->
+            <certificate>../tests/SSL/wolframed.crt</certificate><!-- Server certificate file (PEM) -->
+            <key>../tests/SSL/wolframed.key</key>        <!-- Server key file (PEM) -->
+            <CAdirectory>../tests/SSL/CAdir</CAdirectory>    <!-- Directory holding CA certificate files -->
+            <CAchainFile>../tests/SSL/CAchain.pem</CAchainFile><!-- SSL CA chain file -->
+            <verify>ON</verify>                <!--    Require and verify client certificate -->
+        </listenSsl>
+        <listenSsl>
+            <address>127.0.0.1</address>
+            <port>7962</port>
+            <identifier>Interface 2</identifier>
+            <maxConnections>2</maxConnections>
+            <!--    SSL parameters: required if listenSsl is defined -->
+            <certificate>../tests/SSL/wolframed.crt</certificate>
+            <key>../tests/SSL/wolframed.key</key>
+            <!-- <CAdirectory>../tests/SSL/CAdir</CAdirectory> -->
+                                <!--    It's not necessary to define both
+                                    CAdirectory and CAchainFile. -->
+            <CAchainFile>../tests/SSL/CAchain.pem</CAchainFile>
+            <verify>OFF</verify>
+        </listenSsl>
+    </server>
+
+
+    <!--    Database configuration -->
+    <database>
+<!--
+        <PostgreSQL>
+            <identifier>pgdb</identifier>
+            <host>localhost</host>
+            <port>5432</port>
+            <database>wolframe</database>
+            <user>wolframe</user>
+            <password>blabla</password>
+            <connectionTimeout>10</connectionTimeout>
+            <connections>5</connections>
+            <acquireTimeout>10</acquireTimeout>
+        </PostgreSQL>
+-->
+        <SQLite>
+            <identifier>sqlitedb</identifier>
+            <filename>primary.db</filename>
+<!--            <filename>/var/lib/wolframe/primary.db</filename> -->
+        </SQLite>
+        
+<!--
+        <Oracle>
+            <identifier>oracledb</identifier>
+            <host>localhost</host>
+            <port>1521</port>
+            <database>orcl</database>
+            <user>wolframe</user>
+            <password>wolfpwd</password>
+        </Oracle>
+-->
+    </database>
+
+    <!--    Logging parameters -->
+    <logging>
+        <!--    log level for console (stderr) logging -->
+        <stderr>
+            <level>INFO</level>
+        </stderr>
+
+        <!--    log level for file logging -->
+        <logFile>
+            <filename>C:\TEMP\wolframed.log</filename>
+            <level>INFO</level>
+        </logFile>
+
+        <!--    syslog facility, identifier and log level -->
+        <syslog>
+            <ident>wolframed</ident>
+            <facility>LOCAL2</facility>
+            <level>INFO</level>
+        </syslog>
+
+        <!--    eventlog source and log level. Valid only on Windows -->
+        <eventlog>
+            <name>Application</name>
+            <source>Wolframe</source>
+            <level>INFO</level>
+        </eventlog>
+    </logging>
+
+    <!-- Authentication, authorization, auditing and accounting configuration -->
+    <AAAA>
+
+        <authentication>
+            <database>
+                <identifier>SQLite database authentication</identifier>
+                <database>sqlitedb</database>
+            </database>
+<!--
+            <database>
+                <identifier>PostgreSQL database authentication</identifier>
+                <database>pgdb</database>
+            </database>
+-->
+            <TextFile>
+                <identifier>Text file authentication</identifier>
+                <file>wolframe.auth</file>
+            </TextFile>
+        </authentication>
+
+        <Authorization>
+            <default>deny</default> <!-- what to do when there is no authorization information -->
 
 <!--
-			<database>
-				<identifier>"PostgreSQL database authorization"</identifier>
-				<database>pgdb</database>
-			</database>
+            <database>
+                <identifier>"PostgreSQL database authorization"</identifier>
+                <database>pgdb</database>
+            </database>
 
-			<database>
-				<identifier>"SQLite database authorization"</identifier>
-				<database>sqlitedb</database>
-			</database>
+            <database>
+                <identifier>"SQLite database authorization"</identifier>
+                <database>sqlitedb</database>
+            </database>
 -->
-		</Authorization>
+        </Authorization>
 
-		<Audit>
-			<!-- Audit is mandatory ? If set to yes operations will fail if audit fails -->
-			<mandatory>yes</mandatory>
+        <Audit>
+            <!-- Audit is mandatory ? If set to yes operations will fail if audit fails -->
+            <mandatory>yes</mandatory>
 
-			<TextFile>
-				<required>yes</required>
-				<file>wolframe.audit</file>
-			</TextFile>
+            <TextFile>
+                <required>yes</required>
+                <file>wolframe.audit</file>
+            </TextFile>
 
-			<Database>
-				<required>no</required>
-				<database>sqlitedb</database>
-			</Database>
-		</Audit>
-	<!-- There is no configuration for accounting as it
-	     should be derived from audit information -->
-	</AAAA>
+            <Database>
+                <required>no</required>
+                <database>sqlitedb</database>
+            </Database>
+        </Audit>
+    <!-- There is no configuration for accounting as it
+         should be derived from audit information -->
+    </AAAA>
 
-	<!-- The thing that does the real job ;) -->
-	<Processor>
-	<!--	<database>pgdb</database> -->
-		<database>sqlitedb</database>
-<!--		<EchoProcessor>
-			<timeout>10</timeout>
-		</EchoProcessor>
+    <!-- The thing that does the real job ;) -->
+    <Processor>
+    <!--    <database>pgdb</database> -->
+        <database>sqlitedb</database>
+<!--        <EchoProcessor>
+            <timeout>10</timeout>
+        </EchoProcessor>
 -->
-	</Processor>
+    </Processor>
 
-</configuration>
+</Configuration>
 

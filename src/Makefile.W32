@@ -162,6 +162,7 @@ copy_prereq:
 	@-copy "$(LIBXSLT_DIR)\bin\libxslt.dll" . >NUL
 !ENDIF
 !IFDEF WITH_ICU
+	@-copy "$(ICU_DIR)\bin\icudt$(ICU_LIB_VERSION).dll" . >NUL
 !IFNDEF DEBUG
 	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" . >NUL
 	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" . >NUL

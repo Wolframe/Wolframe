@@ -24,6 +24,11 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_lua=1
 !ENDIF
 
+!IFDEF WITH_PYTHON
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_python=1
+!ENDIF
+
 !IFDEF WITH_PGSQL
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_pgsql=1
@@ -32,6 +37,11 @@ WIX_FLAGS = $(WIX_FLAGS) \
 !IFDEF WITH_SQLITE3
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_sqlite3=1
+!ENDIF
+
+!IFDEF WITH_TEXTWOLF
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_textwolf=1
 !ENDIF
 
 !IFDEF WITH_LIBXML2
@@ -44,9 +54,24 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_libxslt=1
 !ENDIF
 
+!IFDEF WITH_CJSON
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_cjson=1
+!ENDIF
+
 !IFDEF WITH_ICU
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_icu=1 -dicu_lib_version=$(ICU_LIB_VERSION)
+!ENDIF
+
+!IFDEF WITH_LIBHPDF
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_libhpdf=1
+!ENDIF
+
+!IFDEF WITH_FREEIMAGE
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_freeimage=1
 !ENDIF
 
 # The name of libintl and libiconv are not always the same
