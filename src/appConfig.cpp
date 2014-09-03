@@ -256,8 +256,16 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 					else
 					{
 						std::string modpath = m_modDir->getAbsoluteModulePath( *pi, m_modFolder);
-						LOG_NOTICE << MODULE_SECTION_MSG << "Resolved relative module path '" << *pi << "' as '" << modpath << "'";
-						*pi = modpath;
+						if (modpath.empty())
+						{
+							LOG_ERROR << "Could not resolve configured relative module path '" << *pi << "'";
+							retVal = false;
+						}
+						else
+						{
+							LOG_NOTICE << MODULE_SECTION_MSG << "Resolved relative module path '" << *pi << "' as '" << modpath << "'";
+							*pi = modpath;
+						}
 					}
 					LOG_TRACE << MODULE_SECTION_MSG << "Added module file '" << *pi << "'";
 				}
