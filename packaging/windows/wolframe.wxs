@@ -883,11 +883,10 @@ on Windows first.
 		
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
 		
-		<Property Id="WOLFRAME_DATABASE_TYPE" Secure="yes">
+		<Property Id="WOLFRAME_DATABASE_TYPE" Secure="yes" Value="sqlite3">
 			<RegistrySearch Id="WolframeDatabaseType" Root="HKCU"
 			                Key="SOFTWARE\WolframeGroup\Wolframe\Configuration"
 					Name="DatabaseType" Type="raw"/>
-		   sqlite3
 		</Property>
 		<Property Id="WOLFRAME_DATABASE_HOST" Secure="yes">
 			localhost
