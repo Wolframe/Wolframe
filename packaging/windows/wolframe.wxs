@@ -307,9 +307,24 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuthTextfile" Action="createElement" ElementPath="/Configuration/LoadModules"
 								              Name="Module" Value="[INSTALLDIR]modules\mod_auth_textfile.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+<!--
+TODO: must be generated, no snippet in wolframe.xml which gets patched
+
 								<util:XmlFile Id="UpdateAuthTextfileLocation" Action="setValue" ElementPath="/Configuration/AAAA/authentication/TextFile/file"
 								              Value="[INSTALLDIR]data\auth.txt"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+
+            <TextFile>
+                <identifier>Text file authentication</identifier>
+                <file>#inserted by installer#</file>
+            </TextFile>
+
+            <Database>
+                <Identifier>database authentication</Identifier>
+                <Database>#inserted by installer#</Database>
+            </Database>
+
+-->
 							</Component>
 
 							<Component Id="ModAuthDatabase" Guid="{5C91782A-8751-40ED-9E3C-3818405614B8}">
@@ -317,9 +332,11 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuthDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
 								              Name="Module" Value="[INSTALLDIR]modules\mod_auth_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateConfigModAuthDatabaseReference" Action="setValue" ElementPath="/Configuration/AAAA/authentication/database/database"
-								              Value="[WOLFRAME_DATABASE_TYPE]"
+<!--
+								<util:XmlFile Id="UpdateConfigModAuthDatabaseReference" Action="setValue" ElementPath="/Configuration/AAAA/Authentication/Database/Database"
+								              Value="db"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+-->
 							</Component>
 
 							<!-- authorization modules -->        
@@ -329,6 +346,19 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuthzDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
 								              Name="Module" Value="[INSTALLDIR]modules\mod_authz_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+<!--
+TODO: must be generated, no snippet in wolframe.xml which gets patched
+
+            <database>
+                <name>database authorization"</name>
+                <database>db</database>
+            </database>
+
+								<util:XmlFile Id="UpdateConfigModAuthDatabaseReference" Action="setValue" ElementPath="/Configuration/AAAA/Autorization/Database/Database"
+								              Value="db"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+
+-->
 							</Component>
 
 							<Component Id="ModCommandAamap" Guid="{36260062-2100-4580-80f5-85d1641a32a7}">
@@ -345,9 +375,23 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuditTextfile" Action="createElement" ElementPath="/Configuration/LoadModules"
 								              Name="Module" Value="[INSTALLDIR]modules\mod_audit_textfile.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateAuditTextfileLocation" Action="setValue" ElementPath="/Configuration/AAAA/Audit/TextFile/file"
+<!--
+TODO: must be generated, no snippet in wolframe.xml which gets patched
+
+            <TextFile>
+                <required>yes</required>
+                <file>#inserted by installer#</file>
+            </TextFile>
+            
+            <Database>
+                <required>no</required>
+                <database>#inserted by installer#</database>
+            </Database>
+
+								<util:XmlFile Id="UpdateAuditTextfileLocation" Action="setValue" ElementPath="/Configuration/AAAA/Audit/TextFile/File"
 								              Value="[INSTALLDIR]data\audit.txt"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+-->
 							</Component>
 
 							<Component Id="ModAuditDatabase" Guid="{8EBEC554-6E24-435A-82E1-EE7B1DADE59D}">
@@ -355,9 +399,11 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
 								              Name="Module" Value="[INSTALLDIR]modules\mod_audit_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateConfigModAuditDatabaseReference" Action="setValue" ElementPath="/Configuration/AAAA/Audit/Database/database"
-								              Value="[WOLFRAME_DATABASE_TYPE]"
+<!--
+								<util:XmlFile Id="UpdateConfigModAuditDatabaseReference" Action="setValue" ElementPath="/Configuration/AAAA/Audit/Database/Database"
+								              Value="db"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+-->
 							</Component>
 
 							<!-- modules for detecting document types -->

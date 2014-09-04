@@ -106,7 +106,9 @@
 
                 <!-- Deny IP -->
                 
+<!--
                 <Deny>127.0.0.1</Deny>
+-->
             
             </Restrictions>
             
@@ -118,57 +120,121 @@
     <Database>
     </Database>
 
+    <!-- Authentication, authorization, auditing and accounting configuration 
 
+         simple setup, allow access from everywhere and everybody -->
 
-
-
-
-
-
-
-
-    
-    <!-- Authentication, authorization, auditing and accounting configuration -->
     <AAAA>
+        
+        <Authentication>
+        
+            <!-- random device
+                 default: system default, usually /dev/urandom -->
 
-        <authentication>
-            <database>
-                <identifier>database authentication</identifier>
-                <database>#inserted by installer#</database>
-            </database>
-            <TextFile>
-                <identifier>Text file authentication</identifier>
-                <file>#inserted by installer#</file>
-            </TextFile>
-        </authentication>
+            <RandomDevice>/dev/urandom</RandomDevice>
+                        
+        </Authentication>
         
         <Authorization>
-            <default>allow</default> <!-- what to do when there is no authorization information -->
+            
+            <!-- Allow all operations -->
+            
+            <Default>allow</Default>
+            
+        </Authorization>
+        
+        <Audit>
+            
+            <!-- operations only succeed when auditing was successfull
+                 default: no -->
+            
+<!--
+            <Mandatory>yes</Mandatory>
+-->
+            
+        </Audit>
+        
+    </AAAA>
+
+    <!-- data processing -->
+    
+    <Processor>
+        
+        <!-- database to use in all processors as standard database -->
+        
+<!--
+        <Database>db</Database>
+-->
+
+        <!-- normalization program -->
+        
+<!--
+        <Program>program\example.wnmp</Program>
+-->
+
+        <!-- form validation program using simpleform language -->
+        
+<!--
+        <Program>program\example.sfrm</Program>
+-->
+
+        <!-- database transactions using the TDL language -->
 
 <!--
-            <database>
-                <name>database authorization"</name>
-                <database>db</database>
-            </database>
+        <Program>program\example.tdl</Program>
 -->
-        </Authorization>
 
-        <Audit>
-            <!-- Audit is mandatory ? If set to yes operations will fail if audit fails -->
-            <mandatory>yes</mandatory>
-            
-            <TextFile>
-                <required>yes</required>
-                <file>#inserted by installer#</file>
-            </TextFile>
-            
-            <Database>
-                <required>no</required>
-                <database>#inserted by installer#</database>
-            </Database>
-        </Audit>
-    <!-- There is no configuration for accounting as it
-         should be derived from audit information -->
-    </AAAA>
+        <!-- implementation of functions in various scripting languages -->
+
+<!--
+        <Program>program\example.lua</Program>
+        <Program>program\example.py</Program>
+-->
     
+        <!-- command handler program mapping requests to functions handling them -->
+
+        <CmdHandler>
+
+            <!-- the standard command handler using the directmap language -->
+    
+<!--
+            <Directmap>
+-->
+
+                <!-- the list of command mappings -->
+                
+<!--
+                <Program>program\example.dmap</Program>
+-->
+
+                <!-- filter to use for serialization of data (format and implementation
+                     of the filter) -->
+
+<!--
+                <Filter>XML=textwolf</Filter>
+                <Filter>XML=libml2</Filter>
+                <Filter>JSON=cjson</Filter>
+-->
+            
+<!--
+            </Directmap>
+-->
+
+            <!-- command handlers written in scripting languages -->
+
+            <!-- command handlers written in Lua -->
+            
+<!--
+            <Lua>
+                <Program>program\example.lua</Program>            
+                <Filter>XML=textwolf</Filter>
+                <Filter>XML=libml2</Filter>
+                <Filter>JSON=cjson</Filter>
+            </Lua>
+-->
+
+        </CmdHandler>
+
+    </Processor>
+
 </Configuration>
