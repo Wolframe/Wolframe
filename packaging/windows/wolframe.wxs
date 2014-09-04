@@ -174,13 +174,13 @@ Project Wolframe.
 							
 							<?ifdef var.with_icu?>
 							<Component Id="ICUDlls" Guid="{205cf449-6a2e-4d43-969a-5740fc4f737b}">
-								<File Id="icudt$(var.icu_lib_version).dll" Name="icudt.dll" DiskId="1" Source="$(var.topdir)\src\icudt$(var.icu_lib_version).dll"/>
+								<File Id="icudt$(var.icu_lib_version).dll" Name="icudt$(var.icu_lib_version).dll" DiskId="1" Source="$(var.topdir)\src\icudt$(var.icu_lib_version).dll"/>
 								<?ifdef var.debug?>
-									<File Id="icuin$(var.icu_lib_version)d.dll" Name="icuind.dll" DiskId="1" Source="$(var.topdir)\src\icuin$(var.icu_lib_version)d.dll"/>
-									<File Id="icuuc$(var.icu_lib_version)d.dll" Name="icuucd.dll" DiskId="1" Source="$(var.topdir)\src\icuuc$(var.icu_lib_version)d.dll"/>
+									<File Id="icuin$(var.icu_lib_version)d.dll" Name="icuin$(var.icu_lib_version)d.dll" DiskId="1" Source="$(var.topdir)\src\icuin$(var.icu_lib_version)d.dll"/>
+									<File Id="icuuc$(var.icu_lib_version)d.dll" Name="icuuc$(var.icu_lib_version)d.dll" DiskId="1" Source="$(var.topdir)\src\icuuc$(var.icu_lib_version)d.dll"/>
 								<?else?>
-									<File Id="icuin$(var.icu_lib_version).dll" Name="icuin.dll" DiskId="1" Source="$(var.topdir)\src\icuin$(var.icu_lib_version).dll"/>
-									<File Id="icuuc$(var.icu_lib_version).dll" Name="icuuc.dll" DiskId="1" Source="$(var.topdir)\src\icuuc$(var.icu_lib_version).dll"/>
+									<File Id="icuin$(var.icu_lib_version).dll" Name="icuin$(var.icu_lib_version).dll" DiskId="1" Source="$(var.topdir)\src\icuin$(var.icu_lib_version).dll"/>
+									<File Id="icuuc$(var.icu_lib_version).dll" Name="icuuc$(var.icu_lib_version).dll" DiskId="1" Source="$(var.topdir)\src\icuuc$(var.icu_lib_version).dll"/>
 								<?endif?>
 							</Component>
 							<?endif?>							
@@ -532,9 +532,13 @@ TODO: must be generated, no snippet in wolframe.xml which gets patched
 							<?ifdef var.with_python?>
 								<Component Id="ModCommandPython" Guid="{f8a6e400-214d-4a58-8958-08b9e29ded8b}">
 									<File Id="mod_command_python.dll" Name="mod_command_python.dll" DiskId="1" Source="$(var.topdir)\src\modules\cmdbind\python\mod_command_python.dll"/>
+<!--
+TODO: deploy python34.dll, for this we have to be able to build a coplete Python 
+on Windows first.
 									<util:XmlFile Id="AppendConfigModCommandPython" Action="createElement" ElementPath="/Configuration/LoadModules"
 												  Name="Module" Value="[INSTALLDIR]modules\mod_command_python.dll"
 											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+-->
 								</Component>
 							<?endif?>
 
@@ -606,9 +610,11 @@ TODO: must be generated, no snippet in wolframe.xml which gets patched
 							<?ifdef var.with_freeimage?>
 								<Component Id="ModGraphix" Guid="{136637d0-30a1-4bbc-ae5e-0d5d355b215a}">
 									<File Id="mod_graphix.dll" Name="mod_graphix.dll" DiskId="1" Source="$(var.topdir)\src\modules\functions\graphix\mod_graphix.dll"/>
+<!-- TODO deploy freeimage DLLs first
 									<util:XmlFile Id="AppendConfigModGraphix" Action="createElement" ElementPath="/Configuration/LoadModules"
 												  Name="Module" Value="[INSTALLDIR]modules\mod_graphix.dll"
 											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+-->
 								</Component>
 							<?endif?>
 							
