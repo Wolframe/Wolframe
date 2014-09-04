@@ -74,18 +74,18 @@ Project Wolframe.
 			<Publish Dialog="DatabaseSelectDlg" Control="Back" Event="NewDialog" Value="CustomizeDlg" Order="1">WixUI_InstallMode = "InstallCustom"</Publish>
 			<Publish Dialog="DatabaseSelectDlg" Control="Back" Event="NewDialog" Value="SetupTypeDlg" Order="2">WixUI_InstallMode = "InstallTypical" OR WixUI_InstallMode = "InstallComplete"</Publish>
 			<Publish Dialog="DatabaseSelectDlg" Control="Back" Event="NewDialog" Value="CustomizeDlg" Order="3">WixUI_InstallMode = "Change"</Publish>
-			<Publish Dialog="DatabaseSelectDlg" Control="Next" Event="NewDialog" Value="PostgresqlParametersDlg" Order="1">WOLFRAME_DATABASE_TYPE = "pgdb"</Publish>
-			<Publish Dialog="DatabaseSelectDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="1">WOLFRAME_DATABASE_TYPE = "sqlitedb"</Publish>
+			<Publish Dialog="DatabaseSelectDlg" Control="Next" Event="NewDialog" Value="PostgresqlParametersDlg" Order="1">WOLFRAME_DATABASE_TYPE = "pgsql"</Publish>
+			<Publish Dialog="DatabaseSelectDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="1">WOLFRAME_DATABASE_TYPE = "sqlite3"</Publish>
 
 			<Publish Dialog="PostgresqlParametersDlg" Control="Back" Event="NewDialog" Value="DatabaseSelectDlg" Order="1">1</Publish>
 			<Publish Dialog="PostgresqlParametersDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="1">1</Publish>
 			
-			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DatabaseSelectDlg" Order="1">WOLFRAME_DATABASE_TYPE = "sqlitedb" AND (WixUI_InstallMode = "InstallCustom")</Publish>
-			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DatabaseSelectDlg" Order="2">WOLFRAME_DATABASE_TYPE = "sqlitedb" AND (WixUI_InstallMode = "InstallTypical" OR WixUI_InstallMode = "InstallComplete")</Publish>
-			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DatabaseSelectDlg" Order="3">WOLFRAME_DATABASE_TYPE = "sqlitedb" AND (WixUI_InstallMode = "Change")</Publish>
-			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PostgresqlParametersDlg" Order="1">WOLFRAME_DATABASE_TYPE = "pgdb" AND (WixUI_InstallMode = "InstallCustom")</Publish>
-			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PostgresqlParametersDlg" Order="2">WOLFRAME_DATABASE_TYPE = "pgdb" AND (WixUI_InstallMode = "InstallTypical" OR WixUI_InstallMode = "InstallComplete")</Publish>
-			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PostgresqlParametersDlg" Order="3">WOLFRAME_DATABASE_TYPE = "pgdb" AND (WixUI_InstallMode = "Change")</Publish>			
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DatabaseSelectDlg" Order="1">WOLFRAME_DATABASE_TYPE = "sqlite3" AND (WixUI_InstallMode = "InstallCustom")</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DatabaseSelectDlg" Order="2">WOLFRAME_DATABASE_TYPE = "sqlite3" AND (WixUI_InstallMode = "InstallTypical" OR WixUI_InstallMode = "InstallComplete")</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DatabaseSelectDlg" Order="3">WOLFRAME_DATABASE_TYPE = "sqlite3" AND (WixUI_InstallMode = "Change")</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PostgresqlParametersDlg" Order="1">WOLFRAME_DATABASE_TYPE = "pgsql" AND (WixUI_InstallMode = "InstallCustom")</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PostgresqlParametersDlg" Order="2">WOLFRAME_DATABASE_TYPE = "pgsql" AND (WixUI_InstallMode = "InstallTypical" OR WixUI_InstallMode = "InstallComplete")</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PostgresqlParametersDlg" Order="3">WOLFRAME_DATABASE_TYPE = "pgsql" AND (WixUI_InstallMode = "Change")</Publish>			
 			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="4">WixUI_InstallMode = "Repair" OR WixUI_InstallMode = "Remove"</Publish>
 			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">WixUI_InstallMode = "Update"</Publish>
 

@@ -105,7 +105,7 @@ Project Wolframe.
 								<firewall:FirewallException Id="SSLProtocol" Name="Wolframe Protocol (SSL)" Port="7961" Protocol="tcp" Scope="any"/>
 
 								<!-- set location of the logfile -->
-								<util:XmlFile Id="UpdateLogfileLocation" Action="setValue" ElementPath="/Configuration/logging/logFile/filename"
+								<util:XmlFile Id="UpdateLogfileLocation" Action="setValue" ElementPath="/Configuration/Logging/LogFile/Filename"
 								              Value="[INSTALLDIR]logs\wolframed.log"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								<!-- install service (TODO, couple names with config) -->
@@ -230,60 +230,64 @@ Project Wolframe.
 							<?ifdef with_sqlite3?>
 							<Component Id="ModDbSqlite3" Guid="{71270C73-F3B4-4956-8DBC-D80301BB3417}">
 								<File Id="mod_db_sqlite3.dll" Name="mod_db_sqlite3.dll" DiskId="1" Source="$(var.topdir)\src\modules\database\sqlite3\mod_db_sqlite3.dll"/>
-								<util:XmlFile Id="AppendConfigModDbSqlite3" Action="createElement" ElementPath="/Configuration/LoadModules"
-								              Name="Module" Value="[INSTALLDIR]modules\mod_db_sqlite3.dll"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="AppendDBconfigSqlite3SQlite" Action="createElement" ElementPath="/Configuration/database"
-								              Name="SQLite"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="AppendDBconfigSqlite3Identifier" Action="createElement" ElementPath="/Configuration/database/SQLite"
-								              Name="identifier" Value="sqlitedb"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
-								<util:XmlFile Id="AppendDBconfigSqlite3File" Action="createElement" ElementPath="/Configuration/database/SQLite"
-								              Name="file" Value="#inserted by installer#"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="3"/>
-								<util:XmlFile Id="UpdateSqlite3DbLocation" Action="setValue" ElementPath="/Configuration/database/SQLite/file"
-								              Value="[INSTALLDIR]data\primary.db"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
+								<?if "[WOLFRAME_DATABASE_TYPE]" = "sqlite3"?>
+									<util:XmlFile Id="AppendConfigModDbSqlite3" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_db_sqlite3.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+									<util:XmlFile Id="AppendDBconfigSqlite3SQlite" Action="createElement" ElementPath="/Configuration/Database"
+												  Name="SQLite"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+									<util:XmlFile Id="AppendDBconfigSqlite3Identifier" Action="createElement" ElementPath="/Configuration/Database/SQLite"
+												  Name="identifier" Value="db"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
+									<util:XmlFile Id="AppendDBconfigSqlite3File" Action="createElement" ElementPath="/Configuration/Database/SQLite"
+												  Name="file" Value="#inserted by installer#"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="3"/>
+									<util:XmlFile Id="UpdateSqlite3DbLocation" Action="setValue" ElementPath="/Configuration/Database/SQLite/file"
+												  Value="[INSTALLDIR]data\primary.db"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
+								<?endif?>
 							</Component>
 							<?endif?>
 
 							<?ifdef with_pgsql?>
 							<Component Id="ModDbPostgresql" Guid="{F1A6E235-2394-466A-AB1E-A1CD6C396339}">
 								<File Id="mod_db_postgresql.dll" Name="mod_db_postgresql.dll" DiskId="1" Source="$(var.topdir)\src\modules\database\postgresql\mod_db_postgresql.dll"/>
-								<util:XmlFile Id="AppendConfigModDbPostgresql" Action="createElement" ElementPath="/Configuration/LoadModules"
-								              Name="Module" Value="[INSTALLDIR]modules\mod_db_postgresql.dll"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlPostgresql" Action="createElement" ElementPath="/Configuration/database"
-								              Name="PostgreSQL"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlIdentifier" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
-								              Name="identifier" Value="pgdb"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlHost" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
-								              Name="host" Value="[WOLFRAME_DATABASE_HOST]"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="3"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlPort" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
-								              Name="port" Value="[WOLFRAME_DATABASE_PORT]"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlDatabase" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
-								              Name="database" Value="[WOLFRAME_DATABASE_DATABASE]"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="5"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlUser" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
-								              Name="user" Value="[WOLFRAME_DATABASE_USER]"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="6"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlPassword" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
-								              Name="password" Value="[WOLFRAME_DATABASE_PASSWORD]"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="7"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlConnectionTimeout" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
-								              Name="connectionTimeout" Value="10"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="8"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqConnections" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
-								              Name="connections" Value="5"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="9"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlAcquireTimeout" Action="createElement" ElementPath="/Configuration/database/PostgreSQL"
-								              Name="acquireTimeout" Value="10"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="10"/>
+								<?if "[WOLFRAME_DATABASE_TYPE]" = "pgsql"?>
+									<util:XmlFile Id="AppendConfigModDbPostgresql" Action="createElement" ElementPath="/Configuration/LoadModules"
+												  Name="Module" Value="[INSTALLDIR]modules\mod_db_postgresql.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqlPostgresql" Action="createElement" ElementPath="/Configuration/Database"
+												  Name="PostgreSQL"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqlIdentifier" Action="createElement" ElementPath="/Configuration/Database/PostgreSQL"
+												  Name="identifier" Value="db"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="2"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqlHost" Action="createElement" ElementPath="/Configuration/Database/PostgreSQL"
+												  Name="host" Value="[WOLFRAME_DATABASE_HOST]"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="3"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqlPort" Action="createElement" ElementPath="/Configuration/Database/PostgreSQL"
+												  Name="port" Value="[WOLFRAME_DATABASE_PORT]"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqlDatabase" Action="createElement" ElementPath="/Configuration/Database/PostgreSQL"
+												  Name="Database" Value="[WOLFRAME_DATABASE_DATABASE]"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="5"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqlUser" Action="createElement" ElementPath="/Configuration/Database/PostgreSQL"
+												  Name="user" Value="[WOLFRAME_DATABASE_USER]"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="6"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqlPassword" Action="createElement" ElementPath="/Configuration/Database/PostgreSQL"
+												  Name="password" Value="[WOLFRAME_DATABASE_PASSWORD]"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="7"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqlConnectionTimeout" Action="createElement" ElementPath="/Configuration/Database/PostgreSQL"
+												  Name="connectionTimeout" Value="10"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="8"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqConnections" Action="createElement" ElementPath="/Configuration/Database/PostgreSQL"
+												  Name="connections" Value="5"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="9"/>
+									<util:XmlFile Id="AppendDBconfigPostgresqlAcquireTimeout" Action="createElement" ElementPath="/Configuration/Database/PostgreSQL"
+												  Name="acquireTimeout" Value="10"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="10"/>
+								<?endif?>
 							</Component>
 							<?endif?>
 
@@ -359,14 +363,14 @@ Project Wolframe.
 							<!-- modules for detecting document types -->
 							<Component Id="ModDocTypeXml" Guid="{0ace5957-0722-447a-8c74-bc41aaf22cdd}">
 								<File Id="mod_doctype_xml.dll" Name="mod_doctype_xml.dll" DiskId="1" Source="$(var.topdir)\src\modules\doctype\xml\mod_doctype_xml.dll"/>
-								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
+								<util:XmlFile Id="AppendConfigModDocTypeXml" Action="createElement" ElementPath="/Configuration/LoadModules"
 								              Name="Module" Value="[INSTALLDIR]modules\mod_doctype_xml.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
 							<Component Id="ModDocTypeJson" Guid="{08911c37-13e4-4b19-a55e-b4ca168de8f8}">
 								<File Id="mod_doctype_json.dll" Name="mod_doctype_json.dll" DiskId="1" Source="$(var.topdir)\src\modules\doctype\json\mod_doctype_json.dll"/>
-								<util:XmlFile Id="AppendConfigModAuditDatabase" Action="createElement" ElementPath="/Configuration/LoadModules"
+								<util:XmlFile Id="AppendConfigModDocTypeJson" Action="createElement" ElementPath="/Configuration/LoadModules"
 								              Name="Module" Value="[INSTALLDIR]modules\mod_doctype_json.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
@@ -408,7 +412,7 @@ Project Wolframe.
 							<!-- data normalization modules -->
 							<Component Id="ModNormalizeBase64" Guid="{b3ad80af-774a-45cd-a1c6-a9ad34ab5c12}">
 								<File Id="mod_normalize_base64.dll" Name="mod_normalize_base64.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\base64\mod_normalize_base64.dll"/>
-								<util:XmlFile Id="AppendConfigModFilterCjson" Action="createElement" ElementPath="/Configuration/LoadModules"
+								<util:XmlFile Id="AppendConfigModNormalizeBase64" Action="createElement" ElementPath="/Configuration/LoadModules"
 											  Name="Module" Value="[INSTALLDIR]modules\mod_normalize_base64.dll"
 										  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
@@ -440,7 +444,7 @@ Project Wolframe.
 
 							<Component Id="ModDatatypeBcdNumber" Guid="{72b910e2-24ca-4963-ad3b-f24880fe6fe3}">
 								<File Id="mod_datatype_bcdnumber.dll" Name="mod_datatype_bcdnumber.dll" DiskId="1" Source="$(var.topdir)\src\modules\datatype\bcdnumber\mod_datatype_bcdnumber.dll"/>
-								<util:XmlFile Id="AppendConfigModDatatypeBcdNumber Action="createElement" ElementPath="/Configuration/LoadModules"
+								<util:XmlFile Id="AppendConfigModDatatypeBcdNumber" Action="createElement" ElementPath="/Configuration/LoadModules"
 											  Name="Module" Value="[INSTALLDIR]modules\mod_datatype_bcdnumber.dll"
 										  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
@@ -526,10 +530,10 @@ Project Wolframe.
 								</Component>
 							<?endif?>
 
-							<Component Id="ModNormalizeBlob" Guid="{6b646bd3-8ab2-4524-844a-a95111c0bd3f}">
-								<File Id="mod_normalize_blob.dll" Name="mod_normalize_blob.dll" DiskId="1" Source="$(var.topdir)\src\modules\normalize\blob\mod_normalize_blob.dll"/>
-								<util:XmlFile Id="AppendConfigModNormalizeString" Action="createElement" ElementPath="/Configuration/LoadModules"
-											  Name="Module" Value="[INSTALLDIR]modules\mod_normalize_blob.dll"
+							<Component Id="ModFilterBlob" Guid="{6b646bd3-8ab2-4524-844a-a95111c0bd3f}">
+								<File Id="mod_filter_blob.dll" Name="mod_filter_blob.dll" DiskId="1" Source="$(var.topdir)\src\modules\filter\blob\mod_filter_blob.dll"/>
+								<util:XmlFile Id="AppendConfigModFilterBlob" Action="createElement" ElementPath="/Configuration/LoadModules"
+											  Name="Module" Value="[INSTALLDIR]modules\mod_filter_blob.dll"
 										  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
@@ -546,8 +550,8 @@ Project Wolframe.
 
 							<?ifdef var.with_libhpdf?>
 								<Component Id="ModPrintHarupdf" Guid="{eacfd02f-991f-4376-bfe7-fc828a4190a7}">
-									<File Id="mod_print_harupdf.dll" Name="mod_print_harupdf.dll" DiskId="1" Source="$(var.topdir)\src\modules\prnt\haupdfprint\mod_print_harupdf.dll"/>
-									<util:XmlFile Id="AppendConfigModNormalizeString" Action="createElement" ElementPath="/Configuration/LoadModules"
+									<File Id="mod_print_harupdf.dll" Name="mod_print_harupdf.dll" DiskId="1" Source="$(var.topdir)\src\modules\prnt\harupdfprint\mod_print_harupdf.dll"/>
+									<util:XmlFile Id="AppendConfigModPrintHarupdf" Action="createElement" ElementPath="/Configuration/LoadModules"
 												  Name="Module" Value="[INSTALLDIR]modules\mod_print_harupdf.dll"
 											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								</Component>
@@ -556,7 +560,7 @@ Project Wolframe.
 							<?ifdef var.with_freeimage?>
 								<Component Id="ModGraphix" Guid="{136637d0-30a1-4bbc-ae5e-0d5d355b215a}">
 									<File Id="mod_graphix.dll" Name="mod_graphix.dll" DiskId="1" Source="$(var.topdir)\src\modules\functions\graphix\mod_graphix.dll"/>
-									<util:XmlFile Id="AppendConfigModNormalizeString" Action="createElement" ElementPath="/Configuration/LoadModules"
+									<util:XmlFile Id="AppendConfigModGraphix" Action="createElement" ElementPath="/Configuration/LoadModules"
 												  Name="Module" Value="[INSTALLDIR]modules\mod_graphix.dll"
 											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								</Component>
@@ -731,7 +735,7 @@ Project Wolframe.
 				
 				<?ifdef var.with_textwolf?>
 					<Feature Id="NormalizationModulesTextwolf" Title="Normalization modules with textwolf" Description="Normalization modules implemented with textwolf." Level="3" InstallDefault="local" TypicalDefault="install">
-						<ComponentRef Id="ModNormalizeSring"/>
+						<ComponentRef Id="ModNormalizeString"/>
 					</Feature>
 				<?endif?>
 
@@ -785,19 +789,21 @@ Project Wolframe.
 			</Feature>			
 			
 			<Feature Id="VariousOtherModules" Title="Various Other Modules" Description="Various other modules" Level="3">
+<!--
 				<Feature Id="JobSchedule" Title="job scheduler" Description="Schedule jobs in the database." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModJobScheduleDb"/>
 				</Feature>
+-->
 				<?ifdef var.with_libhpdf?>
 					<Feature Id="PrintHaru" Title="Printing with libhpdf" Description="Produce PDF output with libhpdf." Level="3" InstallDefault="local" TypicalDefault="install">
 						<ComponentRef Id="ModPrintHarupdf"/>
 					</Feature>
-				<?endif?
+				<?endif?>
 				<?ifdef var.with_libhpdf?>
 					<Feature Id="Graphix" Title="Image processing with Freeimage" Description="Image manipulations with the FreeImage library." Level="3" InstallDefault="local" TypicalDefault="install">
 						<ComponentRef Id="ModGraphix"/>
 					</Feature>
-				<?endif?
+				<?endif?>
 			</Feature>
 			
 			<Feature Id="Clients" Title="Clients" Description="Client programs talking to Wolframe." Level="3"  InstallDefault="local">
@@ -829,7 +835,7 @@ Project Wolframe.
 			<RegistrySearch Id="WolframeDatabaseType" Root="HKCU"
 			                Key="SOFTWARE\WolframeGroup\Wolframe\Configuration"
 					Name="DatabaseType" Type="raw"/>
-		   sqlitedb
+		   sqlite3
 		</Property>
 		<Property Id="WOLFRAME_DATABASE_HOST" Secure="yes">
 			localhost

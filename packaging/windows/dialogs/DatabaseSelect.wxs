@@ -48,8 +48,8 @@ Project Wolframe.
 				<Control Id="Instruction" Type="Text" Height="15" Width="280" X="20" Y="53" Text="!(loc.DatabaseSelectDlgInstruction)" />
 				<Control Id="radioButtonGroupBox1" Type="RadioButtonGroup" Height="122" Width="296" X="34" Y="83" Property="WOLFRAME_DATABASE_TYPE">
 					<RadioButtonGroup Property="WOLFRAME_DATABASE_TYPE">
-						<RadioButton X="63" Y="26" Height="18" Width="150" Text="!(loc.DatabaseSelectDlgRadio1)" Value="sqlitedb" />
-						<RadioButton X="63" Y="49" Height="18" Width="150" Text="!(loc.DatabaseSelectDlgRadio2)" Value="pgdb" />
+						<RadioButton X="63" Y="26" Height="18" Width="150" Text="!(loc.DatabaseSelectDlgRadio1)" Value="sqlite3" />
+						<RadioButton X="63" Y="49" Height="18" Width="150" Text="!(loc.DatabaseSelectDlgRadio2)" Value="pgsql" />
 					</RadioButtonGroup>
 				</Control>
 			</Dialog>

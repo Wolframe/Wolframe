@@ -20,68 +20,113 @@
       -->
     <ServerSignature>Wolframe</ServerSignature> 
     
-    <!-- Windows service parameters (for service registration) -->
+    <!-- Windows service parameters (for manual service registration) -->
     <Service>
         <ServiceName>wolframe</ServiceName>
         <DisplayName>Wolframe Daemon</DisplayName>
         <Description>Wolframe Daemon</Description>
     </Service>
 
+    <!-- Logging -->
 
-
-
-
-
-
-    <!--    Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
-        Let's use 7660 for unencrypted connections and 7960 for SSL connections.
-        Note that 7654 seems to be used by Winamp. -->
-    <server>
-        <maxConnections>3</maxConnections>    <!--    Maximum number of simultaneous connections (clients).
-                                Default is the OS limit. This is the global (total) value.
-                                Set it to 0 to disable (to use the system limit) -->
-        <threads>7</threads>            <!--    Number of threads for serving client connections.
-                                Default is 4 -->
-        <listen>
-            <address>*</address>
-            <port>7661</port>
-            <maxConnections>2</maxConnections><!--    Maximum number of simultaneous connections (clients)
-                                for this socket. Default is the OS limit. -->
-        </listen>
-    </server>
-
-
-    <!--    Database configuration, get added here by the installer -->
-    <database>
-    </database>
+    <Logging>
     
-    <!--    Logging parameters -->
-    <logging>
-        <!--    log level for console (stderr) logging -->
-        <stderr>
-            <level>INFO</level>
-        </stderr>
+        <!-- logging to stderr (console) is when running in a terminal -->
+        <Stderr>
+            <Level>INFO</Level>
+        </Stderr>
 
-        <!--    log level for file logging -->
-        <logFile>
-            <filename>#inserted by installer#</filename>
-            <level>INFO</level>
-        </logFile>
+        <!-- logging to a file -->
+        <LogFile>
+            <Filename>#inserted by installer#</Filename>
+            <Level>INFO</Level>
+        </LogFile>
 
-        <!--    syslog facility, identifier and log level -->
-        <syslog>
-            <ident>wolframed</ident>
-            <facility>LOCAL2</facility>
-            <level>INFO</level>
-        </syslog>
+        <!-- logging to syslog -->
+        <Syslog>
+            <Ident>wolframed</Ident>
+            <Facility>LOCAL2</Facility>
+            <Level>INFO</Level>
+        </Syslog>
 
         <!--    eventlog source and log level. Valid only on Windows -->
-        <eventlog>
-            <name>Application</name>
-            <source>Wolframe</source>
-            <level>INFO</level>
-        </eventlog>
-    </logging>
+        <Eventlog>
+            <Name>Application</Name>
+            <Source>Wolframe</Source>
+            <Level>INFO</Level>
+        </Eventlog>
+
+    </Logging>
+
+    <Server>
+		
+        <!-- Maximum number of simultaneous connections (clients).
+             Default is the OS limit. This is the global (total) value.
+             Set it to 0 to disable (to use the system limit) -->
+             
+        <MaxConnections>4</MaxConnections>
+
+        <!-- Number of threads for serving client connections.
+             Default: 4 -->
+             
+        <Threads>4</Threads>
+
+        <Listen>
+
+            <!-- Interfaces can be named for later reference -->
+
+            <Identifier>insecure loopback</Identifier>
+            
+            <!-- The address to listen to
+                 can be an IPv4 of the form x.x.x.x or 0.0.0.0 (for any address)
+                 can be an IPv6 of the form x:x:x:x:x:x:x:x or :: (for any address) -->
+
+            <Address>*</Address>
+            
+            <!-- Ports 7649-7671 and 7934-7966 are unassigned according to IANA (last updated 2010-03-11).
+                 Use 7661 for unencrypted connections and 7961 for SSL connections.
+                 Note that 7654 is used by Winamp. -->
+            
+            <Port>7661</Port>
+            
+            <!-- Maximum number of simultaneous connections (clients)								
+                 for this socket.
+                 Default is the OS limit. -->
+                 
+            <MaxConnections>4</MaxConnections>
+
+            <!-- Access restriction by IP
+                 Default: Allow all -->
+            
+            <Restrictions>
+
+                <!-- Allow IP -->
+
+                <Allow>all</Allow>
+
+                <!-- Deny IP -->
+                
+                <Deny>127.0.0.1</Deny>
+            
+            </Restrictions>
+            
+        </Listen>
+    
+    </Server>
+    
+    <!-- Database configuration, gets added here by the installer -->
+    <Database>
+    </Database>
+
+
+
+
+
+
+
+
+
+
     
     <!-- Authentication, authorization, auditing and accounting configuration -->
     <AAAA>
@@ -102,13 +147,8 @@
 
 <!--
             <database>
-                <name>"PostgreSQL database authorization"</name>
-                <database>pgdb</database>
-            </database>
-
-            <database>
-                <name>"SQLite database authorization"</name>
-                <database>sqlitedb</database>
+                <name>database authorization"</name>
+                <database>db</database>
             </database>
 -->
         </Authorization>
