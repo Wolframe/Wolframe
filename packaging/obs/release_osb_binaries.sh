@@ -20,6 +20,7 @@ map_platform_and_arch( )
 	case $PLATFORM in
 		RedHat_RHEL-5)		NICE_PLATFORM="RHEL-5"			;;
 		RedHat_RHEL-6)		NICE_PLATFORM="RHEL-6"			;;
+		RedHat_RHEL-7)		NICE_PLATFORM="RHEL-7"			;;
 		CentOS_CentOS-5)	NICE_PLATFORM="CentOS-5"		;;
 		CentOS_CentOS-6)	NICE_PLATFORM="CentOS-6"		;;
 		Fedora_19)		NICE_PLATFORM="Fedora-19"		;;
