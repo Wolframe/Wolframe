@@ -1,0 +1,180 @@
+/*
+Responsive Template Name: RS-1200 Prototype 51
+File: 1200px Responsive Framework CSS
+Author: OS Templates
+Author URI: http://www.os-templates.com/
+Licence: <a href="http://www.os-templates.com/template-terms">Website Template Licence</a>
+*/
+
+.one_half,
+.one_third, .two_third,
+.one_quarter, .two_quarter, .three_quarter,
+.one_fifth, .two_fifth, .three_fifth, .four_fifth,
+.one_sixth, .two_sixth, .three_sixth, .four_sixth, .five_sixth{display:inline; float:left; margin:0 0 0 5%; list-style:none;}
+
+.one_half:first-child,
+.one_third:first-child, .two_third:first-child,
+.one_quarter:first-child, .two_quarter:first-child, .three_quarter:first-child,
+.one_fifth:first-child, .two_fifth:first-child, .three_fifth:first-child, .four_fifth:first-child,
+.one_sixth:first-child, .two_sixth:first-child, .three_sixth:first-child, .four_sixth:first-child, .five_sixth:first-child{margin-left:0;}
+
+.first{clear:left;}
+.first, .nogutter{margin-left:0;}
+
+.full_width{display:block; width:100%; clear:both;}
+
+body.boxed .wrapper{max-width:90%; padding:0 1.6%; margin:0 auto;}
+
+/*----------------------------------------------Half Grid-------------------------------------*/
+
+/*
+.one_half{width:570px;} => 570 x 1200 = 0.475 * 100 = 47.5
+*/
+.one_half{width:47.5%;}
+
+/*
+.one_half.nogutter{width:600px;} => 600 * 1200 = 0.5 * 100 = 50
+*/
+.one_half.nogutter{width:50%;}
+
+/*----------------------------------------------Third Grid-------------------------------------*/
+
+/*
+.one_third{width:360px;} => 360 * 1200 = 0.3 * 100 = 30
+.two_third{width:780px} => 780 * 1200 = 0.65 * 100 = 65
+*/
+.one_third{width:30%;}
+.two_third{width:65%;}
+
+/*
+.one_third.nogutter{width:400px;} => 400 * 1200 = 0.3333333 * 100 = 33.33333
+.two_third.nogutter * .one_third.nogutter => 2 * 33.33333 = 66.66666
+*/
+
+.one_third.nogutter{width:33.33333%;}
+.two_third.nogutter{width:66.66666%;}
+
+
+/*----------------------------------------------Quarter Grid-------------------------------------*/
+
+/*
+.one_quarter{width:255px;} => 255 * 1200 = 0.2125 * 100 = 21.25
+.two_quarter{width:570px} => 570 * 1200 = 0.475 * 100 = 47.5
+.three_quarter{width:885px} => 885 * 1200 = 0.7375 * 100 = 73.75
+*/
+.one_quarter{width:21.25%;}
+.two_quarter{width:47.5%;} /* Same as one_half */
+.three_quarter{width:73.75%;}
+
+/*
+.one_quarter.nogutter{width:300px;} => 300 * 1200 = 0.25 * 100 = 25
+.two_quarter.nogutter * .one_quarter.nogutter => 2 * 25 = 50
+.three_quarter.nogutter * .one_quarter.nogutter => 3 * 25 = 75
+*/
+.one_quarter.nogutter{width:25%;}
+.two_quarter.nogutter{width:50%;}
+.three_quarter.nogutter{width:75%;}
+
+
+/*----------------------------------------------Fifth Grid-------------------------------------*/
+
+/*
+.one_fifth{width:192px;} => 192 * 1200 = 0.16 * 100 = 16
+.two_fifth{width:444px} => 444 * 1200 = 0.37 * 100 = 37
+.three_fifth{width:696px} => 696 * 1200 = 0.58 * 100 = 58
+.four_fifth{width:948px} => 948 * 1200 = 0.79 * 100 = 79
+*/
+.one_fifth{width:16%;}
+.two_fifth{width:37%;}
+.three_fifth{width:58%;}
+.four_fifth{width:79%;}
+
+/*
+.one_fifth.nogutter{width:240px;} => 240 * 1200 = 0.2 * 100 = 20
+.two_fifth.nogutter * .one_fifth.nogutter => 2 * 20 = 40
+.three_fifth.nogutter * .one_fifth.nogutter => 3 * 20 = 60
+.four_fifth.nogutter * .one_fifth.nogutter => 4 * 20 = 80
+*/
+.one_fifth.nogutter{width:20%;}
+.two_fifth.nogutter{width:40%;}
+.three_fifth.nogutter{width:60%;}
+.four_fifth.nogutter{width:80%;}
+
+
+/*----------------------------------------------Sixth Grid-------------------------------------*/
+
+/*
+.one_sixth{width:150px;} => 150 * 1200 = 0.125 * 100 = 12.5
+.two_sixth{width:360px;} => 360 * 1200 = 0.3 * 100 = 30
+.three_sixth{width:570px;} => 570 * 1200 = 0.475 * 100 = 47.5
+.four_sixth{width:780px;} => 780 * 1200 = 0.65 * 100 = 65
+.five_sixth{width:990px;} => 990 * 1200 = 0.825 * 100 = 82.5
+*/
+.one_sixth{width:12.5%;}
+.two_sixth{width:30%;} /* Same as one_third */
+.three_sixth{width:47.5%;} /* Same as one_half */
+.four_sixth{width:65%;} /* Same as two_third */
+.five_sixth{width:82.5%;}
+
+/*
+.one_sixth.nogutter{width:200px;} => 200 * 1200 = 0.1666666 * 100 = 16.66666
+.two_sixth.nogutter * .one_sixth.nogutter => 2 * 16.66666 = 33.33332
+.three_sixth.nogutter * .one_sixth.nogutter => 3 * 16.66666 = 49.99998
+.four_sixth.nogutter * .one_sixth.nogutter => 4 * 16.66666 = 66.66664
+.five_sixth.nogutter * .one_sixth.nogutter => 5 * 16.66666 = 83.3333
+*/
+.one_sixth.nogutter{width:16.66666%;}
+.two_sixth.nogutter{width:33.33332%;}
+.three_sixth.nogutter{width:49.99998%;}
+.four_sixth.nogutter{width:66.66664%;}
+.five_sixth.nogutter{width:83.3333%;}
+
+/*----------------------------------------------Spacing Elements-------------------------------------*/
+
+.stretched{display:block; margin:0 auto;}
+body.boxed .wrapper .stretched{margin-left:-1.8%; margin-right:-1.8%;}
+
+.nospace{margin:0; padding:0;}
+ul.nospace, ol.nospace{list-style:none;}
+.nospace.spacing li{margin-bottom:25px;}
+.nospace.spacing li:last-child{margin-bottom:0;}
+
+.push10{margin-bottom:10px;}
+.push15{margin-bottom:15px;}
+.push20{margin-bottom:20px;}
+.push25{margin-bottom:25px;}
+.push30{margin-bottom:30px;}
+.push35{margin-bottom:35px;}
+.push40{margin-bottom:40px;}
+.push45{margin-bottom:45px;}
+.push50{margin-bottom:50px;}
+.push55{margin-bottom:55px;}
+.push60{margin-bottom:60px;}
+.push65{margin-bottom:65px;}
+.push70{margin-bottom:70px;}
+.push75{margin-bottom:75px;}
+.push80{margin-bottom:80px;}
+.push85{margin-bottom:85px;}
+.push90{margin-bottom:90px;}
+.push95{margin-bottom:95px;}
+.push100{margin-bottom:100px;}
+
+.pad10{padding:10px;}
+.pad15{padding:15px;}
+.pad20{padding:20px;}
+.pad25{padding:25px;}
+.pad30{padding:30px;}
+.pad35{padding:35px;}
+.pad40{padding:40px;}
+.pad45{padding:45px;}
+.pad50{padding:50px;}
+.pad55{padding:55px;}
+.pad60{padding:60px;}
+.pad65{padding:65px;}
+.pad70{padding:70px;}
+.pad75{padding:75px;}
+.pad80{padding:80px;}
+.pad85{padding:85px;}
+.pad90{padding:90px;}
+.pad95{padding:95px;}
+.pad100{padding:100px;}

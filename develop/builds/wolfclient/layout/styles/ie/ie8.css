@@ -1,0 +1,31 @@
+/*
+Responsive Template Name: RS-1200 Prototype 51
+File: IE CSS
+Author: OS Templates
+Author URI: http://www.os-templates.com/
+Licence: <a href="http://www.os-templates.com/premium-terms">Website Template Licence</a>
+*/
+
+*#topnav{position:relative; z-index:1000;}/* IE7 */
+
+/* IE8 Doesn't Support :last-child, so we add the class .last-child to the last LI element */
+
+#topnav ul li.last-child li > ul {left:-190px;}
+#topnav ul:first-child li.last-child > ul{right:0;}
+#topnav ul:first-child li.last-child{margin-right:0;}
+
+/* IE8 Collapses margin after animation - here we force IE's haslayout to stop it collapsing */
+
+.accordion-wrapper, .toggle-wrapper{overflow:hidden;}
+
+/* IE8 Gradient support for buttons */
+
+.button.blue.gradient{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#56AED4', endColorstr='#1C546C',GradientType=0);}
+.button.green.gradient{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#C0E079', endColorstr='#98BA55', GradientType=0);}
+.button.grey.gradient{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#C9C9C9', endColorstr='#A8A8A8',GradientType=0);}
+.button.orange.gradient{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF9000', endColorstr='#A66000',GradientType=0);}
+.button.purple.gradient{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#9F81A9', endColorstr='#48344E',GradientType=0);}
+.button.red.gradient{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#D54346', endColorstr='#7A1B1D',GradientType=0);}
+.button.yellow.gradient{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#FDE803', endColorstr='#D2A402',GradientType=0);}
+.button.black.gradient{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#999999', endColorstr='#000000',GradientType=0);}
+.button.white.gradient{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#EFEFEF',GradientType=0);}
