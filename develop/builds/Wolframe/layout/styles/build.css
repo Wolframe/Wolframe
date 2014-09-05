@@ -1,0 +1,85 @@
+.matrix table, th, td
+{
+	font: Verdana,Helvetica,sans-serif;
+	margin: 0;
+	padding: 0;
+}
+
+.matrix th
+{
+	text-align: left;
+	margin: 0;
+	padding: 0;
+}
+
+.matrix td
+{
+	text-align: center;
+	margin: 0;
+	padding: 0;
+}
+
+#trace
+{
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+.status_test
+{
+	background-color: #CC3333;
+	color: white;
+	text-align: center;
+}
+
+.status_fail
+{
+	background-color: #CC3333;
+	color: white;
+	text-align: center;
+}
+
+.status_ok
+{
+	background-color: #339933;
+	color: white;
+	text-align: center;
+}
+
+.status_disa
+{
+	color: lightgrey;
+	text-align: center;
+}
+
+.status_schd
+{
+	 background-color: #FFFFCC;
+	 text-align: center;
+}
+
+.status_run
+{
+	 background-color: #FFFF99;
+	 text-align: center;
+}
+
+.status_skip
+{
+	 background-color: lightgrey;
+	 text-align: center;
+}
+
+.label
+{
+	font-weight: bold;
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+.description
+{
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+                

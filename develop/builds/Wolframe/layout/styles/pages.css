@@ -1,0 +1,68 @@
+/*
+Responsive Template Name: RS-1200 Prototype 51
+File: Pages CSS
+Author: OS Templates
+Author URI: http://www.os-templates.com/
+Licence: <a href="http://www.os-templates.com/template-terms">Website Template Licence</a>
+*/
+
+/*----------------------------------------------Site Wide Shared Classes-------------------------------------*/
+
+.post-image{margin-bottom:40px;}
+
+.blog-post-title a{color:#979797; background-color:#FFFFFF;}
+.blog-post-title a:hover{color:#FF9900; background-color:#FFFFFF;}
+.read-more{text-align:right;}
+
+.blog-post-meta{font-size:.8em;}
+.blog-post-meta ul{margin:0; padding:0; list-style:none;}
+.blog-post-meta ul li{display:inline; margin-left:5px; padding-left:5px; border-left:1px solid #D6D6D6;}
+.blog-post-meta ul li:first-child{margin-left:0; padding:0; border:none;}
+
+/*----------------------------------------------Homepage-------------------------------------*/
+
+#homepage{margin:0; padding:0; overflow:hidden;} /*Overflow Hidden - Due to collapsing margin bug*/
+#intro{padding:30px 0;}
+#intro .boxholder{padding:15px; border-color:#333333;}
+
+/*----------------------------------------------Blog Overview-------------------------------------*/
+
+#blog-posts #blog-overview{display:block; width:100%;}
+#blog-posts #blog-overview .blog-post-excerpt{margin-bottom:50px;}
+#blog-posts #blog-overview .blog-post-excerpt .blog-post-meta ul{padding:15px 0; border:solid #D6D6D6; border-width:1px 0;}
+
+/*----------------------------------------------Portfolio Overview-------------------------------------*/
+
+#portfolio ul{margin:0; padding:0; list-style:none;}
+#portfolio ul li{margin-bottom:30px;}
+
+/*----------------------------------------------Gallery-------------------------------------*/
+
+#gallery section figure ul{margin:0; padding:0; list-style:none;}
+#gallery section figure ul li{margin-bottom:30px;}
+
+/*----------------------------------------------404-------------------------------------*/
+
+#fof{display:block; margin:0; padding:100px 0 20px 0; text-align:center;}
+#fof h1, #fof h2{margin:0; padding:0;}
+#fof h1{margin-top:-70px; font-size:15em; text-shadow:6px 6px 0 rgba(229, 228, 227, 1);}
+#fof h2{margin-top:-30px; font-size:3.5em;}
+#fof p{margin:0; padding:0;}
+#fof p.notice{display:block; width:100%; margin-bottom:50px; clear:both; font-weight:bold; text-transform:uppercase;}
+#fof p.clear{padding:10px; border:1px solid #E5E4E3; font-size:16px;}
+
+/*----------------------------------------------About Us-------------------------------------*/
+
+figure.team-member figcaption p{margin:15px 0 0 0; padding:0;}
+figure.team-member figcaption .team-name{font-weight:bold;}
+figure.team-member figcaption .team-title{margin:0 0 15px 0; font-size:11px; line-height:normal;}
+figure.team-member figcaption .team-description{margin:0; padding-top:15px; border-top:1px solid #E5E4E3;}
+
+/*----------------------------------------------Testimonials-------------------------------------*/
+
+.testimonial{margin-top:20px;}
+.testimonial:first-child{margin-top:0;}
+.testimonial div blockquote{position:relative; width:auto; margin:0; padding:0 0 0 60px; border:none;}
+.testimonial div blockquote .marks{position:absolute; top:0; left:0; font-size:120px; line-height:.8em;}
+.testimonial div blockquote p{margin:0 0 15px 0; padding:0;}
+.testimonial .testimonial-author{padding:0 0 0 60px;}

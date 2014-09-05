@@ -1,0 +1,17 @@
+/*
+Responsive Template Name: RS-1200 Prototype 51
+File: Main CSS
+Author: OS Templates
+Author URI: http://www.os-templates.com/
+Licence: <a href="http://www.os-templates.com/template-terms">Website Template Licence</a>
+*/
+
+@import url(layout.css);
+@import url(pages.css);
+@import url(elements.css);
+@import url(framework.css);
+@import url(fonts/font-awesome/font-awesome.min.css);
+/*@import url(fonts/font-awesome/font-awesome.css);*/
+
+/* If you want to add your own css code, please do it in the custom.css file */
+@import url(custom.css);

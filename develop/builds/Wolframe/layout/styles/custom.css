@@ -1,0 +1,73 @@
+/*
+Responsive Template Name: RS-1200 Prototype 51
+File: Custom CSS
+Author: OS Templates
+Author URI: http://www.os-templates.com/
+Licence: <a href="http://www.os-templates.com/template-terms">Website Template Licence</a>
+*/
+
+#rslides figure{}
+#rslides figure img { display: block; float: left; margin-right: 50px; margin-left: 40px; margin-top: 7px; margin-bottom: 7px; }
+/* #rslides figure img { max-width: 500px; width: auto; max-height: 300px; height: auto; } */
+#rslides figure img { width: 500px; height: auto; }
+#rslides figure img { width: auto; height: 300px; }
+#rslides figure img.with-shadow { box-shadow: 0px 0px 15px; -moz-box-shadow: 0px 0px 15px; -webkit-box-shadow: 0px 0px 15px; }
+#rslides figure figcaption{ height: 220px; width: 485px; padding: 30px; }
+#rslides figure figcaption{ display: block; position: relative; float: right; overflow: hidden; }
+#rslides figure figcaption h2{font-size:42px; margin-bottom:10px; font-weight:normal; font-style:italic; text-transform:none;}
+#rslides figure figcaption p{ line-height:1.6em; }
+#rslides figure figcaption .more{ color: #2A5A7A; margin-top: 10px; line-height: normal; }
+
+#facebook-bttn { display: inline-block; width: 24px; height: 24px; background: url("images/facebook.png") no-repeat 0 0; }
+#facebook-bttn { background-position: 0 -24px; background-size: 24px, 24px; padding-right: 4px; }
+#facebook-bttn:hover { background-position: 0 0px; }
+#facebook-bttn span { display: none; }
+
+#googleplus-bttn { display: inline-block; width: 24px; height: 24px; background: url("images/googleplus.png") no-repeat 0 0; }
+#googleplus-bttn { background-position: 0 -24px; background-size: 24px, 24px; padding-right: 4px; }
+#googleplus-bttn:hover { background-position: 0 0px; }
+#googleplus-bttn span { display: none; }
+
+#linkedin-bttn { display: inline-block; width: 24px; height: 24px; background: url("images/linkedin.png") no-repeat 0 0; }
+#linkedin-bttn { background-position: 0 -24px; background-size: 24px, 24px; padding-right: 4px; }
+#linkedin-bttn:hover { background-position: 0 0px; }
+#linkedin-bttn span { display: none; }
+
+#twitter-bttn { display: inline-block; width: 24px; height: 24px; background: url("images/twitter.png") no-repeat 0 0; }
+#twitter-bttn { background-position: 0 -24px; background-size: 24px, 24px; padding-right: 4px; }
+#twitter-bttn:hover { background-position: 0 0px; }
+#twitter-bttn span { display: none; }
+
+#rss-bttn { display: inline-block; width: 24px; height: 24px; background: url("images/rss.png") no-repeat 0 0; }
+#rss-bttn { background-position: 0 -24px; background-size: 24px, 24px; padding-right: 4px; }
+#rss-bttn:hover { background-position: 0 0px; }
+#rss-bttn span { display: none; }
+
+/* social media buttons */
+.twitter-follow-button { display: inline-block; padding-right: 8px; }
+.google-follow-button { display: inline-block; padding-right: 8px; }
+.google-plusone-button { display: inline-block; }
+
+/* Google custom search */
+#header #header-search{ display: inline-block; float: right; width: auto; clear: right; }
+#header #header-search { margin-top: 21px; }
+
+#cse-search-box input.search-bttn {	display: inline-block; font-size: 0; line-height: 0; text-indent: -4000px; cursor: pointer;
+					width: 32px; height: 32px; border: 0; background: url(images/looking-glass.png) no-repeat 0 0; }
+
+#cse-search-box input[type="submit"]	{
+	font-family: FontAwesome;
+	font-size: 2em;
+	border: none;
+	padding: 3px;
+	color: #E0E0E0;
+	background-color: #467aa7;
+	vertical-align: bottom;
+}
+
+#cse-search-box input[type="text"]	{
+	display: inline-block;
+	width: auto;
+	vertical-align: bottom;
+	border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; -o-border-radius: 5px;
+}
