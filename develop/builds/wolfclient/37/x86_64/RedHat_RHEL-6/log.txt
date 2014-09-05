@@ -1,0 +1,746 @@
+[    0s] Using BUILD_ROOT=/var/cache/obs/worker/root_2/.mount
+[    0s] Using BUILD_ARCH=x86_64:i686:i586:i486:i386
+[    0s] Doing kvm build in /var/cache/obs/worker/root_2/root
+[    0s] 
+[    0s] 
+[    0s] cloud128 started "build wolfclient.spec" at Fri Aug 29 11:03:28 UTC 2014.
+[    0s] 
+[    0s] Building wolfclient for project 'home:wolframe_user' repository 'RedHat_RHEL-6' arch 'x86_64' srcmd5 '905f5dc6053cda9cbddef446e9230f04'
+[    0s] 
+[    0s] processing recipe /var/cache/obs/worker/root_2/.build-srcdir/wolfclient.spec ...
+[    0s] running changelog2spec --target rpm --file /var/cache/obs/worker/root_2/.build-srcdir/wolfclient.spec
+[    0s] init_buildsystem --configdir /var/run/obs/worker/2/build/configs --cachedir /var/cache/build --prepare --clean --rpmlist /var/cache/obs/worker/root_2/.build.rpmlist /var/cache/obs/worker/root_2/.build-srcdir/wolfclient.spec build rpmlint-Factory ...
+[    0s] unpacking preinstall image OBS:PreinstallImages/RHEL_6/preinstallimage-libqt4 [accb882658c40a66bd898c93288c35c9]
+[    7s] ...........................
+[    7s] 
+[    7s] copying packages...
+[    8s] reordering...done
+[   28s] ### WATCHDOG MARKER START ###
+[   28s] booting kvm...
+[   28s] /usr/bin/qemu-kvm -no-reboot -nographic -vga none -net none -cpu host -kernel /boot/vmlinuz -initrd /boot/initrd -append root=/dev/disk/by-id/virtio-0 panic=1 quiet no-kvmclock nmi_watchdog=0 rw rd.driver.pre=binfmt_misc elevator=noop console=ttyS0 init=/.build/build -m 3000 -drive file=/var/cache/obs/worker/root_2/root,if=none,id=disk,serial=0,cache=unsafe -device virtio-blk-pci,drive=disk -drive file=/var/cache/obs/worker/root_2/swap,if=none,id=swap,serial=1,cache=unsafe -device virtio-blk-pci,drive=swap -smp 4
+[   31s] [    0.000000] tsc: Fast TSC calibration failed
+[   32s] FATAL: Module kqemu not found.
+[   32s] FATAL: Module ext2 not found.
+[   32s] FATAL: Module ext3 not found.
+[   33s] Waiting for device /dev/disk/by-id/virtio-0 to appear:  ok
+[   33s] fsck from util-linux 2.23.2
+[   33s] [/sbin/fsck.ext4 (1) -- /] fsck.ext4 -a /dev/vda 
+[   33s] /dev/vda: clean, 26447/1281120 files, 296497/5120000 blocks
+[   33s] fsck succeeded. Mounting root device read-write.
+[   33s] Mounting root /dev/disk/by-id/virtio-0
+[   33s] mount -o rw,defaults -t ext4 /dev/disk/by-id/virtio-0 /root
+[   33s] replacing /etc/mtab with symlink to /proc/self/mounts
+[   34s] ### WATCHDOG MARKER END ###
+[   34s] 2nd stage started in virtual machine
+[   34s] machine type: x86_64
+[   35s] mkswap: /dev/disk/by-id/virtio-1: warning: don't erase bootbits sectors
+[   35s]         on whole disk. Use -f to force.
+[   35s] Setting up swapspace version 1, size = 2047996 KiB
+[   35s] no label, UUID=171994d7-a095-4141-8489-5d26b4c15a9c
+[   35s] swapon on /dev/disk/by-id/virtio-1
+[   35s] swapon: /dev/vdb: found swap signature: version 1, page-size 4, same byte order
+[   35s] swapon: /dev/vdb: pagesize=4096, swapsize=2097152000, devsize=2097152000
+[   35s] WARNING: udev not running, creating extra device nodes
+[   35s] mount: none already mounted or //proc busy
+[   35s] mount: according to mtab, proc is already mounted on /proc
+[   35s] mount: none already mounted or //dev/pts busy
+[   35s] mount: according to mtab, devpts is already mounted on /dev/pts
+[   35s] logging output to //.build.log...
+[   35s] processing recipe /.build-srcdir/wolfclient.spec ...
+[   36s] init_buildsystem --configdir /.build/configs --cachedir /var/cache/build /.build-srcdir/wolfclient.spec build rpmlint-Factory ...
+[   42s] initializing rpm db...
+[   44s] [1/255] preinstalled MAKEDEV-3.24-6.el6
+[   44s] [2/255] preinstalled acl-2.2.49-6.el6
+[   44s] [3/255] preinstalled alsa-lib-1.0.22-3.el6
+[   44s] [4/255] preinstalled attr-2.4.44-7.el6
+[   44s] [5/255] preinstalled audit-libs-2.2-2.el6
+[   44s] [6/255] preinstalled autoconf-2.63-5.1.el6
+[   44s] [7/255] preinstalled automake-1.11.1-4.el6
+[   44s] [8/255] preinstalled basesystem-10.0-4.el6
+[   44s] [9/255] preinstalled bash-4.1.2-15.el6_4
+[   44s] [10/255] preinstalled bind-libs-9.8.2-0.17.rc1.el6_4.6
+[   44s] [11/255] preinstalled bind-utils-9.8.2-0.17.rc1.el6_4.6
+[   44s] [12/255] preinstalled binutils-2.20.51.0.2-5.36.el6
+[   44s] [13/255] preinstalled bison-2.4.1-5.el6
+[   44s] [14/255] preinstalled bzip2-1.0.5-7.el6_0
+[   44s] [15/255] preinstalled bzip2-devel-1.0.5-7.el6_0
+[   44s] [16/255] preinstalled bzip2-libs-1.0.5-7.el6_0
+[   44s] [17/255] preinstalled ca-certificates-2013.1.94-65.0.el6
+[   44s] [18/255] preinstalled cairo-1.8.8-3.1.el6
+[   44s] [19/255] preinstalled cdparanoia-libs-10.2-5.1.el6
+[   44s] [20/255] preinstalled checkpolicy-2.0.22-1.el6
+[   44s] [21/255] preinstalled chkconfig-1.3.49.3-2.el6_4.1
+[   44s] [22/255] preinstalled cloog-ppl-0.15.7-1.2.el6
+[   44s] [23/255] preinstalled coreutils-8.4-31.el6
+[   44s] [24/255] preinstalled coreutils-libs-8.4-31.el6
+[   44s] [25/255] preinstalled cpio-2.10-11.el6_3
+[   44s] [26/255] preinstalled cpp-4.4.7-4.el6
+[   44s] [27/255] preinstalled cracklib-2.8.16-4.el6
+[   44s] [28/255] preinstalled cracklib-dicts-2.8.16-4.el6
+[   44s] [29/255] preinstalled curl-7.19.7-37.el6_4
+[   44s] [30/255] preinstalled cvs-1.11.23-16.el6
+[   44s] [31/255] preinstalled cyrus-sasl-lib-2.1.23-13.el6_3.1
+[   44s] [32/255] preinstalled db4-4.7.25-18.el6_4
+[   44s] [33/255] preinstalled db4-utils-4.7.25-18.el6_4
+[   44s] [34/255] preinstalled dbus-glib-0.86-6.el6_4
+[   44s] [35/255] preinstalled dbus-libs-1.2.24-7.el6_3
+[   44s] [36/255] preinstalled device-mapper-1.02.79-8.el6
+[   44s] [37/255] preinstalled diffutils-2.8.1-28.el6
+[   44s] [38/255] preinstalled e2fsprogs-1.41.12-18.el6
+[   44s] [39/255] preinstalled e2fsprogs-libs-1.41.12-18.el6
+[   44s] [40/255] preinstalled elfutils-0.152-1.el6
+[   44s] [41/255] preinstalled elfutils-libelf-0.152-1.el6
+[   44s] [42/255] preinstalled elfutils-libs-0.152-1.el6
+[   44s] [43/255] preinstalled expat-2.0.1-11.el6_2
+[   44s] [44/255] preinstalled expat-devel-2.0.1-11.el6_2
+[   44s] [45/255] preinstalled file-5.04-15.el6
+[   44s] [46/255] preinstalled file-libs-5.04-15.el6
+[   44s] [47/255] preinstalled filesystem-2.4.30-3.el6
+[   44s] [48/255] preinstalled findutils-4.4.2-6.el6
+[   44s] [49/255] preinstalled flex-2.5.35-8.el6
+[   44s] [50/255] preinstalled fontconfig-2.8.0-3.el6
+[   44s] [51/255] preinstalled fontconfig-devel-2.8.0-3.el6
+[   44s] [52/255] preinstalled freetype-2.3.11-14.el6_3.1
+[   44s] [53/255] preinstalled freetype-devel-2.3.11-14.el6_3.1
+[   44s] [54/255] preinstalled gamin-0.1.10-9.el6
+[   44s] [55/255] preinstalled gawk-3.1.7-10.el6
+[   44s] [56/255] preinstalled gcc-4.4.7-4.el6
+[   44s] [57/255] preinstalled gdbm-1.8.0-36.el6
+[   44s] [58/255] preinstalled gettext-0.17-16.el6
+[   44s] [59/255] preinstalled gettext-devel-0.17-16.el6
+[   44s] [60/255] preinstalled gettext-libs-0.17-16.el6
+[   44s] [61/255] preinstalled glib2-2.26.1-3.el6
+[   44s] [62/255] preinstalled glibc-2.12-1.132.el6
+[   44s] [63/255] preinstalled glibc-common-2.12-1.132.el6
+[   44s] [64/255] preinstalled glibc-devel-2.12-1.132.el6
+[   44s] [65/255] preinstalled glibc-headers-2.12-1.132.el6
+[   44s] [66/255] preinstalled gmp-4.3.1-7.el6_2.2
+[   44s] [67/255] preinstalled gnutls-2.8.5-10.el6_4.2
+[   44s] [68/255] preinstalled gpm-1.20.6-12.el6
+[   44s] [69/255] preinstalled gpm-libs-1.20.6-12.el6
+[   44s] [70/255] preinstalled grep-2.6.3-4.el6
+[   44s] [71/255] preinstalled groff-1.18.1.4-21.el6
+[   44s] [72/255] preinstalled gstreamer-0.10.29-1.el6
+[   44s] [73/255] preinstalled gstreamer-plugins-base-0.10.29-2.el6
+[   44s] [74/255] preinstalled gstreamer-tools-0.10.29-1.el6
+[   44s] [75/255] preinstalled gzip-1.3.12-19.el6_4
+[   44s] [76/255] preinstalled hwdata-0.233-9.1.el6
+[   44s] [77/255] preinstalled info-4.13a-8.el6
+[   44s] [78/255] preinstalled initscripts-9.03.40-2.el6
+[   44s] [79/255] preinstalled iso-codes-3.16-2.el6
+[   44s] [80/255] preinstalled kernel-headers-2.6.32-431.el6
+[   44s] [81/255] preinstalled keyutils-libs-1.4-4.el6
+[   44s] [82/255] preinstalled krb5-libs-1.10.3-10.el6_4.6
+[   44s] [83/255] preinstalled lcms-libs-1.19-1.el6
+[   44s] [84/255] preinstalled less-436-10.el6
+[   44s] [85/255] preinstalled libICE-1.0.6-1.el6
+[   44s] [86/255] preinstalled libICE-devel-1.0.6-1.el6
+[   44s] [87/255] preinstalled libSM-1.2.1-2.el6
+[   44s] [88/255] preinstalled libSM-devel-1.2.1-2.el6
+[   44s] [89/255] preinstalled libX11-1.5.0-4.el6
+[   44s] [90/255] preinstalled libX11-common-1.5.0-4.el6
+[   44s] [91/255] preinstalled libX11-devel-1.5.0-4.el6
+[   44s] [92/255] preinstalled libXau-1.0.6-4.el6
+[   44s] [93/255] preinstalled libXau-devel-1.0.6-4.el6
+[   44s] [94/255] preinstalled libXcursor-1.1.13-6.20130524git8f677eaea.el6
+[   44s] [95/255] preinstalled libXcursor-devel-1.1.13-6.20130524git8f677eaea.el6
+[   44s] [96/255] preinstalled libXdamage-1.1.3-4.el6
+[   44s] [97/255] preinstalled libXdamage-devel-1.1.3-4.el6
+[   44s] [98/255] preinstalled libXext-1.3.1-2.el6
+[   44s] [99/255] preinstalled libXext-devel-1.3.1-2.el6
+[   44s] [100/255] preinstalled libXfixes-5.0-3.el6
+[   44s] [101/255] preinstalled libXfixes-devel-5.0-3.el6
+[   44s] [102/255] preinstalled libXft-2.3.1-2.el6
+[   44s] [103/255] preinstalled libXft-devel-2.3.1-2.el6
+[   44s] [104/255] preinstalled libXi-1.6.1-3.el6
+[   44s] [105/255] preinstalled libXi-devel-1.6.1-3.el6
+[   44s] [106/255] preinstalled libXinerama-1.1.2-2.el6
+[   44s] [107/255] preinstalled libXinerama-devel-1.1.2-2.el6
+[   44s] [108/255] preinstalled libXrandr-1.4.0-1.el6
+[   44s] [109/255] preinstalled libXrandr-devel-1.4.0-1.el6
+[   44s] [110/255] preinstalled libXrender-0.9.7-2.el6
+[   44s] [111/255] preinstalled libXrender-devel-0.9.7-2.el6
+[   44s] [112/255] preinstalled libXt-1.1.3-1.el6
+[   44s] [113/255] preinstalled libXt-devel-1.1.3-1.el6
+[   44s] [114/255] preinstalled libXv-1.0.7-2.el6
+[   44s] [115/255] preinstalled libXxf86vm-1.1.2-2.el6
+[   44s] [116/255] preinstalled libXxf86vm-devel-1.1.2-2.el6
+[   44s] [117/255] preinstalled libacl-2.2.49-6.el6
+[   44s] [118/255] preinstalled libattr-2.4.44-7.el6
+[   44s] [119/255] preinstalled libblkid-2.17.2-12.14.el6
+[   44s] [120/255] preinstalled libcap-2.16-5.5.el6
+[   44s] [121/255] preinstalled libcom_err-1.41.12-18.el6
+[   44s] [122/255] preinstalled libcurl-7.19.7-37.el6_4
+[   44s] [123/255] preinstalled libdrm-2.4.45-2.el6
+[   44s] [124/255] preinstalled libdrm-devel-2.4.45-2.el6
+[   44s] [125/255] preinstalled libffi-3.0.5-3.2.el6
+[   44s] [126/255] preinstalled libgcc-4.4.7-4.el6
+[   44s] [127/255] preinstalled libgcrypt-1.4.5-11.el6_4
+[   44s] [128/255] preinstalled libgomp-4.4.7-4.el6
+[   44s] [129/255] preinstalled libgpg-error-1.7-4.el6
+[   44s] [130/255] preinstalled libgudev1-147-2.51.el6
+[   44s] [131/255] preinstalled libidn-1.18-2.el6
+[   44s] [132/255] preinstalled libjpeg-turbo-1.2.1-1.el6
+[   44s] [133/255] preinstalled libjpeg-turbo-devel-1.2.1-1.el6
+[   44s] [134/255] preinstalled libmng-1.0.10-4.1.el6
+[   44s] [135/255] preinstalled libnih-1.0.1-7.el6
+[   44s] [136/255] preinstalled libogg-1.1.4-2.1.el6
+[   44s] [137/255] preinstalled liboil-0.3.16-4.1.el6
+[   44s] [138/255] preinstalled libpciaccess-0.13.1-2.el6
+[   44s] [139/255] preinstalled libpng-1.2.49-1.el6_2
+[   44s] [140/255] preinstalled libpng-devel-1.2.49-1.el6_2
+[   44s] [141/255] preinstalled libproxy-0.3.0-4.el6_3
+[   44s] [142/255] preinstalled libproxy-bin-0.3.0-4.el6_3
+[   44s] [143/255] preinstalled libproxy-python-0.3.0-4.el6_3
+[   44s] [144/255] preinstalled libselinux-2.0.94-5.3.el6_4.1
+[   44s] [145/255] preinstalled libselinux-utils-2.0.94-5.3.el6_4.1
+[   44s] [146/255] preinstalled libsemanage-2.0.43-4.2.el6
+[   44s] [147/255] preinstalled libsepol-2.0.41-4.el6
+[   44s] [148/255] preinstalled libss-1.41.12-18.el6
+[   44s] [149/255] preinstalled libssh2-1.4.2-1.el6
+[   44s] [150/255] preinstalled libstdc++-4.4.7-4.el6
+[   44s] [151/255] installing libstdc++-devel-4.4.7-4.el6
+[   46s] [152/255] preinstalled libtasn1-2.3-3.el6_2.1
+[   46s] [153/255] preinstalled libthai-0.1.12-3.el6
+[   46s] [154/255] preinstalled libtheora-1.1.0-2.el6
+[   46s] [155/255] preinstalled libtiff-3.9.4-9.el6_3
+[   46s] [156/255] preinstalled libtool-2.2.6-15.5.el6
+[   46s] [157/255] preinstalled libudev-147-2.51.el6
+[   46s] [158/255] preinstalled libusb-0.1.12-23.el6
+[   46s] [159/255] preinstalled libutempter-1.1.5-4.1.el6
+[   46s] [160/255] preinstalled libuuid-2.17.2-12.14.el6
+[   46s] [161/255] preinstalled libvisual-0.4.0-9.1.el6
+[   46s] [162/255] preinstalled libvorbis-1.2.3-4.el6_2.1
+[   46s] [163/255] preinstalled libxcb-1.8.1-1.el6
+[   46s] [164/255] preinstalled libxcb-devel-1.8.1-1.el6
+[   46s] [165/255] preinstalled libxml2-2.7.6-14.el6
+[   46s] [166/255] preinstalled lua-5.1.4-4.1.el6
+[   46s] [167/255] preinstalled m4-1.4.13-5.el6
+[   46s] [168/255] preinstalled make-3.81-20.el6
+[   46s] [169/255] preinstalled man-1.6f-32.el6
+[   46s] [170/255] preinstalled mesa-dri-drivers-9.2-0.5.el6
+[   46s] [171/255] preinstalled mesa-dri-filesystem-9.2-0.5.el6
+[   46s] [172/255] preinstalled mesa-dri1-drivers-7.11-8.el6
+[   46s] [173/255] preinstalled mesa-libGL-9.2-0.5.el6
+[   46s] [174/255] preinstalled mesa-libGL-devel-9.2-0.5.el6
+[   46s] [175/255] preinstalled mesa-libGLU-9.2-0.5.el6
+[   46s] [176/255] preinstalled mesa-libGLU-devel-9.2-0.5.el6
+[   46s] [177/255] preinstalled mesa-private-llvm-3.3-0.3.rc3.el6
+[   46s] [178/255] preinstalled module-init-tools-3.9-21.el6_4
+[   46s] [179/255] preinstalled mpfr-2.4.1-6.el6
+[   46s] [180/255] preinstalled ncurses-5.7-3.20090208.el6
+[   46s] [181/255] preinstalled ncurses-base-5.7-3.20090208.el6
+[   46s] [182/255] preinstalled ncurses-devel-5.7-3.20090208.el6
+[   46s] [183/255] preinstalled ncurses-libs-5.7-3.20090208.el6
+[   46s] [184/255] preinstalled neon-0.29.3-3.el6_4
+[   46s] [185/255] preinstalled net-tools-1.60-110.el6_2
+[   46s] [186/255] preinstalled nspr-4.10.0-1.el6
+[   46s] [187/255] preinstalled nss-3.15.1-15.el6
+[   46s] [188/255] preinstalled nss-softokn-3.14.3-9.el6
+[   46s] [189/255] preinstalled nss-softokn-freebl-3.14.3-9.el6
+[   46s] [190/255] preinstalled nss-sysinit-3.15.1-15.el6
+[   46s] [191/255] preinstalled nss-tools-3.15.1-15.el6
+[   46s] [192/255] preinstalled nss-util-3.15.1-3.el6
+[   46s] [193/255] preinstalled openldap-2.4.23-32.el6_4.1
+[   46s] [194/255] preinstalled openssl-1.0.1e-15.el6
+[   46s] [195/255] preinstalled p11-kit-0.18.5-2.el6
+[   46s] [196/255] preinstalled p11-kit-trust-0.18.5-2.el6
+[   46s] [197/255] preinstalled pakchois-0.4-3.2.el6
+[   46s] [198/255] preinstalled pam-1.1.1-17.el6
+[   46s] [199/255] preinstalled pango-1.28.1-7.el6_3
+[   46s] [200/255] preinstalled patch-2.6-6.el6
+[   46s] [201/255] preinstalled pcre-7.8-6.el6
+[   46s] [202/255] preinstalled perl-5.10.1-136.el6
+[   46s] [203/255] preinstalled perl-Module-Pluggable-3.90-136.el6
+[   46s] [204/255] preinstalled perl-Pod-Escapes-1.04-136.el6
+[   46s] [205/255] preinstalled perl-Pod-Simple-3.13-136.el6
+[   46s] [206/255] preinstalled perl-libs-5.10.1-136.el6
+[   46s] [207/255] preinstalled perl-version-0.77-136.el6
+[   46s] [208/255] preinstalled phonon-backend-gstreamer-4.6.2-26.el6_4
+[   46s] [209/255] preinstalled pixman-0.26.2-5.el6_4
+[   46s] [210/255] preinstalled pkgconfig-0.23-9.1.el6
+[   46s] [211/255] preinstalled policycoreutils-2.0.83-19.39.el6
+[   46s] [212/255] preinstalled popt-1.13-7.el6
+[   46s] [213/255] preinstalled ppl-0.10.2-11.el6
+[   46s] [214/255] preinstalled procps-3.2.8-25.el6
+[   46s] [215/255] preinstalled psmisc-22.6-15.el6_0.1
+[   46s] [216/255] preinstalled python-2.6.6-51.el6
+[   46s] [217/255] preinstalled python-libs-2.6.6-51.el6
+[   46s] [218/255] preinstalled qt-4.6.2-26.el6_4
+[   46s] [219/255] preinstalled qt-devel-4.6.2-26.el6_4
+[   46s] [220/255] preinstalled qt-sqlite-4.6.2-26.el6_4
+[   46s] [221/255] preinstalled qt-x11-4.6.2-26.el6_4
+[   46s] [222/255] preinstalled rcs-5.7-37.el6
+[   46s] [223/255] preinstalled readline-6.0-4.el6
+[   46s] [224/255] preinstalled redhat-release-server-6Server-6.5.0.1.el6
+[   46s] [225/255] preinstalled redhat-rpm-config-9.0.3-42.el6
+[   46s] [226/255] preinstalled rpm-4.8.0-37.el6
+[   46s] [227/255] preinstalled rpm-build-4.8.0-37.el6
+[   46s] [228/255] preinstalled rpm-libs-4.8.0-37.el6
+[   46s] [229/255] preinstalled sed-4.2.1-10.el6
+[   46s] [230/255] preinstalled setup-2.8.14-20.el6_4.1
+[   46s] [231/255] preinstalled shadow-utils-4.1.4.2-13.el6
+[   46s] [232/255] preinstalled shared-mime-info-0.70-4.el6
+[   46s] [233/255] preinstalled sqlite-3.6.20-1.el6
+[   46s] [234/255] preinstalled strace-4.5.19-1.17.el6
+[   46s] [235/255] preinstalled sysvinit-tools-2.87-5.dsf.el6
+[   46s] [236/255] preinstalled tar-1.23-11.el6
+[   46s] [237/255] preinstalled texinfo-4.13a-8.el6
+[   46s] [238/255] preinstalled tzdata-2013g-1.el6
+[   46s] [239/255] preinstalled udev-147-2.51.el6
+[   46s] [240/255] preinstalled unzip-6.0-1.el6
+[   46s] [241/255] preinstalled upstart-0.6.5-12.el6_4.1
+[   46s] [242/255] preinstalled ustr-1.0.4-9.1.el6
+[   46s] [243/255] preinstalled util-linux-ng-2.17.2-12.14.el6
+[   46s] [244/255] preinstalled vim-common-7.2.411-1.8.el6
+[   46s] [245/255] preinstalled vim-enhanced-7.2.411-1.8.el6
+[   46s] [246/255] preinstalled vim-minimal-7.2.411-1.8.el6
+[   46s] [247/255] preinstalled which-2.19-6.el6
+[   46s] [248/255] preinstalled xml-common-0.6.3-32.el6
+[   46s] [249/255] preinstalled xorg-x11-proto-devel-7.6-25.el6
+[   46s] [250/255] preinstalled xz-4.999.9-0.3.beta.20091007git.el6
+[   46s] [251/255] preinstalled xz-libs-4.999.9-0.3.beta.20091007git.el6
+[   46s] [252/255] preinstalled xz-lzma-compat-4.999.9-0.3.beta.20091007git.el6
+[   46s] [253/255] preinstalled zlib-1.2.3-29.el6
+[   46s] [254/255] preinstalled zlib-devel-1.2.3-29.el6
+[   46s] [255/255] installing gcc-c++-4.4.7-4.el6
+[   47s] removing nis flags from //etc/nsswitch.conf...
+[   47s] now finalizing build dir...
+[   47s] SIOCSIFADDR: File exists
+[   48s] -----------------------------------------------------------------
+[   48s] I have the following modifications for wolfclient.spec:
+[   48s] 122c122
+[   48s] < Release: 0.1
+[   48s] ---
+[   48s] > Release: %{?dist}.2.1
+[   48s] -----------------------------------------------------------------
+[   48s] ----- building wolfclient.spec (user abuild)
+[   48s] -----------------------------------------------------------------
+[   48s] -----------------------------------------------------------------
+[   48s] + exec rpmbuild -ba --define '_srcdefattr (-,root,root)' --nosignature --define 'disturl obs://build.opensuse.org/home:wolframe_user/RedHat_RHEL-6/905f5dc6053cda9cbddef446e9230f04-wolfclient' /home/abuild/rpmbuild/SOURCES/wolfclient.spec
+[   48s] Executing(%prep): /bin/sh -e /var/tmp/rpm-tmp.Iuq6i9
+[   48s] + umask 022
+[   48s] + cd /home/abuild/rpmbuild/BUILD
+[   48s] + LANG=C
+[   48s] + export LANG
+[   48s] + unset DISPLAY
+[   48s] + cd /home/abuild/rpmbuild/BUILD
+[   48s] + rm -rf wolfclient-0.0.5
+[   48s] + /usr/bin/gzip -dc /home/abuild/rpmbuild/SOURCES/wolfclient_0.0.5.tar.gz
+[   48s] + /bin/tar -xf -
+[   48s] + STATUS=0
+[   48s] + '[' 0 -ne 0 ']'
+[   48s] + cd wolfclient-0.0.5
+[   48s] + /bin/chmod -Rf a+rX,u+w,g-w,o-w .
+[   48s] + exit 0
+[   48s] Executing(%build): /bin/sh -e /var/tmp/rpm-tmp.5ucBpS
+[   48s] + umask 022
+[   48s] + cd /home/abuild/rpmbuild/BUILD
+[   48s] + cd wolfclient-0.0.5
+[   48s] + LANG=C
+[   48s] + export LANG
+[   48s] + unset DISPLAY
+[   48s] + qmake-qt4 wolfclient.pro -config release -recursive PREFIX=/usr LIBDIR=/usr/lib64/wolframe
+[   48s] Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/libqtwolfclient/libqtwolfclient.pro
+[   48s] Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/skeleton/skeleton.pro
+[   48s] Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/example/example.pro
+[   48s] Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/plugins.pro
+[   48s]  Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/filechooser/filechooser.pro
+[   48s]  Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser/picturechooser.pro
+[   48s]  Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/formtest/formtest.pro
+[   48s]  Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner/wolfdesigner.pro
+[   48s] Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/wolfclient/wolfclient.pro
+[   48s] Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/tests.pro
+[   48s]  Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable/SSLavailable.pro
+[   48s]  Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/datatree/datatree.pro
+[   48s]  Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/skeleton/skeleton.pro
+[   49s] RCC: Warning: No resources in 'skeletonTest.qrc'.
+[   49s]  Reading /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/xml/xml.pro
+[   49s] + make -j4 LIBDIR=/usr/lib64/wolframe
+[   49s] cd libqtwolfclient/ && make -f Makefile 
+[   49s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/libqtwolfclient'
+[   49s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I. -o WolframeClient.o WolframeClient.cpp
+[   49s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I. -o WolframeClientProtocolBase.o WolframeClientProtocolBase.cpp
+[   49s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I. -o WolframeClientProtocol.o WolframeClientProtocol.cpp
+[   49s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I. -o serverDefinition.o serverDefinition.cpp
+[   50s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I. -o serverConnection.o serverConnection.cpp
+[   50s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I. WolframeClient.hpp -o moc_WolframeClient.cpp
+[   50s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I. -o moc_WolframeClient.o moc_WolframeClient.cpp
+[   51s] rm -f libqtwolfclient.so.0.0.0 libqtwolfclient.so libqtwolfclient.so.0 libqtwolfclient.so.0.0
+[   51s] g++ -m64 -Wl,-O1 -shared -Wl,-soname,libqtwolfclient.so.0 -o libqtwolfclient.so.0.0.0 WolframeClient.o WolframeClientProtocolBase.o WolframeClientProtocol.o serverDefinition.o serverConnection.o moc_WolframeClient.o    -lQtGui -lQtNetwork -lQtCore -lpthread  
+[   52s] ln -s libqtwolfclient.so.0.0.0 libqtwolfclient.so
+[   52s] ln -s libqtwolfclient.so.0.0.0 libqtwolfclient.so.0
+[   52s] ln -s libqtwolfclient.so.0.0.0 libqtwolfclient.so.0.0
+[   52s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/libqtwolfclient'
+[   52s] cd skeleton/ && make -f Makefile 
+[   52s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/skeleton'
+[   52s] /usr/lib64/qt4/bin/uic SkeletonMainWindow.ui -o ui_SkeletonMainWindow.h
+[   52s] /usr/lib64/qt4/bin/uic loginDialog.ui -o ui_loginDialog.h
+[   52s] /usr/lib64/qt4/bin/uic serverDefinitionDialog.ui -o ui_serverDefinitionDialog.h
+[   52s] /usr/lib64/qt4/bin/uic manageServerDefsDialog.ui -o ui_manageServerDefsDialog.h
+[   52s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. SkeletonMainWindow.hpp -o moc_SkeletonMainWindow.cpp
+[   52s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. loginDialog.hpp -o moc_loginDialog.cpp
+[   52s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. serverDefinitionDialog.hpp -o moc_serverDefinitionDialog.cpp
+[   52s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. manageServerDefsDialog.hpp -o moc_manageServerDefsDialog.cpp
+[   52s] /usr/lib64/qt4/bin/rcc -name skeleton skeleton.qrc -o qrc_skeleton.cpp
+[   52s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. -o SkeletonMainWindow.o SkeletonMainWindow.cpp
+[   52s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. -o loginDialog.o loginDialog.cpp
+[   52s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. -o serverDefinitionDialog.o serverDefinitionDialog.cpp
+[   52s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. -o manageServerDefsDialog.o manageServerDefsDialog.cpp
+[   54s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. -o moc_SkeletonMainWindow.o moc_SkeletonMainWindow.cpp
+[   54s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. -o moc_loginDialog.o moc_loginDialog.cpp
+[   54s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. -o moc_serverDefinitionDialog.o moc_serverDefinitionDialog.cpp
+[   54s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. -o moc_manageServerDefsDialog.o moc_manageServerDefsDialog.cpp
+[   55s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../libqtwolfclient -I. -I. -o qrc_skeleton.o qrc_skeleton.cpp
+[   55s] rm -f libskeleton.so.0.0.0 libskeleton.so libskeleton.so.0 libskeleton.so.0.0
+[   56s] g++ -m64 -Wl,-rpath,/usr/lib64/wolframe -Wl,-O1 -Wl,-rpath,/usr/X11R6/lib64 -shared -Wl,-soname,libskeleton.so.0 -o libskeleton.so.0.0.0 SkeletonMainWindow.o loginDialog.o serverDefinitionDialog.o manageServerDefsDialog.o moc_SkeletonMainWindow.o moc_loginDialog.o moc_serverDefinitionDialog.o moc_manageServerDefsDialog.o qrc_skeleton.o    -L../libqtwolfclient -lqtwolfclient -lQtGui -lQtNetwork -lQtCore -lpthread  
+[   56s] ln -s libskeleton.so.0.0.0 libskeleton.so
+[   56s] ln -s libskeleton.so.0.0.0 libskeleton.so.0
+[   56s] ln -s libskeleton.so.0.0.0 libskeleton.so.0.0
+[   56s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/skeleton'
+[   56s] cd example/ && make -f Makefile 
+[   56s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/example'
+[   56s] /usr/lib64/qt4/bin/uic MainWindow.ui -o ui_MainWindow.h
+[   56s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../skeleton -I../libqtwolfclient -I. -I. -o main.o main.cpp
+[   56s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../skeleton -I../libqtwolfclient -I. -I. MainWindow.hpp -o moc_MainWindow.cpp
+[   56s] /usr/lib64/qt4/bin/rcc -name example example.qrc -o qrc_example.cpp
+[   56s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../skeleton -I../libqtwolfclient -I. -I. -o MainWindow.o MainWindow.cpp
+[   56s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../skeleton -I../libqtwolfclient -I. -I. -o qrc_example.o qrc_example.cpp
+[   56s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../skeleton -I../libqtwolfclient -I. -I. -o moc_MainWindow.o moc_MainWindow.cpp
+[   58s] g++ -m64 -Wl,-O1 -Wl,-rpath,/usr/X11R6/lib64 -o example main.o MainWindow.o moc_MainWindow.o qrc_example.o     -L../libqtwolfclient -lqtwolfclient -L../skeleton -lskeleton -lQtGui -lQtNetwork -lQtCore -lpthread 
+[   58s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/example'
+[   58s] cd plugins/ && make -f Makefile 
+[   58s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins'
+[   58s] cd filechooser/ && make -f Makefile 
+[   58s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/filechooser'
+[   58s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -o FileChooserPlugin.o FileChooserPlugin.cpp
+[   58s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -o FileChooser.o FileChooser.cpp
+[   58s] /usr/lib64/qt4/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. FileChooserPlugin.hpp -o moc_FileChooserPlugin.cpp
+[   58s] /usr/lib64/qt4/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. FileChooser.hpp -o moc_FileChooser.cpp
+[   58s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -o moc_FileChooserPlugin.o moc_FileChooserPlugin.cpp
+[   58s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -o moc_FileChooser.o moc_FileChooser.cpp
+[   60s] rm -f libfilechooser.so
+[   60s] g++ -m64 -Wl,-O1 -shared -o libfilechooser.so FileChooserPlugin.o FileChooser.o moc_FileChooserPlugin.o moc_FileChooser.o    -lQtScript -lQtXml -lQtGui -lQtCore -lQtDesigner -lpthread  
+[   60s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/filechooser'
+[   60s] cd picturechooser/ && make -f Makefile 
+[   60s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser'
+[   60s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../filechooser -I. -o PictureChooserPlugin.o PictureChooserPlugin.cpp
+[   60s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../filechooser -I. -o PictureChooser.o PictureChooser.cpp
+[   60s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../filechooser -I. -o FileChooser.o ../filechooser/FileChooser.cpp
+[   60s] /usr/lib64/qt4/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../filechooser -I. PictureChooserPlugin.hpp -o moc_PictureChooserPlugin.cpp
+[   60s] /usr/lib64/qt4/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../filechooser -I. PictureChooser.hpp -o moc_PictureChooser.cpp
+[   60s] /usr/lib64/qt4/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../filechooser -I. ../filechooser/FileChooser.hpp -o moc_FileChooser.cpp
+[   60s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../filechooser -I. -o moc_PictureChooserPlugin.o moc_PictureChooserPlugin.cpp
+[   61s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../filechooser -I. -o moc_PictureChooser.o moc_PictureChooser.cpp
+[   61s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../filechooser -I. -o moc_FileChooser.o moc_FileChooser.cpp
+[   62s] rm -f libpicturechooser.so
+[   62s] g++ -m64 -Wl,-rpath,/usr/lib64/qt4/plugins/designer -Wl,-O1 -shared -o libpicturechooser.so PictureChooserPlugin.o PictureChooser.o FileChooser.o moc_PictureChooserPlugin.o moc_PictureChooser.o moc_FileChooser.o    -lQtScript -lQtXml -lQtGui -lQtCore -lQtDesigner -lpthread  
+[   62s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser'
+[   62s] cd formtest/ && make -f Makefile 
+[   62s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/formtest'
+[   62s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../../wolfclient -I../../libqtwolfclient -I. -o FormTestPlugin.o FormTestPlugin.cpp
+[   62s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../../wolfclient -I../../libqtwolfclient -I. FormTestPlugin.hpp -o moc_FormTestPlugin.cpp
+[   62s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../../wolfclient -I../../libqtwolfclient -I. -o moc_FormTestPlugin.o moc_FormTestPlugin.cpp
+[   63s] rm -f libformtest.so
+[   63s] g++ -m64 -Wl,-O1 -shared -o libformtest.so FormTestPlugin.o moc_FormTestPlugin.o    -L../../libqtwolfclient -lqtwolfclient -lQtScript -lQtXml -lQtGui -lQtNetwork -lQtCore -lQtDesigner -lpthread  
+[   63s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/formtest'
+[   63s] cd wolfdesigner/ && make -f Makefile 
+[   63s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner'
+[   63s] /usr/lib64/qt4/bin/uic WolfDesignerDialog.ui -o ui_WolfDesignerDialog.h
+[   64s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. -o WolfDesignerPlugin.o WolfDesignerPlugin.cpp
+[   64s] /usr/lib64/qt4/bin/moc -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. WolfDesignerPlugin.hpp -o moc_WolfDesignerPlugin.cpp
+[   64s] /usr/lib64/qt4/bin/moc -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. WolfDesignerMenu.hpp -o moc_WolfDesignerMenu.cpp
+[   64s] /usr/lib64/qt4/bin/moc -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. WolfDesignerDialog.hpp -o moc_WolfDesignerDialog.cpp
+[   64s] /usr/lib64/qt4/bin/moc -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. WolfDesigner.hpp -o moc_WolfDesigner.cpp
+[   64s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. -o WolfDesignerMenu.o WolfDesignerMenu.cpp
+[   64s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. -o WolfDesignerDialog.o WolfDesignerDialog.cpp
+[   64s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. -o moc_WolfDesignerPlugin.o moc_WolfDesignerPlugin.cpp
+[   64s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. -o moc_WolfDesignerMenu.o moc_WolfDesignerMenu.cpp
+[   64s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. -o moc_WolfDesignerDialog.o moc_WolfDesignerDialog.cpp
+[   65s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I. -I. -o moc_WolfDesigner.o moc_WolfDesigner.cpp
+[   66s] rm -f libwolfdesigner.so
+[   66s] g++ -m64 -Wl,-O1 -shared -o libwolfdesigner.so WolfDesignerPlugin.o WolfDesignerMenu.o WolfDesignerDialog.o moc_WolfDesignerPlugin.o moc_WolfDesignerMenu.o moc_WolfDesignerDialog.o moc_WolfDesigner.o    -lQtScript -lQtXml -lQtGui -lQtCore -lQtDesigner -lpthread  
+[   66s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner'
+[   66s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins'
+[   66s] cd wolfclient/ && make -f Makefile 
+[   66s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/wolfclient'
+[   66s] /usr/lib64/qt4/bin/lrelease i18n/wolfclient.de_CH.ts -qm i18n/wolfclient.de_CH.qm
+[   66s] /usr/lib64/qt4/bin/lrelease i18n/wolfclient.ro_RO.ts -qm i18n/wolfclient.ro_RO.qm
+[   66s] /usr/lib64/qt4/bin/uic MainWindow.ui -o ui_MainWindow.h
+[   66s] /usr/lib64/qt4/bin/uic PreferencesDialog.ui -o ui_PreferencesDialog.h
+[   66s] /usr/lib64/qt4/bin/uic PreferencesDialogDeveloper.ui -o ui_PreferencesDialogDeveloper.h
+[   66s] /usr/lib64/qt4/bin/uic PreferencesDialogInterface.ui -o ui_PreferencesDialogInterface.h
+[   66s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormLoader.o FormLoader.cpp
+[   66s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormUiLoader.o FormUiLoader.cpp
+[   66s] Updating 'i18n/wolfclient.ro_RO.qm'...
+[   66s] Updating 'i18n/wolfclient.de_CH.qm'...
+[   66s]     Generated 7 translation(s) (0 finished and 7 unfinished)
+[   66s] 
+[   66s]     Ignored 110 untranslated source text(s)
+[   66s]     Generated 86 translation(s) (84 finished and 2 unfinished)
+[   66s] 
+[   66s]     Ignored 31 untranslated source text(s)
+[   66s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FileFormLoader.o FileFormLoader.cpp
+[   66s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o NetworkFormLoader.o NetworkFormLoader.cpp
+[   66s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataLoader.o DataLoader.cpp
+[   67s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FileDataLoader.o FileDataLoader.cpp
+[   67s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o NetworkDataLoader.o NetworkDataLoader.cpp
+[   67s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetTree.o WidgetTree.cpp
+[   67s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetId.o WidgetId.cpp
+[   67s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetRequestHeader.o WidgetRequestHeader.cpp
+[   68s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor.o WidgetVisitor.cpp
+[   68s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetDataSignal.o WidgetDataSignal.cpp
+[   68s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetEnabler.o WidgetEnabler.cpp
+[   70s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetListener.o WidgetListener.cpp
+[   71s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetRequest.o WidgetRequest.cpp
+[   72s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetMessageDispatcher.o WidgetMessageDispatcher.cpp
+[   73s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetDragAndDrop.o WidgetDragAndDrop.cpp
+[   73s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitorStateConstructor.o WidgetVisitorStateConstructor.cpp
+[   73s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DebugLogTree.o debugview/DebugLogTree.cpp
+[   73s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DebugViewWidget.o debugview/DebugViewWidget.cpp
+[   75s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DebugHelpers.o debugview/DebugHelpers.cpp
+[   75s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DebugMessageHandler.o debugview/DebugMessageHandler.cpp
+[   75s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QLabel.o visitors/WidgetVisitor_QLabel.cpp
+[   75s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QComboBox.o visitors/WidgetVisitor_QComboBox.cpp
+[   76s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QCheckBox.o visitors/WidgetVisitor_QCheckBox.cpp
+[   76s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QGroupBox.o visitors/WidgetVisitor_QGroupBox.cpp
+[   77s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QButtonGroup.o visitors/WidgetVisitor_QButtonGroup.cpp
+[   77s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QRadioButton.o visitors/WidgetVisitor_QRadioButton.cpp
+[   77s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QPushButton.o visitors/WidgetVisitor_QPushButton.cpp
+[   77s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QSpinBox.o visitors/WidgetVisitor_QSpinBox.cpp
+[   78s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QDoubleSpinBox.o visitors/WidgetVisitor_QDoubleSpinBox.cpp
+[   78s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QListWidget.o visitors/WidgetVisitor_QListWidget.cpp
+[   78s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QLineEdit.o visitors/WidgetVisitor_QLineEdit.cpp
+[   78s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QTextEdit.o visitors/WidgetVisitor_QTextEdit.cpp
+[   79s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QPlainTextEdit.o visitors/WidgetVisitor_QPlainTextEdit.cpp
+[   79s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QDateEdit.o visitors/WidgetVisitor_QDateEdit.cpp
+[   80s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QTimeEdit.o visitors/WidgetVisitor_QTimeEdit.cpp
+[   80s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QDateTimeEdit.o visitors/WidgetVisitor_QDateTimeEdit.cpp
+[   80s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QTreeWidget.o visitors/WidgetVisitor_QTreeWidget.cpp
+[   80s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QTableWidget.o visitors/WidgetVisitor_QTableWidget.cpp
+[   81s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QSlider.o visitors/WidgetVisitor_QSlider.cpp
+[   81s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QStackedWidget.o visitors/WidgetVisitor_QStackedWidget.cpp
+[   82s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_FileChooser.o visitors/WidgetVisitor_FileChooser.cpp
+[   82s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_PictureChooser.o visitors/WidgetVisitor_PictureChooser.cpp
+[   82s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataFormatXML.o serialize/DataFormatXML.cpp
+[   83s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStruct.o serialize/DataStruct.cpp
+[   83s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructDescription.o serialize/DataStructDescription.cpp
+[   83s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructDescriptionParse.o serialize/DataStructDescriptionParse.cpp
+[   84s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructDescriptionMap.o serialize/DataStructDescriptionMap.cpp
+[   84s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructSerialize.o serialize/DataStructSerialize.cpp
+[   84s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructMap.o serialize/DataStructMap.cpp
+[   85s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataPathTree.o serialize/DataPathTree.cpp
+[   85s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataSerializeItem.o serialize/DataSerializeItem.cpp
+[   86s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o ActionResultDefinition.o serialize/ActionResultDefinition.cpp
+[   86s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o ActionDefinition.o serialize/ActionDefinition.cpp
+[   86s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o CondProperties.o serialize/CondProperties.cpp
+[   87s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormCall.o FormCall.cpp
+[   87s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormWidget.o FormWidget.cpp
+[   87s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o PreferencesDialog.o PreferencesDialog.cpp
+[   87s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormChooseDialog.o FormChooseDialog.cpp
+[   88s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o settings.o settings.cpp
+[   89s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o LoadMode.o LoadMode.cpp
+[   89s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o HistoryLineEdit.o HistoryLineEdit.cpp
+[   89s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o wolfclient.o wolfclient.cpp
+[   90s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. debugview/DebugViewWidget.hpp -o moc_DebugViewWidget.cpp
+[   90s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. MainWindow.hpp -o moc_MainWindow.cpp
+[   90s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. FormLoader.hpp -o moc_FormLoader.cpp
+[   90s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. DataLoader.hpp -o moc_DataLoader.cpp
+[   90s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. WidgetVisitorObject.hpp -o moc_WidgetVisitorObject.cpp
+[   90s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. FormWidget.hpp -o moc_FormWidget.cpp
+[   90s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
+[   90s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
+[   90s] /usr/lib64/qt4/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
+[   90s] /usr/lib64/qt4/bin/rcc -name wolfclient wolfclient.qrc -o qrc_wolfclient.cpp
+[   90s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o MainWindow.o MainWindow.cpp
+[   90s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_DebugViewWidget.o moc_DebugViewWidget.cpp
+[   90s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_MainWindow.o moc_MainWindow.cpp
+[   91s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_FormLoader.o moc_FormLoader.cpp
+[   91s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_DataLoader.o moc_DataLoader.cpp
+[   91s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_WidgetVisitorObject.o moc_WidgetVisitorObject.cpp
+[   92s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_FormWidget.o moc_FormWidget.cpp
+[   92s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_PreferencesDialog.o moc_PreferencesDialog.cpp
+[   92s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_FormChooseDialog.o moc_FormChooseDialog.cpp
+[   93s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_HistoryLineEdit.o moc_HistoryLineEdit.cpp
+[   93s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtUiTools -I/usr/include/QtDesigner -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include/QtXml -I/usr/include/QtScript -I/usr/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o qrc_wolfclient.o qrc_wolfclient.cpp
+[   97s] g++ -m64 -Wl,-rpath,/usr/lib64/wolframe -Wl,-O1 -Wl,-rpath,/usr/X11R6/lib64 -o wolfclient MainWindow.o FormLoader.o FormUiLoader.o FileFormLoader.o NetworkFormLoader.o DataLoader.o FileDataLoader.o NetworkDataLoader.o WidgetTree.o WidgetId.o WidgetRequestHeader.o WidgetVisitor.o WidgetDataSignal.o WidgetEnabler.o WidgetListener.o WidgetRequest.o WidgetMessageDispatcher.o WidgetDragAndDrop.o WidgetVisitorStateConstructor.o DebugLogTree.o DebugViewWidget.o DebugHelpers.o DebugMessageHandler.o WidgetVisitor_QLabel.o WidgetVisitor_QComboBox.o WidgetVisitor_QCheckBox.o WidgetVisitor_QGroupBox.o WidgetVisitor_QButtonGroup.o WidgetVisitor_QRadioButton.o WidgetVisitor_QPushButton.o WidgetVisitor_QSpinBox.o WidgetVisitor_QDoubleSpinBox.o WidgetVisitor_QListWidget.o WidgetVisitor_QLineEdit.o WidgetVisitor_QTextEdit.o WidgetVisitor_QPlainTextEdit.o WidgetVisitor_QDateEdit.o WidgetVisitor_QTimeEdit.o WidgetVisitor_QDateTimeEdit.o WidgetVisitor_QTreeWidget.o WidgetVisitor_QTableWidget.o WidgetVisitor_QSlider.o WidgetVisitor_QStackedWidget.o WidgetVisitor_FileChooser.o WidgetVisitor_PictureChooser.o DataFormatXML.o DataStruct.o DataStructDescription.o DataStructDescriptionParse.o DataStructDescriptionMap.o DataStructSerialize.o DataStructMap.o DataPathTree.o DataSerializeItem.o ActionResultDefinition.o ActionDefinition.o CondProperties.o FormCall.o FormWidget.o PreferencesDialog.o FormChooseDialog.o settings.o LoadMode.o HistoryLineEdit.o wolfclient.o moc_DebugViewWidget.o moc_MainWindow.o moc_FormLoader.o moc_DataLoader.o moc_WidgetVisitorObject.o moc_FormWidget.o moc_PreferencesDialog.o moc_FormChooseDialog.o moc_HistoryLineEdit.o qrc_wolfclient.o     -L../libqtwolfclient -lqtwolfclient -L../skeleton -lskeleton -L../plugins/filechooser -lfilechooser -L../plugins/picturechooser -lpicturechooser -lQtScript -lQtXml -lQtGui -lQtNetwork -lQtCore -lQtDesigner -lpthread -lQtUiTools 
+[   98s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/wolfclient'
+[   98s] cd tests/ && make -f Makefile 
+[   98s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests'
+[   98s] cd SSLavailable/ && make -f Makefile 
+[   98s] cd datatree/ && make -f Makefile 
+[   98s] cd skeleton/ && make -f Makefile 
+[   98s] cd xml/ && make -f Makefile 
+[   98s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/datatree'
+[   98s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o testDataTree.o testDataTree.cpp
+[   98s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/xml'
+[   98s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o testXmlSerialization.o testXmlSerialization.cpp
+[   98s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable'
+[   98s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I. -o SSLavailable.o SSLavailable.cpp
+[   98s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/skeleton'
+[   98s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../../libqtwolfclient -I../../skeleton -I. -o main.o main.cpp
+[   99s] /usr/lib64/qt4/bin/rcc -name skeletonTest skeletonTest.qrc -o qrc_skeletonTest.cpp
+[   99s] RCC: Warning: No resources in 'skeletonTest.qrc'.
+[   99s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I../../libqtwolfclient -I../../skeleton -I. -o qrc_skeletonTest.o qrc_skeletonTest.cpp
+[   99s] g++ -m64 -Wl,-O1 -o skeletonTest main.o qrc_skeletonTest.o     -L../../libqtwolfclient -lqtwolfclient -L../../skeleton -lskeleton -lQtGui -lQtNetwork -lQtCore -lpthread 
+[   99s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/skeleton'
+[   99s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o DebugHelpers.o ../../wolfclient/debugview/DebugHelpers.cpp
+[   99s] /usr/lib64/qt4/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I. SSLavailable.hpp -o moc_SSLavailable.cpp
+[   99s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtNetwork -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I. -o moc_SSLavailable.o moc_SSLavailable.cpp
+[   99s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o DebugLogTree.o ../../wolfclient/debugview/DebugLogTree.cpp
+[   99s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o DebugHelpers.o ../../wolfclient/debugview/DebugHelpers.cpp
+[  100s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o DebugMessageHandler.o ../../wolfclient/debugview/DebugMessageHandler.cpp
+[  100s] g++ -m64 -Wl,-O1 -o SSLavailable SSLavailable.o moc_SSLavailable.o     -lQtTest -lQtGui -lQtNetwork -lQtCore -lpthread 
+[  100s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable'
+[  100s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o DataStructDescription.o ../../wolfclient/serialize/DataStructDescription.cpp
+[  100s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o DataFormatXML.o ../../wolfclient/serialize/DataFormatXML.cpp
+[  100s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o DataStructDescriptionParse.o ../../wolfclient/serialize/DataStructDescriptionParse.cpp
+[  101s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o DataStruct.o ../../wolfclient/serialize/DataStruct.cpp
+[  101s] /usr/lib64/qt4/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. testXmlSerialization.hpp -o moc_testXmlSerialization.cpp
+[  101s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o moc_testXmlSerialization.o moc_testXmlSerialization.cpp
+[  102s] /usr/lib64/qt4/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. testDataTree.hpp -o moc_testDataTree.cpp
+[  102s] g++ -c -m64 -pipe -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -I/usr/lib64/qt4/mkspecs/linux-g++-64 -I. -I/usr/include/QtCore -I/usr/include/QtGui -I/usr/include -I/usr/include/QtTest -I../../wolfclient -I. -o moc_testDataTree.o moc_testDataTree.cpp
+[  102s] g++ -m64 -Wl,-O1 -o testXmlSerialization testXmlSerialization.o DebugHelpers.o DataFormatXML.o moc_testXmlSerialization.o     -lQtTest -lQtGui -lQtCore -lpthread 
+[  102s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/xml'
+[  102s] g++ -m64 -Wl,-O1 -o testDataTree testDataTree.o DebugHelpers.o DebugLogTree.o DebugMessageHandler.o DataStructDescription.o DataStructDescriptionParse.o DataStruct.o moc_testDataTree.o     -lQtTest -lQtGui -lQtCore -lpthread 
+[  103s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/datatree'
+[  103s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests'
+[  103s] + exit 0
+[  103s] Executing(%install): /bin/sh -e /var/tmp/rpm-tmp.RQhgnF
+[  103s] + umask 022
+[  103s] + cd /home/abuild/rpmbuild/BUILD
+[  103s] + '[' /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64 '!=' / ']'
+[  103s] + rm -rf /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64
+[  103s] ++ dirname /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64
+[  103s] + mkdir -p /home/abuild/rpmbuild/BUILDROOT
+[  103s] + mkdir /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64
+[  103s] + cd wolfclient-0.0.5
+[  103s] + LANG=C
+[  103s] + export LANG
+[  103s] + unset DISPLAY
+[  103s] + rm -rf /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64
+[  103s] + make INSTALL_ROOT=/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64 LIBDIR=/usr/lib64 install
+[  103s] cd libqtwolfclient/ && make -f Makefile install
+[  103s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/libqtwolfclient'
+[  103s] install -m 755 -p "libqtwolfclient.so.0.0.0" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libqtwolfclient.so.0.0.0"
+[  103s] ln -f -s "libqtwolfclient.so.0.0.0" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libqtwolfclient.so"
+[  103s] ln -f -s "libqtwolfclient.so.0.0.0" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libqtwolfclient.so.0"
+[  103s] ln -f -s "libqtwolfclient.so.0.0.0" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libqtwolfclient.so.0.0"
+[  103s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/libqtwolfclient'
+[  103s] cd skeleton/ && make -f Makefile install
+[  103s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/skeleton'
+[  103s] install -m 755 -p "libskeleton.so.0.0.0" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libskeleton.so.0.0.0"
+[  103s] ln -f -s "libskeleton.so.0.0.0" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libskeleton.so"
+[  103s] ln -f -s "libskeleton.so.0.0.0" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libskeleton.so.0"
+[  103s] ln -f -s "libskeleton.so.0.0.0" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libskeleton.so.0.0"
+[  103s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/skeleton'
+[  103s] cd example/ && make -f Makefile install
+[  103s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/example'
+[  103s] make[1]: Nothing to be done for `install'.
+[  103s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/example'
+[  103s] cd plugins/ && make -f Makefile install
+[  103s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins'
+[  103s] cd filechooser/ && make -f Makefile install
+[  103s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/filechooser'
+[  103s] install -m 755 -p "libfilechooser.so" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/qt4/plugins/designer/libfilechooser.so"
+[  103s] install -m 644 -p /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/filechooser/libfilechooser.so /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/
+[  103s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/filechooser'
+[  103s] cd picturechooser/ && make -f Makefile install
+[  103s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser'
+[  103s] install -m 755 -p "libpicturechooser.so" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/qt4/plugins/designer/libpicturechooser.so"
+[  103s] install -m 644 -p /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser/libpicturechooser.so /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/
+[  103s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser'
+[  103s] cd formtest/ && make -f Makefile install
+[  103s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/formtest'
+[  103s] make[2]: Nothing to be done for `install'.
+[  103s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/formtest'
+[  103s] cd wolfdesigner/ && make -f Makefile install
+[  103s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner'
+[  103s] make[2]: Nothing to be done for `install'.
+[  103s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner'
+[  103s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/plugins'
+[  103s] cd wolfclient/ && make -f Makefile install
+[  103s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/wolfclient'
+[  103s] g++ -m64 -Wl,-rpath,/usr/lib64/wolframe -Wl,-O1 -Wl,-rpath,/usr/X11R6/lib64 -o wolfclient MainWindow.o FormLoader.o FormUiLoader.o FileFormLoader.o NetworkFormLoader.o DataLoader.o FileDataLoader.o NetworkDataLoader.o WidgetTree.o WidgetId.o WidgetRequestHeader.o WidgetVisitor.o WidgetDataSignal.o WidgetEnabler.o WidgetListener.o WidgetRequest.o WidgetMessageDispatcher.o WidgetDragAndDrop.o WidgetVisitorStateConstructor.o DebugLogTree.o DebugViewWidget.o DebugHelpers.o DebugMessageHandler.o WidgetVisitor_QLabel.o WidgetVisitor_QComboBox.o WidgetVisitor_QCheckBox.o WidgetVisitor_QGroupBox.o WidgetVisitor_QButtonGroup.o WidgetVisitor_QRadioButton.o WidgetVisitor_QPushButton.o WidgetVisitor_QSpinBox.o WidgetVisitor_QDoubleSpinBox.o WidgetVisitor_QListWidget.o WidgetVisitor_QLineEdit.o WidgetVisitor_QTextEdit.o WidgetVisitor_QPlainTextEdit.o WidgetVisitor_QDateEdit.o WidgetVisitor_QTimeEdit.o WidgetVisitor_QDateTimeEdit.o WidgetVisitor_QTreeWidget.o WidgetVisitor_QTableWidget.o WidgetVisitor_QSlider.o WidgetVisitor_QStackedWidget.o WidgetVisitor_FileChooser.o WidgetVisitor_PictureChooser.o DataFormatXML.o DataStruct.o DataStructDescription.o DataStructDescriptionParse.o DataStructDescriptionMap.o DataStructSerialize.o DataStructMap.o DataPathTree.o DataSerializeItem.o ActionResultDefinition.o ActionDefinition.o CondProperties.o FormCall.o FormWidget.o PreferencesDialog.o FormChooseDialog.o settings.o LoadMode.o HistoryLineEdit.o wolfclient.o moc_DebugViewWidget.o moc_MainWindow.o moc_FormLoader.o moc_DataLoader.o moc_WidgetVisitorObject.o moc_FormWidget.o moc_PreferencesDialog.o moc_FormChooseDialog.o moc_HistoryLineEdit.o qrc_wolfclient.o     -L../libqtwolfclient -lqtwolfclient -L../skeleton -lskeleton -L../plugins/filechooser -lfilechooser -L../plugins/picturechooser -lpicturechooser -lQtScript -lQtXml -lQtGui -lQtNetwork -lQtCore -lQtDesigner -lpthread -lQtUiTools 
+[  104s] install -m 755 -p "wolfclient" "/home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/bin/wolfclient"
+[  104s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/wolfclient'
+[  104s] cd tests/ && make -f Makefile install
+[  104s] make[1]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests'
+[  104s] cd SSLavailable/ && make -f Makefile install
+[  104s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable'
+[  104s] make[2]: Nothing to be done for `install'.
+[  104s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable'
+[  104s] cd datatree/ && make -f Makefile install
+[  104s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/datatree'
+[  104s] make[2]: Nothing to be done for `install'.
+[  104s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/datatree'
+[  104s] cd skeleton/ && make -f Makefile install
+[  104s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/skeleton'
+[  104s] make[2]: Nothing to be done for `install'.
+[  104s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/skeleton'
+[  104s] cd xml/ && make -f Makefile install
+[  104s] make[2]: Entering directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/xml'
+[  104s] make[2]: Nothing to be done for `install'.
+[  104s] make[2]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests/xml'
+[  104s] make[1]: Leaving directory `/home/abuild/rpmbuild/BUILD/wolfclient-0.0.5/tests'
+[  104s] + /usr/lib/rpm/find-debuginfo.sh --strict-build-id /home/abuild/rpmbuild/BUILD/wolfclient-0.0.5
+[  104s] extracting debug info from /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/bin/wolfclient
+[  105s] extracting debug info from /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libskeleton.so.0.0.0
+[  105s] extracting debug info from /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/wolframe/libqtwolfclient.so.0.0.0
+[  105s] extracting debug info from /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/qt4/plugins/designer/libpicturechooser.so
+[  105s] extracting debug info from /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64/usr/lib64/qt4/plugins/designer/libfilechooser.so
+[  105s] symlinked /usr/lib/debug/usr/lib64/wolframe/libskeleton.so.0.0.0.debug to /usr/lib/debug/usr/lib64/wolframe/libskeleton.so.0.0.debug
+[  105s] symlinked /usr/lib/debug/usr/lib64/wolframe/libskeleton.so.0.0.0.debug to /usr/lib/debug/usr/lib64/wolframe/libskeleton.so.debug
+[  105s] symlinked /usr/lib/debug/usr/lib64/wolframe/libskeleton.so.0.0.0.debug to /usr/lib/debug/usr/lib64/wolframe/libskeleton.so.0.debug
+[  105s] symlinked /usr/lib/debug/usr/lib64/wolframe/libqtwolfclient.so.0.0.0.debug to /usr/lib/debug/usr/lib64/wolframe/libqtwolfclient.so.0.0.debug
+[  105s] symlinked /usr/lib/debug/usr/lib64/wolframe/libqtwolfclient.so.0.0.0.debug to /usr/lib/debug/usr/lib64/wolframe/libqtwolfclient.so.debug
+[  105s] symlinked /usr/lib/debug/usr/lib64/wolframe/libqtwolfclient.so.0.0.0.debug to /usr/lib/debug/usr/lib64/wolframe/libqtwolfclient.so.0.debug
+[  105s] 2500 blocks
+[  105s] + /usr/lib/rpm/check-buildroot
+[  105s] + /usr/lib/rpm/redhat/brp-compress
+[  105s] + /usr/lib/rpm/redhat/brp-strip-static-archive /usr/bin/strip
+[  105s] + /usr/lib/rpm/redhat/brp-strip-comment-note /usr/bin/strip /usr/bin/objdump
+[  105s] + /usr/lib/rpm/brp-python-bytecompile
+[  105s] + /usr/lib/rpm/redhat/brp-python-hardlink
+[  105s] + /usr/lib/rpm/redhat/brp-java-repack-jars
+[  105s] Processing files: wolfclient-0.0.5-rhel6.2.1.x86_64
+[  105s] Provides: libfilechooser.so()(64bit) libpicturechooser.so()(64bit) libqtwolfclient.so.0()(64bit) libskeleton.so.0()(64bit)
+[  105s] Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1 rpmlib(FileDigests) <= 4.6.0-1 rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+[  105s] Requires: libQtCore.so.4()(64bit) libQtDesigner.so.4()(64bit) libQtGui.so.4()(64bit) libQtNetwork.so.4()(64bit) libQtScript.so.4()(64bit) libQtXml.so.4()(64bit) libc.so.6()(64bit) libc.so.6(GLIBC_2.2.5)(64bit) libc.so.6(GLIBC_2.3.4)(64bit) libfilechooser.so()(64bit) libgcc_s.so.1()(64bit) libgcc_s.so.1(GCC_3.0)(64bit) libm.so.6()(64bit) libpicturechooser.so()(64bit) libpthread.so.0()(64bit) libqtwolfclient.so.0()(64bit) libskeleton.so.0()(64bit) libstdc++.so.6()(64bit) libstdc++.so.6(CXXABI_1.3)(64bit) libstdc++.so.6(GLIBCXX_3.4)(64bit) rtld(GNU_HASH)
+[  105s] Processing files: wolfclient-debuginfo-0.0.5-rhel6.2.1.x86_64
+[  106s] Processing files: wolfclient-devel-0.0.5-rhel6.2.1.x86_64
+[  106s] Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1 rpmlib(FileDigests) <= 4.6.0-1 rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+[  106s] Requires: libqtwolfclient.so.0()(64bit) libskeleton.so.0()(64bit)
+[  106s] Checking for unpackaged file(s): /usr/lib/rpm/check-files /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64
+[  106s] Wrote: /home/abuild/rpmbuild/SRPMS/wolfclient-0.0.5-rhel6.2.1.src.rpm
+[  106s] Wrote: /home/abuild/rpmbuild/RPMS/x86_64/wolfclient-0.0.5-rhel6.2.1.x86_64.rpm
+[  109s] Wrote: /home/abuild/rpmbuild/RPMS/x86_64/wolfclient-debuginfo-0.0.5-rhel6.2.1.x86_64.rpm
+[  109s] Wrote: /home/abuild/rpmbuild/RPMS/x86_64/wolfclient-devel-0.0.5-rhel6.2.1.x86_64.rpm
+[  109s] Executing(%clean): /bin/sh -e /var/tmp/rpm-tmp.eZuiGs
+[  109s] + umask 022
+[  109s] + cd /home/abuild/rpmbuild/BUILD
+[  109s] + cd wolfclient-0.0.5
+[  109s] + /bin/rm -rf /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64
+[  109s] + rm -rf /home/abuild/rpmbuild/BUILDROOT/wolfclient-0.0.5-rhel6.2.1.x86_64
+[  109s] + exit 0
+[  109s] ... checking for files with abuild user/group
+[  109s] Warning: mkbaselibs missing in build root, skipping baselibs
+[  109s] ... saving statistics
+[  109s] ... saving built packages
+[  109s] RPMS/x86_64/wolfclient-0.0.5-rhel6.2.1.x86_64.rpm
+[  109s] RPMS/x86_64/wolfclient-devel-0.0.5-rhel6.2.1.x86_64.rpm
+[  109s] RPMS/x86_64/wolfclient-debuginfo-0.0.5-rhel6.2.1.x86_64.rpm
+[  109s] SRPMS/wolfclient-0.0.5-rhel6.2.1.src.rpm
+[  109s] OTHER/_statistics
+[  109s] 
+[  109s] cloud128 finished "build wolfclient.spec" at Fri Aug 29 11:05:16 UTC 2014.
+[  109s] 
+[  109s] ### WATCHDOG MARKER START ###
+[  110s] [   79.129688] reboot: Power down
+[  113s] ### WATCHDOG MARKER END ###
+[  113s] build: extracting built packages...
+[  113s] RPMS/x86_64/wolfclient-0.0.5-rhel6.2.1.x86_64.rpm
+[  113s] RPMS/x86_64/wolfclient-devel-0.0.5-rhel6.2.1.x86_64.rpm
+[  113s] RPMS/x86_64/wolfclient-debuginfo-0.0.5-rhel6.2.1.x86_64.rpm
+[  113s] SRPMS/wolfclient-0.0.5-rhel6.2.1.src.rpm
+[  113s] OTHER/_statistics

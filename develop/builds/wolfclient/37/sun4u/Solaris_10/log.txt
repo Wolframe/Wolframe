@@ -1,0 +1,846 @@
+mkdir: "/solarisbuild": Exists but is not a directory
+Reading /wolfclient/libqtwolfclient/libqtwolfclient.pro
+Reading /wolfclient/skeleton/skeleton.pro
+Reading /wolfclient/example/example.pro
+Reading /wolfclient/plugins/plugins.pro
+ Reading /wolfclient/plugins/filechooser/filechooser.pro
+ Reading /wolfclient/plugins/picturechooser/picturechooser.pro
+ Reading /wolfclient/plugins/formtest/formtest.pro
+ Reading /wolfclient/plugins/wolfdesigner/wolfdesigner.pro
+Reading /wolfclient/wolfclient/wolfclient.pro
+Reading /wolfclient/tests/tests.pro
+ Reading /wolfclient/tests/SSLavailable/SSLavailable.pro
+ Reading /wolfclient/tests/datatree/datatree.pro
+ Reading /wolfclient/tests/skeleton/skeleton.pro
+RCC: Warning: No resources in 'skeletonTest.qrc'.
+ Reading /wolfclient/tests/xml/xml.pro
+rm -rf wolfclient-0.0.5.tar.Z ; rm -rf /tmp/wolfclient-0.0.5 ; mkdir /tmp/wolfclient-0.0.5 ; cp -r * /tmp/wolfclient-0.0.5 ; cd /tmp/wolfclient-0.0.5 ; gmake distclean ; cd /tmp ; tar cf wolfclient-0.0.5.tar wolfclient-0.0.5 ; mv /tmp/wolfclient-0.0.5.tar /wolfclient ; cd /wolfclient ; rm -rf /tmp/wolfclient-0.0.5 ; compress wolfclient-0.0.5.tar
+gmake[1]: Entering directory '/tmp/wolfclient-0.0.5'
+/opt/csw/bin/qmake -config release -o Makefile wolfclient.pro
+cd libqtwolfclient/ && gmake -f Makefile distclean
+gmake[2]: Entering directory '/tmp/wolfclient-0.0.5/libqtwolfclient'
+rm -f moc_WolframeClient.cpp
+rm -f WolframeClient.o WolframeClientProtocolBase.o WolframeClientProtocol.o serverDefinition.o serverConnection.o moc_WolframeClient.o
+rm -f *~ core *.core
+rm -f libqtwolfclient.so.0.0.0 
+rm -f libqtwolfclient.so libqtwolfclient.so.0 libqtwolfclient.so.0.0 libqtwolfclient.a
+rm -f Makefile
+gmake[2]: Leaving directory '/tmp/wolfclient-0.0.5/libqtwolfclient'
+cd skeleton/ && gmake -f Makefile distclean
+gmake[2]: Entering directory '/tmp/wolfclient-0.0.5/skeleton'
+rm -f moc_SkeletonMainWindow.cpp moc_loginDialog.cpp moc_serverDefinitionDialog.cpp moc_manageServerDefsDialog.cpp
+rm -f qrc_skeleton.cpp
+rm -f ui_SkeletonMainWindow.h ui_loginDialog.h ui_serverDefinitionDialog.h ui_manageServerDefsDialog.h
+rm -f SkeletonMainWindow.o loginDialog.o serverDefinitionDialog.o manageServerDefsDialog.o moc_SkeletonMainWindow.o moc_loginDialog.o moc_serverDefinitionDialog.o moc_manageServerDefsDialog.o qrc_skeleton.o
+rm -f *~ core *.core
+rm -f libskeleton.so.0.0.0 
+rm -f libskeleton.so libskeleton.so.0 libskeleton.so.0.0 libskeleton.a
+rm -f Makefile
+gmake[2]: Leaving directory '/tmp/wolfclient-0.0.5/skeleton'
+cd example/ && gmake -f Makefile distclean
+gmake[2]: Entering directory '/tmp/wolfclient-0.0.5/example'
+rm -f moc_MainWindow.cpp
+rm -f qrc_example.cpp
+rm -f ui_MainWindow.h
+rm -f main.o MainWindow.o moc_MainWindow.o qrc_example.o
+rm -f *~ core *.core
+rm -f example 
+rm -f Makefile
+gmake[2]: Leaving directory '/tmp/wolfclient-0.0.5/example'
+cd plugins/ && gmake -f Makefile distclean
+gmake[2]: Entering directory '/tmp/wolfclient-0.0.5/plugins'
+cd filechooser/ && gmake -f Makefile distclean
+gmake[3]: Entering directory '/tmp/wolfclient-0.0.5/plugins/filechooser'
+rm -f moc_FileChooserPlugin.cpp moc_FileChooser.cpp
+rm -f FileChooserPlugin.o FileChooser.o moc_FileChooserPlugin.o moc_FileChooser.o
+rm -f *~ core *.core
+rm -f libfilechooser.so 
+rm -f Makefile
+gmake[3]: Leaving directory '/tmp/wolfclient-0.0.5/plugins/filechooser'
+cd picturechooser/ && gmake -f Makefile distclean
+gmake[3]: Entering directory '/tmp/wolfclient-0.0.5/plugins/picturechooser'
+rm -f moc_PictureChooserPlugin.cpp moc_PictureChooser.cpp moc_FileChooser.cpp
+rm -f PictureChooserPlugin.o PictureChooser.o FileChooser.o moc_PictureChooserPlugin.o moc_PictureChooser.o moc_FileChooser.o
+rm -f *~ core *.core
+rm -f libpicturechooser.so 
+rm -f Makefile
+gmake[3]: Leaving directory '/tmp/wolfclient-0.0.5/plugins/picturechooser'
+cd formtest/ && gmake -f Makefile distclean
+gmake[3]: Entering directory '/tmp/wolfclient-0.0.5/plugins/formtest'
+rm -f moc_FormTestPlugin.cpp
+rm -f FormTestPlugin.o moc_FormTestPlugin.o
+rm -f *~ core *.core
+rm -f libformtest.so 
+rm -f Makefile
+gmake[3]: Leaving directory '/tmp/wolfclient-0.0.5/plugins/formtest'
+cd wolfdesigner/ && gmake -f Makefile distclean
+gmake[3]: Entering directory '/tmp/wolfclient-0.0.5/plugins/wolfdesigner'
+rm -f moc_WolfDesignerPlugin.cpp moc_WolfDesignerMenu.cpp moc_WolfDesignerDialog.cpp moc_WolfDesigner.cpp
+rm -f ui_WolfDesignerDialog.h
+rm -f WolfDesignerPlugin.o WolfDesignerMenu.o WolfDesignerDialog.o moc_WolfDesignerPlugin.o moc_WolfDesignerMenu.o moc_WolfDesignerDialog.o moc_WolfDesigner.o
+rm -f *~ core *.core
+rm -f libwolfdesigner.so 
+rm -f Makefile
+gmake[3]: Leaving directory '/tmp/wolfclient-0.0.5/plugins/wolfdesigner'
+rm -f Makefile
+gmake[2]: Leaving directory '/tmp/wolfclient-0.0.5/plugins'
+cd wolfclient/ && gmake -f Makefile distclean
+gmake[2]: Entering directory '/tmp/wolfclient-0.0.5/wolfclient'
+rm -f i18n/wolfclient.de_CH.qm i18n/wolfclient.ro_RO.qm
+rm -f moc_DebugViewWidget.cpp moc_MainWindow.cpp moc_FormLoader.cpp moc_DataLoader.cpp moc_WidgetVisitorObject.cpp moc_FormWidget.cpp moc_PreferencesDialog.cpp moc_FormChooseDialog.cpp moc_HistoryLineEdit.cpp
+rm -f qrc_wolfclient.cpp
+rm -f ui_MainWindow.h ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
+rm -f MainWindow.o FormLoader.o FormUiLoader.o FileFormLoader.o NetworkFormLoader.o DataLoader.o FileDataLoader.o NetworkDataLoader.o WidgetTree.o WidgetId.o WidgetRequestHeader.o WidgetVisitor.o WidgetDataSignal.o WidgetEnabler.o WidgetListener.o WidgetRequest.o WidgetMessageDispatcher.o WidgetDragAndDrop.o WidgetVisitorStateConstructor.o DebugLogTree.o DebugViewWidget.o DebugHelpers.o DebugMessageHandler.o WidgetVisitor_QLabel.o WidgetVisitor_QComboBox.o WidgetVisitor_QCheckBox.o WidgetVisitor_QGroupBox.o WidgetVisitor_QButtonGroup.o WidgetVisitor_QRadioButton.o WidgetVisitor_QPushButton.o WidgetVisitor_QSpinBox.o WidgetVisitor_QDoubleSpinBox.o WidgetVisitor_QListWidget.o WidgetVisitor_QLineEdit.o WidgetVisitor_QTextEdit.o WidgetVisitor_QPlainTextEdit.o WidgetVisitor_QDateEdit.o WidgetVisitor_QTimeEdit.o WidgetVisitor_QDateTimeEdit.o WidgetVisitor_QTreeWidget.o WidgetVisitor_QTableWidget.o WidgetVisitor_QSlider.o WidgetVisitor_QStackedWidget.o WidgetVisitor_FileChooser.o WidgetVisitor_PictureChooser.o DataFormatXML.o DataStruct.o DataStructDescription.o DataStructDescriptionParse.o DataStructDescriptionMap.o DataStructSerialize.o DataStructMap.o DataPathTree.o DataSerializeItem.o ActionResultDefinition.o ActionDefinition.o CondProperties.o FormCall.o FormWidget.o PreferencesDialog.o FormChooseDialog.o settings.o LoadMode.o HistoryLineEdit.o wolfclient.o moc_DebugViewWidget.o moc_MainWindow.o moc_FormLoader.o moc_DataLoader.o moc_WidgetVisitorObject.o moc_FormWidget.o moc_PreferencesDialog.o moc_FormChooseDialog.o moc_HistoryLineEdit.o qrc_wolfclient.o
+rm -f *~ core *.core
+rm -f wolfclient 
+rm -f Makefile
+gmake[2]: Leaving directory '/tmp/wolfclient-0.0.5/wolfclient'
+cd tests/ && gmake -f Makefile distclean
+gmake[2]: Entering directory '/tmp/wolfclient-0.0.5/tests'
+cd SSLavailable/ && gmake -f Makefile distclean
+gmake[3]: Entering directory '/tmp/wolfclient-0.0.5/tests/SSLavailable'
+rm -f moc_SSLavailable.cpp
+rm -f SSLavailable.o moc_SSLavailable.o
+rm -f *~ core *.core
+rm -f SSLavailable 
+rm -f Makefile
+gmake[3]: Leaving directory '/tmp/wolfclient-0.0.5/tests/SSLavailable'
+cd datatree/ && gmake -f Makefile distclean
+gmake[3]: Entering directory '/tmp/wolfclient-0.0.5/tests/datatree'
+rm -f moc_testDataTree.cpp
+rm -f testDataTree.o DebugHelpers.o DebugLogTree.o DebugMessageHandler.o DataStructDescription.o DataStructDescriptionParse.o DataStruct.o moc_testDataTree.o
+rm -f *~ core *.core
+rm -f testDataTree 
+rm -f Makefile
+gmake[3]: Leaving directory '/tmp/wolfclient-0.0.5/tests/datatree'
+cd skeleton/ && gmake -f Makefile distclean
+gmake[3]: Entering directory '/tmp/wolfclient-0.0.5/tests/skeleton'
+rm -f qrc_skeletonTest.cpp
+rm -f main.o qrc_skeletonTest.o
+rm -f *~ core *.core
+rm -f skeletonTest 
+rm -f Makefile
+gmake[3]: Leaving directory '/tmp/wolfclient-0.0.5/tests/skeleton'
+cd xml/ && gmake -f Makefile distclean
+gmake[3]: Entering directory '/tmp/wolfclient-0.0.5/tests/xml'
+rm -f moc_testXmlSerialization.cpp
+rm -f testXmlSerialization.o DebugHelpers.o DataFormatXML.o moc_testXmlSerialization.o
+rm -f *~ core *.core
+rm -f testXmlSerialization 
+rm -f Makefile
+gmake[3]: Leaving directory '/tmp/wolfclient-0.0.5/tests/xml'
+rm -f Makefile
+gmake[2]: Leaving directory '/tmp/wolfclient-0.0.5/tests'
+rm -f Makefile
+gmake[1]: Leaving directory '/tmp/wolfclient-0.0.5'
+x wolfclient-0.0.5, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/3rdparty, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/3rdparty/Qt, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/3rdparty/Qt/LICENSE.LGPL, 26436 bytes, 52 tape blocks
+x wolfclient-0.0.5/AUTHORS, 140 bytes, 1 tape blocks
+x wolfclient-0.0.5/FAQ, 680 bytes, 2 tape blocks
+x wolfclient-0.0.5/INSTALL.MacX, 711 bytes, 2 tape blocks
+x wolfclient-0.0.5/INSTALL.Unix, 5992 bytes, 12 tape blocks
+x wolfclient-0.0.5/INSTALL.Windows, 5254 bytes, 11 tape blocks
+x wolfclient-0.0.5/LICENSE.3rdParty, 185 bytes, 1 tape blocks
+x wolfclient-0.0.5/LICENSE.GPL, 35147 bytes, 69 tape blocks
+x wolfclient-0.0.5/README, 325 bytes, 1 tape blocks
+x wolfclient-0.0.5/build.log, 1136 bytes, 3 tape blocks
+x wolfclient-0.0.5/contrib, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/contrib/README, 57 bytes, 1 tape blocks
+x wolfclient-0.0.5/contrib/gdbinit, 324 bytes, 1 tape blocks
+x wolfclient-0.0.5/doc, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/doc/RequestAnswerSpecLanguage.txt, 4177 bytes, 9 tape blocks
+x wolfclient-0.0.5/example, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/example/MainWindow.cpp, 2460 bytes, 5 tape blocks
+x wolfclient-0.0.5/example/MainWindow.hpp, 1837 bytes, 4 tape blocks
+x wolfclient-0.0.5/example/MainWindow.ui, 15714 bytes, 31 tape blocks
+x wolfclient-0.0.5/example/example.pro, 749 bytes, 2 tape blocks
+x wolfclient-0.0.5/example/example.qrc, 303 bytes, 1 tape blocks
+x wolfclient-0.0.5/example/images, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/example/images/16x16, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/example/images/16x16/connected.png, 1206 bytes, 3 tape blocks
+x wolfclient-0.0.5/example/images/16x16/disconnected.png, 969 bytes, 2 tape blocks
+x wolfclient-0.0.5/example/images/16x16/encrypted.png, 983 bytes, 2 tape blocks
+x wolfclient-0.0.5/example/images/16x16/unencrypted.png, 970 bytes, 2 tape blocks
+x wolfclient-0.0.5/example/images/login.png, 2403 bytes, 5 tape blocks
+x wolfclient-0.0.5/example/images/logout.png, 1614 bytes, 4 tape blocks
+x wolfclient-0.0.5/example/main.cpp, 1629 bytes, 4 tape blocks
+x wolfclient-0.0.5/example/run.sh, 95 bytes, 1 tape blocks
+x wolfclient-0.0.5/libqtwolfclient, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/WolframeClient.cpp, 13017 bytes, 26 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/WolframeClient.hpp, 4069 bytes, 8 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/WolframeClientProtocol.cpp, 12733 bytes, 25 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/WolframeClientProtocolBase.cpp, 5384 bytes, 11 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/libqtwolfclient.pro, 660 bytes, 2 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/private, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/private/WolframeClientProtocol.hpp, 5292 bytes, 11 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/private/WolframeClientProtocolBase.hpp, 2427 bytes, 5 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/serverConnection.cpp, 1431 bytes, 3 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/serverConnection.hpp, 1539 bytes, 4 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/serverDefinition.cpp, 3339 bytes, 7 tape blocks
+x wolfclient-0.0.5/libqtwolfclient/serverDefinition.hpp, 2103 bytes, 5 tape blocks
+x wolfclient-0.0.5/packaging, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/README, 262 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/archlinux, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/archlinux/PKGBUILD, 936 bytes, 2 tape blocks
+x wolfclient-0.0.5/packaging/archlinux/buildlocal.sh, 1484 bytes, 3 tape blocks
+x wolfclient-0.0.5/packaging/archlinux/wolfclient-git.PKGBUILD, 1098 bytes, 3 tape blocks
+x wolfclient-0.0.5/packaging/debian, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/debian/README.source, 209 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/debian/changelog, 749 bytes, 2 tape blocks
+x wolfclient-0.0.5/packaging/debian/compat, 2 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/debian/control, 554 bytes, 2 tape blocks
+x wolfclient-0.0.5/packaging/debian/copyright, 1087 bytes, 3 tape blocks
+x wolfclient-0.0.5/packaging/debian/docs, 27 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/debian/rules, 3258 bytes, 7 tape blocks
+x wolfclient-0.0.5/packaging/debian/watch.ex, 787 bytes, 2 tape blocks
+x wolfclient-0.0.5/packaging/debian/wolframe-doc.docs, 8 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/debian/wolframe-doc.install, 8 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/freebsd, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/freebsd/+MANIFEST, 1125 bytes, 3 tape blocks
+x wolfclient-0.0.5/packaging/freebsd/buildlocal.sh, 2076 bytes, 5 tape blocks
+x wolfclient-0.0.5/packaging/freebsd/comment, 36 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/freebsd/description, 136 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/freebsd/packlist, 532 bytes, 2 tape blocks
+x wolfclient-0.0.5/packaging/netbsd, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/netbsd/buildlocal.sh, 2594 bytes, 6 tape blocks
+x wolfclient-0.0.5/packaging/netbsd/comment, 36 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/netbsd/description, 136 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/netbsd/packlist, 345 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/obs, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/obs/PKGBUILD, 826 bytes, 2 tape blocks
+x wolfclient-0.0.5/packaging/obs/deploy_to_obs.sh, 1751 bytes, 4 tape blocks
+x wolfclient-0.0.5/packaging/obs/release_local_binaries.sh, 1739 bytes, 4 tape blocks
+x wolfclient-0.0.5/packaging/obs/release_osb_binaries.sh, 3097 bytes, 7 tape blocks
+x wolfclient-0.0.5/packaging/obs/wolfclient.dsc, 210 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/redhat, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/redhat/buildlocal.sh, 1909 bytes, 4 tape blocks
+x wolfclient-0.0.5/packaging/redhat/wolfclient.spec, 4846 bytes, 10 tape blocks
+x wolfclient-0.0.5/packaging/slackware, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/slackware/buildlocal.sh, 1170 bytes, 3 tape blocks
+x wolfclient-0.0.5/packaging/slackware/slack-desc, 213 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/solaris, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/solaris/buildlocal.sh, 1871 bytes, 4 tape blocks
+x wolfclient-0.0.5/packaging/solaris/copyright, 35147 bytes, 69 tape blocks
+x wolfclient-0.0.5/packaging/solaris/depend, 354 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/solaris/pkginfo, 184 bytes, 1 tape blocks
+x wolfclient-0.0.5/packaging/solaris/prototype, 1075 bytes, 3 tape blocks
+x wolfclient-0.0.5/packaging/tools, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/tools/setversion.sh, 2841 bytes, 6 tape blocks
+x wolfclient-0.0.5/packaging/windows, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/windows/MAKEFILE, 2101 bytes, 5 tape blocks
+x wolfclient-0.0.5/packaging/windows/WixUI_wolfclient.wxs, 4869 bytes, 10 tape blocks
+x wolfclient-0.0.5/packaging/windows/bitmaps, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/windows/bitmaps/Wolf.bmp, 292086 bytes, 571 tape blocks
+x wolfclient-0.0.5/packaging/windows/bitmaps/Wolframe.ico, 1406 bytes, 3 tape blocks
+x wolfclient-0.0.5/packaging/windows/i18n, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/packaging/windows/i18n/en_us-wolfclient.wxl, 1341 bytes, 3 tape blocks
+x wolfclient-0.0.5/packaging/windows/license.rtf, 1653 bytes, 4 tape blocks
+x wolfclient-0.0.5/packaging/windows/wolfclient.wxs, 13181 bytes, 26 tape blocks
+x wolfclient-0.0.5/plugins, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/plugins/filechooser, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/plugins/filechooser/FileChooser.cpp, 6209 bytes, 13 tape blocks
+x wolfclient-0.0.5/plugins/filechooser/FileChooser.hpp, 3156 bytes, 7 tape blocks
+x wolfclient-0.0.5/plugins/filechooser/FileChooserPlugin.cpp, 2871 bytes, 6 tape blocks
+x wolfclient-0.0.5/plugins/filechooser/FileChooserPlugin.hpp, 2249 bytes, 5 tape blocks
+x wolfclient-0.0.5/plugins/filechooser/filechooser.pro, 1048 bytes, 3 tape blocks
+x wolfclient-0.0.5/plugins/formtest, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/plugins/formtest/FormTestPlugin.cpp, 6041 bytes, 12 tape blocks
+x wolfclient-0.0.5/plugins/formtest/FormTestPlugin.hpp, 2963 bytes, 6 tape blocks
+x wolfclient-0.0.5/plugins/formtest/formtest.pro, 882 bytes, 2 tape blocks
+x wolfclient-0.0.5/plugins/picturechooser, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/plugins/picturechooser/PictureChooser.cpp, 3293 bytes, 7 tape blocks
+x wolfclient-0.0.5/plugins/picturechooser/PictureChooser.hpp, 2381 bytes, 5 tape blocks
+x wolfclient-0.0.5/plugins/picturechooser/PictureChooserPlugin.cpp, 2904 bytes, 6 tape blocks
+x wolfclient-0.0.5/plugins/picturechooser/PictureChooserPlugin.hpp, 2264 bytes, 5 tape blocks
+x wolfclient-0.0.5/plugins/picturechooser/picturechooser.pro, 1536 bytes, 3 tape blocks
+x wolfclient-0.0.5/plugins/plugins.pro, 187 bytes, 1 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/LINKS, 346 bytes, 1 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/README, 1919 bytes, 4 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/README.Others, 396 bytes, 1 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/TODOS, 420 bytes, 1 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/WolfDesigner.hpp, 1627 bytes, 4 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/WolfDesignerDialog.cpp, 5299 bytes, 11 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/WolfDesignerDialog.hpp, 2005 bytes, 4 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/WolfDesignerDialog.ui, 1141 bytes, 3 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/WolfDesignerMenu.cpp, 3141 bytes, 7 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/WolfDesignerMenu.hpp, 2193 bytes, 5 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/WolfDesignerPlugin.cpp, 3221 bytes, 7 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/WolfDesignerPlugin.hpp, 2260 bytes, 5 tape blocks
+x wolfclient-0.0.5/plugins/wolfdesigner/wolfdesigner.pro, 753 bytes, 2 tape blocks
+x wolfclient-0.0.5/skeleton, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/skeleton/SkeletonMainWindow.cpp, 8983 bytes, 18 tape blocks
+x wolfclient-0.0.5/skeleton/SkeletonMainWindow.hpp, 3164 bytes, 7 tape blocks
+x wolfclient-0.0.5/skeleton/SkeletonMainWindow.ui, 3901 bytes, 8 tape blocks
+x wolfclient-0.0.5/skeleton/images, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/skeleton/images/16x16, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/skeleton/images/16x16/connected.png, 1206 bytes, 3 tape blocks
+x wolfclient-0.0.5/skeleton/images/16x16/disconnected.png, 969 bytes, 2 tape blocks
+x wolfclient-0.0.5/skeleton/images/16x16/encrypted.png, 983 bytes, 2 tape blocks
+x wolfclient-0.0.5/skeleton/images/16x16/unencrypted.png, 970 bytes, 2 tape blocks
+x wolfclient-0.0.5/skeleton/images/login.png, 2403 bytes, 5 tape blocks
+x wolfclient-0.0.5/skeleton/images/logout.png, 1614 bytes, 4 tape blocks
+x wolfclient-0.0.5/skeleton/loginDialog.cpp, 3766 bytes, 8 tape blocks
+x wolfclient-0.0.5/skeleton/loginDialog.hpp, 2180 bytes, 5 tape blocks
+x wolfclient-0.0.5/skeleton/loginDialog.ui, 3817 bytes, 8 tape blocks
+x wolfclient-0.0.5/skeleton/manageServerDefsDialog.cpp, 8758 bytes, 18 tape blocks
+x wolfclient-0.0.5/skeleton/manageServerDefsDialog.hpp, 3030 bytes, 6 tape blocks
+x wolfclient-0.0.5/skeleton/manageServerDefsDialog.ui, 4183 bytes, 9 tape blocks
+x wolfclient-0.0.5/skeleton/serverDefinitionDialog.cpp, 10018 bytes, 20 tape blocks
+x wolfclient-0.0.5/skeleton/serverDefinitionDialog.hpp, 2397 bytes, 5 tape blocks
+x wolfclient-0.0.5/skeleton/serverDefinitionDialog.ui, 9907 bytes, 20 tape blocks
+x wolfclient-0.0.5/skeleton/skeleton.pro, 1037 bytes, 3 tape blocks
+x wolfclient-0.0.5/skeleton/skeleton.qrc, 303 bytes, 1 tape blocks
+x wolfclient-0.0.5/tests, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/tests/SSLavailable, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/tests/SSLavailable/SSLavailable.cpp, 1551 bytes, 4 tape blocks
+x wolfclient-0.0.5/tests/SSLavailable/SSLavailable.hpp, 1465 bytes, 3 tape blocks
+x wolfclient-0.0.5/tests/SSLavailable/SSLavailable.pro, 435 bytes, 1 tape blocks
+x wolfclient-0.0.5/tests/datastructmap, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/tests/datastructmap/DataPathTreeVisitor.cpp, 2607 bytes, 6 tape blocks
+x wolfclient-0.0.5/tests/datastructmap/DataPathTreeVisitor.hpp, 3040 bytes, 6 tape blocks
+x wolfclient-0.0.5/tests/datastructmap/datastructmap.pro, 1542 bytes, 4 tape blocks
+x wolfclient-0.0.5/tests/datastructmap/testDataStructMap.cpp, 3742 bytes, 8 tape blocks
+x wolfclient-0.0.5/tests/datastructmap/testDataStructMap.hpp, 1514 bytes, 3 tape blocks
+x wolfclient-0.0.5/tests/datatree, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/tests/datatree/datatree.pro, 850 bytes, 2 tape blocks
+x wolfclient-0.0.5/tests/datatree/testDataTree.cpp, 4002 bytes, 8 tape blocks
+x wolfclient-0.0.5/tests/datatree/testDataTree.hpp, 1555 bytes, 4 tape blocks
+x wolfclient-0.0.5/tests/skeleton, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/tests/skeleton/main.cpp, 1649 bytes, 4 tape blocks
+x wolfclient-0.0.5/tests/skeleton/run.sh, 106 bytes, 1 tape blocks
+x wolfclient-0.0.5/tests/skeleton/skeleton.pro, 756 bytes, 2 tape blocks
+x wolfclient-0.0.5/tests/skeleton/skeletonTest.qrc, 53 bytes, 1 tape blocks
+x wolfclient-0.0.5/tests/tests.pro, 136 bytes, 1 tape blocks
+x wolfclient-0.0.5/tests/xml, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/tests/xml/testXmlSerialization.cpp, 5358 bytes, 11 tape blocks
+x wolfclient-0.0.5/tests/xml/testXmlSerialization.hpp, 1638 bytes, 4 tape blocks
+x wolfclient-0.0.5/tests/xml/xml.pro, 683 bytes, 2 tape blocks
+x wolfclient-0.0.5/wolfclient, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/wolfclient/DataLoader.cpp, 1385 bytes, 3 tape blocks
+x wolfclient-0.0.5/wolfclient/DataLoader.hpp, 2022 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/FileDataLoader.cpp, 4788 bytes, 10 tape blocks
+x wolfclient-0.0.5/wolfclient/FileDataLoader.hpp, 2373 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/FileFormLoader.cpp, 5988 bytes, 12 tape blocks
+x wolfclient-0.0.5/wolfclient/FileFormLoader.hpp, 2666 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/FormCall.cpp, 2496 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/FormCall.hpp, 2629 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/FormChooseDialog.cpp, 3086 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/FormChooseDialog.hpp, 2060 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/FormLoader.cpp, 1385 bytes, 3 tape blocks
+x wolfclient-0.0.5/wolfclient/FormLoader.hpp, 2850 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/FormPluginInterface.hpp, 2218 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/FormPluginRequestHeader.hpp, 3215 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/FormUiLoader.cpp, 2415 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/FormUiLoader.hpp, 1994 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/FormWidget.cpp, 16692 bytes, 33 tape blocks
+x wolfclient-0.0.5/wolfclient/debugview, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/wolfclient/debugview/DebugHelpers.cpp, 2121 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/debugview/DebugHelpers.hpp, 1810 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/debugview/DebugLogTree.cpp, 7676 bytes, 15 tape blocks
+x wolfclient-0.0.5/wolfclient/debugview/DebugLogTree.hpp, 3581 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/debugview/DebugMessageHandler.cpp, 4504 bytes, 9 tape blocks
+x wolfclient-0.0.5/wolfclient/debugview/DebugMessageHandler.hpp, 1754 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/debugview/DebugViewWidget.cpp, 8094 bytes, 16 tape blocks
+x wolfclient-0.0.5/wolfclient/debugview/DebugViewWidget.hpp, 2497 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/FormWidget.hpp, 4925 bytes, 10 tape blocks
+x wolfclient-0.0.5/wolfclient/HistoryLineEdit.cpp, 3043 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/HistoryLineEdit.hpp, 2021 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/LoadMode.cpp, 2011 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/LoadMode.hpp, 1650 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/MainWindow.cpp, 39746 bytes, 78 tape blocks
+x wolfclient-0.0.5/wolfclient/MainWindow.hpp, 6628 bytes, 13 tape blocks
+x wolfclient-0.0.5/wolfclient/MainWindow.ui, 16623 bytes, 33 tape blocks
+x wolfclient-0.0.5/wolfclient/NetworkDataLoader.cpp, 2197 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/NetworkDataLoader.hpp, 2160 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/NetworkFormLoader.cpp, 4252 bytes, 9 tape blocks
+x wolfclient-0.0.5/wolfclient/NetworkFormLoader.hpp, 2513 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/PreferencesDialog.cpp, 8951 bytes, 18 tape blocks
+x wolfclient-0.0.5/wolfclient/PreferencesDialog.hpp, 2565 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/PreferencesDialog.ui, 2927 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/PreferencesDialogDeveloper.ui, 6757 bytes, 14 tape blocks
+x wolfclient-0.0.5/wolfclient/PreferencesDialogInterface.ui, 3359 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetDataSignal.cpp, 8217 bytes, 17 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetDataSignal.hpp, 2166 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetDragAndDrop.cpp, 10467 bytes, 21 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetDragAndDrop.hpp, 4260 bytes, 9 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetEnabler.cpp, 8564 bytes, 17 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetEnabler.hpp, 3525 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetId.cpp, 1881 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetId.hpp, 2436 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetListener.cpp, 10400 bytes, 21 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetListener.hpp, 2301 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetMessageDispatcher.cpp, 2912 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetMessageDispatcher.hpp, 2387 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetRequest.cpp, 16402 bytes, 33 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetRequest.hpp, 2519 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetRequestHeader.cpp, 2837 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetRequestHeader.hpp, 2303 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetTree.cpp, 17841 bytes, 35 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetTree.hpp, 3233 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetVisitor.cpp, 35538 bytes, 70 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetVisitor.hpp, 17010 bytes, 34 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetVisitorObject.hpp, 5708 bytes, 12 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetVisitorStateConstructor.cpp, 3331 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/WidgetVisitorStateConstructor.hpp, 104 bytes, 1 tape blocks
+x wolfclient-0.0.5/wolfclient/global.hpp, 2006 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/i18n, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/wolfclient/i18n/Romanian.qph, 1122 bytes, 3 tape blocks
+x wolfclient-0.0.5/wolfclient/i18n/wolfclient.de_CH.ts, 29850 bytes, 59 tape blocks
+x wolfclient-0.0.5/wolfclient/i18n/wolfclient.ro_RO.ts, 25976 bytes, 51 tape blocks
+x wolfclient-0.0.5/wolfclient/images, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/wolfclient/images/16x16, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/wolfclient/images/16x16/connected.png, 1206 bytes, 3 tape blocks
+x wolfclient-0.0.5/wolfclient/images/16x16/disconnected.png, 969 bytes, 2 tape blocks
+x wolfclient-0.0.5/wolfclient/images/16x16/encrypted.png, 983 bytes, 2 tape blocks
+x wolfclient-0.0.5/wolfclient/images/16x16/unencrypted.png, 970 bytes, 2 tape blocks
+x wolfclient-0.0.5/wolfclient/images/configure.png, 2200 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/images/copy.png, 1073 bytes, 3 tape blocks
+x wolfclient-0.0.5/wolfclient/images/cut.png, 1422 bytes, 3 tape blocks
+x wolfclient-0.0.5/wolfclient/images/debug-error.png, 1019 bytes, 2 tape blocks
+x wolfclient-0.0.5/wolfclient/images/debug-ok.png, 3712 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/images/debug-warning.png, 965 bytes, 2 tape blocks
+x wolfclient-0.0.5/wolfclient/images/debug.png, 2309 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/images/delete.png, 3123 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/images/development.png, 1803 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/images/exit.png, 2597 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/images/interface.png, 2143 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/images/login.png, 2403 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/images/logout.png, 1614 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/images/next.png, 2404 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/images/paste.png, 1689 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/images/previous.png, 2425 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/images/print.png, 1820 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/images/redo.png, 2099 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/images/refresh.png, 2667 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/images/undo.png, 2105 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/images/wolfClient.png, 7229 bytes, 15 tape blocks
+x wolfclient-0.0.5/wolfclient/images/world.png, 3237 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/images/wolframe.png, 375 bytes, 1 tape blocks
+x wolfclient-0.0.5/wolfclient/images/world-setup.png, 3328 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/run.sh, 147 bytes, 1 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/ActionDefinition.cpp, 3306 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/ActionDefinition.hpp, 2218 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/ActionResultDefinition.cpp, 2897 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/ActionResultDefinition.hpp, 2074 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/CondProperties.cpp, 2651 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/CondProperties.hpp, 1582 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataFormatXML.cpp, 6584 bytes, 13 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataFormatXML.hpp, 1780 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataPathTree.cpp, 3239 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataPathTree.hpp, 5240 bytes, 11 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataSerializeItem.cpp, 43 bytes, 1 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataSerializeItem.hpp, 2481 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStruct.cpp, 12081 bytes, 24 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStruct.hpp, 5859 bytes, 12 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStructDescription.cpp, 11283 bytes, 23 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStructDescription.hpp, 8377 bytes, 17 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStructDescriptionMap.cpp, 4040 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStructDescriptionMap.hpp, 3791 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStructDescriptionParse.cpp, 14542 bytes, 29 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStructMap.cpp, 22842 bytes, 45 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStructMap.hpp, 2123 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStructSerialize.cpp, 11714 bytes, 23 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/DataStructSerialize.hpp, 1868 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/serialize/VisitorInterface.hpp, 2645 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/settings.cpp, 8109 bytes, 16 tape blocks
+x wolfclient-0.0.5/wolfclient/settings.hpp, 3450 bytes, 7 tape blocks
+x wolfclient-0.0.5/wolfclient/test.conf, 1038 bytes, 3 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors, 0 bytes, 0 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_FileChooser.cpp, 2712 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_FileChooser.hpp, 2284 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_PictureChooser.cpp, 1845 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_PictureChooser.hpp, 2114 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QButtonGroup.cpp, 4026 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QButtonGroup.hpp, 2371 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QCheckBox.cpp, 3727 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QCheckBox.hpp, 2158 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QComboBox.cpp, 7137 bytes, 14 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QComboBox.hpp, 2398 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QDateEdit.cpp, 2560 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QDateEdit.hpp, 2159 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QDateTimeEdit.cpp, 2956 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QDateTimeEdit.hpp, 2186 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QDoubleSpinBox.cpp, 2305 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QDoubleSpinBox.hpp, 2193 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QGroupBox.cpp, 3950 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QGroupBox.hpp, 2350 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QLabel.cpp, 5514 bytes, 11 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QLabel.hpp, 1974 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QLineEdit.cpp, 3623 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QLineEdit.hpp, 2061 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QListWidget.cpp, 11058 bytes, 22 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QListWidget.hpp, 2553 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QPlainTextEdit.cpp, 2998 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QPlainTextEdit.hpp, 2120 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QPushButton.cpp, 4023 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QPushButton.hpp, 2075 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QRadioButton.cpp, 3935 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QRadioButton.hpp, 2180 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QSlider.cpp, 2174 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QSlider.hpp, 2144 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QSpinBox.cpp, 2364 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QSpinBox.hpp, 2153 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QStackedWidget.cpp, 2468 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QStackedWidget.hpp, 2193 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QTableWidget.cpp, 21000 bytes, 42 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QTextEdit.cpp, 4051 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QTableWidget.hpp, 3710 bytes, 8 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QTextEdit.hpp, 2084 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QTimeEdit.cpp, 2364 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QTimeEdit.hpp, 2159 bytes, 5 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QTreeWidget.cpp, 15966 bytes, 32 tape blocks
+x wolfclient-0.0.5/wolfclient/visitors/WidgetVisitor_QTreeWidget.hpp, 2866 bytes, 6 tape blocks
+x wolfclient-0.0.5/wolfclient/wolfclient.cpp, 1968 bytes, 4 tape blocks
+x wolfclient-0.0.5/wolfclient/wolfclient.ico, 1406 bytes, 3 tape blocks
+x wolfclient-0.0.5/wolfclient/wolfclient.pro, 6221 bytes, 13 tape blocks
+x wolfclient-0.0.5/wolfclient/wolfclient.qrc, 1211 bytes, 3 tape blocks
+x wolfclient-0.0.5/wolfclient/wolfclient.rc, 39 bytes, 1 tape blocks
+x wolfclient-0.0.5/wolfclient.pro, 1685 bytes, 4 tape blocks
+Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/libqtwolfclient/libqtwolfclient.pro
+Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/skeleton/skeleton.pro
+Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/example/example.pro
+Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/plugins.pro
+ Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/filechooser/filechooser.pro
+ Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser/picturechooser.pro
+ Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/formtest/formtest.pro
+ Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner/wolfdesigner.pro
+Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/wolfclient/wolfclient.pro
+Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/tests.pro
+ Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable/SSLavailable.pro
+ Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/datatree/datatree.pro
+ Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/skeleton/skeleton.pro
+RCC: Warning: No resources in 'skeletonTest.qrc'.
+ Reading /export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/xml/xml.pro
+cd libqtwolfclient/ && gmake -f Makefile 
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/libqtwolfclient'
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I. -I/opt/csw/gxx/include -o WolframeClient.o WolframeClient.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I. -I/opt/csw/gxx/include -o WolframeClientProtocolBase.o WolframeClientProtocolBase.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I. -I/opt/csw/gxx/include -o WolframeClientProtocol.o WolframeClientProtocol.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I. -I/opt/csw/gxx/include -o serverDefinition.o serverDefinition.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I. -I/opt/csw/gxx/include -o serverConnection.o serverConnection.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I. -I/opt/csw/gxx/include WolframeClient.hpp -o moc_WolframeClient.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I. -I/opt/csw/gxx/include -o moc_WolframeClient.o moc_WolframeClient.cpp
+rm -f libqtwolfclient.so.0.0.0 libqtwolfclient.so libqtwolfclient.so.0 libqtwolfclient.so.0.0
+g++ -shared -h	libqtwolfclient.so.0 -o libqtwolfclient.so.0.0.0 WolframeClient.o WolframeClientProtocolBase.o WolframeClientProtocol.o serverDefinition.o serverConnection.o moc_WolframeClient.o   -L/opt/csw/gxx/lib -L/opt/csw/lib -lQtGui -L/opt/csw/lib -L/opt/csw/gxx/lib -L/usr/openwin/lib -lQtNetwork -lresolv -lsocket -lxnet -lnsl -lQtCore -lfontconfig -lpthread -lrt  
+ln -s libqtwolfclient.so.0.0.0 libqtwolfclient.so
+ln -s libqtwolfclient.so.0.0.0 libqtwolfclient.so.0
+ln -s libqtwolfclient.so.0.0.0 libqtwolfclient.so.0.0
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/libqtwolfclient'
+cd skeleton/ && gmake -f Makefile 
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/skeleton'
+/opt/csw/bin/uic SkeletonMainWindow.ui -o ui_SkeletonMainWindow.h
+/opt/csw/bin/uic loginDialog.ui -o ui_loginDialog.h
+/opt/csw/bin/uic serverDefinitionDialog.ui -o ui_serverDefinitionDialog.h
+/opt/csw/bin/uic manageServerDefsDialog.ui -o ui_manageServerDefsDialog.h
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o SkeletonMainWindow.o SkeletonMainWindow.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o loginDialog.o loginDialog.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o serverDefinitionDialog.o serverDefinitionDialog.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o manageServerDefsDialog.o manageServerDefsDialog.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include SkeletonMainWindow.hpp -o moc_SkeletonMainWindow.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o moc_SkeletonMainWindow.o moc_SkeletonMainWindow.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include loginDialog.hpp -o moc_loginDialog.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o moc_loginDialog.o moc_loginDialog.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include serverDefinitionDialog.hpp -o moc_serverDefinitionDialog.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o moc_serverDefinitionDialog.o moc_serverDefinitionDialog.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include manageServerDefsDialog.hpp -o moc_manageServerDefsDialog.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o moc_manageServerDefsDialog.o moc_manageServerDefsDialog.cpp
+/opt/csw/bin/rcc -name skeleton skeleton.qrc -o qrc_skeleton.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o qrc_skeleton.o qrc_skeleton.cpp
+rm -f libskeleton.so.0.0.0 libskeleton.so libskeleton.so.0 libskeleton.so.0.0
+g++ -Wl,-R,/opt/csw/lib -Wl,-R,/usr/openwin/lib -shared -h	libskeleton.so.0 -o libskeleton.so.0.0.0 SkeletonMainWindow.o loginDialog.o serverDefinitionDialog.o manageServerDefsDialog.o moc_SkeletonMainWindow.o moc_loginDialog.o moc_serverDefinitionDialog.o moc_manageServerDefsDialog.o qrc_skeleton.o   -L/opt/csw/gxx/lib -L/opt/csw/lib -L../libqtwolfclient -lqtwolfclient -lQtGui -L/opt/csw/lib -L/opt/csw/gxx/lib -L/usr/openwin/lib -lQtNetwork -lresolv -lsocket -lxnet -lnsl -lQtCore -lfontconfig -lpthread -lrt  
+ln -s libskeleton.so.0.0.0 libskeleton.so
+ln -s libskeleton.so.0.0.0 libskeleton.so.0
+ln -s libskeleton.so.0.0.0 libskeleton.so.0.0
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/skeleton'
+cd example/ && gmake -f Makefile 
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/example'
+/opt/csw/bin/uic MainWindow.ui -o ui_MainWindow.h
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../skeleton -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o main.o main.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../skeleton -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o MainWindow.o MainWindow.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../skeleton -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include MainWindow.hpp -o moc_MainWindow.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../skeleton -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o moc_MainWindow.o moc_MainWindow.cpp
+/opt/csw/bin/rcc -name example example.qrc -o qrc_example.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../skeleton -I../libqtwolfclient -I. -I. -I/opt/csw/gxx/include -o qrc_example.o qrc_example.cpp
+g++ -Wl,-R,/usr/openwin/lib -o example main.o MainWindow.o moc_MainWindow.o qrc_example.o    -L/opt/csw/gxx/lib -L/opt/csw/lib -L../libqtwolfclient -lqtwolfclient -L../skeleton -lskeleton -lQtGui -L/opt/csw/lib -L/opt/csw/gxx/lib -L/usr/openwin/lib -lQtNetwork -lresolv -lsocket -lxnet -lnsl -lQtCore -lfontconfig -lpthread -lrt 
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/example'
+cd plugins/ && gmake -f Makefile 
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins'
+cd filechooser/ && gmake -f Makefile 
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/filechooser'
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I/opt/csw/gxx/include -o FileChooserPlugin.o FileChooserPlugin.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I/opt/csw/gxx/include -o FileChooser.o FileChooser.cpp
+/opt/csw/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I/opt/csw/gxx/include FileChooserPlugin.hpp -o moc_FileChooserPlugin.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I/opt/csw/gxx/include -o moc_FileChooserPlugin.o moc_FileChooserPlugin.cpp
+/opt/csw/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I/opt/csw/gxx/include FileChooser.hpp -o moc_FileChooser.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I/opt/csw/gxx/include -o moc_FileChooser.o moc_FileChooser.cpp
+rm -f libfilechooser.so
+g++ -shared -o libfilechooser.so FileChooserPlugin.o FileChooser.o moc_FileChooserPlugin.o moc_FileChooser.o   -L/opt/csw/gxx/lib -L/opt/csw/lib -lQtXml -L/opt/csw/lib -L/opt/csw/gxx/lib -lQtGui -L/usr/openwin/lib -lQtCore -lfontconfig -lQtDesigner -lpthread -lrt  
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/filechooser'
+cd picturechooser/ && gmake -f Makefile 
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser'
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../filechooser -I. -I/opt/csw/gxx/include -o PictureChooserPlugin.o PictureChooserPlugin.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../filechooser -I. -I/opt/csw/gxx/include -o PictureChooser.o PictureChooser.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../filechooser -I. -I/opt/csw/gxx/include -o FileChooser.o ../filechooser/FileChooser.cpp
+/opt/csw/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../filechooser -I. -I/opt/csw/gxx/include PictureChooserPlugin.hpp -o moc_PictureChooserPlugin.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../filechooser -I. -I/opt/csw/gxx/include -o moc_PictureChooserPlugin.o moc_PictureChooserPlugin.cpp
+/opt/csw/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../filechooser -I. -I/opt/csw/gxx/include PictureChooser.hpp -o moc_PictureChooser.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../filechooser -I. -I/opt/csw/gxx/include -o moc_PictureChooser.o moc_PictureChooser.cpp
+/opt/csw/bin/moc -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../filechooser -I. -I/opt/csw/gxx/include ../filechooser/FileChooser.hpp -o moc_FileChooser.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../filechooser -I. -I/opt/csw/gxx/include -o moc_FileChooser.o moc_FileChooser.cpp
+rm -f libpicturechooser.so
+g++ -Wl,-R,/opt/csw/lib/qt4/plugins/designer -shared -o libpicturechooser.so PictureChooserPlugin.o PictureChooser.o FileChooser.o moc_PictureChooserPlugin.o moc_PictureChooser.o moc_FileChooser.o   -L/opt/csw/gxx/lib -L/opt/csw/lib -lQtXml -L/opt/csw/lib -L/opt/csw/gxx/lib -lQtGui -L/usr/openwin/lib -lQtCore -lfontconfig -lQtDesigner -lpthread -lrt  
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser'
+cd formtest/ && gmake -f Makefile 
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/formtest'
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../../wolfclient -I../../libqtwolfclient -I. -I/opt/csw/gxx/include -o FormTestPlugin.o FormTestPlugin.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../../wolfclient -I../../libqtwolfclient -I. -I/opt/csw/gxx/include FormTestPlugin.hpp -o moc_FormTestPlugin.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../../wolfclient -I../../libqtwolfclient -I. -I/opt/csw/gxx/include -o moc_FormTestPlugin.o moc_FormTestPlugin.cpp
+rm -f libformtest.so
+g++ -shared -o libformtest.so FormTestPlugin.o moc_FormTestPlugin.o   -L/opt/csw/gxx/lib -L/opt/csw/lib -L../../libqtwolfclient -lqtwolfclient -lQtXml -L/opt/csw/lib -L/opt/csw/gxx/lib -lQtGui -L/usr/openwin/lib -lQtNetwork -lresolv -lsocket -lxnet -lnsl -lQtCore -lfontconfig -lQtDesigner -lpthread -lrt  
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/formtest'
+cd wolfdesigner/ && gmake -f Makefile 
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner'
+/opt/csw/bin/uic WolfDesignerDialog.ui -o ui_WolfDesignerDialog.h
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include -o WolfDesignerPlugin.o WolfDesignerPlugin.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include -o WolfDesignerMenu.o WolfDesignerMenu.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include -o WolfDesignerDialog.o WolfDesignerDialog.cpp
+/opt/csw/bin/moc -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include WolfDesignerPlugin.hpp -o moc_WolfDesignerPlugin.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include -o moc_WolfDesignerPlugin.o moc_WolfDesignerPlugin.cpp
+/opt/csw/bin/moc -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include WolfDesignerMenu.hpp -o moc_WolfDesignerMenu.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include -o moc_WolfDesignerMenu.o moc_WolfDesignerMenu.cpp
+/opt/csw/bin/moc -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include WolfDesignerDialog.hpp -o moc_WolfDesignerDialog.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include -o moc_WolfDesignerDialog.o moc_WolfDesignerDialog.cpp
+/opt/csw/bin/moc -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include WolfDesigner.hpp -o moc_WolfDesigner.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I. -I. -I/opt/csw/gxx/include -o moc_WolfDesigner.o moc_WolfDesigner.cpp
+rm -f libwolfdesigner.so
+g++ -shared -o libwolfdesigner.so WolfDesignerPlugin.o WolfDesignerMenu.o WolfDesignerDialog.o moc_WolfDesignerPlugin.o moc_WolfDesignerMenu.o moc_WolfDesignerDialog.o moc_WolfDesigner.o   -L/opt/csw/gxx/lib -L/opt/csw/lib -lQtXml -L/opt/csw/lib -L/opt/csw/gxx/lib -lQtGui -L/usr/openwin/lib -lQtCore -lfontconfig -lQtDesigner -lpthread -lrt  
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner'
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins'
+cd wolfclient/ && gmake -f Makefile 
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/wolfclient'
+/opt/csw/bin/lrelease i18n/wolfclient.de_CH.ts -qm i18n/wolfclient.de_CH.qm
+Updating 'i18n/wolfclient.de_CH.qm'...
+    Generated 7 translation(s) (0 finished and 7 unfinished)
+    Ignored 110 untranslated source text(s)
+/opt/csw/bin/lrelease i18n/wolfclient.ro_RO.ts -qm i18n/wolfclient.ro_RO.qm
+Updating 'i18n/wolfclient.ro_RO.qm'...
+    Generated 86 translation(s) (84 finished and 2 unfinished)
+    Ignored 31 untranslated source text(s)
+/opt/csw/bin/uic MainWindow.ui -o ui_MainWindow.h
+/opt/csw/bin/uic PreferencesDialog.ui -o ui_PreferencesDialog.h
+/opt/csw/bin/uic PreferencesDialogDeveloper.ui -o ui_PreferencesDialogDeveloper.h
+/opt/csw/bin/uic PreferencesDialogInterface.ui -o ui_PreferencesDialogInterface.h
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o MainWindow.o MainWindow.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o FormLoader.o FormLoader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o FormUiLoader.o FormUiLoader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o FileFormLoader.o FileFormLoader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o NetworkFormLoader.o NetworkFormLoader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataLoader.o DataLoader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o FileDataLoader.o FileDataLoader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o NetworkDataLoader.o NetworkDataLoader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetTree.o WidgetTree.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetId.o WidgetId.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetRequestHeader.o WidgetRequestHeader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor.o WidgetVisitor.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetDataSignal.o WidgetDataSignal.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetEnabler.o WidgetEnabler.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetListener.o WidgetListener.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetRequest.o WidgetRequest.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetMessageDispatcher.o WidgetMessageDispatcher.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetDragAndDrop.o WidgetDragAndDrop.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitorStateConstructor.o WidgetVisitorStateConstructor.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DebugLogTree.o debugview/DebugLogTree.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DebugViewWidget.o debugview/DebugViewWidget.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DebugHelpers.o debugview/DebugHelpers.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DebugMessageHandler.o debugview/DebugMessageHandler.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QLabel.o visitors/WidgetVisitor_QLabel.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QComboBox.o visitors/WidgetVisitor_QComboBox.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QCheckBox.o visitors/WidgetVisitor_QCheckBox.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QGroupBox.o visitors/WidgetVisitor_QGroupBox.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QButtonGroup.o visitors/WidgetVisitor_QButtonGroup.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QRadioButton.o visitors/WidgetVisitor_QRadioButton.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QPushButton.o visitors/WidgetVisitor_QPushButton.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QSpinBox.o visitors/WidgetVisitor_QSpinBox.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QDoubleSpinBox.o visitors/WidgetVisitor_QDoubleSpinBox.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QListWidget.o visitors/WidgetVisitor_QListWidget.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QLineEdit.o visitors/WidgetVisitor_QLineEdit.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QTextEdit.o visitors/WidgetVisitor_QTextEdit.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QPlainTextEdit.o visitors/WidgetVisitor_QPlainTextEdit.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QDateEdit.o visitors/WidgetVisitor_QDateEdit.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QTimeEdit.o visitors/WidgetVisitor_QTimeEdit.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QDateTimeEdit.o visitors/WidgetVisitor_QDateTimeEdit.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QTreeWidget.o visitors/WidgetVisitor_QTreeWidget.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QTableWidget.o visitors/WidgetVisitor_QTableWidget.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QSlider.o visitors/WidgetVisitor_QSlider.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_QStackedWidget.o visitors/WidgetVisitor_QStackedWidget.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_FileChooser.o visitors/WidgetVisitor_FileChooser.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o WidgetVisitor_PictureChooser.o visitors/WidgetVisitor_PictureChooser.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataFormatXML.o serialize/DataFormatXML.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataStruct.o serialize/DataStruct.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataStructDescription.o serialize/DataStructDescription.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataStructDescriptionParse.o serialize/DataStructDescriptionParse.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataStructDescriptionMap.o serialize/DataStructDescriptionMap.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataStructSerialize.o serialize/DataStructSerialize.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataStructMap.o serialize/DataStructMap.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataPathTree.o serialize/DataPathTree.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o DataSerializeItem.o serialize/DataSerializeItem.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o ActionResultDefinition.o serialize/ActionResultDefinition.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o ActionDefinition.o serialize/ActionDefinition.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o CondProperties.o serialize/CondProperties.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o FormCall.o FormCall.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o FormWidget.o FormWidget.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o PreferencesDialog.o PreferencesDialog.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o FormChooseDialog.o FormChooseDialog.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o settings.o settings.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o LoadMode.o LoadMode.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o HistoryLineEdit.o HistoryLineEdit.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o wolfclient.o wolfclient.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include debugview/DebugViewWidget.hpp -o moc_DebugViewWidget.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o moc_DebugViewWidget.o moc_DebugViewWidget.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include MainWindow.hpp -o moc_MainWindow.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o moc_MainWindow.o moc_MainWindow.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include FormLoader.hpp -o moc_FormLoader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o moc_FormLoader.o moc_FormLoader.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include DataLoader.hpp -o moc_DataLoader.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o moc_DataLoader.o moc_DataLoader.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include WidgetVisitorObject.hpp -o moc_WidgetVisitorObject.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o moc_WidgetVisitorObject.o moc_WidgetVisitorObject.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include FormWidget.hpp -o moc_FormWidget.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o moc_FormWidget.o moc_FormWidget.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o moc_PreferencesDialog.o moc_PreferencesDialog.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o moc_FormChooseDialog.o moc_FormChooseDialog.cpp
+/opt/csw/bin/moc -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o moc_HistoryLineEdit.o moc_HistoryLineEdit.cpp
+/opt/csw/bin/rcc -name wolfclient wolfclient.qrc -o qrc_wolfclient.cpp
+ccache g++ -c -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtUiTools -I/opt/csw/include/QtDesigner -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include/QtXml -I/opt/csw/include -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -I/opt/csw/gxx/include -o qrc_wolfclient.o qrc_wolfclient.cpp
+g++ -Wl,-R,/opt/csw/lib -Wl,-R,/usr/openwin/lib -o wolfclient MainWindow.o FormLoader.o FormUiLoader.o FileFormLoader.o NetworkFormLoader.o DataLoader.o FileDataLoader.o NetworkDataLoader.o WidgetTree.o WidgetId.o WidgetRequestHeader.o WidgetVisitor.o WidgetDataSignal.o WidgetEnabler.o WidgetListener.o WidgetRequest.o WidgetMessageDispatcher.o WidgetDragAndDrop.o WidgetVisitorStateConstructor.o DebugLogTree.o DebugViewWidget.o DebugHelpers.o DebugMessageHandler.o WidgetVisitor_QLabel.o WidgetVisitor_QComboBox.o WidgetVisitor_QCheckBox.o WidgetVisitor_QGroupBox.o WidgetVisitor_QButtonGroup.o WidgetVisitor_QRadioButton.o WidgetVisitor_QPushButton.o WidgetVisitor_QSpinBox.o WidgetVisitor_QDoubleSpinBox.o WidgetVisitor_QListWidget.o WidgetVisitor_QLineEdit.o WidgetVisitor_QTextEdit.o WidgetVisitor_QPlainTextEdit.o WidgetVisitor_QDateEdit.o WidgetVisitor_QTimeEdit.o WidgetVisitor_QDateTimeEdit.o WidgetVisitor_QTreeWidget.o WidgetVisitor_QTableWidget.o WidgetVisitor_QSlider.o WidgetVisitor_QStackedWidget.o WidgetVisitor_FileChooser.o WidgetVisitor_PictureChooser.o DataFormatXML.o DataStruct.o DataStructDescription.o DataStructDescriptionParse.o DataStructDescriptionMap.o DataStructSerialize.o DataStructMap.o DataPathTree.o DataSerializeItem.o ActionResultDefinition.o ActionDefinition.o CondProperties.o FormCall.o FormWidget.o PreferencesDialog.o FormChooseDialog.o settings.o LoadMode.o HistoryLineEdit.o wolfclient.o moc_DebugViewWidget.o moc_MainWindow.o moc_FormLoader.o moc_DataLoader.o moc_WidgetVisitorObject.o moc_FormWidget.o moc_PreferencesDialog.o moc_FormChooseDialog.o moc_HistoryLineEdit.o qrc_wolfclient.o    -L/opt/csw/gxx/lib -L/opt/csw/lib -L../libqtwolfclient -lqtwolfclient -L../skeleton -lskeleton -L../plugins/filechooser -lfilechooser -L../plugins/picturechooser -lpicturechooser -L/opt/csw/lib -L/opt/csw/gxx/lib -L/usr/openwin/lib -lQtNetwork -lresolv -lsocket -lxnet -lnsl -lQtDesigner -lQtUiTools -lQtXml -lQtGui -lQtCore -lfontconfig -lpthread -lrt 
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/wolfclient'
+cd tests/ && gmake -f Makefile 
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests'
+cd SSLavailable/ && gmake -f Makefile 
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable'
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I. -I/opt/csw/gxx/include -o SSLavailable.o SSLavailable.cpp
+/opt/csw/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I. -I/opt/csw/gxx/include SSLavailable.hpp -o moc_SSLavailable.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I. -I/opt/csw/gxx/include -o moc_SSLavailable.o moc_SSLavailable.cpp
+g++  -o SSLavailable SSLavailable.o moc_SSLavailable.o    -L/opt/csw/gxx/lib -L/opt/csw/lib -lQtTest -L/opt/csw/lib -L/opt/csw/gxx/lib -lQtGui -L/usr/openwin/lib -lQtNetwork -lresolv -lsocket -lxnet -lnsl -lQtCore -lfontconfig -lpthread -lrt 
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable'
+cd datatree/ && gmake -f Makefile 
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/datatree'
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o testDataTree.o testDataTree.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o DebugHelpers.o ../../wolfclient/debugview/DebugHelpers.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o DebugLogTree.o ../../wolfclient/debugview/DebugLogTree.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o DebugMessageHandler.o ../../wolfclient/debugview/DebugMessageHandler.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o DataStructDescription.o ../../wolfclient/serialize/DataStructDescription.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o DataStructDescriptionParse.o ../../wolfclient/serialize/DataStructDescriptionParse.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o DataStruct.o ../../wolfclient/serialize/DataStruct.cpp
+/opt/csw/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include testDataTree.hpp -o moc_testDataTree.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o moc_testDataTree.o moc_testDataTree.cpp
+g++  -o testDataTree testDataTree.o DebugHelpers.o DebugLogTree.o DebugMessageHandler.o DataStructDescription.o DataStructDescriptionParse.o DataStruct.o moc_testDataTree.o    -L/opt/csw/gxx/lib -L/opt/csw/lib -lQtTest -L/opt/csw/lib -L/opt/csw/gxx/lib -lQtGui -L/usr/openwin/lib -lQtCore -lfontconfig -lpthread -lrt 
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/datatree'
+cd skeleton/ && gmake -f Makefile 
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/skeleton'
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../../libqtwolfclient -I../../skeleton -I. -I/opt/csw/gxx/include -o main.o main.cpp
+/opt/csw/bin/rcc -name skeletonTest skeletonTest.qrc -o qrc_skeletonTest.cpp
+RCC: Warning: No resources in 'skeletonTest.qrc'.
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtNetwork -I/opt/csw/include/QtGui -I/opt/csw/include -I../../libqtwolfclient -I../../skeleton -I. -I/opt/csw/gxx/include -o qrc_skeletonTest.o qrc_skeletonTest.cpp
+g++  -o skeletonTest main.o qrc_skeletonTest.o    -L/opt/csw/gxx/lib -L/opt/csw/lib -L../../libqtwolfclient -lqtwolfclient -L../../skeleton -lskeleton -lQtGui -L/opt/csw/lib -L/opt/csw/gxx/lib -L/usr/openwin/lib -lQtNetwork -lresolv -lsocket -lxnet -lnsl -lQtCore -lfontconfig -lpthread -lrt 
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/skeleton'
+cd xml/ && gmake -f Makefile 
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/xml'
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o testXmlSerialization.o testXmlSerialization.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o DebugHelpers.o ../../wolfclient/debugview/DebugHelpers.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o DataFormatXML.o ../../wolfclient/serialize/DataFormatXML.cpp
+/opt/csw/bin/moc -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include testXmlSerialization.hpp -o moc_testXmlSerialization.cpp
+ccache g++ -c -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/opt/csw/share/qt4/mkspecs/solaris-g++ -I. -I/opt/csw/include/QtCore -I/opt/csw/include/QtGui -I/opt/csw/include -I/opt/csw/include/QtTest -I../../wolfclient -I. -I/opt/csw/gxx/include -o moc_testXmlSerialization.o moc_testXmlSerialization.cpp
+g++  -o testXmlSerialization testXmlSerialization.o DebugHelpers.o DataFormatXML.o moc_testXmlSerialization.o    -L/opt/csw/gxx/lib -L/opt/csw/lib -lQtTest -L/opt/csw/lib -L/opt/csw/gxx/lib -lQtGui -L/usr/openwin/lib -lQtCore -lfontconfig -lpthread -lrt 
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/xml'
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests'
+cd libqtwolfclient/ && gmake -f Makefile install
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/libqtwolfclient'
+cp -f "libqtwolfclient.so.0.0.0" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/libqtwolfclient.so.0.0.0"
+ln -f -s "libqtwolfclient.so.0.0.0" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/libqtwolfclient.so"
+ln -f -s "libqtwolfclient.so.0.0.0" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/libqtwolfclient.so.0"
+ln -f -s "libqtwolfclient.so.0.0.0" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/libqtwolfclient.so.0.0"
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/libqtwolfclient'
+cd skeleton/ && gmake -f Makefile install
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/skeleton'
+cp -f "libskeleton.so.0.0.0" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/libskeleton.so.0.0.0"
+ln -f -s "libskeleton.so.0.0.0" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/libskeleton.so"
+ln -f -s "libskeleton.so.0.0.0" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/libskeleton.so.0"
+ln -f -s "libskeleton.so.0.0.0" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/libskeleton.so.0.0"
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/skeleton'
+cd example/ && gmake -f Makefile install
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/example'
+gmake[1]: Nothing to be done for 'install'.
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/example'
+cd plugins/ && gmake -f Makefile install
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins'
+cd filechooser/ && gmake -f Makefile install
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/filechooser'
+cp -f "libfilechooser.so" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/qt4/plugins/designer/libfilechooser.so"
+cp -f /export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/filechooser/libfilechooser.so //solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/filechooser'
+cd picturechooser/ && gmake -f Makefile install
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser'
+cp -f "libpicturechooser.so" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/qt4/plugins/designer/libpicturechooser.so"
+cp -f /export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser/libpicturechooser.so //solarisbuild/PKG/wolfclient-0.0.5/opt/csw/lib/
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/picturechooser'
+cd formtest/ && gmake -f Makefile install
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/formtest'
+gmake[2]: Nothing to be done for 'install'.
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/formtest'
+cd wolfdesigner/ && gmake -f Makefile install
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner'
+gmake[2]: Nothing to be done for 'install'.
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins/wolfdesigner'
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/plugins'
+cd wolfclient/ && gmake -f Makefile install
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/wolfclient'
+g++ -Wl,-R,/opt/csw/lib -Wl,-R,/usr/openwin/lib -o wolfclient MainWindow.o FormLoader.o FormUiLoader.o FileFormLoader.o NetworkFormLoader.o DataLoader.o FileDataLoader.o NetworkDataLoader.o WidgetTree.o WidgetId.o WidgetRequestHeader.o WidgetVisitor.o WidgetDataSignal.o WidgetEnabler.o WidgetListener.o WidgetRequest.o WidgetMessageDispatcher.o WidgetDragAndDrop.o WidgetVisitorStateConstructor.o DebugLogTree.o DebugViewWidget.o DebugHelpers.o DebugMessageHandler.o WidgetVisitor_QLabel.o WidgetVisitor_QComboBox.o WidgetVisitor_QCheckBox.o WidgetVisitor_QGroupBox.o WidgetVisitor_QButtonGroup.o WidgetVisitor_QRadioButton.o WidgetVisitor_QPushButton.o WidgetVisitor_QSpinBox.o WidgetVisitor_QDoubleSpinBox.o WidgetVisitor_QListWidget.o WidgetVisitor_QLineEdit.o WidgetVisitor_QTextEdit.o WidgetVisitor_QPlainTextEdit.o WidgetVisitor_QDateEdit.o WidgetVisitor_QTimeEdit.o WidgetVisitor_QDateTimeEdit.o WidgetVisitor_QTreeWidget.o WidgetVisitor_QTableWidget.o WidgetVisitor_QSlider.o WidgetVisitor_QStackedWidget.o WidgetVisitor_FileChooser.o WidgetVisitor_PictureChooser.o DataFormatXML.o DataStruct.o DataStructDescription.o DataStructDescriptionParse.o DataStructDescriptionMap.o DataStructSerialize.o DataStructMap.o DataPathTree.o DataSerializeItem.o ActionResultDefinition.o ActionDefinition.o CondProperties.o FormCall.o FormWidget.o PreferencesDialog.o FormChooseDialog.o settings.o LoadMode.o HistoryLineEdit.o wolfclient.o moc_DebugViewWidget.o moc_MainWindow.o moc_FormLoader.o moc_DataLoader.o moc_WidgetVisitorObject.o moc_FormWidget.o moc_PreferencesDialog.o moc_FormChooseDialog.o moc_HistoryLineEdit.o qrc_wolfclient.o    -L/opt/csw/gxx/lib -L/opt/csw/lib -L../libqtwolfclient -lqtwolfclient -L../skeleton -lskeleton -L../plugins/filechooser -lfilechooser -L../plugins/picturechooser -lpicturechooser -L/opt/csw/lib -L/opt/csw/gxx/lib -L/usr/openwin/lib -lQtNetwork -lresolv -lsocket -lxnet -lnsl -lQtDesigner -lQtUiTools -lQtXml -lQtGui -lQtCore -lfontconfig -lpthread -lrt 
+cp -f "wolfclient" "//solarisbuild/PKG/wolfclient-0.0.5/opt/csw/bin/wolfclient"
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/wolfclient'
+cd tests/ && gmake -f Makefile install
+gmake[1]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests'
+cd SSLavailable/ && gmake -f Makefile install
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable'
+gmake[2]: Nothing to be done for 'install'.
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/SSLavailable'
+cd datatree/ && gmake -f Makefile install
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/datatree'
+gmake[2]: Nothing to be done for 'install'.
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/datatree'
+cd skeleton/ && gmake -f Makefile install
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/skeleton'
+gmake[2]: Nothing to be done for 'install'.
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/skeleton'
+cd xml/ && gmake -f Makefile install
+gmake[2]: Entering directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/xml'
+gmake[2]: Nothing to be done for 'install'.
+gmake[2]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests/xml'
+gmake[1]: Leaving directory '/export/home/solarisbuild/BUILD/wolfclient-0.0.5/tests'
+## Building pkgmap from package prototype file.
+## Processing pkginfo file.
+## Attempting to volumize 20 entries in pkgmap.
+part  1 -- 6512 blocks, 88 entries
+## Packaging one part.
+/var/spool/pkg/WFRGclient/pkgmap
+/var/spool/pkg/WFRGclient/pkginfo
+/var/spool/pkg/WFRGclient/install/copyright
+/var/spool/pkg/WFRGclient/install/depend
+/var/spool/pkg/WFRGclient/reloc/opt/csw/bin/wolfclient
+/var/spool/pkg/WFRGclient/reloc/opt/csw/lib/libfilechooser.so
+/var/spool/pkg/WFRGclient/reloc/opt/csw/lib/libpicturechooser.so
+/var/spool/pkg/WFRGclient/reloc/opt/csw/lib/libqtwolfclient.so.0.0.0
+/var/spool/pkg/WFRGclient/reloc/opt/csw/lib/libskeleton.so.0.0.0
+/var/spool/pkg/WFRGclient/reloc/opt/csw/lib/qt4/plugins/designer/libfilechooser.so
+/var/spool/pkg/WFRGclient/reloc/opt/csw/lib/qt4/plugins/designer/libpicturechooser.so
+## Validating control scripts.
+## Packaging complete.
+Transferring <WFRGclient> package instance
+Build done.

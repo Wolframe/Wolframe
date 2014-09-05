@@ -1,0 +1,1208 @@
+[    0s] Using BUILD_ROOT=/var/cache/obs/worker/root_8/.mount
+[    0s] Using BUILD_ARCH=x86_64:i686:i586:i486:i386
+[    0s] Doing xen build in /var/cache/obs/worker/root_8/root
+[    0s] 
+[    1s] 
+[    1s] build15 started "build wolfclient.dsc" at Fri Aug 29 11:03:07 UTC 2014.
+[    1s] 
+[    1s] Building wolfclient for project 'home:wolframe_user' repository 'xUbuntu_10.04' arch 'x86_64' srcmd5 '905f5dc6053cda9cbddef446e9230f04'
+[    1s] 
+[    1s] processing recipe /var/cache/obs/worker/root_8/.build-srcdir/wolfclient.dsc ...
+[    1s] running changelog2spec --target debian --file /var/cache/obs/worker/root_8/.build-srcdir/wolfclient.dsc
+[    1s] init_buildsystem --configdir /var/run/obs/worker/8/build/configs --cachedir /var/cache/build --prepare --clean --rpmlist /var/cache/obs/worker/root_8/.build.rpmlist /var/cache/obs/worker/root_8/.build-srcdir/wolfclient.dsc build rpmlint-Factory ...
+[    2s] unpacking preinstall image OBS:PreinstallImages/xUbuntu_10.04/preinstallimage-minimal [06b4bbeccc10e637026226093493d785]
+[    6s] .................
+[    6s] 
+[    6s] copying packages...
+[    9s] reordering...done
+[   12s] ### WATCHDOG MARKER START ###
+[   12s] booting xen...
+[   12s] xm create -c /var/tmp/build.xen.conf-ONAgOJE30 name=build_8 disk=phy:/dev/dm-14,hda1,w disk=phy:/dev/dm-15,hda2,w extra=panic=1 quiet init=/.build/build rd.driver.pre=binfmt_misc elevator=noop console=ttyS0
+[   15s] Using config file "/var/tmp/build.xen.conf-ONAgOJE30".
+[   15s] Started domain build_8 (id=457)
+[   16s] [    0.258390] PCI: Fatal: No config space access function found
+[   16s] [    0.260368] Unable to read sysrq code in control/sysrq
+[   16s] [    0.353170] i8042: No controller found
+[   16s] [    0.354352] /home/abuild/rpmbuild/BUILD/kernel-xen-3.4.6/linux-3.4/drivers/rtc/hctosys.c: unable to open rtc device (rtc0)
+[   16s] doing fast boot
+[   16s] FATAL: Module kqemu not found.
+[   16s] FATAL: Module ext2 not found.
+[   16s] Creating device nodes with udev
+[   17s] Waiting for device /dev/hda1 to appear:  ok
+[   17s] fsck from util-linux 2.21.2
+[   17s] [/sbin/fsck.ext4 (1) -- /] fsck.ext4 -a /dev/hda1 
+[   17s] /dev/hda1: clean, 16628/897600 files, 178315/3584000 blocks
+[   17s] fsck succeeded. Mounting root device read-only.
+[   17s] Mounting root /dev/hda1
+[   17s] mount -o ro,defaults -t ext4 /dev/hda1 /root
+[   17s] udevd[115]: sender uid=-1, message ignored
+[   17s] 
+[   17s] ### WATCHDOG MARKER END ###
+[   17s] 2nd stage started in virtual machine
+[   17s] machine type: x86_64
+[   18s] mkswap: /dev/hda2: warning: don't erase bootbits sectors
+[   18s]         on whole disk. Use -f to force.
+[   18s] Setting up swapspace version 1, size = 2047996 KiB
+[   18s] no label, UUID=e545fe5a-7240-4018-8043-1789f035779c
+[   18s] swapon on /dev/hda2
+[   18s] swapon: /dev/hda2: found swap signature: version 1, page-size 4, same byte order
+[   18s] swapon: /dev/hda2: pagesize=4096, swapsize=2097152000, devsize=2097152000
+[   18s] WARNING: udev not running, creating extra device nodes
+[   18s] mount: none already mounted or //proc busy
+[   18s] mount: according to mtab, proc is already mounted on /proc
+[   18s] mount: none already mounted or //dev/pts busy
+[   18s] mount: according to mtab, devpts is already mounted on /dev/pts
+[   18s] logging output to //.build.log...
+[   18s] processing recipe /.build-srcdir/wolfclient.dsc ...
+[   18s] init_buildsystem --configdir /.build/configs --cachedir /var/cache/build /.build-srcdir/wolfclient.dsc build rpmlint-Factory ...
+[   19s] [1/213] preinstalled adduser
+[   19s] [2/213] preinstalled autoconf
+[   19s] [3/213] preinstalled automake
+[   19s] [4/213] preinstalled autotools-dev
+[   19s] [5/213] preinstalled base-files
+[   19s] [6/213] preinstalled base-passwd
+[   19s] [7/213] preinstalled bash
+[   19s] [8/213] preinstalled binutils
+[   20s] [9/213] preinstalled bison
+[   20s] [10/213] preinstalled bsdmainutils
+[   20s] [11/213] preinstalled bsdutils
+[   20s] [12/213] preinstalled build-essential
+[   20s] [13/213] preinstalled busybox-initramfs
+[   20s] [14/213] preinstalled bzip2
+[   20s] [15/213] preinstalled coreutils
+[   20s] [16/213] preinstalled cpio
+[   20s] [17/213] preinstalled cpp
+[   20s] [18/213] preinstalled cpp-4.4
+[   20s] [19/213] preinstalled cvs
+[   20s] [20/213] preinstalled dash
+[   20s] [21/213] preinstalled debconf
+[   20s] [22/213] preinstalled debconf-i18n
+[   20s] [23/213] preinstalled debianutils
+[   20s] [24/213] preinstalled diffutils
+[   20s] [25/213] preinstalled dpkg
+[   20s] [26/213] preinstalled dpkg-dev
+[   20s] [27/213] preinstalled fakeroot
+[   20s] [28/213] preinstalled file
+[   20s] [29/213] preinstalled findutils
+[   20s] [30/213] preinstalled flex
+[   20s] [31/213] preinstalled g++
+[   20s] [32/213] preinstalled g++-4.4
+[   20s] [33/213] preinstalled gawk
+[   20s] [34/213] preinstalled gcc
+[   20s] [35/213] preinstalled gcc-4.4
+[   20s] [36/213] preinstalled gcc-4.4-base
+[   20s] [37/213] preinstalled gettext
+[   20s] [38/213] preinstalled gettext-base
+[   20s] [39/213] preinstalled grep
+[   20s] [40/213] preinstalled groff-base
+[   20s] [41/213] preinstalled gzip
+[   20s] [42/213] preinstalled hostname
+[   20s] [43/213] installing html2text
+[   20s] Processing triggers for man-db ...
+[   21s] [44/213] preinstalled ifupdown
+[   21s] [45/213] preinstalled info
+[   21s] [46/213] preinstalled initramfs-tools
+[   21s] [47/213] preinstalled initramfs-tools-bin
+[   21s] [48/213] preinstalled initscripts
+[   21s] [49/213] preinstalled insserv
+[   21s] [50/213] preinstalled install-info
+[   21s] [51/213] installing intltool-debian
+[   21s] [52/213] preinstalled klibc-utils
+[   21s] [53/213] preinstalled less
+[   21s] [54/213] preinstalled libacl1
+[   22s] [55/213] installing libasound2
+[   22s] Processing triggers for libc-bin ...
+[   22s] ldconfig deferred processing now taking place
+[   22s] [56/213] preinstalled libattr1
+[   22s] [57/213] preinstalled libblkid1
+[   22s] [58/213] preinstalled libbz2-1.0
+[   22s] [59/213] preinstalled libc-dev-bin
+[   22s] [60/213] preinstalled libc6
+[   22s] [61/213] preinstalled libc6-dev
+[   22s] [62/213] preinstalled libcrack2
+[   22s] [63/213] preinstalled libcroco3
+[   22s] [64/213] preinstalled libdb4.8
+[   22s] [65/213] preinstalled libdbus-1-3
+[   22s] [66/213] preinstalled libdrm-intel1
+[   22s] [67/213] preinstalled libdrm-nouveau1
+[   22s] [68/213] preinstalled libdrm-radeon1
+[   22s] [69/213] preinstalled libdrm2
+[   22s] [70/213] installing libexpat1
+[   22s] Processing triggers for libc-bin ...
+[   22s] ldconfig deferred processing now taking place
+[   22s] [71/213] preinstalled libfile-copy-recursive-perl
+[   22s] [72/213] installing libfreetype6
+[   22s] Processing triggers for libc-bin ...
+[   22s] ldconfig deferred processing now taking place
+[   22s] [73/213] preinstalled libgcc1
+[   22s] [74/213] preinstalled libgdbm3
+[   22s] [75/213] preinstalled libglib2.0-0
+[   22s] [76/213] preinstalled libgmp3c2
+[   22s] [77/213] preinstalled libgomp1
+[   22s] [78/213] preinstalled libgpm2
+[   23s] [79/213] installing libjpeg62
+[   23s] Processing triggers for libc-bin ...
+[   23s] ldconfig deferred processing now taking place
+[   23s] [80/213] preinstalled libklibc
+[   23s] [81/213] installing liblcms1
+[   23s] Processing triggers for libc-bin ...
+[   23s] ldconfig deferred processing now taking place
+[   23s] [82/213] preinstalled liblocale-gettext-perl
+[   23s] [83/213] preinstalled liblzma1
+[   23s] [84/213] preinstalled libmagic1
+[   23s] [85/213] preinstalled libmpfr1ldbl
+[   23s] [86/213] preinstalled libncurses5
+[   23s] [87/213] preinstalled libncursesw5
+[   23s] [88/213] preinstalled libnih-dbus1
+[   23s] [89/213] preinstalled libnih1
+[   23s] [90/213] preinstalled libpam-modules
+[   23s] [91/213] preinstalled libpam-runtime
+[   23s] [92/213] preinstalled libpam0g
+[   23s] [93/213] preinstalled libpcre3
+[   23s] [94/213] preinstalled libplymouth2
+[   23s] [95/213] preinstalled libpng12-0
+[   23s] [96/213] installing libpthread-stubs0
+[   23s] [97/213] preinstalled libpython2.6
+[   24s] [98/213] installing libqtcore4
+[   24s] Processing triggers for libc-bin ...
+[   24s] ldconfig deferred processing now taking place
+[   24s] [99/213] preinstalled libreadline5
+[   24s] [100/213] preinstalled libreadline6
+[   25s] [101/213] preinstalled libselinux1
+[   25s] [102/213] preinstalled libsepol1
+[   25s] [103/213] preinstalled libslang2
+[   25s] [104/213] preinstalled libsqlite3-0
+[   25s] [105/213] preinstalled libssl0.9.8
+[   25s] [106/213] preinstalled libstdc++6
+[   25s] [107/213] preinstalled libstdc++6-4.4-dev
+[   25s] [108/213] preinstalled libtext-charwidth-perl
+[   25s] [109/213] preinstalled libtext-iconv-perl
+[   25s] [110/213] preinstalled libtext-wrapi18n-perl
+[   25s] [111/213] preinstalled libtimedate-perl
+[   25s] [112/213] preinstalled libtool
+[   25s] [113/213] preinstalled libudev0
+[   25s] [114/213] preinstalled libusb-0.1-4
+[   25s] [115/213] preinstalled libuuid1
+[   25s] [116/213] installing libx11-data
+[   26s] [117/213] installing libxau6
+[   26s] Processing triggers for libc-bin ...
+[   26s] ldconfig deferred processing now taking place
+[   26s] [118/213] installing libxdmcp6
+[   26s] Processing triggers for libc-bin ...
+[   26s] ldconfig deferred processing now taking place
+[   26s] [119/213] preinstalled libxml2
+[   26s] [120/213] preinstalled linux-libc-dev
+[   26s] [121/213] preinstalled locales
+[   26s] [122/213] preinstalled login
+[   26s] [123/213] preinstalled lsb-base
+[   26s] [124/213] preinstalled lzma
+[   26s] [125/213] preinstalled m4
+[   26s] [126/213] preinstalled make
+[   26s] [127/213] preinstalled makedev
+[   26s] [128/213] preinstalled man-db
+[   26s] [129/213] preinstalled mime-support
+[   26s] [130/213] preinstalled mktemp
+[   26s] [131/213] preinstalled module-init-tools
+[   26s] [132/213] preinstalled mount
+[   26s] [133/213] preinstalled mountall
+[   26s] [134/213] preinstalled ncurses-base
+[   26s] [135/213] preinstalled ncurses-bin
+[   26s] [136/213] preinstalled net-tools
+[   26s] [137/213] preinstalled netbase
+[   26s] [138/213] preinstalled passwd
+[   26s] [139/213] preinstalled patch
+[   26s] [140/213] preinstalled perl
+[   26s] [141/213] preinstalled perl-base
+[   26s] [142/213] preinstalled perl-modules
+[   26s] [143/213] preinstalled plymouth
+[   26s] [144/213] preinstalled procps
+[   26s] [145/213] preinstalled psmisc
+[   26s] [146/213] preinstalled python2.6
+[   26s] [147/213] preinstalled python2.6-minimal
+[   26s] [148/213] installing qt4-qmake
+[   27s] update-alternatives: using /usr/bin/qmake-qt4 to provide /usr/bin/qmake (qmake) in auto mode.
+[   27s] Processing triggers for man-db ...
+[   28s] [149/213] preinstalled readline-common
+[   28s] [150/213] preinstalled sed
+[   28s] [151/213] preinstalled sensible-utils
+[   28s] [152/213] preinstalled strace
+[   28s] [153/213] preinstalled sysv-rc
+[   28s] [154/213] preinstalled sysvinit-utils
+[   28s] [155/213] preinstalled tar
+[   28s] [156/213] preinstalled texinfo
+[   28s] [157/213] installing ttf-dejavu-core
+[   28s] [158/213] preinstalled tzdata
+[   28s] [159/213] installing ucf
+[   28s] Moving old data out of the way
+[   28s] Processing triggers for man-db ...
+[   29s] [160/213] preinstalled udev
+[   29s] [161/213] preinstalled unzip
+[   29s] [162/213] preinstalled update-inetd
+[   29s] [163/213] preinstalled upstart
+[   29s] [164/213] preinstalled util-linux
+[   29s] [165/213] preinstalled vim
+[   29s] [166/213] preinstalled vim-common
+[   29s] [167/213] preinstalled vim-runtime
+[   29s] [168/213] installing x11-common
+[   30s]  * Setting up X server socket directory /tmp/.X11-unix...
+[   30s]    ...done.
+[   30s]  * Setting up ICE socket directory /tmp/.ICE-unix...
+[   30s]    ...done.
+[   30s] Processing triggers for man-db ...
+[   30s] [169/213] installing x11proto-core-dev
+[   31s] [170/213] installing x11proto-kb-dev
+[   31s] [171/213] preinstalled xz-utils
+[   31s] [172/213] preinstalled zlib1g
+[   31s] [173/213] preinstalled libc-bin
+[   31s] [174/213] installing libice6
+[   31s] Processing triggers for libc-bin ...
+[   31s] ldconfig deferred processing now taking place
+[   31s] [175/213] installing libpthread-stubs0-dev
+[   32s] [176/213] installing libqt4-network
+[   32s] Processing triggers for libc-bin ...
+[   32s] ldconfig deferred processing now taking place
+[   32s] [177/213] installing libqt4-sql
+[   32s] Processing triggers for libc-bin ...
+[   32s] ldconfig deferred processing now taking place
+[   32s] [178/213] installing libqt4-test
+[   32s] Processing triggers for libc-bin ...
+[   32s] ldconfig deferred processing now taking place
+[   33s] [179/213] installing libqt4-xml
+[   33s] Processing triggers for libc-bin ...
+[   33s] ldconfig deferred processing now taking place
+[   33s] [180/213] installing libtiff4
+[   33s] Processing triggers for libc-bin ...
+[   33s] ldconfig deferred processing now taking place
+[   33s] [181/213] installing po-debconf
+[   33s] Processing triggers for man-db ...
+[   34s] [182/213] installing x11proto-input-dev
+[   34s] [183/213] installing xtrans-dev
+[   35s] [184/213] installing fontconfig-config
+[   35s] Processing triggers for man-db ...
+[   36s] [185/213] installing libmng1
+[   36s] Processing triggers for libc-bin ...
+[   36s] ldconfig deferred processing now taking place
+[   36s] [186/213] installing libxcb1
+[   36s] Processing triggers for libc-bin ...
+[   36s] ldconfig deferred processing now taking place
+[   36s] [187/213] installing libxdmcp-dev
+[   36s] [188/213] installing libxau-dev
+[   37s] Processing triggers for man-db ...
+[   37s] [189/213] installing libsm6
+[   37s] Processing triggers for libc-bin ...
+[   37s] ldconfig deferred processing now taking place
+[   37s] [190/213] installing debhelper
+[   38s] Processing triggers for man-db ...
+[   39s] [191/213] installing libqt4-assistant
+[   39s] Processing triggers for libc-bin ...
+[   39s] ldconfig deferred processing now taking place
+[   39s] [192/213] installing libqt4-dbus
+[   39s] Processing triggers for libc-bin ...
+[   39s] ldconfig deferred processing now taking place
+[   40s] [193/213] installing libqt4-xmlpatterns
+[   40s] Processing triggers for libc-bin ...
+[   40s] ldconfig deferred processing now taking place
+[   40s] [194/213] installing libx11-6
+[   40s] Processing triggers for libc-bin ...
+[   40s] ldconfig deferred processing now taking place
+[   40s] [195/213] installing libfontconfig1
+[   41s] Processing triggers for libc-bin ...
+[   41s] ldconfig deferred processing now taking place
+[   41s] [196/213] installing libxcb1-dev
+[   41s] [197/213] installing libxext6
+[   41s] Processing triggers for libc-bin ...
+[   41s] ldconfig deferred processing now taking place
+[   41s] [198/213] installing libxrender1
+[   41s] Processing triggers for libc-bin ...
+[   41s] ldconfig deferred processing now taking place
+[   42s] [199/213] installing libqt4-script
+[   42s] Processing triggers for libc-bin ...
+[   42s] ldconfig deferred processing now taking place
+[   42s] [200/213] installing libxt6
+[   42s] Processing triggers for libc-bin ...
+[   42s] ldconfig deferred processing now taking place
+[   42s] [201/213] installing fontconfig
+[   43s] Cleaning up old fontconfig caches... done.
+[   45s] Regenerating fonts cache... done.
+[   45s] Processing triggers for man-db ...
+[   45s] [202/213] installing libx11-dev
+[   46s] Processing triggers for man-db ...
+[   48s] [203/213] installing libaudio2
+[   49s] Processing triggers for libc-bin ...
+[   49s] ldconfig deferred processing now taking place
+[   49s] [204/213] installing libqtgui4
+[   49s] Processing triggers for libc-bin ...
+[   49s] ldconfig deferred processing now taking place
+[   50s] [205/213] installing libqt4-svg
+[   50s] Processing triggers for libc-bin ...
+[   50s] ldconfig deferred processing now taking place
+[   50s] [206/213] installing libqt4-multimedia
+[   50s] Processing triggers for libc-bin ...
+[   50s] ldconfig deferred processing now taking place
+[   50s] [207/213] installing libqt4-scripttools
+[   50s] Processing triggers for libc-bin ...
+[   50s] ldconfig deferred processing now taking place
+[   51s] [208/213] installing libqt4-designer
+[   51s] Processing triggers for libc-bin ...
+[   51s] ldconfig deferred processing now taking place
+[   52s] [209/213] installing libqt4-help
+[   52s] Processing triggers for libc-bin ...
+[   52s] ldconfig deferred processing now taking place
+[   52s] [210/213] installing libphonon4
+[   52s] Processing triggers for libc-bin ...
+[   52s] ldconfig deferred processing now taking place
+[   52s] [211/213] installing libqt4-qt3support
+[   53s] Processing triggers for libc-bin ...
+[   53s] ldconfig deferred processing now taking place
+[   53s] [212/213] installing libqt4-webkit
+[   54s] Processing triggers for libc-bin ...
+[   54s] ldconfig deferred processing now taking place
+[   54s] [213/213] installing libqt4-dev
+[   57s] update-alternatives: using /usr/bin/moc-qt4 to provide /usr/bin/moc (moc) in auto mode.
+[   58s] update-alternatives: using /usr/bin/uic-qt4 to provide /usr/bin/uic (uic) in auto mode.
+[   58s] update-alternatives: using /usr/bin/lupdate-qt4 to provide /usr/bin/lupdate (lupdate) in auto mode.
+[   58s] update-alternatives: using /usr/bin/lrelease-qt4 to provide /usr/bin/lrelease (lrelease) in auto mode.
+[   58s] Processing triggers for man-db ...
+[   58s] configuring all installed packages...
+[   58s] removing nis flags from //etc/nsswitch.conf...
+[   58s] now finalizing build dir...
+[   58s] SIOCSIFADDR: File exists
+[   59s] dpkg-source: warning: extracting unsigned source package (/usr/src/packages/SOURCES/wolfclient.dsc)
+[   59s] dpkg-source: info: extracting wolfclient in /usr/src/packages/BUILD
+[   59s] dpkg-source: info: unpacking wolfclient_0.0.5.orig.tar.gz
+[   59s] dpkg-source: info: unpacking wolfclient_0.0.5.debian.tar.gz
+[   59s] -----------------------------------------------------------------
+[   59s] ----- building wolfclient.dsc (user abuild)
+[   59s] -----------------------------------------------------------------
+[   59s] -----------------------------------------------------------------
+[   59s] dpkg-buildpackage: set CFLAGS to default value: -g -O2
+[   59s] dpkg-buildpackage: set CPPFLAGS to default value: 
+[   59s] dpkg-buildpackage: set LDFLAGS to default value: -Wl,-Bsymbolic-functions
+[   59s] dpkg-buildpackage: set FFLAGS to default value: -g -O2
+[   59s] dpkg-buildpackage: set CXXFLAGS to default value: -g -O2
+[   59s] dpkg-buildpackage: source package wolfclient
+[   59s] dpkg-buildpackage: source version 0.0.5-1676
+[   59s] dpkg-buildpackage: source changed by Andreas Baumann <abaumann@yahoo.com>
+[   59s] dpkg-buildpackage: host architecture amd64
+[   60s]  fakeroot-tcp debian/rules clean
+[   60s] dh_testdir
+[   60s] dh_testroot
+[   60s] rm -f build-stamp
+[   60s] # Add here commands to clean up after the build process.
+[   60s] /usr/bin/make distclean || true
+[   60s] make[1]: Entering directory `/usr/src/packages/BUILD'
+[   60s] make[1]: *** No rule to make target `distclean'.  Stop.
+[   60s] make[1]: Leaving directory `/usr/src/packages/BUILD'
+[   60s] # --- end custom part for cleaning up
+[   60s] dh_clean
+[   60s] dh_clean: Compatibility levels before 5 are deprecated.
+[   60s] 	rm -f debian/wolfclient.substvars
+[   60s] 	rm -f debian/wolfclient.*.debhelper
+[   60s] 	rm -f debian/wolfclient.debhelper.log
+[   60s] 	rm -rf debian/wolfclient/
+[   60s] 	rm -f debian/wolfclient-dev.substvars
+[   60s] 	rm -f debian/wolfclient-dev.*.debhelper
+[   60s] 	rm -f debian/wolfclient-dev.debhelper.log
+[   60s] 	rm -rf debian/wolfclient-dev/
+[   60s] 	rm -f debian/files
+[   60s] 	find .  \( \( -type f -a \
+[   60s] 	        \( -name '#*#' -o -name '.*~' -o -name '*~' -o -name DEADJOE \
+[   60s] 		 -o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \
+[   60s] 		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \
+[   60s] 		 -o -name TAGS -o \( -path '*/.deps/*' -a -name '*.P' \) \
+[   60s] 		\) -exec rm -f {} \; \) -o \
+[   60s] 		\( -type d -a -name autom4te.cache -prune -exec rm -rf {} \; \) \)
+[   60s]  dpkg-source -b BUILD
+[   60s] dpkg-source: info: using source format `3.0 (quilt)'
+[   60s] dpkg-source: info: building wolfclient using existing ./wolfclient_0.0.5.orig.tar.gz
+[   61s] dpkg-source: info: building wolfclient in wolfclient_0.0.5-1676.debian.tar.gz
+[   61s] dpkg-source: info: building wolfclient in wolfclient_0.0.5-1676.dsc
+[   61s]  debian/rules build
+[   61s] DEB_HOST_MULTIARCH is not a supported variable name at /usr/bin/dpkg-architecture line 214.
+[   61s] DEB_HOST_MULTIARCH is not a supported variable name at /usr/bin/dpkg-architecture line 214.
+[   61s] dh_testdir
+[   61s] # Add here commands to compile the package.
+[   61s] qmake-qt4 wolfclient.pro -config release -recursive PREFIX=/usr LIBDIR=/usr/lib//wolframe
+[   61s] Reading /usr/src/packages/BUILD/libqtwolfclient/libqtwolfclient.pro
+[   61s] Reading /usr/src/packages/BUILD/skeleton/skeleton.pro
+[   61s] Reading /usr/src/packages/BUILD/example/example.pro
+[   61s] Reading /usr/src/packages/BUILD/plugins/plugins.pro
+[   61s]  Reading /usr/src/packages/BUILD/plugins/filechooser/filechooser.pro
+[   61s]  Reading /usr/src/packages/BUILD/plugins/picturechooser/picturechooser.pro
+[   61s]  Reading /usr/src/packages/BUILD/plugins/formtest/formtest.pro
+[   61s]  Reading /usr/src/packages/BUILD/plugins/wolfdesigner/wolfdesigner.pro
+[   61s] Reading /usr/src/packages/BUILD/wolfclient/wolfclient.pro
+[   61s] Reading /usr/src/packages/BUILD/tests/tests.pro
+[   61s]  Reading /usr/src/packages/BUILD/tests/SSLavailable/SSLavailable.pro
+[   61s]  Reading /usr/src/packages/BUILD/tests/datatree/datatree.pro
+[   61s]  Reading /usr/src/packages/BUILD/tests/skeleton/skeleton.pro
+[   61s] RCC: Warning: No resources in 'skeletonTest.qrc'.
+[   61s]  Reading /usr/src/packages/BUILD/tests/xml/xml.pro
+[   61s] /usr/bin/make LIBDIR=/usr/lib//wolframe
+[   61s] make[1]: Entering directory `/usr/src/packages/BUILD'
+[   61s] cd libqtwolfclient/ && /usr/bin/make -f Makefile 
+[   61s] make[2]: Entering directory `/usr/src/packages/BUILD/libqtwolfclient'
+[   61s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I. -o WolframeClient.o WolframeClient.cpp
+[   64s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I. -o WolframeClientProtocolBase.o WolframeClientProtocolBase.cpp
+[   64s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I. -o WolframeClientProtocol.o WolframeClientProtocol.cpp
+[   66s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I. -o serverDefinition.o serverDefinition.cpp
+[   67s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I. -o serverConnection.o serverConnection.cpp
+[   67s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I. WolframeClient.hpp -o moc_WolframeClient.cpp
+[   67s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_EXPORT -DWITH_SSL=1 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I. -o moc_WolframeClient.o moc_WolframeClient.cpp
+[   68s] rm -f libqtwolfclient.so.0.0.0 libqtwolfclient.so libqtwolfclient.so.0 libqtwolfclient.so.0.0
+[   68s] g++ -Wl,-O1 -shared -Wl,-soname,libqtwolfclient.so.0 -o libqtwolfclient.so.0.0.0 WolframeClient.o WolframeClientProtocolBase.o WolframeClientProtocol.o serverDefinition.o serverConnection.o moc_WolframeClient.o   -L/usr/lib -lQtGui -lQtNetwork -lQtCore -lpthread  
+[   68s] ln -s libqtwolfclient.so.0.0.0 libqtwolfclient.so
+[   68s] ln -s libqtwolfclient.so.0.0.0 libqtwolfclient.so.0
+[   68s] ln -s libqtwolfclient.so.0.0.0 libqtwolfclient.so.0.0
+[   68s] make[2]: Leaving directory `/usr/src/packages/BUILD/libqtwolfclient'
+[   68s] cd skeleton/ && /usr/bin/make -f Makefile 
+[   68s] make[2]: Entering directory `/usr/src/packages/BUILD/skeleton'
+[   68s] /usr/bin/uic-qt4 SkeletonMainWindow.ui -o ui_SkeletonMainWindow.h
+[   68s] /usr/bin/uic-qt4 loginDialog.ui -o ui_loginDialog.h
+[   68s] /usr/bin/uic-qt4 serverDefinitionDialog.ui -o ui_serverDefinitionDialog.h
+[   68s] /usr/bin/uic-qt4 manageServerDefsDialog.ui -o ui_manageServerDefsDialog.h
+[   68s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. -o SkeletonMainWindow.o SkeletonMainWindow.cpp
+[   70s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. -o loginDialog.o loginDialog.cpp
+[   72s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. -o serverDefinitionDialog.o serverDefinitionDialog.cpp
+[   74s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. -o manageServerDefsDialog.o manageServerDefsDialog.cpp
+[   77s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. SkeletonMainWindow.hpp -o moc_SkeletonMainWindow.cpp
+[   77s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. -o moc_SkeletonMainWindow.o moc_SkeletonMainWindow.cpp
+[   78s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. loginDialog.hpp -o moc_loginDialog.cpp
+[   78s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. -o moc_loginDialog.o moc_loginDialog.cpp
+[   79s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. serverDefinitionDialog.hpp -o moc_serverDefinitionDialog.cpp
+[   79s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. -o moc_serverDefinitionDialog.o moc_serverDefinitionDialog.cpp
+[   80s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. manageServerDefsDialog.hpp -o moc_manageServerDefsDialog.cpp
+[   80s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. -o moc_manageServerDefsDialog.o moc_manageServerDefsDialog.cpp
+[   81s] /usr/bin/rcc -name skeleton skeleton.qrc -o qrc_skeleton.cpp
+[   81s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_EXPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../libqtwolfclient -I. -I. -o qrc_skeleton.o qrc_skeleton.cpp
+[   81s] rm -f libskeleton.so.0.0.0 libskeleton.so libskeleton.so.0 libskeleton.so.0.0
+[   81s] g++ -Wl,-rpath,/usr/lib//wolframe -Wl,-O1 -Wl,-rpath,/usr/X11R6/lib -shared -Wl,-soname,libskeleton.so.0 -o libskeleton.so.0.0.0 SkeletonMainWindow.o loginDialog.o serverDefinitionDialog.o manageServerDefsDialog.o moc_SkeletonMainWindow.o moc_loginDialog.o moc_serverDefinitionDialog.o moc_manageServerDefsDialog.o qrc_skeleton.o   -L/usr/lib -L../libqtwolfclient -lqtwolfclient -lQtGui -lQtNetwork -lQtCore -lpthread  
+[   81s] ln -s libskeleton.so.0.0.0 libskeleton.so
+[   81s] ln -s libskeleton.so.0.0.0 libskeleton.so.0
+[   81s] ln -s libskeleton.so.0.0.0 libskeleton.so.0.0
+[   81s] make[2]: Leaving directory `/usr/src/packages/BUILD/skeleton'
+[   81s] cd example/ && /usr/bin/make -f Makefile 
+[   81s] make[2]: Entering directory `/usr/src/packages/BUILD/example'
+[   81s] /usr/bin/uic-qt4 MainWindow.ui -o ui_MainWindow.h
+[   81s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../skeleton -I../libqtwolfclient -I. -I. -o main.o main.cpp
+[   82s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../skeleton -I../libqtwolfclient -I. -I. -o MainWindow.o MainWindow.cpp
+[   85s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../skeleton -I../libqtwolfclient -I. -I. MainWindow.hpp -o moc_MainWindow.cpp
+[   85s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../skeleton -I../libqtwolfclient -I. -I. -o moc_MainWindow.o moc_MainWindow.cpp
+[   86s] /usr/bin/rcc -name example example.qrc -o qrc_example.cpp
+[   86s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4 -I../skeleton -I../libqtwolfclient -I. -I. -o qrc_example.o qrc_example.cpp
+[   86s] g++ -Wl,-O1 -Wl,-rpath,/usr/X11R6/lib -o example main.o MainWindow.o moc_MainWindow.o qrc_example.o    -L/usr/lib -L../libqtwolfclient -lqtwolfclient -L../skeleton -lskeleton -lQtGui -lQtNetwork -lQtCore -lpthread 
+[   86s] make[2]: Leaving directory `/usr/src/packages/BUILD/example'
+[   86s] cd plugins/ && /usr/bin/make -f Makefile 
+[   86s] make[2]: Entering directory `/usr/src/packages/BUILD/plugins'
+[   86s] cd filechooser/ && /usr/bin/make -f Makefile 
+[   86s] make[3]: Entering directory `/usr/src/packages/BUILD/plugins/filechooser'
+[   86s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -o FileChooserPlugin.o FileChooserPlugin.cpp
+[   87s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -o FileChooser.o FileChooser.cpp
+[   88s] /usr/bin/moc-qt4 -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. FileChooserPlugin.hpp -o moc_FileChooserPlugin.cpp
+[   89s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -o moc_FileChooserPlugin.o moc_FileChooserPlugin.cpp
+[   89s] /usr/bin/moc-qt4 -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. FileChooser.hpp -o moc_FileChooser.cpp
+[   89s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -o moc_FileChooser.o moc_FileChooser.cpp
+[   90s] rm -f libfilechooser.so
+[   90s] g++ -Wl,-O1 -shared -o libfilechooser.so FileChooserPlugin.o FileChooser.o moc_FileChooserPlugin.o moc_FileChooser.o   -L/usr/lib -lQtScript -lQtXml -lQtGui -lQtCore -lQtDesigner -lpthread  
+[   91s] make[3]: Leaving directory `/usr/src/packages/BUILD/plugins/filechooser'
+[   91s] cd picturechooser/ && /usr/bin/make -f Makefile 
+[   91s] make[3]: Entering directory `/usr/src/packages/BUILD/plugins/picturechooser'
+[   91s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../filechooser -I. -o PictureChooserPlugin.o PictureChooserPlugin.cpp
+[   92s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../filechooser -I. -o PictureChooser.o PictureChooser.cpp
+[   93s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../filechooser -I. -o FileChooser.o ../filechooser/FileChooser.cpp
+[   94s] /usr/bin/moc-qt4 -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../filechooser -I. PictureChooserPlugin.hpp -o moc_PictureChooserPlugin.cpp
+[   94s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../filechooser -I. -o moc_PictureChooserPlugin.o moc_PictureChooserPlugin.cpp
+[   95s] /usr/bin/moc-qt4 -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../filechooser -I. PictureChooser.hpp -o moc_PictureChooser.cpp
+[   95s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../filechooser -I. -o moc_PictureChooser.o moc_PictureChooser.cpp
+[   96s] /usr/bin/moc-qt4 -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../filechooser -I. ../filechooser/FileChooser.hpp -o moc_FileChooser.cpp
+[   96s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../filechooser -I. -o moc_FileChooser.o moc_FileChooser.cpp
+[   97s] rm -f libpicturechooser.so
+[   97s] g++ -Wl,-rpath,/usr/lib/qt4/plugins/designer -Wl,-O1 -shared -o libpicturechooser.so PictureChooserPlugin.o PictureChooser.o FileChooser.o moc_PictureChooserPlugin.o moc_PictureChooser.o moc_FileChooser.o   -L/usr/lib -lQtScript -lQtXml -lQtGui -lQtCore -lQtDesigner -lpthread  
+[   98s] make[3]: Leaving directory `/usr/src/packages/BUILD/plugins/picturechooser'
+[   98s] cd formtest/ && /usr/bin/make -f Makefile 
+[   98s] make[3]: Entering directory `/usr/src/packages/BUILD/plugins/formtest'
+[   98s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../../wolfclient -I../../libqtwolfclient -I. -o FormTestPlugin.o FormTestPlugin.cpp
+[   99s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../../wolfclient -I../../libqtwolfclient -I. FormTestPlugin.hpp -o moc_FormTestPlugin.cpp
+[   99s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_EXPORT -DBUILD_AS_PLUGIN -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I../../wolfclient -I../../libqtwolfclient -I. -o moc_FormTestPlugin.o moc_FormTestPlugin.cpp
+[  100s] rm -f libformtest.so
+[  100s] g++ -Wl,-O1 -shared -o libformtest.so FormTestPlugin.o moc_FormTestPlugin.o   -L/usr/lib -L../../libqtwolfclient -lqtwolfclient -lQtScript -lQtXml -lQtGui -lQtNetwork -lQtCore -lQtDesigner -lpthread  
+[  100s] make[3]: Leaving directory `/usr/src/packages/BUILD/plugins/formtest'
+[  100s] cd wolfdesigner/ && /usr/bin/make -f Makefile 
+[  100s] make[3]: Entering directory `/usr/src/packages/BUILD/plugins/wolfdesigner'
+[  100s] /usr/bin/uic-qt4 WolfDesignerDialog.ui -o ui_WolfDesignerDialog.h
+[  100s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. -o WolfDesignerPlugin.o WolfDesignerPlugin.cpp
+[  101s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. -o WolfDesignerMenu.o WolfDesignerMenu.cpp
+[  103s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. -o WolfDesignerDialog.o WolfDesignerDialog.cpp
+[  104s] /usr/bin/moc-qt4 -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. WolfDesignerPlugin.hpp -o moc_WolfDesignerPlugin.cpp
+[  104s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. -o moc_WolfDesignerPlugin.o moc_WolfDesignerPlugin.cpp
+[  105s] /usr/bin/moc-qt4 -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. WolfDesignerMenu.hpp -o moc_WolfDesignerMenu.cpp
+[  105s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. -o moc_WolfDesignerMenu.o moc_WolfDesignerMenu.cpp
+[  106s] /usr/bin/moc-qt4 -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. WolfDesignerDialog.hpp -o moc_WolfDesignerDialog.cpp
+[  106s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. -o moc_WolfDesignerDialog.o moc_WolfDesignerDialog.cpp
+[  107s] /usr/bin/moc-qt4 -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. WolfDesigner.hpp -o moc_WolfDesigner.cpp
+[  107s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -fPIC -DQT_NO_DEBUG -DQT_PLUGIN -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQDESIGNER_EXPORT_WIDGETS -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtDesigner -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4/QtXml -I/usr/include/qt4/QtScript -I/usr/include/qt4 -I. -I. -o moc_WolfDesigner.o moc_WolfDesigner.cpp
+[  108s] rm -f libwolfdesigner.so
+[  108s] g++ -Wl,-O1 -shared -o libwolfdesigner.so WolfDesignerPlugin.o WolfDesignerMenu.o WolfDesignerDialog.o moc_WolfDesignerPlugin.o moc_WolfDesignerMenu.o moc_WolfDesignerDialog.o moc_WolfDesigner.o   -L/usr/lib -lQtScript -lQtXml -lQtGui -lQtCore -lQtDesigner -lpthread  
+[  108s] make[3]: Leaving directory `/usr/src/packages/BUILD/plugins/wolfdesigner'
+[  108s] make[2]: Leaving directory `/usr/src/packages/BUILD/plugins'
+[  108s] cd wolfclient/ && /usr/bin/make -f Makefile 
+[  108s] make[2]: Entering directory `/usr/src/packages/BUILD/wolfclient'
+[  108s] /usr/bin/lrelease i18n/wolfclient.de_CH.ts -qm i18n/wolfclient.de_CH.qm
+[  108s] Updating 'i18n/wolfclient.de_CH.qm'...
+[  108s]     Generated 7 translation(s) (0 finished and 7 unfinished)
+[  108s] 
+[  108s]     Ignored 110 untranslated source text(s)
+[  108s] /usr/bin/lrelease i18n/wolfclient.ro_RO.ts -qm i18n/wolfclient.ro_RO.qm
+[  108s] Updating 'i18n/wolfclient.ro_RO.qm'...
+[  108s]     Generated 86 translation(s) (84 finished and 2 unfinished)
+[  108s] 
+[  108s]     Ignored 31 untranslated source text(s)
+[  108s] /usr/bin/uic-qt4 MainWindow.ui -o ui_MainWindow.h
+[  108s] /usr/bin/uic-qt4 PreferencesDialog.ui -o ui_PreferencesDialog.h
+[  108s] /usr/bin/uic-qt4 PreferencesDialogDeveloper.ui -o ui_PreferencesDialogDeveloper.h
+[  108s] /usr/bin/uic-qt4 PreferencesDialogInterface.ui -o ui_PreferencesDialogInterface.h
+[  108s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o MainWindow.o MainWindow.cpp
+[  116s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormLoader.o FormLoader.cpp
+[  116s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormUiLoader.o FormUiLoader.cpp
+[  118s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FileFormLoader.o FileFormLoader.cpp
+[  120s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o NetworkFormLoader.o NetworkFormLoader.cpp
+[  121s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataLoader.o DataLoader.cpp
+[  121s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FileDataLoader.o FileDataLoader.cpp
+[  122s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o NetworkDataLoader.o NetworkDataLoader.cpp
+[  123s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetTree.o WidgetTree.cpp
+[  128s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetId.o WidgetId.cpp
+[  129s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetRequestHeader.o WidgetRequestHeader.cpp
+[  130s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor.o WidgetVisitor.cpp
+[  135s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetDataSignal.o WidgetDataSignal.cpp
+[  137s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetEnabler.o WidgetEnabler.cpp
+[  139s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetListener.o WidgetListener.cpp
+[  142s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetRequest.o WidgetRequest.cpp
+[  145s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetMessageDispatcher.o WidgetMessageDispatcher.cpp
+[  146s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetDragAndDrop.o WidgetDragAndDrop.cpp
+[  149s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitorStateConstructor.o WidgetVisitorStateConstructor.cpp
+[  151s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DebugLogTree.o debugview/DebugLogTree.cpp
+[  153s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DebugViewWidget.o debugview/DebugViewWidget.cpp
+[  155s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DebugHelpers.o debugview/DebugHelpers.cpp
+[  156s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DebugMessageHandler.o debugview/DebugMessageHandler.cpp
+[  157s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QLabel.o visitors/WidgetVisitor_QLabel.cpp
+[  158s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QComboBox.o visitors/WidgetVisitor_QComboBox.cpp
+[  159s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QCheckBox.o visitors/WidgetVisitor_QCheckBox.cpp
+[  161s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QGroupBox.o visitors/WidgetVisitor_QGroupBox.cpp
+[  162s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QButtonGroup.o visitors/WidgetVisitor_QButtonGroup.cpp
+[  164s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QRadioButton.o visitors/WidgetVisitor_QRadioButton.cpp
+[  165s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QPushButton.o visitors/WidgetVisitor_QPushButton.cpp
+[  166s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QSpinBox.o visitors/WidgetVisitor_QSpinBox.cpp
+[  167s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QDoubleSpinBox.o visitors/WidgetVisitor_QDoubleSpinBox.cpp
+[  168s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QListWidget.o visitors/WidgetVisitor_QListWidget.cpp
+[  170s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QLineEdit.o visitors/WidgetVisitor_QLineEdit.cpp
+[  171s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QTextEdit.o visitors/WidgetVisitor_QTextEdit.cpp
+[  173s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QPlainTextEdit.o visitors/WidgetVisitor_QPlainTextEdit.cpp
+[  174s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QDateEdit.o visitors/WidgetVisitor_QDateEdit.cpp
+[  175s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QTimeEdit.o visitors/WidgetVisitor_QTimeEdit.cpp
+[  177s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QDateTimeEdit.o visitors/WidgetVisitor_QDateTimeEdit.cpp
+[  178s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QTreeWidget.o visitors/WidgetVisitor_QTreeWidget.cpp
+[  180s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QTableWidget.o visitors/WidgetVisitor_QTableWidget.cpp
+[  183s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QSlider.o visitors/WidgetVisitor_QSlider.cpp
+[  184s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_QStackedWidget.o visitors/WidgetVisitor_QStackedWidget.cpp
+[  185s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_FileChooser.o visitors/WidgetVisitor_FileChooser.cpp
+[  186s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o WidgetVisitor_PictureChooser.o visitors/WidgetVisitor_PictureChooser.cpp
+[  188s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataFormatXML.o serialize/DataFormatXML.cpp
+[  189s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStruct.o serialize/DataStruct.cpp
+[  190s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructDescription.o serialize/DataStructDescription.cpp
+[  192s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructDescriptionParse.o serialize/DataStructDescriptionParse.cpp
+[  194s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructDescriptionMap.o serialize/DataStructDescriptionMap.cpp
+[  195s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructSerialize.o serialize/DataStructSerialize.cpp
+[  198s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataStructMap.o serialize/DataStructMap.cpp
+[  201s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataPathTree.o serialize/DataPathTree.cpp
+[  202s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o DataSerializeItem.o serialize/DataSerializeItem.cpp
+[  203s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o ActionResultDefinition.o serialize/ActionResultDefinition.cpp
+[  204s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o ActionDefinition.o serialize/ActionDefinition.cpp
+[  205s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o CondProperties.o serialize/CondProperties.cpp
+[  206s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormCall.o FormCall.cpp
+[  207s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormWidget.o FormWidget.cpp
+[  210s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o PreferencesDialog.o PreferencesDialog.cpp
+[  212s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o FormChooseDialog.o FormChooseDialog.cpp
+[  213s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o settings.o settings.cpp
+[  215s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o LoadMode.o LoadMode.cpp
+[  216s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o HistoryLineEdit.o HistoryLineEdit.cpp
+[  217s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o wolfclient.o wolfclient.cpp
+[  218s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. debugview/DebugViewWidget.hpp -o moc_DebugViewWidget.cpp
+[  219s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_DebugViewWidget.o moc_DebugViewWidget.cpp
+[  220s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. MainWindow.hpp -o moc_MainWindow.cpp
+[  220s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_MainWindow.o moc_MainWindow.cpp
+[  222s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. FormLoader.hpp -o moc_FormLoader.cpp
+[  222s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_FormLoader.o moc_FormLoader.cpp
+[  223s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. DataLoader.hpp -o moc_DataLoader.cpp
+[  223s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_DataLoader.o moc_DataLoader.cpp
+[  223s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. WidgetVisitorObject.hpp -o moc_WidgetVisitorObject.cpp
+[  223s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_WidgetVisitorObject.o moc_WidgetVisitorObject.cpp
+[  224s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. FormWidget.hpp -o moc_FormWidget.cpp
+[  224s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_FormWidget.o moc_FormWidget.cpp
+[  226s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
+[  226s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_PreferencesDialog.o moc_PreferencesDialog.cpp
+[  227s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
+[  227s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_FormChooseDialog.o moc_FormChooseDialog.cpp
+[  229s] /usr/bin/moc-qt4 -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
+[  229s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o moc_HistoryLineEdit.o moc_HistoryLineEdit.cpp
+[  230s] /usr/bin/rcc -name wolfclient wolfclient.qrc -o qrc_wolfclient.cpp
+[  230s] g++ -c -pipe -O2 -D_REENTRANT -Wall -W -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DX_EXPORT=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_SCRIPT_LIB -DQT_XML_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I../../../../share/qt4/mkspecs/linux-g++ -I. -I../../../../include/qt4/QtUiTools -I../../../../include/qt4/QtDesigner -I../../../../include/qt4/QtCore -I../../../../include/qt4/QtNetwork -I../../../../include/qt4/QtGui -I../../../../include/qt4/QtXml -I../../../../include/qt4/QtScript -I../../../../include/qt4 -I../libqtwolfclient -I../skeleton -I../plugins/filechooser -I../plugins/picturechooser -I. -I. -I. -o qrc_wolfclient.o qrc_wolfclient.cpp
+[  230s] g++ -Wl,-rpath,/usr/lib//wolframe -Wl,-O1 -Wl,-rpath,/usr/X11R6/lib -o wolfclient MainWindow.o FormLoader.o FormUiLoader.o FileFormLoader.o NetworkFormLoader.o DataLoader.o FileDataLoader.o NetworkDataLoader.o WidgetTree.o WidgetId.o WidgetRequestHeader.o WidgetVisitor.o WidgetDataSignal.o WidgetEnabler.o WidgetListener.o WidgetRequest.o WidgetMessageDispatcher.o WidgetDragAndDrop.o WidgetVisitorStateConstructor.o DebugLogTree.o DebugViewWidget.o DebugHelpers.o DebugMessageHandler.o WidgetVisitor_QLabel.o WidgetVisitor_QComboBox.o WidgetVisitor_QCheckBox.o WidgetVisitor_QGroupBox.o WidgetVisitor_QButtonGroup.o WidgetVisitor_QRadioButton.o WidgetVisitor_QPushButton.o WidgetVisitor_QSpinBox.o WidgetVisitor_QDoubleSpinBox.o WidgetVisitor_QListWidget.o WidgetVisitor_QLineEdit.o WidgetVisitor_QTextEdit.o WidgetVisitor_QPlainTextEdit.o WidgetVisitor_QDateEdit.o WidgetVisitor_QTimeEdit.o WidgetVisitor_QDateTimeEdit.o WidgetVisitor_QTreeWidget.o WidgetVisitor_QTableWidget.o WidgetVisitor_QSlider.o WidgetVisitor_QStackedWidget.o WidgetVisitor_FileChooser.o WidgetVisitor_PictureChooser.o DataFormatXML.o DataStruct.o DataStructDescription.o DataStructDescriptionParse.o DataStructDescriptionMap.o DataStructSerialize.o DataStructMap.o DataPathTree.o DataSerializeItem.o ActionResultDefinition.o ActionDefinition.o CondProperties.o FormCall.o FormWidget.o PreferencesDialog.o FormChooseDialog.o settings.o LoadMode.o HistoryLineEdit.o wolfclient.o moc_DebugViewWidget.o moc_MainWindow.o moc_FormLoader.o moc_DataLoader.o moc_WidgetVisitorObject.o moc_FormWidget.o moc_PreferencesDialog.o moc_FormChooseDialog.o moc_HistoryLineEdit.o qrc_wolfclient.o    -L/usr/lib -L../libqtwolfclient -lqtwolfclient -L../skeleton -lskeleton -L../plugins/filechooser -lfilechooser -L../plugins/picturechooser -lpicturechooser -lQtScript -lQtXml -lQtGui -lQtNetwork -lQtCore -lQtDesigner -lpthread -lQtUiTools 
+[  230s] make[2]: Leaving directory `/usr/src/packages/BUILD/wolfclient'
+[  230s] cd tests/ && /usr/bin/make -f Makefile 
+[  231s] make[2]: Entering directory `/usr/src/packages/BUILD/tests'
+[  231s] cd SSLavailable/ && /usr/bin/make -f Makefile 
+[  231s] make[3]: Entering directory `/usr/src/packages/BUILD/tests/SSLavailable'
+[  231s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I. -o SSLavailable.o SSLavailable.cpp
+[  232s] /usr/bin/moc-qt4 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I. SSLavailable.hpp -o moc_SSLavailable.cpp
+[  232s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I. -o moc_SSLavailable.o moc_SSLavailable.cpp
+[  232s] g++ -Wl,-O1 -o SSLavailable SSLavailable.o moc_SSLavailable.o    -L/usr/lib -lQtTest -lQtGui -lQtNetwork -lQtCore -lpthread 
+[  233s] make[3]: Leaving directory `/usr/src/packages/BUILD/tests/SSLavailable'
+[  233s] cd datatree/ && /usr/bin/make -f Makefile 
+[  233s] make[3]: Entering directory `/usr/src/packages/BUILD/tests/datatree'
+[  233s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o testDataTree.o testDataTree.cpp
+[  234s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o DebugHelpers.o ../../wolfclient/debugview/DebugHelpers.cpp
+[  235s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o DebugLogTree.o ../../wolfclient/debugview/DebugLogTree.cpp
+[  237s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o DebugMessageHandler.o ../../wolfclient/debugview/DebugMessageHandler.cpp
+[  238s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o DataStructDescription.o ../../wolfclient/serialize/DataStructDescription.cpp
+[  239s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o DataStructDescriptionParse.o ../../wolfclient/serialize/DataStructDescriptionParse.cpp
+[  242s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o DataStruct.o ../../wolfclient/serialize/DataStruct.cpp
+[  243s] /usr/bin/moc-qt4 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. testDataTree.hpp -o moc_testDataTree.cpp
+[  243s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o moc_testDataTree.o moc_testDataTree.cpp
+[  243s] g++ -Wl,-O1 -o testDataTree testDataTree.o DebugHelpers.o DebugLogTree.o DebugMessageHandler.o DataStructDescription.o DataStructDescriptionParse.o DataStruct.o moc_testDataTree.o    -L/usr/lib -lQtTest -lQtGui -lQtCore -lpthread 
+[  244s] make[3]: Leaving directory `/usr/src/packages/BUILD/tests/datatree'
+[  244s] cd skeleton/ && /usr/bin/make -f Makefile 
+[  244s] make[3]: Entering directory `/usr/src/packages/BUILD/tests/skeleton'
+[  244s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I../../libqtwolfclient -I../../skeleton -I. -o main.o main.cpp
+[  245s] /usr/bin/rcc -name skeletonTest skeletonTest.qrc -o qrc_skeletonTest.cpp
+[  245s] RCC: Warning: No resources in 'skeletonTest.qrc'.
+[  245s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DLIBWOLFRAMECLIENT_VISIBILITY=Q_DECL_IMPORT -DSKELETON_VISIBILITY=Q_DECL_IMPORT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtNetwork -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I../../libqtwolfclient -I../../skeleton -I. -o qrc_skeletonTest.o qrc_skeletonTest.cpp
+[  245s] g++ -Wl,-O1 -o skeletonTest main.o qrc_skeletonTest.o    -L/usr/lib -L../../libqtwolfclient -lqtwolfclient -L../../skeleton -lskeleton -lQtGui -lQtNetwork -lQtCore -lpthread 
+[  245s] make[3]: Leaving directory `/usr/src/packages/BUILD/tests/skeleton'
+[  245s] cd xml/ && /usr/bin/make -f Makefile 
+[  245s] make[3]: Entering directory `/usr/src/packages/BUILD/tests/xml'
+[  245s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o testXmlSerialization.o testXmlSerialization.cpp
+[  247s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o DebugHelpers.o ../../wolfclient/debugview/DebugHelpers.cpp
+[  247s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o DataFormatXML.o ../../wolfclient/serialize/DataFormatXML.cpp
+[  249s] /usr/bin/moc-qt4 -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. testXmlSerialization.hpp -o moc_testXmlSerialization.cpp
+[  249s] g++ -c -pipe -O2 -Wall -W -D_REENTRANT -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED -I/usr/share/qt4/mkspecs/linux-g++ -I. -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I/usr/include/qt4 -I/usr/include/qt4/QtTest -I../../wolfclient -I. -o moc_testXmlSerialization.o moc_testXmlSerialization.cpp
+[  249s] g++ -Wl,-O1 -o testXmlSerialization testXmlSerialization.o DebugHelpers.o DataFormatXML.o moc_testXmlSerialization.o    -L/usr/lib -lQtTest -lQtGui -lQtCore -lpthread 
+[  249s] make[3]: Leaving directory `/usr/src/packages/BUILD/tests/xml'
+[  249s] make[2]: Leaving directory `/usr/src/packages/BUILD/tests'
+[  249s] make[1]: Leaving directory `/usr/src/packages/BUILD'
+[  249s] # --- end custom part for compiling
+[  249s] touch build-stamp
+[  249s]  fakeroot-tcp debian/rules binary
+[  250s] DEB_HOST_MULTIARCH is not a supported variable name at /usr/bin/dpkg-architecture line 214.
+[  250s] DEB_HOST_MULTIARCH is not a supported variable name at /usr/bin/dpkg-architecture line 214.
+[  250s] DEB_HOST_MULTIARCH is not a supported variable name at /usr/bin/dpkg-architecture line 214.
+[  250s] DEB_HOST_MULTIARCH is not a supported variable name at /usr/bin/dpkg-architecture line 214.
+[  250s] DEB_HOST_MULTIARCH is not a supported variable name at /usr/bin/dpkg-architecture line 214.
+[  250s] DEB_HOST_MULTIARCH is not a supported variable name at /usr/bin/dpkg-architecture line 214.
+[  250s] dh_testdir
+[  250s] dh_testroot
+[  250s] dh_clean -k
+[  250s] dh_clean: Compatibility levels before 5 are deprecated.
+[  250s] 	rm -f debian/wolfclient.substvars
+[  250s] 	rm -f debian/wolfclient.*.debhelper
+[  250s] 	rm -rf debian/wolfclient/
+[  250s] 	rm -f debian/wolfclient-dev.substvars
+[  250s] 	rm -f debian/wolfclient-dev.*.debhelper
+[  250s] 	rm -rf debian/wolfclient-dev/
+[  250s] 	find .  \( \( -type f -a \
+[  250s] 	        \( -name '#*#' -o -name '.*~' -o -name '*~' -o -name DEADJOE \
+[  250s] 		 -o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \
+[  250s] 		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \
+[  250s] 		 -o -name TAGS -o \( -path '*/.deps/*' -a -name '*.P' \) \
+[  250s] 		\) -exec rm -f {} \; \) -o \
+[  250s] 		\( -type d -a -name autom4te.cache -prune -exec rm -rf {} \; \) \)
+[  250s] dh_installdirs
+[  250s] dh_installdirs: Compatibility levels before 5 are deprecated.
+[  250s] 	install -d debian/wolfclient
+[  250s] 	install -d debian/wolfclient-dev
+[  250s] # Add here commands to install the package
+[  250s] # The DESTDIR Has To Be Exactly  /usr/src/packages/BUILD/debian/<nameOfPackage>
+[  250s] /usr/bin/make INSTALL_ROOT=/usr/src/packages/BUILD/debian/wolfclient \
+[  250s] 		LIBDIR=/usr/lib//wolframe \
+[  250s] 		install
+[  250s] make[1]: Entering directory `/usr/src/packages/BUILD'
+[  250s] cd libqtwolfclient/ && /usr/bin/make -f Makefile install
+[  250s] make[2]: Entering directory `/usr/src/packages/BUILD/libqtwolfclient'
+[  250s] install -m 755 -p "libqtwolfclient.so.0.0.0" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0.0.0"
+[  250s] strip --strip-unneeded "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0.0.0"
+[  250s] ln -f -s "libqtwolfclient.so.0.0.0" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so"
+[  250s] ln -f -s "libqtwolfclient.so.0.0.0" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0"
+[  250s] ln -f -s "libqtwolfclient.so.0.0.0" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0.0"
+[  250s] make[2]: Leaving directory `/usr/src/packages/BUILD/libqtwolfclient'
+[  250s] cd skeleton/ && /usr/bin/make -f Makefile install
+[  250s] make[2]: Entering directory `/usr/src/packages/BUILD/skeleton'
+[  250s] install -m 755 -p "libskeleton.so.0.0.0" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libskeleton.so.0.0.0"
+[  250s] strip --strip-unneeded "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libskeleton.so.0.0.0"
+[  250s] ln -f -s "libskeleton.so.0.0.0" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libskeleton.so"
+[  250s] ln -f -s "libskeleton.so.0.0.0" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libskeleton.so.0"
+[  250s] ln -f -s "libskeleton.so.0.0.0" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/wolframe/libskeleton.so.0.0"
+[  250s] make[2]: Leaving directory `/usr/src/packages/BUILD/skeleton'
+[  250s] cd example/ && /usr/bin/make -f Makefile install
+[  251s] make[2]: Entering directory `/usr/src/packages/BUILD/example'
+[  251s] make[2]: Nothing to be done for `install'.
+[  251s] make[2]: Leaving directory `/usr/src/packages/BUILD/example'
+[  251s] cd plugins/ && /usr/bin/make -f Makefile install
+[  251s] make[2]: Entering directory `/usr/src/packages/BUILD/plugins'
+[  251s] cd filechooser/ && /usr/bin/make -f Makefile install
+[  251s] make[3]: Entering directory `/usr/src/packages/BUILD/plugins/filechooser'
+[  251s] install -m 755 -p "libfilechooser.so" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/qt4/plugins/designer/libfilechooser.so"
+[  251s] strip --strip-unneeded "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/qt4/plugins/designer/libfilechooser.so"
+[  251s] install -m 644 -p /usr/src/packages/BUILD/plugins/filechooser/libfilechooser.so /usr/src/packages/BUILD/debian/wolfclient/usr/lib//wolframe/
+[  251s] make[3]: Leaving directory `/usr/src/packages/BUILD/plugins/filechooser'
+[  251s] cd picturechooser/ && /usr/bin/make -f Makefile install
+[  251s] make[3]: Entering directory `/usr/src/packages/BUILD/plugins/picturechooser'
+[  251s] install -m 755 -p "libpicturechooser.so" "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/qt4/plugins/designer/libpicturechooser.so"
+[  251s] strip --strip-unneeded "/usr/src/packages/BUILD/debian/wolfclient/usr/lib/qt4/plugins/designer/libpicturechooser.so"
+[  251s] install -m 644 -p /usr/src/packages/BUILD/plugins/picturechooser/libpicturechooser.so /usr/src/packages/BUILD/debian/wolfclient/usr/lib//wolframe/
+[  251s] make[3]: Leaving directory `/usr/src/packages/BUILD/plugins/picturechooser'
+[  251s] cd formtest/ && /usr/bin/make -f Makefile install
+[  251s] make[3]: Entering directory `/usr/src/packages/BUILD/plugins/formtest'
+[  251s] make[3]: Nothing to be done for `install'.
+[  251s] make[3]: Leaving directory `/usr/src/packages/BUILD/plugins/formtest'
+[  251s] cd wolfdesigner/ && /usr/bin/make -f Makefile install
+[  251s] make[3]: Entering directory `/usr/src/packages/BUILD/plugins/wolfdesigner'
+[  251s] make[3]: Nothing to be done for `install'.
+[  251s] make[3]: Leaving directory `/usr/src/packages/BUILD/plugins/wolfdesigner'
+[  251s] make[2]: Leaving directory `/usr/src/packages/BUILD/plugins'
+[  251s] cd wolfclient/ && /usr/bin/make -f Makefile install
+[  251s] make[2]: Entering directory `/usr/src/packages/BUILD/wolfclient'
+[  251s] g++ -Wl,-rpath,/usr/lib//wolframe -Wl,-O1 -Wl,-rpath,/usr/X11R6/lib -o wolfclient MainWindow.o FormLoader.o FormUiLoader.o FileFormLoader.o NetworkFormLoader.o DataLoader.o FileDataLoader.o NetworkDataLoader.o WidgetTree.o WidgetId.o WidgetRequestHeader.o WidgetVisitor.o WidgetDataSignal.o WidgetEnabler.o WidgetListener.o WidgetRequest.o WidgetMessageDispatcher.o WidgetDragAndDrop.o WidgetVisitorStateConstructor.o DebugLogTree.o DebugViewWidget.o DebugHelpers.o DebugMessageHandler.o WidgetVisitor_QLabel.o WidgetVisitor_QComboBox.o WidgetVisitor_QCheckBox.o WidgetVisitor_QGroupBox.o WidgetVisitor_QButtonGroup.o WidgetVisitor_QRadioButton.o WidgetVisitor_QPushButton.o WidgetVisitor_QSpinBox.o WidgetVisitor_QDoubleSpinBox.o WidgetVisitor_QListWidget.o WidgetVisitor_QLineEdit.o WidgetVisitor_QTextEdit.o WidgetVisitor_QPlainTextEdit.o WidgetVisitor_QDateEdit.o WidgetVisitor_QTimeEdit.o WidgetVisitor_QDateTimeEdit.o WidgetVisitor_QTreeWidget.o WidgetVisitor_QTableWidget.o WidgetVisitor_QSlider.o WidgetVisitor_QStackedWidget.o WidgetVisitor_FileChooser.o WidgetVisitor_PictureChooser.o DataFormatXML.o DataStruct.o DataStructDescription.o DataStructDescriptionParse.o DataStructDescriptionMap.o DataStructSerialize.o DataStructMap.o DataPathTree.o DataSerializeItem.o ActionResultDefinition.o ActionDefinition.o CondProperties.o FormCall.o FormWidget.o PreferencesDialog.o FormChooseDialog.o settings.o LoadMode.o HistoryLineEdit.o wolfclient.o moc_DebugViewWidget.o moc_MainWindow.o moc_FormLoader.o moc_DataLoader.o moc_WidgetVisitorObject.o moc_FormWidget.o moc_PreferencesDialog.o moc_FormChooseDialog.o moc_HistoryLineEdit.o qrc_wolfclient.o    -L/usr/lib -L../libqtwolfclient -lqtwolfclient -L../skeleton -lskeleton -L../plugins/filechooser -lfilechooser -L../plugins/picturechooser -lpicturechooser -lQtScript -lQtXml -lQtGui -lQtNetwork -lQtCore -lQtDesigner -lpthread -lQtUiTools 
+[  252s] install -m 755 -p "wolfclient" "/usr/src/packages/BUILD/debian/wolfclient/usr/bin/wolfclient"
+[  252s] strip "/usr/src/packages/BUILD/debian/wolfclient/usr/bin/wolfclient"
+[  252s] make[2]: Leaving directory `/usr/src/packages/BUILD/wolfclient'
+[  252s] cd tests/ && /usr/bin/make -f Makefile install
+[  252s] make[2]: Entering directory `/usr/src/packages/BUILD/tests'
+[  252s] cd SSLavailable/ && /usr/bin/make -f Makefile install
+[  252s] make[3]: Entering directory `/usr/src/packages/BUILD/tests/SSLavailable'
+[  252s] make[3]: Nothing to be done for `install'.
+[  252s] make[3]: Leaving directory `/usr/src/packages/BUILD/tests/SSLavailable'
+[  252s] cd datatree/ && /usr/bin/make -f Makefile install
+[  252s] make[3]: Entering directory `/usr/src/packages/BUILD/tests/datatree'
+[  252s] make[3]: Nothing to be done for `install'.
+[  252s] make[3]: Leaving directory `/usr/src/packages/BUILD/tests/datatree'
+[  252s] cd skeleton/ && /usr/bin/make -f Makefile install
+[  252s] make[3]: Entering directory `/usr/src/packages/BUILD/tests/skeleton'
+[  252s] make[3]: Nothing to be done for `install'.
+[  252s] make[3]: Leaving directory `/usr/src/packages/BUILD/tests/skeleton'
+[  252s] cd xml/ && /usr/bin/make -f Makefile install
+[  252s] make[3]: Entering directory `/usr/src/packages/BUILD/tests/xml'
+[  252s] make[3]: Nothing to be done for `install'.
+[  252s] make[3]: Leaving directory `/usr/src/packages/BUILD/tests/xml'
+[  252s] make[2]: Leaving directory `/usr/src/packages/BUILD/tests'
+[  252s] make[1]: Leaving directory `/usr/src/packages/BUILD'
+[  252s] # move things in the main package to a development package
+[  252s] mkdir -p /usr/src/packages/BUILD/debian/wolfclient-dev/usr
+[  252s] mkdir -p /usr/src/packages/BUILD/debian/wolfclient-dev/usr/lib//wolframe
+[  252s] mv -f /usr/src/packages/BUILD/debian/wolfclient/usr/lib//wolframe/*.so \
+[  252s] 		/usr/src/packages/BUILD/debian/wolfclient-dev/usr/lib//wolframe
+[  252s] mv -f /usr/src/packages/BUILD/debian/wolfclient/usr/lib//wolframe/*.so.0.0 \
+[  252s] 		/usr/src/packages/BUILD/debian/wolfclient-dev/usr/lib//wolframe
+[  252s] # --- end custom part for installing
+[  252s] # We have nothing to do by default.
+[  252s] DEB_HOST_MULTIARCH is not a supported variable name at /usr/bin/dpkg-architecture line 214.
+[  252s] dh_testdir
+[  252s] dh_testroot
+[  252s] dh_installdocs
+[  252s] dh_installdocs: Compatibility levels before 5 are deprecated.
+[  252s] 	install -g 0 -o 0 -d debian/wolfclient/usr/share/doc/wolfclient
+[  252s] 	cp -a AUTHORS debian/wolfclient/usr/share/doc/wolfclient
+[  252s] 	cp -a LICENSE.GPL debian/wolfclient/usr/share/doc/wolfclient
+[  252s] 	cp -a README debian/wolfclient/usr/share/doc/wolfclient
+[  252s] 	chown -R 0:0 debian/wolfclient/usr/share/doc
+[  252s] 	chmod -R go=rX debian/wolfclient/usr/share/doc
+[  253s] 	chmod -R u\+rw debian/wolfclient/usr/share/doc
+[  253s] 	install -g 0 -o 0 -m 644 -p debian/copyright debian/wolfclient/usr/share/doc/wolfclient/copyright
+[  253s] 	install -g 0 -o 0 -d debian/wolfclient-dev/usr/share/doc/wolfclient-dev
+[  253s] 	install -g 0 -o 0 -m 644 -p debian/copyright debian/wolfclient-dev/usr/share/doc/wolfclient-dev/copyright
+[  253s] dh_installexamples
+[  253s] dh_installexamples: Compatibility levels before 5 are deprecated.
+[  253s] dh_installmenu
+[  253s] dh_installmenu: Compatibility levels before 5 are deprecated.
+[  253s] dh_installman
+[  253s] dh_installman: Compatibility levels before 5 are deprecated.
+[  253s] dh_installchangelogs
+[  254s] dh_installchangelogs: Compatibility levels before 5 are deprecated.
+[  254s] 	install -o 0 -g 0 -p -m644 debian/changelog debian/wolfclient/usr/share/doc/wolfclient/changelog.Debian
+[  254s] 	install -o 0 -g 0 -p -m644 debian/changelog debian/wolfclient-dev/usr/share/doc/wolfclient-dev/changelog.Debian
+[  254s] dh_link
+[  254s] dh_link: Compatibility levels before 5 are deprecated.
+[  254s] 	rm -f debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0
+[  254s] 	ln -sf libqtwolfclient.so.0.0.0 debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0
+[  254s] 	rm -f debian/wolfclient/usr/lib/wolframe/libskeleton.so.0
+[  254s] 	ln -sf libskeleton.so.0.0.0 debian/wolfclient/usr/lib/wolframe/libskeleton.so.0
+[  254s] 	rm -f debian/wolfclient-dev/usr/lib/wolframe/libqtwolfclient.so
+[  254s] 	ln -sf libqtwolfclient.so.0.0.0 debian/wolfclient-dev/usr/lib/wolframe/libqtwolfclient.so
+[  254s] 	rm -f debian/wolfclient-dev/usr/lib/wolframe/libskeleton.so
+[  254s] 	ln -sf libskeleton.so.0.0.0 debian/wolfclient-dev/usr/lib/wolframe/libskeleton.so
+[  254s] 	rm -f debian/wolfclient-dev/usr/lib/wolframe/libqtwolfclient.so.0.0
+[  254s] 	ln -sf libqtwolfclient.so.0.0.0 debian/wolfclient-dev/usr/lib/wolframe/libqtwolfclient.so.0.0
+[  254s] 	rm -f debian/wolfclient-dev/usr/lib/wolframe/libskeleton.so.0.0
+[  254s] 	ln -sf libskeleton.so.0.0.0 debian/wolfclient-dev/usr/lib/wolframe/libskeleton.so.0.0
+[  254s] dh_strip
+[  254s] dh_strip: Compatibility levels before 5 are deprecated.
+[  254s] 	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/wolfclient/usr/lib/qt4/plugins/designer/libfilechooser.so
+[  254s] 	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/wolfclient/usr/lib/qt4/plugins/designer/libpicturechooser.so
+[  254s] 	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/wolfclient/usr/lib/wolframe/libskeleton.so.0.0.0
+[  254s] 	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0.0.0
+[  254s] 	strip --remove-section=.comment --remove-section=.note debian/wolfclient/usr/bin/wolfclient
+[  254s] 	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/wolfclient-dev/usr/lib/wolframe/libfilechooser.so
+[  254s] 	strip --remove-section=.comment --remove-section=.note --strip-unneeded debian/wolfclient-dev/usr/lib/wolframe/libpicturechooser.so
+[  254s] dh_compress
+[  254s] dh_compress: Compatibility levels before 5 are deprecated.
+[  255s] 	cd debian/wolfclient
+[  255s] 	chmod a-x usr/share/doc/wolfclient/changelog.Debian usr/share/doc/wolfclient/LICENSE.GPL
+[  255s] 	gzip -9nf usr/share/doc/wolfclient/changelog.Debian usr/share/doc/wolfclient/LICENSE.GPL
+[  255s] 	cd '/usr/src/packages/BUILD'
+[  255s] 	cd debian/wolfclient-dev
+[  255s] 	chmod a-x usr/share/doc/wolfclient-dev/changelog.Debian
+[  255s] 	gzip -9nf usr/share/doc/wolfclient-dev/changelog.Debian
+[  255s] 	cd '/usr/src/packages/BUILD'
+[  255s] dh_fixperms
+[  255s] dh_fixperms: Compatibility levels before 5 are deprecated.
+[  255s] 	find debian/wolfclient  -print0 2>/dev/null | xargs -0r chown --no-dereference 0:0
+[  256s] 	find debian/wolfclient ! -type l  -print0 2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s
+[  256s] 	find debian/wolfclient/usr/share/doc -type f  ! -regex 'debian/wolfclient/usr/share/doc/[^/]*/examples/.*' -print0 2>/dev/null | xargs -0r chmod 644
+[  257s] 	find debian/wolfclient/usr/share/doc -type d  -print0 2>/dev/null | xargs -0r chmod 755
+[  257s] 	find debian/wolfclient/usr/share/man debian/wolfclient/usr/man/ debian/wolfclient/usr/X11*/man/ -type f  -print0 2>/dev/null | xargs -0r chmod 644
+[  257s] 	find debian/wolfclient -perm -5 -type f \( -name '*.so*' -or -name '*.la' -or -name '*.a' \)  -print0 2>/dev/null | xargs -0r chmod 644
+[  257s] 	find debian/wolfclient/usr/include -type f  -print0 2>/dev/null | xargs -0r chmod 644
+[  257s] 	find debian/wolfclient/usr/share/applications -type f  -print0 2>/dev/null | xargs -0r chmod 644
+[  257s] 	find debian/wolfclient -perm -5 -type f \( -name '*.cmxs' \)  -print0 2>/dev/null | xargs -0r chmod 644
+[  257s] 	find debian/wolfclient/usr/lib/perl5 debian/wolfclient/usr/share/perl5 -type f -perm -5 -name '*.pm'  -print0 2>/dev/null | xargs -0r chmod a-X
+[  257s] 	find debian/wolfclient/usr/bin -type f  -print0 2>/dev/null | xargs -0r chmod a+x
+[  257s] 	find debian/wolfclient-dev  -print0 2>/dev/null | xargs -0r chown --no-dereference 0:0
+[  257s] 	find debian/wolfclient-dev ! -type l  -print0 2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s
+[  258s] 	find debian/wolfclient-dev/usr/share/doc -type f  ! -regex 'debian/wolfclient-dev/usr/share/doc/[^/]*/examples/.*' -print0 2>/dev/null | xargs -0r chmod 644
+[  258s] 	find debian/wolfclient-dev/usr/share/doc -type d  -print0 2>/dev/null | xargs -0r chmod 755
+[  258s] 	find debian/wolfclient-dev/usr/share/man debian/wolfclient-dev/usr/man/ debian/wolfclient-dev/usr/X11*/man/ -type f  -print0 2>/dev/null | xargs -0r chmod 644
+[  258s] 	find debian/wolfclient-dev -perm -5 -type f \( -name '*.so*' -or -name '*.la' -or -name '*.a' \)  -print0 2>/dev/null | xargs -0r chmod 644
+[  258s] 	find debian/wolfclient-dev/usr/include -type f  -print0 2>/dev/null | xargs -0r chmod 644
+[  258s] 	find debian/wolfclient-dev/usr/share/applications -type f  -print0 2>/dev/null | xargs -0r chmod 644
+[  258s] 	find debian/wolfclient-dev -perm -5 -type f \( -name '*.cmxs' \)  -print0 2>/dev/null | xargs -0r chmod 644
+[  258s] 	find debian/wolfclient-dev/usr/lib/perl5 debian/wolfclient-dev/usr/share/perl5 -type f -perm -5 -name '*.pm'  -print0 2>/dev/null | xargs -0r chmod a-X
+[  258s] dh_makeshlibs
+[  258s] dh_makeshlibs: Compatibility levels before 5 are deprecated.
+[  258s] 	rm -f debian/wolfclient/DEBIAN/shlibs
+[  258s] 	install -d debian/wolfclient/DEBIAN
+[  258s] 	echo 'libskeleton 0 wolfclient' >>debian/wolfclient/DEBIAN/shlibs
+[  258s] 	echo 'libqtwolfclient 0 wolfclient' >>debian/wolfclient/DEBIAN/shlibs
+[  258s] 	echo "# Automatically added by dh_makeshlibs">> debian/wolfclient.postinst.debhelper
+[  258s] 	sed "" /usr/share/debhelper/autoscripts/postinst-makeshlibs >> debian/wolfclient.postinst.debhelper
+[  258s] 	echo '# End automatically added section' >> debian/wolfclient.postinst.debhelper
+[  258s] 	echo "# Automatically added by dh_makeshlibs">> debian/wolfclient.postrm.debhelper
+[  258s] 	sed "" /usr/share/debhelper/autoscripts/postrm-makeshlibs >> debian/wolfclient.postrm.debhelper
+[  258s] 	echo '# End automatically added section' >> debian/wolfclient.postrm.debhelper
+[  258s] 	chmod 644 debian/wolfclient/DEBIAN/shlibs
+[  258s] 	chown 0:0 debian/wolfclient/DEBIAN/shlibs
+[  258s] 	rm -f debian/wolfclient-dev/DEBIAN/shlibs
+[  258s] 	install -d debian/wolfclient-dev/DEBIAN
+[  258s] dh_installdeb
+[  258s] dh_installdeb: Compatibility levels before 5 are deprecated.
+[  258s] 	printf '#!/bin/sh
+[  258s] set -e
+[  258s] ' > debian/wolfclient/DEBIAN/postinst
+[  259s] 	cat debian/wolfclient.postinst.debhelper >> debian/wolfclient/DEBIAN/postinst
+[  259s] 	chown 0:0 debian/wolfclient/DEBIAN/postinst
+[  259s] 	chmod 755 debian/wolfclient/DEBIAN/postinst
+[  259s] 	printf '#!/bin/sh
+[  259s] set -e
+[  259s] ' > debian/wolfclient/DEBIAN/postrm
+[  259s] 	cat debian/wolfclient.postrm.debhelper >> debian/wolfclient/DEBIAN/postrm
+[  259s] 	chown 0:0 debian/wolfclient/DEBIAN/postrm
+[  259s] 	chmod 755 debian/wolfclient/DEBIAN/postrm
+[  259s] dh_shlibdeps \
+[  259s] 		-L libqtwolfclient -L skeleton \
+[  259s] 		-l /usr/src/packages/BUILD/debian/wolfclient/usr/lib//wolframe \
+[  259s] 		-- --ignore-missing-info -v
+[  259s] dh_shlibdeps: Compatibility levels before 5 are deprecated.
+[  259s] 	LD_LIBRARY_PATH=/usr/lib/libfakeroot:/usr/lib64/libfakeroot:/usr/lib32/libfakeroot:/usr/src/packages/BUILD/debian/wolfclient/usr/lib//wolframe
+[  259s] 	dpkg-shlibdeps -Tdebian/wolfclient.substvars -Sdebian/skeleton --ignore-missing-info -v debian/wolfclient/usr/lib/qt4/plugins/designer/libfilechooser.so debian/wolfclient/usr/lib/qt4/plugins/designer/libpicturechooser.so debian/wolfclient/usr/lib/wolframe/libskeleton.so.0.0.0 debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0.0.0 debian/wolfclient/usr/bin/wolfclient
+[  259s] >> Scanning debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0.0.0 (for Depends field)
+[  259s] Library libQtGui.so.4 found in /usr/lib/libQtGui.so.4
+[  259s] Library libQtNetwork.so.4 found in /usr/lib/libQtNetwork.so.4
+[  259s] Library libQtCore.so.4 found in /usr/lib/libQtCore.so.4
+[  259s] Library libpthread.so.0 found in /lib/libpthread.so.0
+[  259s] Library libstdc++.so.6 found in /usr/lib/libstdc++.so.6
+[  259s] Library libm.so.6 found in /lib/libm.so.6
+[  259s] Library libgcc_s.so.1 found in /lib/libgcc_s.so.1
+[  259s] Library libc.so.6 found in /lib/libc.so.6
+[  263s] Using symbols file /var/lib/dpkg/info/libstdc++6.symbols for libstdc++.so.6
+[  263s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libc.so.6
+[  263s] Using symbols file /var/lib/dpkg/info/libqtgui4.symbols for libQtGui.so.4
+[  263s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libpthread.so.0
+[  263s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libm.so.6
+[  263s] Using symbols file /var/lib/dpkg/info/libgcc1.symbols for libgcc_s.so.1
+[  263s] Using symbols file /var/lib/dpkg/info/libqt4-network.symbols for libQtNetwork.so.4
+[  263s] Using symbols file /var/lib/dpkg/info/libqtcore4.symbols for libQtCore.so.4
+[  263s] Updating dependencies of libQtGui.so.4 with build-dependencies
+[  263s]  Minimal version of libqtgui4 #MINVER# updated with 4.4
+[  263s] Updating dependencies of libQtNetwork.so.4 with build-dependencies
+[  263s]  Minimal version of libqt4-network #MINVER# updated with 4.4
+[  263s] Updating dependencies of libQtCore.so.4 with build-dependencies
+[  263s]  Minimal version of libqtcore4 #MINVER# updated with 4.4
+[  263s] >> Scanning debian/wolfclient/usr/bin/wolfclient (for Depends field)
+[  263s] Library libqtwolfclient.so.0 found in debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0
+[  263s] dpkg-shlibdeps: warning: couldn't find library libfilechooser.so needed by debian/wolfclient/usr/bin/wolfclient (ELF format: 'elf64-x86-64'; RPATH: '/usr/lib//wolframe:/usr/X11R6/lib').
+[  263s] Note: libraries are not searched in other binary packages that do not have any shlibs or symbols file.
+[  263s] To help dpkg-shlibdeps find private libraries, you might need to set LD_LIBRARY_PATH.
+[  263s] dpkg-shlibdeps: warning: couldn't find library libpicturechooser.so needed by debian/wolfclient/usr/bin/wolfclient (ELF format: 'elf64-x86-64'; RPATH: '/usr/lib//wolframe:/usr/X11R6/lib').
+[  263s] Note: libraries are not searched in other binary packages that do not have any shlibs or symbols file.
+[  263s] To help dpkg-shlibdeps find private libraries, you might need to set LD_LIBRARY_PATH.
+[  263s] Library libskeleton.so.0 found in debian/wolfclient/usr/lib/wolframe/libskeleton.so.0
+[  263s] Library libQtScript.so.4 found in /usr/lib/libQtScript.so.4
+[  263s] Library libQtXml.so.4 found in /usr/lib/libQtXml.so.4
+[  263s] Library libQtGui.so.4 found in /usr/lib/libQtGui.so.4
+[  263s] Library libQtNetwork.so.4 found in /usr/lib/libQtNetwork.so.4
+[  263s] Library libQtCore.so.4 found in /usr/lib/libQtCore.so.4
+[  263s] Library libQtDesigner.so.4 found in /usr/lib/libQtDesigner.so.4
+[  263s] Library libpthread.so.0 found in /lib/libpthread.so.0
+[  263s] Library libstdc++.so.6 found in /usr/lib/libstdc++.so.6
+[  263s] Library libm.so.6 found in /lib/libm.so.6
+[  263s] Library libgcc_s.so.1 found in /lib/libgcc_s.so.1
+[  263s] Library libc.so.6 found in /lib/libc.so.6
+[  263s] Using symbols file /var/lib/dpkg/info/libstdc++6.symbols for libstdc++.so.6
+[  263s] Using symbols file /var/lib/dpkg/info/libqt4-xml.symbols for libQtXml.so.4
+[  263s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libc.so.6
+[  263s] Using symbols file /var/lib/dpkg/info/libqtgui4.symbols for libQtGui.so.4
+[  263s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libpthread.so.0
+[  263s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libm.so.6
+[  263s] No associated package found for debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0
+[  263s] Using shlibs+objdump for libqtwolfclient.so.0 (file debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0)
+[  263s]  Looking up shlibs dependency of libqtwolfclient.so.0 provided by ''
+[  263s]  Found wolfclient in debian/wolfclient/DEBIAN/shlibs
+[  263s] No associated package found for debian/wolfclient/usr/lib/wolframe/libskeleton.so.0
+[  263s] Using shlibs+objdump for libskeleton.so.0 (file debian/wolfclient/usr/lib/wolframe/libskeleton.so.0)
+[  264s]  Looking up shlibs dependency of libskeleton.so.0 provided by ''
+[  264s]  Found wolfclient in debian/wolfclient/DEBIAN/shlibs
+[  264s] Using symbols file /var/lib/dpkg/info/libgcc1.symbols for libgcc_s.so.1
+[  264s] Using symbols file /var/lib/dpkg/info/libqt4-script.symbols for libQtScript.so.4
+[  264s] Using symbols file /var/lib/dpkg/info/libqt4-designer.symbols for libQtDesigner.so.4
+[  264s] Using symbols file /var/lib/dpkg/info/libqtcore4.symbols for libQtCore.so.4
+[  264s] Using symbols file /var/lib/dpkg/info/libqt4-network.symbols for libQtNetwork.so.4
+[  264s] Updating dependencies of libQtScript.so.4 with build-dependencies
+[  264s]  Minimal version of libqt4-script #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtXml.so.4 with build-dependencies
+[  264s]  Minimal version of libqt4-xml #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtGui.so.4 with build-dependencies
+[  264s]  Minimal version of libqtgui4 #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtNetwork.so.4 with build-dependencies
+[  264s]  Minimal version of libqt4-network #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtCore.so.4 with build-dependencies
+[  264s]  Minimal version of libqtcore4 #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtDesigner.so.4 with build-dependencies
+[  264s]  Minimal version of libqt4-designer #MINVER# updated with 4.4
+[  264s] >> Scanning debian/wolfclient/usr/lib/qt4/plugins/designer/libfilechooser.so (for Depends field)
+[  264s] Library libQtScript.so.4 found in /usr/lib/libQtScript.so.4
+[  264s] Library libQtXml.so.4 found in /usr/lib/libQtXml.so.4
+[  264s] Library libQtGui.so.4 found in /usr/lib/libQtGui.so.4
+[  264s] Library libQtCore.so.4 found in /usr/lib/libQtCore.so.4
+[  264s] Library libQtDesigner.so.4 found in /usr/lib/libQtDesigner.so.4
+[  264s] Library libpthread.so.0 found in /lib/libpthread.so.0
+[  264s] Library libstdc++.so.6 found in /usr/lib/libstdc++.so.6
+[  264s] Library libm.so.6 found in /lib/libm.so.6
+[  264s] Library libgcc_s.so.1 found in /lib/libgcc_s.so.1
+[  264s] Library libc.so.6 found in /lib/libc.so.6
+[  264s] Using symbols file /var/lib/dpkg/info/libstdc++6.symbols for libstdc++.so.6
+[  264s] Using symbols file /var/lib/dpkg/info/libqt4-xml.symbols for libQtXml.so.4
+[  264s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libc.so.6
+[  264s] Using symbols file /var/lib/dpkg/info/libqtgui4.symbols for libQtGui.so.4
+[  264s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libpthread.so.0
+[  264s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libm.so.6
+[  264s] Using symbols file /var/lib/dpkg/info/libgcc1.symbols for libgcc_s.so.1
+[  264s] Using symbols file /var/lib/dpkg/info/libqt4-script.symbols for libQtScript.so.4
+[  264s] Using symbols file /var/lib/dpkg/info/libqt4-designer.symbols for libQtDesigner.so.4
+[  264s] Using symbols file /var/lib/dpkg/info/libqtcore4.symbols for libQtCore.so.4
+[  264s] Updating dependencies of libQtScript.so.4 with build-dependencies
+[  264s]  Minimal version of libqt4-script #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtXml.so.4 with build-dependencies
+[  264s]  Minimal version of libqt4-xml #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtGui.so.4 with build-dependencies
+[  264s]  Minimal version of libqtgui4 #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtCore.so.4 with build-dependencies
+[  264s]  Minimal version of libqtcore4 #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtDesigner.so.4 with build-dependencies
+[  264s]  Minimal version of libqt4-designer #MINVER# updated with 4.4
+[  264s] >> Scanning debian/wolfclient/usr/lib/wolframe/libskeleton.so.0.0.0 (for Depends field)
+[  264s] Library libqtwolfclient.so.0 found in debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0
+[  264s] Library libQtGui.so.4 found in /usr/lib/libQtGui.so.4
+[  264s] Library libQtNetwork.so.4 found in /usr/lib/libQtNetwork.so.4
+[  264s] Library libQtCore.so.4 found in /usr/lib/libQtCore.so.4
+[  264s] Library libpthread.so.0 found in /lib/libpthread.so.0
+[  264s] Library libstdc++.so.6 found in /usr/lib/libstdc++.so.6
+[  264s] Library libm.so.6 found in /lib/libm.so.6
+[  264s] Library libgcc_s.so.1 found in /lib/libgcc_s.so.1
+[  264s] Library libc.so.6 found in /lib/libc.so.6
+[  264s] Using symbols file /var/lib/dpkg/info/libstdc++6.symbols for libstdc++.so.6
+[  264s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libc.so.6
+[  264s] Using symbols file /var/lib/dpkg/info/libqtgui4.symbols for libQtGui.so.4
+[  264s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libpthread.so.0
+[  264s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libm.so.6
+[  264s] No associated package found for debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0
+[  264s] Using shlibs+objdump for libqtwolfclient.so.0 (file debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0)
+[  264s]  Looking up shlibs dependency of libqtwolfclient.so.0 provided by ''
+[  264s]  Found wolfclient in debian/wolfclient/DEBIAN/shlibs
+[  264s] Using symbols file /var/lib/dpkg/info/libgcc1.symbols for libgcc_s.so.1
+[  264s] Using symbols file /var/lib/dpkg/info/libqtcore4.symbols for libQtCore.so.4
+[  264s] Using symbols file /var/lib/dpkg/info/libqt4-network.symbols for libQtNetwork.so.4
+[  264s] Updating dependencies of libQtGui.so.4 with build-dependencies
+[  264s]  Minimal version of libqtgui4 #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtNetwork.so.4 with build-dependencies
+[  264s]  Minimal version of libqt4-network #MINVER# updated with 4.4
+[  264s] Updating dependencies of libQtCore.so.4 with build-dependencies
+[  264s]  Minimal version of libqtcore4 #MINVER# updated with 4.4
+[  264s] >> Scanning debian/wolfclient/usr/lib/qt4/plugins/designer/libpicturechooser.so (for Depends field)
+[  264s] dpkg-shlibdeps: warning: dependency on libQtScript.so.4 could be avoided if "debian/wolfclient/usr/bin/wolfclient debian/wolfclient/usr/lib/qt4/plugins/designer/libfilechooser.so debian/wolfclient/usr/lib/qt4/plugins/designer/libpicturechooser.so" were not uselessly linked against it (they use none of its symbols).
+[  264s] dpkg-shlibdeps: warning: dependency on libQtDesigner.so.4 could be avoided if "debian/wolfclient/usr/bin/wolfclient debian/wolfclient/usr/lib/qt4/plugins/designer/libfilechooser.so debian/wolfclient/usr/lib/qt4/plugins/designer/libpicturechooser.so" were not uselessly linked against it (they use none of its symbols).
+[  264s] dpkg-shlibdeps: warning: dependency on libQtXml.so.4 could be avoided if "debian/wolfclient/usr/bin/wolfclient debian/wolfclient/usr/lib/qt4/plugins/designer/libfilechooser.so debian/wolfclient/usr/lib/qt4/plugins/designer/libpicturechooser.so" were not uselessly linked against it (they use none of its symbols).
+[  264s] dpkg-shlibdeps: warning: dependency on libpthread.so.0 could be avoided if "debian/wolfclient/usr/lib/wolframe/libqtwolfclient.so.0.0.0 debian/wolfclient/usr/bin/wolfclient debian/wolfclient/usr/lib/qt4/plugins/designer/libfilechooser.so debian/wolfclient/usr/lib/wolframe/libskeleton.so.0.0.0 debian/wolfclient/usr/lib/qt4/plugins/designer/libpicturechooser.so" were not uselessly linked against it (they use none of its symbols).
+[  265s] Library libQtScript.so.4 found in /usr/lib/libQtScript.so.4
+[  265s] Library libQtXml.so.4 found in /usr/lib/libQtXml.so.4
+[  265s] Library libQtGui.so.4 found in /usr/lib/libQtGui.so.4
+[  265s] Library libQtCore.so.4 found in /usr/lib/libQtCore.so.4
+[  265s] Library libQtDesigner.so.4 found in /usr/lib/libQtDesigner.so.4
+[  265s] Library libpthread.so.0 found in /lib/libpthread.so.0
+[  265s] Library libstdc++.so.6 found in /usr/lib/libstdc++.so.6
+[  265s] Library libm.so.6 found in /lib/libm.so.6
+[  265s] Library libgcc_s.so.1 found in /lib/libgcc_s.so.1
+[  265s] Library libc.so.6 found in /lib/libc.so.6
+[  265s] Using symbols file /var/lib/dpkg/info/libstdc++6.symbols for libstdc++.so.6
+[  265s] Using symbols file /var/lib/dpkg/info/libqt4-xml.symbols for libQtXml.so.4
+[  265s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libc.so.6
+[  265s] Using symbols file /var/lib/dpkg/info/libqtgui4.symbols for libQtGui.so.4
+[  265s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libpthread.so.0
+[  265s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libm.so.6
+[  265s] Using symbols file /var/lib/dpkg/info/libgcc1.symbols for libgcc_s.so.1
+[  265s] Using symbols file /var/lib/dpkg/info/libqt4-script.symbols for libQtScript.so.4
+[  265s] Using symbols file /var/lib/dpkg/info/libqt4-designer.symbols for libQtDesigner.so.4
+[  265s] Using symbols file /var/lib/dpkg/info/libqtcore4.symbols for libQtCore.so.4
+[  265s] Updating dependencies of libQtScript.so.4 with build-dependencies
+[  265s]  Minimal version of libqt4-script #MINVER# updated with 4.4
+[  265s] Updating dependencies of libQtXml.so.4 with build-dependencies
+[  265s]  Minimal version of libqt4-xml #MINVER# updated with 4.4
+[  265s] Updating dependencies of libQtGui.so.4 with build-dependencies
+[  265s]  Minimal version of libqtgui4 #MINVER# updated with 4.4
+[  265s] Updating dependencies of libQtCore.so.4 with build-dependencies
+[  265s]  Minimal version of libqtcore4 #MINVER# updated with 4.4
+[  265s] Updating dependencies of libQtDesigner.so.4 with build-dependencies
+[  265s]  Minimal version of libqt4-designer #MINVER# updated with 4.4
+[  265s] 	LD_LIBRARY_PATH=/usr/lib/libfakeroot:/usr/lib64/libfakeroot:/usr/lib32/libfakeroot:/usr/src/packages/BUILD/debian/wolfclient/usr/lib//wolframe
+[  265s] 	dpkg-shlibdeps -Tdebian/wolfclient-dev.substvars -Sdebian/skeleton --ignore-missing-info -v debian/wolfclient-dev/usr/lib/wolframe/libfilechooser.so debian/wolfclient-dev/usr/lib/wolframe/libpicturechooser.so
+[  265s] >> Scanning debian/wolfclient-dev/usr/lib/wolframe/libfilechooser.so (for Depends field)
+[  265s] Library libQtScript.so.4 found in /usr/lib/libQtScript.so.4
+[  265s] Library libQtXml.so.4 found in /usr/lib/libQtXml.so.4
+[  265s] Library libQtGui.so.4 found in /usr/lib/libQtGui.so.4
+[  265s] Library libQtCore.so.4 found in /usr/lib/libQtCore.so.4
+[  265s] Library libQtDesigner.so.4 found in /usr/lib/libQtDesigner.so.4
+[  265s] Library libpthread.so.0 found in /lib/libpthread.so.0
+[  265s] Library libstdc++.so.6 found in /usr/lib/libstdc++.so.6
+[  265s] Library libm.so.6 found in /lib/libm.so.6
+[  265s] Library libgcc_s.so.1 found in /lib/libgcc_s.so.1
+[  265s] Library libc.so.6 found in /lib/libc.so.6
+[  269s] Using symbols file /var/lib/dpkg/info/libstdc++6.symbols for libstdc++.so.6
+[  269s] Using symbols file /var/lib/dpkg/info/libqt4-xml.symbols for libQtXml.so.4
+[  269s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libc.so.6
+[  269s] Using symbols file /var/lib/dpkg/info/libqtgui4.symbols for libQtGui.so.4
+[  269s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libpthread.so.0
+[  269s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libm.so.6
+[  269s] Using symbols file /var/lib/dpkg/info/libgcc1.symbols for libgcc_s.so.1
+[  269s] Using symbols file /var/lib/dpkg/info/libqt4-script.symbols for libQtScript.so.4
+[  269s] Using symbols file /var/lib/dpkg/info/libqtcore4.symbols for libQtCore.so.4
+[  269s] Using symbols file /var/lib/dpkg/info/libqt4-designer.symbols for libQtDesigner.so.4
+[  269s] Updating dependencies of libQtScript.so.4 with build-dependencies
+[  269s]  Minimal version of libqt4-script #MINVER# updated with 4.4
+[  269s] Updating dependencies of libQtXml.so.4 with build-dependencies
+[  269s]  Minimal version of libqt4-xml #MINVER# updated with 4.4
+[  269s] Updating dependencies of libQtGui.so.4 with build-dependencies
+[  269s]  Minimal version of libqtgui4 #MINVER# updated with 4.4
+[  269s] Updating dependencies of libQtCore.so.4 with build-dependencies
+[  269s]  Minimal version of libqtcore4 #MINVER# updated with 4.4
+[  269s] Updating dependencies of libQtDesigner.so.4 with build-dependencies
+[  269s]  Minimal version of libqt4-designer #MINVER# updated with 4.4
+[  269s] >> Scanning debian/wolfclient-dev/usr/lib/wolframe/libpicturechooser.so (for Depends field)
+[  269s] dpkg-shlibdeps: warning: dependency on libQtScript.so.4 could be avoided if "debian/wolfclient-dev/usr/lib/wolframe/libfilechooser.so debian/wolfclient-dev/usr/lib/wolframe/libpicturechooser.so" were not uselessly linked against it (they use none of its symbols).
+[  269s] dpkg-shlibdeps: warning: dependency on libQtDesigner.so.4 could be avoided if "debian/wolfclient-dev/usr/lib/wolframe/libfilechooser.so debian/wolfclient-dev/usr/lib/wolframe/libpicturechooser.so" were not uselessly linked against it (they use none of its symbols).
+[  269s] dpkg-shlibdeps: warning: dependency on libQtXml.so.4 could be avoided if "debian/wolfclient-dev/usr/lib/wolframe/libfilechooser.so debian/wolfclient-dev/usr/lib/wolframe/libpicturechooser.so" were not uselessly linked against it (they use none of its symbols).
+[  269s] dpkg-shlibdeps: warning: dependency on libpthread.so.0 could be avoided if "debian/wolfclient-dev/usr/lib/wolframe/libfilechooser.so debian/wolfclient-dev/usr/lib/wolframe/libpicturechooser.so" were not uselessly linked against it (they use none of its symbols).
+[  269s] Library libQtScript.so.4 found in /usr/lib/libQtScript.so.4
+[  269s] Library libQtXml.so.4 found in /usr/lib/libQtXml.so.4
+[  269s] Library libQtGui.so.4 found in /usr/lib/libQtGui.so.4
+[  269s] Library libQtCore.so.4 found in /usr/lib/libQtCore.so.4
+[  269s] Library libQtDesigner.so.4 found in /usr/lib/libQtDesigner.so.4
+[  269s] Library libpthread.so.0 found in /lib/libpthread.so.0
+[  269s] Library libstdc++.so.6 found in /usr/lib/libstdc++.so.6
+[  269s] Library libm.so.6 found in /lib/libm.so.6
+[  269s] Library libgcc_s.so.1 found in /lib/libgcc_s.so.1
+[  269s] Library libc.so.6 found in /lib/libc.so.6
+[  269s] Using symbols file /var/lib/dpkg/info/libstdc++6.symbols for libstdc++.so.6
+[  269s] Using symbols file /var/lib/dpkg/info/libqt4-xml.symbols for libQtXml.so.4
+[  269s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libc.so.6
+[  269s] Using symbols file /var/lib/dpkg/info/libqtgui4.symbols for libQtGui.so.4
+[  269s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libpthread.so.0
+[  269s] Using symbols file /var/lib/dpkg/info/libc6.symbols for libm.so.6
+[  269s] Using symbols file /var/lib/dpkg/info/libgcc1.symbols for libgcc_s.so.1
+[  269s] Using symbols file /var/lib/dpkg/info/libqt4-script.symbols for libQtScript.so.4
+[  269s] Using symbols file /var/lib/dpkg/info/libqt4-designer.symbols for libQtDesigner.so.4
+[  269s] Using symbols file /var/lib/dpkg/info/libqtcore4.symbols for libQtCore.so.4
+[  269s] Updating dependencies of libQtScript.so.4 with build-dependencies
+[  269s]  Minimal version of libqt4-script #MINVER# updated with 4.4
+[  269s] Updating dependencies of libQtXml.so.4 with build-dependencies
+[  269s]  Minimal version of libqt4-xml #MINVER# updated with 4.4
+[  269s] Updating dependencies of libQtGui.so.4 with build-dependencies
+[  269s]  Minimal version of libqtgui4 #MINVER# updated with 4.4
+[  269s] Updating dependencies of libQtCore.so.4 with build-dependencies
+[  269s]  Minimal version of libqtcore4 #MINVER# updated with 4.4
+[  269s] Updating dependencies of libQtDesigner.so.4 with build-dependencies
+[  269s]  Minimal version of libqt4-designer #MINVER# updated with 4.4
+[  269s] dh_gencontrol
+[  269s] dh_gencontrol: Compatibility levels before 5 are deprecated.
+[  270s] 	echo misc:Depends= >> debian/wolfclient.substvars
+[  270s] 	dpkg-gencontrol -pwolfclient -ldebian/changelog -Tdebian/wolfclient.substvars -Pdebian/wolfclient
+[  270s] 	chmod 644 debian/wolfclient/DEBIAN/control
+[  270s] 	chown 0:0 debian/wolfclient/DEBIAN/control
+[  270s] 	echo misc:Depends= >> debian/wolfclient-dev.substvars
+[  270s] 	dpkg-gencontrol -pwolfclient-dev -ldebian/changelog -Tdebian/wolfclient-dev.substvars -Pdebian/wolfclient-dev
+[  270s] 	chmod 644 debian/wolfclient-dev/DEBIAN/control
+[  270s] 	chown 0:0 debian/wolfclient-dev/DEBIAN/control
+[  270s] dh_md5sums
+[  270s] dh_md5sums: Compatibility levels before 5 are deprecated.
+[  270s] 	(cd debian/wolfclient >/dev/null ; find . -type f  ! -regex '.*/DEBIAN/.*' -printf '%P\0' | xargs -r0 md5sum > DEBIAN/md5sums) >/dev/null
+[  270s] 	chmod 644 debian/wolfclient/DEBIAN/md5sums
+[  270s] 	chown 0:0 debian/wolfclient/DEBIAN/md5sums
+[  270s] 	(cd debian/wolfclient-dev >/dev/null ; find . -type f  ! -regex '.*/DEBIAN/.*' -printf '%P\0' | xargs -r0 md5sum > DEBIAN/md5sums) >/dev/null
+[  270s] 	chmod 644 debian/wolfclient-dev/DEBIAN/md5sums
+[  270s] 	chown 0:0 debian/wolfclient-dev/DEBIAN/md5sums
+[  270s] dh_builddeb
+[  270s] dh_builddeb: Compatibility levels before 5 are deprecated.
+[  270s] 	dpkg-deb --build debian/wolfclient ..
+[  270s] dpkg-deb: building package `wolfclient' in `../wolfclient_0.0.5-1676_amd64.deb'.
+[  271s] 	dpkg-deb --build debian/wolfclient-dev ..
+[  271s] dpkg-deb: building package `wolfclient-dev' in `../wolfclient-dev_0.0.5-1676_amd64.deb'.
+[  271s]  dpkg-genchanges  >../wolfclient_0.0.5-1676_amd64.changes
+[  271s] dpkg-genchanges: including full source code in upload
+[  272s] dpkg-buildpackage: full upload (original source is included)
+[  272s] Warning: mkbaselibs missing in build root, skipping baselibs
+[  272s] ... saving statistics
+[  272s] ... saving built packages
+[  272s] DEBS/wolfclient_0.0.5.orig.tar.gz
+[  272s] DEBS/wolfclient.dsc
+[  272s] DEBS/wolfclient_0.0.5-1676_amd64.deb
+[  272s] DEBS/wolfclient-dev_0.0.5-1676_amd64.deb
+[  272s] DEBS/wolfclient_0.0.5.debian.tar.gz
+[  272s] OTHER/_statistics
+[  272s] 
+[  272s] build15 finished "build wolfclient.dsc" at Fri Aug 29 11:07:37 UTC 2014.
+[  272s] 
+[  272s] ### WATCHDOG MARKER START ###
+[  273s] [  257.444468] System halted.
+[  274s] ### WATCHDOG MARKER END ###
+[  274s] build: extracting built packages...
+[  274s] DEBS/wolfclient_0.0.5.orig.tar.gz
+[  274s] DEBS/wolfclient.dsc
+[  274s] DEBS/wolfclient_0.0.5-1676_amd64.deb
+[  274s] DEBS/wolfclient-dev_0.0.5-1676_amd64.deb
+[  274s] DEBS/wolfclient_0.0.5.debian.tar.gz
+[  274s] OTHER/_statistics
