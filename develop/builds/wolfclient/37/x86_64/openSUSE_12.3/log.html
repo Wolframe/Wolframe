@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Build Result</title><meta charset="utf-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"></link><link href="/develop/builds/wolfclient/layout/styles/main.css" rel="stylesheet" type="text/css" media="all"></link><link href="/develop/builds/wolfclient/layout/styles/mediaqueries.css" rel="stylesheet" type="text/css" media="all"></link><link href="/develop/builds/wolfclient/layout/styles/build.css" rel="stylesheet" type="text/css" media="all"></link></head><body><div class="wrapper row1"><header id="header" class="full_width clear"><div id="header-logo"><h1><a href="/index.html">Project Wolframe</a></h1><h2>The Straight Path to Successful Projects</h2></div><div id="header-search"><form id="cse-search-box" action="http://www.wolframe.org/gsearch.html"><input type="hidden" name="cx" value="007231504736047898702:wrnjvfljzvu"></input><input type="hidden" name="ie" value="UTF-8"></input><input type="text" name="q" size="31"></input><input type="submit" name="sa" class="search-bttn" value=""></input></form></div></header></div><div class="wrapper row2"><nav id="topnav"><ul class="clear"><li><a href="/index.html" title="Home">Home</a></li><li><a href="/downloads.html" title="Downloads">Downloads</a></li><li><a href="/documentation.html" title="Documentation">Documentation</a></li><li><a class="drop" href="/support.html" title="Support">Support</a><ul><li><a href="/faq.html" title="FAQ">FAQ</a></li><li><a href="http://www.wolframe.ch/mailman/listinfo" title="Mailing lists">Mailing lists</a></li></ul></li><li class="active"><a class="drop" href="/development/development_daily_builds.html" title="Smoke tests">Smoke tests</a><ul><li><a href="/develop/builds/Wolframe/" title="Wolframe">Wolframe</a></li><li class="last-child"><a href="/develop/builds/wolfclient/" title="wolfclient">wolfclient</a></li></ul></li><li class="last-child"><a href="/contact.html" title="Contact Us">Contact Us</a></li></ul></nav></div><div class="wrapper row3"><div id="container"><div class="three_quarter first">		<h2>Build Result wolfclient, rev. 37, x86_64, openSUSE_12.3</h2><table><tr><td class="label">OSC version:
+        </td><td>37</td></tr><tr><td class="label">GIT version:
+        </td><td><a href="https://github.com/Wolframe/wolfclient/tree/ad5e6708b7" title="ad5e6708b7">ad5e6708b743357458e4862e96ecc8c6122467ca</a></td></tr><tr><td class="label">Architecture:
+        </td><td>x86_64</td></tr><tr><td class="label">Platform:
+        </td><td>openSUSE_12.3 
+          <img src="/develop/builds/wolfclient/images/opensuse.png" alt="OpenSuSE 12.3" title="OpenSuSE 12.3" height="20" width="20"></img></td></tr><tr><td class="label">Build state:
+        </td><td class="status_ok">succeeded</td></tr><tr><td class="label">Build logfile:
+        </td><td><a href="/develop/builds/wolfclient/docs/37/x86_64/openSUSE_12.3/log.txt
+            ">
+            raw text
+          </a></td></tr></table><script language="javascript" type="text/JavaScript">
+	var maxPos = 1081;
+	var pos = 1081 - 20;
+
+	function createRequest() {
+		var request = null;
+		try {
+			request = new XMLHttpRequest( );
+		} catch( tryMS ) {
+			try {
+				request = new ActiveXObject( "Msxml2.XMLHTTP" );
+			} catch( tryMS2 ) {
+				try {
+					request = new ActiveXObject("Microsoft.XMLHTTP"); 
+				} catch( failed ) {
+					request = null;
+				}
+			}
+		}
+
+		if( request == null ) {
+			alert( "Error creating request object!" );
+		} else {
+			return request;
+		}
+	}
+
+	var request = createRequest( );
+
+	function scrollTo( pos ) {
+		if( pos < 20 ) {
+			document.getElementById( "watchFirst" ).disabled = true; 
+			document.getElementById( "watchPrev" ).disabled = true; 
+		} else {
+			document.getElementById( "watchFirst" ).disabled = false; 
+			document.getElementById( "watchPrev" ).disabled = false; 
+		}
+
+		if( pos > maxPos - 20 ) {
+			document.getElementById( "watchNext" ).disabled = true; 
+			document.getElementById( "watchLast" ).disabled = true; 
+		} else {
+			document.getElementById( "watchNext" ).disabled = false; 
+			document.getElementById( "watchLast" ).disabled = false; 
+		}
+
+		filter = document.getElementById( "filter" ).value;
+
+		var url = "http://wolframe.org/develop/builds/wolfclient/log.php?file=/develop/builds/wolfclient/docs/37/x86_64/openSUSE_12.3/log.txt&pos=" + pos + "&filter=" + encodeURIComponent( filter );
+		request.open( "GET", url, true );
+		request.onreadystatechange = updatePage;
+		request.send( null );
+	}
+
+	function updatePage( ) {
+		if( request.readyState == 4 ) {
+			if( request.status == 200 ) {
+				var text = request.responseText;
+				var lines = text.split( '\n' );
+				var nofLines = lines[0];
+				lines.splice( 0, 1 );
+				var newtext = lines.join( '\n' );
+				log.innerHTML = '<pre>' + newtext + '</pre>';
+				adaptBoundaries( nofLines );
+			} else {
+				alert( "Error! Request status is " + request.status );
+			}
+		}
+	}
+
+	function adaptBoundaries( nofLines ) {
+		if( nofLines == 0 ) {
+			filterAlert.innerHTML = "no matches";
+		} else {
+			filterAlert.innerHTML = nofLines + " lines match";
+		}
+
+		allDisabled = ( nofLines == 0 );
+                document.getElementById( "watchSlider" ).disabled = allDisabled;
+                document.getElementById( "watchFirst" ).disabled = allDisabled;
+                document.getElementById( "watchNext" ).disabled = allDisabled;
+                document.getElementById( "watchPrev" ).disabled = allDisabled;
+                document.getElementById( "watchLast" ).disabled = allDisabled;
+		if( pos < 20 ) {
+			document.getElementById( "watchFirst" ).disabled = true; 
+			document.getElementById( "watchPrev" ).disabled = true; 
+		} else {
+			document.getElementById( "watchFirst" ).disabled = false; 
+			document.getElementById( "watchPrev" ).disabled = false; 
+		}
+		if( pos > maxPos - 20 ) {
+			document.getElementById( "watchNext" ).disabled = true; 
+			document.getElementById( "watchLast" ).disabled = true; 
+		} else {
+			document.getElementById( "watchNext" ).disabled = false; 
+			document.getElementById( "watchLast" ).disabled = false; 
+		}
+
+		if( nofLines != maxPos ) {
+			maxPos = nofLines;
+			document.getElementById( "watchSlider" ).max = maxPos;
+		}
+		if( pos > nofLines ) {
+			pos = 1;
+			scrollToPos( pos );
+		}
+
+	}
+
+	function filterLog( ) {
+		pos = document.getElementById( "watchSlider" ).value;
+		scrollTo( pos );
+	}
+
+	function watchFirst( ) {
+		pos = 1;
+		scrollTo( pos );
+		document.getElementById( "watchSlider" ).value = pos;
+	}
+
+	function watchPrev( ) {
+		pos = pos - 20;
+		if( pos < 1 ) {
+			pos = 1;
+		}
+		scrollTo( pos );
+		document.getElementById( "watchSlider" ).value = pos;
+	}
+
+	function watchNext( ) {
+		pos = pos + 20;
+		if( pos > maxPos - 20 ) {
+			pos = maxPos - 20;
+		}
+		scrollTo( pos );
+		document.getElementById( "watchSlider" ).value = pos;
+	}
+
+	function watchLast( ) {
+		pos = maxPos;
+		scrollTo( pos );
+		document.getElementById( "watchSlider" ).value = pos;
+	}
+
+	function updateSlider( value ) {
+		if( pos == value ) {
+			return;
+		}
+		pos = value;
+		scrollTo( pos );
+	}
+
+</script><table><tr><td style="width:100px;" class="label">Filter:</td><td><input id="filter" type="text" onKeyUp="filterLog( );"></input><div style="float: right" id="filterAlert"></div></td></tr></table><table><tr><td style="width:100px;" class="label">Scroll logfile:</td><td><input type="button" style="width:40px; 0px" id="watchFirst" value="&lt;&lt;" onClick="watchFirst( );"></input>
+				 
+                                <input type="button" style="width:40px; 0px" id="watchPrev" value="&lt;" onClick="watchPrev( );"></input>
+				 
+                                  <input style="width: 60%" type="range" id="watchSlider" min="1" step="20" max="1081" value="1081" onChange="updateSlider( this.value );"></input>
+				 
+                                <input type="button" style="width:40px; 0px" id="watchNext" value="&gt;" disabled onClick="watchNext( );"></input>
+				 
+                                <input type="button" style="width:40px; 0px" id="watchLast" value="&gt;&gt;" disabled onClick="watchLast( );"></input>
+				 
+                        </td></tr></table><div class="description" id="log" style="width:100%; height:90%; overflow:auto;"><pre>[  126s]   cpio gzip 9
+[  126s]   
+[  126s] - 1403265600 Andreas Baumann &lt;abaumann@yahoo.com&gt; 0.0.4-0.1 - intermediary release
+[  126s] + 1409313600 Andreas Baumann &lt;abaumann@yahoo.com&gt; 0.0.5-0.1 - intermediary release
+[  126s] RPM meta information is different
+[  126s] ... saving statistics
+[  126s] ... saving built packages
+[  126s] RPMS/x86_64/wolfclient-devel-0.0.5-osu122.2.1.x86_64.rpm
+[  126s] RPMS/x86_64/wolfclient-0.0.5-osu122.2.1.x86_64.rpm
+[  126s] SRPMS/wolfclient-0.0.5-osu122.2.1.src.rpm
+[  126s] OTHER/_statistics
+[  126s] OTHER/rpmlint.log
+[  126s] 
+[  126s] build13 finished "build wolfclient.spec" at Fri Aug 29 11:05:09 UTC 2014.
+[  126s] 
+[  126s] ### WATCHDOG MARKER START ###
+[  129s] [  104.775249] SysRq : Power Off
+[  130s] [  105.087014] Power down.
+[  131s] ### WATCHDOG MARKER END ###
+[  131s] build: extracting built packages...
+[  131s] RPMS/x86_64/wolfclient-devel-0.0.5-osu122.2.1.x86_64.rpm
+[  131s] RPMS/x86_64/wolfclient-0.0.5-osu122.2.1.x86_64.rpm
+[  131s] SRPMS/wolfclient-0.0.5-osu122.2.1.src.rpm
+[  131s] OTHER/_statistics
+[  131s] OTHER/rpmlint.log</pre></div>
+</div><div id="sidebar_1" class="sidebar one_quarter"><aside><h2>Smoke tests</h2><nav><ul><li><a href="/develop/builds/Wolframe">Wolframe</a></li><li><a href="/develop/builds/wolfclient">wolfclient</a></li></ul></nav></aside></div><div class="clear"></div></div></div><div class="wrapper row2"><div id="footer" class="clear"><div class="one_third first"><h2 class="footer_title">Documentation</h2><nav class="footer_nav"><ul class="nospace"><li><a href="/documentation.html">User documentation</a></li><li><a href="/documentation.html">Developer documentation</a></li></ul></nav></div><div class="one_third"><h2 class="footer_title">Downloads</h2><nav class="footer_nav"><ul class="nospace"><li><a href="/downloads/downloads_wolframe.html">Wolframe server</a></li><li><a href="/downloads/downloads_wolfclient.html">Wolframe client</a></li></ul></nav></div><div class="one_third"><h2 class="footer_title">Contact Us</h2></div></div></div><div class="wrapper row4"><div id="copyright" class="clear"><p class="fl_left">Copyright © 2013 - <a href="#">Project Wolframe</a> - All Rights Reserved</p><p class="fl_right"><a href="/copyright.html">Copyright and web credits</a> - Template by <a href="http://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p></div></div><script src="http://code.jquery.com/jquery-latest.min.js"></script><script src="http://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script><script>window.jQuery || document.write('\x3Cscript src="/layout/scripts/jquery-latest.min.js">\x3C\/script>\
+\x3Cscript src="/layout/scripts/jquery-ui.min.js">\x3C\/script>')</script><script>jQuery(document).ready(function($){ $('img').removeAttr('width height'); });</script><script src="/layout/scripts/jquery-mobilemenu.min.js"></script><script src="/layout/scripts/custom.js"></script><script>
+	!function( d, s, id )	{
+		var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location)?'http':'https';
+		if( !d.getElementById( id ))	{
+			js = d.createElement( s );
+			js.id = id;
+			js.src = p + '://platform.twitter.com/widgets.js';
+			fjs.parentNode.insertBefore( js,fjs );
+		}
+	} ( document, 'script', 'twitter-wjs' );
+</script></body></html>
