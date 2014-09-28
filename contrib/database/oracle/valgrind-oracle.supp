@@ -1,0 +1,131 @@
+{
+OCI suppression
+Memcheck:Cond
+fun:slpmloclfv
+fun:slpmloc
+fun:lpmloadpkg
+fun:lfvLoadPkg
+}
+{
+OCI suppression
+Memcheck:Value4
+fun:ztced_einit
+fun:ztcedgks
+fun:ztcedi
+fun:ztcebi
+fun:ztcei
+}
+{
+OCI suppression
+Memcheck:Value4
+fun:ztcedecb
+fun:ztcedencbk
+fun:ztceb_encblk
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:CMP_Compare
+fun:CMP_ModularReduce
+fun:Alg_ComputeModQ_GHash
+fun:A_X931RandomGenerateBytes
+fun:ztcr2rnd
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:CMP_BitLengthOfCMPInt
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:CMP_CMPIntToOctetString
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:CMP_OctetStringToCMPInt
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:CMP_SubtractInPlace
+fun:CMP_ModularReduce
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:ztvo5ke
+fun:kpu8lgn
+fun:kpuauthxa
+}
+{
+OCI suppression
+Memcheck:Value4
+fun:ztceaencbk
+fun:ztceb_encblk
+fun:ztcebn
+fun:ztcen
+}
+{
+OCI suppression
+Memcheck:Value4
+fun:ztceaencbk
+fun:ztceb_encblk
+fun:ztceb_padding
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:kzsrepw
+fun:kpu8lgn
+fun:kpuauthxa
+}
+{
+OCI suppression
+Memcheck:Value4
+fun:ztceai
+fun:ztcebi
+fun:ztcei
+}
+{
+OCI suppression
+Memcheck:Value4
+fun:ztucbtx
+fun:ztvo5pe
+fun:kzsrepw
+}
+{
+OCI suppression
+Memcheck:Value4
+fun:ztceadecbk
+fun:ztceb_decblk
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:ztceb_unpadding
+fun:ztcebf
+fun:ztcef
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:nassky
+fun:nszssk
+fun:nszssk2
+}
+{
+OCI suppression
+Memcheck:Cond
+fun:_intel_fast_memcmp
+obj:*
+}
+{
+OCI suppression
+Memcheck:Overlap
+fun:_intel_fast_memcpy
+fun:kpufprow
+fun:kpufch0
+fun:kpufch
+}
