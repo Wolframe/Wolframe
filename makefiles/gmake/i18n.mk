@@ -12,7 +12,7 @@
 # provides:
 # - target: init-po
 # - target: merge-po
-# - taget: check-po
+# - target: check-po
 # - target: install_po
 # - target: uninstall_po
 
